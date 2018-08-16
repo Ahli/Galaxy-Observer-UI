@@ -72,6 +72,10 @@ public class Main extends Application {
 	private boolean hasUnsavedFileChanges;
 	private LayoutExtensionReader layoutExtReader;
 	
+	public Main() {
+		// nothing to do
+	}
+	
 	/**
 	 * Entry point of Application.
 	 *
@@ -86,7 +90,7 @@ public class Main extends Application {
 		logger.error("error log visible");
 		logger.fatal("fatal log visible");
 		
-		logger.trace("Configuration File of System: " + System.getProperty("log4j.configurationFile"));
+		logger.trace("Configuration File of System: {}", () -> System.getProperty("log4j.configurationFile"));
 		
 		// TEST Locale
 		//Messages.setBundle(Locale.CHINA);
@@ -102,7 +106,7 @@ public class Main extends Application {
 	public void start(final Stage primaryStage) {
 		try {
 			Thread.currentThread().setName("UI");
-			logger.warn("start function called after " + (System.nanoTime() - appStartTime) / 1000000 + "ms.");
+			logger.trace("start function called after {}ms.", () -> (System.nanoTime() - appStartTime) / 1000000);
 			Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 			this.primaryStage = primaryStage;
 			primaryStage.setMaximized(true);
@@ -112,21 +116,21 @@ public class Main extends Application {
 			
 			initAppIcon();
 			
-			long time = System.nanoTime();
+			final long time = System.nanoTime();
 			initRootLayout();
-			logger.warn("initialized root layout within " + (System.nanoTime() - time) / 1000000 + "ms.");
+			logger.trace("initialized root layout within {}ms.", () -> (System.nanoTime() - time) / 1000000);
 			
 			// Load Tab layout from fxml file
-			time = System.nanoTime();
+			final long time2 = System.nanoTime();
 			final FXMLLoader loader = new FXMLLoader();
 			loader.setResources(Messages.getBundle());
 			
 			final TabPane tabPane;
-			try (final InputStream is = Main.class.getResourceAsStream("view/TabsLayout.fxml")) {
+			try (InputStream is = Main.class.getResourceAsStream("view/TabsLayout.fxml")) {
 				tabPane = loader.load(is); // $NON-NLS-1$
 			}
 			
-			logger.warn("initialized tab layout within " + (System.nanoTime() - time) / 1000000 + "ms.");
+			logger.trace("initialized tab layout within {}ms.", () -> (System.nanoTime() - time2) / 1000000);
 			rootLayout.setCenter(tabPane);
 			tabsCtrl = loader.getController();
 			tabsCtrl.setMainApp(this);
@@ -151,15 +155,15 @@ public class Main extends Application {
 			ft.setToValue(1.0);
 			ft.play();
 			
-			time = System.nanoTime();
+			final long time3 = System.nanoTime();
 			primaryStage.show();
 			primaryStage.setOpacity(1);
-			logger.warn("executed root layout stage.show() within " + (System.nanoTime() - time) / 1000000 + "ms.");
+			logger.trace("executed root layout stage.show() within {}", () -> (System.nanoTime() - time3) / 1000000);
 			
 			// hide apps splash screen image
 			Platform.runLater(new SplashScreenHider());
 			
-			logger.warn("finished app initialization after " + (System.nanoTime() - appStartTime) / 1000000 + "ms.");
+			logger.trace("finished app initialization after {}", () -> (System.nanoTime() - appStartTime) / 1000000);
 			
 			initMpqInterface();
 			
@@ -188,30 +192,32 @@ public class Main extends Application {
 	 */
 	public void initRootLayout() throws IOException {
 		// Load root layout from fxml file.
-		long time = System.nanoTime();
+		final long time = System.nanoTime();
 		final FXMLLoader loader = new FXMLLoader();
 		loader.setResources(Messages.getBundle());
 		
-		try (final InputStream is = Main.class.getResourceAsStream("view/RootLayout.fxml")) {
+		try (InputStream is = Main.class.getResourceAsStream("view/RootLayout.fxml")) {
 			rootLayout = loader.load(is); // $NON-NLS-1$
 		}
-		logger.warn("initialized root layout fxml within " + (System.nanoTime() - time) / 1000000 + "ms.");
+		logger.trace("initialized root layout fxml within {}ms.", () -> (System.nanoTime() - time) / 1000000);
 		
 		// get Controller
-		time = System.nanoTime();
+		final long time2 = System.nanoTime();
 		mbarCtrl = loader.getController();
 		mbarCtrl.setMainApp(this);
-		logger.warn("received root layout controller within " + (System.nanoTime() - time) / 1000000 + "ms.");
+		logger.trace("received root layout controller within {}ms.", () -> (System.nanoTime() - time2) / 1000000);
 		
 		// Show the scene containing the root layout.
 		final Scene scene = new Scene(rootLayout);
-		time = System.nanoTime();
+		final long time3 = System.nanoTime();
 		scene.getStylesheets().add(Main.class.getResource("view/application.css").toExternalForm());
 		
-		logger.debug("installed font families: " + Font.getFamilies());
-		logger.trace("Locale dflt is '" + Locale.getDefault() + "'");
-		logger.trace("Locale of Messages.class is '" + Messages.getBundle().getLocale() + "'");
-		logger.trace("Locale china: " + Locale.SIMPLIFIED_CHINESE);
+		if (logger.isTraceEnabled()) {
+			logger.trace("installed font families: " + Font.getFamilies());
+			logger.trace("Locale dflt is '" + Locale.getDefault() + "'");
+			logger.trace("Locale of Messages.class is '" + Messages.getBundle().getLocale() + "'");
+			logger.trace("Locale china: " + Locale.SIMPLIFIED_CHINESE);
+		}
 		if (Messages.checkIfTargetResourceIsUsed(Locale.CHINA)) {
 			logger.trace("apply Chinese css");
 			
@@ -219,16 +225,16 @@ public class Main extends Application {
 			//
 			
 		}
-		logger.warn("initialized root layout css within " + (System.nanoTime() - time) / 1000000 + "ms.");
+		logger.trace("initialized root layout css within {}ms.", () -> (System.nanoTime() - time3) / 1000000);
 		
-		time = System.nanoTime();
+		final long time4 = System.nanoTime();
 		primaryStage.setTitle(Messages.getString("Main.observerUiSettingsEditorTitle"));
 		primaryStage.setScene(scene);
-		logger.warn("executed root layout setScene+title within " + (System.nanoTime() - time) / 1000000 + "ms.");
+		logger.trace("executed root layout setScene+title within {}ms.", () -> (System.nanoTime() - time4) / 1000000);
 		
-		time = System.nanoTime();
+		final long time5 = System.nanoTime();
 		updateMenuBar();
-		logger.warn("updateMenuBar within " + (System.nanoTime() - time) / 1000000 + "ms.");
+		logger.trace("updateMenuBar within {}ms.", () -> (System.nanoTime() - time5) / 1000000);
 	}
 	
 	/**
@@ -324,11 +330,13 @@ public class Main extends Application {
 			mpqi.buildMpq(openedDocPath, false, MpqEditorCompression.BLIZZARD_SC2_HEROES, false);
 			hasUnsavedFileChanges = false;
 			updateAppTitle();
-		} catch (final IOException | InterruptedException | ParserConfigurationException | SAXException | MpqException e) {
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+		} catch (final IOException | ParserConfigurationException | SAXException | MpqException e) {
 			logger.error(ExceptionUtils.getStackTrace(e), e);
 			showErrorAlert(e);
 		}
-		logger.warn("opened mpq within " + (System.nanoTime() - time) / 1000000 + "ms.");
+		logger.trace("opened mpq within {}ms.", () -> (System.nanoTime() - time) / 1000000);
 	}
 	
 	/**
@@ -388,7 +396,9 @@ public class Main extends Application {
 	 */
 	private void showErrorAlert(final Exception e) {
 		Platform.runLater(() -> {
-			logger.trace("showing error popup");
+			if (logger.isTraceEnabled()) {
+				logger.trace("showing error popup");
+			}
 			final String title = Messages.getString("Main.anErrorOccured");
 			final String content = e.getMessage();
 			final Alert alert = Alerts.buildErrorAlert(getPrimaryStage(), title, title, content);
@@ -463,22 +473,19 @@ public class Main extends Application {
 				openedDocPath = f.getAbsolutePath();
 				updateAppTitle();
 				
-				// load desc index from mpq
-				final boolean isNamespaceHeroes = isNameSpaceHeroes(mpqi);
-				final boolean ignoreRequiredToLoadEntries = true;
-				
 				final File componentListFile = mpqi.getComponentListFile();
 				if (componentListFile == null) {
 					throw new ShowToUserException(Messages.getString("Main.OpenedFileNoComponentList"));
 				}
 				
+				final boolean isNamespaceHeroes = isNameSpaceHeroes(mpqi);
 				final GameDef game = isNamespaceHeroes ? new HeroesGameDef() : new SC2GameDef();
 				
+				// load desc index from mpq
 				descIndex.setDescIndexPathAndClear(ComponentsListReader.getDescIndexPath(componentListFile, game));
 				
 				final File descIndexFile = mpqi.getFilePathFromMpq(descIndex.getDescIndexIntPath()).toFile();
-				descIndex.addLayoutIntPath(
-						DescIndexReader.getLayoutPathList(descIndexFile, ignoreRequiredToLoadEntries));
+				descIndex.addLayoutIntPath(DescIndexReader.getLayoutPathList(descIndexFile, true));
 				
 				tabsCtrl.clearData();
 				hasUnsavedFileChanges = false;
@@ -509,9 +516,11 @@ public class Main extends Application {
 			}
 			updateMenuBar();
 		} else {
-			logger.trace("File to open was null, most likely due to 'cancel'.");
+			if (logger.isTraceEnabled()) {
+				logger.trace("File to open was null, most likely due to 'cancel'.");
+			}
 		}
-		logger.warn("opened mpq within " + (System.nanoTime() - time) / 1000000 + "ms.");
+		logger.trace("opened mpq within {}ms.", () -> (System.nanoTime() - time) / 1000000);
 	}
 	
 	/**
@@ -535,7 +544,9 @@ public class Main extends Application {
 	 */
 	private void showExceptionAlert(final Exception e) {
 		Platform.runLater(() -> {
-			logger.trace("showing exception popup");
+			if (logger.isTraceEnabled()) {
+				logger.trace("showing exception popup");
+			}
 			final Alert alert = Alerts.buildExceptionAlert(getPrimaryStage(), e);
 			alert.showAndWait();
 		});
@@ -608,7 +619,9 @@ public class Main extends Application {
 				hasUnsavedFileChanges = false;
 				openedDocPath = f.getAbsolutePath();
 				updateAppTitle();
-			} catch (final IOException | InterruptedException | ParserConfigurationException | SAXException | MpqException e) {
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+			} catch (final IOException | ParserConfigurationException | SAXException | MpqException e) {
 				logger.error(ExceptionUtils.getStackTrace(e), e);
 				showErrorAlert(e);
 			}

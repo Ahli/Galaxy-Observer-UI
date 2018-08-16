@@ -55,7 +55,9 @@ public class TabsController {
 						@Override
 						protected void updateItem(final String item, final boolean empty) {
 							if (empty || item == null) {
-								logger.trace("update wrapping table cell - null");
+								if (logger.isTraceEnabled()) {
+									logger.trace("update wrapping table cell - null");
+								}
 								super.updateItem(item, empty);
 								super.setGraphic(null);
 								super.setText(null);
@@ -64,7 +66,9 @@ public class TabsController {
 								final boolean equals = item.equals(getItem());
 								super.updateItem(item, false);
 								if (!equals) {
-									logger.trace("update wrapping table cell - newLabel " + item);
+									if (logger.isTraceEnabled()) {
+										logger.trace("update wrapping table cell - newLabel " + item);
+									}
 									final Label l = new Label(item);
 									l.setWrapText(true);
 									final VBox box = new VBox(l);
@@ -78,7 +82,9 @@ public class TabsController {
 									});
 									super.setGraphic(box);
 								} else {
-									logger.trace("update wrapping table cell - equal");
+									if (logger.isTraceEnabled()) {
+										logger.trace("update wrapping table cell - equal");
+									}
 								}
 							}
 						}
@@ -113,12 +119,18 @@ public class TabsController {
 	@FXML
 	private TableColumn<ValueDef, Boolean> settingsActionsCol;
 	
+	public TabsController() {
+		// nothing to do
+	}
+	
 	/**
 	 * On Controller initialization.
 	 */
 	@FXML
 	public void initialize() {
-		logger.trace("initializing");
+		if (logger.isTraceEnabled()) {
+			logger.trace("initializing");
+		}
 		
 		hotkeysNameCol.setCellValueFactory(new PropertyValueFactory<>("id"));
 		hotkeysDescriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));
@@ -131,7 +143,9 @@ public class TabsController {
 			public void handle(final CellEditEvent<ValueDef, String> t) {
 				if (!t.getOldValue().equals(t.getNewValue())) {
 					t.getTableView().getItems().get(t.getTablePosition().getRow()).setValue(t.getNewValue());
-					logger.trace("write hotkey val: " + t.getNewValue());
+					if (logger.isTraceEnabled()) {
+						logger.trace("write hotkey val: " + t.getNewValue());
+					}
 					getMain().notifyFileDataWasChanged();
 				}
 			}
@@ -151,7 +165,9 @@ public class TabsController {
 			public void handle(final CellEditEvent<ValueDef, String> t) {
 				if (!t.getOldValue().equals(t.getNewValue())) {
 					t.getTableView().getItems().get(t.getTablePosition().getRow()).setValue(t.getNewValue());
-					logger.trace("write setting val: " + t.getNewValue());
+					if (logger.isTraceEnabled()) {
+						logger.trace("write setting val: " + t.getNewValue());
+					}
 					getMain().notifyFileDataWasChanged();
 				}
 			}

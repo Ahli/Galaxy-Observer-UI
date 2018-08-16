@@ -34,7 +34,9 @@ public class ResetDefaultButtonTableCell extends TableCell<ValueDef, Boolean> {
 		cellButton.setOnAction(new EventHandler<>() {
 			@Override
 			public void handle(final ActionEvent t) {
-				logger.trace("reset table item clicked");
+				if (logger.isTraceEnabled()) {
+					logger.trace("reset table item clicked");
+				}
 				final ValueDef data = getTableRow().getItem();
 				data.setValue(data.getDefaultValue());
 			}

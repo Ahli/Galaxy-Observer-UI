@@ -131,8 +131,8 @@ public final class StylizedTextAreaAppender extends AbstractAppender {
 						} else if (level == Level.WARN) {
 							controller.reportWarning();
 						}
-					} catch (final Throwable t) {
-						System.err.println("Error while append to TextArea: " + t.getMessage());
+					} catch (final Exception e) {
+						System.err.println("Error while append to TextArea: " + e.getMessage());
 					}
 				});
 			}

@@ -36,15 +36,14 @@ public final class Alerts {
 			final String content) {
 		final long time = System.nanoTime();
 		final ButtonType yesButton = new ButtonType(Messages.getString("General.YesButton"), ButtonData.YES);
-		final ButtonType noButton = new ButtonType(Messages.getString("General.NoButton"), ButtonData.NO); //$NON
-		// -NLS-1$
+		final ButtonType noButton = new ButtonType(Messages.getString("General.NoButton"), ButtonData.NO);
 		final ButtonType cancelButton =
-				new ButtonType(Messages.getString("General.CancelButton"), ButtonData.CANCEL_CLOSE); // $NON-NLS-1$
+				new ButtonType(Messages.getString("General.CancelButton"), ButtonData.CANCEL_CLOSE);
 		final Alert alert = new Alert(AlertType.INFORMATION, content, yesButton, noButton, cancelButton);
 		alert.initOwner(owner);
 		alert.setTitle(title);
 		alert.setHeaderText(header);
-		logger.warn("created yesNoCancelAlert within " + (System.nanoTime() - time) / 1000000 + "ms.");
+		logger.trace("created yesNoCancelAlert within {}ms.", () -> (System.nanoTime() - time) / 1000000);
 		return alert;
 	}
 	
@@ -63,7 +62,7 @@ public final class Alerts {
 		alert.initOwner(owner);
 		alert.setTitle(title);
 		alert.setHeaderText(header);
-		logger.warn("created errorAlert within " + (System.nanoTime() - time) / 1000000 + "ms.");
+		logger.trace("created errorAlert within {}", () -> (System.nanoTime() - time) / 1000000);
 		return alert;
 	}
 	
@@ -86,7 +85,7 @@ public final class Alerts {
 		alert.initOwner(owner);
 		alert.setTitle(title);
 		alert.setHeaderText(header);
-		logger.warn("created warningAlert within " + (System.nanoTime() - time) / 1000000 + "ms.");
+		logger.trace("created warningAlert within {}ms.", () -> (System.nanoTime() - time) / 1000000);
 		return alert;
 	}
 	
@@ -110,7 +109,7 @@ public final class Alerts {
 			alert.setGraphic(new ImageView(imageUrl));
 		}
 		alert.getDialogPane().setPrefSize(480, 360);
-		logger.warn("initialized about-alert within " + (System.nanoTime() - time) / 1000000 + "ms.");
+		logger.trace("initialized about-alert within {}ms.", () -> (System.nanoTime() - time) / 1000000);
 		return alert;
 	}
 	
@@ -145,7 +144,7 @@ public final class Alerts {
 		
 		// Set expandable Exception into the dialog pane.
 		alert.getDialogPane().setExpandableContent(expContent);
-		logger.warn("created exceptionAlert within " + (System.nanoTime() - time) / 1000000 + "ms.");
+		logger.trace("created exceptionAlert within {}ms.", () -> (System.nanoTime() - time) / 1000000);
 		
 		return alert;
 	}

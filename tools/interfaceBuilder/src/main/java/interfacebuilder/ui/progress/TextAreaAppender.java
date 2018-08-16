@@ -100,9 +100,9 @@ public final class TextAreaAppender extends AbstractAppender {
 							textArea.insertText(textArea.getText().length(), message);
 						}
 					}
-				} catch (final Throwable t) {
+				} catch (final Exception e) {
 					// do not call log4j's logger here!
-					System.err.println("Error while append to TextArea: " + t.getMessage());
+					System.err.println("Error while append to TextArea: " + e.getMessage());
 				}
 			});
 		} catch (final IllegalStateException ex) {

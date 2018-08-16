@@ -343,7 +343,7 @@ public class MpqBuilderService {
 		logger.info("Compiling... " + sourceFile.getName());
 		
 		// perform checks/improvements on code
-		compileService.compile(mod, "Terr", repairLayoutOrder, verifyLayout, verifyXml);
+		compileService.compile(mod, configService.getRaceId(), repairLayoutOrder, verifyLayout, verifyXml);
 		
 		logger.info("Building... " + sourceFile.getName());
 		

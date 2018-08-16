@@ -29,6 +29,10 @@ public class MenuBarController {
 	@FXML
 	private MenuItem menuClose;
 	
+	public MenuBarController() {
+		// nothing to do
+	}
+	
 	/**
 	 * Automatically called on Controller initialization.
 	 */
