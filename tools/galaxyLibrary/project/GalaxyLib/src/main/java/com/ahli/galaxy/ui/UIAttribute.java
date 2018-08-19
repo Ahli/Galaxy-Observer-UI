@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Basic Attribute implementation to describe default UI's attribute.
@@ -94,7 +95,7 @@ public class UIAttribute extends UIElement {
 		return null;
 	}
 	
-	public List<String> getKeyValues(){
+	public List<String> getKeyValues() {
 		return keyValueList;
 	}
 	
@@ -111,5 +112,34 @@ public class UIAttribute extends UIElement {
 	@Override
 	public List<UIElement> getChildren() {
 		return Collections.emptyList();
+	}
+	
+	@Override
+	public boolean equals(final Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof UIAttribute)) {
+			return false;
+		}
+		if (obj == this) {
+			return true;
+		}
+		final UIAttribute that = (UIAttribute) obj;
+		for (int i = 0; i < getSignatureFields().length; i++) {
+			if (!Objects.equals(getSignatureFields()[i], that.getSignatureFields()[i])) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	private Object[] getSignatureFields() {
+		return new Object[] { getName(), keyValueList };
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(getSignatureFields());
 	}
 }

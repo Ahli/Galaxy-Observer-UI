@@ -1,4 +1,4 @@
-package interfacebuilder.baseUi;
+package interfacebuilder.base_ui;
 
 import com.ahli.galaxy.ui.interfaces.UICatalog;
 import com.fasterxml.jackson.databind.ObjectMapper;

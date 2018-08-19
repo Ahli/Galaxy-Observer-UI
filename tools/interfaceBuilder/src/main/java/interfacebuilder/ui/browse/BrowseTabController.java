@@ -3,6 +3,8 @@ package interfacebuilder.ui.browse;
 import com.ahli.galaxy.ui.UIAnchorSide;
 import com.ahli.galaxy.ui.UIAttribute;
 import com.ahli.galaxy.ui.UIFrame;
+import com.ahli.galaxy.ui.UIState;
+import com.ahli.galaxy.ui.UIStateGroup;
 import com.ahli.galaxy.ui.UITemplate;
 import com.ahli.galaxy.ui.abstracts.UIElement;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
@@ -20,6 +22,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.util.Callback;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
 
@@ -31,6 +35,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class BrowseTabController implements Updateable {
+	private static final Logger logger = LogManager.getLogger();
 	private static final String GAME_UI = "GameUI";
 	
 	@FXML
@@ -84,33 +89,53 @@ public class BrowseTabController implements Updateable {
 		});
 		columnAttributes.prefWidthProperty().bind(tableView.widthProperty().divide(2));
 		columnValues.prefWidthProperty().bind(tableView.widthProperty().divide(2));
+		columnAttributes.sortTypeProperty().set(TableColumn.SortType.ASCENDING);
+		tableView.getSortOrder().add(columnAttributes);
 	}
 	
 	private void showInTableView(final TreeItem<UIElement> selected) {
-		final UIElement el = selected.getValue();
-		final Map<String, String> map = new HashMap<>();
-		if (el instanceof UIFrame) {
-			final UIFrame elem = (UIFrame) el;
-			UIAnchorSide side = UIAnchorSide.TOP;
-			map.put("Anchor-Top", elem.getAnchorRelative(side) + " - " + elem.getAnchorPos(side) + " - " +
-					elem.getAnchorOffset(side));
-			side = UIAnchorSide.LEFT;
-			map.put("Anchor-Left", elem.getAnchorRelative(side) + " - " + elem.getAnchorPos(side) + " - " +
-					elem.getAnchorOffset(side));
-			side = UIAnchorSide.BOTTOM;
-			map.put("Anchor-Bottom", elem.getAnchorRelative(side) + " - " + elem.getAnchorPos(side) + " - " +
-					elem.getAnchorOffset(side));
-			side = UIAnchorSide.RIGHT;
-			map.put("Anchor-Right", elem.getAnchorRelative(side) + " - " + elem.getAnchorPos(side) + " - " +
-					elem.getAnchorOffset(side));
-			for (final UIAttribute attr : elem.getAttributes()) {
-				map.put(attr.getName(), attr.getKeyValues().toString());
+		if (selected == null) {
+			tableView.getItems().clear();
+		} else {
+			final UIElement el = selected.getValue();
+			final Map<String, String> map = new HashMap<>(); // TODO maybe use something different that holds entries
+			if (el instanceof UIFrame) {
+				final UIFrame elem = (UIFrame) el;
+				UIAnchorSide side = UIAnchorSide.TOP;
+				map.put("Anchor-Top", elem.getAnchorRelative(side) + " - " + elem.getAnchorPos(side) + " - " +
+						elem.getAnchorOffset(side));
+				side = UIAnchorSide.LEFT;
+				map.put("Anchor-Left", elem.getAnchorRelative(side) + " - " + elem.getAnchorPos(side) + " - " +
+						elem.getAnchorOffset(side));
+				side = UIAnchorSide.BOTTOM;
+				map.put("Anchor-Bottom", elem.getAnchorRelative(side) + " - " + elem.getAnchorPos(side) + " - " +
+						elem.getAnchorOffset(side));
+				side = UIAnchorSide.RIGHT;
+				map.put("Anchor-Right", elem.getAnchorRelative(side) + " - " + elem.getAnchorPos(side) + " - " +
+						elem.getAnchorOffset(side));
+				for (final UIAttribute attr : elem.getAttributes()) {
+					map.put(attr.getName(), prettyPrintAttributes(attr.getKeyValues()));
+				}
+			} else if(el instanceof UIStateGroup){
+				final UIStateGroup elem = (UIStateGroup) el;
+				final String dfltState = elem.getDefaultState();
+				if(dfltState != null){
+					map.put("DefaultState", dfltState);
+				}
+				for (final UIState state : elem.getStates()) {
+					map.put(state.getName(), state.toString());
+				}
 			}
-			columnAttributes.sortTypeProperty().set(TableColumn.SortType.ASCENDING);
+			tableView.getItems().setAll(map.entrySet());
+			tableView.sort();
 		}
-		
-		final ObservableList<Map.Entry<String, String>> items = FXCollections.observableArrayList(map.entrySet());
-		tableView.setItems(items);
+	}
+	
+	private String prettyPrintAttributes(final List<String> attributes) {
+		if (attributes.size() == 2 && attributes.get(0).equals("val")) {
+			return attributes.get(1);
+		}
+		return attributes.toString();
 	}
 	
 	
@@ -130,6 +155,7 @@ public class BrowseTabController implements Updateable {
 		} else {
 			frameTree.setRoot(null);
 		}
+		frameTree.getSelectionModel().select(0);
 	}
 	
 	/**
@@ -167,6 +193,7 @@ public class BrowseTabController implements Updateable {
 			fileNames.sort(null);
 			fileDropdown.setItems(fileNames);
 			final String firstSelection = fileNamesSet.contains(GAME_UI) ? GAME_UI : fileNames.get(0);
+			logger.info("first selection {}", firstSelection);
 			fileDropdown.setValue(firstSelection);
 			if (fileDropdownAutoCompleteBinding != null) {
 				fileDropdownAutoCompleteBinding.dispose();

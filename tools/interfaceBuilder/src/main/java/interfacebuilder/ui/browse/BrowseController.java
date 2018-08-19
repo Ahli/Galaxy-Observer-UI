@@ -6,7 +6,7 @@ import com.ahli.galaxy.archive.DescIndexData;
 import com.ahli.galaxy.game.GameData;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
 import com.ahli.mpq.MpqEditorInterface;
-import interfacebuilder.baseUi.BaseUiService;
+import interfacebuilder.base_ui.BaseUiService;
 import interfacebuilder.build.MpqBuilderService;
 import interfacebuilder.compile.CompileService;
 import interfacebuilder.compress.GameService;
@@ -213,23 +213,23 @@ public class BrowseController implements Updateable {
 				final String cachePath =
 						configService.getMpqCachePath() + File.separator + "browseCache" + File.separator +
 								project.getName();
-				File cacheDir = new File(cachePath);
+				final File cacheDir = new File(cachePath);
 				try {
 					Files.createDirectories(cacheDir.toPath());
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					logger.error("ERROR: could not create directories.", e);
 					continue;
 				}
 				mod.setMpqCacheDirectory(cacheDir);
 				
-				MpqEditorInterface mpqi = new MpqEditorInterface(cachePath, configService.getMpqEditorPath());
+				final MpqEditorInterface mpqi = new MpqEditorInterface(cachePath, configService.getMpqEditorPath());
 				if (!mpqi.clearCacheExtractedMpq()) {
 					logger.error("ERROR: could not clear cache directory.");
 					continue;
 				}
 				try {
 					fileService.copyFileOrDirectory(new File(project.getProjectPath()), cacheDir);
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					logger.error("ERROR: could not copy project files.", e);
 					continue;
 				}
@@ -251,9 +251,9 @@ public class BrowseController implements Updateable {
 				final Runnable followupTask = () -> {
 					try {
 						// TODO cache compiled uicatalogs
-						UICatalog uiCatalog = compileService.compile(mod, configService.getRaceId(), false, true, true);
+						final UICatalog uiCatalog = compileService.compile(mod, configService.getRaceId(), false, true, true);
 						mod.setUi(uiCatalog);
-					} catch (InterruptedException e) {
+					} catch (final InterruptedException e) {
 						Thread.currentThread().interrupt();
 						return;
 					}

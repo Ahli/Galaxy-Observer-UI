@@ -10,7 +10,7 @@ import com.ahli.mpq.MpqEditorInterface;
 import com.ahli.mpq.MpqException;
 import com.ahli.mpq.mpqeditor.MpqEditorCompression;
 import interfacebuilder.InterfaceBuilderApp;
-import interfacebuilder.baseUi.BaseUiService;
+import interfacebuilder.base_ui.BaseUiService;
 import interfacebuilder.compile.CompileService;
 import interfacebuilder.compress.RuleSet;
 import interfacebuilder.config.ConfigService;

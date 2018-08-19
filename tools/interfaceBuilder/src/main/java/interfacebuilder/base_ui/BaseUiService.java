@@ -1,4 +1,4 @@
-package interfacebuilder.baseUi;
+package interfacebuilder.base_ui;
 
 import cascexplorerconfigedit.editor.CascExplorerConfigFileEditor;
 import com.ahli.galaxy.game.GameData;

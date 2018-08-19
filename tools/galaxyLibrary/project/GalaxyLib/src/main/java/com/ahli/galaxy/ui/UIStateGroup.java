@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Ahli
@@ -113,5 +114,34 @@ public class UIStateGroup extends UIElement {
 	@Override
 	public List<UIElement> getChildren() {
 		return Collections.emptyList();
+	}
+	
+	@Override
+	public boolean equals(final Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof UIStateGroup)) {
+			return false;
+		}
+		if (obj == this) {
+			return true;
+		}
+		final UIStateGroup that = (UIStateGroup) obj;
+		for (int i = 0; i < getSignatureFields().length; i++) {
+			if (!Objects.equals(getSignatureFields()[i], that.getSignatureFields()[i])) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	private Object[] getSignatureFields() {
+		return new Object[] { getName(), defaultState, states };
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(getSignatureFields());
 	}
 }

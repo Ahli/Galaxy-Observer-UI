@@ -1,12 +1,17 @@
 package com.ahli.galaxy.ui;
 
 import com.ahli.galaxy.ui.abstracts.UIElement;
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.ahli.galaxy.ui.serializer.UIFrameDeserializer;
+import com.ahli.galaxy.ui.serializer.UIFrameSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Ahli
@@ -15,19 +20,18 @@ import java.util.List;
  * NOTES: using null for certain often occurring values did not yield in
  * performance improvements
  */
-//@JsonInclude (JsonInclude.Include.NON_EMPTY)
-@JsonAutoDetect (fieldVisibility = JsonAutoDetect.Visibility.ANY )
+@JsonSerialize (using = UIFrameSerializer.class)
+@JsonDeserialize (using = UIFrameDeserializer.class)
 public class UIFrame extends UIElement {
-	@JsonIgnore
+	private static final Logger logger = LogManager.getLogger();
 	private static final String THIS = "$this";
-	@JsonIgnore
 	private static final String[] POSI = { "Min", "Max" };
-	@JsonIgnore
 	private static final String ZERO = "0";
 	
 	private final String[] pos = new String[4];
 	private final String[] offset = new String[4];
 	private final String[] relative = new String[4];
+	
 	private List<UIAttribute> attributes;
 	private String type;
 	private List<UIElement> children;
@@ -37,18 +41,6 @@ public class UIFrame extends UIElement {
 		init();
 		attributes = null;
 		children = null;
-	}
-	
-	/**
-	 * @param name
-	 * @param type
-	 */
-	public UIFrame(final String name, final String type) {
-		super(name);
-		init();
-		attributes = null;
-		children = null;
-		this.type = type;
 	}
 	
 	/**
@@ -67,6 +59,18 @@ public class UIFrame extends UIElement {
 		offset[1] = ZERO;
 		offset[2] = ZERO;
 		offset[3] = ZERO;
+	}
+	
+	/**
+	 * @param name
+	 * @param type
+	 */
+	public UIFrame(final String name, final String type) {
+		super(name);
+		init();
+		attributes = null;
+		children = null;
+		this.type = type;
 	}
 	
 	/**
@@ -197,30 +201,6 @@ public class UIFrame extends UIElement {
 	
 	/**
 	 * @param side
-	 * @param relative
-	 */
-	public void setAnchorRelative(final UIAnchorSide side, final String relative) {
-		this.relative[side.ordinal()] = relative;
-	}
-	
-	/**
-	 * @param side
-	 * @param offset
-	 */
-	public void setAnchorOffset(final UIAnchorSide side, final String offset) {
-		this.offset[side.ordinal()] = offset;
-	}
-	
-	/**
-	 * @param side
-	 * @param pos
-	 */
-	public void setAnchorPos(final UIAnchorSide side, final String pos) {
-		this.pos[side.ordinal()] = pos;
-	}
-	
-	/**
-	 * @param side
 	 * @return
 	 */
 	public String getAnchorRelative(final UIAnchorSide side) {
@@ -270,6 +250,42 @@ public class UIFrame extends UIElement {
 	}
 	
 	/**
+	 * @param side
+	 * @param relative
+	 * @param pos
+	 * @param offset
+	 */
+	public void setAnchor(final UIAnchorSide side, final String relative, final String pos, final String offset) {
+		setAnchorRelative(side, relative);
+		setAnchorPos(side, pos);
+		setAnchorOffset(side, offset);
+	}
+	
+	/**
+	 * @param side
+	 * @param relative
+	 */
+	public void setAnchorRelative(final UIAnchorSide side, final String relative) {
+		this.relative[side.ordinal()] = relative;
+	}
+	
+	/**
+	 * @param side
+	 * @param pos
+	 */
+	public void setAnchorPos(final UIAnchorSide side, final String pos) {
+		this.pos[side.ordinal()] = pos;
+	}
+	
+	/**
+	 * @param side
+	 * @param offset
+	 */
+	public void setAnchorOffset(final UIAnchorSide side, final String offset) {
+		this.offset[side.ordinal()] = offset;
+	}
+	
+	/**
 	 * @param path
 	 * @return
 	 */
@@ -298,4 +314,56 @@ public class UIFrame extends UIElement {
 	public String toString() {
 		return "<Frame type='" + type + "' name='" + getName() + "'>";
 	}
+	
+	@Override
+	public boolean equals(final Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof UIFrame)) {
+			return false;
+		}
+		if (obj == this) {
+			return true;
+		}
+		final UIFrame that = (UIFrame) obj;
+		final Object[] signatureFields = getSignatureFields();
+		final Object[] thatSignatureFields = getSignatureFields();
+		logger.info("equal lengths " + signatureFields.length + " and " + thatSignatureFields.length);
+		for (int i = 0; i < signatureFields.length; i++) {
+			if (!(signatureFields[i] instanceof Object[])) {
+				logger.info("checking equal on element " + i);
+				if (!Objects.equals(signatureFields[i], thatSignatureFields[i])) {
+					logger.info("found difference in element " + i);
+					return false;
+				}
+			} else {
+				//				logger.info("checking equal on array element " + i);
+				//				if(Arrays.deepEquals((Object[]) signatureFields[i], (Object[]) thatSignatureFields[i])){
+				//					logger.info("found difference in array element " + i);
+				//					logger.info(Arrays.toString((Object[]) signatureFields[i]));
+				//					logger.info(Arrays.toString((Object[]) thatSignatureFields[i]));
+				//					return false;
+				//				}
+			}
+		}
+		logger.info(Arrays.equals(relative, that.relative));
+		logger.info(Arrays.toString(relative));
+		logger.info(Arrays.toString(that.relative));
+		
+		final boolean result = Arrays.equals(pos, that.pos) && Arrays.equals(offset, that.offset) &&
+				Arrays.equals(relative, that.relative);
+		logger.info("equals checks arrays: " + result);
+		return result;
+	}
+	
+	private Object[] getSignatureFields() {
+		return new Object[] { getName(), type, relative, pos, offset, attributes, children };
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(getSignatureFields());
+	}
+	
 }

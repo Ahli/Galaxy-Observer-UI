@@ -4,6 +4,8 @@ import com.ahli.galaxy.ui.abstracts.UIElement;
 import com.ahli.util.DeepCopyable;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import java.util.Objects;
+
 /**
  * @author Ahli
  */
@@ -96,5 +98,34 @@ public class UITemplate implements DeepCopyable {
 	@Override
 	public String toString() {
 		return "<Template fileName='" + fileName + "' elementName='" + element.getName() + "'>";
+	}
+	
+	@Override
+	public boolean equals(final Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof UITemplate)) {
+			return false;
+		}
+		if (obj == this) {
+			return true;
+		}
+		final UITemplate that = (UITemplate) obj;
+		for (int i = 0; i < getSignatureFields().length; i++) {
+			if (!Objects.equals(getSignatureFields()[i], that.getSignatureFields()[i])) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	private Object[] getSignatureFields() {
+		return new Object[] { fileName, isLocked, element };
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(getSignatureFields());
 	}
 }

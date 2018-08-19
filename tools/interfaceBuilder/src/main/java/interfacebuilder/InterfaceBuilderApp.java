@@ -1,7 +1,7 @@
 package interfacebuilder;
 
 import com.ahli.galaxy.game.def.abstracts.GameDef;
-import interfacebuilder.baseUi.BaseUiService;
+import interfacebuilder.base_ui.BaseUiService;
 import interfacebuilder.build.MpqBuilderService;
 import interfacebuilder.compress.GameService;
 import interfacebuilder.config.ConfigService;
