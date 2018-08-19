@@ -94,6 +94,10 @@ public class UIAttribute extends UIElement {
 		return null;
 	}
 	
+	public List<String> getKeyValues(){
+		return keyValueList;
+	}
+	
 	@Override
 	public UIElement receiveFrameFromPath(final String path) {
 		return (path == null || path.isEmpty()) ? this : null;

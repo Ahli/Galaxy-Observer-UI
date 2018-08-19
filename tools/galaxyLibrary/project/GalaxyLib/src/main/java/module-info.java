@@ -1,11 +1,11 @@
 module GalaxyLib {
-	requires transitive java.xml;
-	requires transitive com.fasterxml.jackson.annotation;
-	requires transitive org.apache.commons.configuration2;
-	requires transitive org.apache.commons.io;
-	requires transitive org.apache.commons.lang3;
+	requires java.xml;
+	requires com.fasterxml.jackson.annotation;
+	requires org.apache.commons.configuration2;
+	requires org.apache.commons.io;
+	requires org.apache.commons.lang3;
 	requires transitive org.apache.logging.log4j;
-	requires transitive vtd.xml;
+	requires vtd.xml;
 	
 	exports com.ahli.galaxy;
 	exports com.ahli.galaxy.archive;

@@ -1,6 +1,8 @@
 package com.ahli.galaxy.ui;
 
 import com.ahli.galaxy.ui.abstracts.UIElement;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.ArrayList;
@@ -13,10 +15,14 @@ import java.util.List;
  * NOTES: using null for certain often occurring values did not yield in
  * performance improvements
  */
-@JsonInclude (JsonInclude.Include.NON_EMPTY)
+//@JsonInclude (JsonInclude.Include.NON_EMPTY)
+@JsonAutoDetect (fieldVisibility = JsonAutoDetect.Visibility.ANY )
 public class UIFrame extends UIElement {
+	@JsonIgnore
 	private static final String THIS = "$this";
+	@JsonIgnore
 	private static final String[] POSI = { "Min", "Max" };
+	@JsonIgnore
 	private static final String ZERO = "0";
 	
 	private final String[] pos = new String[4];
@@ -28,6 +34,9 @@ public class UIFrame extends UIElement {
 	
 	public UIFrame() {
 		super(null);
+		init();
+		attributes = null;
+		children = null;
 	}
 	
 	/**
@@ -127,6 +136,7 @@ public class UIFrame extends UIElement {
 	/**
 	 * @return list of children
 	 */
+	@Override
 	public List<UIElement> getChildren() {
 		if (children == null) {
 			children = new ArrayList<>(0);
@@ -173,6 +183,16 @@ public class UIFrame extends UIElement {
 			}
 		}
 		return null;
+	}
+	
+	/**
+	 * @return
+	 */
+	public List<UIAttribute> getAttributes() {
+		if (attributes == null) {
+			attributes = new ArrayList<>(0);
+		}
+		return attributes;
 	}
 	
 	/**
