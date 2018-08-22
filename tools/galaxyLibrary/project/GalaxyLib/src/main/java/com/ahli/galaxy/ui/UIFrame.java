@@ -1,12 +1,9 @@
 package com.ahli.galaxy.ui;
 
 import com.ahli.galaxy.ui.abstracts.UIElement;
-import com.ahli.galaxy.ui.serializer.UIFrameDeserializer;
-import com.ahli.galaxy.ui.serializer.UIFrameSerializer;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,10 +17,16 @@ import java.util.Objects;
  * NOTES: using null for certain often occurring values did not yield in
  * performance improvements
  */
-@JsonSerialize (using = UIFrameSerializer.class)
-@JsonDeserialize (using = UIFrameDeserializer.class)
+// CUSTOM ENCODING ATTEMPT
+//@JsonSerialize (using = UIFrameSerializer.class)
+//@JsonDeserialize (using = UIFrameDeserializer.class)
+//@JsonIgnoreProperties (ignoreUnknown = true) // custom deserializer requires this
+
+
+@JsonTypeInfo (use = JsonTypeInfo.Id.MINIMAL_CLASS)
+@JsonInclude (JsonInclude.Include.NON_EMPTY)
+@JsonAutoDetect (fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class UIFrame extends UIElement {
-	private static final Logger logger = LogManager.getLogger();
 	private static final String THIS = "$this";
 	private static final String[] POSI = { "Min", "Max" };
 	private static final String ZERO = "0";
@@ -90,6 +93,7 @@ public class UIFrame extends UIElement {
 	 */
 	public UIFrame(final String name) {
 		super(name);
+		init();
 		type = null;
 		attributes = null;
 		children = null;
@@ -326,35 +330,20 @@ public class UIFrame extends UIElement {
 		if (obj == this) {
 			return true;
 		}
-		final UIFrame that = (UIFrame) obj;
 		final Object[] signatureFields = getSignatureFields();
-		final Object[] thatSignatureFields = getSignatureFields();
-		logger.info("equal lengths " + signatureFields.length + " and " + thatSignatureFields.length);
+		final Object[] thatSignatureFields = ((UIFrame) obj).getSignatureFields();
 		for (int i = 0; i < signatureFields.length; i++) {
 			if (!(signatureFields[i] instanceof Object[])) {
-				logger.info("checking equal on element " + i);
 				if (!Objects.equals(signatureFields[i], thatSignatureFields[i])) {
-					logger.info("found difference in element " + i);
 					return false;
 				}
 			} else {
-				//				logger.info("checking equal on array element " + i);
-				//				if(Arrays.deepEquals((Object[]) signatureFields[i], (Object[]) thatSignatureFields[i])){
-				//					logger.info("found difference in array element " + i);
-				//					logger.info(Arrays.toString((Object[]) signatureFields[i]));
-				//					logger.info(Arrays.toString((Object[]) thatSignatureFields[i]));
-				//					return false;
-				//				}
+				if (!Arrays.deepEquals((Object[]) signatureFields[i], (Object[]) thatSignatureFields[i])) {
+					return false;
+				}
 			}
 		}
-		logger.info(Arrays.equals(relative, that.relative));
-		logger.info(Arrays.toString(relative));
-		logger.info(Arrays.toString(that.relative));
-		
-		final boolean result = Arrays.equals(pos, that.pos) && Arrays.equals(offset, that.offset) &&
-				Arrays.equals(relative, that.relative);
-		logger.info("equals checks arrays: " + result);
-		return result;
+		return true;
 	}
 	
 	private Object[] getSignatureFields() {

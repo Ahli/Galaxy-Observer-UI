@@ -2,7 +2,9 @@ package com.ahli.galaxy.ui;
 
 import com.ahli.galaxy.ui.abstracts.UIElement;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -10,6 +12,7 @@ import java.util.Objects;
 /**
  * @author Ahli
  */
+@JsonTypeInfo (use = JsonTypeInfo.Id.MINIMAL_CLASS)
 @JsonInclude (JsonInclude.Include.NON_EMPTY)
 public class UIConstant extends UIElement {
 	private String value;
@@ -80,10 +83,17 @@ public class UIConstant extends UIElement {
 		if (obj == this) {
 			return true;
 		}
-		final UIConstant that = (UIConstant) obj;
-		for (int i = 0; i < getSignatureFields().length; i++) {
-			if (!Objects.equals(getSignatureFields()[i], that.getSignatureFields()[i])) {
-				return false;
+		final Object[] signatureFields = getSignatureFields();
+		final Object[] thatSignatureFields = ((UIConstant) obj).getSignatureFields();
+		for (int i = 0; i < signatureFields.length; i++) {
+			if (!(signatureFields[i] instanceof Object[])) {
+				if (!Objects.equals(signatureFields[i], thatSignatureFields[i])) {
+					return false;
+				}
+			} else {
+				if (!Arrays.deepEquals((Object[]) signatureFields[i], (Object[]) thatSignatureFields[i])) {
+					return false;
+				}
 			}
 		}
 		return true;

@@ -229,6 +229,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				catalog.addConstant((UIConstant) newElem, curIsDevLayout);
 				return;
 			case "desc":
+				// nothing to do
 				return;
 			case "descflags":
 				// locked or internal
@@ -252,7 +253,43 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				}
 				// add to parent
 				if (curElement instanceof UIFrame) {
+					// Frame's attributes
 					((UIFrame) curElement).addAttribute((UIAttribute) newElem);
+				} else if (curElement instanceof UIAnimation) {
+					// Animation's events
+					if (tagName.equals("event")) {
+						((UIAnimation) curElement).addEvent(newElem.getName(), (UIAttribute) newElem);
+					} else {
+						logger.error("found an attribute that cannot be added to UIAnimation: " + newElem.toString());
+					}
+				} else if (curElement instanceof UIController) {
+					// Controller's keys
+					if (tagName.equals("key")) {
+						((UIController) curElement).getKeys().add((UIAttribute) newElem);
+					} else {
+						logger.error("found an attribute that cannot be added to UIController: " + newElem.toString());
+					}
+				} else if (curElement instanceof UIStateGroup) {
+					if (tagName.equals("defaultstate")) {
+						final String stateVal = ((UIAttribute) newElem).getValue("val");
+						if (stateVal != null) {
+							((UIStateGroup) curElement).setDefaultState(stateVal);
+						} else {
+							logger.error("found <DefaultState> in <StateGroup '{}'> without val", curElement.getName());
+						}
+					} else {
+						logger.error("found an attribute that cannot be added to UIController: " + newElem.toString());
+					}
+				} else if (curElement instanceof UIState) {
+					if (tagName.equals("when")) {
+						((UIState) curElement).getWhens().add((UIAttribute) newElem);
+					} else if (tagName.equals("action")) {
+						((UIState) curElement).getActions().add((UIAttribute) newElem);
+					} else {
+						logger.error("found an attribute that cannot be added to UIState: " + newElem.toString());
+					}
+				} else {
+					logger.error("found an attribute that cannot be added to anything: " + newElem.toString());
 				}
 				
 				newElem = null;
@@ -280,6 +317,8 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			curElement = newElem;
 			curLevel = level;
 		}
+		
+		// TODO state whens/actions overriding
 		
 	}
 	

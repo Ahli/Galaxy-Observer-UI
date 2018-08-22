@@ -8,6 +8,7 @@ import com.ahli.galaxy.ui.exception.UIException;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
@@ -18,13 +19,16 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /***
  * Represents a container for UI frame.**
  *
  * @author Ahli
  */
+@JsonTypeInfo (use = JsonTypeInfo.Id.MINIMAL_CLASS)
 @JsonInclude (JsonInclude.Include.NON_EMPTY)
 public class UICatalogImpl implements UICatalog {
 	
@@ -409,4 +413,41 @@ public class UICatalogImpl implements UICatalog {
 		blizzOnlyLayouts = devLayouts;
 	}
 	
+	@Override
+	public boolean equals(final Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof UICatalogImpl)) {
+			return false;
+		}
+		if (obj == this) {
+			return true;
+		}
+		final Object[] signatureFields = getSignatureFields();
+		final Object[] thatSignatureFields = ((UICatalogImpl) obj).getSignatureFields();
+		for (int i = 0; i < signatureFields.length; i++) {
+			if (!(signatureFields[i] instanceof Object[])) {
+				if (!Objects.equals(signatureFields[i], thatSignatureFields[i])) {
+					logger.info("equals=false - object - i=" + i);
+					return false;
+				}
+			} else {
+				if (!Arrays.deepEquals((Object[]) signatureFields[i], (Object[]) thatSignatureFields[i])) {
+					logger.info("equals=false - array - i=" + i);
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+	
+	private Object[] getSignatureFields() {
+		return new Object[] { templates, constants, blizzOnlyTemplates, blizzOnlyConstants, blizzOnlyLayouts };
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(getSignatureFields());
+	}
 }

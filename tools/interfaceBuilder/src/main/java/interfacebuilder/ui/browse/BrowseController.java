@@ -251,7 +251,8 @@ public class BrowseController implements Updateable {
 				final Runnable followupTask = () -> {
 					try {
 						// TODO cache compiled uicatalogs
-						final UICatalog uiCatalog = compileService.compile(mod, configService.getRaceId(), false, true, true);
+						final UICatalog uiCatalog =
+								compileService.compile(mod, configService.getRaceId(), false, true, true);
 						mod.setUi(uiCatalog);
 					} catch (final InterruptedException e) {
 						Thread.currentThread().interrupt();

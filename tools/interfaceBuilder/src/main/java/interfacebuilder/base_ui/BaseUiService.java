@@ -2,6 +2,7 @@ package interfacebuilder.base_ui;
 
 import cascexplorerconfigedit.editor.CascExplorerConfigFileEditor;
 import com.ahli.galaxy.game.GameData;
+import com.ahli.galaxy.game.def.SC2GameDef;
 import com.ahli.galaxy.game.def.abstracts.GameDef;
 import com.ahli.galaxy.ui.UICatalogImpl;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
@@ -233,10 +234,11 @@ public class BaseUiService {
 				UICatalog uiCatalog = game.getUiCatalog();
 				final String gameName = game.getGameDef().getName();
 				if (uiCatalog != null) {
-					logger.trace("Aborting parsing baseUI for '" + gameName + "' as was already " + "parsed.");
+					logger.trace("Aborting parsing baseUI for '" + gameName + "' as was already parsed.");
 				} else {
 					boolean needToParseAgain = true;
-					final boolean isPtr = configService.getIniSettings().isHeroesPtrActive();
+					final boolean isPtr = game.getGameDef() instanceof SC2GameDef ? false :
+							configService.getIniSettings().isHeroesPtrActive();
 					if (discCacheService.exists(gameName, isPtr)) {
 						// load from cache
 						try {
@@ -286,8 +288,7 @@ public class BaseUiService {
 						logger.info(msg);
 						app.printInfoLogMessageToGeneral(msg);
 						try {
-							discCacheService
-									.put(uiCatalog, gameName, configService.getIniSettings().isHeroesPtrActive());
+							discCacheService.put(uiCatalog, gameName, isPtr);
 						} catch (final IOException e) {
 							logger.error("ERROR when creating cache file of UI", e);
 						}

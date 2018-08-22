@@ -1,13 +1,16 @@
 package interfacebuilder.ui.browse;
 
 import com.ahli.galaxy.ui.UIAnchorSide;
+import com.ahli.galaxy.ui.UIAnimation;
 import com.ahli.galaxy.ui.UIAttribute;
+import com.ahli.galaxy.ui.UIController;
 import com.ahli.galaxy.ui.UIFrame;
 import com.ahli.galaxy.ui.UIState;
 import com.ahli.galaxy.ui.UIStateGroup;
 import com.ahli.galaxy.ui.UITemplate;
 import com.ahli.galaxy.ui.abstracts.UIElement;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
+import com.ahli.util.Pair;
 import gnu.trove.map.hash.THashMap;
 import interfacebuilder.ui.settings.Updateable;
 import javafx.application.Platform;
@@ -87,8 +90,8 @@ public class BrowseTabController implements Updateable {
 				return new SimpleObjectProperty<>(p.getValue().getValue());
 			}
 		});
-		columnAttributes.prefWidthProperty().bind(tableView.widthProperty().divide(2));
-		columnValues.prefWidthProperty().bind(tableView.widthProperty().divide(2));
+		columnAttributes.prefWidthProperty().bind(tableView.widthProperty().divide(3));
+		columnValues.prefWidthProperty().bind(tableView.widthProperty().divide(1.5));
 		columnAttributes.sortTypeProperty().set(TableColumn.SortType.ASCENDING);
 		tableView.getSortOrder().add(columnAttributes);
 	}
@@ -114,16 +117,53 @@ public class BrowseTabController implements Updateable {
 				map.put("Anchor-Right", elem.getAnchorRelative(side) + " - " + elem.getAnchorPos(side) + " - " +
 						elem.getAnchorOffset(side));
 				for (final UIAttribute attr : elem.getAttributes()) {
-					map.put(attr.getName(), prettyPrintAttributes(attr.getKeyValues()));
+					map.put(attr.getName(), prettyPrint(attr));
 				}
-			} else if(el instanceof UIStateGroup){
+			} else if (el instanceof UIStateGroup) {
 				final UIStateGroup elem = (UIStateGroup) el;
 				final String dfltState = elem.getDefaultState();
-				if(dfltState != null){
+				if (dfltState != null) {
 					map.put("DefaultState", dfltState);
 				}
+				final String statePrefix = "State ";
+				int i = 0;
 				for (final UIState state : elem.getStates()) {
-					map.put(state.getName(), state.toString());
+					i++;
+					map.put(statePrefix + i, state.getName());
+				}
+			} else if (el instanceof UIAnimation) {
+				final UIAnimation elem = (UIAnimation) el;
+				final UIAttribute driver = elem.getDriver();
+				if (driver != null) {
+					map.put("Driver", prettyPrint(driver));
+				}
+				int i = 0;
+				final String eventPrefix = "Event ";
+				for (Pair<String, UIAttribute> event : elem.getEvents()) {
+					i++;
+					map.put(eventPrefix + i, prettyPrint(event.getValue()));
+				}
+			} else if (el instanceof UIController) {
+				final UIController elem = (UIController) el;
+				int i = 0;
+				final String keyPrefix = "Key ";
+				for (final UIAttribute attr : elem.getKeys()) {
+					i++;
+					map.put(keyPrefix + i, prettyPrint(attr));
+				}
+			} else if (el instanceof UIState) {
+				final UIState elem = (UIState) el;
+				int i = 0;
+				final String whenPrefix = "When ";
+				for (final UIAttribute attr : elem.getWhens()) {
+					i++;
+					map.put(whenPrefix + i, prettyPrint(attr));
+				}
+				i = 0;
+				final String actionPrefix = "Action ";
+				for (final UIAttribute attr : elem.getActions()) {
+					i++;
+					map.put(actionPrefix + i, prettyPrint(attr));
 				}
 			}
 			tableView.getItems().setAll(map.entrySet());
@@ -131,11 +171,21 @@ public class BrowseTabController implements Updateable {
 		}
 	}
 	
-	private String prettyPrintAttributes(final List<String> attributes) {
+	private String prettyPrint(final UIAttribute attr) {
+		return prettyPrintAttributeStringList(attr.getKeyValues());
+	}
+	
+	private String prettyPrintAttributeStringList(final List<String> attributes) {
 		if (attributes.size() == 2 && attributes.get(0).equals("val")) {
 			return attributes.get(1);
 		}
-		return attributes.toString();
+		StringBuilder str = new StringBuilder();
+		str.append(attributes.get(0)).append('=').append(attributes.get(1));
+		final String separator = ", ";
+		for (int i = 2, len = attributes.size(); i < len; i += 2) {
+			str.append(separator).append(attributes.get(i)).append('=').append(attributes.get(i + 1));
+		}
+		return str.toString();
 	}
 	
 	

@@ -2,15 +2,17 @@ package com.ahli.galaxy.ui;
 
 import com.ahli.galaxy.ui.abstracts.UIElement;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
 /**
  * @author Ahli
  */
+@JsonTypeInfo (use = JsonTypeInfo.Id.MINIMAL_CLASS)
 @JsonInclude (JsonInclude.Include.NON_EMPTY)
 public class UIStateGroup extends UIElement {
 	
@@ -113,7 +115,7 @@ public class UIStateGroup extends UIElement {
 	
 	@Override
 	public List<UIElement> getChildren() {
-		return Collections.emptyList();
+		return new ArrayList<>(states);
 	}
 	
 	@Override
@@ -127,10 +129,17 @@ public class UIStateGroup extends UIElement {
 		if (obj == this) {
 			return true;
 		}
-		final UIStateGroup that = (UIStateGroup) obj;
-		for (int i = 0; i < getSignatureFields().length; i++) {
-			if (!Objects.equals(getSignatureFields()[i], that.getSignatureFields()[i])) {
-				return false;
+		final Object[] signatureFields = getSignatureFields();
+		final Object[] thatSignatureFields = ((UIStateGroup) obj).getSignatureFields();
+		for (int i = 0; i < signatureFields.length; i++) {
+			if (!(signatureFields[i] instanceof Object[])) {
+				if (!Objects.equals(signatureFields[i], thatSignatureFields[i])) {
+					return false;
+				}
+			} else {
+				if (!Arrays.deepEquals((Object[]) signatureFields[i], (Object[]) thatSignatureFields[i])) {
+					return false;
+				}
 			}
 		}
 		return true;

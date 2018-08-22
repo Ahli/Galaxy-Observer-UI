@@ -3,20 +3,22 @@ package com.ahli.galaxy.ui;
 import com.ahli.galaxy.ui.abstracts.UIElement;
 import com.ahli.util.Pair;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
 /**
  * @author Ahli
  */
+@JsonTypeInfo (use = JsonTypeInfo.Id.MINIMAL_CLASS)
 @JsonInclude (JsonInclude.Include.NON_EMPTY)
 public class UIAnimation extends UIElement {
 	private List<UIController> controllers;
 	private List<Pair<String, UIAttribute>> events;
-	@JsonInclude (JsonInclude.Include.NON_DEFAULT)
+	//	@JsonInclude (JsonInclude.Include.NON_DEFAULT)
 	private boolean nextEventsAdditionShouldOverride;
 	private UIAttribute driver;
 	
@@ -187,7 +189,7 @@ public class UIAnimation extends UIElement {
 	
 	@Override
 	public List<UIElement> getChildren() {
-		return Collections.emptyList();
+		return new ArrayList<>(this.controllers);
 	}
 	
 	@Override
@@ -201,10 +203,17 @@ public class UIAnimation extends UIElement {
 		if (obj == this) {
 			return true;
 		}
-		final UIAnimation that = (UIAnimation) obj;
-		for (int i = 0; i < getSignatureFields().length; i++) {
-			if (!Objects.equals(getSignatureFields()[i], that.getSignatureFields()[i])) {
-				return false;
+		final Object[] signatureFields = getSignatureFields();
+		final Object[] thatSignatureFields = ((UIAnimation) obj).getSignatureFields();
+		for (int i = 0; i < signatureFields.length; i++) {
+			if (!(signatureFields[i] instanceof Object[])) {
+				if (!Objects.equals(signatureFields[i], thatSignatureFields[i])) {
+					return false;
+				}
+			} else {
+				if (!Arrays.deepEquals((Object[]) signatureFields[i], (Object[]) thatSignatureFields[i])) {
+					return false;
+				}
 			}
 		}
 		return true;

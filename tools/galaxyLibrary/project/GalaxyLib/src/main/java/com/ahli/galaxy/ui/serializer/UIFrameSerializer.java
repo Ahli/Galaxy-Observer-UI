@@ -3,6 +3,8 @@ package com.ahli.galaxy.ui.serializer;
 import com.ahli.galaxy.ui.UIAnchorSide;
 import com.ahli.galaxy.ui.UIFrame;
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.core.type.WritableTypeId;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
@@ -20,16 +22,16 @@ import java.util.Set;
 import static java.util.stream.Collectors.toList;
 
 public class UIFrameSerializer extends StdSerializer<UIFrame> {
+	public static final String PARENT = "$parent";
+	public static final char NEXT_ARRAY_VAL_SEPARATOR = '<';
+	public static final char NEXT_TYPE_SEPARATOR = '>';
+	public static final String EMPTYANCHOR = "" + NEXT_TYPE_SEPARATOR + NEXT_TYPE_SEPARATOR;
+	public static final String ZERO = "0";
+	public static final String MIN = "Min";
+	public static final String MAX = "Max";
 	private static final Logger logger = LogManager.getLogger();
 	private static final Set<String> ignoredFields = new HashSet<>(Arrays.asList("pos", "offset", "relative", "type"));
 	private static final List<Field> fields;
-	private static final String PARENT = "$parent";
-	private static final char NEXT_ARRAY_VAL_SEPARATOR = '<';
-	private static final char NEXT_TYPE_SEPARATOR = '>';
-	private static final String EMPTYANCHOR = "" + NEXT_TYPE_SEPARATOR + NEXT_TYPE_SEPARATOR;
-	private static final String ZERO = "0";
-	private static final String MIN = "Min";
-	private static final String MAX = "Max";
 	
 	static {
 		fields = Arrays.stream(UIFrame.class.getDeclaredFields()).filter(UIFrameSerializer::filter).collect(toList());
@@ -49,37 +51,69 @@ public class UIFrameSerializer extends StdSerializer<UIFrame> {
 	}
 	
 	@Override
-	public void serialize(final UIFrame value, final JsonGenerator gen, final SerializerProvider provider) {
-		logger.error("attempting to serialize without type");
-	}
-	
-	@Override
 	public void serializeWithType(final UIFrame instance, final JsonGenerator gen, final SerializerProvider provider,
 			final TypeSerializer typeSer) throws IOException {
-		gen.writeStartObject();
-		gen.writeStringField("@c", ".UIFrame");
-		String type = instance.getType();
-		if(!"Frame".equals(type)) {
-			gen.writeStringField("t", type);
+		final WritableTypeId typeIdDef = typeSer.writeTypePrefix(gen, typeSer.typeId(instance, JsonToken.START_OBJECT));
+		customSerialize(instance, gen, provider);
+		typeSer.writeTypeSuffix(gen, typeIdDef);
+	}
+	
+	private void customSerialize(final UIFrame instance, final JsonGenerator gen, final SerializerProvider provider)
+			throws IOException {
+		
+		final String type = instance.getType();
+		if (!"Frame".equals(type)) {
+			gen.writeStringField("T", type);
 		}
-		gen.writeStringField("n", instance.getName());
+		gen.writeStringField("N", instance.getName());
+		
+		// first attempt -> good for simple fields, not for child UIFrames and attributes
 		Object fieldInstance;
 		for (final Field field : fields) {
 			try {
 				field.setAccessible(true);
 				fieldInstance = field.get(instance);
 				if (fieldInstance != null) {
-					gen.writeObjectField(field.getName(), field.get(instance));
+					if (field.getName().equals("children")) {
+						gen.writeFieldName("children");
+					} else {
+						gen.writeObjectField(field.getName(), field.get(instance));
+					}
 				}
 			} catch (final IllegalAccessException e) {
 				logger.warn("ignoring exception", e);
 			}
 		}
-		String anchor = getAnchor(instance);
-		if(!EMPTYANCHOR.equals(anchor)) {
-			gen.writeStringField("a", getAnchor(instance));
+		
+		
+		// // like Object node
+		// // https://github.com/FasterXML/jackson-databind/blob/master/src/main/java/com/fasterxml/jackson/databind/node/ObjectNode.java#L314
+		//		@SuppressWarnings("deprecation")
+		//		final boolean trimEmptyArray = (provider != null) &&
+		//				!provider.isEnabled(SerializationFeature.WRITE_EMPTY_JSON_ARRAYS);
+		//		for (Map.Entry<String, JsonNode> en : _children.entrySet()) {
+		//			BaseJsonNode value = (BaseJsonNode) en.getValue();
+		//
+		//			if (trimEmptyArray && value.isArray() && value.isEmpty(provider)) {
+		//				continue;
+		//			}
+		//
+		//			gen.writeFieldName(en.getKey());
+		//			value.serialize(gen, provider);
+		//		}
+		
+		
+		// like deserialization -> Problem: cannot put own code there
+		//		final SerializationConfig config = provider.getConfig();
+		//		final JavaType javaType = TypeFactory.defaultInstance().constructType(UIFrame.class);
+		//		final JsonSerializer<Object> serializer = BeanSerializerFactory.instance.createSerializer(provider, javaType);
+		//		serializer.serialize(instance,gen,provider);
+		
+		
+		final String anchor = getAnchor(instance);
+		if (!EMPTYANCHOR.equals(anchor)) {
+			gen.writeStringField("A", getAnchor(instance));
 		}
-		gen.writeEndObject();
 	}
 	
 	private String getAnchor(final UIFrame value) {
@@ -125,5 +159,13 @@ public class UIFrameSerializer extends StdSerializer<UIFrame> {
 	
 	private boolean notEqual(final String a, final String b, final String c, final String d) {
 		return !b.equals(a) || !c.equals(a) || !d.equals(a);
+	}
+	
+	@Override
+	public void serialize(final UIFrame instance, final JsonGenerator gen, final SerializerProvider provider)
+			throws IOException {
+		gen.writeStartObject(instance);
+		customSerialize(instance, gen, provider);
+		gen.writeEndObject();
 	}
 }
