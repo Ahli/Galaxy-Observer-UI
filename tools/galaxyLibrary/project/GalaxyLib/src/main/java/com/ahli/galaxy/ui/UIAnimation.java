@@ -1,7 +1,6 @@
 package com.ahli.galaxy.ui;
 
 import com.ahli.galaxy.ui.abstracts.UIElement;
-import com.ahli.util.Pair;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
@@ -17,7 +16,7 @@ import java.util.Objects;
 @JsonInclude (JsonInclude.Include.NON_EMPTY)
 public class UIAnimation extends UIElement {
 	private List<UIController> controllers;
-	private List<Pair<String, UIAttribute>> events;
+	private List<UIAttribute> events;
 	//	@JsonInclude (JsonInclude.Include.NON_DEFAULT)
 	private boolean nextEventsAdditionShouldOverride;
 	private UIAttribute driver;
@@ -59,8 +58,8 @@ public class UIAnimation extends UIElement {
 			clone.controllers.add((UIController) controllers.get(i).deepCopy());
 		}
 		for (int i = 0, len = events.size(); i < len; i++) {
-			final Pair<String, UIAttribute> p = events.get(i);
-			clone.events.add(new Pair<>(p.getKey(), (UIAttribute) p.getValue().deepCopy()));
+			final UIAttribute p = events.get(i);
+			clone.events.add((UIAttribute) p.deepCopy());
 		}
 		clone.nextEventsAdditionShouldOverride = nextEventsAdditionShouldOverride;
 		if (driver != null) {
@@ -87,7 +86,7 @@ public class UIAnimation extends UIElement {
 	/**
 	 * @return the events
 	 */
-	public List<Pair<String, UIAttribute>> getEvents() {
+	public List<UIAttribute> getEvents() {
 		return events;
 	}
 	
@@ -95,40 +94,32 @@ public class UIAnimation extends UIElement {
 	 * @param events
 	 * 		the events to set
 	 */
-	public void setEvents(final List<Pair<String, UIAttribute>> events) {
+	public void setEvents(final List<UIAttribute> events) {
 		this.events = events;
 	}
 	
 	/**
-	 * @param key
-	 * @param value
+	 * @param newEvent
 	 */
-	public UIAttribute addEvent(final String key, final UIAttribute value) {
-		final Pair<String, UIAttribute> newPair = new Pair<>(key, value);
-		final int i = events.indexOf(newPair);
-		if (i == -1) {
-			events.add(newPair);
-			return null;
-		} else {
-			return events.set(i, newPair).getValue();
-		}
+	public void addEvent(final UIAttribute newEvent) {
+		events.add(newEvent);
 	}
 	
-	/**
-	 * @param key
-	 * @return
-	 */
-	public UIAttribute getValue(final String key) {
-		int i;
-		Pair<String, UIAttribute> p;
-		for (i = 0; i < events.size(); i++) {
-			p = events.get(i);
-			if (p.getKey().equals(key)) {
-				return p.getValue();
-			}
-		}
-		return null;
-	}
+	//	/**
+	//	 * @param key
+	//	 * @return
+	//	 */
+	//	public UIAttribute getValue(final String key) {
+	//		int i;
+	//		Pair<String, UIAttribute> p;
+	//		for (i = 0; i < events.size(); i++) {
+	//			p = events.get(i);
+	//			if (p.getKey().equals(key)) {
+	//				return p.getValue();
+	//			}
+	//		}
+	//		return null;
+	//	}
 	
 	/**
 	 * @return
@@ -189,7 +180,7 @@ public class UIAnimation extends UIElement {
 	
 	@Override
 	public List<UIElement> getChildren() {
-		return new ArrayList<>(this.controllers);
+		return new ArrayList<>(controllers);
 	}
 	
 	@Override

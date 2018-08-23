@@ -1,6 +1,8 @@
 package com.ahli.galaxy.ui.abstracts;
 
 import com.ahli.util.DeepCopyable;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
@@ -21,8 +23,9 @@ public abstract class UIElement implements DeepCopyable {
 	 * @param name
 	 * 		element's name
 	 */
+	@JsonCreator
 	public UIElement(final String name) {
-		this.name = name;
+		this.name = name != null ? name.intern() : null;
 	}
 	
 	/**
@@ -57,7 +60,7 @@ public abstract class UIElement implements DeepCopyable {
 	 * 		the name to set
 	 */
 	public void setName(final String name) {
-		this.name = name;
+		this.name = name != null ? name.intern() : null;
 	}
 	
 	/**
@@ -80,5 +83,6 @@ public abstract class UIElement implements DeepCopyable {
 	 *
 	 * @return
 	 */
+	@JsonIgnore
 	public abstract List<UIElement> getChildren();
 }

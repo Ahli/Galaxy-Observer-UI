@@ -25,7 +25,7 @@ public class UIFrameSerializer extends StdSerializer<UIFrame> {
 	public static final String PARENT = "$parent";
 	public static final char NEXT_ARRAY_VAL_SEPARATOR = '<';
 	public static final char NEXT_TYPE_SEPARATOR = '>';
-	public static final String EMPTYANCHOR = "" + NEXT_TYPE_SEPARATOR + NEXT_TYPE_SEPARATOR;
+	public static final String EMPTYANCHOR = Character.toString(NEXT_TYPE_SEPARATOR) + NEXT_TYPE_SEPARATOR;
 	public static final String ZERO = "0";
 	public static final String MIN = "Min";
 	public static final String MAX = "Max";

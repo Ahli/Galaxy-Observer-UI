@@ -10,7 +10,6 @@ import com.ahli.galaxy.ui.UIStateGroup;
 import com.ahli.galaxy.ui.UITemplate;
 import com.ahli.galaxy.ui.abstracts.UIElement;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
-import com.ahli.util.Pair;
 import gnu.trove.map.hash.THashMap;
 import interfacebuilder.ui.settings.Updateable;
 import javafx.application.Platform;
@@ -139,9 +138,9 @@ public class BrowseTabController implements Updateable {
 				}
 				int i = 0;
 				final String eventPrefix = "Event ";
-				for (Pair<String, UIAttribute> event : elem.getEvents()) {
+				for (final UIAttribute event : elem.getEvents()) {
 					i++;
-					map.put(eventPrefix + i, prettyPrint(event.getValue()));
+					map.put(eventPrefix + i, prettyPrint(event));
 				}
 			} else if (el instanceof UIController) {
 				final UIController elem = (UIController) el;
@@ -179,7 +178,7 @@ public class BrowseTabController implements Updateable {
 		if (attributes.size() == 2 && attributes.get(0).equals("val")) {
 			return attributes.get(1);
 		}
-		StringBuilder str = new StringBuilder();
+		final StringBuilder str = new StringBuilder();
 		str.append(attributes.get(0)).append('=').append(attributes.get(1));
 		final String separator = ", ";
 		for (int i = 2, len = attributes.size(); i < len; i += 2) {

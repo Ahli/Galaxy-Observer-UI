@@ -1,11 +1,14 @@
 package com.ahli.galaxy.ui;
 
 import com.ahli.galaxy.ui.abstracts.UIElement;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -15,13 +18,21 @@ import java.util.Objects;
 @JsonTypeInfo (use = JsonTypeInfo.Id.MINIMAL_CLASS)
 @JsonInclude (JsonInclude.Include.NON_EMPTY)
 public class UIStateGroup extends UIElement {
-	
 	private String defaultState;
 	private List<UIState> states;
 	
 	public UIStateGroup() {
 		super(null);
 		states = new ArrayList<>(0);
+	}
+	
+	@JsonCreator
+	public UIStateGroup(@JsonProperty ("name") final String name,
+			@JsonProperty ("defaultState") final String defaultState,
+			@JsonProperty ("states") final List<UIState> states) {
+		super(name);
+		this.defaultState = defaultState != null ? defaultState.intern() : defaultState;
+		this.states = states;
 	}
 	
 	/**
@@ -65,7 +76,7 @@ public class UIStateGroup extends UIElement {
 	 * 		the defaultState to set
 	 */
 	public void setDefaultState(final String defaultState) {
-		this.defaultState = defaultState;
+		this.defaultState = defaultState.intern();
 	}
 	
 	/**
@@ -115,6 +126,9 @@ public class UIStateGroup extends UIElement {
 	
 	@Override
 	public List<UIElement> getChildren() {
+		if (states == null) {
+			return Collections.emptyList();
+		}
 		return new ArrayList<>(states);
 	}
 	

@@ -2,7 +2,9 @@ package com.ahli.galaxy.ui;
 
 import com.ahli.galaxy.ui.abstracts.UIElement;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import java.util.ArrayList;
@@ -62,6 +64,22 @@ public class UIFrame extends UIElement {
 		offset[1] = ZERO;
 		offset[2] = ZERO;
 		offset[3] = ZERO;
+	}
+	
+	@JsonCreator
+	public UIFrame(@JsonProperty ("name") final String name, @JsonProperty ("pos") final String[] pos,
+			@JsonProperty ("offset") final String[] offset, @JsonProperty ("relative") final String[] relative,
+			@JsonProperty ("attributes") final List<UIAttribute> attributes, @JsonProperty ("type") final String type,
+			@JsonProperty ("children") final List<UIElement> children) {
+		super(name);
+		for (int i = 0; i < 4; i++) {
+			this.pos[i] = pos[i].intern();
+			this.offset[i] = offset[i].intern();
+			this.relative[i] = relative[i].intern();
+		}
+		this.attributes = attributes;
+		this.type = type.intern();
+		this.children = children;
 	}
 	
 	/**
@@ -138,7 +156,7 @@ public class UIFrame extends UIElement {
 	 * 		the type to set
 	 */
 	public void setType(final String type) {
-		this.type = type;
+		this.type = type.intern();
 	}
 	
 	/**
@@ -232,19 +250,19 @@ public class UIFrame extends UIElement {
 	 * @param offset
 	 */
 	public void setAnchor(final String relative, final String offset) {
-		this.relative[0] = relative;
-		this.relative[1] = relative;
-		this.relative[2] = relative;
-		this.relative[3] = relative;
-		pos[0] = POSI[0];
-		pos[1] = POSI[0];
-		pos[2] = POSI[1];
-		pos[3] = POSI[1];
+		this.relative[0] = relative.intern();
+		this.relative[1] = relative.intern();
+		this.relative[2] = relative.intern();
+		this.relative[3] = relative.intern();
+		pos[0] = POSI[0].intern();
+		pos[1] = POSI[0].intern();
+		pos[2] = POSI[1].intern();
+		pos[3] = POSI[1].intern();
 		if (offset != null) {
-			this.offset[0] = offset;
-			this.offset[1] = offset;
-			this.offset[2] = Integer.toString((Integer.parseInt(offset) * (-1)));
-			this.offset[3] = Integer.toString((Integer.parseInt(offset) * (-1)));
+			this.offset[0] = offset.intern();
+			this.offset[1] = offset.intern();
+			this.offset[2] = Integer.toString((Integer.parseInt(offset) * (-1))).intern();
+			this.offset[3] = Integer.toString((Integer.parseInt(offset) * (-1))).intern();
 		} else {
 			this.offset[0] = ZERO;
 			this.offset[1] = ZERO;
@@ -270,7 +288,7 @@ public class UIFrame extends UIElement {
 	 * @param relative
 	 */
 	public void setAnchorRelative(final UIAnchorSide side, final String relative) {
-		this.relative[side.ordinal()] = relative;
+		this.relative[side.ordinal()] = relative.intern();
 	}
 	
 	/**
@@ -278,7 +296,7 @@ public class UIFrame extends UIElement {
 	 * @param pos
 	 */
 	public void setAnchorPos(final UIAnchorSide side, final String pos) {
-		this.pos[side.ordinal()] = pos;
+		this.pos[side.ordinal()] = pos.intern();
 	}
 	
 	/**
@@ -286,7 +304,7 @@ public class UIFrame extends UIElement {
 	 * @param offset
 	 */
 	public void setAnchorOffset(final UIAnchorSide side, final String offset) {
-		this.offset[side.ordinal()] = offset;
+		this.offset[side.ordinal()] = offset.intern();
 	}
 	
 	/**

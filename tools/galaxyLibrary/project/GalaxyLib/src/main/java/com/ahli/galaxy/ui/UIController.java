@@ -1,7 +1,9 @@
 package com.ahli.galaxy.ui;
 
 import com.ahli.galaxy.ui.abstracts.UIElement;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import java.util.ArrayList;
@@ -25,6 +27,20 @@ public class UIController extends UIElement {
 		super(null);
 		attributesKeyValueList = new ArrayList<>(0);
 		keys = new ArrayList<>(0);
+	}
+	
+	@JsonCreator
+	public UIController(@JsonProperty ("name") final String name,
+			@JsonProperty ("attributesKeyValues") final List<String> attributesKeyValueList) {
+		super(name);
+		if (attributesKeyValueList != null) {
+			this.attributesKeyValueList = attributesKeyValueList;
+			for (int i = 0, len = attributesKeyValueList.size(); i < len; i++) {
+				this.attributesKeyValueList.set(i, this.attributesKeyValueList.get(i).intern());
+			}
+		} else {
+			this.attributesKeyValueList = new ArrayList<>(0);
+		}
 	}
 	
 	/**
@@ -108,11 +124,11 @@ public class UIController extends UIElement {
 		}
 		if (i >= len) {
 			// not found
-			attributesKeyValueList.add(key);
-			attributesKeyValueList.add(value);
+			attributesKeyValueList.add(key.intern());
+			attributesKeyValueList.add(value.intern());
 			return null;
 		} else {
-			return attributesKeyValueList.set(i, value);
+			return attributesKeyValueList.set(i, value.intern());
 		}
 	}
 	
