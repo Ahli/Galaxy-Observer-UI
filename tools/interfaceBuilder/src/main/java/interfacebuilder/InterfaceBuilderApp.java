@@ -95,7 +95,7 @@ public class InterfaceBuilderApp extends Application {
 	 * 		command line arguments
 	 */
 	public static void main(final String[] args) {
-		if(!initInterProcessCommunication(args, 12317)){
+		if (!initInterProcessCommunication(args, 12317)) {
 			return;
 		}
 		
@@ -159,7 +159,7 @@ public class InterfaceBuilderApp extends Application {
 										Arrays.asList(inputLine.substring(1, inputLine.length() - 1).split(", "));
 								getInstance().executeCommand(params);
 							}
-						} catch(IOException e){
+						} catch (IOException e) {
 							// client closed connection
 						} finally {
 							clientSocket.close();
