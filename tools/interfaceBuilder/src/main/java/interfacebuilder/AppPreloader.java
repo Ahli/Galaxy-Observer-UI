@@ -13,7 +13,7 @@ import org.apache.logging.log4j.Logger;
 import java.net.URISyntaxException;
 
 public class AppPreloader extends Preloader {
-	private static final Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger(AppPreloader.class);
 	private Stage stage;
 	
 	@Override

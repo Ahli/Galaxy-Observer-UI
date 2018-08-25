@@ -33,7 +33,7 @@ import java.util.Objects;
 public class UICatalogImpl implements UICatalog {
 	
 	@JsonIgnore
-	private static final Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger(UICatalogImpl.class);
 	
 	@JsonIgnore
 	private UICatalogParser parser;

@@ -20,7 +20,7 @@ import java.io.IOException;
  * @author Ahli
  */
 public final class ComponentsListReader {
-	private static final Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger(ComponentsListReader.class);
 	
 	/**
 	 *

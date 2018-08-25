@@ -34,7 +34,7 @@ public class LayoutExtensionReader {
 	public static final String CONSTANT = "constant";
 	public static final String DEFAULT = "default";
 	public static final String DESCRIPTION = "description";
-	private static final Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger(LayoutExtensionReader.class);
 	
 	private List<ValueDef> hotkeys = new ArrayList<>();
 	private List<ValueDef> settings = new ArrayList<>();

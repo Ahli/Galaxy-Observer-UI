@@ -19,7 +19,7 @@ import java.util.List;
 
 public class XmlParserVtd extends XmlParserAbstract {
 	private static final String ANY_TAG = "*";
-	private static final Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger(XmlParserVtd.class);
 	private VTDGen vtd;
 	
 	private List<String> attrTypes;

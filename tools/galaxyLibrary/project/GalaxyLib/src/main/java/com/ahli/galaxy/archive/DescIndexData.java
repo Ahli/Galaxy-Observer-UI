@@ -35,7 +35,7 @@ public class DescIndexData {
 	private static final String XML_VERSION_1_0_ENCODING_UTF_8_STANDALONE_YES_DESC =
 			"<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\r\n<Desc>\r\n";
 	
-	private static final Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger(DescIndexData.class);
 	private final MpqInterface mpqi;
 	private final List<Pair<Path, String>> fileIntPathList;
 	private String descIndexIntPath;

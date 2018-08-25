@@ -16,7 +16,7 @@ import org.apache.logging.log4j.Logger;
  * @author Ahli
  */
 public class MenuBarController {
-	private static final Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger(MenuBarController.class);
 	
 	private Main main;
 	

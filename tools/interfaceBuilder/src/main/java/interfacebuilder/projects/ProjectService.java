@@ -25,7 +25,7 @@ import java.util.List;
  * ProjectService manages Observer Interface project related tasks.
  */
 public class ProjectService {
-	private static final Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger(ProjectService.class);
 	
 	@Autowired
 	private ProjectJpaRepository projectRepo;

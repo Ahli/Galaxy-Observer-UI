@@ -29,7 +29,7 @@ public class UIFrameSerializer extends StdSerializer<UIFrame> {
 	public static final String ZERO = "0";
 	public static final String MIN = "Min";
 	public static final String MAX = "Max";
-	private static final Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger(UIFrameSerializer.class);
 	private static final Set<String> ignoredFields = new HashSet<>(Arrays.asList("pos", "offset", "relative", "type"));
 	private static final List<Field> fields;
 	

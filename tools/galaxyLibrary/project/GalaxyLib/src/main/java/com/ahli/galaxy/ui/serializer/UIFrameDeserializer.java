@@ -28,7 +28,7 @@ public class UIFrameDeserializer extends StdDeserializer<UIFrame> {
 	public static final String KEY_TYPE = "T";
 	public static final String KEY_ANCHOR = "A";
 	public static final String EMPTY_ANCHOR = ">>";
-	private static final Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger(UIFrameDeserializer.class);
 	
 	public UIFrameDeserializer() {
 		this(null);

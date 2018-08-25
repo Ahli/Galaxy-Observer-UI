@@ -61,7 +61,7 @@ public class Main extends Application {
 	public static final String VERSION = "alpha";
 	public static final String STORM_INTERFACE_FILE_FILTER = "*.StormInterface";
 	public static final String SC2_INTERFACE_FILE_FILTER = "*.SC2Interface";
-	private static final Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger(Main.class);
 	private final long appStartTime = System.nanoTime();
 	private Stage primaryStage;
 	private BorderPane rootLayout;

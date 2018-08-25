@@ -24,7 +24,7 @@ import java.nio.file.Paths;
  */
 public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	private static final char QUOTE = '\"';
-	private static final Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger(MpqEditorInterface.class);
 	private static final String MPQ_INTERFACE_MPQ_EDITOR_NOT_FOUND = "MpqInterface.MpqEditorNotFound";
 	private static final String CMD_C = "cmd /C ";
 	private MpqEditorSettingsInterface settings;

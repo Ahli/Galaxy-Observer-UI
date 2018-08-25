@@ -48,7 +48,7 @@ import java.util.Locale;
 import java.util.Optional;
 
 public class HomeController implements Updateable {
-	private static final Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger(HomeController.class);
 	@FXML
 	private Pane selectedPanel;
 	@FXML

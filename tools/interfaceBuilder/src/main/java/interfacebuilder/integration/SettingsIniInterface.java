@@ -22,7 +22,7 @@ import java.nio.file.Paths;
  * @author Ahli
  */
 public class SettingsIniInterface {
-	private static final Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger(SettingsIniInterface.class);
 	
 	private static final String CATEGORY_GAME_PATHS = "GamePaths";
 	private static final String HEROES_PATH = "Heroes_Path";

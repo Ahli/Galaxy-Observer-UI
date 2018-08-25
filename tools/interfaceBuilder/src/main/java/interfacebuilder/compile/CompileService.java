@@ -22,7 +22,7 @@ import java.util.Collection;
  * @author Ahli
  */
 public class CompileService {
-	private static final Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger(CompileService.class);
 	
 	/**
 	 * Compiles and updates the data in the cache.
@@ -116,11 +116,11 @@ public class CompileService {
 	/**
 	 * Verifies the syntax of the xml document.
 	 */
-	private void verifyXml(Collection<File> files) throws IOException, SAXException, ParserConfigurationException {
+	private void verifyXml(final Collection<File> files) throws IOException, SAXException, ParserConfigurationException {
 		final DocumentBuilder dBuilder;
 		dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		dBuilder.setErrorHandler(new SilentXmlSaxErrorHandler());
-		for (File file : files) {
+		for (final File file : files) {
 			dBuilder.parse(file);
 		}
 	}

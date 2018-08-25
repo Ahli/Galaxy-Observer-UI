@@ -35,7 +35,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class CompressionMiningController implements Updateable {
-	private static final Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger(CompressionMiningController.class);
 	
 	@FXML
 	private Button miningButton;

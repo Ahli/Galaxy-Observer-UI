@@ -29,7 +29,7 @@ import org.apache.logging.log4j.Logger;
  * @author Ahli
  */
 public class TabsController {
-	private static final Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger(TabsController.class);
 	private static final Callback<CellDataFeatures<ValueDef, Boolean>, ObservableValue<Boolean>>
 			ActionColumnCellValueFactory = new Callback<>() {
 		@Override

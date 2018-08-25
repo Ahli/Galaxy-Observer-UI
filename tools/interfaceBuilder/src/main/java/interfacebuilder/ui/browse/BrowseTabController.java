@@ -37,7 +37,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class BrowseTabController implements Updateable {
-	private static final Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger(BrowseTabController.class);
 	private static final String GAME_UI = "GameUI";
 	
 	@FXML

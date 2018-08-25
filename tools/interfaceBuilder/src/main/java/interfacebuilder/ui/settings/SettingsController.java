@@ -19,7 +19,7 @@ import org.springframework.context.ApplicationContext;
 import java.io.IOException;
 
 public class SettingsController implements Updateable {
-	private static final Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger(SettingsController.class);
 	/*
 	categories: 0=GamePaths, 1=GuiMmode, 2=CommandLineMode
 	 */

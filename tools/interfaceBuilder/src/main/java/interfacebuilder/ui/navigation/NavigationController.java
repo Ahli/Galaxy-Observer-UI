@@ -32,7 +32,7 @@ public class NavigationController {
 	public static final int PROGRESS_TAB = 1;
 	public static final int BROWSE_TAB = 2;
 	public static final int SETTINGS_TAB = 3;
-	private static final Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger(NavigationController.class);
 	private static NavigationController instance;
 	/* ContentPages:
 	 * 0: taskChoice

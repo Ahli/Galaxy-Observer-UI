@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith (MockitoExtension.class)
 public class UIFrameTest {
-	private static final Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger(UIFrameTest.class);
 	
 	@BeforeEach
 	public void initMocks() {

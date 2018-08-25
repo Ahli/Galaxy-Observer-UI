@@ -22,7 +22,7 @@ import java.util.Collection;
  * @author Ahli
  */
 public class ReplayFinder {
-	private static final Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger(ReplayFinder.class);
 	
 	/**
 	 * Gets the last or newest replay.

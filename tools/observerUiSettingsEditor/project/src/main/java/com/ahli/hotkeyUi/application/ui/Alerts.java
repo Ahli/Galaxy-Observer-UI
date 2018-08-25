@@ -19,7 +19,7 @@ import org.apache.logging.log4j.Logger;
  * @author Ahli
  */
 public final class Alerts {
-	private static final Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger(Alerts.class);
 	
 	private Alerts() {
 		// disallow class instances

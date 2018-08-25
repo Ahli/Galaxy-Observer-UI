@@ -23,7 +23,7 @@ import java.util.List;
  * @author Ahli
  */
 public final class DescIndexReader {
-	private static final Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger(DescIndexReader.class);
 	
 	/**
 	 *

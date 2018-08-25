@@ -15,7 +15,7 @@ import java.util.ResourceBundle;
  */
 public final class Messages {
 	private static final String BUNDLE_NAME = "galaxylib_i18n.galaxyLibMessages";
-	private static final Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger(Messages.class);
 	private static ResourceBundle resourceBundle = ResourceBundle.getBundle(BUNDLE_NAME);
 	
 	private static Locale usedLocale = Locale.getDefault();

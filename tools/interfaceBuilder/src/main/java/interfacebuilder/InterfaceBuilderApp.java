@@ -67,7 +67,7 @@ import java.util.concurrent.TimeUnit;
 @SpringBootApplication
 public class InterfaceBuilderApp extends Application {
 	
-	private static final Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger(InterfaceBuilderApp.class);
 	private static InterfaceBuilderApp instance;
 	private static ServerSocket serverSocket;
 	private final List<ErrorTabController> errorTabControllers = new ArrayList<>();

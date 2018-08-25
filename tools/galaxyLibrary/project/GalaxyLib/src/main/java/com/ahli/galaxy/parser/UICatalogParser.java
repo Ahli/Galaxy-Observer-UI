@@ -25,7 +25,7 @@ import java.util.List;
 public class UICatalogParser implements ParsedXmlConsumer {
 	private static final String TYPE = "type";
 	
-	private static final Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger(UICatalogParser.class);
 	
 	private final UICatalog catalog;
 	private final XmlParser parser;

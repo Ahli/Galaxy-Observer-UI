@@ -33,7 +33,7 @@ import java.util.Date;
 import java.util.List;
 
 public class MpqBuilderService {
-	private static final Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger(MpqBuilderService.class);
 	
 	private final InterfaceBuilderApp app = InterfaceBuilderApp.getInstance();
 	

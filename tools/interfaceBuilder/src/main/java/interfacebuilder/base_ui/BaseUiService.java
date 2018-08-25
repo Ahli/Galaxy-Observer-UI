@@ -32,7 +32,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 public class BaseUiService {
 	private static final String UNKNOWN_GAME_EXCEPTION = "Unknown Game";
-	private static final Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger(BaseUiService.class);
 	
 	private final InterfaceBuilderApp app = InterfaceBuilderApp.getInstance();
 	

@@ -12,7 +12,7 @@ import java.io.File;
  * @author Ahli
  */
 public final class Main {
-	private static final Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger(Main.class);
 	
 	private Main() {
 		// no instance

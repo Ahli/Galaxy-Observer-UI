@@ -26,7 +26,7 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 	private static final String MPQEDITOR_RULESET_INI = "MPQEditor_Ruleset.ini";
 	private static final String CUSTOM_RULE_PROPERTY_KEY = "CustomRules. ";
 	private static final String MPQEDITOR_INI = "MPQEditor.ini";
-	private static final Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger(MpqEditorSettingsInterface.class);
 	private static final String APPDATA = "APPDATA";
 	private static final String NO_COMPRESSION_CUSTOM_RULE = "0x01000000, 0x00000002, 0xFFFFFFFF";
 	private static final String DEFAULT = "Default";

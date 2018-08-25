@@ -16,7 +16,7 @@ import java.nio.file.Paths;
  * @author Ahli
  */
 public final class JarHelper {
-	private static final Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger(JarHelper.class);
 	
 	/**
 	 * Disabled Constructor.
@@ -42,12 +42,12 @@ public final class JarHelper {
 		
 		// check if started in eclipse
 		final String targetClasses = File.separator + "target" + File.separator + "classes;";
-		int i = str.indexOf(targetClasses);
+		final int i = str.indexOf(targetClasses);
 		if (i > 0) {
 			final String check = str.substring(0, i);
 			logger.trace("target/classes location: {}", () -> check);
 			if (check.indexOf(';') < 0) {
-				Path p = Paths.get(check).getParent().getParent();
+				final Path p = Paths.get(check).getParent().getParent();
 				if (Files.exists(p)) {
 					return p.toFile();
 				}

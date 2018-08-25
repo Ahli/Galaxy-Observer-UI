@@ -22,7 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.File;
 
 public class AddProjectController {
-	private static final Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger(AddProjectController.class);
 	
 	@FXML
 	private Dialog<Project> dialog;
