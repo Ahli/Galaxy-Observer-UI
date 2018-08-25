@@ -95,7 +95,9 @@ public class InterfaceBuilderApp extends Application {
 	 * 		command line arguments
 	 */
 	public static void main(final String[] args) {
-		initInterProcessCommunication(args, 12317);
+		if(!initInterProcessCommunication(args, 12317)){
+			return;
+		}
 		
 		logger.trace("trace log visible");
 		logger.debug("debug log visible");
@@ -118,60 +120,65 @@ public class InterfaceBuilderApp extends Application {
 	 * @param args
 	 * @param port
 	 */
-	private static void initInterProcessCommunication(final String[] args, final int port) {
+	private static boolean initInterProcessCommunication(final String[] args, final int port) {
 		try {
 			serverSocket = new ServerSocket(port, 4, InetAddress.getByAddress(new byte[] { 127, 0, 0, 1 }));
-			final Thread serverThread = new Thread() {
-				@Override
-				public void run() {
-					Socket clientSocket;
-					while (true) {
-						try {
-							clientSocket = InterfaceBuilderApp.serverSocket.accept();
-							try (final PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-							     final BufferedReader in = new BufferedReader(
-									     new InputStreamReader(clientSocket.getInputStream()))) {
-								String inputLine;
-								while (in.ready() && (inputLine = in.readLine()) != null) {
-									out.println(inputLine);
-									logger.info("message from client: " + inputLine);
-									final List<String> params =
-											Arrays.asList(inputLine.substring(1, inputLine.length() - 1).split(", "));
-									getInstance().executeCommand(params);
-								}
-								
-								clientSocket.close();
-							}
-						} catch (final IOException e) {
-							logger.fatal("I/O Exception while waiting for client connections.", e);
-						}
-						logger.info("socket host loop");
-					}
-				}
-			};
-			serverThread.setName("IPCserver");
-			serverThread.setDaemon(true);
-			serverThread.setPriority(Thread.MIN_PRIORITY);
-			serverThread.start();
-		} catch (final UnknownHostException e) {
+		} catch (UnknownHostException e) {
 			logger.fatal("Could not retrieve localhost address.", e);
-			System.exit(1);
-		} catch (final IOException e) {
+			return false;
+		} catch (IOException e) {
 			// port taken, so app is already running
 			logger.info("App already running. Passing over command line arguments.");
-			
 			try (final Socket socket = new Socket(InetAddress.getByAddress(new byte[] { 127, 0, 0, 1 }), port)) {
 				final PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 				// sending parameters
-				out.println(Arrays.toString(args));
+				String command = Arrays.toString(args);
+				logger.info("Sending: " + command);
+				out.println(command);
 			} catch (final IOException e1) {
 				logger.fatal("Exception while sending parameters to primary instance.", e1);
-				System.exit(1);
-				return;
 			}
-			
-			System.exit(0);
+			return false;
 		}
+		
+		final Thread serverThread = new Thread() {
+			@Override
+			public void run() {
+				Socket clientSocket;
+				while (true) {
+					try {
+						clientSocket = InterfaceBuilderApp.serverSocket.accept();
+						try (final PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+						     final BufferedReader in = new BufferedReader(
+								     new InputStreamReader(clientSocket.getInputStream()))) {
+							String inputLine;
+							while ((inputLine = in.readLine()) != null) {
+								out.println(inputLine);
+								logger.info("received message from client: " + inputLine);
+								final List<String> params =
+										Arrays.asList(inputLine.substring(1, inputLine.length() - 1).split(", "));
+								getInstance().executeCommand(params);
+							}
+						} catch(IOException e){
+							// client closed connection
+						} finally {
+							clientSocket.close();
+						}
+					} catch (final IOException e) {
+						if (e.getMessage().equals("socket closed")) {
+							// close thread, socket was closed
+							return;
+						}
+						logger.error("I/O Exception while waiting for client connections.", e);
+					}
+				}
+			}
+		};
+		serverThread.setName("IPCserver");
+		serverThread.setDaemon(true);
+		serverThread.setPriority(Thread.MIN_PRIORITY);
+		serverThread.start();
+		return true;
 	}
 	
 	/**
@@ -214,8 +221,6 @@ public class InterfaceBuilderApp extends Application {
 					}
 					startReplayOrQuitOrShowError(stage, params);
 					Platform.runLater(() -> navigationController.unlockNav());
-					executorTmp.shutdown();
-					executorTmp.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 				} catch (final InterruptedException e) {
 					Thread.currentThread().interrupt();
 				} catch (final Exception e) {
@@ -602,9 +607,16 @@ public class InterfaceBuilderApp extends Application {
 	 */
 	@Override
 	public void stop() {
+		try {
+			serverSocket.close();
+		} catch (IOException e) {
+			logger.error("ERROR: Server Socket had exception when closing: e");
+		}
 		logger.info("App is about to shut down.");
 		if (!executor.isShutdown()) {
 			executor.shutdownNow();
+		} else {
+			logger.info("Executor was already shut down.");
 		}
 		try {
 			executor.awaitTermination(120L, TimeUnit.SECONDS);

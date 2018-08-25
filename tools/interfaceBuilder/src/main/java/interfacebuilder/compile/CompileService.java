@@ -116,7 +116,8 @@ public class CompileService {
 	/**
 	 * Verifies the syntax of the xml document.
 	 */
-	private void verifyXml(final Collection<File> files) throws IOException, SAXException, ParserConfigurationException {
+	private void verifyXml(final Collection<File> files)
+			throws IOException, SAXException, ParserConfigurationException {
 		final DocumentBuilder dBuilder;
 		dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		dBuilder.setErrorHandler(new SilentXmlSaxErrorHandler());
