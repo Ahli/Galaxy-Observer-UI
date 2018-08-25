@@ -31,7 +31,8 @@ public class UIController extends UIElement {
 	
 	@JsonCreator
 	public UIController(@JsonProperty ("name") final String name,
-			@JsonProperty ("attributesKeyValues") final List<String> attributesKeyValueList) {
+			@JsonProperty ("attributesKeyValues") final List<String> attributesKeyValueList,
+			@JsonProperty ("keys") final List<UIAttribute> keys) {
 		super(name);
 		if (attributesKeyValueList != null) {
 			this.attributesKeyValueList = attributesKeyValueList;
@@ -40,6 +41,11 @@ public class UIController extends UIElement {
 			}
 		} else {
 			this.attributesKeyValueList = new ArrayList<>(0);
+		}
+		if(keys != null) {
+			this.keys = keys;
+		} else {
+			this.keys = new ArrayList<>(0);
 		}
 	}
 	

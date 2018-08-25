@@ -28,7 +28,8 @@ public class UIAttribute extends UIElement {
 	}
 	
 	@JsonCreator
-	public UIAttribute(@JsonProperty ("name") final String name, @JsonProperty ("keyValues") final List<String> keyValueList) {
+	public UIAttribute(@JsonProperty ("name") final String name,
+			@JsonProperty ("keyValues") final List<String> keyValueList) {
 		super(name);
 		this.keyValueList = keyValueList;
 		for (int i = 0, len = keyValueList.size(); i < len; i++) {

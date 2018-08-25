@@ -259,6 +259,8 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					// Animation's events
 					if (tagName.equals("event")) {
 						((UIAnimation) curElement).addEvent((UIAttribute) newElem);
+					} else if (tagName.equals("driver")) {
+						((UIAnimation) curElement).setDriver((UIAttribute) newElem);
 					} else {
 						logger.error("found an attribute that cannot be added to UIAnimation: " + newElem.toString());
 					}

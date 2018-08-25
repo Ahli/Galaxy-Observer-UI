@@ -32,7 +32,11 @@ public class UIStateGroup extends UIElement {
 			@JsonProperty ("states") final List<UIState> states) {
 		super(name);
 		this.defaultState = defaultState != null ? defaultState.intern() : defaultState;
-		this.states = states;
+		if(states != null) {
+			this.states = states;
+		} else {
+			this.states = new ArrayList<>(0);
+		}
 	}
 	
 	/**

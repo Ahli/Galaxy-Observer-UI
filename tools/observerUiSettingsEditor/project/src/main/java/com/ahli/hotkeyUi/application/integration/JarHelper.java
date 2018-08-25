@@ -69,7 +69,7 @@ public final class JarHelper {
 				final String tools = "\\tools\\";
 				str += dirStr.substring(dirStr.indexOf(tools) + tools.length(), dirStr.indexOf("\\target\\"));
 				str = str.replace('\\', '/');
-				if(logger.isTraceEnabled()) {
+				if (logger.isTraceEnabled()) {
 					logger.trace("after intellij #1: " + str);
 				}
 			}
@@ -104,13 +104,13 @@ public final class JarHelper {
 				str = str.substring(0, str.lastIndexOf(File.separator));
 			} else {
 				// test if intellij
-				if(f.getAbsolutePath().contains("\\lib\\idea_rt.jar")){
+				if (f.getAbsolutePath().contains("\\lib\\idea_rt.jar")) {
 					str = Paths.get("").toAbsolutePath().toString();
-					if(logger.isTraceEnabled()) {
+					if (logger.isTraceEnabled()) {
 						logger.trace("current working directory: " + str);
 					}
 					str = System.getProperty("user.dir");
-					if(logger.isTraceEnabled()) {
+					if (logger.isTraceEnabled()) {
 						logger.trace("current user.dir: " + str);
 					}
 				}
