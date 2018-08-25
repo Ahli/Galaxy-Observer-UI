@@ -72,8 +72,6 @@ public class InterfaceBuilderApp extends Application {
 	private static ServerSocket serverSocket;
 	private final List<ErrorTabController> errorTabControllers = new ArrayList<>();
 	@Autowired
-	private ConfigService config;
-	@Autowired
 	private ReplayFinder replayFinder;
 	@Autowired
 	private MpqBuilderService mpqBuilderService;
@@ -334,7 +332,7 @@ public class InterfaceBuilderApp extends Application {
 		}
 		logger.info("Game location: " + gamePath);
 		
-		final File replay = replayFinder.getLastUsedOrNewestReplay(isHeroes, config.getDocumentsPath());
+		final File replay = replayFinder.getLastUsedOrNewestReplay(isHeroes, configService.getDocumentsPath());
 		if (replay != null && replay.exists() && replay.isFile()) {
 			logger.info("Starting game with replay: " + replay.getName());
 			final String cmd = "cmd /C start \"\" \"" + gamePath + "\" \"" + replay.getAbsolutePath() + "\"";
@@ -454,8 +452,8 @@ public class InterfaceBuilderApp extends Application {
 	 * Prints variables into console.
 	 */
 	private void printVariables(final CommandLineParams params) {
-		logger.info("basePath: " + config.getBasePath());
-		logger.info("documentsPath: " + config.getDocumentsPath());
+		logger.info("basePath: " + configService.getBasePath());
+		logger.info("documentsPath: " + configService.getDocumentsPath());
 		final String paramCompilePath = params.getParamCompilePath();
 		if (paramCompilePath != null) {
 			logger.info("compile param path: " + paramCompilePath);
@@ -572,7 +570,6 @@ public class InterfaceBuilderApp extends Application {
 		final AutowireCapableBeanFactory autowireCapableBeanFactory = appContext.getAutowireCapableBeanFactory();
 		autowireCapableBeanFactory.autowireBean(this);
 		autowireCapableBeanFactory.initializeBean(this, getClass().getName());
-		
 	}
 	
 	/**

@@ -4,11 +4,9 @@ import com.ahli.galaxy.game.def.abstracts.GameDef;
 import interfacebuilder.integration.SettingsIniInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
 
 import java.io.File;
 
-@Service
 public class ConfigService {
 	
 	@Autowired

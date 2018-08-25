@@ -19,7 +19,6 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -31,7 +30,6 @@ import java.security.InvalidParameterException;
 import java.util.Collection;
 import java.util.concurrent.ThreadPoolExecutor;
 
-@Service
 public class BaseUiService {
 	private static final String UNKNOWN_GAME_EXCEPTION = "Unknown Game";
 	private static final Logger logger = LogManager.getLogger();

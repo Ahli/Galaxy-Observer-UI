@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
@@ -25,7 +24,6 @@ import java.util.List;
 /**
  * ProjectService manages Observer Interface project related tasks.
  */
-@Service
 public class ProjectService {
 	private static final Logger logger = LogManager.getLogger();
 	
