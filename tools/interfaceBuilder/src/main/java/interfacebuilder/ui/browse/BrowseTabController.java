@@ -14,6 +14,7 @@ import gnu.trove.map.hash.THashMap;
 import interfacebuilder.ui.settings.Updateable;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -48,6 +49,7 @@ public class BrowseTabController implements Updateable {
 	private TableColumn<Map.Entry<String, String>, String> columnValues;
 	@FXML
 	private TreeView<UIElement> frameTree;
+//	private ChangeListener<TreeItem<UIElement>> treeItemChangeListener;
 	@FXML
 	private ComboBox<String> fileDropdown;
 	private AutoCompletionBinding<String> fileDropdownAutoCompleteBinding;
@@ -74,11 +76,20 @@ public class BrowseTabController implements Updateable {
 		}));
 		frameTree.getSelectionModel().selectedItemProperty()
 				.addListener((observable, oldValue, newValue) -> showInTableView(newValue));
+//		treeItemChangeListener = new ChangeListener<>(){
+//			@Override
+//			public void changed(final ObservableValue<? extends TreeItem<UIElement>> observable, final TreeItem<UIElement> oldValue,
+//					final TreeItem<UIElement> newValue) {
+//				showInTableView(newValue);
+//			}
+//		};
+//		frameTree.getSelectionModel().selectedItemProperty().addListener(treeItemChangeListener);
 		
 		columnAttributes.setCellValueFactory(new Callback<>() {
 			@Override
 			public ObservableValue<String> call(
 					final TableColumn.CellDataFeatures<Map.Entry<String, String>, String> p) {
+				logger.info("attr cell value produced - "+p.getValue().getKey());
 				return new SimpleObjectProperty<>(p.getValue().getKey());
 			}
 		});
@@ -97,8 +108,10 @@ public class BrowseTabController implements Updateable {
 	
 	private void showInTableView(final TreeItem<UIElement> selected) {
 		if (selected == null) {
+			logger.info("table update - nothing selected");
 			tableView.getItems().clear();
 		} else {
+			logger.info("table update - start - "+selected);
 			final UIElement el = selected.getValue();
 			final Map<String, String> map = new HashMap<>(); // TODO maybe use something different that holds entries
 			if (el instanceof UIFrame) {
@@ -166,7 +179,10 @@ public class BrowseTabController implements Updateable {
 				}
 			}
 			tableView.getItems().setAll(map.entrySet());
+			logger.info("table update - item size "+tableView.getItems().size());
 			tableView.sort();
+//			tableView.refresh();
+			logger.info("table update - end");
 		}
 	}
 	
