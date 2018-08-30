@@ -41,7 +41,7 @@ public class SettingsController implements Updateable {
 		addCategoryItem(new TreeItem<>("Command Line Mode"), 2);
 		
 		// load page for selected setting
-		categoryTree.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<>() {
+		categoryTree.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<TreeItem<String>>() {
 			@Override
 			public void changed(final ObservableValue<? extends TreeItem<String>> observable,
 					final TreeItem<String> oldVal, final TreeItem<String> newVal) {

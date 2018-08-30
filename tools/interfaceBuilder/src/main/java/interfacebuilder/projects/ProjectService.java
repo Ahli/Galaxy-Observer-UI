@@ -107,7 +107,7 @@ public class ProjectService {
 	 * @return list of Projects with matching path
 	 */
 	public List<Project> getProjectsOfPath(final String path) {
-		return projectRepo.findAll(new Example<>() {
+		return projectRepo.findAll(new Example<Project>() {
 			@Override
 			public Project getProbe() {
 				return new Project(null, path, null);

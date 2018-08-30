@@ -2,6 +2,7 @@ package interfacebuilder.ui.home;
 
 import interfacebuilder.InterfaceBuilderApp;
 import interfacebuilder.compress.GameService;
+import interfacebuilder.i18n.Messages;
 import interfacebuilder.integration.FileService;
 import interfacebuilder.projects.Project;
 import interfacebuilder.projects.ProjectService;
@@ -95,10 +96,10 @@ public class HomeController implements Updateable {
 		projectsObservable = FXCollections.observableList(projectService.getAllProjects());
 		selectionList.setItems(projectsObservable);
 		selectionList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-		selectionList.setCellFactory(new Callback<>() {
+		selectionList.setCellFactory(new Callback<ListView<Project>, ListCell<Project>>() {
 			@Override
 			public ListCell<Project> call(final ListView<Project> p) {
-				return new ListCell<>() {
+				return new ListCell<Project>() {
 					@Override
 					protected void updateItem(final Project project, final boolean empty) {
 						super.updateItem(project, empty);
@@ -316,7 +317,7 @@ public class HomeController implements Updateable {
 			
 			// context menu with close option
 			final ContextMenu contextMenu = new ContextMenu();
-			final MenuItem closeItem = new MenuItem("Close");
+			final MenuItem closeItem = new MenuItem(Messages.getString("contextmenu.close"));
 			closeItem.setOnAction(event -> {
 				TabPaneController.getInstance().getTabPane().getTabs().remove(newTab);
 				logger.trace("close tab");

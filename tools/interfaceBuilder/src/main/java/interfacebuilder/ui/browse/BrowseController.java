@@ -24,9 +24,11 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -92,10 +94,10 @@ public class BrowseController implements Updateable {
 				FXCollections.observableList(projectService.getAllProjects());
 		projectListView.setItems(projectsObservable);
 		projectListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-		projectListView.setCellFactory(new Callback<>() {
+		projectListView.setCellFactory(new Callback<ListView<Project>, ListCell<Project>>() {
 			@Override
 			public ListCell<Project> call(final ListView<Project> p) {
-				return new ListCell<>() {
+				return new ListCell<Project>() {
 					@Override
 					protected void updateItem(final Project project, final boolean empty) {
 						super.updateItem(project, empty);
@@ -189,8 +191,16 @@ public class BrowseController implements Updateable {
 					loader.load(appContext.getResource("view/Content_UiBrowser_BrowseTab.fxml").getInputStream());
 			controller = loader.getController();
 			controllers.add(controller);
-			final Tab tab = new Tab(name, content);
-			tabPane.getTabs().add(tab);
+			final Tab newTab = new Tab(name, content);
+			tabPane.getTabs().add(newTab);
+			
+			// context menu with close option
+			final ContextMenu contextMenu = new ContextMenu();
+			final MenuItem closeItem = new MenuItem(Messages.getString("contextmenu.close"));
+			closeItem.setOnAction(event -> tabPane.getTabs().remove(newTab));
+			contextMenu.getItems().addAll(closeItem);
+			newTab.setContextMenu(contextMenu);
+			
 		} catch (final IOException e) {
 			logger.error("failed to load BrowseTab FXML", e);
 		}
