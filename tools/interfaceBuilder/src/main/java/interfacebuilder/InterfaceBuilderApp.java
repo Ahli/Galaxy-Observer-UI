@@ -20,8 +20,6 @@ import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.application.Preloader;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
@@ -165,7 +163,9 @@ public class InterfaceBuilderApp extends Application {
 							clientSocket.close();
 						}
 					} catch (final IOException e) {
-						if (e.getMessage().equals("socket closed")) {
+						final String message = e.getMessage();
+						if ("Socket is closed".equals(message) || "socket closed".equals(message) ||
+								("Interrupted function call: accept failed").equals(message)) {
 							// close thread, socket was closed
 							return;
 						}
@@ -259,12 +259,7 @@ public class InterfaceBuilderApp extends Application {
 						try {
 							// close after 5 seconds, if compiled all and no errors
 							final PauseTransition delay = new PauseTransition(Duration.seconds(5));
-							delay.setOnFinished(new EventHandler<>() {
-								@Override
-								public void handle(final ActionEvent event) {
-									primaryStage.close();
-								}
-							});
+							delay.setOnFinished(event -> primaryStage.close());
 							delay.play();
 						} catch (final Exception e) {
 							logger.fatal("FATAL ERROR: ", e);
@@ -341,10 +336,8 @@ public class InterfaceBuilderApp extends Application {
 		if (replay != null && replay.exists() && replay.isFile()) {
 			logger.info("Starting game with replay: " + replay.getName());
 			final String cmd = "cmd /C start \"\" \"" + gamePath + "\" \"" + replay.getAbsolutePath() + "\"";
-			// logging.trace("executing: " + cmd);
 			try {
 				Runtime.getRuntime().exec(cmd);
-				// logging.trace("after Start attempt...");
 			} catch (final IOException e) {
 				logger.error("Failed to execute the game launch command.", e);
 			}

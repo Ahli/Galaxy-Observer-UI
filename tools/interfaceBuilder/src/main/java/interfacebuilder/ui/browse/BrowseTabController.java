@@ -14,8 +14,6 @@ import gnu.trove.map.hash.THashMap;
 import interfacebuilder.ui.settings.Updateable;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -24,9 +22,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
-import javafx.util.Callback;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
 
@@ -38,7 +33,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class BrowseTabController implements Updateable {
-	private static final Logger logger = LogManager.getLogger(BrowseTabController.class);
+	//	private static final Logger logger = LogManager.getLogger(BrowseTabController.class);
 	private static final String GAME_UI = "GameUI";
 	
 	@FXML
@@ -49,7 +44,6 @@ public class BrowseTabController implements Updateable {
 	private TableColumn<Map.Entry<String, String>, String> columnValues;
 	@FXML
 	private TreeView<UIElement> frameTree;
-//	private ChangeListener<TreeItem<UIElement>> treeItemChangeListener;
 	@FXML
 	private ComboBox<String> fileDropdown;
 	private AutoCompletionBinding<String> fileDropdownAutoCompleteBinding;
@@ -76,30 +70,9 @@ public class BrowseTabController implements Updateable {
 		}));
 		frameTree.getSelectionModel().selectedItemProperty()
 				.addListener((observable, oldValue, newValue) -> showInTableView(newValue));
-//		treeItemChangeListener = new ChangeListener<>(){
-//			@Override
-//			public void changed(final ObservableValue<? extends TreeItem<UIElement>> observable, final TreeItem<UIElement> oldValue,
-//					final TreeItem<UIElement> newValue) {
-//				showInTableView(newValue);
-//			}
-//		};
-//		frameTree.getSelectionModel().selectedItemProperty().addListener(treeItemChangeListener);
 		
-		columnAttributes.setCellValueFactory(new Callback<>() {
-			@Override
-			public ObservableValue<String> call(
-					final TableColumn.CellDataFeatures<Map.Entry<String, String>, String> p) {
-				logger.info("attr cell value produced - "+p.getValue().getKey());
-				return new SimpleObjectProperty<>(p.getValue().getKey());
-			}
-		});
-		columnValues.setCellValueFactory(new Callback<>() {
-			@Override
-			public ObservableValue<String> call(
-					final TableColumn.CellDataFeatures<Map.Entry<String, String>, String> p) {
-				return new SimpleObjectProperty<>(p.getValue().getValue());
-			}
-		});
+		columnAttributes.setCellValueFactory(p -> new SimpleObjectProperty<>(p.getValue().getKey()));
+		columnValues.setCellValueFactory(p -> new SimpleObjectProperty<>(p.getValue().getValue()));
 		columnAttributes.prefWidthProperty().bind(tableView.widthProperty().divide(3));
 		columnValues.prefWidthProperty().bind(tableView.widthProperty().divide(1.5));
 		columnAttributes.sortTypeProperty().set(TableColumn.SortType.ASCENDING);
@@ -108,10 +81,8 @@ public class BrowseTabController implements Updateable {
 	
 	private void showInTableView(final TreeItem<UIElement> selected) {
 		if (selected == null) {
-			logger.info("table update - nothing selected");
 			tableView.getItems().clear();
 		} else {
-			logger.info("table update - start - "+selected);
 			final UIElement el = selected.getValue();
 			final Map<String, String> map = new HashMap<>(); // TODO maybe use something different that holds entries
 			if (el instanceof UIFrame) {
@@ -179,10 +150,7 @@ public class BrowseTabController implements Updateable {
 				}
 			}
 			tableView.getItems().setAll(map.entrySet());
-			logger.info("table update - item size "+tableView.getItems().size());
 			tableView.sort();
-//			tableView.refresh();
-			logger.info("table update - end");
 		}
 	}
 	
@@ -258,8 +226,6 @@ public class BrowseTabController implements Updateable {
 			fileNames.sort(null);
 			fileDropdown.setItems(fileNames);
 			final String firstSelection = fileNamesSet.contains(GAME_UI) ? GAME_UI : fileNames.get(0);
-			logger.info("first selection {}", firstSelection);
-			fileDropdown.setValue(firstSelection);
 			if (fileDropdownAutoCompleteBinding != null) {
 				fileDropdownAutoCompleteBinding.dispose();
 			}
@@ -268,6 +234,8 @@ public class BrowseTabController implements Updateable {
 			fileDropdownAutoCompleteBinding.setMaxWidth(fileDropdown.getWidth());
 			fileDropdownAutoCompleteBinding.setMinWidth(fileDropdown.getWidth());
 			fileDropdownAutoCompleteBinding.setPrefWidth(fileDropdown.getWidth());
+			// delay required to fix some internal nullpointer on the first usage of such an element
+			Platform.runLater(() -> fileDropdown.setValue(firstSelection));
 		}
 	}
 	

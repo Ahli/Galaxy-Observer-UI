@@ -42,7 +42,7 @@ public class UIController extends UIElement {
 		} else {
 			this.attributesKeyValueList = new ArrayList<>(0);
 		}
-		if(keys != null) {
+		if (keys != null) {
 			this.keys = keys;
 		} else {
 			this.keys = new ArrayList<>(0);
