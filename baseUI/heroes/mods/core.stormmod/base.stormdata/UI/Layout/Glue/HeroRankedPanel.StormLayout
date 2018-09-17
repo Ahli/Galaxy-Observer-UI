@@ -513,6 +513,20 @@
       <TooltipAnchorPosition val="TopCenter" />
       <Frame type="AnchoredPopup" name="ReadyRequirementsPopup" template="HeroRankedPanel/RankedReadyButtonAnchoredPopupTemplate" />
     </Frame>
+    <StateGroup name="ShowModeState">
+      <DefaultState val="HideUnknownModeWarning" />
+      <State name="ShowUnknownModeWarning">
+        <When type="Property" frame="$this" LastSoloModeUnknown="True" />
+        <When type="Property" frame="LeagueTypes/HeroLeague" IsSelected="False" />
+        <When type="Property" frame="LeagueTypes/TeamLeague" IsSelected="False" />
+        <Action type="SetState" frame="LeagueTypes/HeroLeague" group="WarningState" state="True" />
+        <Action type="SetState" frame="LeagueTypes/TeamLeague" group="WarningState" state="True" />
+      </State>
+      <State name="HideUnknownModeWarning">
+        <Action type="SetState" frame="LeagueTypes/HeroLeague" group="WarningState" state="False" />
+        <Action type="SetState" frame="LeagueTypes/TeamLeague" group="WarningState" state="False" />
+      </State>
+    </StateGroup>
     <Frame type="Button" name="ReadyButton" template="StandardTemplates/ReadyButtonTemplate_Middle">
       <ClickSound val="@UI_BNet_Ready" />
       <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
@@ -592,6 +606,25 @@
       <Frame type="Frame" name="TooltipHandler">
         <TooltipFrame val="WaitTimeTooltip" />
       </Frame>
+      <Frame type="Frame" name="QuestBranchTooltipHandler">
+        <Anchor relative="$parent/TooltipHandler" />
+        <Visible val="false" />
+        <TooltipAnchorPosition val="TopCenter" />
+        <TooltipFrame val="StandardTooltip" />
+        <AcceptsMouse val="true" />
+        <Tooltip val="{$parent/TooltipHandler/@Tooltip}" />
+      </Frame>
+      <StateGroup name="TooltipStates">
+        <State name="QuestBranchWarning">
+          <When type="AnimationState" ReadyNotification="QuestBranchWarning" />
+          <Action type="SetProperty" frame="TooltipHandler" Visible="false" />
+          <Action type="SetProperty" frame="QuestBranchTooltipHandler" Visible="true" />
+        </State>
+        <State name="DefaultState">
+          <Action type="SetProperty" frame="TooltipHandler" Visible="true" />
+          <Action type="SetProperty" frame="QuestBranchTooltipHandler" Visible="false" />
+        </State>
+      </StateGroup>
     </Frame>
   </Frame>
 </Desc>

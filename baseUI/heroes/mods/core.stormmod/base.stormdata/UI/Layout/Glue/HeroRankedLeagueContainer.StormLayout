@@ -102,13 +102,47 @@
       <Event event="NotRankedPlayLeaver" action="Restart,Play" frame="$parent/$parent" />
       <Event event="RankedPlayLeaver" action="DirectionReverse,Play" frame="$parent/$parent" />
     </Animation>
+    <StateGroup name="WarningState">
+      <State name="True">
+        <Action type="SetProperty" frame="ContainerButton/PulseImage" Visible="True" />
+      </State>
+      <State name="False">
+        <Action type="SetProperty" frame="ContainerButton/PulseImage" Visible="False" />
+      </State>
+    </StateGroup>
+    <StateGroup name="SelectionStates">
+      <State name="NotSelectedState">
+        <When type="Property" frame="$this" IsSelected="False" />
+        <When type="Property" frame="$this" CanSelect="True" />
+        <Action type="SendEvent" frame="ContainerButton/SelectedImage" event="Normal" />
+        <Action type="SetProperty" frame="ContainerButton" enabled="True" />
+        <Action type="SendEvent" frame="$this" event="Deselected" />
+      </State>
+      <State name="OnSelectionState">
+        <When type="Property" frame="$this" IsSelected="True" />
+        <When type="Property" frame="$this" CanSelect="True" />
+        <Action type="SendEvent" frame="ContainerButton/SelectedImage" event="Selected" />
+        <Action type="SetProperty" frame="ContainerButton" enabled="True" />
+        <Action type="SendEvent" frame="$this" event="Selected" />
+      </State>
+      <State name="DisabledState">
+        <When type="Property" frame="$this" IsSelected="False" />
+        <When type="Property" frame="$this" CanSelect="False" />
+        <Action type="SendEvent" frame="ContainerButton/SelectedImage" event="Disabled" />
+        <Action type="SetProperty" frame="ContainerButton" enabled="False" />
+        <Action type="SendEvent" frame="$this" event="Deselected" />
+      </State>
+      <State name="SelectedDisabledState">
+        <When type="Property" frame="$this" IsSelected="True" />
+        <When type="Property" frame="$this" CanSelect="False" />
+        <Action type="SendEvent" frame="ContainerButton/SelectedImage" event="Selected" />
+        <Action type="SetProperty" frame="ContainerButton" enabled="False" />
+        <Action type="SendEvent" frame="$this" event="Selected" />
+      </State>
+    </StateGroup>
     <Animation name="Selected">
       <Event event="Selected" action="Restart,Play" />
       <Event event="Deselected" action="DirectionReverse,Play" />
-      <Controller type="Texture" end="Pause" frame="Background">
-        <Key type="Image" time="0" image="@UI/Storm_UI_Ranked_ModeBackground_Off" />
-        <Key type="Image" time=".01" image="@UI/Storm_UI_Ranked_ModeBackground_On" />
-      </Controller>
       <Controller type="Visibility" end="Pause" frame="Glow1Image">
         <Key type="Bool" time="0" value="False" />
         <Key type="Bool" time=".01" value="True" />
@@ -237,6 +271,79 @@
       <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
       <Texture val="@UI/Storm_UI_Ranked_ModeBackground_Off" />
     </Frame>
+    <Frame type="Button" name="ContainerButton">
+      <Anchor relative="$parent/Background" />
+      <ClickSound val="@UI_BNet_Generic_01" />
+      <Frame type="Image" name="NormalImage">
+        <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
+        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
+        <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+        <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+        <StateCount val="1" />
+        <LayerCount val="1" />
+        <Texture val="@UI/Storm_UI_Ranked_ModeBackground_Off" layer="0" />
+        <DesaturateOnDisable val="false" />
+        <DisabledAlpha val="255" />
+        <Alpha val="0" />
+      </Frame>
+      <Frame type="Image" name="HoverImage">
+        <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
+        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
+        <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+        <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+        <StateCount val="1" />
+        <LayerCount val="1" />
+        <Texture val="@UI/Storm_UI_Ranked_ModeBackground_On" layer="0" />
+        <DesaturateOnDisable val="false" />
+        <DisabledAlpha val="255" />
+      </Frame>
+      <Frame type="Image" name="SelectedImage">
+        <Anchor relative="$parent/NormalImage" />
+        <Texture val="@UI/Storm_UI_Ranked_ModeBackground_Selected" />
+        <Visible val="false" />
+        <Alpha val="0" />
+        <DesaturateOnDisable val="false" />
+        <DisabledAlpha val="255" />
+        <Animation name="OnSelected">
+          <Event event="Selected" action="DirectionForward,Play" />
+          <Event event="Normal" action="DirectionReverse,Play" />
+          <Event event="Disabled" action="DirectionReverse,Play" />
+          <Controller type="Visibility" end="Pause">
+            <Key type="Bool" time="0" value="False" />
+            <Key type="Bool" time=".01" value="True" />
+          </Controller>
+          <Controller type="Fade" end="Pause">
+            <Key type="Curve" time="0" value="0" inout="Linear" />
+            <Key type="Curve" time=".2" value="255" inout="Slow,Linear" />
+          </Controller>
+          <Controller type="Fade" frame="$parent/HoverImage" end="Pause">
+            <Key type="Curve" time="0" value="255" inout="Linear" />
+            <Key type="Curve" time=".01" value="0" inout="Slow,Linear" />
+          </Controller>
+        </Animation>
+      </Frame>
+      <Frame type="Image" name="PulseImage">
+        <Anchor relative="$parent" />
+        <Texture val="@UI/Storm_UI_Ranked_ModeBackground_On" />
+        <BlendMode val="Add" />
+        <Alpha val="0" />
+        <Visible val="False" />
+        <Animation name="Glowing">
+          <Event event="OnShown" action="Reset,Play" />
+          <Controller type="Fade" end="Loop">
+            <Key type="Curve" time="0" value="200" inout="Linear" />
+            <Key type="Curve" time="0.75" value="0" inout="Linear" />
+            <Key type="Curve" time="1.5" value="200" inout="Linear" />
+          </Controller>
+        </Animation>
+      </Frame>
+      <Frame type="Frame" name="HitTestFrame">
+        <Anchor side="Top" relative="$parent" pos="Min" offset="15" />
+        <Anchor side="Bottom" relative="$parent" pos="Max" offset="-9" />
+        <Anchor side="Left" relative="$parent" pos="Min" offset="2" />
+        <Anchor side="Right" relative="$parent" pos="Max" offset="-2" />
+      </Frame>
+    </Frame>
     <Frame type="Image" name="HexGlow">
       <Anchor side="Bottom" relative="$parent/Background" pos="Max" offset="-28" />
       <Anchor side="Left" relative="$parent/Background" pos="Min" offset="15" />
@@ -315,7 +422,7 @@
       <Anchor side="Left" relative="$parent/Background" pos="Mid" offset="0" />
       <Tooltip val="@UI/RankedPlay/CasualLeagueTooltip" />
       <Texture val="@UI/TooltipInfoIcon" />
-      <AcceptsMouse val="true" />
+      <AcceptsMouseTooltip val="true" />
     </Frame>
     <Frame type="Label" name="DescriptionLabel">
       <Anchor side="Top" relative="$parent/TitleLabel" pos="Max" offset="-4" />
@@ -352,7 +459,7 @@
       <Anchor side="Left" relative="$parent/Background" pos="Mid" offset="0" />
       <Anchor side="Right" relative="$parent/Background" pos="Mid" offset="0" />
       <Style val="HeroLobbyRankedHeroLeagueRecord" />
-      <AcceptsMouse val="true" />
+      <AcceptsMouseTooltip val="true" />
       <TooltipAnchorPosition val="MiddleRight" />
     </Frame>
     <Frame type="Frame" name="FavoriteHeroPanel">

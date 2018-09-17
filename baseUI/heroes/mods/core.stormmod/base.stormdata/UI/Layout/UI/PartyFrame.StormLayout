@@ -168,13 +168,6 @@
       <VisibleToAlly val="False" />
       <VisibleToEnemy val="False" />
     </Frame>
-    <StateGroup name="LeoricDeathRecycle">
-      <State name="LeoricDead">
-        <When type="AnimationState" LeoricDeathRecycle="LeoricDead" />
-        <Action type="SetProperty" frame="HealthBar" ColorAdjustMode="Desaturate" />
-        <Action type="SetProperty" frame="HealthBar" AdjustmentColor="BBBBBB" />
-      </State>
-    </StateGroup>
   </Frame>
   <Frame type="UnitStatusFrame" name="HeroUnitStatusYellowEnergyTemplate" template="PartyFrame/HeroUnitStatusTemplate">
     <Frame type="UnitStatusEnergyBar" name="EnergyBar">
@@ -192,6 +185,12 @@
     <Frame type="UnitStatusEnergyBar" name="EnergyBar">
       <Width val="#HeroUnitEnergyBar_Wide" />
       <ColorStyle val="DivaEnergy" />
+    </Frame>
+  </Frame>
+  <Frame type="UnitStatusFrame" name="HeroUnitStatusRespawnTemplate" template="PartyFrame/HeroUnitStatusNoResourceTemplate">
+    <Frame type="UnitStatusShieldedHealthBar" name="HealthBar">
+      <ColorAdjustMode val="Desaturate" />
+      <AdjustmentColor val="BBBBBB" />
     </Frame>
   </Frame>
   <Frame type="Frame" name="HeroWithPetStatusFrameTemplate">
@@ -1984,10 +1983,11 @@
       </StateGroup>
     </Frame>
     <Frame type="Label" name="HeroDeathTimeLabel">
-      <Anchor side="Top" relative="$parent/IconFrame" pos="Min" offset="2" />
-      <Anchor side="Bottom" relative="$parent/IconFrame" pos="Max" offset="0" />
+      <Anchor side="Top" relative="$parent/IconFrame" pos="Mid" offset="1" />
+      <Anchor side="Bottom" relative="$parent/IconFrame" pos="Mid" offset="1" />
       <Anchor side="Left" relative="$parent/IconFrame" pos="Min" offset="15" />
       <Anchor side="Right" relative="$parent/IconFrame" pos="Max" offset="-10" />
+      <Height val="61" />
       <Style val="Storm_TopBar_DeathTimer" />
       <Visible val="false" />
       <Animation name="HeroRespawnAnim">
@@ -2008,18 +2008,23 @@
           <Key type="Curve" time="5.01" value="1" />
         </Controller>
       </Animation>
-      <StateGroup name="DeathExtendedIconVisible">
-        <State name="WhenDeathExtended">
+      <StateGroup name="AnchorsStates">
+        <DefaultState val="Default" />
+        <State name="Default" />
+        <State name="BottomRespawnBar">
+          <When type="Property" frame="$parent/HeroUnitStatusFrameRespawn" visible="True" />
+          <Action type="SetAnchor" side="Top" relative="$parent" pos="Mid" offset="-11" />
+          <Action type="SetAnchor" side="Bottom" relative="$parent" pos="Mid" offset="-11" />
+          <Action type="SetAnchor" side="Left" relative="$parent" pos="Min" offset="0" />
+          <Action type="SetAnchor" side="Right" relative="$parent" pos="Max" offset="0" />
+        </State>
+        <State name="DeathExtendedIcon">
           <When type="Property" frame="$parent/HeroDeathExtendedIcon" visible="True" />
-          <Action type="SetAnchor" frame="$this" side="Right" relative="$parent/HeroDeathExtendedIcon" pos="Min" offset="10" />
+          <Action type="SetAnchor" side="Right" relative="$parent/HeroDeathExtendedIcon" pos="Min" offset="10" />
         </State>
-        <State name="WhenDeathCondensed">
+        <State name="DeathCondensedIcon">
           <When type="Property" frame="$parent/HeroDeathCondensedIcon" visible="True" />
-          <Action type="SetAnchor" frame="$this" side="Right" relative="$parent/HeroDeathCondensedIcon" pos="Min" offset="10" />
-        </State>
-        <State name="WhenDeathNormal">
-          <When type="Property" frame="$parent/HeroDeathExtendedIcon" visible="False" />
-          <Action type="SetAnchor" frame="$this" side="Right" relative="$parent/IconFrame" pos="Max" offset="-10" />
+          <Action type="SetAnchor" side="Right" relative="$parent/HeroDeathCondensedIcon" pos="Min" offset="10" />
         </State>
       </StateGroup>
     </Frame>
@@ -2169,6 +2174,11 @@
       <Anchor side="Right" relative="$parent" pos="Max" offset="#HeathBarRightPosition" />
     </Frame>
     <Frame type="UnitStatusFrame" name="HeroUnitStatusFramePinkEnergy" template="PartyFrame/HeroUnitStatusPinkEnergyTemplate">
+      <Anchor side="Bottom" relative="$this" pos="Min" offset="0" />
+      <Anchor side="Top" relative="$parent" pos="Min" offset="#HealthBarVerticalPosition" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="#HeathBarRightPosition" />
+    </Frame>
+    <Frame type="UnitStatusFrame" name="HeroUnitStatusFrameRespawn" template="PartyFrame/HeroUnitStatusRespawnTemplate">
       <Anchor side="Bottom" relative="$this" pos="Min" offset="0" />
       <Anchor side="Top" relative="$parent" pos="Min" offset="#HealthBarVerticalPosition" />
       <Anchor side="Right" relative="$parent" pos="Max" offset="#HeathBarRightPosition" />
@@ -2656,6 +2666,18 @@
       <Frame type="UnitStatusEnergyBar" name="EnergyBar">
         <Anchor side="Left" relative="$parent/HealthBar" pos="Min" offset="-5" />
         <Texture val="@UI/HUD_TopBar_Team_HeroFrame_ManaFill_Right" />
+      </Frame>
+    </Frame>
+    <Frame type="UnitStatusFrame" name="HeroUnitStatusFrameRespawn" template="PartyFrame/HeroUnitStatusRespawnTemplate">
+      <Anchor side="Bottom" relative="$this" pos="Min" offset="0" />
+      <Anchor side="Right" relative="$this" pos="Min" offset="0" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="2" />
+      <Frame type="Image" name="HealthBarBacking">
+        <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0" />
+      </Frame>
+      <Frame type="UnitStatusShieldedHealthBar" name="HealthBar">
+        <Anchor side="Right" relative="$parent/HealthBarBacking" pos="Max" offset="-2" />
+        <Texture val="@UI/HUD_TopBar_Team_HeroFrame_HealthFill_Right" />
       </Frame>
     </Frame>
     <Frame type="Frame" name="HeroWithPetStatusFrame">
