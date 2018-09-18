@@ -364,7 +364,7 @@ public class Main extends Application {
 	 */
 	public void compile() throws ParserConfigurationException, SAXException {
 		final File cache = new File(mpqi.getMpqCachePath());
-		final String[] extensions = new String[] { "StormLayout", "SC2Layout" };
+		final String[] extensions = new String[] { "stormlayout", "sc2layout" };
 		final Collection<File> layoutFiles = FileUtils.listFiles(cache, extensions, true);
 		layoutExtReader.updateLayoutFiles(layoutFiles);
 	}

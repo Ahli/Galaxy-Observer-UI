@@ -176,9 +176,9 @@ public class BaseUiService {
 	private String[] getQueryMasks(final Game game) {
 		switch (game) {
 			case SC2:
-				return new String[] { "*.SC2Layout", "*Assets.txt", "*.SC2Style" };
+				return new String[] { "*.sc2layout", "*assets.txt", "*.sc2style" };
 			case HEROES:
-				return new String[] { "*.StormLayout", "*Assets.txt", "*.StormStyle" };
+				return new String[] { "*.stormlayout", "*assets.txt", "*.stormstyle" };
 			default:
 				throw new InvalidParameterException(UNKNOWN_GAME_EXCEPTION);
 		}
@@ -257,7 +257,7 @@ public class BaseUiService {
 						final String gameDir = configService.getBaseUiPath(game.getGameDef()) + File.separator +
 								game.getGameDef().getModsSubDirectory();
 						try {
-							final WildcardFileFilter fileFilter = new WildcardFileFilter("DescIndex.*Layout");
+							final WildcardFileFilter fileFilter = new WildcardFileFilter("descindex.*layout");
 							for (final String modOrDir : game.getGameDef().getCoreModsOrDirectories()) {
 								
 								final File directory = new File(gameDir + File.separator + modOrDir);

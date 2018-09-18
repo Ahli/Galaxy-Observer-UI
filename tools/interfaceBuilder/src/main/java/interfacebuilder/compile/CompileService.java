@@ -74,8 +74,8 @@ public class CompileService {
 				if (!repairLayoutOrder && verifyXml) {
 					// only verify XML and nothing else
 					final String[] extensions =
-							{ "xml", "SC2Layout", "StormLayout", "StormComponents", "SC2Components", "StormCutscene",
-									"SC2Cutscene", "StormStyle", "SC2Style" };
+							{ "xml", "sc2layout", "stormlayout", "stormcomponents", "sc2components", "stormcutscene",
+									"sc2cutscene", "stormstyle", "sc2style" };
 					final Collection<File> filesOfCache =
 							FileUtils.listFiles(mod.getMpqCacheDirectory(), extensions, true);
 					verifyXml(filesOfCache);

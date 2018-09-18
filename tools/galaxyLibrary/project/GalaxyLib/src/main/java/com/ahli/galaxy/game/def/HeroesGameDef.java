@@ -18,7 +18,7 @@ public class HeroesGameDef extends GameDef {
 		setDefaultRaceId("Terr");
 		setDocumentsGameDirectoryName("Heroes of the Storm");
 		setLayoutFileEnding("stormlayout");
-		setBaseDataFolderName("Base.StormData");
+		setBaseDataFolderName("base.stormdata");
 		setRootExeName("Heroes of the Storm.exe");
 		setPtrRootExeName("Heroes of the Storm Public Test.exe");
 		setSwitcherExeNameX32("HeroesSwitcher.exe");

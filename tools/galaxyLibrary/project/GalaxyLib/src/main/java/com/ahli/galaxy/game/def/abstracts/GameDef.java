@@ -15,7 +15,7 @@ public abstract class GameDef {
 	private String name = "StarCraft II";
 	private String nameHandle = "sc2";
 	private String layoutFileEnding = ".sc2layout";
-	private String baseDataFolderName = "Base.SC2Data";
+	private String baseDataFolderName = "base.sc2data";
 	private String rootExeName = "StarCraft II.exe";
 	private String ptrRootExeName = "StarCraft II Public Test.exe";
 	private String switcherExeNameX32 = "SC2Switcher.exe";
