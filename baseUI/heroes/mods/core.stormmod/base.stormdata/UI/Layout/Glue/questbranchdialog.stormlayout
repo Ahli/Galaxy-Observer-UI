@@ -14,6 +14,36 @@
       </Controller>
     </Animation>
   </Frame>
+  <Frame type="Frame" name="AcceptErrorFrameTemplate">
+    <Width val="860" />
+    <Height val="520" />
+    <Visible val="false" />
+    <Frame type="Image" name="BackgroundFrame">
+      <Anchor relative="$parent" />
+      <Texture val="@UI/Storm_UI_Quest_Event_Spooky_Dialog_ConfirmationFrame" />
+    </Frame>
+    <Frame type="Label" name="AcceptLabel">
+      <Anchor side="Top" relative="$parent" pos="Mid" offset="-20" />
+      <Anchor side="Bottom" relative="$parent" pos="Mid" offset="-20" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="100" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="-100" />
+      <Style val="QuestBranch_ConfirmDialogText" />
+      <Text val="@UI/RecruitFriendDialog/Error" />
+    </Frame>
+    <Frame type="Button" name="ContinueButton" template="StandardTemplates/QuestBranchCustomButtonTemplate">
+      <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
+      <Shortcut val="@UI/ScreenNavigationBack_Hotkey" />
+      <Text val="@@UI/Continue_Control" />
+      <Animation name="CloseAnim">
+        <Event event="OnClick" action="Reset, Play" />
+        <Controller type="Visibility" frame="$parent" end="Pause">
+          <Key type="Bool" time="0" value="false" />
+        </Controller>
+      </Animation>
+    </Frame>
+  </Frame>
   <Frame type="Frame" name="QuestAcceptFrameTemplate">
     <Width val="860" />
     <Height val="520" />
@@ -3923,14 +3953,8 @@
               <Controller type="Property" frame="$parent/$parent/Quest0" property="Toggled" end="Pause">
                 <Key type="Property" time="0" value="false" />
               </Controller>
-              <Controller type="Property" frame="$parent/$parent/Quest0" property="AcceptsMouse" end="Pause">
-                <Key type="Property" time="0" value="false" />
-              </Controller>
               <Controller type="Event" frame="$parent/$parent/Quest0" end="Stop">
                 <Key type="Event" time="0" event="QuestAccepted" />
-              </Controller>
-              <Controller type="Visibility" frame="$parent/$parent/Quest1" end="Pause">
-                <Key type="Bool" time="0" value="false" />
               </Controller>
             </Animation>
           </Frame>
@@ -3948,14 +3972,8 @@
               <Controller type="Property" frame="$parent/$parent/Quest1" property="Toggled" end="Pause">
                 <Key type="Property" time="0" value="false" />
               </Controller>
-              <Controller type="Property" frame="$parent/$parent/Quest1" property="AcceptsMouse" end="Pause">
-                <Key type="Property" time="0" value="false" />
-              </Controller>
               <Controller type="Event" frame="$parent/$parent/Quest1" end="Stop">
                 <Key type="Event" time="0" event="QuestAccepted" />
-              </Controller>
-              <Controller type="Visibility" frame="$parent/$parent/Quest0" end="Pause">
-                <Key type="Bool" time="0" value="false" />
               </Controller>
             </Animation>
           </Frame>
@@ -3983,11 +4001,19 @@
         <StateGroup name="RavenLordIntroStates">
           <State name="IntroPlayed">
             <When type="Property" frame="$ancestor[@type=QuestBranchDialog]" HasSeenRavenLordIntro="true" />
+            <When type="Property" frame="$ancestor[@type=QuestBranchDialog]" operator="NotEqual" FocusedQuest="" />
             <Action type="SetAnimationProperty" frame="Quest0" animation="ArcStart" enabled="false" />
             <Action type="SetAnimationProperty" frame="Quest1" animation="ArcStart" enabled="false" />
           </State>
           <State name="IntroNotPlayed">
             <When type="Property" frame="$ancestor[@type=QuestBranchDialog]" HasSeenRavenLordIntro="false" />
+            <When type="Property" frame="$ancestor[@type=QuestBranchDialog]" FocusedQuest="" />
+            <Action type="SetAnimationProperty" frame="Quest0" animation="ArcStart" enabled="true" />
+            <Action type="SetAnimationProperty" frame="Quest1" animation="ArcStart" enabled="true" />
+          </State>
+          <State name="ErrorState">
+            <When type="Property" frame="$ancestor[@type=QuestBranchDialog]" HasSeenRavenLordIntro="true" />
+            <When type="Property" frame="$ancestor[@type=QuestBranchDialog]" FocusedQuest="" />
             <Action type="SetAnimationProperty" frame="Quest0" animation="ArcStart" enabled="true" />
             <Action type="SetAnimationProperty" frame="Quest1" animation="ArcStart" enabled="true" />
           </State>
@@ -4269,6 +4295,20 @@
         </Controller>
         <Controller type="Texture" end="Pause" frame="EmceePortraitFrame/CharacterPortrait/HeroImage">
           <Key type="Image" time="0" image="@UI/Storm_UI_Quest_Event_Spooky_Emcee_Portrait_RavenLord_Happy" />
+        </Controller>
+      </Animation>
+    </Frame>
+    <Frame type="Frame" name="AcceptErrorFrame" template="QuestBranchDialog/AcceptErrorFrameTemplate">
+      <Anchor side="Top" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0" />
+      <RenderPriority val="803" />
+      <Handle val="QuestBranchDialogErrorFrame" />
+      <Animation name="ShowErrorAnim">
+        <Event event="BranchSelectError" frame="$parent" action="Reset, Play" />
+        <Controller type="Visibility" end="Pause">
+          <Key type="Bool" time="0" value="true" />
         </Controller>
       </Animation>
     </Frame>
