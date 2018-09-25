@@ -35,6 +35,9 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOCase;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -49,8 +52,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-
-;
 
 /**
  * Application
@@ -128,7 +129,7 @@ public class Main extends Application {
 			loader.setResources(Messages.getBundle());
 			
 			final TabPane tabPane;
-			try (InputStream is = Main.class.getResourceAsStream("/view/TabsLayout.fxml")) {
+			try (final InputStream is = Main.class.getResourceAsStream("/view/TabsLayout.fxml")) {
 				tabPane = loader.load(is);
 			}
 			
@@ -198,7 +199,7 @@ public class Main extends Application {
 		final FXMLLoader loader = new FXMLLoader();
 		loader.setResources(Messages.getBundle());
 		
-		try (InputStream is = Main.class.getResourceAsStream("/view/RootLayout.fxml")) {
+		try (final InputStream is = Main.class.getResourceAsStream("/view/RootLayout.fxml")) {
 			rootLayout = loader.load(is);
 		}
 		logger.trace("initialized root layout fxml within {}ms.", () -> (System.nanoTime() - time) / 1000000);
@@ -329,7 +330,7 @@ public class Main extends Application {
 			mpqi.buildMpq(openedDocPath, false, MpqEditorCompression.BLIZZARD_SC2_HEROES, false);
 			hasUnsavedFileChanges = false;
 			updateAppTitle();
-		} catch (InterruptedException e) {
+		} catch (final InterruptedException e) {
 			Thread.currentThread().interrupt();
 		} catch (final IOException | ParserConfigurationException | SAXException | MpqException e) {
 			logger.error(ExceptionUtils.getStackTrace(e), e);
@@ -364,8 +365,9 @@ public class Main extends Application {
 	 */
 	public void compile() throws ParserConfigurationException, SAXException {
 		final File cache = new File(mpqi.getMpqCachePath());
-		final String[] extensions = new String[] { "stormlayout", "sc2layout" };
-		final Collection<File> layoutFiles = FileUtils.listFiles(cache, extensions, true);
+		final String[] suffixes = new String[] { ".stormlayout", ".SC2Layout" };
+		final Collection<File> layoutFiles =
+				FileUtils.listFiles(cache, new SuffixFileFilter(suffixes, IOCase.INSENSITIVE), TrueFileFilter.INSTANCE);
 		layoutExtReader.updateLayoutFiles(layoutFiles);
 	}
 	
@@ -489,9 +491,8 @@ public class Main extends Application {
 				tabsCtrl.clearData();
 				hasUnsavedFileChanges = false;
 				
-				final boolean recursive = true;
 				final File cache = new File(mpqi.getMpqCachePath());
-				final Collection<File> layoutFiles = FileUtils.listFiles(cache, null, recursive);
+				final Collection<File> layoutFiles = FileUtils.listFiles(cache, null, true);
 				
 				layoutExtReader = new LayoutExtensionReader();
 				layoutExtReader.processLayoutFiles(layoutFiles);
@@ -618,7 +619,7 @@ public class Main extends Application {
 				hasUnsavedFileChanges = false;
 				openedDocPath = f.getAbsolutePath();
 				updateAppTitle();
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 				Thread.currentThread().interrupt();
 			} catch (final IOException | ParserConfigurationException | SAXException | MpqException e) {
 				logger.error(ExceptionUtils.getStackTrace(e), e);

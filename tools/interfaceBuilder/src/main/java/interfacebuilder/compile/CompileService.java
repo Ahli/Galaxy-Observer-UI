@@ -5,6 +5,9 @@ import com.ahli.galaxy.archive.DescIndexData;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
 import com.ahli.util.SilentXmlSaxErrorHandler;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOCase;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
@@ -73,11 +76,13 @@ public class CompileService {
 			} else {
 				if (!repairLayoutOrder && verifyXml) {
 					// only verify XML and nothing else
-					final String[] extensions =
-							{ "xml", "sc2layout", "stormlayout", "stormcomponents", "sc2components", "stormcutscene",
-									"sc2cutscene", "stormstyle", "sc2style" };
-					final Collection<File> filesOfCache =
-							FileUtils.listFiles(mod.getMpqCacheDirectory(), extensions, true);
+					final String[] suffixes =
+							{ ".xml", ".SC2Layout", ".stormlayout", ".stormcomponents", ".SC2Components",
+									".stormcutscene", ".SC2Cutscene", ".stormstyle", ".SC2Style" };
+					final Collection<File> filesOfCache = FileUtils
+							.listFiles(mod.getMpqCacheDirectory(), new SuffixFileFilter(suffixes, IOCase.INSENSITIVE),
+									TrueFileFilter.INSTANCE);
+					
 					verifyXml(filesOfCache);
 				}
 			}

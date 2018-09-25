@@ -10,12 +10,12 @@ public abstract class GameDef {
 	private String defaultRaceId = "Terr";
 	private String documentsGameDirectoryName = "StarCraft II";
 	private String documentsInterfaceSubdirectoryName = "Interfaces";
-	private String modFileEnding = ".sc2mod";
+	private String modFileEnding = ".SC2Mod";
 	private String modsSubDirectory = "mods";
 	private String name = "StarCraft II";
 	private String nameHandle = "sc2";
-	private String layoutFileEnding = ".sc2layout";
-	private String baseDataFolderName = "base.sc2data";
+	private String layoutFileEnding = ".SC2Layout";
+	private String baseDataFolderName = "Base.SC2Data";
 	private String rootExeName = "StarCraft II.exe";
 	private String ptrRootExeName = "StarCraft II Public Test.exe";
 	private String switcherExeNameX32 = "SC2Switcher.exe";

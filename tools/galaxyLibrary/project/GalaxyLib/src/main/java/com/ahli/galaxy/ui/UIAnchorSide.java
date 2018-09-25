@@ -5,6 +5,4 @@ package com.ahli.galaxy.ui;
  *
  * @author Ahli
  */
-public enum UIAnchorSide {
-	TOP, LEFT, BOTTOM, RIGHT
-}
+public enum UIAnchorSide {TOP, LEFT, BOTTOM, RIGHT}

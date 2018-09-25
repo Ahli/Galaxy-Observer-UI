@@ -13,6 +13,7 @@ import interfacebuilder.integration.FileService;
 import interfacebuilder.integration.SettingsIniInterface;
 import interfacebuilder.projects.enums.Game;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOCase;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
@@ -176,7 +177,7 @@ public class BaseUiService {
 	private String[] getQueryMasks(final Game game) {
 		switch (game) {
 			case SC2:
-				return new String[] { "*.sc2layout", "*assets.txt", "*.sc2style" };
+				return new String[] { "*.SC2Layout", "*Assets.txt", "*.SC2Style" };
 			case HEROES:
 				return new String[] { "*.stormlayout", "*assets.txt", "*.stormstyle" };
 			default:
@@ -257,7 +258,8 @@ public class BaseUiService {
 						final String gameDir = configService.getBaseUiPath(game.getGameDef()) + File.separator +
 								game.getGameDef().getModsSubDirectory();
 						try {
-							final WildcardFileFilter fileFilter = new WildcardFileFilter("descindex.*layout");
+							final WildcardFileFilter fileFilter =
+									new WildcardFileFilter("descindex.*layout", IOCase.INSENSITIVE);
 							for (final String modOrDir : game.getGameDef().getCoreModsOrDirectories()) {
 								
 								final File directory = new File(gameDir + File.separator + modOrDir);
