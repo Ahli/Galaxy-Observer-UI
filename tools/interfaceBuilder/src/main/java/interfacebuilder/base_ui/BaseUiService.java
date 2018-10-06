@@ -112,7 +112,7 @@ public class BaseUiService {
 				return;
 			}
 			fileService.cleanDirectory(destination);
-			discCacheService.remove(game.name(), configService.getIniSettings().isHeroesPtrActive());
+			discCacheService.remove(game.name(), usePtr);
 		} catch (final IOException e) {
 			logger.error(String.format("Directory %s could not be cleaned.", destination), e);
 			return;
@@ -123,10 +123,9 @@ public class BaseUiService {
 		for (final String mask : queryMasks) {
 			final Runnable task = () -> {
 				try {
-					final String maskFinal = mask;
-					if (extract(extractorExe, maskFinal, destination)) {
+					if (extract(extractorExe, mask, destination)) {
 						Thread.sleep(50);
-						if (extract(extractorExe, maskFinal, destination)) {
+						if (extract(extractorExe, mask, destination)) {
 							logger.warn(
 									"Extraction failed due to a file access. Try closing the Battle.net App, if it " +
 											"is" + " " + "running and this fails to extract all files.");
@@ -236,7 +235,7 @@ public class BaseUiService {
 					logger.trace("Aborting parsing baseUI for '" + gameName + "' as was already parsed.");
 				} else {
 					boolean needToParseAgain = true;
-					final boolean isPtr = game.getGameDef() instanceof SC2GameDef ? false :
+					final boolean isPtr = !(game.getGameDef() instanceof SC2GameDef) &&
 							configService.getIniSettings().isHeroesPtrActive();
 					if (discCacheService.exists(gameName, isPtr)) {
 						// load from cache

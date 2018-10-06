@@ -2,7 +2,12 @@ package interfacebuilder.ui.progress;
 
 import gnu.trove.map.hash.THashMap;
 import javafx.application.Platform;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.Appender;
+import org.apache.logging.log4j.core.Core;
 import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.LogEvent;
@@ -12,7 +17,6 @@ import org.apache.logging.log4j.core.config.plugins.PluginAttribute;
 import org.apache.logging.log4j.core.config.plugins.PluginElement;
 import org.apache.logging.log4j.core.config.plugins.PluginFactory;
 import org.apache.logging.log4j.core.layout.PatternLayout;
-import org.fxmisc.richtext.StyleClassedTextArea;
 
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
@@ -25,7 +29,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * TextAreaAppender for Log4j2. Source: http://blog.pikodat.com/2015/10/11/frontend-logging-with-javafx/ , modified for
  * org.fxmisc.richtext.StyleClassedTextArea: Ahli
  */
-@Plugin (name = "StylizedTextAreaAppender", category = "Core", elementType = "appender", printObject = true)
+@Plugin (name = "StylizedTextAreaAppender", category = Core.CATEGORY_NAME, elementType = Appender.ELEMENT_TYPE,
+         printObject = true)
 public final class StylizedTextAreaAppender extends AbstractAppender {
 	/* THashMap is more memory efficient than Java's one */
 	private static final Map<String, ErrorTabController> workerTaskControllers = new THashMap<>();
@@ -118,13 +123,18 @@ public final class StylizedTextAreaAppender extends AbstractAppender {
 			final Level level = event.getLevel();
 			final ErrorTabController controller = getWorkerTaskController(event.getThreadName());
 			if (controller != null) {
-				final StyleClassedTextArea txtArea = controller.getTextArea();
+				//				final StyleClassedTextArea txtArea = controller.getTextArea();
+				final TextFlow txtArea = controller.getTextArea();
 				
 				Platform.runLater(() -> {
 					try {
-						final int length = txtArea.getLength();
-						txtArea.appendText(message);
-						txtArea.setStyleClass(length, txtArea.getLength(), level.toString());
+						//						final int length = txtArea.getLength();
+						//						txtArea.appendText(message);
+						//						txtArea.setStyleClass(length, txtArea.getLength(), level.toString());
+						
+						final Text text = new Text(message);
+						text.setFill(Color.RED);
+						txtArea.getChildren().add(text);
 						
 						if (level == Level.ERROR || level == Level.FATAL) {
 							controller.reportError();

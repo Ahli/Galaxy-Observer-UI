@@ -5,6 +5,11 @@
 	<artifactId>ObserverUiSettingsEditor</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
+	<name>Observer UI Settings Editor</name>
+	<organization>
+		<!-- Used as the 'Vendor' for JNLP generation -->
+		<name>Ahli</name>
+	</organization>
 
 	<!-- goal to execute to check for plugins and dependency updates:
 			 versions:display-plugin-updates versions:display-dependency-updates
@@ -16,6 +21,8 @@
 		<executableJavaClass>com.ahli.hotkeyUi.application.Main</executableJavaClass>
 		<jarTargetPath>../../release/Observer UI Settings Editor</jarTargetPath>
 		<installerTargetPath>../../release</installerTargetPath>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<moduleName>ObserverUiSettingsEditor</moduleName>
 	</properties>
 
 	<build>
@@ -111,13 +118,32 @@
 					<parameters>true</parameters>
 					<compilerArgument>-.-add-modules=javafx.controls,javafx.base,javafx.fxml,javafx.graphics
 					</compilerArgument>-->
+
+					<compilerArgs>
+						<!-- for moditect -->
+						<compilerArg>--module-path</compilerArg>
+						<compilerArg>${project.build.directory}/modules</compilerArg>
+					</compilerArgs>
 				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>org.ow2.asm</groupId>
+						<artifactId>asm</artifactId>
+						<version>7.0-beta</version>
+					</dependency>
+				</dependencies>
 			</plugin>
 
 			<plugin>
 				<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-jar-plugin -->
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>3.1.0</version>
+				<configuration>
+					<!-- for moditect -->
+					<outputDirectory>
+						${project.build.directory}/modules
+					</outputDirectory>
+				</configuration>
 			</plugin>
 			<plugin>
 				<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-site-plugin -->
@@ -127,12 +153,12 @@
 			<plugin>
 				<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-deploy-plugin -->
 				<artifactId>maven-deploy-plugin</artifactId>
-				<version>2.8.2</version>
+				<version>3.0.0-M1</version>
 			</plugin>
 			<plugin>
 				<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-install-plugin -->
 				<artifactId>maven-install-plugin</artifactId>
-				<version>2.5.2</version>
+				<version>3.0.0-M1</version>
 			</plugin>
 			<plugin>
 				<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-surefire-plugin -->
@@ -288,6 +314,122 @@
 						<goals>
 							<goal>check</goal>
 						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.moditect</groupId>
+				<artifactId>moditect-maven-plugin</artifactId>
+				<version>1.0.0.Beta1</version>
+				<executions>
+					<execution>
+						<id>add-module-infos-2</id>
+						<phase>package</phase>
+						<goals>
+							<goal>add-module-info</goal>
+						</goals>
+						<configuration>
+							<!--<jvmVersion>11</jvmVersion>-->
+							<module>
+								<moduleInfo>
+									<name>ObserverUiSettingsEditor</name>
+									<opens>
+										com.ahli.hotkeyUi.application
+									</opens>
+								</moduleInfo>
+							</module>
+						</configuration>
+					</execution>
+					<execution>
+						<id>create-runtime-image</id>
+						<phase>package</phase>
+						<goals>
+							<goal>create-runtime-image</goal>
+						</goals>
+						<configuration>
+							<modulePath>
+								<path>${project.build.directory}/modules</path>
+							</modulePath>
+							<modules>
+								<module>ObserverUiSettingsEditor</module>
+								<!--<module>javafx.base</module>-->
+							</modules>
+							<!--<excludedResources>-->
+							<!--<pattern>glob:/com.example/**</pattern>-->
+							<!--</excludedResources>-->
+							<baseJdk>version=11,vendor=openjdk,platform=windows-x64</baseJdk>
+							<launcher>
+								<name>Observer UI Settings Editor</name>
+								<module>ObserverUiSettingsEditor</module>
+							</launcher>
+							<compression>2</compression>
+							<stripDebug>true</stripDebug>
+							<outputDirectory>
+								${project.build.directory}/jlink-image
+							</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- used to make the program run
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.6.0</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>${java.home}/bin/java</executable>
+							<arguments>
+								<argument>-.-module-path</argument>
+								<argument>
+									${project.build.directory}/modules
+								</argument>
+								<argument>-.-module</argument>
+								<argument>${moduleName}/${executableJavaClass}</argument>
+							</arguments>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin> -->
+			<plugin>
+				<groupId>com.coderplus.maven.plugins</groupId>
+				<artifactId>copy-rename-maven-plugin</artifactId>
+				<version>1.0.1</version>
+				<executions>
+					<execution>
+						<id>copy-target</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<sourceFile>${project.build.directory}/${project.build.finalName}.jar</sourceFile>
+							<destinationFile>${project.build.directory}/modules/${project.build.finalName}.jar
+							</destinationFile>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>3.1.1</version>
+				<executions>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/modules</outputDirectory>
+							<includeScope>runtime</includeScope>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>

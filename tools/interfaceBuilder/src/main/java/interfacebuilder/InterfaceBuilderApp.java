@@ -28,12 +28,11 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.fxmisc.flowless.VirtualizedScrollPane;
-import org.fxmisc.richtext.StyleClassedTextArea;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.SpringApplication;
@@ -64,10 +63,14 @@ import java.util.concurrent.TimeUnit;
 
 @SpringBootApplication
 public class InterfaceBuilderApp extends Application {
-	
+	static {
+		System.setProperty("log4j2.debug", "true");
+	}
 	private static final Logger logger = LogManager.getLogger(InterfaceBuilderApp.class);
 	private static InterfaceBuilderApp instance;
 	private static ServerSocket serverSocket;
+	
+	
 	private final List<ErrorTabController> errorTabControllers = new ArrayList<>();
 	@Autowired
 	private ReplayFinder replayFinder;
@@ -85,7 +88,6 @@ public class InterfaceBuilderApp extends Application {
 	private Stage primaryStage;
 	private NavigationController navigationController;
 	
-	
 	/**
 	 * Entry point of the App.
 	 *
@@ -93,6 +95,20 @@ public class InterfaceBuilderApp extends Application {
 	 * 		command line arguments
 	 */
 	public static void main(final String[] args) {
+		//		try {
+		//			TextFlow textFlow;
+		//			final FileDescriptor fd = new RandomAccessFile("/javafx/scene/text/TextFlow", "r").getFD();
+		//			final Field field = FileDescriptor.class.getDeclaredField("fd");
+		//			final Method export = Module.class.getDeclaredMethod("implAddOpens", String.class);
+		//			Permit.setAccessible(export);
+		//
+		//		} catch (final NoSuchMethodException | IOException e) {
+		//			e.printStackTrace();
+		//		} catch (final NoSuchFieldException e) {
+		//			e.printStackTrace();
+		//		}
+		//		Permit.godMode();
+		
 		if (!initInterProcessCommunication(args, 12317)) {
 			return;
 		}
@@ -109,6 +125,8 @@ public class InterfaceBuilderApp extends Application {
 		logger.info("Max Heap Space: " + Runtime.getRuntime().maxMemory() / 1048576L + "mb.");
 		
 		System.setProperty("javafx.preloader", AppPreloader.class.getCanonicalName());
+		
+		
 		launch(args);
 	}
 	
@@ -121,16 +139,16 @@ public class InterfaceBuilderApp extends Application {
 	private static boolean initInterProcessCommunication(final String[] args, final int port) {
 		try {
 			serverSocket = new ServerSocket(port, 4, InetAddress.getByAddress(new byte[] { 127, 0, 0, 1 }));
-		} catch (UnknownHostException e) {
+		} catch (final UnknownHostException e) {
 			logger.fatal("Could not retrieve localhost address.", e);
 			return false;
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			// port taken, so app is already running
 			logger.info("App already running. Passing over command line arguments.");
 			try (final Socket socket = new Socket(InetAddress.getByAddress(new byte[] { 127, 0, 0, 1 }), port)) {
 				final PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 				// sending parameters
-				String command = Arrays.toString(args);
+				final String command = Arrays.toString(args);
 				logger.info("Sending: " + command);
 				out.println(command);
 			} catch (final IOException e1) {
@@ -157,7 +175,7 @@ public class InterfaceBuilderApp extends Application {
 										Arrays.asList(inputLine.substring(1, inputLine.length() - 1).split(", "));
 								getInstance().executeCommand(params);
 							}
-						} catch (IOException e) {
+						} catch (final IOException e) {
 							// client closed connection
 						} finally {
 							clientSocket.close();
@@ -508,18 +526,21 @@ public class InterfaceBuilderApp extends Application {
 	public void addThreadLoggerTab(final String threadName, final String tabTitle,
 			final boolean errorsDoNotPreventExit) {
 		final Tab newTab = new Tab();
-		final StyleClassedTextArea newTxtArea = new StyleClassedTextArea();
+		//		final StyleClassedTextArea newTxtArea = new StyleClassedTextArea();
+		final TextFlow newTxtArea = new TextFlow();
 		final ErrorTabController errorTabCtrl =
 				new ErrorTabController(newTab, newTxtArea, true, false, errorsDoNotPreventExit);
 		errorTabCtrl.setRunning(true);
 		errorTabControllers.add(errorTabCtrl);
 		
-		final VirtualizedScrollPane<StyleClassedTextArea> virtualizedScrollPane =
-				new VirtualizedScrollPane<>(newTxtArea);
-		newTab.setContent(virtualizedScrollPane);
+		//		final VirtualizedScrollPane<StyleClassedTextArea> virtualizedScrollPane =
+		//		final VirtualizedScrollPane<StyleClassedTextArea> virtualizedScrollPane =
+		//				new VirtualizedScrollPane<>(newTxtArea);
+		//		newTab.setContent(virtualizedScrollPane);
+		newTab.setContent(newTxtArea);
 		StylizedTextAreaAppender.setWorkerTaskController(errorTabCtrl, threadName);
 		newTab.setText(tabTitle);
-		newTxtArea.setEditable(false);
+		//		newTxtArea.setEditable(false);
 		
 		// context menu with close option
 		final ContextMenu contextMenu = new ContextMenu();
@@ -568,6 +589,15 @@ public class InterfaceBuilderApp extends Application {
 		final AutowireCapableBeanFactory autowireCapableBeanFactory = appContext.getAutowireCapableBeanFactory();
 		autowireCapableBeanFactory.autowireBean(this);
 		autowireCapableBeanFactory.initializeBean(this, getClass().getName());
+		
+		// load log4j2 config because that does not seem to work with java 11 modules anymore
+		//		try (final InputStream is = appContext.getResource("log4j2.xml").getInputStream()) {
+		//			final ConfigurationSource source = new ConfigurationSource(is);
+		//			Configurator.initialize(null, source);
+		//		} catch (final IOException e) {
+		//			logger.error("Could not programmatically load log4j2.xml.", e);
+		//		}
+		
 	}
 	
 	/**
@@ -602,7 +632,7 @@ public class InterfaceBuilderApp extends Application {
 	public void stop() {
 		try {
 			serverSocket.close();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			logger.error("ERROR: Server Socket had exception when closing: e");
 		}
 		logger.info("App is about to shut down.");

@@ -25,4 +25,6 @@ module GalaxyLib {
 	exports com.ahli.mpq.i18n;
 	exports com.ahli.mpq.mpqeditor;
 	exports com.ahli.util;
+	
+	opens com.ahli.galaxy.ui to com.fasterxml.jackson.databind;
 }

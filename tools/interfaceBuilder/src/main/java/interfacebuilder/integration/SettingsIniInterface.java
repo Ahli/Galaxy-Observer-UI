@@ -75,7 +75,9 @@ public class SettingsIniInterface {
 		try {
 			readSettingsFromFile();
 		} catch (final IOException e) {
-			logger.error("Failed to load settings from ini at construction.", e);
+			logger.error(
+					String.format("Failed to load settings from ini at construction. Filepath=%s", settingsFilePath),
+					e);
 		}
 	}
 	

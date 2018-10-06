@@ -6,8 +6,8 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import org.fxmisc.flowless.VirtualizedScrollPane;
-import org.fxmisc.richtext.StyleClassedTextArea;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 
 public class TabPaneController implements Updateable {
 	private static TabPaneController instance;
@@ -38,14 +38,18 @@ public class TabPaneController implements Updateable {
 	public void initialize() {
 		
 		// log4j2 prints into txtArea
-		final StyleClassedTextArea txtArea = new StyleClassedTextArea();
-		txtArea.setEditable(false);
+		//		final StyleClassedTextArea txtArea = new StyleClassedTextArea();
+		//		txtArea.setEditable(false);
 		// txtArea within special ScrollPane
-		final VirtualizedScrollPane<StyleClassedTextArea> virtualizedScrollPane = new VirtualizedScrollPane<>(txtArea);
+		//		final VirtualizedScrollPane<StyleClassedTextArea> virtualizedScrollPane = new VirtualizedScrollPane<>(txtArea);
+		final TextFlow txtArea = new TextFlow();
+		txtArea.getChildren().add(new Text("This is how text looks like in TextFlow."));
+		
 		// special ScrollPane within first Tab of tabPane
 		final ObservableList<Tab> tabs = tabPane.getTabs();
 		final Tab tab = tabs.get(0);
-		tab.setContent(virtualizedScrollPane);
+		//		tab.setContent(virtualizedScrollPane);
+		tab.setContent(txtArea);
 		
 		final ErrorTabController errorTabCtrl = new ErrorTabController(tab, txtArea, false, true, false);
 		//errorTabCtrl.setRunning(true);

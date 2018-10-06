@@ -2,6 +2,7 @@ package interfacebuilder.integration;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.boot.system.ApplicationHome;
 
 import java.io.File;
 import java.net.URI;
@@ -34,14 +35,16 @@ public final class JarHelper {
 	public static File getJarDir(final Class<?> aclass) {
 		logger.trace("_FINDING JAR'S PATH");
 		
+		
 		// ATTEMPT #1
-		final File f = new File(System.getProperty("java.class.path"));
-		final File dir = f.getAbsoluteFile().getParentFile();
+		//		final File f = new File(System.getProperty("java.class.path"));
+		//		final File dir = f.getAbsoluteFile().getParentFile();
+		final File dir = new ApplicationHome(aclass).getDir();
 		String str = dir.toString();
 		logger.trace("Attempt#1 java.class.path: {}", () -> dir.toString());
 		
 		// check if started in eclipse
-		final String targetClasses = File.separator + "target" + File.separator + "classes;";
+		final String targetClasses = File.separator + "target" + File.separator + "classes";
 		final int i = str.indexOf(targetClasses);
 		if (i > 0) {
 			final String check = str.substring(0, i);
