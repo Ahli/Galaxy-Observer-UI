@@ -2,7 +2,7 @@ package interfacebuilder.ui.progress;
 
 import gnu.trove.map.hash.THashMap;
 import javafx.application.Platform;
-import javafx.scene.paint.Color;
+import javafx.scene.text.FontSmoothingType;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import org.apache.logging.log4j.Level;
@@ -133,7 +133,8 @@ public final class StylizedTextAreaAppender extends AbstractAppender {
 						//						txtArea.setStyleClass(length, txtArea.getLength(), level.toString());
 						
 						final Text text = new Text(message);
-						text.setFill(Color.RED);
+						text.getStyleClass().add(level.toString());
+						text.setFontSmoothingType(FontSmoothingType.LCD);
 						txtArea.getChildren().add(text);
 						
 						if (level == Level.ERROR || level == Level.FATAL) {

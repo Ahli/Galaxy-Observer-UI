@@ -4,9 +4,9 @@ import interfacebuilder.InterfaceBuilderApp;
 import interfacebuilder.ui.settings.Updateable;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
 public class TabPaneController implements Updateable {
@@ -43,13 +43,15 @@ public class TabPaneController implements Updateable {
 		// txtArea within special ScrollPane
 		//		final VirtualizedScrollPane<StyleClassedTextArea> virtualizedScrollPane = new VirtualizedScrollPane<>(txtArea);
 		final TextFlow txtArea = new TextFlow();
-		txtArea.getChildren().add(new Text("This is how text looks like in TextFlow."));
+		txtArea.getStyleClass().add("styled-text-area");
+		final ScrollPane scrollPane = new ScrollPane(txtArea);
+		scrollPane.getStyleClass().add("virtualized-scroll-pane");
 		
 		// special ScrollPane within first Tab of tabPane
 		final ObservableList<Tab> tabs = tabPane.getTabs();
 		final Tab tab = tabs.get(0);
 		//		tab.setContent(virtualizedScrollPane);
-		tab.setContent(txtArea);
+		tab.setContent(scrollPane);
 		
 		final ErrorTabController errorTabCtrl = new ErrorTabController(tab, txtArea, false, true, false);
 		//errorTabCtrl.setRunning(true);

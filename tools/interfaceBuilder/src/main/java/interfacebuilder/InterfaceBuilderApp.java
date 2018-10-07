@@ -24,6 +24,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.image.Image;
@@ -528,6 +529,7 @@ public class InterfaceBuilderApp extends Application {
 		final Tab newTab = new Tab();
 		//		final StyleClassedTextArea newTxtArea = new StyleClassedTextArea();
 		final TextFlow newTxtArea = new TextFlow();
+		newTxtArea.getStyleClass().add("styled-text-area");
 		final ErrorTabController errorTabCtrl =
 				new ErrorTabController(newTab, newTxtArea, true, false, errorsDoNotPreventExit);
 		errorTabCtrl.setRunning(true);
@@ -537,7 +539,10 @@ public class InterfaceBuilderApp extends Application {
 		//		final VirtualizedScrollPane<StyleClassedTextArea> virtualizedScrollPane =
 		//				new VirtualizedScrollPane<>(newTxtArea);
 		//		newTab.setContent(virtualizedScrollPane);
-		newTab.setContent(newTxtArea);
+		
+		ScrollPane scrollPane = new ScrollPane(newTxtArea);
+		scrollPane.getStyleClass().add("virtualized-scroll-pane");
+		newTab.setContent(scrollPane);
 		StylizedTextAreaAppender.setWorkerTaskController(errorTabCtrl, threadName);
 		newTab.setText(tabTitle);
 		//		newTxtArea.setEditable(false);
