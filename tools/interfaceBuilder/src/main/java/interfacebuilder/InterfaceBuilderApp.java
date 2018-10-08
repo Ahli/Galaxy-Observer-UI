@@ -65,12 +65,12 @@ import java.util.concurrent.TimeUnit;
 @SpringBootApplication
 public class InterfaceBuilderApp extends Application {
 	static {
-		System.setProperty("log4j2.debug", "true");
+		//		System.setProperty("log4j2.debug", "true");
 	}
+	
 	private static final Logger logger = LogManager.getLogger(InterfaceBuilderApp.class);
 	private static InterfaceBuilderApp instance;
 	private static ServerSocket serverSocket;
-	
 	
 	private final List<ErrorTabController> errorTabControllers = new ArrayList<>();
 	@Autowired
@@ -96,19 +96,6 @@ public class InterfaceBuilderApp extends Application {
 	 * 		command line arguments
 	 */
 	public static void main(final String[] args) {
-		//		try {
-		//			TextFlow textFlow;
-		//			final FileDescriptor fd = new RandomAccessFile("/javafx/scene/text/TextFlow", "r").getFD();
-		//			final Field field = FileDescriptor.class.getDeclaredField("fd");
-		//			final Method export = Module.class.getDeclaredMethod("implAddOpens", String.class);
-		//			Permit.setAccessible(export);
-		//
-		//		} catch (final NoSuchMethodException | IOException e) {
-		//			e.printStackTrace();
-		//		} catch (final NoSuchFieldException e) {
-		//			e.printStackTrace();
-		//		}
-		//		Permit.godMode();
 		
 		if (!initInterProcessCommunication(args, 12317)) {
 			return;
@@ -540,7 +527,7 @@ public class InterfaceBuilderApp extends Application {
 		//				new VirtualizedScrollPane<>(newTxtArea);
 		//		newTab.setContent(virtualizedScrollPane);
 		
-		ScrollPane scrollPane = new ScrollPane(newTxtArea);
+		final ScrollPane scrollPane = new ScrollPane(newTxtArea);
 		scrollPane.getStyleClass().add("virtualized-scroll-pane");
 		newTab.setContent(scrollPane);
 		StylizedTextAreaAppender.setWorkerTaskController(errorTabCtrl, threadName);

@@ -28,6 +28,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 /**
  * TextAreaAppender for Log4j2. Source: http://blog.pikodat.com/2015/10/11/frontend-logging-with-javafx/ , modified for
  * org.fxmisc.richtext.StyleClassedTextArea: Ahli
+ * <p>
+ * If this Appender does not work, then the Log4j2Plugins.dat might not have been created.
  */
 @Plugin (name = "StylizedTextAreaAppender", category = Core.CATEGORY_NAME, elementType = Appender.ELEMENT_TYPE,
          printObject = true)
@@ -48,6 +50,12 @@ public final class StylizedTextAreaAppender extends AbstractAppender {
 			final Layout<? extends Serializable> layout, final boolean ignoreExceptions) {
 		super(name, filter, layout, ignoreExceptions);
 	}
+	
+	
+	//	public static StylizedTextAreaAppender createDefaultAppenderForLayout(final Layout<? extends Serializable> layout) {
+	//		// this method cannot use the builder class without introducing an infinite loop due to DefaultConfiguration
+	//		return new StylizedTextAreaAppender("", null, null, false);
+	//	}
 	
 	/**
 	 * Factory method. Log4j will parse the configuration and call this factory method to construct the appender with

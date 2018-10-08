@@ -2,7 +2,7 @@
 : Batch Script 
 : author: @AhliSC2
 
-java -jar compile-spring-boot.jar
+"C:\Program Files\Java\jdk-11\bin\java.exe" -jar compile.jar
 
 : line breaks
 echo.

@@ -53,8 +53,6 @@ module interfacex.builder {
 	opens interfacebuilder.ui.browse to spring.core, javafx.fxml;
 	// open to log4j to maybe fix the appender
 	opens interfacebuilder.ui.progress to javafx.fxml, org.apache.logging.log4j;
-	// richtextfx requires text, but does not have access
-	
 	exports interfacebuilder.ui.progress to org.apache.logging.log4j.core;
 	
 }
