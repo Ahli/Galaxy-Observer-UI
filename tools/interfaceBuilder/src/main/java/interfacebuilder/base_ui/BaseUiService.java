@@ -112,7 +112,7 @@ public class BaseUiService {
 				return;
 			}
 			fileService.cleanDirectory(destination);
-			discCacheService.remove(game.name(), usePtr);
+			discCacheService.remove(gameDef.getName(), usePtr);
 		} catch (final IOException e) {
 			logger.error(String.format("Directory %s could not be cleaned.", destination), e);
 			return;

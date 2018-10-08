@@ -19,12 +19,12 @@ public class DiscCacheService {
 	
 	/**
 	 * @param catalog
-	 * @param id
+	 * @param gameDefName
 	 * @throws IOException
 	 */
-	public void put(final UICatalog catalog, final String id, final boolean isPtr) throws IOException {
+	public void put(final UICatalog catalog, final String gameDefName, final boolean isPtr) throws IOException {
 		final ObjectMapper objMapper = new ObjectMapper();
-		final File f = getCacheFile(id, isPtr);
+		final File f = getCacheFile(gameDefName, isPtr);
 		Files.createDirectories(f.getParentFile().toPath());
 		final Path p = f.toPath();
 		Files.deleteIfExists(p);
@@ -36,26 +36,27 @@ public class DiscCacheService {
 	}
 	
 	/**
-	 * @param id
+	 * @param gameDefName
 	 * @return
 	 */
-	private File getCacheFile(final String id, final boolean isPtr) {
-		final String path = configService.getCachePath() + File.separator + id + (isPtr ? " PTR" : "") + ".zip";
+	private File getCacheFile(final String gameDefName, final boolean isPtr) {
+		final String path =
+				configService.getCachePath() + File.separator + gameDefName + (isPtr ? " PTR" : "") + ".zip";
 		return new File(path);
 	}
 	
 	/**
-	 * @param id
+	 * @param gameDefName
 	 * @param isPtr
 	 * @param clazz
 	 * @param <T>
 	 * @return
 	 * @throws IOException
 	 */
-	public <T> T get(final String id, final boolean isPtr, final Class<T> clazz) throws IOException {
+	public <T> T get(final String gameDefName, final boolean isPtr, final Class<T> clazz) throws IOException {
 		final T catalog;
 		final ObjectMapper objMapper = new ObjectMapper();
-		final Path p = getCacheFile(id, isPtr).toPath();
+		final Path p = getCacheFile(gameDefName, isPtr).toPath();
 		try (final ZipInputStream in = new ZipInputStream(Files.newInputStream(p))) {
 			in.getNextEntry();
 			catalog = objMapper.readValue(in, clazz);
@@ -64,23 +65,23 @@ public class DiscCacheService {
 	}
 	
 	/**
-	 * @param id
+	 * @param gameDefName
 	 * @param isPtr
 	 * @throws IOException
 	 */
-	public void remove(final String id, final boolean isPtr) throws IOException {
-		final File f = getCacheFile(id, isPtr);
+	public void remove(final String gameDefName, final boolean isPtr) throws IOException {
+		final File f = getCacheFile(gameDefName, isPtr);
 		if (f.exists()) {
 			Files.delete(f.toPath());
 		}
 	}
 	
 	/**
-	 * @param id
+	 * @param gameDefName
 	 * @param isPtr
 	 * @return
 	 */
-	public boolean exists(final String id, final boolean isPtr) {
-		return getCacheFile(id, isPtr).exists();
+	public boolean exists(final String gameDefName, final boolean isPtr) {
+		return getCacheFile(gameDefName, isPtr).exists();
 	}
 }
