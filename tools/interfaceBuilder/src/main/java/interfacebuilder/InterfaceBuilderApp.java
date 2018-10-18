@@ -68,10 +68,10 @@ public class InterfaceBuilderApp extends Application {
 	private static final Logger logger = LogManager.getLogger(InterfaceBuilderApp.class);
 	private static InterfaceBuilderApp instance;
 	private static ServerSocket serverSocket;
-
-	static {
-		//		System.setProperty("log4j2.debug", "true");
-	}
+	
+	//	static {
+	//				System.setProperty("log4j2.debug", "true");
+	//	}
 	
 	private final List<ErrorTabController> errorTabControllers = new ArrayList<>();
 	@Autowired
@@ -321,9 +321,8 @@ public class InterfaceBuilderApp extends Application {
 				isHeroes = true;
 				gameDef = gameService.getGameDef(Game.HEROES);
 				final boolean isPtr = settings.isHeroesPtrActive();
-				final boolean is64bit = isPtr ? settings.isHeroesPtr64bit() : settings.isHeroes64bit();
-				final String supportDir = is64bit ? gameDef.getSupportDirectoryX64() : gameDef.getSupportDirectoryX32();
-				final String swicherExe = is64bit ? gameDef.getSwitcherExeNameX64() : gameDef.getSwitcherExeNameX32();
+				final String supportDir = gameDef.getSupportDirectoryX64();
+				final String swicherExe = gameDef.getSwitcherExeNameX64();
 				gamePath =
 						(isPtr ? settings.getHeroesPtrPath() : settings.getHeroesPath()) + File.separator + supportDir +
 								File.separator + swicherExe;
@@ -483,7 +482,7 @@ public class InterfaceBuilderApp extends Application {
 			logger.error("Error during SC2 baseUI update check.", e);
 		}
 		try {
-			if (baseUiService.isOutdated(Game.HEROES, false, configService.getIniSettings().isHeroes64bit())) {
+			if (baseUiService.isOutdated(Game.HEROES, false, true)) {
 				navigationController.appendNotification(
 						new Notification(Messages.getString("browse.notification.heroesOutOfDate"),
 								NavigationController.BROWSE_TAB));
@@ -492,7 +491,7 @@ public class InterfaceBuilderApp extends Application {
 			logger.error("Error during Heroes baseUI update check.", e);
 		}
 		try {
-			if (baseUiService.isOutdated(Game.HEROES, true, configService.getIniSettings().isHeroesPtr64bit())) {
+			if (baseUiService.isOutdated(Game.HEROES, true, true)) {
 				navigationController.appendNotification(
 						new Notification(Messages.getString("browse.notification.heroesPtrOutOfDate"),
 								NavigationController.BROWSE_TAB));

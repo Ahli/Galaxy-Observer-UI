@@ -18,7 +18,6 @@ import java.io.File;
 public class SettingsGamesPathsController extends SettingsAutoSaveController {
 	public static final String HEROES_SWITCHER_EXE = "HeroesSwitcher.exe";
 	public static final String SC2_SWITCHER_EXE = "SC2Switcher.exe";
-	
 	@FXML
 	private TextField sc2Path;
 	@FXML
@@ -26,11 +25,7 @@ public class SettingsGamesPathsController extends SettingsAutoSaveController {
 	@FXML
 	private TextField heroesPath;
 	@FXML
-	private CheckBox heroesArchitecture;
-	@FXML
 	private TextField heroesPtrPath;
-	@FXML
-	private CheckBox heroesPtrArchitecture;
 	@FXML
 	private Label sc2PathLabel;
 	@FXML
@@ -67,9 +62,7 @@ public class SettingsGamesPathsController extends SettingsAutoSaveController {
 		// load values from ini
 		final SettingsIniInterface settings = configService.getIniSettings();
 		heroesPath.setText(settings.getHeroesPath());
-		heroesArchitecture.setSelected(settings.isHeroes64bit());
 		heroesPtrPath.setText(settings.getHeroesPtrPath());
-		heroesPtrArchitecture.setSelected(settings.isHeroesPtr64bit());
 		sc2Path.setText(settings.getSc2Path());
 		sc2Architecture.setSelected(settings.isSc64bit());
 		
@@ -95,69 +88,10 @@ public class SettingsGamesPathsController extends SettingsAutoSaveController {
 		validatePath(heroesPtrPath.getText(), HEROES_SWITCHER_EXE, heroesPtrPathLabel);
 	}
 	
-	private void setSc2Path(final String path) {
-		sc2Path.setText(path);
-		configService.getIniSettings().setSc2Path(path);
-		validatePath(path, SC2_SWITCHER_EXE, sc2PathLabel);
-		persistSettingsIni();
-	}
-	
-	private void setHeroesPath(final String path) {
-		heroesPath.setText(path);
-		configService.getIniSettings().setHeroesPath(path);
-		validatePath(path, HEROES_SWITCHER_EXE, heroesPathLabel);
-		persistSettingsIni();
-	}
-	
-	private void setHeroesPtrPath(final String path) {
-		heroesPtrPath.setText(path);
-		configService.getIniSettings().setHeroesPtrPath(path);
-		validatePath(path, HEROES_SWITCHER_EXE, heroesPtrPathLabel);
-		persistSettingsIni();
-	}
-	
-	/**
-	 * Validates a path leading to a game directory and adjusts the UI's error label.
-	 *
-	 * @param path
-	 * 		installation path to validate
-	 * @param switcher
-	 * 		name of the Switcher.exe file found in the "Support" folder
-	 * @param invalidLabel
-	 * 		label set visible if invalid, can be null
-	 * @return whether the path belongs to that game directory or not
-	 */
-	private boolean validatePath(final String path, final String switcher, final Label invalidLabel) {
-		boolean valid = false;
-		if (path != null) {
-			final File f = new File(path);
-			valid = f.exists() && f.isDirectory() &&
-					new File(path + File.separator + "Support" + File.separator + switcher).exists();
-		}
-		if (invalidLabel != null) {
-			invalidLabel.setVisible(!valid);
-		}
-		return valid;
-	}
-	
 	@FXML
 	public void onSc2ArchitectureChange(final ActionEvent event) {
 		final boolean val = ((CheckBox) event.getSource()).selectedProperty().getValue();
 		configService.getIniSettings().setSc2Is64Bit(val);
-		persistSettingsIni();
-	}
-	
-	@FXML
-	public void onHeroesArchitectureChange(final ActionEvent event) {
-		final boolean val = ((CheckBox) event.getSource()).selectedProperty().getValue();
-		configService.getIniSettings().setHeroesIs64Bit(val);
-		persistSettingsIni();
-	}
-	
-	@FXML
-	public void onHeroesPtrArchitectureChange(final ActionEvent event) {
-		final boolean val = ((CheckBox) event.getSource()).selectedProperty().getValue();
-		configService.getIniSettings().setHeroesPtrIs64Bit(val);
 		persistSettingsIni();
 	}
 	
@@ -190,6 +124,49 @@ public class SettingsGamesPathsController extends SettingsAutoSaveController {
 		return directoryChooser.showDialog(getWindow());
 	}
 	
+	private void setSc2Path(final String path) {
+		sc2Path.setText(path);
+		configService.getIniSettings().setSc2Path(path);
+		validatePath(path, SC2_SWITCHER_EXE, sc2PathLabel);
+		persistSettingsIni();
+	}
+	
+	/**
+	 * Validates a path leading to a game directory and adjusts the UI's error label.
+	 *
+	 * @param path
+	 * 		installation path to validate
+	 * @param switcher
+	 * 		name of the Switcher.exe file found in the "Support" folder
+	 * @param invalidLabel
+	 * 		label set visible if invalid, can be null
+	 * @return whether the path belongs to that game directory or not
+	 */
+	private boolean validatePath(final String path, final String switcher, final Label invalidLabel) {
+		boolean valid = false;
+		if (path != null) {
+			final File f = new File(path);
+			valid = switcherExists(path, switcher, false) ||
+					switcherExists(path, switcher.replace(".exe", "_x64.exe"), true);
+		}
+		if (invalidLabel != null) {
+			invalidLabel.setVisible(!valid);
+		}
+		return valid;
+	}
+	
+	/**
+	 * @param gameDirectoryPath
+	 * @param switcherName
+	 * @param is64bit
+	 * @return
+	 */
+	private boolean switcherExists(final String gameDirectoryPath, final String switcherName, final boolean is64bit) {
+		return new File(
+				gameDirectoryPath + File.separator + "Support" + (is64bit ? "64" : "") + File.separator + switcherName)
+				.exists();
+	}
+	
 	@FXML
 	public void onHeroesPathButtonClick() {
 		final File selectedFile =
@@ -199,6 +176,13 @@ public class SettingsGamesPathsController extends SettingsAutoSaveController {
 		}
 	}
 	
+	private void setHeroesPath(final String path) {
+		heroesPath.setText(path);
+		configService.getIniSettings().setHeroesPath(path);
+		validatePath(path, HEROES_SWITCHER_EXE, heroesPathLabel);
+		persistSettingsIni();
+	}
+	
 	@FXML
 	public void onHeroesPtrPathButtonClick() {
 		final File selectedFile = showDirectoryChooser("Select Heroes of the Storm's PTR installation directory",
@@ -206,5 +190,12 @@ public class SettingsGamesPathsController extends SettingsAutoSaveController {
 		if (selectedFile != null) {
 			setHeroesPtrPath(selectedFile.getAbsolutePath());
 		}
+	}
+	
+	private void setHeroesPtrPath(final String path) {
+		heroesPtrPath.setText(path);
+		configService.getIniSettings().setHeroesPtrPath(path);
+		validatePath(path, HEROES_SWITCHER_EXE, heroesPtrPathLabel);
+		persistSettingsIni();
 	}
 }

@@ -48,8 +48,6 @@ public class SettingsIniInterface {
 	private String heroesPtrPath = "";
 	private boolean heroesPtrActive;
 	private boolean sc2X64;
-	private boolean heroesX64;
-	private boolean heroesPtrX64;
 	private boolean cmdLineVerifyXml = true;
 	private boolean cmdLineRepairLayoutOrder = true;
 	private boolean cmdLineVerifyLayout = true;
@@ -113,8 +111,6 @@ public class SettingsIniInterface {
 		heroesPath = section.getString(HEROES_PATH, emptryStr);
 		heroesPtrPath = section.getString(HEROES_PTR_PATH, emptryStr);
 		sc2Path = section.getString(STARCRAFT2_PATH, emptryStr);
-		heroesX64 = section.getBoolean(HEROES_USE64BIT, false);
-		heroesPtrX64 = section.getBoolean(HEROES_PTR_USE64BIT, false);
 		sc2X64 = section.getBoolean(STARCRAFT2_USE64BIT, false);
 		
 		section = ini.getSection(CATEGORY_COMMAND_LINE_TOOL);
@@ -172,8 +168,6 @@ public class SettingsIniInterface {
 		section.setProperty(HEROES_PATH, heroesPath);
 		section.setProperty(HEROES_PTR_PATH, heroesPtrPath);
 		section.setProperty(STARCRAFT2_USE64BIT, sc2X64);
-		section.setProperty(HEROES_USE64BIT, heroesX64);
-		section.setProperty(HEROES_PTR_USE64BIT, heroesPtrX64);
 		
 		section = ini.getSection(CATEGORY_COMMAND_LINE_TOOL);
 		section.setProperty(VERIFY_XML, cmdLineVerifyXml);
@@ -347,38 +341,10 @@ public class SettingsIniInterface {
 	}
 	
 	/**
-	 * @return
-	 */
-	public boolean isHeroesPtr64bit() {
-		return heroesPtrX64;
-	}
-	
-	/**
-	 * @return
-	 */
-	public boolean isHeroes64bit() {
-		return heroesX64;
-	}
-	
-	/**
 	 * @param sc2Is64Bit
 	 */
 	public void setSc2Is64Bit(final boolean sc2Is64Bit) {
 		sc2X64 = sc2Is64Bit;
-	}
-	
-	/**
-	 * @param heroesIs64Bit
-	 */
-	public void setHeroesIs64Bit(final boolean heroesIs64Bit) {
-		heroesX64 = heroesIs64Bit;
-	}
-	
-	/**
-	 * @param heroesPtrIs64Bit
-	 */
-	public void setHeroesPtrIs64Bit(final boolean heroesPtrIs64Bit) {
-		heroesPtrX64 = heroesPtrIs64Bit;
 	}
 	
 	/**
