@@ -23,6 +23,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,7 +34,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class BrowseTabController implements Updateable {
-	//	private static final Logger logger = LogManager.getLogger(BrowseTabController.class);
+	private static final Logger logger = LogManager.getLogger(BrowseTabController.class);
 	private static final String GAME_UI = "GameUI";
 	@FXML
 	private TextField treeFilter;
@@ -44,7 +46,7 @@ public class BrowseTabController implements Updateable {
 	private TableColumn<Map.Entry<String, String>, String> columnValues;
 	@FXML
 	private TreeView<UIElement> frameTree;
-	private THashMap<TreeItem<UIElement>, List<TreeItem<UIElement>>> hiddenTreeChildMap;
+	private Map<TreeItem<UIElement>, List<TreeItem<UIElement>>> hiddenTreeChildMap;
 	@FXML
 	private ComboBox<String> fileDropdown;
 	//	private AutoCompletionBinding<String> fileDropdownAutoCompleteBinding;
@@ -75,7 +77,7 @@ public class BrowseTabController implements Updateable {
 		columnAttributes.setCellValueFactory(p -> new SimpleObjectProperty<>(p.getValue().getKey()));
 		columnValues.setCellValueFactory(p -> new SimpleObjectProperty<>(p.getValue().getValue()));
 		columnAttributes.prefWidthProperty().bind(tableView.widthProperty().divide(3));
-		columnValues.prefWidthProperty().bind(tableView.widthProperty().divide(1.5));
+		columnValues.prefWidthProperty().bind(tableView.widthProperty().divide(1.5).subtract(5));
 		columnAttributes.sortTypeProperty().set(TableColumn.SortType.ASCENDING);
 		tableView.getSortOrder().add(columnAttributes);
 		
@@ -86,27 +88,33 @@ public class BrowseTabController implements Updateable {
 	 * @param filter
 	 */
 	private void filterTree(final String filter, final String filterBefore) {
+		frameTree.setVisible(false);
 		if (hiddenTreeChildMap == null) {
-			hiddenTreeChildMap = new THashMap<>();
+			hiddenTreeChildMap = new HashMap<>();
 		}
 		final String filterUpper = filter.toUpperCase();
 		
 		
-		final String filterBeforeUpper = filterBefore.toUpperCase();
-		if (filterBeforeUpper.contains(filterUpper)) {
-			filterTreeShow(filterUpper);
+		//		final String filterBeforeUpper = filterBefore.toUpperCase();
+		//		if (filterBeforeUpper.contains(filterUpper)) {
+		//		}
+		logger.info("filter-show: " + filterUpper);
+		filterTreeShow(filterUpper);
+		if(!filterUpper.isEmpty()) {
+			logger.info("filter-hide: " + filterUpper);
+			filterTreeHide(filterUpper, frameTree.getRoot());
 		}
-		filterTreeHide(filter, frameTree.getRoot());
 		
 		// release memory
 		if (hiddenTreeChildMap.isEmpty()) {
 			hiddenTreeChildMap = null;
 		}
+		frameTree.setVisible(true);
 	}
 	
 	private void filterTreeShow(final String queryUpper) {
 		List<TreeItem<UIElement>> children;
-		for (final var entry : hiddenTreeChildMap.entrySet()) {
+		for (final var entry : Set.copyOf(hiddenTreeChildMap.entrySet())) {
 			children = entry.getValue();
 			final TreeItem<UIElement> parent = entry.getKey();
 			final var visibleChildren = parent.getChildren();
@@ -124,6 +132,7 @@ public class BrowseTabController implements Updateable {
 					final String name = elem.getName();
 					if (name != null && name.toUpperCase().contains(queryUpper)) {
 						// is a match -> make visible
+//						logger.info("making visible: " + name);
 						visibleChildren.add(indexVisible, child);
 						sizeVisible++;
 						indexVisible++;
@@ -138,27 +147,48 @@ public class BrowseTabController implements Updateable {
 			}
 			// clear the list, if possible
 			if (hasNoInvisChildLeft) {
+//				logger.info("has no invis child left: " + parent.getValue().getName());
 				hiddenTreeChildMap.remove(parent);
 			}
 		}
-		
+		//		if(){
+		//
+		//		}
 	}
 	
 	
-	private void filterTreeHide(final String queryUpper, final TreeItem<UIElement> elem) {
+	private boolean filterTreeHide(final String queryUpper, final TreeItem<UIElement> elem) {
 		final var children = elem.getChildren();
-		if (children.isEmpty()) {
-			final String name = elem.getValue().getName();
-			if (name == null || !name.toUpperCase().contains(queryUpper)) {
-				final var parent = elem.getParent();
-				final var siblings = parent.getChildren();
-				if (!hiddenTreeChildMap.containsKey(parent)) {
-					final List<TreeItem<UIElement>> siblingsCopy = new ArrayList<>(siblings);
-					hiddenTreeChildMap.put(parent, siblingsCopy);
+		if (!children.isEmpty()) {
+			for (int i = 0, len = children.size(); i < len; i++) {
+				if (filterTreeHide(queryUpper, children.get(i))) {
+					i--;
+					len--;
 				}
-				siblings.remove(elem);
 			}
 		}
+		boolean removed = false;
+		if (children.isEmpty()) {
+			final String name = elem.getValue().getName();
+//			logger.info("checking to hide: " + name);
+			if (name == null || !name.toUpperCase().contains(queryUpper)) {
+//				logger.info("hiding: " + name.toUpperCase() + ", query: "+queryUpper);
+				removed = true;
+				final var parent = elem.getParent();
+				if (parent != null) {
+					final var siblings = parent.getChildren();
+					if (!hiddenTreeChildMap.containsKey(parent)) {
+						final List<TreeItem<UIElement>> siblingsCopy = new ArrayList<>(siblings);
+						hiddenTreeChildMap.put(parent, siblingsCopy);
+					}
+					siblings.remove(elem);
+				}
+				//				else {
+				//					frameTree.setShowRoot(false);
+				//				}
+			}
+		}
+		return removed;
 	}
 	
 	private void showInTableView(final TreeItem<UIElement> selected) {

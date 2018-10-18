@@ -4,7 +4,7 @@ module interfacex.builder {
 	requires java.xml;
 	requires com.fasterxml.jackson.databind;
 	requires com.fasterxml.jackson.annotation;
-	requires controlsfx;
+//	requires controlsfx;
 	requires core;
 	requires de.jensd.fx.glyphs.fontawesome;
 	requires javafx.base;
