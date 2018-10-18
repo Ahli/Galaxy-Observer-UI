@@ -23,8 +23,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
-import org.controlsfx.control.textfield.AutoCompletionBinding;
-import org.controlsfx.control.textfield.TextFields;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,10 +47,10 @@ public class BrowseTabController implements Updateable {
 	private THashMap<TreeItem<UIElement>, List<TreeItem<UIElement>>> hiddenTreeChildMap;
 	@FXML
 	private ComboBox<String> fileDropdown;
-	private AutoCompletionBinding<String> fileDropdownAutoCompleteBinding;
+	//	private AutoCompletionBinding<String> fileDropdownAutoCompleteBinding;
 	@FXML
 	private ComboBox<String> templateDropdown;
-	private AutoCompletionBinding<String> templateDropdownAutoCompleteBinding;
+	//	private AutoCompletionBinding<String> templateDropdownAutoCompleteBinding;
 	private Map<String, UITemplate> templateMap;
 	
 	private UICatalog uiCatalog;
@@ -310,14 +308,14 @@ public class BrowseTabController implements Updateable {
 			fileNames.sort(null);
 			fileDropdown.setItems(fileNames);
 			final String firstSelection = fileNamesSet.contains(GAME_UI) ? GAME_UI : fileNames.get(0);
-//			if (fileDropdownAutoCompleteBinding != null) {
-//				fileDropdownAutoCompleteBinding.dispose();
-//			}
-//			fileDropdownAutoCompleteBinding =
-//					TextFields.bindAutoCompletion(fileDropdown.getEditor(), fileDropdown.getItems());
-//			fileDropdownAutoCompleteBinding.setMaxWidth(fileDropdown.getWidth());
-//			fileDropdownAutoCompleteBinding.setMinWidth(fileDropdown.getWidth());
-//			fileDropdownAutoCompleteBinding.setPrefWidth(fileDropdown.getWidth());
+			//			if (fileDropdownAutoCompleteBinding != null) {
+			//				fileDropdownAutoCompleteBinding.dispose();
+			//			}
+			//			fileDropdownAutoCompleteBinding =
+			//					TextFields.bindAutoCompletion(fileDropdown.getEditor(), fileDropdown.getItems());
+			//			fileDropdownAutoCompleteBinding.setMaxWidth(fileDropdown.getWidth());
+			//			fileDropdownAutoCompleteBinding.setMinWidth(fileDropdown.getWidth());
+			//			fileDropdownAutoCompleteBinding.setPrefWidth(fileDropdown.getWidth());
 			// delay required to fix some internal nullpointer on the first usage of such an element
 			Platform.runLater(() -> fileDropdown.setValue(firstSelection));
 		}
@@ -349,14 +347,14 @@ public class BrowseTabController implements Updateable {
 			}
 			final ObservableList<String> elementNames = FXCollections.observableList(new ArrayList<>(templatesOfFile));
 			templateDropdown.setItems(elementNames);
-//			if (templateDropdownAutoCompleteBinding != null) {
-//				templateDropdownAutoCompleteBinding.dispose();
-//			}
-//			templateDropdownAutoCompleteBinding =
-//					TextFields.bindAutoCompletion(templateDropdown.getEditor(), templateDropdown.getItems());
-//			templateDropdownAutoCompleteBinding.setMaxWidth(templateDropdown.getWidth());
-//			templateDropdownAutoCompleteBinding.setMinWidth(templateDropdown.getWidth());
-//			templateDropdownAutoCompleteBinding.setPrefWidth(templateDropdown.getWidth());
+			//			if (templateDropdownAutoCompleteBinding != null) {
+			//				templateDropdownAutoCompleteBinding.dispose();
+			//			}
+			//			templateDropdownAutoCompleteBinding =
+			//					TextFields.bindAutoCompletion(templateDropdown.getEditor(), templateDropdown.getItems());
+			//			templateDropdownAutoCompleteBinding.setMaxWidth(templateDropdown.getWidth());
+			//			templateDropdownAutoCompleteBinding.setMinWidth(templateDropdown.getWidth());
+			//			templateDropdownAutoCompleteBinding.setPrefWidth(templateDropdown.getWidth());
 			if (firstSelection != null) {
 				templateDropdown.setValue(firstSelection);
 			} else {

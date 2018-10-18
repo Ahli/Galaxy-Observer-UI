@@ -1,4 +1,4 @@
-package interfacebuilder;
+package interfacebuilder.integration;
 
 import javafx.application.Application;
 

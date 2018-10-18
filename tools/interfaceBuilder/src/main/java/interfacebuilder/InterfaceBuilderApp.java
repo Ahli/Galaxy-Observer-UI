@@ -6,6 +6,7 @@ import interfacebuilder.build.MpqBuilderService;
 import interfacebuilder.compress.GameService;
 import interfacebuilder.config.ConfigService;
 import interfacebuilder.i18n.Messages;
+import interfacebuilder.integration.CommandLineParams;
 import interfacebuilder.integration.ReplayFinder;
 import interfacebuilder.integration.SettingsIniInterface;
 import interfacebuilder.projects.enums.Game;
@@ -64,13 +65,13 @@ import java.util.concurrent.TimeUnit;
 
 @SpringBootApplication
 public class InterfaceBuilderApp extends Application {
-	static {
-		//		System.setProperty("log4j2.debug", "true");
-	}
-	
 	private static final Logger logger = LogManager.getLogger(InterfaceBuilderApp.class);
 	private static InterfaceBuilderApp instance;
 	private static ServerSocket serverSocket;
+
+	static {
+		//		System.setProperty("log4j2.debug", "true");
+	}
 	
 	private final List<ErrorTabController> errorTabControllers = new ArrayList<>();
 	@Autowired
