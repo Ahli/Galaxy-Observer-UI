@@ -20,6 +20,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
@@ -35,7 +36,8 @@ import java.util.Set;
 public class BrowseTabController implements Updateable {
 	//	private static final Logger logger = LogManager.getLogger(BrowseTabController.class);
 	private static final String GAME_UI = "GameUI";
-	
+	@FXML
+	private TextField treeFilter;
 	@FXML
 	private TableView<Map.Entry<String, String>> tableView;
 	@FXML
@@ -44,6 +46,7 @@ public class BrowseTabController implements Updateable {
 	private TableColumn<Map.Entry<String, String>, String> columnValues;
 	@FXML
 	private TreeView<UIElement> frameTree;
+	private THashMap<TreeItem<UIElement>, List<TreeItem<UIElement>>> hiddenTreeChildMap;
 	@FXML
 	private ComboBox<String> fileDropdown;
 	private AutoCompletionBinding<String> fileDropdownAutoCompleteBinding;
@@ -77,6 +80,87 @@ public class BrowseTabController implements Updateable {
 		columnValues.prefWidthProperty().bind(tableView.widthProperty().divide(1.5));
 		columnAttributes.sortTypeProperty().set(TableColumn.SortType.ASCENDING);
 		tableView.getSortOrder().add(columnAttributes);
+		
+		treeFilter.textProperty().addListener((observable, oldValue, newValue) -> filterTree(newValue, oldValue));
+	}
+	
+	/**
+	 * @param filter
+	 */
+	private void filterTree(final String filter, final String filterBefore) {
+		if (hiddenTreeChildMap == null) {
+			hiddenTreeChildMap = new THashMap<>();
+		}
+		final String filterUpper = filter.toUpperCase();
+		
+		
+		final String filterBeforeUpper = filterBefore.toUpperCase();
+		if (filterBeforeUpper.contains(filterUpper)) {
+			filterTreeShow(filterUpper);
+		}
+		filterTreeHide(filter, frameTree.getRoot());
+		
+		// release memory
+		if (hiddenTreeChildMap.isEmpty()) {
+			hiddenTreeChildMap = null;
+		}
+	}
+	
+	private void filterTreeShow(final String queryUpper) {
+		List<TreeItem<UIElement>> children;
+		for (final var entry : hiddenTreeChildMap.entrySet()) {
+			children = entry.getValue();
+			final TreeItem<UIElement> parent = entry.getKey();
+			final var visibleChildren = parent.getChildren();
+			
+			final int lenTotal = children.size();
+			int indexVisible = 0;
+			int sizeVisible = visibleChildren.size();
+			boolean hasNoInvisChildLeft = true;
+			TreeItem<UIElement> visChild;
+			for (int i = 0; i < lenTotal; i++) {
+				visChild = indexVisible < sizeVisible ? visibleChildren.get(indexVisible) : null;
+				final TreeItem<UIElement> child = children.get(i);
+				if (child != visChild) {
+					final UIElement elem = child.getValue();
+					final String name = elem.getName();
+					if (name != null && name.toUpperCase().contains(queryUpper)) {
+						// is a match -> make visible
+						visibleChildren.add(indexVisible, child);
+						sizeVisible++;
+						indexVisible++;
+					} else {
+						// no match -> remain invisible
+						hasNoInvisChildLeft = false;
+					}
+				} else {
+					// already visible -> compare next
+					indexVisible++;
+				}
+			}
+			// clear the list, if possible
+			if (hasNoInvisChildLeft) {
+				hiddenTreeChildMap.remove(parent);
+			}
+		}
+		
+	}
+	
+	
+	private void filterTreeHide(final String queryUpper, final TreeItem<UIElement> elem) {
+		final var children = elem.getChildren();
+		if (children.isEmpty()) {
+			final String name = elem.getValue().getName();
+			if (name == null || !name.toUpperCase().contains(queryUpper)) {
+				final var parent = elem.getParent();
+				final var siblings = parent.getChildren();
+				if (!hiddenTreeChildMap.containsKey(parent)) {
+					final List<TreeItem<UIElement>> siblingsCopy = new ArrayList<>(siblings);
+					hiddenTreeChildMap.put(parent, siblingsCopy);
+				}
+				siblings.remove(elem);
+			}
+		}
 	}
 	
 	private void showInTableView(final TreeItem<UIElement> selected) {
@@ -226,14 +310,14 @@ public class BrowseTabController implements Updateable {
 			fileNames.sort(null);
 			fileDropdown.setItems(fileNames);
 			final String firstSelection = fileNamesSet.contains(GAME_UI) ? GAME_UI : fileNames.get(0);
-			if (fileDropdownAutoCompleteBinding != null) {
-				fileDropdownAutoCompleteBinding.dispose();
-			}
-			fileDropdownAutoCompleteBinding =
-					TextFields.bindAutoCompletion(fileDropdown.getEditor(), fileDropdown.getItems());
-			fileDropdownAutoCompleteBinding.setMaxWidth(fileDropdown.getWidth());
-			fileDropdownAutoCompleteBinding.setMinWidth(fileDropdown.getWidth());
-			fileDropdownAutoCompleteBinding.setPrefWidth(fileDropdown.getWidth());
+//			if (fileDropdownAutoCompleteBinding != null) {
+//				fileDropdownAutoCompleteBinding.dispose();
+//			}
+//			fileDropdownAutoCompleteBinding =
+//					TextFields.bindAutoCompletion(fileDropdown.getEditor(), fileDropdown.getItems());
+//			fileDropdownAutoCompleteBinding.setMaxWidth(fileDropdown.getWidth());
+//			fileDropdownAutoCompleteBinding.setMinWidth(fileDropdown.getWidth());
+//			fileDropdownAutoCompleteBinding.setPrefWidth(fileDropdown.getWidth());
 			// delay required to fix some internal nullpointer on the first usage of such an element
 			Platform.runLater(() -> fileDropdown.setValue(firstSelection));
 		}
@@ -265,14 +349,14 @@ public class BrowseTabController implements Updateable {
 			}
 			final ObservableList<String> elementNames = FXCollections.observableList(new ArrayList<>(templatesOfFile));
 			templateDropdown.setItems(elementNames);
-			if (templateDropdownAutoCompleteBinding != null) {
-				templateDropdownAutoCompleteBinding.dispose();
-			}
-			templateDropdownAutoCompleteBinding =
-					TextFields.bindAutoCompletion(templateDropdown.getEditor(), templateDropdown.getItems());
-			templateDropdownAutoCompleteBinding.setMaxWidth(templateDropdown.getWidth());
-			templateDropdownAutoCompleteBinding.setMinWidth(templateDropdown.getWidth());
-			templateDropdownAutoCompleteBinding.setPrefWidth(templateDropdown.getWidth());
+//			if (templateDropdownAutoCompleteBinding != null) {
+//				templateDropdownAutoCompleteBinding.dispose();
+//			}
+//			templateDropdownAutoCompleteBinding =
+//					TextFields.bindAutoCompletion(templateDropdown.getEditor(), templateDropdown.getItems());
+//			templateDropdownAutoCompleteBinding.setMaxWidth(templateDropdown.getWidth());
+//			templateDropdownAutoCompleteBinding.setMinWidth(templateDropdown.getWidth());
+//			templateDropdownAutoCompleteBinding.setPrefWidth(templateDropdown.getWidth());
 			if (firstSelection != null) {
 				templateDropdown.setValue(firstSelection);
 			} else {
