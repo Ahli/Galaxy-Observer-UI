@@ -34,6 +34,8 @@ module interfacex.builder {
 	requires java.sql;
 	// fix spring boot not finding jaxbexception
 	requires java.xml.bind;
+	// fix spring boot not finding bytebuddy classes for hibernate configuration
+	requires net.bytebuddy;
 	
 	// log4j export is a test to fix stylized text area appender
 	exports interfacebuilder to javafx.graphics, javafx.fxml, spring.context;
