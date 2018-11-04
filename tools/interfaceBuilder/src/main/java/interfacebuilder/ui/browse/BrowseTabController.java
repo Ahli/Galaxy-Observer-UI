@@ -10,7 +10,6 @@ import com.ahli.galaxy.ui.UIStateGroup;
 import com.ahli.galaxy.ui.UITemplate;
 import com.ahli.galaxy.ui.abstracts.UIElement;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
-import gnu.trove.map.hash.THashMap;
 import interfacebuilder.ui.settings.Updateable;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
@@ -23,6 +22,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.layout.AnchorPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -45,6 +45,8 @@ public class BrowseTabController implements Updateable {
 	@FXML
 	private TableColumn<Map.Entry<String, String>, String> columnValues;
 	@FXML
+	private AnchorPane frameTreeContainer;
+	@FXML
 	private TreeView<UIElement> frameTree;
 	private Map<TreeItem<UIElement>, List<TreeItem<UIElement>>> hiddenTreeChildMap;
 	@FXML
@@ -54,6 +56,7 @@ public class BrowseTabController implements Updateable {
 	private ComboBox<String> templateDropdown;
 	//	private AutoCompletionBinding<String> templateDropdownAutoCompleteBinding;
 	private Map<String, UITemplate> templateMap;
+	private int framesTotal = 0;
 	
 	private UICatalog uiCatalog;
 	
@@ -61,7 +64,7 @@ public class BrowseTabController implements Updateable {
 	 * Automatically called by FxmlLoader
 	 */
 	public void initialize() {
-		templateMap = new THashMap<>();
+		templateMap = new HashMap<>();
 		fileDropdown.setOnAction(actionEvent -> Platform.runLater(() -> {
 			final String selectedFile = fileDropdown.getSelectionModel().getSelectedItem();
 			updateTemplateDropdown(selectedFile);
@@ -69,7 +72,9 @@ public class BrowseTabController implements Updateable {
 		templateDropdown.setOnAction(actionEvent -> Platform.runLater(() -> {
 			final String selectedTemplateRootElem = templateDropdown.getSelectionModel().getSelectedItem();
 			final UITemplate template = templateMap.get(selectedTemplateRootElem);
+			final long start = System.currentTimeMillis();
 			createTree(template);
+			logger.info("Tree creation: " + (System.currentTimeMillis() - start) + "ms , " + framesTotal + " frames");
 		}));
 		frameTree.getSelectionModel().selectedItemProperty()
 				.addListener((observable, oldValue, newValue) -> showInTableView(newValue));
@@ -88,28 +93,33 @@ public class BrowseTabController implements Updateable {
 	 * @param filter
 	 */
 	private void filterTree(final String filter, final String filterBefore) {
-		frameTree.setVisible(false);
+		final long startTime = System.currentTimeMillis();
+		//		frameTreeContainer.getChildren().remove(frameTree);
+		
 		if (hiddenTreeChildMap == null) {
 			hiddenTreeChildMap = new HashMap<>();
 		}
 		final String filterUpper = filter.toUpperCase();
 		
-		
-		//		final String filterBeforeUpper = filterBefore.toUpperCase();
-		//		if (filterBeforeUpper.contains(filterUpper)) {
-		//		}
-		logger.info("filter-show: " + filterUpper);
+		final long midTime = System.currentTimeMillis();
+		logger.info("filter-show: " + filterUpper + ", preparation: " + (midTime - startTime));
 		filterTreeShow(filterUpper);
-		if(!filterUpper.isEmpty()) {
+		final long midTime2 = System.currentTimeMillis();
+		logger.info("filter-show execution: " + (midTime2 - midTime));
+		if (!filterUpper.isEmpty()) {
 			logger.info("filter-hide: " + filterUpper);
 			filterTreeHide(filterUpper, frameTree.getRoot());
 		}
+		final long midTime3 = System.currentTimeMillis();
+		logger.info("filter-hide execution: " + (midTime3 - midTime2));
 		
 		// release memory
-		if (hiddenTreeChildMap.isEmpty()) {
-			hiddenTreeChildMap = null;
-		}
-		frameTree.setVisible(true);
+		//		if (hiddenTreeChildMap.isEmpty()) {
+		//			hiddenTreeChildMap = null;
+		//		}
+		
+		//		frameTreeContainer.getChildren().add(frameTree);
+		logger.info("filter cleanup: " + (System.currentTimeMillis() - midTime3));
 	}
 	
 	private void filterTreeShow(final String queryUpper) {
@@ -132,7 +142,6 @@ public class BrowseTabController implements Updateable {
 					final String name = elem.getName();
 					if (name != null && name.toUpperCase().contains(queryUpper)) {
 						// is a match -> make visible
-//						logger.info("making visible: " + name);
 						visibleChildren.add(indexVisible, child);
 						sizeVisible++;
 						indexVisible++;
@@ -147,13 +156,9 @@ public class BrowseTabController implements Updateable {
 			}
 			// clear the list, if possible
 			if (hasNoInvisChildLeft) {
-//				logger.info("has no invis child left: " + parent.getValue().getName());
 				hiddenTreeChildMap.remove(parent);
 			}
 		}
-		//		if(){
-		//
-		//		}
 	}
 	
 	
@@ -170,9 +175,7 @@ public class BrowseTabController implements Updateable {
 		boolean removed = false;
 		if (children.isEmpty()) {
 			final String name = elem.getValue().getName();
-//			logger.info("checking to hide: " + name);
 			if (name == null || !name.toUpperCase().contains(queryUpper)) {
-//				logger.info("hiding: " + name.toUpperCase() + ", query: "+queryUpper);
 				removed = true;
 				final var parent = elem.getParent();
 				if (parent != null) {
@@ -182,10 +185,9 @@ public class BrowseTabController implements Updateable {
 						hiddenTreeChildMap.put(parent, siblingsCopy);
 					}
 					siblings.remove(elem);
+				} else {
+					logger.info("root? ", name);
 				}
-				//				else {
-				//					frameTree.setShowRoot(false);
-				//				}
 			}
 		}
 		return removed;
@@ -196,7 +198,9 @@ public class BrowseTabController implements Updateable {
 			tableView.getItems().clear();
 		} else {
 			final UIElement el = selected.getValue();
-			final Map<String, String> map = new HashMap<>(); // TODO maybe use something different that holds entries
+			final Map<String, String> map = new HashMap<>((framesTotal * 75 / 100) + 1, 0.75f); // TODO maybe use
+			// something different
+			// that holds entries
 			if (el instanceof UIFrame) {
 				final UIFrame elem = (UIFrame) el;
 				UIAnchorSide side = UIAnchorSide.TOP;
@@ -292,6 +296,7 @@ public class BrowseTabController implements Updateable {
 			final UIElement rootElement = template.getElement();
 			final TreeItem<UIElement> treeItem = new TreeItem<>(rootElement);
 			frameTree.setRoot(treeItem);
+			framesTotal += 1;
 			final ObservableList<TreeItem<UIElement>> treeItemChildren = frameTree.getRoot().getChildren();
 			for (final UIElement child : rootElement.getChildren()) {
 				createTree(child, treeItemChildren);
@@ -310,6 +315,7 @@ public class BrowseTabController implements Updateable {
 	private void createTree(final UIElement element, final ObservableList<TreeItem<UIElement>> parentsChildren) {
 		final TreeItem<UIElement> treeItem = new TreeItem<>(element);
 		parentsChildren.add(treeItem);
+		framesTotal += 1;
 		final ObservableList<TreeItem<UIElement>> treeItemChildren = treeItem.getChildren();
 		for (final UIElement child : element.getChildren()) {
 			createTree(child, treeItemChildren);

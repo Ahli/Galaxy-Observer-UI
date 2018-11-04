@@ -1,6 +1,6 @@
 package com.ahli.hotkeyUi.application.controller;
 
-import com.ahli.hotkeyUi.application.Main;
+import com.ahli.hotkeyUi.application.SettingsEditorApplication;
 import com.ahli.hotkeyUi.application.i18n.Messages;
 import com.ahli.hotkeyUi.application.ui.Alerts;
 import javafx.fxml.FXML;
@@ -18,7 +18,7 @@ import org.apache.logging.log4j.Logger;
 public class MenuBarController {
 	private static final Logger logger = LogManager.getLogger(MenuBarController.class);
 	
-	private Main main;
+	private SettingsEditorApplication main;
 	
 	@FXML
 	private MenuItem menuOpen;
@@ -47,7 +47,7 @@ public class MenuBarController {
 	/**
 	 * @param main
 	 */
-	public void setMainApp(final Main main) {
+	public void setMainApp(final SettingsEditorApplication main) {
 		this.main = main;
 	}
 	
@@ -108,13 +108,13 @@ public class MenuBarController {
 	@FXML
 	public void aboutClicked() {
 		final String content =
-				String.format(Messages.getString("MenuBarController.AboutText"), Main.VERSION) + "\n" + "\n" +
-						Messages.getString("MenuBarController.AboutText2");
+				String.format(Messages.getString("MenuBarController.AboutText"), SettingsEditorApplication.VERSION) +
+						"\n" + "\n" + Messages.getString("MenuBarController.AboutText2");
 		final String title = Messages.getString("MenuBarController.About");
 		final String header = Messages.getString("MenuBarController.ObserverUISettingsEditor");
 		String imgUrl;
 		try {
-			imgUrl = Main.class.getResource("/res/ahliLogo.png").toString();
+			imgUrl = SettingsEditorApplication.class.getResource("/res/ahliLogo.png").toString();
 		} catch (final NullPointerException e) {
 			logger.error("Error loading resource");
 			imgUrl = "/ahliLogo.png";

@@ -1,6 +1,6 @@
 package com.ahli.hotkeyUi.application.controller;
 
-import com.ahli.hotkeyUi.application.Main;
+import com.ahli.hotkeyUi.application.SettingsEditorApplication;
 import com.ahli.hotkeyUi.application.i18n.Messages;
 import com.ahli.hotkeyUi.application.model.ValueDef;
 import com.ahli.hotkeyUi.application.ui.ResetDefaultButtonTableCell;
@@ -93,7 +93,7 @@ public class TabsController {
 			};
 	private final ObservableList<ValueDef> hotkeysData = FXCollections.observableArrayList();
 	private final ObservableList<ValueDef> settingsData = FXCollections.observableArrayList();
-	private Main main;
+	private SettingsEditorApplication main;
 	@FXML
 	private TableView<ValueDef> hotkeysTable;
 	@FXML
@@ -183,14 +183,14 @@ public class TabsController {
 	/**
 	 * @return the main
 	 */
-	public Main getMain() {
+	public SettingsEditorApplication getMain() {
 		return main;
 	}
 	
 	/**
 	 * @param main
 	 */
-	public void setMainApp(final Main main) {
+	public void setMainApp(final SettingsEditorApplication main) {
 		this.main = main;
 	}
 	

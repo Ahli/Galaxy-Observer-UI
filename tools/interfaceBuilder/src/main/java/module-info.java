@@ -56,5 +56,6 @@ module interfacex.builder {
 	// open to log4j to maybe fix the appender
 	opens interfacebuilder.ui.progress to javafx.fxml, org.apache.logging.log4j;
 	exports interfacebuilder.ui.progress to org.apache.logging.log4j.core;
-	
+	exports interfacebuilder.integration;
+	exports interfacebuilder.ui.navigation;
 }
