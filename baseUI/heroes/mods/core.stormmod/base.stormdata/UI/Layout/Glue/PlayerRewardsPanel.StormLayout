@@ -418,6 +418,13 @@
         <Key type="Event" time="0.55" event="IntroComplete" />
       </Controller>
     </Animation>
+    <Animation name="PotentialLevelUpIntro">
+      <Event event="StartPotentialBoostIntro" action="Reset,Play" />
+      <Controller type="Event" end="Pause">
+        <Key type="Event" time="0" event="ShowBoostVisuals" />
+        <Key type="Event" time="0.55" event="IntroComplete" />
+      </Controller>
+    </Animation>
     <Animation name="LevelUpMasteryUpgrade">
       <Event event="LevelUpMasteryUpgrade" action="Reset,Play" />
       <Event event="HeroLevelUpIntroMasteryUpgrade" action="Stop" />
@@ -1385,6 +1392,46 @@
       <Anchor relative="$parent/ProgressBackground" />
       <TooltipAnchorPosition val="TopCenter" />
     </Frame>
+    <Animation name="ShowPotentialBoost">
+      <Event event="ShowPotentialBoost" action="Reset, Play" frame="$ancestor[@type=PlayerRewardsPanel]" />
+      <Controller type="State" stateGroup="PotentialBoostVisuals" end="Pause">
+        <Key type="Identifier" time="0" value="Show" />
+      </Controller>
+    </Animation>
+    <Animation name="HidePotentialBoost">
+      <Event event="HidePotentialBoost" action="Reset, Play" frame="$ancestor[@type=PlayerRewardsPanel]" />
+      <Controller type="State" stateGroup="PotentialBoostVisuals" end="Pause">
+        <Key type="Identifier" time="0" value="Hidden" />
+      </Controller>
+    </Animation>
+    <StateGroup name="PotentialBoostVisuals">
+      <DefaultState val="Hidden" />
+      <State name="Hidden" />
+      <State name="Show">
+        <Action type="SendEvent" event="ShowBoostVisuals" on="Enter" />
+        <Action type="SendEvent" event="HideBoostVisuals" on="Exit" />
+      </State>
+    </StateGroup>
+    <Animation name="PotentialInfoHide">
+      <Event event="PotentialOutro" frame="$ancestor[@type=PlayerRewardsPanel]" action="Reset,Play" />
+      <Event event="CancelPotentialOutro" frame="$ancestor[@type=PlayerRewardsPanel]" action="Stop" />
+      <Controller type="State" stateGroup="PotentialBoostVisuals" end="Pause">
+        <Key type="Identifier" time="0" value="Show" />
+        <Key type="Identifier" time="3" value="Hidden" />
+      </Controller>
+    </Animation>
+    <Animation name="PotentialBoostOutro">
+      <Event event="HidePotentialBoost" action="Reset, Play" />
+      <Event event="Reset" action="Reset" />
+      <Controller type="Event" end="Stop">
+        <Key type="Event" time="1.5" event="HideBoostVisuals" />
+      </Controller>
+      <Controller type="Fade" frame="BoostProgressBar" end="Pause">
+        <Key type="Curve" time="0" value="255" />
+        <Key type="Curve" time="1.5" value="255" />
+        <Key type="Curve" time="2" value="0" />
+      </Controller>
+    </Animation>
   </Frame>
   <Frame type="ScoreScreenPointReward" name="HeroScoreFrameTemplate" template="PlayerRewardsPanel/ScoreFrameTemplate">
     <Animation name="ScoreLayout">
@@ -1567,6 +1614,129 @@
       <Frame type="Image" name="ArrowsImage">
         <Width val="246" />
         <Height val="246" />
+      </Frame>
+    </Frame>
+    <Animation name="ScoreLayout">
+      <Controller type="State" stateGroup="HeroScoreFrameSize" end="Pause">
+        <Key type="Identifier" time="0" value="NormalSize" />
+        <Key type="Identifier" time="0" value="SmallSize" />
+      </Controller>
+    </Animation>
+    <StateGroup name="HeroScoreFrameSize">
+      <DefaultState val="NormalSize" />
+      <State name="NormalSize"></State>
+      <State name="SmallSize">
+        <Action type="SetProperty" frame="BoostVisuals/Icon" Width="114" undo="true" />
+        <Action type="SetProperty" frame="BoostVisuals/Icon" Height="147" undo="true" />
+        <Action type="SetProperty" frame="BoostVisuals/Glow" Width="154" undo="true" />
+        <Action type="SetProperty" frame="BoostVisuals/Glow" Height="185" undo="true" />
+      </State>
+    </StateGroup>
+    <Animation name="BoostBarFade">
+      <Event event="ShowBoostVisuals" action="DirectionForward, Play" />
+      <Event event="HideBoostVisuals" action="DirectionReverse, Play" />
+      <Controller type="Fade" frame="BoostProgressBar" end="Pause">
+        <Key type="Curve" time="0" value="0" />
+        <Key type="Curve" time="0.5" value="255" />
+      </Controller>
+    </Animation>
+    <Frame type="Frame" name="BoostVisuals">
+      <Anchor relative="$parent/LevelUpContainer" offset="0" />
+      <Visible val="False" />
+      <Animation name="ShowVisuals">
+        <Event event="ShowBoostVisuals" frame="$parent" action="Reset, Play" />
+        <Event event="Reset" fame="$parent" action="Reset" />
+        <Controller type="Visibility" end="Pause">
+          <Key type="Bool" time="0" value="false" />
+          <Key type="Bool" time="0.01" value="true" />
+        </Controller>
+      </Animation>
+      <Animation name="HideVisuals">
+        <Event event="HideBoostVisuals" frame="$parent" action="Play" />
+        <Event event="ShowBoostVisuals" frame="$parent" action="Stop" />
+        <Event event="Reset" fame="$parent" action="Reset" />
+        <Controller type="Fade" end="Pause">
+          <Key type="Curve" time="0" value="255" />
+          <Key type="Curve" time="0.5" value="0" />
+        </Controller>
+        <Controller type="Visibility" end="Pause">
+          <Key type="Bool" time="0.5" value="false" />
+        </Controller>
+      </Animation>
+      <Frame type="Image" name="Swirl">
+        <Anchor relative="$parent" pos="Mid" offset="10" />
+        <Texture val="@UI/Storm_UI_Boost_Icon_Dialog_Twirl" />
+        <Alpha val="0" />
+        <Animation name="SwirlAnimation">
+          <Event event="OnShown" action="Reset, Play" />
+          <Event event="OnHidden" action="Stop" />
+          <Controller type="Rotation" end="Loop">
+            <Key type="Curve" time="0" value="0" />
+            <Key type="Curve" time="10" value="360" />
+          </Controller>
+          <Controller type="Fade" end="Pause">
+            <Key type="Curve" time="0" value="0" />
+            <Key type="Curve" time="0.25" value="255" />
+          </Controller>
+        </Animation>
+      </Frame>
+      <Frame type="Image" name="Icon">
+        <Anchor side="Top" relative="$parent" pos="Mid" offset="0" />
+        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0" />
+        <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
+        <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
+        <Width val="163" />
+        <Height val="211" />
+        <Alpha val="0" />
+        <Texture val="@UI/Storm_UI_Boost_Icon_Big_Inside" />
+        <Animation name="Intro">
+          <Event event="OnShown" action="Reset, Play" />
+          <Controller type="Fade" end="Pause">
+            <Key type="Curve" time="0" value="0" />
+            <Key type="Curve" time="0.5" value="255" />
+          </Controller>
+          <Controller type="Event" end="Stop">
+            <Key type="Event" time="0.5" event="StartPulse" />
+          </Controller>
+        </Animation>
+        <Animation name="Pulse">
+          <Event event="StartPulse" action="Reset, Play" />
+          <Event event="OnHidden" action="Stop" />
+          <Controller type="Fade" end="Loop">
+            <Key type="Curve" time="0" value="255" />
+            <Key type="Curve" time="0.5" value="125" />
+            <Key type="Curve" time="1" value="255" />
+          </Controller>
+        </Animation>
+      </Frame>
+      <Frame type="Image" name="Glow">
+        <Anchor side="Top" relative="$parent" pos="Mid" offset="0" />
+        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0" />
+        <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
+        <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
+        <Width val="220" />
+        <Height val="265" />
+        <Alpha val="0" />
+        <Texture val="@UI/Storm_UI_Boost_Icon_Big_Outside" />
+        <Animation name="Intro">
+          <Event event="OnShown" action="Reset, Play" />
+          <Controller type="Fade" end="Pause">
+            <Key type="Curve" time="0" value="0" />
+            <Key type="Curve" time="1" value="255" />
+          </Controller>
+          <Controller type="Event" end="Stop">
+            <Key type="Event" time="1" event="StartPulse" />
+          </Controller>
+        </Animation>
+        <Animation name="Pulse">
+          <Event event="StartPulse" action="Reset, Play" />
+          <Event event="OnHidden" action="Stop" />
+          <Controller type="Fade" end="Loop">
+            <Key type="Curve" time="0" value="255" />
+            <Key type="Curve" time="0.5" value="125" />
+            <Key type="Curve" time="1" value="255" />
+          </Controller>
+        </Animation>
       </Frame>
     </Frame>
     <Frame type="Label" name="LevelDescriptionLabel">
@@ -2107,6 +2277,7 @@
         <Event event="PlayerPostLevelUp1" action="Stop" />
         <Event event="OnShown" action="Stop" />
         <Event event="OnHidden" action="Stop" />
+        <Event event="FinishAnimation" action="Stop" frame="$ancestor[@type=PlayerRewardsPanel]" />
         <Controller type="Fade" frame="AscensionFrame/BadgeContainer/LogoImage" end="Pause">
           <Key type="Curve" time="0.0" value="255" />
           <Key type="Curve" time="0.25" value="0" />
@@ -2177,6 +2348,26 @@
           <Key type="Event" time="1.3" event="IntroComplete" />
         </Controller>
       </Animation>
+      <Animation name="BoostBarFade">
+        <Event event="ShowBoostVisuals" action="DirectionForward, Play" />
+        <Event event="HideBoostVisuals" action="DirectionReverse, Play" />
+        <Controller type="Fade" frame="BoostProgressBar" end="Pause">
+          <Key type="Curve" time="0" value="0" />
+          <Key type="Curve" time="0.5" value="255" />
+        </Controller>
+      </Animation>
+      <Animation name="PotentialBoost">
+        <Event event="StartPotentialBoostIntro" action="Reset,Play" />
+        <Controller type="Fade" frame="BoostProgressBar" end="Pause">
+          <Key type="Curve" time="0" value="0" />
+        </Controller>
+        <Controller type="State" stateGroup="PotentialBoostVisuals" end="Pause">
+          <Key type="Identifier" time="0" value="Show" />
+        </Controller>
+        <Controller type="Event" end="Pause">
+          <Key type="Event" time="0.55" event="IntroComplete" />
+        </Controller>
+      </Animation>
       <Animation name="AnimationCascade">
         <Event event="OnShown" action="DirectionForward,Play" />
         <Event event="OnMouseUp" action="Play" />
@@ -2211,7 +2402,14 @@
         </Frame>
       </Frame>
       <Frame type="ProgressBar" name="BoostProgressBar">
-        <Visible val="False" />
+        <Visible val="True" />
+        <Frame type="Frame" name="FillImageContainer">
+          <Frame type="Image" name="FillImage">
+            <Anchor relative="$parent" />
+            <Texture val="@UI/Storm_UI_Scorescreen_Progress_Boostbar" />
+            <TextureType val="Circular" />
+          </Frame>
+        </Frame>
       </Frame>
       <Frame type="AscensionFrame" name="AscensionFrame" template="AscensionBadge/AscensionScoreBadgeTemplate">
         <Anchor side="Left" relative="$parent/ProgressBackground" pos="Mid" offset="0" />
@@ -2253,6 +2451,18 @@
           <Event event="IntroComplete" action="Stop" frame="$ancestor[@type=ScoreScreenPointReward]" />
         </Animation>
       </Frame>
+      <StateGroup name="BoostType">
+        <DefaultState val="Standard" />
+        <State name="Standard">
+          <Action type="SetProperty" frame="BoostProgressBar/FillImageContainer/FillImage" Texture="@UI/Storm_UI_Scorescreen_HeroXP_BoostBar" />
+          <Action type="SetProperty" frame="FillImageForAnimation" Texture="@UI/Storm_UI_Scorescreen_HeroXP_BoostBar" />
+        </State>
+        <State name="Potential">
+          <When type="AnimationState" BoostTheme="Potential" />
+          <Action type="SetProperty" frame="BoostProgressBar/FillImageContainer/FillImage" Texture="@UI/Storm_UI_Scorescreen_BoostXP_Bar" />
+          <Action type="SetProperty" frame="FillImageForAnimation" Texture="@UI/Storm_UI_Scorescreen_BoostXP_Bar" />
+        </State>
+      </StateGroup>
       <Frame type="Label" name="LevelLabel">
         <Style val="ScoreHeroLevel" />
         <Animation name="ShakeAnimation" template="StandardAnimationTemplates/ShakeAnimation" />
@@ -2287,6 +2497,18 @@
       <Animation name="HeroLevelUpIntro">
         <Event event="HeroLevelUpIntro" action="Reset,Play" />
         <Controller type="Event" name="CompleteEvent" end="Pause">
+          <Key type="Event" time="0.55" event="IntroComplete" />
+        </Controller>
+      </Animation>
+      <Animation name="LevelUpIntro">
+        <Event event="StartPotentialBoostIntro" action="Reset,Play" />
+        <Controller type="Fade" frame="BoostProgressBar" end="Pause">
+          <Key type="Curve" time="0" value="0" />
+        </Controller>
+        <Controller type="State" stateGroup="PotentialBoostVisuals" end="Pause">
+          <Key type="Identifier" time="0" value="Show" />
+        </Controller>
+        <Controller type="Event" end="Pause">
           <Key type="Event" time="0.55" event="IntroComplete" />
         </Controller>
       </Animation>

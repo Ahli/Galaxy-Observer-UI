@@ -544,7 +544,17 @@
         <DisabledAlpha val="0" />
         <Width val="300" />
         <Height val="100" />
-        <Text val="@UI/LootChest/Action/Buy" />
+        <StateGroup name="BuyText">
+          <DefaultState val="Normal" />
+          <State name="Normal">
+            <When type="StateGroup" frame="$LootChestSales" SellMethod="Direct" />
+            <Action type="SetProperty" frame="$this" Text="@UI/LootChest/Action/Buy" />
+          </State>
+          <State name="Shards">
+            <When type="StateGroup" frame="$LootChestSales" SellMethod="ShardBundles" />
+            <Action type="SetProperty" frame="$this" Text="@UI/LootChest/Action/BuyShards" />
+          </State>
+        </StateGroup>
         <Animation name="CarouselMove">
           <Event event="MoveStart" action="DirectionForward, Play" frame="$parent/$parent" />
           <Event event="MoveEnd" action="DirectionReverse, Play" frame="$parent/$parent" />
@@ -601,6 +611,26 @@
             <When type="Property" frame="$ancestor[@type=LootChestCarouselPanel]" LoadTimeoutActive="true" />
             <Action type="SetProperty" Enabled="false" />
             <Action type="SetProperty" Tooltip="{$this/LoadTimeoutTextFrame/@Text}" />
+          </State>
+        </StateGroup>
+      </Frame>
+      <Frame type="Label" name="LootChestShardPromo">
+        <Anchor side="Top" relative="$parent/BuyButton" pos="Max" offset="-20" />
+        <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
+        <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
+        <Height val="50" />
+        <Text val="@UI/LootChest/Action/BuyShardsDescription" />
+        <Style val="StandardTooltip" />
+        <Alpha val="{$parent/BuyButton/@Alpha}" />
+        <StateGroup name="Visibility">
+          <DefaultState val="NoShards" />
+          <State name="BuyShards">
+            <When type="Property" frame="$parent/BuyButton" Enabled="true" />
+            <When type="StateGroup" frame="$LootChestSales" SellMethod="ShardBundles" />
+            <Action type="SetProperty" frame="$this" Visible="true" />
+          </State>
+          <State name="NoShards">
+            <Action type="SetProperty" frame="$this" Visible="false" />
           </State>
         </StateGroup>
       </Frame>
@@ -693,6 +723,28 @@
       <AutoPlay val="True" />
       <RenderType val="HDR" />
       <ToneMapping val="False" />
+    </Frame>
+    <Frame type="Frame" name="LootChestSales">
+      <Anchor relative="$parent" />
+      <Handle val="LootChestSales" />
+      <Visible val="false" />
+      <StateGroup name="SellMethod">
+        <DefaultState val="Direct" />
+        <State name="Direct" />
+        <State name="ShardBundles" />
+      </StateGroup>
+      <StateGroup name="RegionalRestrictions">
+        <DefaultState val="None" />
+        <State name="None">
+          <Action type="SetState" group="SellMethod" state="Direct" />
+          <Action type="SetProperty" frame="$parent" DirectChestSalesEnabled="true" />
+        </State>
+        <State name="China">
+          <When type="Property" frame="$BattleUI" TargetRegion="CN" />
+          <Action type="SetState" group="SellMethod" state="ShardBundles" />
+          <Action type="SetProperty" frame="$parent" DirectChestSalesEnabled="false" />
+        </State>
+      </StateGroup>
     </Frame>
   </Frame>
 </Desc>

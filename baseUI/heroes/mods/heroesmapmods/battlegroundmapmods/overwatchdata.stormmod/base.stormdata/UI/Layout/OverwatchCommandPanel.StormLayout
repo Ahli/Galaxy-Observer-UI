@@ -37,18 +37,54 @@
   </Frame>
   <Frame type="CommandPanel" name="GameUI/UIContainer/ConsoleUIContainer/CommandPanel" file="GameUI">
     <Frame type="CommandButton" name="CommandButton15" template="CommandButton/CommandButtonTemplate">
-      <Anchor side="Top" relative="$parent/ButtonHolder" pos="Min" offset="-49" />
-      <Anchor side="Left" relative="$parent/ButtonHolder" pos="Min" offset="162" />
+      <Anchor side="Top" relative="$parent/CommandButton01" pos="Min" offset="0" />
+      <Anchor side="Left" relative="$parent/CommandButton13" pos="Max" offset="-5" />
       <ClickSound val="@UI_Game_ActionClick" />
       <BatchGroup val="false" />
       <RenderPriority val="511" />
+      <Frame type="Frame" name="HideValidation">
+        <Anchor relative="$parent" />
+        <Animation name="HideFromValidator">
+          <Event event="AbilButtonActiveFVisibility" action="DirectionForward,Play" frame="$F_HideAnimValidatorFrame" />
+          <Event event="NoState" action="DirectionReverse,Play" frame="$F_HideAnimValidatorFrame" />
+          <Controller type="Fade" end="Pause" frame="$parent">
+            <Key type="Curve" time="0" value="0" inout="Linear" />
+            <Key type="Curve" time=".2" value="255" inout="Slow,Linear" />
+          </Controller>
+        </Animation>
+      </Frame>
+      <Frame type="Image" name="DisabledLockOverlay">
+        <Anchor relative="$parent/NormalImage" offset="0" />
+        <Texture val="@UI/HUD_BTN_BG_Ability_Locked" />
+        <ImageMaskTexture val="@UI/HUD_BTN_BG_Ability_AlphaMask" />
+        <DesaturateOnDisable val="False" />
+        <RenderPriority val="503" />
+        <Animation name="Fade">
+          <Event event="FadeOut" action="DirectionForward,Play" />
+          <Event event="FadeIn" action="DirectionReverse,Play" />
+          <Controller type="Fade" layer="1" end="Pause">
+            <Key type="Curve" time="0" value="255" />
+            <Key type="Curve" time="0.25" value="0" />
+          </Controller>
+          <Controller type="Visibility" end="Pause">
+            <Key type="Bool" time="0" value="True" />
+            <Key type="Bool" time="0.25" value="True" />
+            <Key type="Bool" time="0.25" value="False" />
+          </Controller>
+        </Animation>
+      </Frame>
       <Frame type="Image" name="GameButtonDefaultBorder">
         <StateGroup name="BorderStates">
           <DefaultState val="Normal" />
           <State name="Cleared">
             <When type="Property" frame="$parent" Cleared="true" />
             <Action type="SetProperty" frame="$parent" Visible="false" />
-            <Action type="SetProperty" frame="$parent/$parent/ButtonHolder" Visible="false" />
+          </State>
+          <State name="Disabled">
+            <When type="Property" frame="$parent" CommandDisabled="true" />
+            <Action type="SetProperty" frame="$this" DesaturationColor="#ColorCommandDisabled" />
+            <Action type="SetProperty" frame="$parent/GameButtonDefaultHoverBorder" Visible="false" />
+            <Action type="SendEvent" frame="$parent/DisabledLockOverlay" event="FadeIn" />
           </State>
           <State name="Normal">
             <When type="Property" frame="$parent" Executing="false" />
@@ -56,6 +92,7 @@
             <When type="Property" frame="$parent/CooldownLabel" Visible="false" />
             <Action type="SetProperty" frame="$this" Texture="@UI/Storm_UI_InGame_AbilityButtonBorder" />
             <Action type="SetProperty" frame="$parent/GameButtonDefaultHoverBorder" Visible="true" />
+            <Action type="SendEvent" frame="$parent/DisabledLockOverlay" event="FadeOut" />
           </State>
           <State name="Executing">
             <When type="Property" frame="$parent" Executing="true" />
@@ -77,43 +114,24 @@
       <Visible val="True" />
       <Handle val="FKeyButtonPulse3" />
     </Frame>
-    <Frame type="Image" name="ButtonHolder">
-      <Anchor side="Top" relative="$parent/CommandButton05" pos="Min" offset="49" />
-      <Anchor side="Left" relative="$parent/CommandButton05" pos="Min" offset="40" />
-      <BatchGroup val="false" />
-      <RenderPriority val="495" />
-      <Constant name="RotationAngle" val="90" />
-      <Texture val="@UI/HUD_BG_ExtendedBackplate" />
-      <Animation name="RollIn">
-        <Event event="OnShown" action="Play" />
-        <Controller type="Anchor" end="Pause" side="Left" relative="true">
-          <Key type="Curve" time="0.0" value="-80" inout="Linear,Step" />
-          <Key type="Curve" time="0.5" value="-80" inout="Step,Slow" />
-          <Key type="Curve" time="0.7" value="0" inout="Smooth,Linear" />
-        </Controller>
-        <Controller type="Fade" end="Pause">
-          <Key type="Curve" time="0.0" value="0" inout="Linear,Step" />
-          <Key type="Curve" time="0.4" value="0" inout="Step,Smooth" />
-          <Key type="Curve" time="0.5" value="255" inout="Smooth,Linear" />
-        </Controller>
-        <Controller type="Fade" end="Pause" frame="$parent/CommandButton15">
-          <Key type="Curve" time="0.0" value="0" inout="Linear,Step" />
-          <Key type="Curve" time="1.3" value="0" inout="Step,Smooth" />
-          <Key type="Curve" time="1.5" value="255" inout="Smooth,Linear" />
-        </Controller>
-        <Controller type="Animation" end="Pause" frame="$FKeyButtonPulse1" Animation="ButtonPulse">
-          <Key type="Animation" time="0" action="reset" />
-          <Key type="Animation" time="0.7" action="play" />
-        </Controller>
-        <Controller type="Animation" end="Pause" frame="$FKeyButtonPulse2" Animation="ButtonPulse">
-          <Key type="Animation" time="0" action="reset" />
-          <Key type="Animation" time="0.9" action="play" />
-        </Controller>
-        <Controller type="Animation" end="Pause" frame="$FKeyButtonPulse3" Animation="ButtonPulse">
-          <Key type="Animation" time="0" action="reset" />
-          <Key type="Animation" time="1.1" action="play" />
-        </Controller>
-      </Animation>
-    </Frame>
+    <Animation name="RollIn">
+      <Event event="OnShown" frame="CommandButton15" action="Reset, Play" />
+      <Controller type="Fade" end="Pause" frame="CommandButton15">
+        <Key type="Curve" time="0.0" value="0" inout="Linear,Step" />
+        <Key type="Curve" time="1.3" value="0" inout="Step,Smooth" />
+        <Key type="Curve" time="1.5" value="255" inout="Smooth,Linear" />
+      </Controller>
+      <Controller type="Animation" end="stop" frame="$FKeyButtonPulse1" Animation="ButtonPulse">
+        <Key type="Animation" time="0" action="reset" />
+        <Key type="Animation" time="0.7" action="play" />
+      </Controller>
+      <Controller type="Animation" end="stop" frame="$FKeyButtonPulse2" Animation="ButtonPulse">
+        <Key type="Animation" time="0" action="reset" />
+        <Key type="Animation" time="0.9" action="play" />
+      </Controller>
+      <Controller type="Animation" end="stop" frame="$FKeyButtonPulse3" Animation="ButtonPulse">
+        <Key type="Animation" time="0" action="reset" />f
+                <Key type="Animation" time="1.1" action="play" /></Controller>
+    </Animation>
   </Frame>
 </Desc>
