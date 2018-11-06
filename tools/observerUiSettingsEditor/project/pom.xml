@@ -27,21 +27,21 @@
 
 	<build>
 		<!-- name of the generated jar -->
-		<finalName>${jarName}</finalName>
+		<!--<finalName>${jarName}</finalName>-->
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<resources>
 			<!-- copy res folder to res folder in jar -->
 			<resource>
 				<directory>src/main/resources</directory>
 			</resource>
-			<!-- copy resources for exe application generation -->
+			<!-- copy resources for exe application generation
 			<resource>
 				<directory>exepackage</directory>
 				<targetPath>../jfx/app</targetPath>
 				<excludes>
 					<exclude>**/*.ico</exclude>
 				</excludes>
-			</resource>
+			</resource> -->
 		</resources>
 
 		<pluginManagement>
@@ -114,10 +114,6 @@
 					<encoding>UTF-8</encoding>
 					<showWarnings>true</showWarnings>
 					<showDeprecation>true</showDeprecation>
-					<!-- parameters for JDK 10
-					<parameters>true</parameters>
-					<compilerArgument>-.-add-modules=javafx.controls,javafx.base,javafx.fxml,javafx.graphics
-					</compilerArgument>-->
 				</configuration>
 				<dependencies>
 					<dependency>
@@ -140,6 +136,11 @@
 							<mainClass>${executableJavaClass}</mainClass>
 						</manifest>
 					</archive>
+					<!-- for moditect -->
+					<outputDirectory>
+						${project.build.directory}/modules
+					</outputDirectory>
+
 				</configuration>
 			</plugin>
 			<plugin>
@@ -302,27 +303,397 @@
 				</executions>
 			</plugin>-->
 
-			<!--<plugin>-->
-				<!--<groupId>org.owasp</groupId>-->
-				<!--<artifactId>dependency-check-maven</artifactId>-->
-				<!--<version>3.3.4</version>-->
-				<!--<executions>-->
+			<!--<plugin>
+				<groupId>org.owasp</groupId>
+				<artifactId>dependency-check-maven</artifactId>
+				<version>3.3.4</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<failOnError>false</failOnError>
+				</configuration>
+			</plugin>-->
+
+			<plugin>
+				<groupId>org.moditect</groupId>
+				<artifactId>moditect-maven-plugin</artifactId>
+				<version>1.0.0.Beta1</version>
+				<executions>
 					<!--<execution>-->
+						<!--<id>add-module-infos2</id>-->
+						<!--<phase>package</phase>-->
 						<!--<goals>-->
-							<!--<goal>check</goal>-->
+							<!--<goal>add-module-info</goal>-->
 						<!--</goals>-->
+						<!--<configuration>-->
+							<!--<outputDirectory>${project.build.directory}/modules</outputDirectory>-->
+							<!--&lt;!&ndash;<jvmVersion>11</jvmVersion>&ndash;&gt;-->
+							<!--<module>-->
+								<!--<moduleInfoFile>src/main/java/com/ahli/hotkeyUi/application</moduleInfoFile>-->
+							<!--</module>-->
+						<!--</configuration>-->
 					<!--</execution>-->
-				<!--</executions>-->
-				<!--<configuration>-->
-					<!--<failOnError>false</failOnError>-->
-				<!--</configuration>-->
+					<execution>
+						<id>add-module-infos</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>add-module-info</goal>
+						</goals>
+						<configuration>
+							<overwriteExistingFiles>true</overwriteExistingFiles>
+							<outputDirectory>${project.build.directory}/modules</outputDirectory>
+							<modules>
+								<module>
+									<artifact>
+										<groupId>commons-io</groupId>
+										<artifactId>commons-io</artifactId>
+										<version>2.6</version>
+									</artifact>
+									<moduleInfoSource>
+										module org.apache.commons.io {
+										exports org.apache.commons.io;
+										exports org.apache.commons.io.filefilter;
+										}
+									</moduleInfoSource>
+								</module>
+								<module>
+									<artifact>
+										<groupId>org.apache.commons</groupId>
+										<artifactId>commons-text</artifactId>
+										<version>1.6</version>
+									</artifact>
+									<moduleInfoSource>
+										module org.apache.commons.text {
+										exports org.apache.commons.text;
+										exports org.apache.commons.text.lookup;
+										requires org.apache.commons.lang3;
+										}
+									</moduleInfoSource>
+								</module>
+								<module>
+									<artifact>
+										<groupId>com.fasterxml.jackson.core</groupId>
+										<artifactId>jackson-core</artifactId>
+										<version>2.9.7</version>
+									</artifact>
+									<moduleInfoSource>
+										module com.fasterxml.jackson.core {
+										exports com.fasterxml.jackson.core;
+										}
+									</moduleInfoSource>
+								</module>
+								<module>
+									<artifact>
+										<groupId>org.openjfx</groupId>
+										<artifactId>javafx-controls</artifactId>
+										<version>11.0.1-ea+1</version>
+									</artifact>
+									<moduleInfoSource>
+										module javafx.controlsEmpty {
+										}
+									</moduleInfoSource>
+								</module>
+								<module>
+									<artifact>
+										<groupId>com.lmax</groupId>
+										<artifactId>disruptor</artifactId>
+										<version>3.4.2</version>
+									</artifact>
+									<moduleInfoSource>
+										module com.lmax.disruptor {
+										exports com.lmax.disruptor;
+										}
+									</moduleInfoSource>
+								</module>
+								<module>
+									<artifact>
+										<groupId>com.fasterxml.jackson.core</groupId>
+										<artifactId>jackson-annotations</artifactId>
+										<version>2.9.7</version>
+									</artifact>
+									<moduleInfoSource>
+										module com.fasterxml.jackson.annotation {
+										exports com.fasterxml.jackson.annotation;
+										}
+									</moduleInfoSource>
+								</module>
+								<module>
+									<artifact>
+										<groupId>commons-logging</groupId>
+										<artifactId>commons-logging</artifactId>
+										<version>1.2</version>
+									</artifact>
+									<moduleInfoSource>
+										module org.apache.commons.logging {
+										exports org.apache.commons.logging;
+										exports org.apache.commons.logging.impl;
+										}
+									</moduleInfoSource>
+								</module>
+								<module>
+									<artifact>
+										<groupId>org.apache.logging.log4j</groupId>
+										<artifactId>log4j-core</artifactId>
+										<version>2.11.1</version>
+									</artifact>
+									<moduleInfoSource>
+										module org.apache.logging.log4j.core {
+										exports org.apache.logging.log4j.core;
+										requires org.apache.logging.log4j;
+										}
+									</moduleInfoSource>
+								</module>
+								<module>
+									<artifact>
+										<groupId>org.apache.commons</groupId>
+										<artifactId>commons-lang3</artifactId>
+										<version>3.8.1</version>
+									</artifact>
+									<moduleInfoSource>
+										module org.apache.commons.lang3 {
+										exports org.apache.commons.lang3;
+										exports org.apache.commons.lang3.builder;
+										}
+									</moduleInfoSource>
+								</module>
+								<module>
+									<artifact>
+										<groupId>org.apache.commons</groupId>
+										<artifactId>commons-configuration2</artifactId>
+										<version>2.4</version>
+									</artifact>
+									<moduleInfoSource>
+										module org.apache.commons.configuration2 {
+										exports org.apache.commons.configuration2;
+										exports org.apache.commons.configuration2.ex;
+										exports org.apache.commons.configuration2.builder.fluent;
+										requires org.apache.commons.logging;
+										requires org.apache.commons.beanutils;
+										requires org.apache.commons.text;
+										exports org.apache.commons.configuration2.builder;
+										requires org.apache.commons.lang3;
+										}
+									</moduleInfoSource>
+								</module>
+								<module>
+									<artifact>
+										<groupId>net.sf.trove4j</groupId>
+										<artifactId>core</artifactId>
+										<version>3.1.0</version>
+									</artifact>
+									<moduleInfoSource>
+										module gnu.trove {
+										exports gnu.trove;
+										}
+									</moduleInfoSource>
+								</module>
+								<module>
+									<artifact>
+										<groupId>com.fasterxml.jackson.core</groupId>
+										<artifactId>jackson-databind</artifactId>
+										<version>2.9.7</version>
+									</artifact>
+									<moduleInfoSource>
+										module com.fasterxml.jackson.databind {
+										exports com.fasterxml.jackson.databind;
+										}
+									</moduleInfoSource>
+								</module>
+								<module>
+									<artifact>
+										<groupId>com.ximpleware</groupId>
+										<artifactId>vtd-xml</artifactId>
+										<version>2.13.4</version>
+									</artifact>
+									<moduleInfoSource>
+										module vtd.xml {
+										exports com.ximpleware;
+										}
+									</moduleInfoSource>
+								</module>
+								<!-- following ones are added because I need to add mainClass to module-info.class
+								somehow
+								 -->
+								<module>
+									<artifact>
+										<groupId>org.openjfx</groupId>
+										<artifactId>javafx-graphics</artifactId>
+										<version>11.0.1-ea+1</version>
+									</artifact>
+									<moduleInfoSource>
+										module javafx.graphicsEmpty {
+										}
+									</moduleInfoSource>
+								</module>
+								<module>
+									<artifact>
+										<groupId>org.openjfx</groupId>
+										<artifactId>javafx-media</artifactId>
+										<version>11.0.1-ea+1</version>
+									</artifact>
+									<moduleInfoSource>
+										module javafx.mediaEmpty {
+										}
+									</moduleInfoSource>
+								</module>
+								<module>
+									<artifact>
+										<groupId>org.openjfx</groupId>
+										<artifactId>javafx-media</artifactId>
+										<version>11.0.1-ea+1</version>
+									</artifact>
+									<moduleInfoSource>
+										module javafx.mediaEmpty {
+										}
+									</moduleInfoSource>
+								</module>
+								<module>
+									<artifact>
+										<groupId>org.openjfx</groupId>
+										<artifactId>javafx-fxml</artifactId>
+										<version>11.0.1-ea+1</version>
+									</artifact>
+									<moduleInfoSource>
+										module javafx.fxmlEmpty {
+										}
+									</moduleInfoSource>
+								</module>
+								<module>
+									<artifact>
+										<groupId>org.openjfx</groupId>
+										<artifactId>javafx-base</artifactId>
+										<version>11.0.1-ea+1</version>
+									</artifact>
+									<moduleInfoSource>
+										module javafx.baseEmpty {
+										}
+									</moduleInfoSource>
+								</module>
+								<module>
+									<artifact>
+										<groupId>commons-beanutils</groupId>
+										<artifactId>commons-beanutils</artifactId>
+										<version>1.9.3</version>
+									</artifact>
+									<moduleInfoSource>
+									module org.apache.commons.beanutils {
+										exports org.apache.commons.beanutils;
+										requires java.desktop;
+										requires org.apache.commons.logging;
+										requires java.sql;
+									}
+									</moduleInfoSource>
+								</module>
+								<module>
+									<artifact>
+										<groupId>commons-collections</groupId>
+										<artifactId>commons-collections</artifactId>
+										<version>3.2.2</version>
+									</artifact>
+									<moduleInfoSource>
+										module org.apache.commons.collections {
+										exports org.apache.commons.collections;
+										}
+									</moduleInfoSource>
+								</module>
+								<!--<module>-->
+									<!--<artifact>-->
+										<!--<groupId>ahli</groupId>-->
+										<!--<artifactId>ObserverUiSettingsEditor</artifactId>-->
+										<!--<version>1.0.0-SNAPSHOT</version>-->
+									<!--</artifact>-->
+									<!--<moduleInfoSource>-->
+										<!--module ObserverUiSettingsEditor {-->
+										<!--requires java.datatransfer;-->
+										<!--requires java.desktop;-->
+										<!--requires java.xml;-->
+										<!--requires javafx.base;-->
+										<!--requires javafx.controls;-->
+										<!--requires javafx.fxml;-->
+										<!--requires javafx.graphics;-->
+										<!--requires org.apache.commons.io;-->
+										<!--requires org.apache.commons.lang3;-->
+										<!--requires org.apache.logging.log4j;-->
+										<!--requires GalaxyLib;-->
+										<!--exports com.ahli.hotkeyUi.application to javafx.graphics;-->
+										<!--exports com.ahli.hotkeyUi.application.controller to javafx.fxml;-->
+										<!--opens com.ahli.hotkeyUi.application.controller to javafx.fxml;-->
+										<!--}-->
+									<!--</moduleInfoSource>-->
+									<!--<mainClass>${executableJavaClass}</mainClass>-->
+								<!--</module>-->
+							</modules>
+						</configuration>
+					</execution>
+					<execution>
+						<id>create-runtime-image</id>
+						<phase>package</phase>
+						<goals>
+							<goal>create-runtime-image</goal>
+						</goals>
+						<configuration>
+							<modulePath>
+								<path>${project.build.directory}/modules</path>
+							</modulePath>
+							<modules>
+								<module>${moduleName}</module>
+							</modules>
+							<baseJdk>version=11,vendor=openjdk</baseJdk>
+							<outputDirectory>
+								${project.build.directory}/jlink-image
+							</outputDirectory>
+							<!--<launcher>-->
+								<!--<name>Test</name>-->
+								<!--<module>${moduleName}</module>-->
+							<!--</launcher>-->
+							<stripDebug>true</stripDebug>
+							<compression>2</compression>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!--<plugin>-->
+			<!--<groupId>com.coderplus.maven.plugins</groupId>-->
+			<!--<artifactId>copy-rename-maven-plugin</artifactId>-->
+			<!--<version>1.0.1</version>-->
+			<!--<executions>-->
+			<!--<execution>-->
+			<!--<id>copy-target</id>-->
+			<!--<phase>package</phase>-->
+			<!--<goals>-->
+			<!--<goal>copy</goal>-->
+			<!--</goals>-->
+			<!--<configuration>-->
+			<!--<sourceFile>${project.build.directory}/${project.build.finalName}.jar</sourceFile>-->
+			<!--<destinationFile>${project.build.directory}/modules/${project.build.finalName}.jar-->
+			<!--</destinationFile>-->
+			<!--</configuration>-->
+			<!--</execution>-->
+			<!--</executions>-->
 			<!--</plugin>-->
-
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<version>3.1.1</version>
+				<executions>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/modules</outputDirectory>
+							<includeScope>runtime</includeScope>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 
 		</plugins>
