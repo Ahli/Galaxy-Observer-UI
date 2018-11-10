@@ -18,25 +18,13 @@ These Observer Interface files can be loaded in the game options of Blizzard Ent
 The interfaces are required to define adjustable constants within a layout file with the syntax described at the end of this document.
 
 
-Requirements:
--------------
-- Java 10 JRE (or newer) needs to be installed. Just try to start the "settingsEditor.jar" file and you will see if it works.
-     You can download it here: http://www.oracle.com/technetwork/java/javase/downloads/index.html
-
-Installation:
--------------
-Place the editor's folder somewhere on your computer.
-
 
 Contained Files:
 ----------------
-- ReadMe.txt									This file.
-- settingsEditor.jar								The settings editor program.
-- plugins/mpq/MpqEditor.exe							Ladik's MpqEditor.
-- plugins/mpq/History.txt							Changelog of Ladik's MpqEditor.
+The files installed into your install directory.
 
 
-Files that are created and persist:
+Other Files that are created and persist:
 -----------------------------------
 - %AppData%\Roaming\MPQEditor.ini						Ladik's MpqEditor settings file.
 - %AppData%\Roaming\MPQEditor_Ruleset.ini					Ladik's MpqEditor settings file for custom file compression.
