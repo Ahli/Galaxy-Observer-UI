@@ -26,7 +26,8 @@
     <Anchor side="Left" relative="ContentFrame" pos="Min" offset="0" />
     <Anchor side="Right" relative="ContentFrame" pos="Max" offset="0" />
     <Anchor side="Bottom" relative="Arrow" pos="Max" offset="0" />
-    <Visible val="false" />
+    <Visible val="true" />
+    <Alpha val="0" />
     <Height val="150" />
     <Frame type="Label" name="ApplyImmediatelyLabel">
       <Anchor side="Left" relative="$parent/ContentFrame" pos="Mid" offset="0" />
@@ -516,8 +517,8 @@
       <Text val="@UI/ScreenScore/LeaveScoreScreen" />
     </Frame>
     <Frame type="PotentialBoostFrame" name="PotentialBoostFrame" template="ScreenScore/PotentialBoostFrameTemplate">
-      <Anchor side="Left" relative="$parent/RenameReplayButton" pos="Max" offset="-21" />
-      <Anchor side="Bottom" relative="$parent/RenameReplayButton" pos="Max" offset="-11" />
+      <Anchor side="Left" relative="$parent/RenameReplayButton" pos="Max" offset="-23" />
+      <Anchor side="Bottom" relative="$parent/RenameReplayButton" pos="Max" offset="-12" />
       <StateGroup name="EnterGamePanelVisibility">
         <State name="BoostButtonShown">
           <When type="Property" frame="$parent" Visible="true" />
@@ -541,20 +542,25 @@
         <Anchor side="Right" relative="$parent/$parent/PotentialBoostFrame" pos="Mid" offset="0" />
         <Anchor side="Bottom" relative="$parent/$parent/PotentialBoostFrame" pos="Mid" offset="-25" />
       </Frame>
-      <StateGroup name="HoverStates">
-        <State name="BuyButtonHovered">
-          <When type="Property" frame="$parent/PotentialBoostFrame/BuyBoostButton" Hovering="true" />
-        </State>
-      </StateGroup>
       <StateGroup name="VisibilityStates">
         <State name="Show">
           <When type="Property" frame="$parent/SummaryButton" Toggled="true" />
           <When type="Property" frame="$parent/PotentialBoostFrame" Visible="true" />
           <When type="StateGroup" frame="$parent/PotentialBoostFrame" PurchaseState="InProgress" operator="NotEqual" />
           <When type="StateGroup" frame="$parent/PotentialBoostFrame" PurchaseState="Delayed" operator="NotEqual" />
-          <Action type="SetProperty" Visible="true" />
+          <When type="Property" frame="$parent/PotentialBoostFrame/BuyBoostButton" Hovering="true" />
+          <Action type="SendEvent" Event="FadeIn" on="Enter" />
+          <Action type="SendEvent" Event="FadeOut" on="Exit" />
         </State>
       </StateGroup>
+      <Animation name="SmoothFading">
+        <Event event="FadeIn" action="DirectionForward,Play" frame="$this" />
+        <Event event="FadeOut" action="DirectionReverse,Play" frame="$this" />
+        <Controller type="Fade" end="Pause">
+          <Key type="Curve" time="0" value="0" />
+          <Key type="Curve" time="0.2" value="255" />
+        </Controller>
+      </Animation>
     </Frame>
     <StateGroup name="SubNavState">
       <DefaultState val="NoChoices" />
