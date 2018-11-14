@@ -17,6 +17,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -36,6 +37,9 @@ import java.util.Set;
 public class BrowseTabController implements Updateable {
 	private static final Logger logger = LogManager.getLogger(BrowseTabController.class);
 	private static final String GAME_UI = "GameUI";
+	//	private final StringProperty filterProp = new SimpleStringProperty();
+	@FXML
+	private Label pathLabel;
 	@FXML
 	private TextField treeFilter;
 	@FXML
@@ -57,7 +61,8 @@ public class BrowseTabController implements Updateable {
 	//	private AutoCompletionBinding<String> templateDropdownAutoCompleteBinding;
 	private Map<String, UITemplate> templateMap;
 	private int framesTotal = 0;
-	
+//	private Runnable queryRunnable;
+//	private Thread queryThread;
 	private UICatalog uiCatalog;
 	
 	/**
@@ -101,6 +106,10 @@ public class BrowseTabController implements Updateable {
 		}
 		final String filterUpper = filter.toUpperCase();
 		
+		
+		//		queryRunnable = () -> {
+		//			synchronized (BrowseTabController.class) {
+		//				try {
 		final long midTime = System.currentTimeMillis();
 		logger.info("filter-show: " + filterUpper + ", preparation: " + (midTime - startTime));
 		filterTreeShow(filterUpper);
@@ -114,17 +123,34 @@ public class BrowseTabController implements Updateable {
 		logger.info("filter-hide execution: " + (midTime3 - midTime2));
 		
 		// release memory
-		//		if (hiddenTreeChildMap.isEmpty()) {
-		//			hiddenTreeChildMap = null;
-		//		}
+		if (hiddenTreeChildMap.isEmpty()) {
+			hiddenTreeChildMap = null;
+		}
 		
 		//		frameTreeContainer.getChildren().add(frameTree);
 		logger.info("filter cleanup: " + (System.currentTimeMillis() - midTime3));
+		//				} catch (final InterruptedException e) {
+		//					// do nothing
+		//				}
+		//			}
+		
+		//		};
+		
+		//		if (queryThread != null) {
+		//			queryThread.interrupt();
+		//		}
+		//		queryThread = new Thread(queryRunnable);
+		//		queryThread.start();
+		
+		//		filterProp.setValue(filter);
 	}
 	
 	private void filterTreeShow(final String queryUpper) {
 		List<TreeItem<UIElement>> children;
 		for (final var entry : Set.copyOf(hiddenTreeChildMap.entrySet())) {
+			//			if (Thread.currentThread().isInterrupted()) {
+			//				throw new InterruptedException();
+			//			}
 			children = entry.getValue();
 			final TreeItem<UIElement> parent = entry.getKey();
 			final var visibleChildren = parent.getChildren();
@@ -161,8 +187,10 @@ public class BrowseTabController implements Updateable {
 		}
 	}
 	
-	
 	private boolean filterTreeHide(final String queryUpper, final TreeItem<UIElement> elem) {
+		//		if (Thread.currentThread().isInterrupted()) {
+		//			throw new InterruptedException();
+		//		}
 		final var children = elem.getChildren();
 		if (!children.isEmpty()) {
 			for (int i = 0, len = children.size(); i < len; i++) {
@@ -194,13 +222,13 @@ public class BrowseTabController implements Updateable {
 	}
 	
 	private void showInTableView(final TreeItem<UIElement> selected) {
+		updatePath(selected);
 		if (selected == null) {
 			tableView.getItems().clear();
 		} else {
 			final UIElement el = selected.getValue();
-			final Map<String, String> map = new HashMap<>((framesTotal * 75 / 100) + 1, 0.75f); // TODO maybe use
-			// something different
-			// that holds entries
+			// TODO maybe use something different that holds entries
+			final Map<String, String> map = new HashMap<>((framesTotal * 75 / 100) + 1, 0.75f);
 			if (el instanceof UIFrame) {
 				final UIFrame elem = (UIFrame) el;
 				UIAnchorSide side = UIAnchorSide.TOP;
@@ -287,6 +315,18 @@ public class BrowseTabController implements Updateable {
 		return str.toString();
 	}
 	
+	private void updatePath(final TreeItem<UIElement> elem) {
+		final String path = addParentPath(new StringBuilder(), elem).toString();
+		pathLabel.setText(path);
+	}
+	
+	private StringBuilder addParentPath(final StringBuilder sb, final TreeItem<UIElement> elem) {
+		if (elem.getParent() != null) {
+			addParentPath(sb, elem.getParent());
+			sb.append(" > ");
+		}
+		return sb.append(elem.getValue().getName());
+	}
 	
 	/**
 	 * @param template
@@ -294,18 +334,36 @@ public class BrowseTabController implements Updateable {
 	private void createTree(final UITemplate template) {
 		if (template != null) {
 			final UIElement rootElement = template.getElement();
-			final TreeItem<UIElement> treeItem = new TreeItem<>(rootElement);
-			frameTree.setRoot(treeItem);
+			final TreeItem<UIElement> rootItem = new TreeItem<>(rootElement);
+			frameTree.setRoot(rootItem);
 			framesTotal += 1;
-			final ObservableList<TreeItem<UIElement>> treeItemChildren = frameTree.getRoot().getChildren();
+			final ObservableList<TreeItem<UIElement>> treeItemChildren = rootItem.getChildren();
 			for (final UIElement child : rootElement.getChildren()) {
 				createTree(child, treeItemChildren);
 			}
-			treeItem.expandedProperty().setValue(true);
+			rootItem.expandedProperty().setValue(true);
+			
+			//			rootItem.predicateProperty().bind(Bindings.createObjectBinding(new Callable<>() {
+			//				@Override
+			//				public TreeItemPredicate<UIElement> call() throws Exception {
+			//					return TreeItemPredicate.<UIElement>create(
+			//							elem -> {return elem.getName().equalsIgnoreCase(filterProp.getValue());});
+			//				}
+			//			}, filterProp));
 		} else {
 			frameTree.setRoot(null);
 		}
 		frameTree.getSelectionModel().select(0);
+		
+		// TEST
+		//		MyNode myRootNode = myService.getTreeRootNode();
+		//		FilterableTreeItem<MyNode> rootItem = new FilterableTreeItem<>(myRootNode);
+		//		rootItem.setExpanded(true);
+		//		for (MyNode node : myRootNode.getChildren()) {
+		//			FilterableTreeItem<MyNode> item = new FilterableTreeItem<>(node);
+		//			rootItem.getInternalChildren().add(item);
+		//		}
+		//		tree.setRoot(rootItem);
 	}
 	
 	/**
