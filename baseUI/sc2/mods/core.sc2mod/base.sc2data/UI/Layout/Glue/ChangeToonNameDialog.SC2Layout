@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <Frame type="ChangeToonNameDialog" name="ChangeToonNameDialog" template="StandardDialog/EditBoxConfirmationDialogTemplate">
+        <Anchor relative="$parent"/>
+        
+        <Frame type="EditBox" name="EditBox" template="StandardTemplates/StandardEditBoxTemplate">
+            <MaxCharacters val="12"/>
+        </Frame>
+        
+        <Frame type="Button" name="Button">
+            <Anchor side="Left" relative="$parent/BackgroundFrame/BorderImage" pos="Min" offset="50"/>
+            <Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+            <Text val="@UI/ConfirmDialog_Control"/>
+            <Shortcut val="@UI/StandardDialog_Yes_Hotkey"/>
+        </Frame>
+
+        <Frame type="Button" name="SecondButton" template="StandardTemplates/StandardButtonTemplate">
+            <Anchor side="Top" relative="$parent/Button" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/BackgroundFrame/BorderImage" pos="Max" offset="-50"/>
+            <Text val="@UI/Cancel"/>
+            <Shortcut val="@UI/StandardDialog_No_Hotkey"/>
+        </Frame>
+
+        <Frame type="Frame" name="Loading">
+            <Anchor relative="$parent"/>
+            <Visible val="False"/>
+
+            <Frame type="Frame" name="IdleSpinner" template="StandardBattlenetTemplates/IdleSpinnerTemplate">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            </Frame>
+        </Frame>
+
+        <StateGroup name="NameChangedEnabledState">
+            <DefaultState val="InvalidName"/>
+
+            <State name="Loading">
+                <When type="Property" frame="$this" IsLoading="true"/>
+                <Action type="SetProperty" frame="$this/Button" Enabled="false"/>
+                <Action type="SetProperty" frame="$this/Button" Tooltip=""/>
+            </State>
+
+            <State name="NoNameChangeAvaialble">
+                <When type="Property" frame="$this" CanChangeToonName="false"/>
+                <Action type="SetProperty" frame="$this/Button" Enabled="false"/>
+                <Action type="SetProperty" frame="$this/Button" Tooltip="@UI/ChangeToonNameDialogTooltipNameChangeUnavailable"/>
+            </State>
+            
+            <State name="Enabled">
+                <When type="Property" frame="$this" IsNameValid="true"/>
+                <Action type="SetProperty" frame="$this/Button" Enabled="true"/>
+                <Action type="SetProperty" frame="$this/Button" Tooltip=""/>
+            </State>
+
+            <State name="InvalidName">
+                <Action type="SetProperty" frame="$this/Button" Enabled="false"/>
+                <Action type="SetProperty" frame="$this/Button" Tooltip="@UI/CreateToonDialog/Tooltip"/>
+            </State>
+        </StateGroup>
+ 
+        <StateGroup name="LoadingState">
+            <DefaultState val="CannotChangeToonName"/>
+
+            <State name="Loading">
+                <When type="Property" frame="$this" IsLoading="true"/>
+                <Action type="SetProperty" frame="$this/Loading" Visible="True"/>
+                <Action type="SetProperty" frame="$this/MessageLabel" Visible="False"/>
+                <Action type="SetProperty" frame="$this/EditBox" Visible="False"/>
+                
+            <Action type="SetProperty" frame="$this/MessageLabel" Text="@UI/ChangeToonNameDialogMessage"/>
+            </State>
+
+            <State name="CanChangeToonName">
+                <When type="Property" frame="$this" CanChangeToonName="true"/>
+                <Action type="SetProperty" frame="$this/Loading" Visible="False"/>
+                <Action type="SetProperty" frame="$this/MessageLabel" Visible="True"/>
+                <Action type="SetProperty" frame="$this/EditBox" Visible="True"/>
+            <Action type="SetProperty" frame="$this/MessageLabel" Text="@UI/ChangeToonNameDialogMessage"/>
+            </State>
+
+            <State name="CannotChangeToonName">
+                <Action type="SetProperty" frame="$this/Loading" Visible="False"/>
+                <Action type="SetProperty" frame="$this/MessageLabel" Visible="True"/>
+                <Action type="SetProperty" frame="$this/EditBox" Visible="False"/>
+            
+                <Action type="SetProperty" frame="$this/MessageLabel" Text="@UI/ChangeToonNameUnavailableDialogMessage"/>
+            </State>
+        </StateGroup>
+    </Frame>
+</Desc>
