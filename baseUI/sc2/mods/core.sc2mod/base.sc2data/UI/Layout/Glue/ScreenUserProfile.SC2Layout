@@ -1,0 +1,827 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+    
+    <Frame type="ScreenUserProfile" name="ScreenUserProfile">
+        <Anchor relative="$parent"/>
+        <Handle val="ScreenUserProfile"/>
+        <!-- This must render below ScreenBattlenet so fanfares and profile can appear above it -->
+        <!-- But render above ScreenNavigation and other content screens so you can't navigate or interact with other things -->
+        <RenderPriority val="650"/>
+
+        <Animation name="Show">
+            <Event event="Hide" action="Reset,Stop" frame="$this"/>
+            <Event event="Begin" action="Reset,Play" frame="$this"/>
+
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0.000" value="0" out="Slow"/>
+                <Key type="Curve" time="0.175" value="255" in="Auto"/>
+            </Controller>
+        </Animation>
+
+        <Frame type="RaceCacheFrame" name="RaceCacheFrame">
+            <Anchor relative="$parent"/>
+            <RaceFourCC val="{$parent/@HighestRace}"/>
+        </Frame>
+
+        <Frame type="UserProfileRaceStatsFrame" name="TerranStatsFrame">
+            <Anchor relative="$parent"/>
+            <PresenceId val="{$parent/@PresenceId}"/>
+            <FilterMyRace val="Terr"/>
+        </Frame>
+
+        <Frame type="UserProfileRaceStatsFrame" name="ZergStatsFrame">
+            <Anchor relative="$parent"/>
+            <PresenceId val="{$parent/@PresenceId}"/>
+            <FilterMyRace val="Zerg"/>
+        </Frame>
+
+        <Frame type="UserProfileRaceStatsFrame" name="ProtossStatsFrame">
+            <Anchor relative="$parent"/>
+            <PresenceId val="{$parent/@PresenceId}"/>
+            <FilterMyRace val="Prot"/>
+        </Frame>
+        
+        <StateGroup name="RaceState">
+            <State name="Terran"/>
+            <State name="Zerg"/>
+            <State name="Protoss"/>
+            <State name="Random"/>
+        </StateGroup>
+
+        <StateGroup name="PrimaryRaceState">
+            <DefaultState val="DefaultState"/>
+
+            <State name="TerranState">
+                <When type="Property" frame="RaceCacheFrame" Race="Terr"/>
+                <Action type="SetState" group="RaceState" state="Terran"/>
+            </State>
+
+            <State name="ZergState">
+                <When type="Property" frame="RaceCacheFrame" Race="Zerg"/>
+                <Action type="SetState" group="RaceState" state="Zerg"/>
+            </State>
+
+            <State name="ProtossState">
+                <When type="Property" frame="RaceCacheFrame" Race="Prot"/>
+                <Action type="SetState" group="RaceState" state="Protoss"/>
+            </State>
+
+            <State name="RandomState">
+                <When type="Property" frame="RaceCacheFrame" Race="Rand"/>
+                <Action type="SetState" group="RaceState" state="Random"/>
+            </State>
+
+            <!-- If not 1v1 ranked, use the most played race -->
+            <State name="TerranMostPlayedState">
+                <When type="Property" frame="TerranStatsFrame" operator="GreaterThan" GamesPlayed="{$this/ZergStatsFrame/@GamesPlayed}"/>
+                <When type="Property" frame="TerranStatsFrame" operator="GreaterThan" GamesPlayed="{$this/ProtossStatsFrame/@GamesPlayed}"/>
+                <Action type="SetState" group="RaceState" state="Terran"/>
+            </State>
+
+            <State name="ZergMostPlayedState">
+                <When type="Property" frame="ZergStatsFrame" operator="GreaterThan" GamesPlayed="{$this/TerranStatsFrame/@GamesPlayed}"/>
+                <When type="Property" frame="ZergStatsFrame" operator="GreaterThan" GamesPlayed="{$this/ProtossStatsFrame/@GamesPlayed}"/>
+                <Action type="SetState" group="RaceState" state="Zerg"/>
+            </State>
+
+            <State name="ProtossMostPlayedState">
+                <When type="Property" frame="ProtossStatsFrame" operator="GreaterThan" GamesPlayed="{$this/TerranStatsFrame/@GamesPlayed}"/>
+                <When type="Property" frame="ProtossStatsFrame" operator="GreaterThan" GamesPlayed="{$this/ZergStatsFrame/@GamesPlayed}"/>
+                <Action type="SetState" group="RaceState" state="Protoss"/>
+            </State>
+
+            <State name="DefaultState">
+                <Action type="SetState" group="RaceState" state="Random"/>
+            </State>
+        </StateGroup>
+
+        <!-- This tooltip is just for blocking tooltips behind this panel -->
+        <Frame type="StandardTooltip" name="ScreenUserProfileTooltip">
+            <Frame type="Label" name="Label">
+                <Anchor relative="$parent"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Frame" name="ExtendedExperienceBG" template="StandardExtendedExperienceTemplates/StandardSizeExtendedExperienceTemplate"/>
+
+        <Frame type="BattleUserFrame" name="UserFrame">
+            <Anchor relative="$parent"/>
+            <PresenceId val="{$ScreenUserProfile/@PresenceId}"/>
+        </Frame>
+
+        <Frame type="Button" name="BackButton" template="StandardBattlenetTemplates/BattlenetStandardBackButtonTemplate">
+            <Anchor side="Top" relative="$parent/ProfileContainerFrame/TitleBackgroundAnchorFrame" pos="Mid" offset="-1"/>
+            <Anchor side="Bottom" relative="$parent/ProfileContainerFrame/TitleBackgroundAnchorFrame" pos="Mid" offset="-1"/>
+            <Anchor side="Left" relative="$parent/ProfileContainerFrame/TitleBackgroundAnchorFrame" pos="Min" offset="4"/>
+            <CollapseLayout val="true"/>
+            <Visible val="false"/>
+
+            <StateGroup name="ProfileStateGroup">
+                <State name="ProfileState">
+                    <When type="Property" frame="$parent" FromScoreScreen="true"/>
+                    <When type="Property" frame="$parent/ProfileContainerFrame/ProfileTabButton" Visible="false"/>
+                    <When type="Property" frame="$parent/ProfileContainerFrame/LadderSummaryButton" Visible="false"/>
+                    <Action type="SetProperty" frame="$this" Visible="true"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="Button" name="CloseButton" template="StandardBattlenetTemplates/CloseButton">
+            <Anchor side="Top" relative="$parent/ExtendedExperienceBG/AnchorFrame" pos="Min" offset="11"/>
+            <Anchor side="Right" relative="$parent/ExtendedExperienceBG/AnchorFrame" pos="Max" offset="-14"/>
+            <Shortcut val="@UI/ScreenNavigationBack_Hotkey"/>
+            <ClickSound val="@UI_BnetDefaultClick"/>
+        </Frame>
+
+        <Frame type="Frame" name="ProfileContainerFrame">
+            <Anchor relative="$parent"/>
+            <Visible val="false"/>
+
+            <Frame type="Frame" name="TitleBackgroundAnchorFrame">
+                <Anchor side="Top" relative="$ScreenUserProfile/ExtendedExperienceBG/AnchorFrame" pos="Min" offset="56"/>
+                <Anchor side="Left" relative="$ScreenUserProfile/ExtendedExperienceBG/AnchorFrame" pos="Min" offset="32"/>
+                <Width val="376"/>
+                <Height val="53"/>
+            </Frame>
+
+            <Frame type="Button" name="ProfileTabButton" template="StandardBattlenetTemplates/BattlenetStandardBackButtonTemplate">
+                <Anchor side="Top" relative="$parent/TitleBackgroundAnchorFrame" pos="Mid" offset="-1"/>
+                <Anchor side="Bottom" relative="$parent/TitleBackgroundAnchorFrame" pos="Mid" offset="-1"/>
+                <Anchor side="Left" relative="$parent/$parent/BackButton" pos="Max" offset="6"/>
+                <CollapseLayout val="true"/>
+                <Visible val="false"/>
+
+                <StateGroup name="ProfileStateGroup">
+                    <State name="ProfileState">
+                        <When type="Property" frame="$parent/SummaryTabControl" Visible="true"/>
+                        <Action type="SetProperty" frame="$this" Visible="false"/>
+                        <Action type="SetProperty" frame="$parent/TitleLabel" Text="@UI/ScreenUserProfile/TitleProfile"/>
+                    </State>
+                    <State name="AchievementsState">
+                        <When type="Property" frame="$parent/AchievementsFrame" Visible="true"/>
+                        <Action type="SetProperty" frame="$this" Visible="true"/>
+                        <Action type="SetProperty" frame="$parent/TitleLabel" Text="@UI/ScreenUserProfile/TitleAchievements"/>
+                    </State>
+                    <State name="LadderSummaryState">
+                        <When type="Property" frame="$parent/LaddersTabControl/SummaryTabControl" Visible="true"/>
+                        <Action type="SetProperty" frame="$this" Visible="true"/>
+                        <Action type="SetProperty" frame="$parent/TitleLabel" Text="@UI/ScreenUserProfile/TitleLadders"/>
+                    </State>
+                    <State name="LaddersState">
+                        <When type="Property" frame="$parent/LaddersTabControl" Visible="true"/>
+                        <Action type="SetProperty" frame="$this" Visible="false"/>
+                        <Action type="SetProperty" frame="$parent/TitleLabel" Text="@UI/ScreenUserProfile/TitleLadders"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+
+            <Frame type="Button" name="LadderSummaryButton" template="StandardBattlenetTemplates/BattlenetStandardBackButtonTemplate">
+                <Anchor side="Top" relative="$parent/TitleBackgroundAnchorFrame" pos="Mid" offset="-1"/>
+                <Anchor side="Bottom" relative="$parent/TitleBackgroundAnchorFrame" pos="Mid" offset="-1"/>
+                <Anchor side="Left" relative="$parent/ProfileTabButton" pos="Max" offset="0"/>
+                <CollapseLayout val="true"/>
+                <Visible val="false"/>
+
+                <StateGroup name="LadderStateGroup">
+                    <State name="LadderSummaryState">
+                        <When type="Property" frame="$parent/LaddersTabControl" Visible="true"/>
+                        <When type="Property" frame="$parent/LaddersTabControl/SummaryTabControl" Visible="false"/>
+                        <Action type="SetProperty" frame="$this" Visible="true"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+        
+            <Frame type="Image" name="TitleBackground">
+                <Anchor side="Top" relative="$parent/TitleBackgroundAnchorFrame" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/LadderSummaryButton" pos="Max" offset="0"/>
+                <Anchor side="Right" relative="$parent/TitleBackgroundAnchorFrame" pos="Max" offset="0"/>
+                <Height val="53"/>
+                <PreserveAnchorOffset val="True"/>
+                <Texture val="@UI/Glues_Battlenet_PageAssets_ListHeaderBg"/>
+                <TextureType val="Nineslice"/>
+                
+                <!-- Save a few pixels when a Back button is visible by anchoring further left-->
+                <StateGroup name="LeftAnchorState">
+                    <DefaultState val="BackButton"/>
+                    
+                    <State name="NoBackButton">
+                        <When type="Property" frame="$parent/ProfileTabButton" visible="False"/>
+                        <When type="Property" frame="$parent/LadderSummaryButton" visible="False"/>
+                        <Action type="SetAnchor" side="Left" relative="$parent/LadderSummaryButton" pos="Max" offset="0"/>
+                    </State>
+                    
+                    <State name="BackButton">
+                        <Action type="SetAnchor" side="Left" relative="$parent/LadderSummaryButton" pos="Max" offset="-4"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+
+            <Frame type="Label" name="TitleLabel">
+                <Anchor side="Top" relative="$parent/TitleBackground" pos="Min" offset="1"/>
+                <Anchor side="Bottom" relative="$parent/TitleBackground" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/TitleBackground" pos="Min" offset="14"/>
+                <Anchor side="Right" relative="$parent/TitleBackground" pos="Max" offset="-14"/>
+                <Style val="@Arcade_Title"/>
+                <Text val="@UI/ScreenUserProfile/TitleProfile"/>
+            </Frame>
+
+            <Frame type="Image" name="RaceHeaderImage">
+                <Anchor side="Top" relative="$parent/PageHeaderBackground" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent/PageHeaderBackground" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent/PageHeaderBackground" pos="Min" offset="113"/>
+                <Texture val="@UI/SC2_UI_UserProfile_HeaderRace_Random"/>
+                <Width val="996"/>
+                <Height val="80"/>
+                <Alpha val="0"/>
+                    
+                <Animation name="Show">
+                    <Event event="SummaryLoading" action="Reset,Stop" frame="$ScreenUserProfile"/>
+                    <Event event="SummaryLoaded" action="Reset,Play" frame="$ScreenUserProfile"/>
+
+                    <Controller type="Fade" end="Pause">
+                        <Key type="Curve" time="0.000" value="0" out="Slow"/>
+                        <Key type="Curve" time="0.175" value="255" in="Auto"/>
+                    </Controller>
+                </Animation>
+                
+                <StateGroup name="RaceStateGroup">
+                    <State name="TerranState">
+                        <When type="StateGroup" frame="$ScreenUserProfile" RaceState="Terran"/>
+                        <Action type="SetProperty" Texture="@UI/SC2_UI_UserProfile_HeaderRace_Terran"/>
+                    </State>
+
+                    <State name="ZergState">
+                        <When type="StateGroup" frame="$ScreenUserProfile" RaceState="Zerg"/>
+                        <Action type="SetProperty" Texture="@UI/SC2_UI_UserProfile_HeaderRace_Zerg"/>
+                    </State>
+
+                    <State name="ProtossState">
+                        <When type="StateGroup" frame="$ScreenUserProfile" RaceState="Protoss"/>
+                        <Action type="SetProperty" Texture="@UI/SC2_UI_UserProfile_HeaderRace_Protoss"/>
+                    </State>
+
+                    <State name="RandomState">
+                        <When type="StateGroup" frame="$ScreenUserProfile" RaceState="Random"/>
+                        <Action type="SetProperty" Texture="@UI/SC2_UI_UserProfile_HeaderRace_Random"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+
+            <Frame type="Frame" name="PageHeaderBackground">
+                <Anchor side="Top" relative="$parent/TitleBackgroundAnchorFrame" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/TitleBackgroundAnchorFrame" pos="Max" offset="4"/>
+                <Width val="1120"/>
+                <Height val="104"/>
+                
+                <Frame type="Image" name="LeftOuter">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                    <Texture val="@UI/SC2_UI_UserProfile_HeaderBackground_LeftOuter"/>
+                </Frame>
+                
+                <Frame type="Image" name="LeftCenter">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/LeftOuter" pos="Max" offset="0"/>
+                    <Anchor side="Right" relative="$parent/LeftInner" pos="Min" offset="0"/>
+                    <Texture val="@UI/SC2_UI_UserProfile_HeaderBackground_LeftCenter"/>
+                </Frame>
+                
+                <Frame type="Image" name="LeftInner">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="108"/>
+                    <Texture val="@UI/SC2_UI_UserProfile_HeaderBackground_LeftInner"/>
+                </Frame>
+                
+                <Frame type="Image" name="CenterFill">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/LeftInner" pos="Max" offset="0"/>
+                    <Anchor side="Right" relative="$parent/Right" pos="Min" offset="0"/>
+                    <Texture val="@UI/SC2_UI_UserProfile_HeaderBackground_Fill"/>
+                </Frame>
+                
+                <Frame type="Image" name="Right">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                    <Texture val="@UI/SC2_UI_UserProfile_HeaderBackground_Right"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="AvatarFrame" name="AvatarFrame" template="StandardTemplates/AvatarFrameMediumTemplate">
+                <Anchor side="Top" relative="$parent/PageHeaderBackground" pos="Mid" offset="2"/>
+                <Anchor side="Bottom" relative="$parent/PageHeaderBackground" pos="Mid" offset="2"/>
+                <Anchor side="Left" relative="$parent/PageHeaderBackground" pos="Min" offset="2"/>
+                <PresenceId val="{$ScreenUserProfile/@PresenceId}"/>
+                <BypassOnlineChecks val="true"/>
+                <HighestLeague val="{$ScreenUserProfile/@HighestLeague}"/>
+                <HighestLeagueTier val="{$ScreenUserProfile/@HighestLeagueTier}"/>
+                <ContextMenu val="$parent/AvatarContextMenu"/>
+                <AcceptsMouse val="true"/>
+            </Frame>
+
+            <Frame type="Label" name="UserNameLabel">
+                <Anchor side="Top" relative="$parent/PageHeaderBackground" pos="Mid" offset="-13"/>
+                <Anchor side="Bottom" relative="$parent/PageHeaderBackground" pos="Mid" offset="-13"/>
+                <Anchor side="Left" relative="$parent/AvatarFrame" pos="Max" offset="22"/>
+                <Style val="Profile_UserName"/>
+                <AcceptsMouseTooltip val="true"/>
+                <Options val="Ellipsis | TooltipIfTruncated | NoWrapping"/>
+                <PreserveAnchorOffset val="true"/>
+                <Text val="{$ScreenUserProfile/UserFrame/@DisplayName}"/>
+            </Frame>
+
+            <Frame type="BattleUserContextMenu" name="UserContextMenu" template="BattleUserContextMenu/BattleUserContextMenu">
+                <Anchor side="Top" relative="$parent/OptionsButton" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/OptionsButton" pos="Min" offset="0"/>
+                <UseAnchors val="true"/>
+                <PresenceId val="{$ScreenUserProfile/@PresenceId}"/>
+                <HideProfile val="true"/>
+                <ShowChangeToonName val="true"/>
+                <ShowChangePortrait val="true"/>
+            </Frame>
+
+            <Frame type="BattleUserContextMenu" name="AvatarContextMenu" template="BattleUserContextMenu/BattleUserContextMenu">
+                <Anchor side="Top" relative="$parent/OptionsButton" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/OptionsButton" pos="Min" offset="0"/>
+                <PresenceId val="{$ScreenUserProfile/@PresenceId}"/>
+                <HideProfile val="true"/>
+                <ShowChangePortrait val="true"/>
+            </Frame>
+        
+            <Frame type="Button" name="OptionsButton" template="StandardBattlenetTemplates/OptionsButton">
+                <Anchor side="Top" relative="$parent/UserNameLabel" pos="Mid" offset="2"/>
+                <Anchor side="Bottom" relative="$parent/UserNameLabel" pos="Mid" offset="2"/>
+                <Anchor side="Left" relative="$parent/UserNameLabel" pos="Max" offset="3"/>
+                <ContextMenu val="$parent/UserContextMenu"/>
+                <ContextMenuButtons val="Left"/>
+            </Frame>
+
+            <Frame type="Label" name="AchievementPointsLabel">
+                <Anchor side="Top" relative="$parent/PageHeaderBackground" pos="Mid" offset="-2"/>
+                <Anchor side="Bottom" relative="$parent/PageHeaderBackground" pos="Mid" offset="-2"/>
+                <Anchor side="Right" relative="$parent/PageHeaderBackground" pos="Max" offset="-34"/>
+                <Style val="Profile_AchievementPointsTotal"/>
+                <Text val="{$parent/AchievementsFrame/@AchievementPoints}"/>
+            </Frame>
+            
+            <Frame type="Image" name="AchievementPointsIcon">
+                <Anchor side="Top" relative="$parent/PageHeaderBackground" pos="Mid" offset="-2"/>
+                <Anchor side="Bottom" relative="$parent/PageHeaderBackground" pos="Mid" offset="-2"/>
+                <Anchor side="Right" relative="$parent/AchievementPointsLabel" pos="Min" offset="-3"/>
+                <Texture val="@UI/SC2_UI_UserProfile_HeaderPoints_Total"/>
+            </Frame>
+
+            <Frame type="Frame" name="TabAnchorFrame">
+                <Anchor side="Top" relative="$parent/TitleBackgroundAnchorFrame" pos="Max" offset="-1"/>
+                <Anchor side="Left" relative="$parent/TitleBackgroundAnchorFrame" pos="Min" offset="4"/>
+                <Anchor side="Bottom" relative="$ScreenUserProfile/ExtendedExperienceBG/AnchorFrame" pos="Max" offset="-30"/>
+                <Anchor side="Right" relative="$ScreenUserProfile/ExtendedExperienceBG/AnchorFrame" pos="Max" offset="-28"/>
+            </Frame>
+
+            <Frame type="TabControl" name="ProfileTabControl">
+                <Anchor relative="$parent"/>
+                <TabListItem val="$parent/ProfileTabButton"/>
+                <TabListItem val="$parent/SummaryTabControl/LaddersButton"/>
+                <TabListItem val="$parent/SummaryTabControl/AchievementsButton"/>
+                <PanelListItem val="$parent/SummaryTabControl"/>
+                <PanelListItem val="$parent/LaddersTabControl"/>
+                <PanelListItem val="$parent/AchievementsFrame"/>
+            </Frame>
+        
+            <Frame type="TabControl" name="SummaryTabControl">
+                <Anchor relative="$parent"/>
+                <TabListItem val="SummaryButton"/>
+                <TabListItem val="MatchHistoryButton"/>
+                <TabListItem val="TrophyCaseButton"/>
+                <TabListItem val="ReviewsButton"/>
+                <PanelListItem val="SummaryFrame"/>
+                <PanelListItem val="MatchHistoryFrame"/>
+                <PanelListItem val="TrophyCaseFrame"/>
+                <PanelListItem val="ReviewsFrame"/>
+
+                <Frame type="Button" name="SummaryButton" template="UserProfileTemplates/VerticalTabButtonTemplate">
+                    <Anchor side="Top" relative="$parent/$parent/TabAnchorFrame" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/$parent/TabAnchorFrame" pos="Min" offset="0"/>
+                    <Text val="@UI/ScreenUserProfile/ButtonProfileSummary"/>
+                    <Width val="370"/>
+                    <HoverSound val="@UI_HoverTick"/>
+                    <Toggleable val="true"/>
+                </Frame>
+
+                <Frame type="Button" name="AchievementsButton" template="UserProfileTemplates/VerticalTabArrowButtonTemplate">
+                    <Anchor side="Top" relative="$parent/SummaryButton" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent/SummaryButton" pos="Min" offset="0"/>
+                    <Text val="@UI/ScreenUserProfile/ButtonAchievements"/>
+                    <Width val="370"/>
+                    <HoverSound val="@UI_HoverTick"/>
+                    <Toggleable val="true"/>
+                </Frame>
+
+                <Frame type="Button" name="MatchHistoryButton" template="UserProfileTemplates/VerticalTabButtonTemplate">
+                    <Anchor side="Top" relative="$parent/AchievementsButton" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent/AchievementsButton" pos="Min" offset="0"/>
+                    <Text val="@UI/ScreenUserProfile/ButtonMatchHistory"/>
+                    <Width val="370"/>
+                    <HoverSound val="@UI_HoverTick"/>
+                    <Toggleable val="true"/>
+                </Frame>
+
+                <Frame type="Button" name="LaddersButton" template="UserProfileTemplates/VerticalTabArrowButtonTemplate">
+                    <Anchor side="Top" relative="$parent/MatchHistoryButton" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent/MatchHistoryButton" pos="Min" offset="0"/>
+                    <Text val="@UI/ScreenUserProfile/ButtonLadders"/>
+                    <Width val="370"/>
+                    <HoverSound val="@UI_HoverTick"/>
+                    <Toggleable val="true"/>
+                </Frame>
+
+                <Frame type="Button" name="TrophyCaseButton" template="UserProfileTemplates/VerticalTabButtonTemplate">
+                    <Anchor side="Top" relative="$parent/LaddersButton" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent/LaddersButton" pos="Min" offset="0"/>
+                    <Text val="@UI/ScreenUserProfile/ButtonTrophyCase"/>
+                    <Width val="370"/>
+                    <HoverSound val="@UI_HoverTick"/>
+                    <Toggleable val="true"/>
+                </Frame>
+
+                <Frame type="Button" name="ReviewsButton" template="UserProfileTemplates/VerticalTabButtonTemplate">
+                    <Anchor side="Top" relative="$parent/TrophyCaseButton" pos="Max" offset="0"/>
+                    <Anchor side="Left" relative="$parent/TrophyCaseButton" pos="Min" offset="0"/>
+                    <Text val="@UI/ScreenUserProfile/ButtonReviews"/>
+                    <Width val="370"/>
+                    <HoverSound val="@UI_HoverTick"/>
+                    <Toggleable val="true"/>
+                </Frame>
+
+                <Frame type="Frame" name="SummaryFrame" template="UserProfileSummaryFrame/UserProfileSummaryFrameTemplate">
+                    <Anchor side="Top" relative="$parent/$parent/PageHeaderBackground" pos="Max" offset="5"/>
+                    <Anchor side="Left" relative="$parent/SummaryButton" pos="Max" offset="6"/>
+                    <Anchor side="Right" relative="$parent/$parent/TabAnchorFrame" pos="Max" offset="3"/>
+                    <Anchor side="Bottom" relative="$parent/$parent/TabAnchorFrame" pos="Max" offset="-4"/>
+                    <Alpha val="0"/>
+                    
+                    <!-- I did not add a state for when the coop commander is loading, -->
+                    <!-- because I don't want the summary to fail to load if the coop match history fails, which is more likely. -->
+                    <!-- If the teams don't fail, then there's something much worse that's wrong. -->
+                    <StateGroup name="LoadingStateGroup">
+                        <DefaultState val="LoadedState"/>
+                        
+                        <State name="LoadingTeamsState">
+                            <When type="Property" frame="VersusContainer/UserProfileSummaryTeamsFrame" TeamsResolved="false"/>
+                            <Action type="SendEvent" frame="$ScreenUserProfile" event="SummaryLoading"/>
+                            <Action type="SetProperty" frame="$parent/SummaryLoadingSpinner" Visible="{$parent/SummaryFrame/@Visible}"/>
+                        </State>
+                        
+                        <State name="LoadedState">
+                            <Action type="SendEvent" frame="$ScreenUserProfile" event="SummaryLoaded"/>
+                            <Action type="SetProperty" frame="$parent/SummaryLoadingSpinner" Visible="false"/>
+                        </State>
+                    </StateGroup>
+                    
+                    <Animation name="Show">
+                        <Event event="SummaryLoading" action="Reset,Stop" frame="$ScreenUserProfile"/>
+                        <Event event="SummaryLoaded" action="Reset,Play" frame="$ScreenUserProfile"/>
+
+                        <Controller type="Fade" end="Pause">
+                            <Key type="Curve" time="0.000" value="0" out="Slow"/>
+                            <Key type="Curve" time="0.175" value="255" in="Auto"/>
+                        </Controller>
+                    </Animation>
+                </Frame>
+
+                <Frame type="Frame" name="SummaryLoadingSpinner" template="StandardBattlenetTemplates/IdleSpinnerTemplate">
+                    <Anchor side="Top" relative="$parent/SummaryFrame" pos="Mid" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent/SummaryFrame" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent/SummaryFrame" pos="Mid" offset="0"/>
+                    <Anchor side="Right" relative="$parent/SummaryFrame" pos="Mid" offset="0"/>
+                    <Visible val="false"/>
+                </Frame>
+
+                <Frame type="UserProfileMatchHistoryFrame" name="MatchHistoryFrame" template="UserProfileMatchHistoryFrame/UserProfileMatchHistoryFrameTemplate">
+                    <Anchor side="Top" relative="$parent/$parent/PageHeaderBackground" pos="Max" offset="-2"/>
+                    <Anchor side="Left" relative="$parent/SummaryButton" pos="Max" offset="6"/>
+                    <Anchor side="Right" relative="$parent/$parent/TabAnchorFrame" pos="Max" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent/$parent/TabAnchorFrame" pos="Max" offset="-21"/>
+                    <PresenceId val="{$ScreenUserProfile/@PresenceId}"/>
+                </Frame>v
+
+                <Frame type="TrophyCollectionFrame" name="TrophyCaseFrame" template="TrophyCollectionFrame/TrophyCollectionFrameTemplate">
+                    <Anchor side="Top" relative="$parent/$parent/PageHeaderBackground" pos="Max" offset="-2"/>
+                    <Anchor side="Left" relative="$parent/SummaryButton" pos="Max" offset="6"/>
+                    <Anchor side="Right" relative="$parent/$parent/TabAnchorFrame" pos="Max" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent/$parent/TabAnchorFrame" pos="Max" offset="-17"/>
+                    <PresenceId val="{$ScreenUserProfile/@PresenceId}"/>
+                </Frame>
+
+                <Frame type="UserProfileMapReviewsFrame" name="ReviewsFrame" template="UserProfileMapReviewsFrame/UserProfileMapReviewsFrameTemplate">
+                    <Anchor side="Top" relative="$parent/$parent/PageHeaderBackground" pos="Max" offset="-2"/>
+                    <Anchor side="Left" relative="$parent/SummaryButton" pos="Max" offset="6"/>
+                    <Anchor side="Right" relative="$parent/$parent/TabAnchorFrame" pos="Max" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent/$parent/TabAnchorFrame" pos="Max" offset="-18"/>
+                    <PresenceId val="{$ScreenUserProfile/@PresenceId}"/>
+                </Frame>
+            </Frame>
+
+            <Frame type="TabControl" name="LaddersTabControl">
+                <Anchor relative="$parent"/>
+                <TabListItem val="$parent/LadderSummaryButton"/>
+                <TabListItem val="SummaryTabControl/CurrentSeasonButton"/>
+                <TabListItem val="SummaryTabControl/LastSeasonButton"/>
+                <TabListItem val="SummaryTabControl/GrandmasterButton"/>
+                <PanelListItem val="SummaryTabControl"/>
+                <PanelListItem val="LadderDivisionFrame"/>
+                <PanelListItem val="LadderDivisionFrame"/>
+                <PanelListItem val="LadderDivisionFrame"/>
+
+                <Frame type="TabControl" name="SummaryTabControl">
+                    <Anchor relative="$parent"/>
+                    <TabListItem val="SummaryButton"/>
+                    <TabListItem val="CareerSummaryButton"/>
+                    <TabListItem val="RaceReportButton"/>
+                    <TabListItem val="MapReportButton"/>
+                    <TabListItem val="PlacementsButton"/>
+                    <TabListItem val="FriendsButton"/>
+                    <PanelListItem val="SummaryFrame"/>
+                    <PanelListItem val="CareerSummaryFrame"/>
+                    <PanelListItem val="RaceReportFrame"/>
+                    <PanelListItem val="MapReportFrame"/>
+                    <PanelListItem val="PlacementsFrame"/>
+                    <PanelListItem val="FriendsFrame"/>
+                    
+                    <Frame type="Button" name="SummaryButton" template="StandardBattlenetTemplates/BattlenetVerticalTabButtonTemplate">
+                        <Anchor side="Top" relative="$parent/$parent/$parent/TabAnchorFrame" pos="Min" offset="0"/>
+                        <Anchor side="Left" relative="$parent/$parent/$parent/TabAnchorFrame" pos="Min" offset="0"/>
+                        <Text val="@UI/ScreenUserProfile/ButtonLadderSummary"/>
+                        <Width val="370"/>
+                        <HoverSound val="@UI_HoverTick"/>
+                        <Toggleable val="true"/>
+                    </Frame>
+
+                    <Frame type="Button" name="CurrentSeasonButton" template="StandardBattlenetTemplates/BattlenetVerticalTabArrowButtonTemplate">
+                        <Anchor side="Top" relative="$parent/SummaryButton" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent/SummaryButton" pos="Min" offset="0"/>
+                        <Text val="@UI/ScreenUserProfile/ButtonCurrentSeason"/>
+                        <Width val="370"/>
+                        <HoverSound val="@UI_HoverTick"/>
+                        <Toggleable val="true"/>
+                    </Frame>
+
+                    <Frame type="Button" name="LastSeasonButton" template="StandardBattlenetTemplates/BattlenetVerticalTabArrowButtonTemplate">
+                        <Anchor side="Top" relative="$parent/CurrentSeasonButton" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent/CurrentSeasonButton" pos="Min" offset="0"/>
+                        <Text val="@UI/ScreenUserProfile/ButtonLastSeason"/>
+                        <Width val="370"/>
+                        <HoverSound val="@UI_HoverTick"/>
+                        <Toggleable val="true"/>
+                    </Frame>
+
+                    <Frame type="Button" name="GrandmasterButton" template="StandardBattlenetTemplates/BattlenetVerticalTabArrowButtonTemplate">
+                        <Anchor side="Top" relative="$parent/LastSeasonButton" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent/LastSeasonButton" pos="Min" offset="0"/>
+                        <Text val="@UI/ScreenUserProfile/ButtonGrandmaster"/>
+                        <Width val="370"/>
+                        <HoverSound val="@UI_HoverTick"/>
+                        <Toggleable val="true"/>
+                    </Frame>
+
+                    <Frame type="Button" name="CareerSummaryButton" template="StandardBattlenetTemplates/BattlenetVerticalTabButtonTemplate">
+                        <Anchor side="Top" relative="$parent/GrandmasterButton" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent/GrandmasterButton" pos="Min" offset="0"/>
+                        <Text val="@UI/ScreenUserProfile/ButtonCareerSummary"/>
+                        <Width val="370"/>
+                        <HoverSound val="@UI_HoverTick"/>
+                        <Toggleable val="true"/>
+                    </Frame>
+
+                    <Frame type="Button" name="RaceReportButton" template="StandardBattlenetTemplates/BattlenetVerticalTabButtonTemplate">
+                        <Anchor side="Top" relative="$parent/CareerSummaryButton" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent/CareerSummaryButton" pos="Min" offset="0"/>
+                        <Text val="@UI/ScreenUserProfile/ButtonRaceReport"/>
+                        <Width val="370"/>
+                        <HoverSound val="@UI_HoverTick"/>
+                        <Toggleable val="true"/>
+                    </Frame>
+
+                    <Frame type="Button" name="MapReportButton" template="StandardBattlenetTemplates/BattlenetVerticalTabButtonTemplate">
+                        <Anchor side="Top" relative="$parent/RaceReportButton" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent/RaceReportButton" pos="Min" offset="0"/>
+                        <Text val="@UI/ScreenUserProfile/ButtonMapReport"/>
+                        <Width val="370"/>
+                        <HoverSound val="@UI_HoverTick"/>
+                        <Toggleable val="true"/>
+                    </Frame>
+
+                    <Frame type="Button" name="PlacementsButton" template="StandardBattlenetTemplates/BattlenetVerticalTabButtonTemplate">
+                        <Anchor side="Top" relative="$parent/MapReportButton" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent/MapReportButton" pos="Min" offset="0"/>
+                        <Text val="@UI/ScreenUserProfile/ButtonPlacements"/>
+                        <Width val="370"/>
+                        <HoverSound val="@UI_HoverTick"/>
+                        <Toggleable val="true"/>
+                    </Frame>
+
+                    <Frame type="Button" name="FriendsButton" template="StandardBattlenetTemplates/BattlenetVerticalTabButtonTemplate">
+                        <Anchor side="Top" relative="$parent/PlacementsButton" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent/PlacementsButton" pos="Min" offset="0"/>
+                        <Text val="@UI/ScreenUserProfile/ButtonFriends"/>
+                        <Width val="370"/>
+                        <HoverSound val="@UI_HoverTick"/>
+                        <Toggleable val="true"/>
+                        <Visible val="true"/>
+                        
+                        <!-- Only show the friends button for the local player -->
+                        <StateGroup name="LocalUserStateGroup">
+                            <State name="LocalUserState">
+                                <When type="Property" frame="$BattleUI" operator="NotEqual" LocalToonPresenceId="{$ScreenUserProfile/@PresenceId}"/>
+                                <Action type="SetProperty" Visible="false"/>
+                                <Action type="SetProperty" frame="$parent" SelectedIndex="0"/>
+                            </State>
+                        </StateGroup>
+                    </Frame>
+
+                    <Frame type="Frame" name="SummaryAnchorFrame">
+                        <Anchor side="Top" relative="$parent/$parent/$parent/PageHeaderBackground" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent/SummaryButton" pos="Max" offset="7"/>
+                        <Anchor side="Right" relative="$parent/$parent/$parent/TabAnchorFrame" pos="Max" offset="4"/>
+                        <Anchor side="Bottom" relative="$parent/$parent/$parent/TabAnchorFrame" pos="Max" offset="-4"/>
+                    </Frame>
+
+                    <Frame type="Frame" name="SummaryFrame" template="UserProfileLadderSummaryFrame/UserProfileLadderSummaryFrame">
+                        <Anchor relative="$parent"/>
+
+                        <Frame type="Frame" name="AnchorFrame">
+                            <Anchor relative="$parent/$parent/SummaryAnchorFrame"/>
+                        </Frame>
+
+                        <Frame type="LadderTeamShowcaseFrame" name="LadderTeamShowcaseFrame">
+                            <PresenceId val="{$ScreenUserProfile/@PresenceId}"/>
+                        </Frame>
+                    </Frame>
+
+                    <Frame type="Frame" name="RaceReportFrame" template="UserProfileLadderRaceReport/UserProfileLadderRaceReportFrameTemplate">
+                        <Anchor side="Top" relative="$parent/$parent/$parent/PageHeaderBackground" pos="Max" offset="-3"/>
+                        <Anchor side="Bottom" relative="$parent/$parent/$parent/TabAnchorFrame" pos="Max" offset="-12"/>
+                        <Anchor side="Left" relative="$parent/SummaryButton" pos="Max" offset="6"/>
+                        <Anchor side="Right" relative="$parent/$parent/$parent/TabAnchorFrame" pos="Max" offset="0"/>
+                    </Frame>
+
+                    <Frame type="UserProfileMapStatsFrame" name="MapReportFrame" template="UserProfileLadderMapStatsFrame/UserProfileLadderMapStatsFrameTemplate">
+                        <Anchor side="Top" relative="$parent/$parent/$parent/PageHeaderBackground" pos="Max" offset="-3"/>
+                        <Anchor side="Bottom" relative="$parent/$parent/$parent/TabAnchorFrame" pos="Max" offset="-12"/>
+                        <Anchor side="Left" relative="$parent/SummaryButton" pos="Max" offset="6"/>
+                        <Anchor side="Right" relative="$parent/$parent/$parent/TabAnchorFrame" pos="Max" offset="0"/>
+                    </Frame>
+
+                    <Frame type="UserProfileLadderCareerFrame" name="CareerSummaryFrame" template="UserProfileLadderCareerFrame/UserProfileLadderCareerFrameTemplate">
+                        <Anchor side="Top" relative="$parent/$parent/$parent/PageHeaderBackground" pos="Max" offset="-3"/>
+                        <Anchor side="Bottom" relative="$parent/$parent/$parent/TabAnchorFrame" pos="Max" offset="-12"/>
+                        <Anchor side="Left" relative="$parent/SummaryButton" pos="Max" offset="6"/>
+                        <Anchor side="Right" relative="$parent/$parent/$parent/TabAnchorFrame" pos="Max" offset="0"/>
+                        <PresenceId val="{$ScreenUserProfile/@PresenceId}"/>
+                    </Frame>
+
+                    <Frame type="UserProfileLadderPlacementsFrame" name="PlacementsFrame" template="UserProfileLadderPlacementsFrame/UserProfileLadderPlacementsExtendedFrameTemplate">
+                        <Anchor side="Top" relative="$parent/$parent/$parent/PageHeaderBackground" pos="Max" offset="-3"/>
+                        <Anchor side="Bottom" relative="$parent/$parent/$parent/TabAnchorFrame" pos="Max" offset="-57"/>
+                        <Anchor side="Left" relative="$parent/SummaryButton" pos="Max" offset="6"/>
+                        <Anchor side="Right" relative="$parent/$parent/$parent/TabAnchorFrame" pos="Max" offset="0"/>
+                    </Frame>
+
+                    <Frame type="UserProfileLadderFriendsFrame" name="FriendsFrame" template="UserProfileLadderFriendsFrame/UserProfileLadderFriendsFrameTemplate">
+                        <Anchor side="Top" relative="$parent/$parent/$parent/PageHeaderBackground" pos="Max" offset="-3"/>
+                        <Anchor side="Bottom" relative="$parent/$parent/$parent/TabAnchorFrame" pos="Max" offset="-12"/>
+                        <Anchor side="Left" relative="$parent/SummaryButton" pos="Max" offset="6"/>
+                        <Anchor side="Right" relative="$parent/$parent/$parent/TabAnchorFrame" pos="Max" offset="0"/>
+                        <PresenceId val="{$ScreenUserProfile/@PresenceId}"/>
+                    </Frame>
+                </Frame>
+                
+                <Frame type="UserProfileLadderDivisionFrame" name="LadderDivisionFrame" template="UserProfileLadderDivisionFrame/UserProfileLadderDivisionFrameTemplate">
+                    <Anchor relative="$parent"/>
+                    <IsPreviousSeason val="{$parent/SummaryTabControl/LastSeasonButton/@Toggled}"/>
+                    <IsGrandmasterLadder val="{$parent/SummaryTabControl/GrandmasterButton/@Toggled}"/>
+                    <QueueId val="{$ScreenUserProfile/@QueueId}"/>
+                    <TeamHash val="{$ScreenUserProfile/@TeamHash}"/>
+                    <TeamRecordId val="{$ScreenUserProfile/@TeamRecordId}"/>
+
+                    <Frame type="Image" name="BackgroundAnchor">
+                        <Anchor side="Top" relative="$parent/$parent/$parent/PageHeaderBackground" pos="Max" offset="-2"/>
+                        <Anchor side="Right" relative="$parent/$parent/$parent/TabAnchorFrame" pos="Max" offset="0"/>
+                        <Anchor side="Bottom" relative="$parent/$parent/$parent/TabAnchorFrame" pos="Max" offset="-11"/>
+                    </Frame>
+
+                    <Frame type="TileList" name="MenuTileList">
+                        <Anchor side="Top" relative="$parent/$parent/$parent/TabAnchorFrame" pos="Min" offset="0"/>
+                        <Anchor side="Left" relative="$parent/$parent/$parent/TabAnchorFrame" pos="Min" offset="0"/>
+                    </Frame>
+                </Frame>
+            </Frame>
+            
+            <Frame type="UserProfileAchievementsFrame" name="AchievementsFrame" template="UserProfileAchievementsFrame/UserProfileAchievementsFrameTemplate">
+                <Anchor relative="$parent"/>
+                <AchievementId val="{$ScreenUserProfile/@AchievementId}"/>
+                <PresenceId val="{$ScreenUserProfile/@PresenceId}"/>
+
+                <Frame type="Image" name="BackgroundAnchor">
+                    <Anchor side="Top" relative="$parent/$parent/PageHeaderBackground" pos="Max" offset="-2"/>
+                    <Anchor side="Right" relative="$parent/$parent/TabAnchorFrame" pos="Max" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent/$parent/TabAnchorFrame" pos="Max" offset="-11"/>
+                </Frame>
+                
+                <Frame type="TreeView" name="CategoryTreeView">
+                    <Anchor side="Top" relative="$parent/$parent/TabAnchorFrame" pos="Min" offset="0"/>
+                    <Anchor side="Left" relative="$parent/$parent/TabAnchorFrame" pos="Min" offset="0"/>
+                </Frame>
+            </Frame>
+        </Frame>
+
+        <Frame type="Frame" name="ErrorContainerFrame">
+            <Anchor relative="$parent"/>
+            <Visible val="false"/>
+
+            <Frame type="Label" name="TitleLabel">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Style val="@Arcade_Title"/>
+                <Text val="@UI/ScreenUserProfile/Error"/>
+            </Frame>
+        </Frame>
+
+        <Frame type="Frame" name="LoadingSpinner" template="StandardBattlenetTemplates/IdleSpinnerTemplate">
+            <Anchor side="Top" relative="$parent/ExtendedExperienceBG" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/ExtendedExperienceBG" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/ExtendedExperienceBG" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/ExtendedExperienceBG" pos="Mid" offset="0"/>
+            <Visible val="false"/>
+        </Frame>
+
+        <Animation name="ViewAchievement">
+            <Event event="ViewAchievement" action="Reset,Play" frame="$this"/>
+
+            <Controller type="Property" property="SelectedIndex" frame="ProfileContainerFrame/ProfileTabControl" end="Pause">
+                <Key type="Property" time="0" value="2"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="ViewLadderTeam">
+            <Event event="ViewLadderTeam" action="Reset,Play" frame="$this"/>
+
+            <Controller type="Property" property="SelectedIndex" frame="ProfileContainerFrame/ProfileTabControl" end="Pause">
+                <Key type="Property" time="0" value="1"/>
+            </Controller>
+
+            <Controller type="Property" property="SelectedIndex" frame="ProfileContainerFrame/LaddersTabControl" end="Pause">
+                <Key type="Property" time="0" value="1"/>
+            </Controller>
+
+            <Controller type="Property" property="SelectedIndex" frame="ProfileContainerFrame/LaddersTabControl/SummaryTabControl" end="Pause">
+                <Key type="Property" time="0" value="0"/>
+            </Controller>
+        </Animation>
+
+        <Animation name="ViewProfileSummary">
+            <Event event="ViewProfileSummary" action="Reset,Play" frame="$this"/>
+
+            <Controller type="Property" property="SelectedIndex" frame="ProfileContainerFrame/ProfileTabControl" end="Pause">
+                <Key type="Property" time="0" value="0"/>
+            </Controller>
+
+            <Controller type="Property" property="SelectedIndex" frame="ProfileContainerFrame/SummaryTabControl" end="Pause">
+                <Key type="Property" time="0" value="0"/>
+            </Controller>
+
+            <Controller type="Property" property="SelectedIndex" frame="ProfileContainerFrame/LaddersTabControl" end="Pause">
+                <Key type="Property" time="0" value="0"/>
+            </Controller>
+
+            <Controller type="Property" property="SelectedIndex" frame="ProfileContainerFrame/LaddersTabControl/SummaryTabControl" end="Pause">
+                <Key type="Property" time="0" value="0"/>
+            </Controller>
+        </Animation>
+
+        <StateGroup name="LoadingStateGroup">
+            <State name="LoadingState">
+                <When type="AnimationState" frame="$ScreenUserProfile" UserProfileState="Loading"/>
+                <Action type="SetProperty" frame="ProfileContainerFrame" Visible="false"/>
+                <Action type="SetProperty" frame="ErrorContainerFrame" Visible="false"/>
+                <Action type="SetProperty" frame="LoadingSpinner" Visible="true"/>
+            </State>
+            
+            <State name="LoadedState">
+                <When type="AnimationState" frame="$ScreenUserProfile" UserProfileState="Loaded"/>
+                <Action type="SetProperty" frame="ProfileContainerFrame" Visible="true"/>
+                <Action type="SetProperty" frame="ErrorContainerFrame" Visible="false"/>
+                <Action type="SetProperty" frame="LoadingSpinner" Visible="false"/>
+            </State>
+
+            <State name="ErrorState">
+                <When type="AnimationState" frame="$ScreenUserProfile" UserProfileState="Error"/>
+                <Action type="SetProperty" frame="ProfileContainerFrame" Visible="false"/>
+                <Action type="SetProperty" frame="ErrorContainerFrame" Visible="true"/>
+                <Action type="SetProperty" frame="LoadingSpinner" Visible="false"/>
+            </State>
+        </StateGroup>
+    </Frame>
+</Desc>
