@@ -12,6 +12,41 @@
     <Height val="102" />
     <RenderPriority val="10" />
   </Frame>
+  <Frame type="Image" name="ButtonPulseTemplate">
+    <Anchor side="Top" relative="$parent/GameButtonDefaultBorder" pos="Mid" offset="0" />
+    <Anchor side="Left" relative="$parent/GameButtonDefaultBorder" pos="Mid" offset="0" />
+    <Anchor side="Right" relative="$parent/GameButtonDefaultBorder" pos="Mid" offset="0" />
+    <Anchor side="Bottom" relative="$parent/GameButtonDefaultBorder" pos="Mid" offset="0" />
+    <Texture val="@UI/Storm_UI_InGame_AbilityButton_Activate_Add" />
+    <BlendMode val="Add" />
+    <ColorAdjustMode val="None" />
+    <Color val="00c8ff" />
+    <Alpha val="0" />
+    <Visible val="False" />
+    <Unclipped val="True" />
+    <Animation name="ButtonPulse">
+      <Event event="OnShown" action="Stop" />
+      <Event event="ButtonPulse" action="Restart, play" frame="$parent" />
+      <Controller type="Dimension" dimension="Height" end="Pause" unclipped="True" percentage="false" relative="False">
+        <Key type="Curve" time="0" value="300" inout="Linear" />
+        <Key type="Curve" time="0.6" value="116" inout="Linear,Slow" />
+        <Key type="Curve" time="0.8" value="116" inout="Slow,Linear" />
+      </Controller>
+      <Controller type="Dimension" dimension="Width" end="Pause" unclipped="True" percentage="false" relative="False">
+        <Key type="Curve" time="0" value="300" inout="Linear" />
+        <Key type="Curve" time="0.6" value="116" inout="Linear,Slow" />
+        <Key type="Curve" time="0.8" value="116" inout="Slow,Linear" />
+      </Controller>
+      <Controller type="Fade" end="Pause">
+        <Key type="Curve" time="0" value="0" />
+        <Key type="Curve" time=".6" value="255" inout="Linear" />
+        <Key type="Curve" time="0.8" value="0" inout="Slow,Linear" />
+      </Controller>
+      <Controller type="Visibility" end="Pause">
+        <Key type="Bool" time="1" value="False" />
+      </Controller>
+    </Animation>
+  </Frame>
   <Frame type="CommandPanel" name="CommandPanelTemplate">
     <StateGroup name="CurrentUnit"></StateGroup>
     <Animation name="FlipCommandPanel">
@@ -94,17 +129,17 @@
           <Validator val="AbilButtonActiveRHealing" />
           <Validator val="AbilButtonActiveRMana" />
         </Frame>
-        <Frame type="UnitStatusValidatorAnimElement" name="ActiveValidatorElementF">
-          <Handle val="F_HideAnimValidatorFrame" />
-          <Anchor relative="$parent" />
-          <Validator val="AbilButtonActiveFVisibility" />
-        </Frame>
         <Frame type="UnitStatusValidatorAnimElement" name="ActiveValidatorElementD">
           <Handle val="D_ActiveAnimValidatorFrame" />
           <Anchor relative="$parent" />
           <Validator val="AbilButtonActiveDDamage" />
           <Validator val="AbilButtonActiveDHealing" />
           <Validator val="AbilButtonActiveDMana" />
+        </Frame>
+        <Frame type="UnitStatusValidatorAnimElement" name="ActiveValidatorElementF">
+          <Handle val="F_AbilMapMechanicShown" />
+          <Anchor relative="$parent" />
+          <Validator val="AbilButtonHideFMapMechanic" />
         </Frame>
         <Frame type="UnitStatusValidatorAnimElement" name="AbilBarHealthBarPortraitGlow">
           <Handle val="AbilBarHealthBarPortraitGlow" />
@@ -368,6 +403,145 @@
         <Height val="120" />
         <Width val="120" />
         <HeroSpecificLocation val="CommandButton05Status" />
+      </Frame>
+    </Frame>
+    <Frame type="CommandButton" name="CommandButton15" template="CommandButton/CommandButtonTemplate">
+      <Anchor side="Top" relative="$parent/CommandButton01" pos="Min" offset="0" />
+      <Anchor side="Left" relative="$parent/CommandButton13" pos="Max" offset="-5" />
+      <ClickSound val="@UI_Game_ActionClick" />
+      <BatchGroup val="false" />
+      <RenderPriority val="511" />
+      <Unclipped val="true" />
+      <Width val="0" />
+      <Height val="0" />
+      <StateGroup name="PlayOnceAnimationState">
+        <DefaultState val="IntroOff" />
+        <State name="IntroOff">
+          <When type="AnimationState" frame="$this" PlayOnceAnimationState="IntroOff" />
+          <Action type="SendEvent" frame="$this" event="StopAll" />
+        </State>
+        <State name="IntroOn">
+          <When type="AnimationState" frame="$this" PlayOnceAnimationState="IntroOn" />
+          <Action type="SendEvent" frame="$this" event="PlayIntro" />
+        </State>
+      </StateGroup>
+      <Animation name="SpawnInPlayOnceAnimation">
+        <Event event="PlayIntro" action="Reset, Play" />
+        <Event event="StopAll" action="Reset, Stop" />
+        <Controller type="Anchor" end="Pause" unclipped="True" side="Left" relative="true">
+          <Key type="Curve" time="0.0" value="-92" inout="Linear" />
+          <Key type="Curve" time="0.7" value="0" inout="Smooth,Linear" />
+        </Controller>
+        <Controller type="Rotation" end="Pause" relative="false" frame="GameButtonDefaultBorder">
+          <Key type="Curve" time="0.0" value="-90" inout="Linear" />
+          <Key type="Curve" time="0.7" value="0" inout="Smooth,Linear" />
+        </Controller>
+        <Controller type="Rotation" end="Pause" relative="false" frame="IconBackground">
+          <Key type="Curve" time="0.0" value="-90" inout="Linear" />
+          <Key type="Curve" time="0.7" value="0" inout="Smooth,Linear" />
+        </Controller>
+        <Controller type="Rotation" end="Pause" relative="false" frame="DisabledLockOverlay">
+          <Key type="Curve" time="0.0" value="-90" inout="Linear" />
+          <Key type="Curve" time="0.7" value="0" inout="Smooth,Linear" />
+        </Controller>
+        <Controller type="Rotation" end="Pause" relative="false" frame="NormalImage">
+          <Key type="Curve" time="0.0" value="-90" inout="Linear" />
+          <Key type="Curve" time="0.7" value="0" inout="Smooth,Linear" />
+        </Controller>
+        <Controller type="Fade" end="Pause">
+          <Key type="Curve" time="0.0" value="0" inout="Linear,Step" />
+          <Key type="Curve" time="0.2" value="0" inout="Step,Smooth" />
+          <Key type="Curve" time="0.6" value="255" inout="Smooth,Linear" />
+        </Controller>
+        <Controller type="Animation" end="stop" frame="$FKeyButtonPulse1" Animation="ButtonPulse">
+          <Key type="Animation" time="0" action="reset" />
+          <Key type="Animation" time="0.7" action="play" />
+        </Controller>
+        <Controller type="Animation" end="stop" frame="$FKeyButtonPulse2" Animation="ButtonPulse">
+          <Key type="Animation" time="0" action="reset" />
+          <Key type="Animation" time="0.9" action="play" />
+        </Controller>
+        <Controller type="Animation" end="stop" frame="$FKeyButtonPulse3" Animation="ButtonPulse">
+          <Key type="Animation" time="0" action="reset" />
+          <Key type="Animation" time="1.1" action="play" />
+        </Controller>
+      </Animation>
+      <Frame type="Frame" name="ValidatorResponseFrame">
+        <Animation name="ValidatorState">
+          <Event event="AbilButtonHideFMapMechanic" action="DirectionForward,Play" frame="$F_AbilMapMechanicShown" />
+          <Event event="NoState" action="DirectionReverse,Play" frame="$F_AbilMapMechanicShown" />
+          <Controller type="Fade" end="Pause" frame="$parent">
+            <Key type="Curve" time="0" value="255" inout="Linear,slow" />
+            <Key type="Curve" time=".2" value="0" inout="Linear" />
+          </Controller>
+          <Controller type="Visibility" end="Pause" frame="$parent">
+            <Key type="Bool" time=".2" value="False" />
+          </Controller>
+        </Animation>
+      </Frame>
+      <Frame type="Image" name="DisabledLockOverlay">
+        <Anchor relative="$parent/NormalImage" offset="0" />
+        <Texture val="@UI/HUD_BTN_BG_Ability_Locked" />
+        <ImageMaskTexture val="@UI/HUD_BTN_BG_Ability_AlphaMask" />
+        <DesaturateOnDisable val="False" />
+        <RenderPriority val="503" />
+        <Animation name="Fade">
+          <Event event="FadeOut" action="DirectionForward,Play" />
+          <Event event="FadeIn" action="DirectionReverse,Play" />
+          <Controller type="Fade" layer="1" end="Pause">
+            <Key type="Curve" time="0" value="255" />
+            <Key type="Curve" time="0.25" value="0" />
+          </Controller>
+          <Controller type="Visibility" end="Pause">
+            <Key type="Bool" time="0" value="True" />
+            <Key type="Bool" time="0.25" value="True" />
+            <Key type="Bool" time="0.25" value="False" />
+          </Controller>
+        </Animation>
+      </Frame>
+      <Frame type="Image" name="GameButtonDefaultBorder">
+        <StateGroup name="BorderStates">
+          <DefaultState val="Normal" />
+          <State name="Cleared">
+            <When type="StateGroup" ButtonEnabled="Enabled" />
+            <When type="Property" frame="$parent" Cleared="true" />
+            <Action type="SetProperty" frame="$parent" Visible="false" />
+          </State>
+          <State name="Disabled">
+            <When type="StateGroup" ButtonEnabled="Enabled" />
+            <When type="Property" frame="$parent" CommandDisabled="true" />
+            <Action type="SetProperty" frame="$this" DesaturationColor="#ColorCommandDisabled" />
+            <Action type="SetProperty" frame="$parent/GameButtonDefaultHoverBorder" Visible="false" />
+            <Action type="SendEvent" frame="$parent/DisabledLockOverlay" event="FadeIn" />
+          </State>
+          <State name="Normal">
+            <When type="Property" frame="$parent" Executing="false" />
+            <When type="Property" frame="$parent" CommandDisabled="false" />
+            <When type="Property" frame="$parent/CooldownLabel" Visible="false" />
+            <When type="StateGroup" ButtonEnabled="Enabled" />
+            <Action type="SetProperty" frame="$this" Texture="@UI/Storm_UI_InGame_AbilityButtonBorder" />
+            <Action type="SetProperty" frame="$parent/GameButtonDefaultHoverBorder" Visible="true" />
+            <Action type="SendEvent" frame="$parent/DisabledLockOverlay" event="FadeOut" />
+          </State>
+          <State name="Executing">
+            <When type="Property" frame="$parent" Executing="true" />
+            <When type="StateGroup" ButtonEnabled="Enabled" />
+            <Action type="SetProperty" frame="$this" Texture="@UI/Storm_UI_InGame_AbilityButtonBorder_Hover" />
+            <Action type="SetProperty" frame="$parent/GameButtonDefaultHoverBorder" Visible="false" />
+          </State>
+        </StateGroup>
+      </Frame>
+      <Frame type="Image" name="FKeyButtonPulse1" template="CommandPanel/ButtonPulseTemplate">
+        <Visible val="True" />
+        <Handle val="FKeyButtonPulse1" />
+      </Frame>
+      <Frame type="Image" name="FKeyButtonPulse2" template="CommandPanel/ButtonPulseTemplate">
+        <Visible val="True" />
+        <Handle val="FKeyButtonPulse2" />
+      </Frame>
+      <Frame type="Image" name="FKeyButtonPulse3" template="CommandPanel/ButtonPulseTemplate">
+        <Visible val="True" />
+        <Handle val="FKeyButtonPulse3" />
       </Frame>
     </Frame>
     <Frame type="Image" name="EmptyDynamicButton30" template="CommandPanel/EmptyDynamicButtonImageTemplate">

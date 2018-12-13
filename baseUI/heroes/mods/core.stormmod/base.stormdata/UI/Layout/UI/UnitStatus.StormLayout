@@ -844,131 +844,329 @@
     </StateGroup>
   </Frame>
   <Frame type="UnitStatusUnitArmor" name="UnitArmorStatusDisplayTemplate">
-    <Anchor side="Bottom" relative="StatusImage" pos="Max" offset="0" />
-    <Anchor side="Right" relative="StatusImage" pos="Max" offset="0" />
-    <Frame type="Image" name="BackgroundImage">
-      <Anchor relative="$parent/StatusImage" />
-      <Texture val="{$parent/DurationBar/FillImageContainer/FillImage/@Texture}" />
-      <Alpha val="50" />
-    </Frame>
-    <Frame type="ProgressBar" name="DurationBar">
-      <Anchor relative="$parent/StatusImage" />
-      <Circular val="True" />
-      <CircularStart val="0" />
-      <CircularEndOffset val="360" />
-      <AcceptsMouse val="False" />
-      <MaxValue val="{$parent/@DurationMax}" />
-      <Value val="{$parent/@DurationRemaining}" />
-      <Frame type="Frame" name="FillImageContainer">
-        <Anchor relative="$parent" />
-        <Frame type="Image" name="FillImage">
-          <Anchor relative="$parent" />
-          <Texture val="@UI/Storm_UI_Ingame_Armor_DurationBar" />
-          <TextureType val="Circular" />
-        </Frame>
+    <Anchor side="Bottom" relative="PhysicalArmorFrame" pos="Max" offset="0" />
+    <Anchor side="Right" relative="PhysicalArmorFrame" pos="Max" offset="0" />
+    <Frame type="Frame" name="AllArmorFrame">
+      <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="5" />
+      <Anchor side="Right" relative="StatusImage" pos="Max" offset="0" />
+      <Anchor side="Bottom" relative="StatusImage" pos="Max" offset="0" />
+      <CollapseLayout val="true" />
+      <Visible val="{$parent/@ShowAllArmorBuff}" />
+      <Frame type="Image" name="BackgroundImage">
+        <Anchor relative="$parent/StatusImage" />
+        <Texture val="@UI/Storm_UI_HUD_Status_Duration_Ring_BG" />
       </Frame>
+      <Frame type="ProgressBar" name="DurationBar">
+        <Anchor relative="$parent/StatusImage" />
+        <Circular val="True" />
+        <CircularStart val="0" />
+        <CircularEndOffset val="-360" />
+        <AcceptsMouse val="False" />
+        <MaxValue val="{$parent/$parent/@PhysicalDurationMax}" />
+        <Value val="{$parent/$parent/@PhysicalDurationRemaining}" />
+        <Frame type="Frame" name="FillImageContainer">
+          <Anchor relative="$parent" />
+          <Frame type="Image" name="FillImage">
+            <Anchor relative="$parent" />
+            <Texture val="@UI/Storm_UI_Ingame_Armor_DurationBar" />
+            <TextureType val="Circular" />
+          </Frame>
+        </Frame>
+        <Frame type="Image" name="PermanentDurationBar">
+          <Anchor relative="$parent" />
+          <Texture val="{$parent/FillImageContainer/FillImage/@Texture}" />
+        </Frame>
+        <StateGroup name="Visibility">
+          <State name="Permanent">
+            <When type="Property" frame="$parent/$parent" PhysicalDurationRemaining="0" />
+            <Action type="SetProperty" frame="PermanentDurationBar" Visible="true" />
+            <Action type="SetProperty" frame="FillImageContainer" Visible="false" />
+          </State>
+          <State name="Timed">
+            <When type="Property" frame="$parent/$parent" PhysicalDurationRemaining="0" operator="NotEqual" />
+            <Action type="SetProperty" frame="PermanentDurationBar" Visible="false" />
+            <Action type="SetProperty" frame="FillImageContainer" Visible="true" />
+          </State>
+        </StateGroup>
+      </Frame>
+      <Frame type="Image" name="StatusImage">
+        <Anchor side="Top" relative="$parent" pos="Min" offset="8" />
+        <Anchor side="Left" relative="$parent" pos="Min" offset="-12" />
+        <Width val="64" />
+        <Height val="64" />
+        <Texture val="@UI/Storm_UI_Ingame_All_Armor_Icon" />
+      </Frame>
+      <Frame type="Label" name="ArmorLabel">
+        <Anchor side="Top" relative="$parent/StatusImage" pos="Max" offset="-23" />
+        <Anchor side="Left" relative="$parent/StatusImage" pos="Min" offset="0" />
+        <Anchor side="Right" relative="$parent/StatusImage" pos="Max" offset="0" />
+        <Height val="33" />
+        <Style val="UnitStatusPositiveArmorHealing" />
+        <Text val="{$parent/$parent/@CurrentPhysicalArmor}" />
+      </Frame>
+      <StateGroup name="BuffDebuffStates">
+        <State name="Buffed">
+          <When type="Property" frame="$parent" CurrentPhysicalArmor="0" operator="GreaterThan" />
+        </State>
+        <State name="Debuffed">
+          <When type="Property" frame="$parent" CurrentPhysicalArmor="0" operator="LessThan" />
+          <Action type="SetAnchor" frame="ArmorLabel" side="Left" relative="$parent/StatusImage" pos="Min" offset="-3" />
+          <Action type="SetAnchor" frame="ArmorLabel" side="Right" relative="$parent/StatusImage" pos="Max" offset="-3" />
+        </State>
+      </StateGroup>
+      <StateGroup name="IconAndTextStates">
+        <State name="Buffed">
+          <When type="StateGroup" BuffDebuffStates="Buffed" />
+          <When type="Option" colorblind="false" />
+          <Action type="SetProperty" frame="StatusImage" Texture="@UI/Storm_UI_Ingame_All_Armor_Icon" />
+          <Action type="SetProperty" frame="DurationBar/FillImageContainer/FillImage" Texture="@UI/Storm_UI_Ingame_Armor_DurationBar" />
+        </State>
+        <State name="Debuffed">
+          <When type="StateGroup" BuffDebuffStates="Debuffed" />
+          <When type="Option" colorblind="false" />
+          <Action type="SetProperty" frame="ArmorLabel" style="UnitStatusNegativeArmorHealing" />
+          <Action type="SetProperty" frame="StatusImage" Texture="@UI/Storm_UI_Ingame_All_Armor_Icon_Negative" />
+          <Action type="SetProperty" frame="DurationBar/FillImageContainer/FillImage" Texture="@UI/Storm_UI_Ingame_Armor_DurationBar_Negative" />
+        </State>
+        <State name="ColorblindBuffed">
+          <When type="StateGroup" BuffDebuffStates="Buffed" />
+          <When type="Option" colorblind="true" />
+          <Action type="SetProperty" frame="StatusImage" Texture="@UI/Storm_UI_Ingame_All_Armor_Icon_CB" />
+          <Action type="SetProperty" frame="DurationBar/FillImageContainer/FillImage" Texture="@UI/Storm_UI_HUD_Status_Duration_Ring_Buff_CB" />
+        </State>
+        <State name="ColorblindDebuffed">
+          <When type="StateGroup" BuffDebuffStates="Debuffed" />
+          <When type="Option" colorblind="true" />
+          <Action type="SetProperty" frame="ArmorLabel" style="UnitStatusNegativeArmorColorblind" />
+          <Action type="SetProperty" frame="StatusImage" Texture="@UI/Storm_UI_Ingame_All_Armor_Icon_Negative_CB" />
+          <Action type="SetProperty" frame="DurationBar/FillImageContainer/FillImage" Texture="@UI/Storm_UI_Ingame_Armor_DurationBar_Negative_CB" />
+        </State>
+      </StateGroup>
     </Frame>
-    <Frame type="Image" name="StatusImage">
-      <Anchor side="Top" relative="$parent" pos="Min" offset="8" />
-      <Anchor side="Left" relative="$parent" pos="Min" offset="-12" />
-      <Texture val="@UI/Storm_UI_Ingame_Armor_Icon" />
+    <Frame type="Frame" name="AbilityArmorFrame">
+      <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
+      <Anchor side="Left" relative="$parent/AllArmorFrame" pos="Max" offset="-15" />
+      <Anchor side="Right" relative="StatusImage" pos="Max" offset="0" />
+      <Anchor side="Bottom" relative="StatusImage" pos="Max" offset="0" />
+      <CollapseLayout val="true" />
+      <Visible val="false" />
+      <Frame type="Image" name="BackgroundImage">
+        <Anchor relative="$parent/StatusImage" />
+        <Texture val="@UI/Storm_UI_HUD_Status_Duration_Ring_BG" />
+      </Frame>
+      <Frame type="ProgressBar" name="DurationBar">
+        <Anchor relative="$parent/StatusImage" />
+        <Circular val="True" />
+        <CircularStart val="0" />
+        <CircularEndOffset val="-360" />
+        <AcceptsMouse val="False" />
+        <MaxValue val="{$parent/$parent/@AbilityDurationMax}" />
+        <Value val="{$parent/$parent/@AbilityDurationRemaining}" />
+        <Frame type="Frame" name="FillImageContainer">
+          <Anchor relative="$parent" />
+          <Frame type="Image" name="FillImage">
+            <Anchor relative="$parent" />
+            <Texture val="@UI/Storm_UI_Ingame_Armor_DurationBar" />
+            <TextureType val="Circular" />
+          </Frame>
+        </Frame>
+        <Frame type="Image" name="PermanentDurationBar">
+          <Anchor relative="$parent" />
+          <Texture val="{$parent/FillImageContainer/FillImage/@Texture}" />
+        </Frame>
+        <StateGroup name="Visibility">
+          <State name="Permanent">
+            <When type="Property" frame="$parent/$parent" AbilityDurationRemaining="0" />
+            <Action type="SetProperty" frame="PermanentDurationBar" Visible="true" />
+            <Action type="SetProperty" frame="FillImageContainer" Visible="false" />
+          </State>
+          <State name="Timed">
+            <When type="Property" frame="$parent/$parent" AbilityDurationRemaining="0" operator="NotEqual" />
+            <Action type="SetProperty" frame="PermanentDurationBar" Visible="false" />
+            <Action type="SetProperty" frame="FillImageContainer" Visible="true" />
+          </State>
+        </StateGroup>
+      </Frame>
+      <Frame type="Image" name="StatusImage">
+        <Anchor side="Top" relative="$parent" pos="Min" offset="8" />
+        <Anchor side="Left" relative="$parent" pos="Min" offset="-12" />
+        <Width val="64" />
+        <Height val="64" />
+        <Texture val="@UI/Storm_UI_Ingame_Ability_Armor_Icon" />
+      </Frame>
+      <Frame type="Label" name="ArmorLabel">
+        <Anchor side="Top" relative="$parent/StatusImage" pos="Max" offset="-23" />
+        <Anchor side="Left" relative="$parent/StatusImage" pos="Min" offset="0" />
+        <Anchor side="Right" relative="$parent/StatusImage" pos="Max" offset="0" />
+        <Height val="33" />
+        <Style val="UnitStatusPositiveArmorHealing" />
+        <Text val="{$parent/$parent/@CurrentAbilityArmor}" />
+      </Frame>
+      <StateGroup name="Visibility">
+        <State name="Show">
+          <When type="Property" frame="$parent" ShowAllArmorBuff="false" />
+          <When type="Property" frame="$parent" CurrentAbilityArmor="0" operator="NotEqual" />
+          <Action type="SetProperty" Visible="true" />
+        </State>
+      </StateGroup>
+      <StateGroup name="BuffDebuffStates">
+        <State name="Buffed">
+          <When type="Property" frame="$parent" CurrentAbilityArmor="0" operator="GreaterThan" />
+        </State>
+        <State name="Debuffed">
+          <When type="Property" frame="$parent" CurrentAbilityArmor="0" operator="LessThan" />
+          <Action type="SetAnchor" frame="ArmorLabel" side="Left" relative="$parent/StatusImage" pos="Min" offset="-3" />
+          <Action type="SetAnchor" frame="ArmorLabel" side="Right" relative="$parent/StatusImage" pos="Max" offset="-3" />
+        </State>
+      </StateGroup>
+      <StateGroup name="IconAndTextStates">
+        <State name="Buffed">
+          <When type="StateGroup" BuffDebuffStates="Buffed" />
+          <When type="Option" colorblind="false" />
+          <Action type="SetProperty" frame="StatusImage" Texture="@UI/Storm_UI_Ingame_Ability_Armor_Icon" />
+          <Action type="SetProperty" frame="DurationBar/FillImageContainer/FillImage" Texture="@UI/Storm_UI_Ingame_Armor_DurationBar" />
+        </State>
+        <State name="Debuffed">
+          <When type="StateGroup" BuffDebuffStates="Debuffed" />
+          <When type="Option" colorblind="false" />
+          <Action type="SetProperty" frame="ArmorLabel" style="UnitStatusNegativeArmorHealing" />
+          <Action type="SetProperty" frame="StatusImage" Texture="@UI/Storm_UI_Ingame_Ability_Armor_Icon_Negative" />
+          <Action type="SetProperty" frame="DurationBar/FillImageContainer/FillImage" Texture="@UI/Storm_UI_Ingame_Armor_DurationBar_Negative" />
+        </State>
+        <State name="ColorblindBuffed">
+          <When type="StateGroup" BuffDebuffStates="Buffed" />
+          <When type="Option" colorblind="true" />
+          <Action type="SetProperty" frame="StatusImage" Texture="@UI/Storm_UI_Ingame_Ability_Armor_Icon_CB" />
+          <Action type="SetProperty" frame="DurationBar/FillImageContainer/FillImage" Texture="@UI/Storm_UI_HUD_Status_Duration_Ring_Buff_CB" />
+        </State>
+        <State name="ColorblindDebuffed">
+          <When type="StateGroup" BuffDebuffStates="Debuffed" />
+          <When type="Option" colorblind="true" />
+          <Action type="SetProperty" frame="ArmorLabel" style="UnitStatusNegativeArmorColorblind" />
+          <Action type="SetProperty" frame="StatusImage" Texture="@UI/Storm_UI_Ingame_Ability_Armor_Icon_Negative_CB" />
+          <Action type="SetProperty" frame="DurationBar/FillImageContainer/FillImage" Texture="@UI/Storm_UI_Ingame_Armor_DurationBar_Negative_CB" />
+        </State>
+      </StateGroup>
     </Frame>
-    <Frame type="TextFormatFrame" name="ArmorLabelFormatSign">
-      <FormatText val="+%0%" />
-      <Replacement index="0" val="{$parent/@AllArmorBonus}" />
+    <Frame type="Frame" name="PhysicalArmorFrame">
+      <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
+      <Anchor side="Left" relative="$parent/AbilityArmorFrame" pos="Max" offset="-15" />
+      <Anchor side="Right" relative="StatusImage" pos="Max" offset="0" />
+      <Anchor side="Bottom" relative="StatusImage" pos="Max" offset="0" />
+      <CollapseLayout val="true" />
+      <Visible val="false" />
+      <Frame type="Image" name="BackgroundImage">
+        <Anchor relative="$parent/StatusImage" />
+        <Texture val="@UI/Storm_UI_HUD_Status_Duration_Ring_BG" />
+      </Frame>
+      <Frame type="ProgressBar" name="DurationBar">
+        <Anchor relative="$parent/StatusImage" />
+        <Circular val="True" />
+        <CircularStart val="0" />
+        <CircularEndOffset val="-360" />
+        <AcceptsMouse val="False" />
+        <MaxValue val="{$parent/$parent/@PhysicalDurationMax}" />
+        <Value val="{$parent/$parent/@PhysicalDurationRemaining}" />
+        <Frame type="Frame" name="FillImageContainer">
+          <Anchor relative="$parent" />
+          <Frame type="Image" name="FillImage">
+            <Anchor relative="$parent" />
+            <Texture val="@UI/Storm_UI_Ingame_Armor_DurationBar" />
+            <TextureType val="Circular" />
+          </Frame>
+        </Frame>
+        <Frame type="Image" name="PermanentDurationBar">
+          <Anchor relative="$parent" />
+          <Texture val="{$parent/FillImageContainer/FillImage/@Texture}" />
+        </Frame>
+        <StateGroup name="Visibility">
+          <State name="Permanent">
+            <When type="Property" frame="$parent/$parent" PhysicalDurationRemaining="0" />
+            <Action type="SetProperty" frame="PermanentDurationBar" Visible="true" />
+            <Action type="SetProperty" frame="FillImageContainer" Visible="false" />
+          </State>
+          <State name="Timed">
+            <When type="Property" frame="$parent/$parent" PhysicalDurationRemaining="0" operator="NotEqual" />
+            <Action type="SetProperty" frame="PermanentDurationBar" Visible="false" />
+            <Action type="SetProperty" frame="FillImageContainer" Visible="true" />
+          </State>
+        </StateGroup>
+      </Frame>
+      <Frame type="Image" name="StatusImage">
+        <Anchor side="Top" relative="$parent" pos="Min" offset="8" />
+        <Anchor side="Left" relative="$parent" pos="Min" offset="-12" />
+        <Width val="64" />
+        <Height val="64" />
+        <Texture val="@UI/Storm_UI_Ingame_Physical_Armor_Icon" />
+      </Frame>
+      <Frame type="Label" name="ArmorLabel">
+        <Anchor side="Top" relative="$parent/StatusImage" pos="Max" offset="-23" />
+        <Anchor side="Left" relative="$parent/StatusImage" pos="Min" offset="0" />
+        <Anchor side="Right" relative="$parent/StatusImage" pos="Max" offset="0" />
+        <Height val="33" />
+        <Style val="UnitStatusPositiveArmorHealing" />
+        <Text val="{$parent/$parent/@CurrentPhysicalArmor}" />
+      </Frame>
+      <StateGroup name="Visibility">
+        <State name="Show">
+          <When type="Property" frame="$parent" ShowAllArmorBuff="false" />
+          <When type="Property" frame="$parent" CurrentPhysicalArmor="0" operator="NotEqual" />
+          <Action type="SetProperty" Visible="true" />
+        </State>
+      </StateGroup>
+      <StateGroup name="BuffDebuffStates">
+        <State name="Buffed">
+          <When type="Property" frame="$parent" CurrentPhysicalArmor="0" operator="GreaterThan" />
+        </State>
+        <State name="Debuffed">
+          <When type="Property" frame="$parent" CurrentPhysicalArmor="0" operator="LessThan" />
+          <Action type="SetAnchor" frame="ArmorLabel" side="Left" relative="$parent/StatusImage" pos="Min" offset="-3" />
+          <Action type="SetAnchor" frame="ArmorLabel" side="Right" relative="$parent/StatusImage" pos="Max" offset="-3" />
+        </State>
+      </StateGroup>
+      <StateGroup name="IconAndTextStates">
+        <State name="Buffed">
+          <When type="StateGroup" BuffDebuffStates="Buffed" />
+          <When type="Option" colorblind="false" />
+          <Action type="SetProperty" frame="StatusImage" Texture="@UI/Storm_UI_Ingame_Physical_Armor_Icon" />
+          <Action type="SetProperty" frame="DurationBar/FillImageContainer/FillImage" Texture="@UI/Storm_UI_Ingame_Armor_DurationBar" />
+        </State>
+        <State name="Debuffed">
+          <When type="StateGroup" BuffDebuffStates="Debuffed" />
+          <When type="Option" colorblind="false" />
+          <Action type="SetProperty" frame="ArmorLabel" style="UnitStatusNegativeArmorHealing" />
+          <Action type="SetProperty" frame="StatusImage" Texture="@UI/Storm_UI_Ingame_Physical_Armor_Icon_Negative" />
+          <Action type="SetProperty" frame="DurationBar/FillImageContainer/FillImage" Texture="@UI/Storm_UI_Ingame_Armor_DurationBar_Negative" />
+        </State>
+        <State name="ColorblindBuffed">
+          <When type="StateGroup" BuffDebuffStates="Buffed" />
+          <When type="Option" colorblind="true" />
+          <Action type="SetProperty" frame="StatusImage" Texture="@UI/Storm_UI_Ingame_Physical_Armor_Icon_CB" />
+          <Action type="SetProperty" frame="DurationBar/FillImageContainer/FillImage" Texture="@UI/Storm_UI_HUD_Status_Duration_Ring_Buff_CB" />
+        </State>
+        <State name="ColorblindDebuffed">
+          <When type="StateGroup" BuffDebuffStates="Debuffed" />
+          <When type="Option" colorblind="true" />
+          <Action type="SetProperty" frame="ArmorLabel" style="UnitStatusNegativeArmorColorblind" />
+          <Action type="SetProperty" frame="StatusImage" Texture="@UI/Storm_UI_Ingame_Physical_Armor_Icon_Negative_CB" />
+          <Action type="SetProperty" frame="DurationBar/FillImageContainer/FillImage" Texture="@UI/Storm_UI_Ingame_Armor_DurationBar_Negative_CB" />
+        </State>
+      </StateGroup>
     </Frame>
-    <Frame type="Label" name="ArmorLabel">
-      <Anchor side="Top" relative="$parent/StatusImage" pos="Max" offset="-23" />
-      <Anchor side="Left" relative="$parent/StatusImage" pos="Min" offset="0" />
-      <Anchor side="Right" relative="$parent/StatusImage" pos="Max" offset="0" />
-      <Height val="33" />
-      <Text val="{$parent/ArmorLabelFormatSign/@Text}" />
-      <Style val="UnitStatusPositiveArmor" />
-    </Frame>
-    <StateGroup name="ArmorBonusIconController">
-      <DefaultState val="Neutral" />
-      <State name="Unraisable">
-        <When type="Property" AllArmorBonus="0" />
-        <When type="Property" MaximumArmor="0" />
-        <Action type="SetProperty" frame="ArmorLabel" visible="False" />
-        <Action type="SetProperty" frame="StatusImage" Texture="@UI/Storm_UI_Ingame_Armor_Icon_Unraisable" />
-        <Action type="SetProperty" frame="DurationBar/FillImageContainer/FillImage" Texture="@UI/Storm_UI_Ingame_Armor_DurationBar_Negative_CB" />
-      </State>
-      <State name="Buffed">
-        <When type="Property" ShowArmorBuff="True" />
-        <When type="Property" AllArmorBonus="0" operator="GreaterThanOrEqual" />
-        <When type="Property" DurationMax="0" operator="GreaterThan" />
-        <Action type="SetProperty" frame="ArmorLabel" visible="True" />
-      </State>
-      <State name="UnTimedBuffed">
-        <When type="Property" ShowArmorBuff="True" />
-        <When type="Property" AllArmorBonus="0" operator="GreaterThan" />
-        <When type="Property" DurationMax="0" />
-        <Action type="SetProperty" frame="ArmorLabel" visible="True" />
-      </State>
-      <State name="Debuffed">
-        <When type="Property" AllArmorBonus="0" operator="LessThan" />
-        <When type="Property" DurationMax="0" operator="GreaterThan" />
-        <When type="Option" colorblind="False" />
-        <Action type="SetProperty" frame="ArmorLabel" visible="True" />
-        <Action type="SetProperty" frame="ArmorLabel" style="UnitStatusNegativeArmor" />
-        <Action type="SetProperty" frame="ArmorLabelFormatSign" FormatText="%0%" />
-        <Action type="SetProperty" frame="StatusImage" Texture="@UI/Storm_UI_Ingame_Armor_Icon_Negative" />
-        <Action type="SetProperty" frame="DurationBar/FillImageContainer/FillImage" Texture="@UI/Storm_UI_Ingame_Armor_DurationBar_Negative" />
-      </State>
-      <State name="UnTimedDebuffed">
-        <When type="Property" ShowArmorBuff="True" />
-        <When type="Property" AllArmorBonus="0" operator="LessThan" />
-        <When type="Property" DurationMax="0" />
-        <When type="Option" colorblind="False" />
-        <Action type="SetProperty" frame="ArmorLabel" visible="True" />
-        <Action type="SetProperty" frame="ArmorLabel" style="UnitStatusNegativeArmor" />
-        <Action type="SetProperty" frame="ArmorLabelFormatSign" FormatText="%0%" />
-        <Action type="SetProperty" frame="StatusImage" Texture="@UI/Storm_UI_Ingame_Armor_Icon_Negative" />
-        <Action type="SetProperty" frame="DurationBar/FillImageContainer/FillImage" Texture="@UI/Storm_UI_Ingame_Armor_DurationBar_Negative" />
-      </State>
-      <State name="UnTimedColorBlindDebuffed">
-        <When type="Property" ShowArmorBuff="True" />
-        <When type="Property" AllArmorBonus="0" operator="LessThan" />
-        <When type="Property" DurationMax="0" />
-        <When type="Option" colorblind="True" />
-        <Action type="SetProperty" frame="ArmorLabel" visible="True" />
-        <Action type="SetProperty" frame="ArmorLabel" style="UnitStatusNegativeArmorColorblind" />
-        <Action type="SetProperty" frame="ArmorLabelFormatSign" FormatText="%0%" />
-        <Action type="SetProperty" frame="StatusImage" Texture="@UI/Storm_UI_Ingame_Armor_Icon_Negative_CB" />
-        <Action type="SetProperty" frame="DurationBar/FillImageContainer/FillImage" Texture="@UI/Storm_UI_Ingame_Armor_DurationBar_Negative_CB" />
-      </State>
-      <State name="ColorblindDebuff">
-        <When type="Property" AllArmorBonus="0" operator="LessThan" />
-        <When type="Property" DurationMax="0" operator="GreaterThan" />
-        <When type="Option" colorblind="True" />
-        <Action type="SetProperty" frame="ArmorLabel" visible="True" />
-        <Action type="SetProperty" frame="ArmorLabel" style="UnitStatusNegativeArmorColorblind" />
-        <Action type="SetProperty" frame="ArmorLabelFormatSign" FormatText="%0%" />
-        <Action type="SetProperty" frame="StatusImage" Texture="@UI/Storm_UI_Ingame_Armor_Icon_Negative_CB" />
-        <Action type="SetProperty" frame="DurationBar/FillImageContainer/FillImage" Texture="@UI/Storm_UI_Ingame_Armor_DurationBar_Negative_CB" />
-      </State>
-      <State name="Neutral">
-        <Action type="SetProperty" frame="StatusImage" visible="false" />
-        <Action type="SetProperty" frame="ArmorLabel" visible="false" />
-        <Action type="SetProperty" frame="BackgroundImage" visible="false" />
-        <Action type="SetProperty" frame="DurationBar" visible="false" />
-      </State>
-    </StateGroup>
   </Frame>
   <Frame type="UnitStatusUnitHealingModifier" name="UnitStatusHealingDisplayTemplate">
     <Anchor side="Right" relative="StatusImage" pos="Max" offset="0" />
     <Anchor side="Bottom" relative="StatusImage" pos="Max" offset="0" />
     <Frame type="Image" name="BackgroundImage">
       <Anchor relative="$parent/StatusImage" />
-      <Texture val="{$parent/DurationBar/FillImageContainer/FillImage/@Texture}" />
-      <Alpha val="50" />
+      <Texture val="@UI/Storm_UI_HUD_Status_Duration_Ring_BG" />
     </Frame>
     <Frame type="ProgressBar" name="DurationBar">
       <Anchor relative="$parent/StatusImage" />
       <Circular val="True" />
       <CircularStart val="0" />
-      <CircularEndOffset val="360" />
+      <CircularEndOffset val="-360" />
       <AcceptsMouse val="False" />
       <MaxValue val="{$parent/@DurationMax}" />
       <Value val="{$parent/@DurationRemaining}" />
@@ -980,6 +1178,22 @@
           <TextureType val="Circular" />
         </Frame>
       </Frame>
+      <Frame type="Image" name="PermanentDurationBar">
+        <Anchor relative="$parent" />
+        <Texture val="{$parent/FillImageContainer/FillImage/@Texture}" />
+      </Frame>
+      <StateGroup name="Visibility">
+        <State name="Permanent">
+          <When type="Property" frame="$parent" DurationRemaining="0" />
+          <Action type="SetProperty" frame="PermanentDurationBar" Visible="true" />
+          <Action type="SetProperty" frame="FillImageContainer" Visible="false" />
+        </State>
+        <State name="Timed">
+          <When type="Property" frame="$parent" DurationRemaining="0" operator="NotEqual" />
+          <Action type="SetProperty" frame="PermanentDurationBar" Visible="false" />
+          <Action type="SetProperty" frame="FillImageContainer" Visible="true" />
+        </State>
+      </StateGroup>
     </Frame>
     <Frame type="Image" name="StatusImage">
       <Anchor side="Top" relative="$parent" pos="Min" offset="-12" />
@@ -989,7 +1203,7 @@
       <Texture val="@UI/Storm_UI_InGame_Status_Healing" />
     </Frame>
     <Frame type="TextFormatFrame" name="StatusLabelFormatSign">
-      <FormatText val="+%0%" />
+      <FormatText val="%0%" />
       <Replacement index="0" val="{$parent/@HealingModification}" />
     </Frame>
     <Frame type="Image" name="TextFlareImage">
@@ -1001,6 +1215,12 @@
       <BlendMode val="Add" />
       <RenderPriority val="600" />
       <Visible val="false" />
+      <StateGroup name="FlareVisibility">
+        <State name="DebuffMax">
+          <When type="Property" frame="$parent" HealingModification="-100" />
+          <Action type="SetProperty" Visible="true" />
+        </State>
+      </StateGroup>
     </Frame>
     <Frame type="Label" name="StatusLabel">
       <Anchor side="Top" relative="$parent/StatusImage" pos="Max" offset="-23" />
@@ -1008,61 +1228,84 @@
       <Anchor side="Right" relative="$parent/StatusImage" pos="Max" offset="0" />
       <Height val="33" />
       <Text val="{$parent/StatusLabelFormatSign/@Text}" />
-      <Style val="UnitStatusPositiveArmor" />
+      <Style val="UnitStatusPositiveArmorHealing" />
       <RenderPriority val="601" />
     </Frame>
-    <StateGroup name="HealingBonusIconController">
-      <DefaultState val="Neutral" />
-      <State name="TemporaryBuff">
-        <When type="Property" HealingModification="0" operator="GreaterThan" />
-        <When type="Property" DurationMax="0" operator="GreaterThan" />
+    <StateGroup name="VisibilityStates">
+      <State name="Visible">
+        <When type="StateGroup" BuffDebuffStates="Neutral" operator="NotEqual" />
+        <Action type="SetProperty" frame="BackgroundImage" Visible="true" />
+        <Action type="SetProperty" frame="DurationBar" Visible="true" />
+        <Action type="SetProperty" frame="StatusImage" Visible="true" />
+        <Action type="SetProperty" frame="StatusLabel" Visible="true" />
       </State>
-      <State name="Debuff">
+      <State name="Hidden">
+        <When type="StateGroup" BuffDebuffStates="Neutral" />
+        <Action type="SetProperty" frame="BackgroundImage" Visible="false" />
+        <Action type="SetProperty" frame="DurationBar" Visible="false" />
+        <Action type="SetProperty" frame="StatusImage" Visible="false" />
+        <Action type="SetProperty" frame="StatusLabel" Visible="false" />
+      </State>
+    </StateGroup>
+    <StateGroup name="BuffDebuffStates">
+      <DefaultState val="Neutral" />
+      <State name="Buffed">
+        <When type="Property" HealingModification="0" operator="GreaterThan" />
+      </State>
+      <State name="Debuffed">
         <When type="Property" HealingModification="0" operator="LessThan" />
         <When type="Property" HealingModification="-100" operator="GreaterThan" />
-        <When type="Property" DurationMax="0" operator="GreaterThan" />
-        <When type="Option" colorblind="False" />
-        <Action type="SetProperty" frame="StatusLabel" Style="UnitStatusNegativeArmor" />
         <Action type="SetProperty" frame="StatusLabelFormatSign" FormatText="%0%" />
+        <Action type="SetAnchor" frame="StatusLabel" side="Left" relative="$parent/StatusImage" pos="Min" offset="-3" />
+        <Action type="SetAnchor" frame="StatusLabel" side="Right" relative="$parent/StatusImage" pos="Max" offset="-3" />
+      </State>
+      <State name="DebuffedMax">
+        <When type="Property" HealingModification="-100" />
+        <Action type="SetProperty" frame="StatusLabelFormatSign" FormatText="%0%" />
+        <Action type="SetAnchor" frame="StatusLabel" side="Left" relative="$parent/StatusImage" pos="Min" offset="-3" />
+        <Action type="SetAnchor" frame="StatusLabel" side="Right" relative="$parent/StatusImage" pos="Max" offset="-3" />
+      </State>
+      <State name="Neutral" />
+    </StateGroup>
+    <StateGroup name="IconAndTextStates">
+      <State name="Buffed">
+        <When type="StateGroup" BuffDebuffStates="Buffed" />
+        <When type="Option" colorblind="false" />
+      </State>
+      <State name="Debuffed">
+        <When type="StateGroup" BuffDebuffStates="Debuffed" />
+        <When type="Option" colorblind="false" />
+        <Action type="SetProperty" frame="StatusLabel" Style="UnitStatusNegativeArmorHealing" />
         <Action type="SetProperty" frame="StatusImage" Texture="@UI/Storm_UI_InGame_Status_HinderedHealing" />
         <Action type="SetProperty" frame="DurationBar/FillImageContainer/FillImage" Texture="@UI/Storm_UI_InGame_Status_HinderedHealing_Negative" />
       </State>
-      <State name="DebuffMax">
-        <When type="Property" HealingModification="-100" />
-        <When type="Property" DurationMax="0" operator="GreaterThan" />
-        <When type="Option" colorblind="False" />
-        <Action type="SetProperty" frame="StatusLabel" Style="UnitStatusNoHealing" />
-        <Action type="SetProperty" frame="StatusLabelFormatSign" FormatText="%0%" />
-        <Action type="SetProperty" frame="StatusImage" Texture="@UI/HealingDisplay/None/Icon" />
+      <State name="DebuffedMax">
+        <When type="StateGroup" BuffDebuffStates="DebuffedMax" />
+        <When type="Option" colorblind="false" />
+        <Action type="SetProperty" frame="StatusLabel" Style="UnitStatusNegativeArmorHealing" />
+        <Action type="SetProperty" frame="StatusImage" Texture="@UI/Storm_UI_InGame_Status_HinderedHealing" />
         <Action type="SetProperty" frame="DurationBar/FillImageContainer/FillImage" Texture="@UI/HealingDisplay/None/DurationRing" />
-        <Action type="SetProperty" frame="TextFlareImage" Visible="true" />
       </State>
-      <State name="ColorblindDebuff">
-        <When type="Property" HealingModification="0" operator="LessThan" />
-        <When type="Property" HealingModification="-100" operator="GreaterThan" />
-        <When type="Property" DurationMax="0" operator="GreaterThan" />
-        <When type="Option" colorblind="True" />
+      <State name="ColorblindBuffed">
+        <When type="StateGroup" BuffDebuffStates="Buffed" />
+        <When type="Option" colorblind="true" />
+        <Action type="SetProperty" frame="StatusImage" Texture="@UI/Storm_UI_HUD_Status_Icon_Health_Buff_CB" />
+        <Action type="SetProperty" frame="DurationBar/FillImageContainer/FillImage" Texture="@UI/Storm_UI_HUD_Status_Duration_Ring_Buff_CB" />
+      </State>
+      <State name="ColorblindDebuffed">
+        <When type="StateGroup" BuffDebuffStates="Debuffed" />
+        <When type="Option" colorblind="true" />
         <Action type="SetProperty" frame="StatusLabel" Style="UnitStatusNegativeArmorColorblind" />
-        <Action type="SetProperty" frame="StatusLabelFormatSign" FormatText="%0%" />
         <Action type="SetProperty" frame="StatusImage" Texture="@UI/Storm_UI_InGame_Status_HinderedHealing_CB" />
         <Action type="SetProperty" frame="DurationBar/FillImageContainer/FillImage" Texture="@UI/Storm_UI_InGame_Status_HinderedHealing_Negative_CB" />
       </State>
-      <State name="ColorblindDebuffMax">
-        <When type="Property" HealingModification="-100" />
-        <When type="Property" DurationMax="0" operator="GreaterThan" />
-        <When type="Option" colorblind="True" />
+      <State name="ColorblindDebuffedMax">
+        <When type="StateGroup" BuffDebuffStates="DebuffedMax" />
+        <When type="Option" colorblind="true" />
         <Action type="SetProperty" frame="StatusLabel" Style="UnitStatusNoHealingColorblind" />
-        <Action type="SetProperty" frame="StatusLabelFormatSign" FormatText="%0%" />
         <Action type="SetProperty" frame="TextFlareImage" Texture="@UI/HealingDisplay/None/TextFlareCB" />
-        <Action type="SetProperty" frame="StatusImage" Texture="@UI/HealingDisplay/None/IconCB" />
-        <Action type="SetProperty" frame="DurationBar/FillImageContainer/FillImage" Texture="@UI/HealingDisplay/None/DurationRingCB" />
-        <Action type="SetProperty" frame="TextFlareImage" Visible="true" />
-      </State>
-      <State name="Neutral">
-        <Action type="SetProperty" frame="StatusImage" Visible="false" />
-        <Action type="SetProperty" frame="StatusLabel" Visible="false" />
-        <Action type="SetProperty" frame="BackgroundImage" Visible="false" />
-        <Action type="SetProperty" frame="DurationBar" Visible="false" />
+        <Action type="SetProperty" frame="StatusImage" Texture="@UI/Storm_UI_InGame_Status_HinderedHealing_CB" />
+        <Action type="SetProperty" frame="DurationBar/FillImageContainer/FillImage" Texture="@UI/Storm_UI_InGame_Status_HinderedHealing_Negative_CB" />
       </State>
     </StateGroup>
   </Frame>
@@ -1468,19 +1711,13 @@
         <Width val="193" />
         <Height val="64" />
       </Frame>
-      <Frame type="UnitStatusUnitHealingModifier" name="UnitStatusHealingDisplay" template="UnitStatus/UnitStatusHealingDisplayTemplate">
-        <Anchor side="Top" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="-16" />
-        <Anchor side="Left" relative="$parent/HeroFrameBackgroundContainer" pos="Max" offset="0" />
-      </Frame>
       <Frame type="UnitStatusUnitArmor" name="UnitArmorStatusDisplay" template="UnitStatus/UnitArmorStatusDisplayTemplate">
         <Anchor side="Top" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="-36" />
-        <Anchor side="Left" relative="$parent/UnitStatusHealingDisplay" pos="Max" offset="-12" />
-        <StateGroup name="AnchorShift">
-          <State name="NoPotions">
-            <When type="StateGroup" frame="$parent/UnitStatusHealingDisplay" HealingBonusIconController="Neutral" />
-            <Action type="SetAnchor" side="Left" relative="$parent/HeroFrameBackgroundContainer" pos="Max" offset="0" />
-          </State>
-        </StateGroup>
+        <Anchor side="Left" relative="$parent/HeroFrameBackgroundContainer" pos="Max" offset="0" />
+      </Frame>
+      <Frame type="UnitStatusUnitHealingModifier" name="UnitStatusHealingDisplay" template="UnitStatus/UnitStatusHealingDisplayTemplate">
+        <Anchor side="Top" relative="$parent/HeroFrameBackgroundContainer" pos="Mid" offset="-16" />
+        <Anchor side="Left" relative="$parent/UnitArmorStatusDisplay/PhysicalArmorFrame" pos="Max" offset="-15" />
       </Frame>
       <Frame type="Image" name="DimmingFrame">
         <Anchor side="Top" relative="$parent/HealthBar" pos="Min" offset="0" />
