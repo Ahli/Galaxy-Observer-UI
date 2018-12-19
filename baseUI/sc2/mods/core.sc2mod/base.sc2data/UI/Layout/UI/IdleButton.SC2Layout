@@ -1,81 +1,65 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Desc>
-    <Frame type="IdleButton" name="IdleButtonTemplate">
-        <Width val="92"/>
-        <Height val="72"/>
-        <NormalImage val="NormalImage"/>
-        <HoverImage val="HoverImage"/>
-        <HitTestFrame val="HitTestFrame"/>
+    <Frame type="IdleButton" name="IdleButtonTemplate" template="StandardTemplates/HelperButtonTemplate">
 
-        <Frame type="Image" name="BackgroundImage">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Width val="92"/>
-            <Height val="62"/>
-            <Texture val="@@UI/UnitButtonsFrame"/>
-            <RenderPriority val="500"/>
-            <DesaturateOnDisable val="false"/>
+        <Frame type="Image" name="Icon">
+            <Anchor side="Bottom" relative="$parent/NormalImage" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/NormalImage" pos="Min" offset="0"/>
+            <Width val="72"/>
+            <Height val="42"/>
+            <Texture val="@@@UI/IdleButtonIcon"/>
+            <Color val="###ColorHelperButtonIcon"/>
         </Frame>
-
-        <Frame type="Image" name="NormalImage">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="7"/>
-            <Width val="85"/>
-            <Height val="62"/>
-            <Texture val="@@UI/IdleButtonNormal"/>
-            <StateCount val="2"/>
-            <DescFlags val="Internal"/>
-        </Frame>
-
-        <Frame type="Image" name="HoverImage">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="7"/>
-            <Width val="85"/>
-            <Height val="62"/>
-            <Texture val="@@UI/IdleButtonHover"/>
-            <StateCount val="2"/>
-            <DescFlags val="Internal"/>
-        </Frame>
-
-        <Frame type="Frame" name="HitTestFrame">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="15"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-8"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="8"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-8"/>
-            <DescFlags val="Internal"/>
-        </Frame>
-
-        <Frame type="Image" name="GlowImage">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="7"/>
-            <Width val="85"/>
-            <Height val="62"/>
-            <Texture val="@@UI/IdleButtonGlow"/>
+        
+        <Frame type="Image" name="GlowButton">
+            <Anchor relative="$parent/NormalImage"/>
+            <Visible val="False"/>
+            <Texture val="{$parent/NormalImage/@Texture[0]}"/>
+            <BlendMode val="Add"/>
             <RenderPriority val="519"/>
+            <Alpha val="0"/>
+            
+            <Animation name="Glow" speed="1">
+                <Event event="OnShown" action="Reset,Play" frame="$this"/>
+                
+                <Controller type="Fade" end="PingPong">
+                    <Key type="Curve" time="0" value="0" inout="Smooth"/>
+                    <Key type="Curve" time="1.5" value="255" inout="Smooth"/>
+                </Controller>
+            </Animation>
         </Frame>
-
-        <Frame type="Label" name="CountLabel">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="4"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-4"/>
-            <Width val="33"/>
-            <Style val="IdleButtonCharge"/>
-            <RenderPriority val="520"/>
+        
+        <Frame type="Image" name="GlowIcon">
+            <Anchor relative="$parent/Icon"/>
+            <Visible val="False"/>
+            <Texture val="{$parent/Icon/@Texture[0]}"/>
+            <BlendMode val="Add"/>
+            <RenderPriority val="519"/>
+            <Alpha val="0"/>
+            
+            <Animation name="Glow" speed="1">
+                <Event event="OnShown" action="Reset,Play" frame="$this"/>
+                
+                <Controller type="Fade" end="PingPong">
+                    <Key type="Curve" time="0" value="0" inout="Smooth"/>
+                    <Key type="Curve" time="1.5" value="200" inout="Smooth"/>
+                </Controller>
+            </Animation>
         </Frame>
-
-        <Frame type="CommandHotkeyFrame" name="HotkeyFrame" template="StandardTemplates/HotkeyFrameTemplate">
-            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-8"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
-            <RenderPriority val="520"/>
-
-            <Frame type="Label" name="HotkeyLabel">
-                <Anchor side="Top" relative="$this" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$this" pos="Max" offset="0"/>
-                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                <AutoSizeClamps maxWidth="90"/>
-            </Frame>
-        </Frame>
+        
+        <StateGroup name="EnabledState">
+            <DefaultState val="NotEnabled"/>
+        
+            <State name="Enabled">
+                <When type="Property" frame="$this" enabled="True"/>
+                <Action type="SetProperty" frame="$this/GlowButton" visible="True"/>
+                <Action type="SetProperty" frame="$this/GlowIcon" visible="True"/>
+            </State>
+        
+            <State name="NotEnabled">
+                <Action type="SetProperty" frame="$this/GlowButton" visible="False"/>
+                <Action type="SetProperty" frame="$this/GlowIcon" visible="False"/>
+            </State>
+        </StateGroup>
     </Frame>
 </Desc>
