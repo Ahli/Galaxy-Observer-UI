@@ -238,6 +238,52 @@
       <Anchor side="Top" relative="$parent/HeaderLabel" pos="Max" offset="0" />
     </Frame>
   </Frame>
+  <Frame type="Frame" name="StickerTemplate">
+    <Height val="85" />
+    <Width val="85" />
+    <Visible val="False" />
+    <Frame type="Frame" name="ImageFrame">
+      <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+      <Frame type="Image" name="StickerImage">
+        <Anchor side="Top" relative="$parent/$parent" pos="Min" offset="0" />
+        <Anchor side="Left" relative="$parent/$parent" pos="Min" offset="0" />
+        <Anchor side="Bottom" relative="$parent/$parent" pos="Max" offset="0" />
+        <Anchor side="Right" relative="$parent/$parent" pos="Max" offset="0" />
+      </Frame>
+    </Frame>
+    <Animation name="Apply">
+      <Event event="Apply" action="Reset,Play" />
+      <Controller type="Anchor" end="Stop" frame="ImageFrame" side="Top" relative="true">
+        <Key type="Curve" time="0" value="85" inout="Fast" />
+        <Key type="Curve" time="0.75" value="0" inout="Slow" />
+      </Controller>
+      <Controller type="Fade" end="Pause">
+        <Key type="Curve" time="0" value="0" inout="Fast" />
+        <Key type="Curve" time="0.6" value="255" inout="Slow" />
+      </Controller>
+      <Controller type="Sound" end="Stop">
+        <Key type="Sound" time="0.15" sound="*@UI_Toys18_Quest_Sticker_On" />
+      </Controller>
+    </Animation>
+    <Animation name="Peel">
+      <Event event="Peel" action="Reset,Play" />
+      <Controller type="Anchor" end="Stop" frame="ImageFrame" side="Top" relative="true">
+        <Key type="Curve" time="0" value="0" inout="Slow" />
+        <Key type="Curve" time="0.75" value="85" inout="Fast" />
+      </Controller>
+      <Controller type="Fade" end="Pause">
+        <Key type="Curve" time="0.0" value="255" inout="Linear" />
+        <Key type="Curve" time="0.15" value="255" inout="Slow" />
+        <Key type="Curve" time="0.75" value="0" inout="Fast" />
+      </Controller>
+      <Controller type="Sound" end="Stop">
+        <Key type="Sound" time="0.15" sound="*@UI_Toys18_Quest_Sticker_Off" />
+      </Controller>
+    </Animation>
+  </Frame>
   <Frame type="QuestProxyFrame" name="QuestCardTemplate">
     <Frame type="Image" name="FaceDownContent">
       <Width val="#QuestCardWidth" />
@@ -1236,8 +1282,8 @@
       <Anchor relative="$parent/ContentAnchorFrame" offset="0" />
     </Frame>
     <Frame type="Image" name="PigProp">
-      <Anchor side="Top" relative="$parent/ContentAnchorFrame" pos="Min" offset="0" />
-      <Anchor side="Right" relative="$parent/StitchesInactiveProp" pos="Min" offset="0" />
+      <Anchor side="Top" relative="$parent/ContentAnchorFrame" pos="Min" offset="-17" />
+      <Anchor side="Right" relative="$parent/StitchesInactiveProp" pos="Min" offset="70" />
       <Texture val="@UI/Storm_UI_ToyEvent_GameBoard_PigProp" />
     </Frame>
     <StateGroup name="ActiveProps">
@@ -1374,13 +1420,13 @@
       </State>
     </StateGroup>
     <Animation name="StitchesPropShowInactive">
-      <Event event="OnShown" frame="$parent" action="Reset,Play" />
+      <Event event="BoardSetup" frame="$parent" action="Reset,Play" />
       <Controller type="Visibility" frame="StitchesInactiveProp" end="Pause">
         <Key type="Bool" time="0" value="True" />
       </Controller>
     </Animation>
     <Animation name="StitchesPropShowInProgress" flags="Disabled">
-      <Event event="OnShown" frame="$parent" action="Reset,Play" />
+      <Event event="BoardSetup" frame="$parent" action="Reset,Play" />
       <Controller type="Visibility" frame="StitchesInProgressProp" end="Pause">
         <Key type="Bool" time="0" value="True" />
       </Controller>
@@ -1935,96 +1981,74 @@
       </StateGroup>
     </Frame>
     <StateGroup name="StickerStates">
-      <State name="StickerNone">
+      <State name="StickerNone_Idle" debug="False">
         <When type="Property" frame="$parent" StickerCount="0" />
-        <Action type="SetProperty" frame="StickerRed" Visible="False" />
-        <Action type="SetProperty" frame="StickerGreen" Visible="False" />
-        <Action type="SetProperty" frame="StickerYellow" Visible="False" />
-        <Action type="SetProperty" frame="StickerLoot" Visible="False" />
       </State>
-      <State name="StickerOne">
+      <State name="StickerOne_Reveal" debug="False">
+        <When type="Property" frame="$parent" LastSeenStickerCount="0" />
         <When type="Property" frame="$parent" StickerCount="1" />
         <Action type="SetProperty" frame="StickerRed" Visible="True" />
-        <Action type="SetProperty" frame="StickerGreen" Visible="False" />
-        <Action type="SetProperty" frame="StickerYellow" Visible="False" />
-        <Action type="SetProperty" frame="StickerLoot" Visible="False" />
+        <Action type="SendEvent" frame="StickerRed" event="Apply" />
       </State>
-      <State name="StickerTwo">
+      <State name="StickerOne_Idle" debug="False">
+        <When type="Property" frame="$parent" StickerCount="1" />
+        <Action type="SetProperty" frame="StickerRed" Visible="True" />
+      </State>
+      <State name="StickerTwo_Reveal">
+        <When type="Property" frame="$parent" LastSeenStickerCount="1" />
         <When type="Property" frame="$parent" StickerCount="2" />
         <Action type="SetProperty" frame="StickerRed" Visible="True" />
         <Action type="SetProperty" frame="StickerGreen" Visible="True" />
-        <Action type="SetProperty" frame="StickerYellow" Visible="False" />
-        <Action type="SetProperty" frame="StickerLoot" Visible="False" />
+        <Action type="SendEvent" frame="StickerGreen" event="Apply" />
       </State>
-      <State name="StickerThree">
+      <State name="StickerTwo_Idle">
+        <When type="Property" frame="$parent" StickerCount="2" />
+        <Action type="SetProperty" frame="StickerRed" Visible="True" />
+        <Action type="SetProperty" frame="StickerGreen" Visible="True" />
+      </State>
+      <State name="StickerThree_Reveal">
         <When type="Property" frame="$parent" StickerCount="3" />
         <Action type="SetProperty" frame="StickerRed" Visible="True" />
         <Action type="SetProperty" frame="StickerGreen" Visible="True" />
         <Action type="SetProperty" frame="StickerYellow" Visible="True" />
+        <Action type="SendEvent" frame="StickerYellow" event="Apply" />
         <Action type="SetProperty" frame="StickerLoot" Visible="True" />
       </State>
     </StateGroup>
-    <Frame type="Frame" name="StickerRed">
-      <Anchor side="Right" relative="$parent/StickerGreen" pos="Mid" offset="20" />
-      <Anchor side="Top" relative="$parent/StickerGreen" pos="Max" offset="-30" />
-      <Height val="85" />
-      <Width val="85" />
-      <Visible val="False" />
+    <Frame type="Frame" name="StickerRed" template="ToyEventQuestPopupPanel/StickerTemplate">
+      <Anchor side="Right" relative="$parent/StickerGreen" pos="Mid" offset="22" />
+      <Anchor side="Top" relative="$parent/StickerGreen" pos="Max" offset="-31" />
       <Frame type="Frame" name="ImageFrame">
-        <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
-        <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
-        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
-        <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
         <Frame type="Image" name="StickerImage">
-          <Anchor side="Top" relative="$parent/$parent" pos="Min" offset="0" />
-          <Anchor side="Left" relative="$parent/$parent" pos="Min" offset="0" />
-          <Anchor side="Bottom" relative="$parent/$parent" pos="Max" offset="0" />
-          <Anchor side="Right" relative="$parent/$parent" pos="Max" offset="0" />
           <Texture val="@UI/Storm_UI_ToyEvent_Sticker_Red" />
         </Frame>
       </Frame>
-      <Animation name="OnShowSticker">
-        <Event event="OnShown" action="DirectionForward,Play" />
-        <Event event="Peel" action="DirectionReverse,Play" />
-        <Controller type="Anchor" end="Pause" frame="ImageFrame" side="Top" relative="true">
-          <Key type="Curve" time="0" value="85" inout="Fast" />
-          <Key type="Curve" time="0.75" value="0" inout="Slow" />
-        </Controller>
-      </Animation>
     </Frame>
-    <Frame type="Frame" name="StickerGreen">
-      <Anchor side="Right" relative="$parent" pos="Mid" offset="-40" />
-      <Anchor side="Bottom" relative="$parent/LapCounter/Backing" pos="Max" offset="-20" />
-      <Height val="85" />
-      <Width val="85" />
-      <Visible val="False" />
+    <Frame type="Frame" name="StickerGreen" template="ToyEventQuestPopupPanel/StickerTemplate">
+      <Anchor side="Right" relative="$parent" pos="Mid" offset="-34" />
+      <Anchor side="Bottom" relative="$parent/LapCounter/Backing" pos="Max" offset="-30" />
       <Frame type="Frame" name="ImageFrame">
-        <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
-        <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
-        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
-        <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
         <Frame type="Image" name="StickerImage">
-          <Anchor side="Top" relative="$parent/$parent" pos="Min" offset="0" />
-          <Anchor side="Left" relative="$parent/$parent" pos="Min" offset="0" />
-          <Anchor side="Bottom" relative="$parent/$parent" pos="Max" offset="0" />
-          <Anchor side="Right" relative="$parent/$parent" pos="Max" offset="0" />
           <Texture val="@UI/Storm_UI_ToyEvent_Sticker_Green" />
         </Frame>
       </Frame>
-      <Animation name="OnShowSticker">
-        <Event event="OnShown" action="DirectionForward,Play" />
-        <Event event="Peel" action="DirectionReverse,Play" />
-        <Controller type="Anchor" end="Pause" frame="ImageFrame" side="Top" relative="true">
-          <Key type="Curve" time="0" value="85" inout="Fast" />
-          <Key type="Curve" time="0.75" value="0" inout="Slow" />
-        </Controller>
-      </Animation>
     </Frame>
-    <Frame type="Frame" name="StickerYellow">
+    <Frame type="Frame" name="StickerYellow" template="ToyEventQuestPopupPanel/StickerTemplate">
       <Anchor side="Left" relative="$parent/StickerGreen" pos="Max" offset="-30" />
-      <Anchor side="Bottom" relative="$parent/StickerGreen" pos="Max" offset="-10" />
-      <Height val="85" />
-      <Width val="85" />
+      <Anchor side="Bottom" relative="$parent/StickerGreen" pos="Max" offset="-12" />
+      <Frame type="Frame" name="ImageFrame">
+        <Frame type="Image" name="StickerImage">
+          <Texture val="@UI/Storm_UI_ToyEvent_Sticker_Yellow" />
+        </Frame>
+      </Frame>
+    </Frame>
+    <Frame type="Frame" name="StickerLoot">
+      <Anchor side="Top" relative="$parent/StickerTooltipHitArea" pos="Max" offset="-44" />
+      <Anchor side="Bottom" relative="$parent/StickerTooltipHitArea" pos="Max" offset="-44" />
+      <Anchor side="Left" relative="$parent/StickerTooltipHitArea" pos="Max" offset="-46" />
+      <Anchor side="Right" relative="$parent/StickerTooltipHitArea" pos="Max" offset="-46" />
+      <Height val="130" />
+      <Width val="130" />
       <Visible val="False" />
       <Frame type="Frame" name="ImageFrame">
         <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
@@ -2036,25 +2060,9 @@
           <Anchor side="Left" relative="$parent/$parent" pos="Min" offset="0" />
           <Anchor side="Bottom" relative="$parent/$parent" pos="Max" offset="0" />
           <Anchor side="Right" relative="$parent/$parent" pos="Max" offset="0" />
-          <Texture val="@UI/Storm_UI_ToyEvent_Sticker_Yellow" />
+          <Texture val="@UI/Storm_UI_ToyEvent_Sticker_Lootbox" />
         </Frame>
       </Frame>
-      <Animation name="OnShowSticker">
-        <Event event="OnShown" action="DirectionForward,Play" />
-        <Event event="Peel" action="DirectionReverse,Play" />
-        <Controller type="Anchor" end="Pause" frame="ImageFrame" side="Top" relative="true">
-          <Key type="Curve" time="0" value="85" inout="Fast" />
-          <Key type="Curve" time="0.75" value="0" inout="Slow" />
-        </Controller>
-      </Animation>
-    </Frame>
-    <Frame type="Image" name="StickerLoot">
-      <Anchor side="Left" relative="$parent/StickerGreen" pos="Mid" offset="20" />
-      <Anchor side="Top" relative="$parent/StickerGreen" pos="Max" offset="-20" />
-      <Height val="100" />
-      <Width val="100" />
-      <Texture val="@UI/Storm_UI_ToyEvent_Sticker_Lootbox" />
-      <Visible val="False" />
       <Animation name="OnShowSticker">
         <Event event="OnShown" action="DirectionForward,Play" />
         <Event event="OnHidden" action="Stop" />
@@ -2062,20 +2070,36 @@
           <Key type="Event" time="1.0" event="Peel" />
         </Controller>
         <Controller type="Event" frame="$parent/StickerGreen" end="Stop">
-          <Key type="Event" time="1.5" event="Peel" />
+          <Key type="Event" time="1.35" event="Peel" />
         </Controller>
         <Controller type="Event" frame="$parent/StickerYellow" end="Stop">
-          <Key type="Event" time="2.0" event="Peel" />
+          <Key type="Event" time="1.7" event="Peel" />
         </Controller>
         <Controller type="Fade" end="Pause">
           <Key type="Curve" time="0" value="0" inout="Linear" />
-          <Key type="Curve" time="2.75" value="0" inout="Slow" />
-          <Key type="Curve" time="3.0" value="255" inout="Fast" />
-          <Key type="Curve" time="4.25" value="0" inout="Slow" />
+          <Key type="Curve" time="2.3" value="0" inout="Slow" />
+          <Key type="Curve" time="2.55" value="255" inout="Fast" />
+          <Key type="Curve" time="3.8" value="255" inout="Slow" />
+          <Key type="Curve" time="4.1" value="0" inout="Fast" />
         </Controller>
-        <Controller type="Visibility" end="Pause">
-          <Key type="Bool" time="0" value="True" />
-          <Key type="Bool" time="4.25" value="False" />
+        <Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause">
+          <Key type="Curve" time="0" value="200" inout="Linear" />
+          <Key type="Curve" time="2.25" value="200" inout="Slow" />
+          <Key type="Curve" time="2.55" value="100" inout="Fast" />
+        </Controller>
+        <Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause">
+          <Key type="Curve" time="0" value="200" inout="Linear" />
+          <Key type="Curve" time="2.25" value="200" inout="Slow" />
+          <Key type="Curve" time="2.55" value="100" inout="Fast" />
+        </Controller>
+        <Controller type="Anchor" end="Pause" frame="ImageFrame" side="Top" relative="true">
+          <Key type="Curve" time="0" value="0" inout="Linear" />
+          <Key type="Curve" time="3.7" value="0" inout="Slow" />
+          <Key type="Curve" time="4.2" value="130" inout="Fast" />
+        </Controller>
+        <Controller type="Sound" end="Stop">
+          <Key type="Sound" time="2.35" sound="*@UI_Toys18_Quest_Sticker_Smack_On" />
+          <Key type="Sound" time="3.7" sound="*@UI_Toys18_Quest_Sticker_Off" />
         </Controller>
       </Animation>
     </Frame>
