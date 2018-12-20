@@ -33,6 +33,10 @@ public class ConfigService {
 	private String raceId;
 	
 	@Autowired
+	@Qualifier ("consoleSkinId")
+	private String consoleSkinId;
+	
+	@Autowired
 	@Qualifier ("baseUiPath")
 	private String baseUiPath;
 	
@@ -86,5 +90,9 @@ public class ConfigService {
 	
 	public String getCachePath() {
 		return cachePath;
+	}
+	
+	public String getConsoleSkinId() {
+		return consoleSkinId;
 	}
 }

@@ -41,7 +41,8 @@ public class CompileService {
 	 * @throws InterruptedException
 	 */
 	public UICatalog compile(final ModData mod, final String raceId, final boolean repairLayoutOrder,
-			final boolean verifyLayout, final boolean verifyXml) throws InterruptedException {
+			final boolean verifyLayout, final boolean verifyXml, final String consoleSkinId)
+			throws InterruptedException {
 		UICatalog catalogClone = null;
 		try {
 			long startTime;
@@ -68,7 +69,7 @@ public class CompileService {
 				// apply mod's UI
 				final File descIndexFile = new File(
 						mod.getMpqCacheDirectory() + File.separator + mod.getDescIndexData().getDescIndexIntPath());
-				catalogClone.processDescIndex(descIndexFile, raceId);
+				catalogClone.processDescIndex(descIndexFile, raceId, consoleSkinId);
 				catalogClone.clearParser();
 				
 				executionTime = (System.currentTimeMillis() - startTime);

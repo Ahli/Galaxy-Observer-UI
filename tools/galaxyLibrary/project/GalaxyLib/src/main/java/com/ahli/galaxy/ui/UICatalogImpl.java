@@ -27,8 +27,8 @@ import java.util.Objects;
  */
 public class UICatalogImpl implements UICatalog {
 	
+	private static final String UNDERSCORE = "_";
 	private static final Logger logger = LogManager.getLogger(UICatalogImpl.class);
-	
 	private UICatalogParser parser;
 	
 	// members
@@ -106,7 +106,7 @@ public class UICatalogImpl implements UICatalog {
 	}
 	
 	@Override
-	public void processDescIndex(final File f, final String raceId)
+	public void processDescIndex(final File f, final String raceId, final String consoleSkinId)
 			throws SAXException, IOException, ParserConfigurationException, InterruptedException {
 		
 		final List<String> generalLayouts = DescIndexReader.getLayoutPathList(f, true);
@@ -121,7 +121,7 @@ public class UICatalogImpl implements UICatalog {
 		logger.trace("descIndexPath={}", () -> descIndexPath);
 		logger.trace("basePath={}", () -> basePath);
 		
-		processLayouts(combinedList, basePath, raceId);
+		processLayouts(combinedList, basePath, raceId, consoleSkinId);
 		
 		//		printDebugStats();
 	}
@@ -132,8 +132,8 @@ public class UICatalogImpl implements UICatalog {
 	 * @throws InterruptedException
 	 * 		if the current thread was interrupted
 	 */
-	private void processLayouts(final List<String> toProcessList, final String basePath, final String raceId)
-			throws InterruptedException {
+	private void processLayouts(final List<String> toProcessList, final String basePath, final String raceId,
+			final String consoleSkinId) throws InterruptedException {
 		String basePathTemp;
 		for (final String intPath : toProcessList) {
 			final boolean isDevLayout = blizzOnlyLayouts.contains(intPath);
@@ -160,7 +160,7 @@ public class UICatalogImpl implements UICatalog {
 				curBasePath = basePathTemp;
 				final File layoutFile = new File(basePathTemp + File.separator + intPath);
 				try {
-					processLayoutFile(layoutFile, raceId, isDevLayout);
+					processLayoutFile(layoutFile, raceId, isDevLayout, consoleSkinId);
 				} catch (final IOException e) {
 					logger.error(
 							"ERROR: encountered an Exception while processing the layout file '" + layoutFile + "'.",
@@ -174,9 +174,10 @@ public class UICatalogImpl implements UICatalog {
 	}
 	
 	@Override
-	public void processLayoutFile(final File f, final String raceId, final boolean isDevLayout) throws IOException {
+	public void processLayoutFile(final File f, final String raceId, final boolean isDevLayout,
+			final String consoleSkinId) throws IOException {
 		prepareParser();
-		parser.parseFile(f, raceId, isDevLayout);
+		parser.parseFile(f, raceId, isDevLayout, consoleSkinId);
 	}
 	
 	private void prepareParser() {
@@ -192,7 +193,8 @@ public class UICatalogImpl implements UICatalog {
 	}
 	
 	@Override
-	public void processInclude(final String path, final boolean isDevLayout, final String raceId) {
+	public void processInclude(final String path, final boolean isDevLayout, final String raceId,
+			final String consoleSkinId) {
 		if (logger.isTraceEnabled()) {
 			logger.trace("processing Include appearing within a real layout");
 		}
@@ -218,7 +220,7 @@ public class UICatalogImpl implements UICatalog {
 		final XmlParser xmlParser = new XmlParserVtd();
 		final UICatalogParser parserTemp = new UICatalogParser(this, xmlParser);
 		try {
-			parserTemp.parseFile(file, raceId, isDevLayout);
+			parserTemp.parseFile(file, raceId, isDevLayout, consoleSkinId);
 		} catch (final IOException e) {
 			logger.error("ERROR: while parsing include appearing within usual layouts.", e);
 		}
@@ -306,7 +308,8 @@ public class UICatalogImpl implements UICatalog {
 	}
 	
 	@Override
-	public String getConstantValue(final String constantRef, final String raceId, final boolean isDevLayout) {
+	public String getConstantValue(final String constantRef, final String raceId, final boolean isDevLayout,
+			final String consoleSkinId) {
 		int i = 0;
 		if (constantRef.length() > 0) {
 			while (constantRef.charAt(i) == '#') {
@@ -327,14 +330,20 @@ public class UICatalogImpl implements UICatalog {
 		}
 		// constant tag with race suffix
 		if (i == 2) {
-			final String constantNameWithRacePostFix = constantName + "_" + raceId;
+			final String constantNameWithRacePostFix = constantName + UNDERSCORE + raceId;
 			for (final UIConstant c : constants) {
 				if (c.getName().equalsIgnoreCase(constantNameWithRacePostFix)) {
 					return c.getValue();
 				}
 			}
-		}
-		if (i >= 3) {
+		} else if (i == 3) {
+			final String constantNameWithConsolePostFix = constantName + UNDERSCORE + consoleSkinId;
+			for (final UIConstant c : constants) {
+				if (c.getName().equalsIgnoreCase(constantNameWithConsolePostFix)) {
+					return c.getValue();
+				}
+			}
+		} else if (i >= 4) {
 			logger.error("ERROR: Encountered a constant definition with three #'" + constantRef +
 					"' when its maximum is two '#'.");
 		}

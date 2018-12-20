@@ -61,8 +61,8 @@ public class BrowseTabController implements Updateable {
 	//	private AutoCompletionBinding<String> templateDropdownAutoCompleteBinding;
 	private Map<String, UITemplate> templateMap;
 	private int framesTotal = 0;
-//	private Runnable queryRunnable;
-//	private Thread queryThread;
+	//	private Runnable queryRunnable;
+	//	private Thread queryThread;
 	private UICatalog uiCatalog;
 	
 	/**

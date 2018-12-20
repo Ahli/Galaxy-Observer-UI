@@ -181,7 +181,8 @@ public class SettingsEditorApplication extends Application {
 	private void initAppIcon() {
 		// if it fails to load the resource in as a jar, check the eclipse settings
 		try {
-			primaryStage.getIcons().add(new Image(SettingsEditorApplication.class.getResourceAsStream("/res/ahliLogo.png")));
+			primaryStage.getIcons()
+					.add(new Image(SettingsEditorApplication.class.getResourceAsStream("/res/ahliLogo.png")));
 		} catch (final NullPointerException e) {
 			logger.error("Error loading resource");
 			primaryStage.getIcons().add(new Image("ahliLogo.png"));
@@ -213,7 +214,8 @@ public class SettingsEditorApplication extends Application {
 		// Show the scene containing the root layout.
 		final Scene scene = new Scene(rootLayout);
 		final long time3 = System.nanoTime();
-		scene.getStylesheets().add(SettingsEditorApplication.class.getResource("/view/application.css").toExternalForm());
+		scene.getStylesheets()
+				.add(SettingsEditorApplication.class.getResource("/view/application.css").toExternalForm());
 		
 		if (logger.isTraceEnabled()) {
 			logger.trace("installed font families: " + Font.getFamilies());

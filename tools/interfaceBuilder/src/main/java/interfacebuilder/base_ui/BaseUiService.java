@@ -272,7 +272,8 @@ public class BaseUiService {
 								
 								for (final File descIndexFile : descIndexFiles) {
 									logger.info("parsing descIndexFile '" + descIndexFile.getPath() + "'");
-									uiCatalog.processDescIndex(descIndexFile, game.getGameDef().getDefaultRaceId());
+									uiCatalog.processDescIndex(descIndexFile, game.getGameDef().getDefaultRaceId(),
+											game.getGameDef().getDefaultConsoleSkinId());
 								}
 							}
 							game.setUiCatalog(uiCatalog);

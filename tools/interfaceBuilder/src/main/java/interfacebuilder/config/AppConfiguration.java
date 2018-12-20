@@ -107,6 +107,11 @@ public class AppConfiguration {
 	}
 	
 	@Bean
+	public String consoleSkinId() {
+		return "ClassicTerran";
+	}
+	
+	@Bean
 	public MpqBuilderService mpqBuilderService() {
 		return new MpqBuilderService();
 	}

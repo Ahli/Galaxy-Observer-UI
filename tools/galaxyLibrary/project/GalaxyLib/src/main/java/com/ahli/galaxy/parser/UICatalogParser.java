@@ -23,10 +23,38 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UICatalogParser implements ParsedXmlConsumer {
+	private static final String ACTION = "action";
+	private static final String KEY = "key";
+	private static final String FILE = "file";
+	private static final String NAME = "name";
+	private static final String TEMPLATE = "template";
+	private static final String FRAME = "frame";
+	private static final String ANCHOR = "anchor";
+	private static final String STATE = "state";
+	private static final String CONTROLLER = "controller";
+	private static final String ANIMATION = "animation";
+	private static final String STATEGROUP = "stategroup";
+	private static final String CONSTANT = "constant";
+	private static final String DESC = "desc";
+	private static final String DESCFLAGS = "descflags";
+	private static final String INCLUDE = "include";
+	private static final String PATH = "path";
+	private static final String REQUIREDTOLOAD = "requiredtoload";
+	private static final String VAL = "val";
+	private static final String EVENT = "event";
+	private static final String DRIVER = "driver";
+	private static final String WHEN = "when";
+	private static final String DEFAULTSTATE = "defaultstate";
+	private static final String SIDE = "side";
+	private static final String RELATIVE = "relative";
+	private static final String POS = "pos";
+	private static final String OFFSET = "offset";
+	private static final String LEFT = "left";
+	private static final String BOTTOM = "bottom";
+	private static final String RIGHT = "right";
+	private static final String TOP = "top";
 	private static final String TYPE = "type";
-	
 	private static final Logger logger = LogManager.getLogger(UICatalogParser.class);
-	
 	private final UICatalog catalog;
 	private final XmlParser parser;
 	private final List<UIElement> curPath = new ArrayList<>();
@@ -36,21 +64,25 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	private int curLevel;
 	private boolean curIsDevLayout;
 	private String raceId;
+	private String consoleSkinId;
+	
 	// private UITemplate curTemplate;
 	// private boolean editingMode;
 	private String curFileName;
 	
-	public UICatalogParser(final UICatalog catalog2, final XmlParser parser2) {
-		catalog = catalog2;
-		parser = parser2;
+	public UICatalogParser(final UICatalog catalog, final XmlParser parser) {
+		this.catalog = catalog;
+		this.parser = parser;
 		statesToClose = new ArrayList<>();
 		statesToCloseLevel = new ArrayList<>();
 		parser.setConsumer(this);
 		
 	}
 	
-	public void parseFile(final File f, final String raceId2, final boolean isDevLayout) throws IOException {
-		raceId = raceId2;
+	public void parseFile(final File f, final String raceId, final boolean isDevLayout, final String consoleSkinId)
+			throws IOException {
+		this.raceId = raceId;
+		this.consoleSkinId = consoleSkinId;
 		curIsDevLayout = isDevLayout;
 		curFileName = f.getName().substring(0, f.getName().lastIndexOf('.'));
 		parser.parseFile(f);
@@ -112,7 +144,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		
 		// file in attributes or template (filtering out key and action tags as they can
 		// contain file=, e.g. for cutscene frames)
-		if ((i = attrTypes.indexOf("file")) != -1 && !"key".equals(tagName) && !"action".equals(tagName)) {
+		if ((i = attrTypes.indexOf(FILE)) != -1 && !KEY.equals(tagName) && !ACTION.equals(tagName)) {
 			if (level == 2) {
 				// editingMode = true;
 				// TODO edit existing template
@@ -121,24 +153,24 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				logger.error("unexpected attribute 'file=' found in " + curElement);
 			}
 		}
-		final String name = ((i = attrTypes.indexOf("name")) != -1) ?
-				catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout) : null;
+		final String name = ((i = attrTypes.indexOf(NAME)) != -1) ?
+				catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout, consoleSkinId) : null;
 		// TODO editingMode retrieving existing element if possible
 		
 		// TODO copy template settings, if template used in existing frame
 		
 		// create from template (actions may use template= and need to be ignored)
-		UIElement newElem = ((i = attrTypes.indexOf("template")) != -1 && !"action".equals(tagName)) ?
+		UIElement newElem = ((i = attrTypes.indexOf(TEMPLATE)) != -1 && !ACTION.equals(tagName)) ?
 				instanciateTemplate(attrValues.get(i), name) : null;
 		
 		// use lowercase for cases!
 		switch (tagName) {
-			case "frame":
+			case FRAME:
 				if (newElem == null) {
 					newElem = new UIFrame(name);
 				}
 				final String type = ((i = attrTypes.indexOf(TYPE)) != -1) ?
-						catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout) : null;
+						catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout, consoleSkinId) : null;
 				if (!checkFrameTypeCompatibility(type, ((UIFrame) newElem).getType())) {
 					logger.error("ERROR: The type of the frame is not compatible with the used template.");
 				}
@@ -152,10 +184,10 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					}
 				}
 				break;
-			case "anchor":
+			case ANCHOR:
 				parseAnchor(attrTypes, attrValues);
 				return;
-			case "state":
+			case STATE:
 				if (newElem == null) {
 					newElem = new UIState(name);
 				}
@@ -174,7 +206,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					}
 				}
 				break;
-			case "controller":
+			case CONTROLLER:
 				newElem = new UIController(name);
 				// add to parent
 				if (curElement != null) {
@@ -193,7 +225,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					}
 				}
 				break;
-			case "animation":
+			case ANIMATION:
 				newElem = new UIAnimation(name);
 				// add to parent
 				if (curElement != null) {
@@ -204,7 +236,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					}
 				}
 				break;
-			case "stategroup":
+			case STATEGROUP:
 				newElem = new UIStateGroup(name);
 				// add to parent
 				if (curElement != null) {
@@ -215,12 +247,12 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					}
 				}
 				break;
-			case "constant":
+			case CONSTANT:
 				if (newElem == null) {
 					newElem = new UIConstant(name);
 				}
-				final String val = ((i = attrTypes.indexOf("val")) != -1) ?
-						catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout) : null;
+				final String val = ((i = attrTypes.indexOf(VAL)) != -1) ?
+						catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout, consoleSkinId) : null;
 				if (val == null) {
 					logger.error("Value of Constant '" + name + "' is null");
 					return;
@@ -228,18 +260,18 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				((UIConstant) newElem).setValue(val);
 				catalog.addConstant((UIConstant) newElem, curIsDevLayout);
 				return;
-			case "desc":
+			case DESC:
 				// nothing to do
 				return;
-			case "descflags":
+			case DESCFLAGS:
 				// locked or internal
 				return;
-			case "include":
-				final int j = attrTypes.indexOf("path");
+			case INCLUDE:
+				final int j = attrTypes.indexOf(PATH);
 				if (j != -1) {
 					final String path = attrValues.get(j);
-					final boolean isDevLayout = curIsDevLayout || attrTypes.contains("requiredtoload");
-					catalog.processInclude(path, isDevLayout, raceId);
+					final boolean isDevLayout = curIsDevLayout || attrTypes.contains(REQUIREDTOLOAD);
+					catalog.processInclude(path, isDevLayout, raceId, consoleSkinId);
 				}
 				
 				break;
@@ -249,7 +281,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				i = 0;
 				for (final int len = attrTypes.size(); i < len; i++) {
 					((UIAttribute) newElem).addValue(attrTypes.get(i),
-							catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout));
+							catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout, consoleSkinId));
 				}
 				// add to parent
 				if (curElement instanceof UIFrame) {
@@ -257,23 +289,23 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					((UIFrame) curElement).addAttribute((UIAttribute) newElem);
 				} else if (curElement instanceof UIAnimation) {
 					// Animation's events
-					if (tagName.equals("event")) {
+					if (tagName.equals(EVENT)) {
 						((UIAnimation) curElement).addEvent((UIAttribute) newElem);
-					} else if (tagName.equals("driver")) {
+					} else if (tagName.equals(DRIVER)) {
 						((UIAnimation) curElement).setDriver((UIAttribute) newElem);
 					} else {
 						logger.error("found an attribute that cannot be added to UIAnimation: " + newElem.toString());
 					}
 				} else if (curElement instanceof UIController) {
 					// Controller's keys
-					if (tagName.equals("key")) {
+					if (tagName.equals(KEY)) {
 						((UIController) curElement).getKeys().add((UIAttribute) newElem);
 					} else {
 						logger.error("found an attribute that cannot be added to UIController: " + newElem.toString());
 					}
 				} else if (curElement instanceof UIStateGroup) {
-					if (tagName.equals("defaultstate")) {
-						final String stateVal = ((UIAttribute) newElem).getValue("val");
+					if (tagName.equals(DEFAULTSTATE)) {
+						final String stateVal = ((UIAttribute) newElem).getValue(VAL);
 						if (stateVal != null) {
 							((UIStateGroup) curElement).setDefaultState(stateVal);
 						} else {
@@ -283,9 +315,9 @@ public class UICatalogParser implements ParsedXmlConsumer {
 						logger.error("found an attribute that cannot be added to UIController: " + newElem.toString());
 					}
 				} else if (curElement instanceof UIState) {
-					if (tagName.equals("when")) {
+					if (tagName.equals(WHEN)) {
 						((UIState) curElement).getWhens().add((UIAttribute) newElem);
-					} else if (tagName.equals("action")) {
+					} else if (tagName.equals(ACTION)) {
 						((UIState) curElement).getActions().add((UIAttribute) newElem);
 					} else {
 						logger.error("found an attribute that cannot be added to UIState: " + newElem.toString());
@@ -382,14 +414,14 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	 */
 	private void parseAnchor(final List<String> attrTypes, final List<String> attrValues) {
 		int i;
-		final String side = ((i = attrTypes.indexOf("side")) != -1) ?
-				catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout) : null;
-		final String relative = ((i = attrTypes.indexOf("relative")) != -1) ?
-				catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout) : null;
-		final String pos = ((i = attrTypes.indexOf("pos")) != -1) ?
-				catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout) : null;
-		final String offset = ((i = attrTypes.indexOf("offset")) != -1) ?
-				catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout) : null;
+		final String side = ((i = attrTypes.indexOf(SIDE)) != -1) ?
+				catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout, consoleSkinId) : null;
+		final String relative = ((i = attrTypes.indexOf(RELATIVE)) != -1) ?
+				catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout, consoleSkinId) : null;
+		final String pos = ((i = attrTypes.indexOf(POS)) != -1) ?
+				catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout, consoleSkinId) : null;
+		final String offset = ((i = attrTypes.indexOf(OFFSET)) != -1) ?
+				catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout, consoleSkinId) : null;
 		
 		if (curElement instanceof UIFrame) {
 			final UIFrame frame = (UIFrame) curElement;
@@ -400,13 +432,13 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				frame.setAnchor(relative, offset);
 			} else {
 				UIAnchorSide sideVal = null;
-				if (side.compareToIgnoreCase("left") == 0) {
+				if (side.compareToIgnoreCase(LEFT) == 0) {
 					sideVal = UIAnchorSide.LEFT;
-				} else if (side.compareToIgnoreCase("bottom") == 0) {
+				} else if (side.compareToIgnoreCase(BOTTOM) == 0) {
 					sideVal = UIAnchorSide.BOTTOM;
-				} else if (side.compareToIgnoreCase("right") == 0) {
+				} else if (side.compareToIgnoreCase(RIGHT) == 0) {
 					sideVal = UIAnchorSide.RIGHT;
-				} else if (side.compareToIgnoreCase("top") == 0) {
+				} else if (side.compareToIgnoreCase(TOP) == 0) {
 					sideVal = UIAnchorSide.TOP;
 				} else {
 					logger.error("'Anchor' attribute has unrecognizable value for 'side='. Value is '" + side + "'.");

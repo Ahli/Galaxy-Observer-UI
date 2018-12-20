@@ -16,6 +16,7 @@ public class SC2GameDef extends GameDef {
 		setModFileEnding("SC2Mod");
 		setCoreModsOrDirectories("Core.SC2Mod");
 		setDefaultRaceId("Terr");
+		setDefaultConsoleSkinId("ClassicTerran");
 		setDocumentsGameDirectoryName("StarCraft II");
 		setLayoutFileEnding("SC2Layout");
 		setBaseDataFolderName("Base.SC2Data");

@@ -37,7 +37,7 @@ public interface UICatalog extends DeepCopyable {
 	 * @throws InterruptedException
 	 * 		if the current Thread was interrupted
 	 */
-	void processDescIndex(File f, String raceId)
+	void processDescIndex(File f, String raceId, String consoleSkinId)
 			throws SAXException, IOException, ParserConfigurationException, InterruptedException;
 	
 	/**
@@ -51,7 +51,7 @@ public interface UICatalog extends DeepCopyable {
 	 * @throws UIException
 	 * @throws InterruptedException
 	 */
-	void processLayoutFile(File f, String raceId, boolean isDevLayout) throws IOException;
+	void processLayoutFile(File f, String raceId, boolean isDevLayout, String consoleSkinId) throws IOException;
 	
 	/**
 	 * @param constantRef
@@ -59,7 +59,7 @@ public interface UICatalog extends DeepCopyable {
 	 * 		id String of the viewer's Race
 	 * @return
 	 */
-	String getConstantValue(String constantRef, String raceId, boolean isDevLayout);
+	String getConstantValue(String constantRef, String raceId, boolean isDevLayout, String consoleSkinId);
 	
 	/**
 	 * @return the templates
@@ -139,5 +139,5 @@ public interface UICatalog extends DeepCopyable {
 	UITemplate addTemplate(final String fileName, final UIElement thisElem, final boolean isDevLayout)
 			throws UIException;
 	
-	void processInclude(String path, boolean isDevLayout, String raceId);
+	void processInclude(String path, boolean isDevLayout, String raceId, String consoleSkinId);
 }

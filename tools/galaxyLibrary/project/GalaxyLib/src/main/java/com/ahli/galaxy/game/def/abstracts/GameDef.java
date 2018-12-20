@@ -8,6 +8,7 @@ import java.util.Arrays;
 public abstract class GameDef {
 	private String[] coreModsOrDirectories;
 	private String defaultRaceId = "Terr";
+	private String defaultConsoleSkinId = "ClassicTerran";
 	private String documentsGameDirectoryName = "StarCraft II";
 	private String documentsInterfaceSubdirectoryName = "Interfaces";
 	private String modFileEnding = ".SC2Mod";
@@ -237,4 +238,13 @@ public abstract class GameDef {
 	public void setSupportDirectoryX64(final String supportDirectoryX64) {
 		this.supportDirectoryX64 = supportDirectoryX64;
 	}
+	
+	public String getDefaultConsoleSkinId() {
+		return defaultConsoleSkinId;
+	}
+	
+	public void setDefaultConsoleSkinId(final String defaultConsoleSkinId) {
+		this.defaultConsoleSkinId = defaultConsoleSkinId;
+	}
+	
 }

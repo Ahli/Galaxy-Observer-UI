@@ -343,7 +343,8 @@ public class MpqBuilderService {
 		logger.info("Compiling... " + sourceFile.getName());
 		
 		// perform checks/improvements on code
-		compileService.compile(mod, configService.getRaceId(), repairLayoutOrder, verifyLayout, verifyXml);
+		compileService.compile(mod, configService.getRaceId(), repairLayoutOrder, verifyLayout, verifyXml,
+				configService.getConsoleSkinId());
 		
 		logger.info("Building... " + sourceFile.getName());
 		

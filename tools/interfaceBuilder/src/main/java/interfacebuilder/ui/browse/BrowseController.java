@@ -94,10 +94,10 @@ public class BrowseController implements Updateable {
 				FXCollections.observableList(projectService.getAllProjects());
 		projectListView.setItems(projectsObservable);
 		projectListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-		projectListView.setCellFactory(new Callback<ListView<Project>, ListCell<Project>>() {
+		projectListView.setCellFactory(new Callback<>() {
 			@Override
 			public ListCell<Project> call(final ListView<Project> p) {
-				return new ListCell<Project>() {
+				return new ListCell<>() {
 					@Override
 					protected void updateItem(final Project project, final boolean empty) {
 						super.updateItem(project, empty);
@@ -261,8 +261,9 @@ public class BrowseController implements Updateable {
 				final Runnable followupTask = () -> {
 					try {
 						// TODO cache compiled uicatalogs
-						final UICatalog uiCatalog =
-								compileService.compile(mod, configService.getRaceId(), false, true, true);
+						final UICatalog uiCatalog = compileService
+								.compile(mod, configService.getRaceId(), false, true, true,
+										configService.getConsoleSkinId());
 						mod.setUi(uiCatalog);
 					} catch (final InterruptedException e) {
 						Thread.currentThread().interrupt();

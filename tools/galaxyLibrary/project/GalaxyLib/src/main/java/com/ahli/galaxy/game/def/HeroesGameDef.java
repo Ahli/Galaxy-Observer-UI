@@ -16,6 +16,7 @@ public class HeroesGameDef extends GameDef {
 		setModFileEnding("stormmod");
 		setCoreModsOrDirectories("core.stormmod", "heroesdata.stormmod", "heromods");
 		setDefaultRaceId("Terr");
+		setDefaultConsoleSkinId("ClassicTerran");
 		setDocumentsGameDirectoryName("Heroes of the Storm");
 		setLayoutFileEnding("stormlayout");
 		setBaseDataFolderName("base.stormdata");
