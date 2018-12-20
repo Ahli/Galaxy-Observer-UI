@@ -2,9 +2,7 @@ module interfacex.builder {
 	requires java.desktop;
 	requires java.persistence;
 	requires java.xml;
-	requires com.fasterxml.jackson.databind;
-	requires com.fasterxml.jackson.annotation;
-//	requires controlsfx;
+	//	requires controlsfx;
 	requires core;
 	requires de.jensd.fx.glyphs.fontawesome;
 	requires javafx.base;
@@ -28,7 +26,7 @@ module interfacex.builder {
 	requires spring.tx;
 	requires CascExplorerConfigFileEdit;
 	requires GalaxyLib;
-	requires permit.reflect;
+	requires kryo;
 	
 	// fix: spring boot not finding sqlexception
 	requires java.sql;

@@ -1,8 +1,6 @@
 package com.ahli.galaxy.ui;
 
 import com.ahli.galaxy.ui.abstracts.UIElement;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,12 +10,9 @@ import java.util.Objects;
 /**
  * @author Ahli
  */
-@JsonTypeInfo (use = JsonTypeInfo.Id.MINIMAL_CLASS)
-@JsonInclude (JsonInclude.Include.NON_EMPTY)
 public class UIAnimation extends UIElement {
 	private List<UIController> controllers;
 	private List<UIAttribute> events;
-	//	@JsonInclude (JsonInclude.Include.NON_DEFAULT)
 	private boolean nextEventsAdditionShouldOverride;
 	private UIAttribute driver;
 	

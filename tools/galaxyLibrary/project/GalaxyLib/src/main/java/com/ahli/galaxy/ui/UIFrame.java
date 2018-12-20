@@ -1,11 +1,6 @@
 package com.ahli.galaxy.ui;
 
 import com.ahli.galaxy.ui.abstracts.UIElement;
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,15 +14,6 @@ import java.util.Objects;
  * NOTES: using null for certain often occurring values did not yield in
  * performance improvements
  */
-// CUSTOM ENCODING ATTEMPT
-//@JsonSerialize (using = UIFrameSerializer.class)
-//@JsonDeserialize (using = UIFrameDeserializer.class)
-//@JsonIgnoreProperties (ignoreUnknown = true) // custom deserializer requires this
-
-
-@JsonTypeInfo (use = JsonTypeInfo.Id.MINIMAL_CLASS)
-@JsonInclude (JsonInclude.Include.NON_EMPTY)
-@JsonAutoDetect (fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class UIFrame extends UIElement {
 	private static final String THIS = "$this";
 	private static final String[] POSI = { "Min", "Max" };
@@ -64,22 +50,6 @@ public class UIFrame extends UIElement {
 		offset[1] = ZERO;
 		offset[2] = ZERO;
 		offset[3] = ZERO;
-	}
-	
-	@JsonCreator
-	public UIFrame(@JsonProperty ("name") final String name, @JsonProperty ("pos") final String[] pos,
-			@JsonProperty ("offset") final String[] offset, @JsonProperty ("relative") final String[] relative,
-			@JsonProperty ("attributes") final List<UIAttribute> attributes, @JsonProperty ("type") final String type,
-			@JsonProperty ("children") final List<UIElement> children) {
-		super(name);
-		for (int i = 0; i < 4; i++) {
-			this.pos[i] = pos[i].intern();
-			this.offset[i] = offset[i].intern();
-			this.relative[i] = relative[i].intern();
-		}
-		this.attributes = attributes;
-		this.type = type.intern();
-		this.children = children;
 	}
 	
 	/**

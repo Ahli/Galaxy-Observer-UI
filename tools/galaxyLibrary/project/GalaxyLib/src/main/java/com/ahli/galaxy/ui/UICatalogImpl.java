@@ -6,9 +6,6 @@ import com.ahli.galaxy.parser.interfaces.XmlParser;
 import com.ahli.galaxy.ui.abstracts.UIElement;
 import com.ahli.galaxy.ui.exception.UIException;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
@@ -28,14 +25,10 @@ import java.util.Objects;
  *
  * @author Ahli
  */
-@JsonTypeInfo (use = JsonTypeInfo.Id.MINIMAL_CLASS)
-@JsonInclude (JsonInclude.Include.NON_EMPTY)
 public class UICatalogImpl implements UICatalog {
 	
-	@JsonIgnore
 	private static final Logger logger = LogManager.getLogger(UICatalogImpl.class);
 	
-	@JsonIgnore
 	private UICatalogParser parser;
 	
 	// members
@@ -46,7 +39,6 @@ public class UICatalogImpl implements UICatalog {
 	private List<String> blizzOnlyLayouts;
 	
 	// internal, used during processing
-	@JsonIgnore
 	private String curBasePath;
 	
 	/**

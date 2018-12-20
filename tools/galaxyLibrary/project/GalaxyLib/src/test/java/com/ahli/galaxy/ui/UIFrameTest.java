@@ -1,21 +1,14 @@
 package com.ahli.galaxy.ui;
 
 
-import com.ahli.galaxy.ui.abstracts.UIElement;
-import com.ahli.galaxy.ui.exception.UIException;
-import com.ahli.galaxy.ui.interfaces.UICatalog;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.io.IOException;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+//import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ExtendWith (MockitoExtension.class)
 public class UIFrameTest {
@@ -75,23 +68,23 @@ public class UIFrameTest {
 	}
 	
 	
-	@Test
-	public void testJsonTree() throws IOException, UIException {
-		final ObjectMapper objMapper = new ObjectMapper();
-		final UICatalog catalog = new UICatalogImpl();
-		final UIElement state = new UIState("MyState");
-		final UIFrame frame = new UIFrame("MyFrame", "type");
-		final UIFrame frame2 = new UIFrame("MyFrame2", "type");
-		frame.getChildren().add(frame2);
-		frame2.getChildren().add(state);
-		catalog.addTemplate("fileName", frame, false);
-		String result = objMapper.writeValueAsString(catalog);
-		logger.info(result);
-		
-		final UICatalogImpl reborn = objMapper.readValue(result, UICatalogImpl.class);
-		result = objMapper.writeValueAsString(reborn);
-		logger.info(result);
-		assertEquals(reborn, catalog);
-	}
+	//	@Test
+	//	public void testJsonTree() throws IOException, UIException {
+	//		final ObjectMapper objMapper = new ObjectMapper();
+	//		final UICatalog catalog = new UICatalogImpl();
+	//		final UIElement state = new UIState("MyState");
+	//		final UIFrame frame = new UIFrame("MyFrame", "type");
+	//		final UIFrame frame2 = new UIFrame("MyFrame2", "type");
+	//		frame.getChildren().add(frame2);
+	//		frame2.getChildren().add(state);
+	//		catalog.addTemplate("fileName", frame, false);
+	//		String result = objMapper.writeValueAsString(catalog);
+	//		logger.info(result);
+	//
+	//		final UICatalogImpl reborn = objMapper.readValue(result, UICatalogImpl.class);
+	//		result = objMapper.writeValueAsString(reborn);
+	//		logger.info(result);
+	//		assertEquals(reborn, catalog);
+	//	}
 	
 }

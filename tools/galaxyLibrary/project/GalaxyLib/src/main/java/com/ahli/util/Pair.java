@@ -1,17 +1,8 @@
 package com.ahli.util;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
 /**
  * <p> A convenience class to represent name-value pairs. </p>
  */
-@JsonTypeInfo (use = JsonTypeInfo.Id.MINIMAL_CLASS)
-@JsonInclude (JsonInclude.Include.NON_EMPTY)
-@JsonAutoDetect (fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class Pair <K, V> {
 	
 	/**
@@ -31,8 +22,7 @@ public class Pair <K, V> {
 	 * @param value
 	 * 		The value to use for this pair
 	 */
-	@JsonCreator
-	public Pair(@JsonProperty ("key") final K key, @JsonProperty ("value") final V value) {
+	public Pair(final K key, final V value) {
 		this.key = key;
 		this.value = value;
 	}

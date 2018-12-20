@@ -1,13 +1,10 @@
 module GalaxyLib {
 	requires java.xml;
-	requires com.fasterxml.jackson.annotation;
 	requires org.apache.commons.configuration2;
 	requires org.apache.commons.io;
 	requires org.apache.commons.lang3;
 	requires transitive org.apache.logging.log4j;
 	requires vtd.xml;
-	requires com.fasterxml.jackson.databind;
-	requires com.fasterxml.jackson.core;
 	
 	exports com.ahli.galaxy;
 	exports com.ahli.galaxy.archive;
@@ -26,5 +23,6 @@ module GalaxyLib {
 	exports com.ahli.mpq.mpqeditor;
 	exports com.ahli.util;
 	
-	opens com.ahli.galaxy.ui to com.fasterxml.jackson.databind;
+	opens com.ahli.galaxy.ui;
+	opens com.ahli.galaxy.ui.abstracts;
 }

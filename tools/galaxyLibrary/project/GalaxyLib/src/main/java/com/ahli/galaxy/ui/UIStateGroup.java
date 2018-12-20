@@ -1,10 +1,6 @@
 package com.ahli.galaxy.ui;
 
 import com.ahli.galaxy.ui.abstracts.UIElement;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,8 +11,6 @@ import java.util.Objects;
 /**
  * @author Ahli
  */
-@JsonTypeInfo (use = JsonTypeInfo.Id.MINIMAL_CLASS)
-@JsonInclude (JsonInclude.Include.NON_EMPTY)
 public class UIStateGroup extends UIElement {
 	private String defaultState;
 	private List<UIState> states;
@@ -24,19 +18,6 @@ public class UIStateGroup extends UIElement {
 	public UIStateGroup() {
 		super(null);
 		states = new ArrayList<>(0);
-	}
-	
-	@JsonCreator
-	public UIStateGroup(@JsonProperty ("name") final String name,
-			@JsonProperty ("defaultState") final String defaultState,
-			@JsonProperty ("states") final List<UIState> states) {
-		super(name);
-		this.defaultState = defaultState != null ? defaultState.intern() : defaultState;
-		if (states != null) {
-			this.states = states;
-		} else {
-			this.states = new ArrayList<>(0);
-		}
 	}
 	
 	/**

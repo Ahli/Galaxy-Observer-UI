@@ -96,10 +96,10 @@ public class HomeController implements Updateable {
 		projectsObservable = FXCollections.observableList(projectService.getAllProjects());
 		selectionList.setItems(projectsObservable);
 		selectionList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-		selectionList.setCellFactory(new Callback<ListView<Project>, ListCell<Project>>() {
+		selectionList.setCellFactory(new Callback<>() {
 			@Override
 			public ListCell<Project> call(final ListView<Project> p) {
-				return new ListCell<Project>() {
+				return new ListCell<>() {
 					@Override
 					protected void updateItem(final Project project, final boolean empty) {
 						super.updateItem(project, empty);

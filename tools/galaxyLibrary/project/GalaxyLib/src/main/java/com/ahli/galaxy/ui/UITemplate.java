@@ -2,8 +2,6 @@ package com.ahli.galaxy.ui;
 
 import com.ahli.galaxy.ui.abstracts.UIElement;
 import com.ahli.util.DeepCopyable;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -11,8 +9,6 @@ import java.util.Objects;
 /**
  * @author Ahli
  */
-@JsonTypeInfo (use = JsonTypeInfo.Id.MINIMAL_CLASS)
-@JsonInclude (JsonInclude.Include.NON_DEFAULT)
 public class UITemplate implements DeepCopyable {
 	private String fileName;
 	private UIElement element;
