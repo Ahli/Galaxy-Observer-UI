@@ -24,7 +24,6 @@ import javax.swing.JFileChooser;
 import java.io.File;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 
@@ -142,11 +141,11 @@ public class AppConfiguration {
 	}
 	
 	@Bean
-	public ThreadPoolExecutor threadPoolExecutor() {
+	public StylizedTextAreaAppenderThreadPoolExecutor threadPoolExecutor() {
 		final int maxThreads = Math.max(1, Runtime.getRuntime().availableProcessors() / 2);
-		final ThreadPoolExecutor executor =
+		final StylizedTextAreaAppenderThreadPoolExecutor executor =
 				new StylizedTextAreaAppenderThreadPoolExecutor(maxThreads, maxThreads, 5000L, TimeUnit.MILLISECONDS,
-						new LinkedBlockingQueue<>(), Executors.defaultThreadFactory());
+						new LinkedBlockingQueue<>(), Executors.defaultThreadFactory(), null);
 		executor.allowCoreThreadTimeOut(true);
 		return executor;
 	}

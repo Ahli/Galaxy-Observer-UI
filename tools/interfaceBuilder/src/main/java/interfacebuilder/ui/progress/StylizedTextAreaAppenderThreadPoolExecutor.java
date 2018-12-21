@@ -1,8 +1,5 @@
 package interfacebuilder.ui.progress;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -14,7 +11,7 @@ import java.util.concurrent.TimeUnit;
  * which Thread created which log message.
  */
 public class StylizedTextAreaAppenderThreadPoolExecutor extends ThreadPoolExecutor {
-	private static final Logger logger = LogManager.getLogger(StylizedTextAreaAppenderThreadPoolExecutor.class);
+	private Runnable cleanUpTask;
 	
 	/**
 	 * Creates a new {@code ThreadPoolExecutor} with the given initial parameters and {@linkplain
@@ -42,8 +39,9 @@ public class StylizedTextAreaAppenderThreadPoolExecutor extends ThreadPoolExecut
 	 */
 	public StylizedTextAreaAppenderThreadPoolExecutor(final int corePoolSize, final int maximumPoolSize,
 			final long keepAliveTime, final TimeUnit unit, final BlockingQueue<Runnable> workQueue,
-			final ThreadFactory threadFactory) {
+			final ThreadFactory threadFactory, final Runnable cleanUpTask) {
 		super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory);
+		this.cleanUpTask = cleanUpTask;
 	}
 	
 	@Override
@@ -58,6 +56,17 @@ public class StylizedTextAreaAppenderThreadPoolExecutor extends ThreadPoolExecut
 	protected void afterExecute(final Runnable r, final Throwable t) {
 		super.afterExecute(r, t);
 		StylizedTextAreaAppender.finishedWork(Thread.currentThread().getName());
+		
+		if (cleanUpTask != null && r != cleanUpTask) {
+			final int count = getActiveCount() - 1; // subtract this task
+			if (count <= 0) {
+				execute(cleanUpTask);
+			}
+		}
+	}
+	
+	public void setCleanUpTask(final Runnable cleanUpTask) {
+		this.cleanUpTask = cleanUpTask;
 	}
 	
 }

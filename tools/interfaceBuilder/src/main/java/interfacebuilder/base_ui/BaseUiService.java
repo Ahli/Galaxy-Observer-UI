@@ -232,8 +232,12 @@ public class BaseUiService {
 				UICatalog uiCatalog = game.getUiCatalog();
 				final String gameName = game.getGameDef().getName();
 				if (uiCatalog != null) {
-					logger.trace("Aborting parsing baseUI for '" + gameName + "' as was already parsed.");
+					if (logger.isTraceEnabled()) {
+						logger.trace("Aborting parsing baseUI for '" + gameName + "' as was already parsed.");
+					}
 				} else {
+					final long startTime = System.currentTimeMillis();
+					logger.info("Loading baseUI for " + gameName);
 					boolean needToParseAgain = true;
 					final boolean isPtr = !(game.getGameDef() instanceof SC2GameDef) &&
 							configService.getIniSettings().isHeroesPtrActive();
@@ -243,7 +247,9 @@ public class BaseUiService {
 							uiCatalog = discCacheService.get(gameName, isPtr, UICatalogImpl.class);
 							game.setUiCatalog(uiCatalog);
 							needToParseAgain = false;
-							logger.trace("Loaded UI from cache");
+							if (logger.isTraceEnabled()) {
+								logger.trace("Loaded baseUI for '" + gameName + "' from cache");
+							}
 						} catch (final IOException e) {
 							logger.warn("ERROR: loading cached base UI failed.", e);
 						}
@@ -293,9 +299,10 @@ public class BaseUiService {
 							logger.error("ERROR when creating cache file of UI", e);
 						}
 					}
+					final long executionTime = (System.currentTimeMillis() - startTime);
+					logger.info("Loading BaseUI for '" + gameName + "' took " + executionTime + "ms.");
 				}
 			}
-			
 			addTaskToExecutor(followupTask);
 		});
 	}

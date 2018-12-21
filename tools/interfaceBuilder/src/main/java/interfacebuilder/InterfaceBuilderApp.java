@@ -15,6 +15,7 @@ import interfacebuilder.ui.navigation.NavigationController;
 import interfacebuilder.ui.navigation.Notification;
 import interfacebuilder.ui.progress.ErrorTabController;
 import interfacebuilder.ui.progress.StylizedTextAreaAppender;
+import interfacebuilder.ui.progress.StylizedTextAreaAppenderThreadPoolExecutor;
 import interfacebuilder.ui.progress.TabPaneController;
 import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
@@ -39,10 +40,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -67,7 +66,7 @@ import java.util.concurrent.TimeUnit;
  */
 
 @EnableAutoConfiguration
-@ComponentScan(basePackages = "interfacebuilder")
+@ComponentScan (basePackages = "interfacebuilder")
 public class InterfaceBuilderApp extends Application {
 	private static final Logger logger = LogManager.getLogger(InterfaceBuilderApp.class);
 	private static InterfaceBuilderApp instance;
@@ -83,7 +82,7 @@ public class InterfaceBuilderApp extends Application {
 	@Autowired
 	private MpqBuilderService mpqBuilderService;
 	@Autowired
-	private ThreadPoolExecutor executor;
+	private StylizedTextAreaAppenderThreadPoolExecutor executor;
 	@Autowired
 	private ConfigService configService;
 	@Autowired
@@ -594,6 +593,16 @@ public class InterfaceBuilderApp extends Application {
 		//			logger.error("Could not programmatically load log4j2.xml.", e);
 		//		}
 		
+		executor.setCleanUpTask(new Runnable() {
+			@Override
+			public void run() {
+				// free space of baseUI
+				logger.info("Deallocating baseUI");
+				mpqBuilderService.getGameData(Game.SC2).setUiCatalog(null);
+				mpqBuilderService.getGameData(Game.HEROES).setUiCatalog(null);
+				System.gc();
+			}
+		});
 	}
 	
 	/**
