@@ -241,7 +241,7 @@ public class CompressionMiningController implements Updateable {
 		if (expCompMiner != null) {
 			final long newBest = expCompMiner.getBestSize();
 			expCompMiner = null;
-			logger.info(String.format("Currently best Compression produces archives of size: %s", newBest / 1024));
+			logger.info(String.format("Currently best Compression produces archives of size: %s kb", newBest / 1024));
 		}
 		miningButton.setText(Messages.getString("progress.compressionMining.startMining"));
 	}
