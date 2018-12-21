@@ -29,10 +29,11 @@ public class RandomCompressionMiner {
 	private final ModData mod;
 	private final MpqEditorInterface mpqInterface;
 	private final Random random = new Random();
-	private final MpqEditorCompressionRuleMethod[] compressionSetting = MpqEditorCompressionRuleMethod.values();
+	//	private final MpqEditorCompressionRuleMethod[] compressionSetting = MpqEditorCompressionRuleMethod.values();
 	private MpqEditorCompressionRule[] rules;
 	private long bestSize;
 	private MpqEditorCompressionRule[] bestRuleSet;
+	private boolean oldRulesetHadMissingFiles = false;
 	
 	/**
 	 * Creates a Miner with a ruleset whose entries all refer to exactly a single file within the source location.
@@ -78,6 +79,7 @@ public class RandomCompressionMiner {
 			final List<File> untrackedFiles = getUntrackedFiles(oldBestRuleset, cache.toPath());
 			if (!untrackedFiles.isEmpty()) {
 				rules = addRulesForFiles(oldBestRuleset, untrackedFiles, cache);
+				oldRulesetHadMissingFiles = true;
 			} else {
 				rules = oldBestRuleset;
 			}
@@ -304,10 +306,15 @@ public class RandomCompressionMiner {
 	 */
 	private MpqEditorCompressionRuleMethod getRandomCompressionMethod() {
 		// exclude LZMA
-		MpqEditorCompressionRuleMethod method;
-		do {
-			method = compressionSetting[random.nextInt(compressionSetting.length)];
-		} while (method == MpqEditorCompressionRuleMethod.LZMA);
+		final MpqEditorCompressionRuleMethod method;
+		//		final int max = compressionSetting.length;
+		//		do {
+		//			method = compressionSetting[random.nextInt(max)];
+		//		} while (method == MpqEditorCompressionRuleMethod.LZMA || method == MpqEditorCompressionRuleMethod.NONE ||
+		//				method == MpqEditorCompressionRuleMethod.PKWARE || method == MpqEditorCompressionRuleMethod.SPARSE ||
+		//				method == MpqEditorCompressionRuleMethod.SPARSE_BZIP2 ||
+		//				method == MpqEditorCompressionRuleMethod.SPARSE_ZLIB);
+		method = random.nextBoolean() ? MpqEditorCompressionRuleMethod.ZLIB : MpqEditorCompressionRuleMethod.BZIP2;
 		return method;
 	}
 	
@@ -317,6 +324,10 @@ public class RandomCompressionMiner {
 	
 	public long getBestSize() {
 		return bestSize;
+	}
+	
+	public boolean isOldRulesetHadMissingFiles() {
+		return oldRulesetHadMissingFiles;
 	}
 	
 	/**

@@ -2,6 +2,8 @@ package interfacebuilder.ui.progress;
 
 import gnu.trove.map.hash.THashMap;
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.text.FontSmoothingType;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
@@ -143,12 +145,17 @@ public final class StylizedTextAreaAppender extends AbstractAppender {
 						final Text text = new Text(message);
 						text.getStyleClass().add(level.toString());
 						text.setFontSmoothingType(FontSmoothingType.LCD);
-						txtArea.getChildren().add(text);
+						ObservableList<Node> children = txtArea.getChildren();
+						children.add(text);
 						
 						if (level == Level.ERROR || level == Level.FATAL) {
 							controller.reportError();
 						} else if (level == Level.WARN) {
 							controller.reportWarning();
+						}
+						
+						if(children.size() > 2000){
+							children.remove(0);
 						}
 					} catch (final Exception e) {
 						System.err.println("Error while append to TextArea: " + e.getMessage());
