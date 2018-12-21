@@ -316,7 +316,7 @@ public class BrowseTabController implements Updateable {
 	}
 	
 	private void updatePath(final TreeItem<UIElement> elem) {
-		final String path = addParentPath(new StringBuilder(), elem).toString();
+		final String path = elem != null ? addParentPath(new StringBuilder(), elem).toString() : "";
 		pathLabel.setText(path);
 	}
 	

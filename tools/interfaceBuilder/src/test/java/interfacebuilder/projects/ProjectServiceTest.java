@@ -1,5 +1,6 @@
 package interfacebuilder.projects;
 
+import interfacebuilder.InterfaceBuilderApp;
 import interfacebuilder.projects.enums.Game;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 @ExtendWith (MockitoExtension.class)
-@SpringBootTest
+@SpringBootTest (classes = InterfaceBuilderApp.class)
 public class ProjectServiceTest {
 	@Mock
 	ProjectJpaRepository projectRepoMock;

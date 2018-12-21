@@ -38,8 +38,11 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -63,7 +66,8 @@ import java.util.concurrent.TimeUnit;
  * @author Ahli
  */
 
-@SpringBootApplication
+@EnableAutoConfiguration
+@ComponentScan(basePackages = "interfacebuilder")
 public class InterfaceBuilderApp extends Application {
 	private static final Logger logger = LogManager.getLogger(InterfaceBuilderApp.class);
 	private static InterfaceBuilderApp instance;
