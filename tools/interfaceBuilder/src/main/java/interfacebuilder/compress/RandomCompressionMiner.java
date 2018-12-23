@@ -292,9 +292,10 @@ public class RandomCompressionMiner {
 	public void randomizeRules() {
 		// fine for all: NONE, BZIP2, ZLIB, PKWARE, SPARSE, SPARSE_BZIP2, SPARSE_ZLIB
 		// not fine: LZMA (crash during load)
-		for (final MpqEditorCompressionRule r : rules) {
-			if (r instanceof MpqEditorCompressionRuleMask) {
-				r.setCompressionMethod(getRandomCompressionMethod());
+		for (final MpqEditorCompressionRule rule : rules) {
+			if (rule instanceof MpqEditorCompressionRuleMask) {
+				rule.setCompressionMethod(getRandomCompressionMethod());
+				rule.setSingleUnit(random.nextBoolean());
 			}
 		}
 	}
