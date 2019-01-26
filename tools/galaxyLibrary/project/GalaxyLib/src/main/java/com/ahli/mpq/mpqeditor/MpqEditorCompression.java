@@ -3,7 +3,9 @@ package com.ahli.mpq.mpqeditor;
 /**
  * Compression mode for the Mpq Editor.
  */
-public enum MpqEditorCompression {/**
+public enum MpqEditorCompression {
+	
+	/**
  * Files will not be compressed.
  */
 NONE,

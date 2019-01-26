@@ -2,7 +2,7 @@
 : Batch Script 
 : author: @AhliSC2
 
-"C:\Program Files\Java\jdk-11.0.1\bin\java.exe" -jar compile.jar
+"C:\Program Files\Java\jdk-12\bin\java.exe" -jar compile.jar
 
 : line breaks
 echo.

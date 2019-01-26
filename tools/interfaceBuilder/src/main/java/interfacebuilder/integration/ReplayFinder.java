@@ -1,6 +1,3 @@
-/*
- *
- */
 package interfacebuilder.integration;
 
 import org.apache.commons.io.FileUtils;

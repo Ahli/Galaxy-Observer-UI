@@ -252,7 +252,10 @@ public class DescIndexData {
 							for (int i2 = i + 1; i2 < dependencies.size(); i2++) {
 								final Pair<Path, String> otherPair = fileIntPathList.get(i2);
 								String fileName = otherPair.getKey().getFileName().toString();
-								fileName = fileName.substring(0, fileName.lastIndexOf('.'));
+								int dotIndex = fileName.lastIndexOf('.');
+								if (dotIndex > 0) {
+									fileName = fileName.substring(0, dotIndex);
+								}
 								for (final String constant : ownConstants.get(i2)) {
 									if (constant.equals(curDependencyTo)) {
 										if (logger.isTraceEnabled()) {
@@ -315,7 +318,10 @@ public class DescIndexData {
 						for (int i2 = i + 1; i2 < dependencies.size(); i2++) {
 							final Pair<Path, String> otherPair = fileIntPathList.get(i2);
 							String fileName = otherPair.getKey().getFileName().toString();
-							fileName = fileName.substring(0, fileName.lastIndexOf('.'));
+							int dotIndex = fileName.lastIndexOf('.');
+							if (dotIndex >= 0) {
+								fileName = fileName.substring(0, dotIndex);
+							}
 							
 							if (fileName.equals(curDependencyTo)) {
 								if (logger.isTraceEnabled()) {

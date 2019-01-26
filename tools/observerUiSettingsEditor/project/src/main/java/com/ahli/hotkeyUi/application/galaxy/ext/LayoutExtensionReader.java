@@ -151,6 +151,19 @@ public class LayoutExtensionReader {
 		}
 	}
 	
+	private String getValueAfterEqualsChar(String part){
+		return part.substring(1 + part.indexOf('=')).trim();
+	}
+	
+	private String getValueWithinQuotes(String part){
+		final int quoteEnd = part.lastIndexOf('"');
+		final int quoteStart = part.indexOf('"');
+		if(quoteStart < 0 || quoteStart >= quoteEnd){
+			return null;
+		}
+		return part.substring(quoteStart + 1, quoteEnd);
+	}
+	
 	/**
 	 * Creates ValueDef for the Hotkey and Setting definitions found in this comment
 	 *
@@ -197,29 +210,29 @@ public class LayoutExtensionReader {
 						}
 						if (partLower.startsWith(CONSTANT)) {
 							// move beyond '='
-							part = part.substring(1 + part.indexOf('=')).trim();
-							constant = part.substring(part.indexOf('"') + 1, part.lastIndexOf('"'));
+							part = getValueAfterEqualsChar(part);
+							constant = getValueWithinQuotes(part);
 							if (logger.isTraceEnabled()) {
 								logger.trace("constant = " + constant);
 							}
 						} else if (partLower.startsWith(DEFAULT)) {
 							// move beyond '='
-							part = part.substring(1 + part.indexOf('=')).trim();
-							defaultValue = part.substring(part.indexOf('"') + 1, part.lastIndexOf('"'));
+							part = getValueAfterEqualsChar(part);
+							defaultValue = getValueWithinQuotes(part);
 							if (logger.isTraceEnabled()) {
 								logger.trace("default = " + defaultValue);
 							}
 						} else if (partLower.startsWith(DESCRIPTION)) {
 							// move beyond '='
-							part = part.substring(1 + part.indexOf('=')).trim();
-							description = part.substring(part.indexOf('"') + 1, part.lastIndexOf('"'));
+							part = getValueAfterEqualsChar(part);
+							description = getValueWithinQuotes(part);
 							if (logger.isTraceEnabled()) {
-								logger.trace("description = {}" + description);
+								logger.trace("description = " + description);
 							}
 						}
 					}
 					
-					if (!"".equals(constant)) {
+					if (constant != null && !"".equals(constant)) {
 						if (isHotkey) {
 							addHotkeyValueDef(constant, description, defaultValue, "");
 						} else {

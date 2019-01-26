@@ -144,7 +144,7 @@ public class UICatalogImpl implements UICatalog {
 			while (!new File(basePathTemp + File.separator + intPath).exists() && lastIndex != -1) {
 				lastIndex = basePathTemp.lastIndexOf(File.separatorChar);
 				if (lastIndex != -1) {
-					basePathTemp = basePathTemp.substring(0, basePathTemp.lastIndexOf(File.separatorChar));
+					basePathTemp = basePathTemp.substring(0, lastIndex);
 					if (logger.isTraceEnabled()) {
 						logger.trace("basePathTemp=" + basePathTemp);
 					}
@@ -203,7 +203,7 @@ public class UICatalogImpl implements UICatalog {
 		while (!Files.exists(Paths.get(basePathTemp + File.separator + path))) {
 			final int lastIndex = basePathTemp.lastIndexOf(File.separatorChar);
 			if (lastIndex != -1) {
-				basePathTemp = basePathTemp.substring(0, basePathTemp.lastIndexOf(File.separatorChar));
+				basePathTemp = basePathTemp.substring(0, lastIndex);
 				if (logger.isTraceEnabled()) {
 					logger.trace("basePathTemp=" + basePathTemp);
 				}

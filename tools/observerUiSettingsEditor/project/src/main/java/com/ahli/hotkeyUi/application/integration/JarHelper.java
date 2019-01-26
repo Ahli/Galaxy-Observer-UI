@@ -67,11 +67,14 @@ public final class JarHelper {
 				str = str.substring(0, str.length() - 2);
 				final String dirStr = dir.toString();
 				final String tools = "\\tools\\";
-				str += dirStr.substring(dirStr.indexOf(tools) + tools.length(), dirStr.indexOf("\\target\\"));
+				final int targetIndex = dirStr.indexOf("\\target\\");
+				if (targetIndex >= 0) {
+					str += dirStr.substring(dirStr.indexOf(tools) + tools.length(), targetIndex);
 				str = str.replace('\\', '/');
 				if (logger.isTraceEnabled()) {
 					logger.trace("after intellij #1: " + str);
 				}
+			}
 			}
 			
 			if (str.startsWith("file:/")) {
@@ -101,7 +104,10 @@ public final class JarHelper {
 				if (logger.isTraceEnabled()) {
 					logger.trace("path before .jar: " + str);
 				}
-				str = str.substring(0, str.lastIndexOf(File.separator));
+				final int lastFileSepIndex = str.lastIndexOf(File.separator);
+				if (lastFileSepIndex >= 0) {
+					str = str.substring(0, lastFileSepIndex);
+				}
 			} else {
 				// test if intellij
 				if (f.getAbsolutePath().contains("\\lib\\idea_rt.jar")) {

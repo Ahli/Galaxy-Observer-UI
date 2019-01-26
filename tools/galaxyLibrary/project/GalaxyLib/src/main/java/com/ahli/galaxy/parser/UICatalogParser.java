@@ -84,7 +84,11 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		this.raceId = raceId;
 		this.consoleSkinId = consoleSkinId;
 		curIsDevLayout = isDevLayout;
-		curFileName = f.getName().substring(0, f.getName().lastIndexOf('.'));
+		curFileName = f.getName();
+		final int dotIndex = curFileName.lastIndexOf('.');
+		if (dotIndex > 0) {
+			curFileName = curFileName.substring(0, dotIndex);
+		}
 		parser.parseFile(f);
 	}
 	
@@ -171,9 +175,9 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				}
 				final String type = ((i = attrTypes.indexOf(TYPE)) != -1) ?
 						catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout, consoleSkinId) : null;
-				if (!checkFrameTypeCompatibility(type, ((UIFrame) newElem).getType())) {
-					logger.error("ERROR: The type of the frame is not compatible with the used template.");
-				}
+				//				if (!checkFrameTypeCompatibility(type, ((UIFrame) newElem).getType())) {
+				//					logger.error("ERROR: The type of the frame is not compatible with the used template.");
+				//				}
 				((UIFrame) newElem).setType(type);
 				// add to parent
 				if (curElement != null) {
@@ -370,7 +374,13 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			logger.trace("Instanciating Template of path " + path);
 		}
 		path = path.replace('\\', '/');
-		final String fileName = path.substring(0, path.indexOf('/'));
+		final int seperatorIndex = path.indexOf('/');
+		if (seperatorIndex < 0) {
+			logger.error("ERROR: Template paths must follow the pattern 'FileName/FrameName'. Found '" + path + "' " +
+					"instead.");
+			return null;
+		}
+		final String fileName = path.substring(0, seperatorIndex);
 		
 		// 1. check templates
 		UIElement templateInstance = instanciateTemplateFromList(catalog.getTemplates(), fileName, path, newName);
@@ -396,16 +406,6 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					"' could not be found, but we are creating a Blizz-only layout, so this is fine.");
 		}
 		return null;
-	}
-	
-	/**
-	 * @param type
-	 * @param type2
-	 * @return
-	 */
-	private boolean checkFrameTypeCompatibility(final String type, final String type2) {
-		// TODO
-		return true;
 	}
 	
 	/**
@@ -526,6 +526,16 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			logger.trace("Implicit controller name existing: {}", () -> name);
 			i++;
 		}
+	}
+	
+	/**
+	 * @param type
+	 * @param type2
+	 * @return
+	 */
+	private boolean checkFrameTypeCompatibility(final String type, final String type2) {
+		// TODO
+		return true;
 	}
 	
 	@Override

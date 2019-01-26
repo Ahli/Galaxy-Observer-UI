@@ -87,7 +87,8 @@ public class UITemplate implements DeepCopyable {
 	 */
 	public UIElement receiveFrameFromPath(final String path) {
 		final String curName = UIElement.getLeftPathLevel(path);
-		if (curName != null && curName.equalsIgnoreCase(element.getName())) {
+		// curName cannot be null here
+		if (curName.equalsIgnoreCase(element.getName())) {
 			final String newPath = UIElement.removeLeftPathLevel(path);
 			return element.receiveFrameFromPath(newPath);
 		}

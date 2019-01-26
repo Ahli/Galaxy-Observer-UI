@@ -7,7 +7,7 @@ public final class MpqEditorCompressionRuleParser {
 	}
 	
 	public static MpqEditorCompressionRule parse(final String ruleString) {
-		char startsWith = ruleString.charAt(0);
+		final char startsWith = ruleString.charAt(0);
 		if (startsWith == 'M') {
 			return parseRuleMask(ruleString);
 		} else if (startsWith == 'S') {

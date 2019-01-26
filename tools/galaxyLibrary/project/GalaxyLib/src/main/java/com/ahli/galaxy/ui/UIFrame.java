@@ -289,8 +289,9 @@ public class UIFrame extends UIElement {
 		} else {
 			// go deeper
 			final String curName = UIElement.getLeftPathLevel(path);
-			if (curName != null && children != null) {
+			if (children != null) {
 				for (final UIElement curElem : children) {
+					// curName cannot be null here
 					if (curName.equalsIgnoreCase(curElem.getName())) {
 						// found right frame -> cut path
 						final String newPath = UIElement.removeLeftPathLevel(path);

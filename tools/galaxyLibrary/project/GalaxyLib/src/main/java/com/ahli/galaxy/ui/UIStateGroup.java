@@ -91,15 +91,14 @@ public class UIStateGroup extends UIElement {
 		} else {
 			// go deeper
 			final String curName = UIElement.getLeftPathLevel(path);
-			if (curName != null) {
 				for (final UIElement curElem : states) {
+				// curName cannot be null here
 					if (curName.equalsIgnoreCase(curElem.getName())) {
 						// found right frame -> cut path
 						final String newPath = UIElement.removeLeftPathLevel(path);
 						return curElem.receiveFrameFromPath(newPath);
 					}
 				}
-			}
 			return null;
 		}
 	}

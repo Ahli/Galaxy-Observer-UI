@@ -205,7 +205,8 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	 */
 	private String getPathWithUnprotectedSuffix(final String absolutePath) {
 		final int i = absolutePath.lastIndexOf('.');
-		return absolutePath.substring(0, i) + "_unprtctd" + absolutePath.substring(i);
+		return absolutePath.substring(0, i < 0 ? absolutePath.length() : i) + "_unprtctd" +
+				(i < 0 ? "" : absolutePath.substring(i));
 	}
 	
 	/**
