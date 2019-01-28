@@ -1,4 +1,9 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 package com.ahli.mpq.mpqeditor;
+
+import java.io.IOException;
 
 public final class MpqEditorCompressionRuleParser {
 	
@@ -6,7 +11,7 @@ public final class MpqEditorCompressionRuleParser {
 		// no instances
 	}
 	
-	public static MpqEditorCompressionRule parse(final String ruleString) {
+	public static MpqEditorCompressionRule parse(final String ruleString) throws IOException {
 		final char startsWith = ruleString.charAt(0);
 		if (startsWith == 'M') {
 			return parseRuleMask(ruleString);
@@ -18,18 +23,24 @@ public final class MpqEditorCompressionRuleParser {
 		throw new IllegalArgumentException("Unknown type of rule string: " + ruleString);
 	}
 	
-	private static MpqEditorCompressionRule parseRuleMask(final String ruleString) {
+	private static MpqEditorCompressionRule parseRuleMask(final String ruleString) throws IOException {
 		final int start = ruleString.indexOf(':') + 1;
 		final int end = ruleString.indexOf('=');
+		if (end < 0) {
+			throw new IOException(String.format("Unable to parse Compression Rule: %s", ruleString));
+		}
 		final MpqEditorCompressionRule rule = new MpqEditorCompressionRuleMask(ruleString.substring(start, end));
 		parseAbstractFields(rule, ruleString);
 		return rule;
 	}
 	
-	private static MpqEditorCompressionRule parseRuleSize(final String ruleString) {
+	private static MpqEditorCompressionRule parseRuleSize(final String ruleString) throws IOException {
 		final int start = ruleString.indexOf(':') + 1;
 		final int dividerIndex = ruleString.indexOf('-');
 		final int end = ruleString.indexOf('=');
+		if (dividerIndex < 0 || end < 0 || dividerIndex + 1 >= end) {
+			throw new IOException(String.format("Unable to parse Compression Rule: %s", ruleString));
+		}
 		final int minSize = Integer.parseInt(ruleString.substring(start, dividerIndex));
 		final int maxSize = Integer.parseInt(ruleString.substring(dividerIndex + 1, end));
 		final MpqEditorCompressionRule rule = new MpqEditorCompressionRuleSize(minSize, maxSize);

@@ -1,3 +1,6 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 package interfacebuilder.compress;
 
 import com.ahli.mpq.mpqeditor.MpqEditorCompressionRule;
@@ -10,6 +13,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Transient;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -43,7 +47,7 @@ public class RuleSet {
 	}
 	
 	@Transient
-	public MpqEditorCompressionRule[] getCompressionRules() {
+	public MpqEditorCompressionRule[] getCompressionRules() throws IOException {
 		// lazy-load array
 		if (compressionRules == null) {
 			compressionRules = new MpqEditorCompressionRule[getCompressionRulesString().size()];

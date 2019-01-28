@@ -1,3 +1,6 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 package com.ahli.mpq.mpqeditor;
 
 import com.ahli.util.DeepCopyable;
@@ -14,6 +17,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -272,7 +276,9 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 				break;
 		}
 		
-		try (final BufferedWriter bw = Files.newBufferedWriter(rulesetFile.toPath())) {
+		final Path rulesetFilePath = rulesetFile.toPath();
+		
+		try (final BufferedWriter bw = Files.newBufferedWriter(rulesetFilePath)) {
 			ini.write(bw);
 		} catch (final ConfigurationException | IOException e) {
 			throw new IOException("Could not write '" + rulesetFile.getAbsolutePath() + "'.", e);
@@ -281,11 +287,13 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 		// remove custom ruleset line beginnings
 		if (compression == MpqEditorCompression.CUSTOM) {
 			final List<String> editedLines;
-			try (final Stream<String> lineStream = Files.lines(rulesetFile.toPath())) {
+			try (final Stream<String> lineStream = Files.lines(rulesetFilePath)) {
 				editedLines = lineStream.map(line -> line.replace("  = ", "")).collect(Collectors.toList());
 			}
-			try (final BufferedWriter bw = Files.newBufferedWriter(rulesetFile.toPath())) {
-				Files.write(rulesetFile.toPath(), editedLines);
+			try (final BufferedWriter bw = Files.newBufferedWriter(rulesetFilePath)) {
+				for (final String line : editedLines) {
+					bw.write(line);
+				}
 			}
 		}
 	}

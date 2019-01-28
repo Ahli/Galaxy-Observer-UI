@@ -1,3 +1,6 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 package interfacebuilder.integration;
 
 import org.apache.logging.log4j.LogManager;
@@ -70,8 +73,11 @@ public final class JarHelper {
 				str = str.substring(0, str.length() - 2);
 				final String dirStr = dir.toString();
 				final String tools = "\\tools\\";
-				str += dirStr.substring(dirStr.indexOf(tools) + tools.length(), dirStr.indexOf("\\target\\"));
-				str = str.replace('\\', '/');
+				final int targetIndex = dirStr.indexOf("\\target\\");
+				if (targetIndex >= 0) {
+					str += dirStr.substring(dirStr.indexOf(tools) + tools.length(), targetIndex);
+					str = str.replace('\\', '/');
+				}
 			}
 			if (str.startsWith("file:/")) {
 				str = str.substring(6);
@@ -100,7 +106,10 @@ public final class JarHelper {
 				if (logger.isTraceEnabled()) {
 					logger.trace("path before .jar: " + str);
 				}
-				str = str.substring(0, str.lastIndexOf(File.separator));
+				final int lastFileSepIndex = str.lastIndexOf(File.separator);
+				if (lastFileSepIndex >= 0) {
+					str = str.substring(0, lastFileSepIndex);
+				}
 			}
 			
 		}

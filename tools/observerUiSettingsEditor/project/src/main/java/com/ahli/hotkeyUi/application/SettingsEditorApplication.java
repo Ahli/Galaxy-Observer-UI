@@ -1,3 +1,6 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 package com.ahli.hotkeyUi.application;
 
 import com.ahli.galaxy.archive.ComponentsListReader;
@@ -616,7 +619,11 @@ public class SettingsEditorApplication extends Application {
 		if (f != null) {
 			try {
 				compile();
-				mpqi.buildMpq(f.getParentFile().getAbsolutePath(), f.getName(), false,
+				final File parentFile = f.getParentFile();
+				if (parentFile == null) {
+					throw new IOException(String.format("Parent of File %s is null.", parentFile));
+				}
+				mpqi.buildMpq(parentFile.getAbsolutePath(), f.getName(), false,
 						MpqEditorCompression.BLIZZARD_SC2_HEROES, false);
 				hasUnsavedFileChanges = false;
 				openedDocPath = f.getAbsolutePath();

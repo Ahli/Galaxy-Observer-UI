@@ -1,3 +1,6 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 package interfacebuilder.ui.progress;
 
 import gnu.trove.map.hash.THashMap;
@@ -154,7 +157,7 @@ public final class StylizedTextAreaAppender extends AbstractAppender {
 							controller.reportWarning();
 						}
 						
-						if(children.size() > 2000){
+						if (children.size() > 2000) {
 							children.remove(0);
 						}
 					} catch (final Exception e) {

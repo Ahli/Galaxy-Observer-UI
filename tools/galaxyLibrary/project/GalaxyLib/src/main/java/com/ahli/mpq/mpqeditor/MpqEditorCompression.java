@@ -1,3 +1,6 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 package com.ahli.mpq.mpqeditor;
 
 /**
@@ -6,9 +9,9 @@ package com.ahli.mpq.mpqeditor;
 public enum MpqEditorCompression {
 	
 	/**
- * Files will not be compressed.
- */
-NONE,
+	 * Files will not be compressed.
+	 */
+	NONE,
 	
 	/**
 	 * Blizzard's default compression for StarCraft II and Heroes of the Storm.

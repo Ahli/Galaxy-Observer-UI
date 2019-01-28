@@ -1,3 +1,6 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 package com.ahli.galaxy.ui;
 
 import com.ahli.galaxy.ui.abstracts.UIElement;
@@ -221,18 +224,18 @@ public class UIFrame extends UIElement {
 	 */
 	public void setAnchor(final String relative, final String offset) {
 		this.relative[0] = relative.intern();
-		this.relative[1] = relative.intern();
-		this.relative[2] = relative.intern();
-		this.relative[3] = relative.intern();
+		this.relative[1] = this.relative[0];
+		this.relative[2] = this.relative[0];
+		this.relative[3] = this.relative[0];
 		pos[0] = POSI[0].intern();
-		pos[1] = POSI[0].intern();
+		pos[1] = pos[0];
 		pos[2] = POSI[1].intern();
-		pos[3] = POSI[1].intern();
+		pos[3] = pos[2];
 		if (offset != null) {
 			this.offset[0] = offset.intern();
-			this.offset[1] = offset.intern();
+			this.offset[1] = this.offset[0];
 			this.offset[2] = Integer.toString((Integer.parseInt(offset) * (-1))).intern();
-			this.offset[3] = Integer.toString((Integer.parseInt(offset) * (-1))).intern();
+			this.offset[3] = this.offset[2];
 		} else {
 			this.offset[0] = ZERO;
 			this.offset[1] = ZERO;

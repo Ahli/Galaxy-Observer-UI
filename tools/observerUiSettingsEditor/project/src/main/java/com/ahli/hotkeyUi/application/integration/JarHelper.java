@@ -1,3 +1,6 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 package com.ahli.hotkeyUi.application.integration;
 
 import org.apache.logging.log4j.LogManager;
@@ -37,6 +40,11 @@ public final class JarHelper {
 		// ATTEMPT #1
 		final File f = new File(System.getProperty("java.class.path"));
 		final File dir = f.getAbsoluteFile().getParentFile();
+		if (dir == null) {
+			logger.error("Classpath system property has no valid parent path: {}",
+					() -> f.getAbsoluteFile().getAbsolutePath());
+			return null;
+		}
 		String str = dir.toString();
 		logger.trace("Attempt#1 java.class.path: {}", () -> dir.toString());
 		
@@ -70,11 +78,11 @@ public final class JarHelper {
 				final int targetIndex = dirStr.indexOf("\\target\\");
 				if (targetIndex >= 0) {
 					str += dirStr.substring(dirStr.indexOf(tools) + tools.length(), targetIndex);
-				str = str.replace('\\', '/');
-				if (logger.isTraceEnabled()) {
-					logger.trace("after intellij #1: " + str);
+					str = str.replace('\\', '/');
+					if (logger.isTraceEnabled()) {
+						logger.trace("after intellij #1: " + str);
+					}
 				}
-			}
 			}
 			
 			if (str.startsWith("file:/")) {

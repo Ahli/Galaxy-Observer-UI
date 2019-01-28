@@ -1,3 +1,6 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 package interfacebuilder.ui.settings;
 
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
@@ -145,7 +148,6 @@ public class SettingsGamesPathsController extends SettingsAutoSaveController {
 	private boolean validatePath(final String path, final String switcher, final Label invalidLabel) {
 		boolean valid = false;
 		if (path != null) {
-			final File f = new File(path);
 			valid = switcherExists(path, switcher, false) ||
 					switcherExists(path, switcher.replace(".exe", "_x64.exe"), true);
 		}

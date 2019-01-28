@@ -1,3 +1,6 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 package interfacebuilder.ui.home;
 
 import com.ahli.mpq.mpqeditor.MpqEditorCompressionRule;
@@ -18,6 +21,8 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.io.IOException;
 
 public class ViewRuleSetController {
 	@FXML
@@ -96,7 +101,7 @@ public class ViewRuleSetController {
 	 *
 	 * @param project
 	 */
-	public void setProject(final Project project) {
+	public void setProject(final Project project) throws IOException {
 		dialog.setTitle(String.format("Best Compression Ruleset for %s", project.getName()));
 		showProjectsRuleSet(project);
 	}
@@ -106,7 +111,7 @@ public class ViewRuleSetController {
 	 *
 	 * @param project
 	 */
-	public void showProjectsRuleSet(final Project project) {
+	public void showProjectsRuleSet(final Project project) throws IOException {
 		final ObservableList<MpqEditorCompressionRule> ruleSetObservableItems = FXCollections.observableArrayList();
 		final RuleSet bestCompressionRuleSet = projectService.fetchBestCompressionRuleSet(project);
 		if (bestCompressionRuleSet != null) {

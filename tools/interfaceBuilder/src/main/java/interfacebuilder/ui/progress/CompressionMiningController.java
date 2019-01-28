@@ -1,3 +1,6 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 package interfacebuilder.ui.progress;
 
 import com.ahli.galaxy.ModData;
@@ -129,7 +132,7 @@ public class CompressionMiningController implements Updateable {
 	 *
 	 * @param project
 	 */
-	public void setProject(final Project project) {
+	public void setProject(final Project project) throws IOException {
 		this.project = project;
 		showProjectsRuleSet(project);
 	}
@@ -139,7 +142,7 @@ public class CompressionMiningController implements Updateable {
 	 *
 	 * @param project
 	 */
-	public void showProjectsRuleSet(final Project project) {
+	public void showProjectsRuleSet(final Project project) throws IOException {
 		ruleSetObservableItems = FXCollections.observableArrayList();
 		final RuleSet bestCompressionRuleSet = projectService.fetchBestCompressionRuleSet(project);
 		if (bestCompressionRuleSet != null) {

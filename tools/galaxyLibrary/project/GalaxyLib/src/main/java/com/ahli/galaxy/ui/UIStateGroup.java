@@ -1,3 +1,6 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 package com.ahli.galaxy.ui;
 
 import com.ahli.galaxy.ui.abstracts.UIElement;
@@ -91,14 +94,14 @@ public class UIStateGroup extends UIElement {
 		} else {
 			// go deeper
 			final String curName = UIElement.getLeftPathLevel(path);
-				for (final UIElement curElem : states) {
+			for (final UIElement curElem : states) {
 				// curName cannot be null here
-					if (curName.equalsIgnoreCase(curElem.getName())) {
-						// found right frame -> cut path
-						final String newPath = UIElement.removeLeftPathLevel(path);
-						return curElem.receiveFrameFromPath(newPath);
-					}
+				if (curName.equalsIgnoreCase(curElem.getName())) {
+					// found right frame -> cut path
+					final String newPath = UIElement.removeLeftPathLevel(path);
+					return curElem.receiveFrameFromPath(newPath);
 				}
+			}
 			return null;
 		}
 	}

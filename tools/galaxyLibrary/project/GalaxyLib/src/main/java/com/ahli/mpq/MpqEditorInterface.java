@@ -1,3 +1,6 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 package com.ahli.mpq;
 
 import com.ahli.mpq.i18n.Messages;
@@ -154,8 +157,13 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 		// create parent directory
 		final File targetFile = new File(absolutePath);
 		final File parentFolder = targetFile.getParentFile();
+		if (parentFolder == null) {
+			final String msg = "ERROR: Could not receive parent directory of path: " + absolutePath;
+			logger.error(msg);
+			throw new MpqException(String.format(Messages.getString("MpqInterface.CouldNotCreatePath"), absolutePath));
+		}
 		if (!parentFolder.exists() && !parentFolder.mkdirs()) {
-			final String msg = "ERROR: Could not create path " + parentFolder.getAbsolutePath();
+			final String msg = "ERROR: Could not create path: " + parentFolder.getAbsolutePath();
 			logger.error(msg);
 			throw new MpqException(String.format(Messages.getString("MpqInterface.CouldNotCreatePath"),
 					parentFolder.getAbsolutePath()));

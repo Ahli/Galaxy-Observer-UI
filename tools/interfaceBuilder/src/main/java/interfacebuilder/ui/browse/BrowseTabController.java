@@ -1,3 +1,6 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 package interfacebuilder.ui.browse;
 
 import com.ahli.galaxy.ui.UIAnchorSide;
@@ -91,13 +94,13 @@ public class BrowseTabController implements Updateable {
 		columnAttributes.sortTypeProperty().set(TableColumn.SortType.ASCENDING);
 		tableView.getSortOrder().add(columnAttributes);
 		
-		treeFilter.textProperty().addListener((observable, oldValue, newValue) -> filterTree(newValue, oldValue));
+		treeFilter.textProperty().addListener((observable, oldValue, newValue) -> filterTree(newValue/*, oldValue*/));
 	}
 	
 	/**
 	 * @param filter
 	 */
-	private void filterTree(final String filter, final String filterBefore) {
+	private void filterTree(final String filter/*, final String filterBefore*/) {
 		final long startTime = System.currentTimeMillis();
 		//		frameTreeContainer.getChildren().remove(frameTree);
 		
