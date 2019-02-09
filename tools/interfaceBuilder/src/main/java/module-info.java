@@ -2,7 +2,6 @@ module interfacex.builder {
 	requires java.desktop;
 	requires java.persistence;
 	requires java.xml;
-	//	requires controlsfx;
 	requires core;
 	requires de.jensd.fx.glyphs.fontawesome;
 	requires javafx.base;
@@ -14,8 +13,6 @@ module interfacex.builder {
 	requires org.apache.logging.log4j;
 	requires org.apache.logging.log4j.core;
 	requires org.hibernate.orm.core;
-	//	requires richtextfx; disabled because not properly supporting jdk11
-	//	requires flowless; part of richtextfx
 	requires spring.beans;
 	requires spring.boot.autoconfigure;
 	requires spring.boot;
@@ -26,7 +23,7 @@ module interfacex.builder {
 	requires spring.tx;
 	requires CascExplorerConfigFileEdit;
 	requires GalaxyLib;
-	requires kryo;
+	requires com.esotericsoftware.kryo;
 	
 	// fix: spring boot not finding sqlexception
 	requires java.sql;

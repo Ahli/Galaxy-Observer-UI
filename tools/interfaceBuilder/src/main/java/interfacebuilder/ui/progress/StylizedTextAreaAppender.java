@@ -17,6 +17,7 @@ import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.appender.AbstractAppender;
+import org.apache.logging.log4j.core.config.Property;
 import org.apache.logging.log4j.core.config.plugins.Plugin;
 import org.apache.logging.log4j.core.config.plugins.PluginAttribute;
 import org.apache.logging.log4j.core.config.plugins.PluginElement;
@@ -52,15 +53,9 @@ public final class StylizedTextAreaAppender extends AbstractAppender {
 	 * @param ignoreExceptions
 	 */
 	protected StylizedTextAreaAppender(final String name, final Filter filter,
-			final Layout<? extends Serializable> layout, final boolean ignoreExceptions) {
-		super(name, filter, layout, ignoreExceptions);
+			final Layout<? extends Serializable> layout, final boolean ignoreExceptions, final Property[] properties) {
+		super(name, filter, layout, ignoreExceptions, properties);
 	}
-	
-	
-	//	public static StylizedTextAreaAppender createDefaultAppenderForLayout(final Layout<? extends Serializable> layout) {
-	//		// this method cannot use the builder class without introducing an infinite loop due to DefaultConfiguration
-	//		return new StylizedTextAreaAppender("", null, null, false);
-	//	}
 	
 	/**
 	 * Factory method. Log4j will parse the configuration and call this factory method to construct the appender with
@@ -85,7 +80,7 @@ public final class StylizedTextAreaAppender extends AbstractAppender {
 		if (layout == null) {
 			layout = PatternLayout.createDefaultLayout();
 		}
-		return new StylizedTextAreaAppender(name, filter, layout, true);
+		return new StylizedTextAreaAppender(name, filter, layout, true, Property.EMPTY_ARRAY);
 	}
 	
 	
@@ -136,19 +131,14 @@ public final class StylizedTextAreaAppender extends AbstractAppender {
 			final Level level = event.getLevel();
 			final ErrorTabController controller = getWorkerTaskController(event.getThreadName());
 			if (controller != null) {
-				//				final StyleClassedTextArea txtArea = controller.getTextArea();
 				final TextFlow txtArea = controller.getTextArea();
 				
 				Platform.runLater(() -> {
 					try {
-						//						final int length = txtArea.getLength();
-						//						txtArea.appendText(message);
-						//						txtArea.setStyleClass(length, txtArea.getLength(), level.toString());
-						
 						final Text text = new Text(message);
 						text.getStyleClass().add(level.toString());
 						text.setFontSmoothingType(FontSmoothingType.LCD);
-						ObservableList<Node> children = txtArea.getChildren();
+						final ObservableList<Node> children = txtArea.getChildren();
 						children.add(text);
 						
 						if (level == Level.ERROR || level == Level.FATAL) {

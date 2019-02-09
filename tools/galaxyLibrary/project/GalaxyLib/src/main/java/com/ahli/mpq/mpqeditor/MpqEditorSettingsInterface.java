@@ -247,10 +247,10 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 			ini = new INIConfiguration();
 		}
 		final SubnodeConfiguration section = ini.getSection("CustomRules");
-		section.setProperty("MpqVersion", 3);
+		section.setProperty("MpqVersion", 1);
 		section.setProperty("AttrFlags", 5);
 		section.setProperty("SectorSize", 16384);
-		section.setProperty("RawChunkSize", 16384);
+		section.setProperty("RawChunkSize", 0);
 		
 		switch (compression) {
 			case CUSTOM:
@@ -260,7 +260,7 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 							ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, customRules[i].toString());
 						} else {
 							throw new IllegalArgumentException(
-									"Compression Rules in MpqEditorSettingsInterface has " + "null entry");
+									"Compression Rules in MpqEditorSettingsInterface has null entry");
 						}
 					}
 				} else {
@@ -291,8 +291,10 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 				editedLines = lineStream.map(line -> line.replace("  = ", "")).collect(Collectors.toList());
 			}
 			try (final BufferedWriter bw = Files.newBufferedWriter(rulesetFilePath)) {
+				final String separator = System.lineSeparator();
 				for (final String line : editedLines) {
 					bw.write(line);
+					bw.write(separator);
 				}
 			}
 		}
