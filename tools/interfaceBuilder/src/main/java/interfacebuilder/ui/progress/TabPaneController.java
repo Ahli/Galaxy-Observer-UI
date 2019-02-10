@@ -41,10 +41,6 @@ public class TabPaneController implements Updateable {
 	public void initialize() {
 		
 		// log4j2 prints into txtArea
-		//		final StyleClassedTextArea txtArea = new StyleClassedTextArea();
-		//		txtArea.setEditable(false);
-		// txtArea within special ScrollPane
-		//		final VirtualizedScrollPane<StyleClassedTextArea> virtualizedScrollPane = new VirtualizedScrollPane<>(txtArea);
 		final TextFlow txtArea = new TextFlow();
 		txtArea.getStyleClass().add("styled-text-area");
 		final ScrollPane scrollPane = new ScrollPane(txtArea);
@@ -53,11 +49,9 @@ public class TabPaneController implements Updateable {
 		// special ScrollPane within first Tab of tabPane
 		final ObservableList<Tab> tabs = tabPane.getTabs();
 		final Tab tab = tabs.get(0);
-		//		tab.setContent(virtualizedScrollPane);
 		tab.setContent(scrollPane);
 		
 		final ErrorTabController errorTabCtrl = new ErrorTabController(tab, txtArea, false, true, false);
-		//errorTabCtrl.setRunning(true);
 		InterfaceBuilderApp.getInstance().addErrorTabController(errorTabCtrl);
 		StylizedTextAreaAppender.setGeneralController(errorTabCtrl);
 	}

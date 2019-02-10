@@ -520,7 +520,6 @@ public class InterfaceBuilderApp extends Application {
 	public void addThreadLoggerTab(final String threadName, final String tabTitle,
 			final boolean errorsDoNotPreventExit) {
 		final Tab newTab = new Tab();
-		//		final StyleClassedTextArea newTxtArea = new StyleClassedTextArea();
 		final TextFlow newTxtArea = new TextFlow();
 		newTxtArea.getStyleClass().add("styled-text-area");
 		final ErrorTabController errorTabCtrl =
@@ -528,21 +527,15 @@ public class InterfaceBuilderApp extends Application {
 		errorTabCtrl.setRunning(true);
 		errorTabControllers.add(errorTabCtrl);
 		
-		//		final VirtualizedScrollPane<StyleClassedTextArea> virtualizedScrollPane =
-		//		final VirtualizedScrollPane<StyleClassedTextArea> virtualizedScrollPane =
-		//				new VirtualizedScrollPane<>(newTxtArea);
-		//		newTab.setContent(virtualizedScrollPane);
-		
 		final ScrollPane scrollPane = new ScrollPane(newTxtArea);
 		scrollPane.getStyleClass().add("virtualized-scroll-pane");
 		newTab.setContent(scrollPane);
 		StylizedTextAreaAppender.setWorkerTaskController(errorTabCtrl, threadName);
 		newTab.setText(tabTitle);
-		//		newTxtArea.setEditable(false);
 		
 		// context menu with close option
 		final ContextMenu contextMenu = new ContextMenu();
-		final MenuItem closeItem = new MenuItem("Close");
+		final MenuItem closeItem = new MenuItem(Messages.getString("contextmenu.close"));
 		closeItem.setOnAction(event -> getTabPane().getTabs().remove(newTab));
 		contextMenu.getItems().addAll(closeItem);
 		newTab.setContextMenu(contextMenu);
@@ -588,23 +581,13 @@ public class InterfaceBuilderApp extends Application {
 		autowireCapableBeanFactory.autowireBean(this);
 		autowireCapableBeanFactory.initializeBean(this, getClass().getName());
 		
-		// load log4j2 config because that does not seem to work with java 11 modules anymore
-		//		try (final InputStream is = appContext.getResource("log4j2.xml").getInputStream()) {
-		//			final ConfigurationSource source = new ConfigurationSource(is);
-		//			Configurator.initialize(null, source);
-		//		} catch (final IOException e) {
-		//			logger.error("Could not programmatically load log4j2.xml.", e);
-		//		}
-		
-		executor.setCleanUpTask(new Runnable() {
-			@Override
-			public void run() {
-				// free space of baseUI
-				logger.info("Deallocating baseUI");
-				mpqBuilderService.getGameData(Game.SC2).setUiCatalog(null);
-				mpqBuilderService.getGameData(Game.HEROES).setUiCatalog(null);
-				System.gc();
-			}
+		executor.setCleanUpTask(() -> {
+			// free space of baseUI
+			logger.info("Deallocating baseUI");
+			mpqBuilderService.getGameData(Game.SC2).setUiCatalog(null);
+			mpqBuilderService.getGameData(Game.HEROES).setUiCatalog(null);
+			// GC1 is the default GC and can now release RAM -> actually good to do after a task
+			System.gc();
 		});
 	}
 	

@@ -224,9 +224,7 @@ public class RandomCompressionMiner {
 		initRules.add(new MpqEditorCompressionRuleSize(0, 0).setSingleUnit(true));
 		final File sourceDir = mod.getMpqCacheDirectory();
 		try (final Stream<Path> ps = Files.walk(cacheModDirectory)) {
-			ps.filter(Files::isRegularFile).forEach(p -> initRules
-					.add(new MpqEditorCompressionRuleMask(getFileMask(p, sourceDir)).setSingleUnit(true)
-							.setCompress(true).setCompressionMethod(MpqEditorCompressionRuleMethod.NONE)));
+			ps.filter(Files::isRegularFile).forEach(p -> initRules.add(getDefaultRule(p, sourceDir)));
 		}
 		return initRules.toArray(new MpqEditorCompressionRule[0]);
 	}
@@ -270,6 +268,74 @@ public class RandomCompressionMiner {
 		}
 		final File referencedFile = new File(cacheDir.getAbsolutePath() + File.separator + mask);
 		return referencedFile.exists() && referencedFile.isFile();
+	}
+	
+	private MpqEditorCompressionRule getDefaultRule(final Path path, final File sourceDir) {
+		final var rule = new MpqEditorCompressionRuleMask(getFileMask(path, sourceDir));
+		switch (path.getFileName().toString()) {
+			case "DocumentHeader":
+				rule.setSingleUnit(true).setCompress(true).setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2);
+				break;
+			case "DocumentInfo":
+				rule.setSingleUnit(true).setCompress(true).setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2);
+				break;
+			case "MapInfo":
+				rule.setSingleUnit(true).setCompress(true).setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2);
+				break;
+			case "Objects":
+				rule.setSingleUnit(true).setCompress(true).setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2);
+				break;
+			case "PaintedPathingLayer":
+				rule.setSingleUnit(true).setCompress(true).setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2);
+				break;
+			case "Regions":
+				rule.setSingleUnit(true).setCompress(true).setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2);
+				break;
+			case "t3CellFlags":
+				rule.setSingleUnit(true).setCompress(true).setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2);
+				break;
+			case "t3FluffDoodad":
+				rule.setSingleUnit(true).setCompress(true).setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2);
+				break;
+			case "t3HardTile":
+				rule.setSingleUnit(true).setCompress(true).setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2);
+				break;
+			case "t3HeightMap":
+				rule.setSingleUnit(true).setCompress(true).setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2);
+				break;
+			case "t3SyncCliffLevel":
+				rule.setSingleUnit(true).setCompress(true).setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2);
+				break;
+			case "t3SyncHeightMap":
+				rule.setSingleUnit(true).setCompress(true).setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2);
+				break;
+			case "t3SyncTextureInfo":
+				rule.setSingleUnit(true).setCompress(true).setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2);
+				break;
+			case "t3TextureMasks":
+				rule.setSingleUnit(true).setCompress(true).setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2);
+				break;
+			case "t3VertCol":
+				rule.setSingleUnit(true).setCompress(true).setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2);
+				break;
+			case "t3Water":
+				rule.setSingleUnit(true).setCompress(true).setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2);
+				break;
+			case "Triggers":
+				rule.setSingleUnit(true).setCompress(true).setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2);
+				break;
+			case "Attributes":
+				rule.setSingleUnit(true).setCompress(true).setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2);
+				break;
+			default:
+				rule.setSingleUnit(true).setCompress(true).setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2);
+				if (path.endsWith(".ogg") || path.endsWith(".ogv") || path.endsWith(".wav") || path.endsWith(".txt") ||
+						path.endsWith(".swf") || path.endsWith(".ttf") || path.endsWith(".otf") ||
+						path.endsWith(".m3")) {
+					rule.setCompressionMethod(MpqEditorCompressionRuleMethod.ZLIB);
+				}
+		}
+		return rule;
 	}
 	
 	/**

@@ -8,7 +8,6 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.scene.control.Tab;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextFlow;
-//import org.fxmisc.richtext.StyleClassedTextArea;
 
 /**
  * Tracks occurrence of an error.
@@ -22,7 +21,6 @@ public final class ErrorTabController {
 	private final boolean showResultIcon;
 	private boolean encounteredError;
 	private Tab tab;
-	//	private StyleClassedTextArea textArea;
 	private TextFlow textArea;
 	private boolean running;
 	private boolean encounteredWarning;
@@ -37,7 +35,6 @@ public final class ErrorTabController {
 	 * @param colorizeTitle
 	 * @param noResultIcon
 	 */
-	//	public ErrorTabController(final Tab tab, final StyleClassedTextArea textArea, final boolean colorizeTitle,
 	public ErrorTabController(final Tab tab, final TextFlow textArea, final boolean colorizeTitle,
 			final boolean noResultIcon, final boolean errorsDoNotPreventExit) {
 		this.tab = tab;
@@ -127,7 +124,6 @@ public final class ErrorTabController {
 	/**
 	 * @return
 	 */
-	//	public StyleClassedTextArea getTextArea() {
 	public TextFlow getTextArea() {
 		return textArea;
 	}
@@ -135,7 +131,6 @@ public final class ErrorTabController {
 	/**
 	 * @param textArea
 	 */
-	//	public void setTextArea(final StyleClassedTextArea textArea) {
 	public void setTextArea(final TextFlow textArea) {
 		this.textArea = textArea;
 	}
