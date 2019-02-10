@@ -903,13 +903,12 @@
 				<Height val="#commandButtonHeight"/>
 			</Frame>
 			
-			<!-- F (Nuke) -->
+			<!-- F (Nuke, Item, etc) -->
 			<Frame type="CommandButton" name="CommandButton15">
-				<Anchor side="Top" relative="$parent/CommandButton05" pos="Min" offset="0"/>
+				<Anchor side="Top" relative="$parent/CommandButton05" pos="Min" offset="9999"/> <!-- offset to hide button on other maps -->
 				<Anchor side="Left" relative="$parent/CommandButton13" pos="Max" offset="0"/>
 				<Width val="#commandButtonWidth"/>
 				<Height val="#commandButtonHeight"/>
-				<Alpha val="0"/>
 				
 				<!-- mod's Assets.txt:
 				132x132 UI/Storm_UI_InGame_AbilityButtonBorder_Terran=Assets/Textures/Storm_UI_InGame_AbilityButtonBorder_Terran.dds
@@ -921,8 +920,8 @@
 				-->
 				<Frame type="Image" name="DisabledLockOverlay">
 					<!--<Texture val="@UI/HUD_Btn_BG_Ability_Locked"/>-->
-					<Width val="#commandButtonWidth"/>
-					<Height val="#commandButtonHeight"/>
+					<!--<Width val="#commandButtonWidth"/>
+					<Height val="#commandButtonHeight"/>-->
 					<Unclipped val="true"/>
 				</Frame>
 				<Frame type="Image" name="GameButtonDefaultBorder">
@@ -966,14 +965,18 @@
 					<Anchor side="Right" relative="$parent" pos="Max" offset="-5"/>
 					<Unclipped val="true"/>
 				</Frame>
-				<Frame type="Frame" name="HideValidation">
-					<Animation name="HideFromValidator">
-						<Controller type="Fade" name="Fade_1" end="Pause" frame="$parent">
-							<Key type="Curve" time="0" value="0" inout="Linear" />
-							<Key type="Curve" time="0.01" value="255" inout="Slow,Linear" />
-						</Controller>
-					</Animation>
-				</Frame>
+				<!-- @Override -->
+				<StateGroup name="PlayOnceAnimationState">
+					<State name="IntroOn">
+						<When type="AnimationState" frame="$this" PlayOnceAnimationState="IntroOn"/>
+						<Action type="SendEvent" frame="$this" event="StopAll"/>
+						<!-- FIX: Width set in button is overridden -->
+						<Action type="SetProperty" frame="$this" Width="#commandButtonWidth" undo="false"/>
+						<Action type="SetProperty" frame="$this" Height="#commandButtonHeight" undo="false"/>
+						<!-- FIX: ValidatorResponseFrame does not seem to work, e.g. button is visible on Cursed Hollow without this -->
+						<Action type="SetAnchor" frame="$this" side="Top" relative="$parent/CommandButton05" pos="Min" offset="0" undo="false"/>
+					</State>
+				</StateGroup>
 				<Frame type="Image" name="DisabledLockOverlay">
 					<Animation name="Fade">
 						<Controller type="Fade" name="Fade_1" layer="1" end="Pause">
@@ -987,49 +990,20 @@
 						</Controller>
 					</Animation>
 				</Frame>
-
-				<!-- @Override -->
-				<Frame type="Frame" name="HideValidation">
+				<Frame type="Image" name="FKeyButtonPulse1">
+					<Anchor relative="$INVALID"/>
+					<Visible val="false"/>
 				</Frame>
-			</Frame>
-			<Frame type="Image" name="ButtonPulse1">
-				<Anchor relative="$INVALID"/>
-				<Visible val="false"/>
-			</Frame>
-			<Frame type="Image" name="ButtonPulse2">
-				<Anchor relative="$INVALID"/>
-				<Visible val="false"/>
-			</Frame>
-			<Frame type="Image" name="ButtonPulse3">
-				<Anchor relative="$INVALID"/>
-				<Visible val="false"/>
-			</Frame>
-			<!-- <Animation name="RollIn"> -->
-				<!-- <Event event="OnShown" frame="CommandButton15" action="Reset, Play" /> -->
-				<!-- <Controller name="Fade_0" type="Fade" end="Pause" frame="$this/CommandButton15">
-					<Key type="Curve" time="0.0" value="0" inout="Linear,Step" />
-					<Key type="Curve" time="0.01" value="255" inout="Linear,Step" />
-				</Controller> -->
-				<!-- <Controller name="Animation_0" type="Animation" end="stop" frame="$FKeyButtonPulse1" Animation="ButtonPulse">
-					<Key type="Animation" time="0" action="Reset" />
-				</Controller>
-				<Controller name="Animation_1" type="Animation" end="stop" frame="$FKeyButtonPulse2" Animation="ButtonPulse">
-					<Key type="Animation" time="0" action="Reset" />
-				</Controller>
-				<Controller name="Animation_2" type="Animation" end="stop" frame="$FKeyButtonPulse3" Animation="ButtonPulse">
-					<Key type="Animation" time="0" action="Reset" />
-				</Controller> -->
-			<!-- </Animation> -->
+				<Frame type="Image" name="FKeyButtonPulse2">
+					<Anchor relative="$INVALID"/>
+					<Visible val="false"/>
+				</Frame>
+				<Frame type="Image" name="FKeyButtonPulse3">
+					<Anchor relative="$INVALID"/>
+					<Visible val="false"/>
+				</Frame>
 
-			<StateGroup name="CommandButton15Usage">
-				<DefaultState val="Other"/>
-				<State name="Used">
-					<When type="Property" frame="$this/CommandButton15/HideValidation" visible="True"/>
-					<Action type="ApplyTemplate" template="_BottomLeft/RollinAnimDisabler" frame="$this"/>
-				</State>
-				<State name="Other">
-				</State>
-			</StateGroup>
+			</Frame>
 			
 			<!-- activatable talent buttons -->
 			<Frame type="Image" name="EmptyDynamicButton30" template="_BottomLeft/EmptyDynamicButtonTemplate">
