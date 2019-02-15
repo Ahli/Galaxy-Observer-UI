@@ -8,9 +8,15 @@ import com.ahli.galaxy.game.GameData;
 import com.ahli.galaxy.game.def.HeroesGameDef;
 import com.ahli.galaxy.game.def.SC2GameDef;
 import com.ahli.galaxy.game.def.abstracts.GameDef;
+import interfacebuilder.config.ConfigService;
+import interfacebuilder.integration.SettingsIniInterface;
 import interfacebuilder.projects.enums.Game;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class GameService {
+	@Autowired
+	private ConfigService configService;
+	
 	
 	/**
 	 * Returns a ModData instance containing the specified game definition.
@@ -59,5 +65,24 @@ public class GameService {
 			default:
 				return "res/ahli.png";
 		}
+	}
+	
+	/**
+	 * Returns the Game Directory of a specified game Def.
+	 *
+	 * @param gameDef
+	 * @param isPtr
+	 * @return Path to the game's directory
+	 */
+	public String getGameDirPath(final GameDef gameDef, final boolean isPtr) {
+		final SettingsIniInterface iniSettings = configService.getIniSettings();
+		
+		if (gameDef instanceof SC2GameDef) {
+			return iniSettings.getSc2Path();
+		}
+		if (gameDef instanceof HeroesGameDef) {
+			return isPtr ? iniSettings.getHeroesPtrPath() : iniSettings.getHeroesPath();
+		}
+		return null;
 	}
 }

@@ -24,6 +24,7 @@ module interfacex.builder {
 	requires CascExplorerConfigFileEdit;
 	requires GalaxyLib;
 	requires com.esotericsoftware.kryo;
+	requires pecoff4j;
 	
 	// fix: spring boot not finding sqlexception
 	requires java.sql;
@@ -40,7 +41,7 @@ module interfacex.builder {
 	opens interfacebuilder.projects to org.hibernate.orm.core, spring.core, spring.beans;
 	exports interfacebuilder.config to spring.beans, spring.context;
 	opens interfacebuilder.build to spring.core;
-	opens interfacebuilder.base_ui to spring.core;
+	opens interfacebuilder.base_ui to spring.core, com.esotericsoftware.kryo;
 	opens view;
 	opens i18n;
 	opens res; // not sure if required atm

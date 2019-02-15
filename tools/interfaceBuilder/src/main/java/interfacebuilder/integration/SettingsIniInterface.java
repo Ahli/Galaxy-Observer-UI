@@ -31,8 +31,6 @@ public class SettingsIniInterface {
 	private static final String HEROES_PATH = "Heroes_Path";
 	private static final String HEROES_PTR_PATH = "HeroesPTR_Path";
 	private static final String STARCRAFT2_PATH = "StarCraft2_Path";
-	private static final String HEROES_USE64BIT = "Heroes_use64bit";
-	private static final String HEROES_PTR_USE64BIT = "HeroesPTR_use64bit";
 	private static final String STARCRAFT2_USE64BIT = "StarCraft2_use64bit";
 	private static final String CATEGORY_COMMAND_LINE_TOOL = "CommandLineExecution";
 	private static final String CATEGORY_GUI_TOOL = "GuiExecution";

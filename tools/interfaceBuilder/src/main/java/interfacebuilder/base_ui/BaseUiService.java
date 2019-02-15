@@ -22,6 +22,16 @@ import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.boris.pecoff4j.PE;
+import org.boris.pecoff4j.ResourceDirectory;
+import org.boris.pecoff4j.ResourceEntry;
+import org.boris.pecoff4j.constant.ResourceType;
+import org.boris.pecoff4j.io.PEParser;
+import org.boris.pecoff4j.io.ResourceParser;
+import org.boris.pecoff4j.resources.StringFileInfo;
+import org.boris.pecoff4j.resources.StringTable;
+import org.boris.pecoff4j.resources.VersionInfo;
+import org.boris.pecoff4j.util.ResourceHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.xml.sax.SAXException;
 
@@ -30,6 +40,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.InvalidParameterException;
 import java.util.Collection;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -130,8 +142,7 @@ public class BaseUiService {
 						Thread.sleep(50);
 						if (extract(extractorExe, mask, destination)) {
 							logger.warn(
-									"Extraction failed due to a file access. Try closing the Battle.net App, if it " +
-											"is" + " " + "running and this fails to extract all files.");
+									"Extraction failed due to a file access. Try closing the Battle.net App, if it is running and this fails to extract all files.");
 						}
 					}
 				} catch (final IOException e) {
@@ -143,6 +154,8 @@ public class BaseUiService {
 			executor.execute(task);
 		}
 		
+		final int[] version = getVersion(gameDef, usePtr);
+		writeToMetaFile(destination, gameDef.getName(), version, usePtr);
 	}
 	
 	/**
@@ -217,6 +230,49 @@ public class BaseUiService {
 			} while (process.isAlive());
 		}
 		return retry;
+	}
+	
+	public int[] getVersion(final GameDef gameDef, final boolean isPtr) {
+		final int[] versions = new int[4];
+		final Path path = Paths.get(gameService.getGameDirPath(gameDef, isPtr), gameDef.getSupportDirectoryX64(),
+				gameDef.getSwitcherExeNameX64());
+		try {
+			final PE pe = PEParser.parse(path.toFile());
+			final ResourceDirectory rd = pe.getImageData().getResourceTable();
+			
+			final ResourceEntry[] entries = ResourceHelper.findResources(rd, ResourceType.VERSION_INFO);
+			
+			for (int i = 0; i < entries.length; i++) {
+				final byte[] data = entries[i].getData();
+				final VersionInfo version = ResourceParser.readVersionInfo(data);
+				
+				final StringFileInfo strings = version.getStringFileInfo();
+				final StringTable table = strings.getTable(0);
+				for (int j = 0; j < table.getCount(); j++) {
+					final String key = table.getString(j).getKey();
+					if ("FileVersion".equals(key)) {
+						final String value = table.getString(j).getValue();
+						logger.trace("found FileVersion={}", () -> value);
+						
+						final String[] parts = value.split("\\.");
+						for (int k = 0; k < 4; k++) {
+							versions[k] = Integer.parseInt(parts[k]);
+						}
+						return versions;
+					}
+				}
+			}
+		} catch (final IOException e) {
+			logger.error("Error attempting to parse FileVersion from game's exe: ", e);
+		}
+		return versions;
+	}
+	
+	private void writeToMetaFile(final File destination, final String gameName, final int[] version,
+			final boolean usePtr) {
+		
+		Paths.get(destination.getAbsolutePath(), ".meta");
+		// TODO write a metaFile that is expandable & contains same info as catalogMetaInfo
 	}
 	
 	/**
@@ -297,7 +353,7 @@ public class BaseUiService {
 						logger.info(msg);
 						app.printInfoLogMessageToGeneral(msg);
 						try {
-							discCacheService.put(uiCatalog, gameName, isPtr);
+							discCacheService.put(uiCatalog, gameName, isPtr, getVersion(game.getGameDef(), isPtr));
 						} catch (final IOException e) {
 							logger.error("ERROR when creating cache file of UI", e);
 						}

@@ -18,6 +18,8 @@ import com.esotericsoftware.kryo.KryoException;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import interfacebuilder.config.ConfigService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
@@ -29,6 +31,7 @@ import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
 public class DiscCacheService {
+	private static final Logger logger = LogManager.getLogger(BaseUiService.class);
 	@Autowired
 	private ConfigService configService;
 	
@@ -37,15 +40,18 @@ public class DiscCacheService {
 	 * @param gameDefName
 	 * @throws IOException
 	 */
-	public void put(final UICatalog catalog, final String gameDefName, final boolean isPtr) throws IOException {
+	public void put(final UICatalog catalog, final String gameDefName, final boolean isPtr, final int[] version) throws IOException {
 		final File f = getCacheFile(gameDefName, isPtr);
 		final Path p = f.toPath();
 		Files.deleteIfExists(p);
+		
+		KryoUiCatalogMetaInfo metaInfo = new KryoUiCatalogMetaInfo(version, gameDefName, isPtr);
 		
 		try (final DeflaterOutputStream out = new DeflaterOutputStream(Files.newOutputStream(p))) {
 			try (final Output output = new Output(out)) {
 				final Kryo kryo = getKryo();
 				kryo.writeObject(output, catalog);
+				kryo.writeObject(output, metaInfo);
 			}
 		}
 	}
@@ -73,6 +79,7 @@ public class DiscCacheService {
 		kryo.register(UIController.class);
 		kryo.register(UIAnimation.class);
 		kryo.register(UIStateGroup.class);
+		kryo.register(KryoUiCatalogMetaInfo.class);
 		kryo.setReferences(true);
 		return kryo;
 	}
@@ -108,6 +115,9 @@ public class DiscCacheService {
 		final File f = getCacheFile(gameDefName, isPtr);
 		if (f.exists()) {
 			Files.delete(f.toPath());
+			logger.trace("Cleaning cache of {} in {}", () -> gameDefName, f::getAbsolutePath);
+		} else {
+			logger.trace("Could not find cache of {} in {} to clean it", () -> gameDefName, f::getAbsolutePath);
 		}
 	}
 	
