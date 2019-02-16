@@ -166,7 +166,9 @@ public class RandomCompressionMiner {
 				if (isValidFileSpecificMask(mask, cacheDir)) {
 					clean.add(rule);
 				} else {
-					logger.trace("removing rule from ruleset due to invalid mask: " + mask);
+					if (logger.isTraceEnabled()) {
+						logger.trace("removing rule from ruleset due to invalid mask: " + mask);
+					}
 				}
 			} else {
 				if (rule != null) {
@@ -230,10 +232,10 @@ public class RandomCompressionMiner {
 	}
 	
 	private static boolean containsFile(final MpqEditorCompressionRule[] rules, final Path p) {
-		for (int i = 0; i < rules.length; i++) {
-			if (rules[i] instanceof MpqEditorCompressionRuleMask) {
+		for (final var rule : rules) {
+			if (rule instanceof MpqEditorCompressionRuleMask) {
 				final String cleanedMask =
-						File.separator + ((MpqEditorCompressionRuleMask) rules[i]).getMask().replace("*", "");
+						File.separator + ((MpqEditorCompressionRuleMask) rule).getMask().replace("*", "");
 				if (p.toString().endsWith(cleanedMask)) {
 					return true;
 				}

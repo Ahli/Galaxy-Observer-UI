@@ -15,6 +15,7 @@ import interfacebuilder.ui.settings.SettingsCommandLineToolController;
 import interfacebuilder.ui.settings.SettingsController;
 import interfacebuilder.ui.settings.SettingsGamesPathsController;
 import interfacebuilder.ui.settings.SettingsGuiToolController;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -25,7 +26,7 @@ import org.springframework.context.annotation.Scope;
 public class FxmlConfiguration {
 	
 	@Bean
-	@Scope ("prototype")
+	@Scope (ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 	public ViewRuleSetController viewRuleSetController() {
 		return new ViewRuleSetController();
 	}
@@ -36,31 +37,31 @@ public class FxmlConfiguration {
 	}
 	
 	@Bean
-	@Scope ("prototype")
+	@Scope (ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 	public HomeController homeController() {
 		return new HomeController();
 	}
 	
 	@Bean
-	@Scope ("prototype")
+	@Scope (ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 	public SettingsCommandLineToolController settingsCommandLineToolController() {
 		return new SettingsCommandLineToolController();
 	}
 	
 	@Bean
-	@Scope ("prototype")
+	@Scope (ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 	public SettingsController settingsController() {
 		return new SettingsController();
 	}
 	
 	@Bean
-	@Scope ("prototype")
+	@Scope (ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 	public SettingsGamesPathsController settingsGamesPathsController() {
 		return new SettingsGamesPathsController();
 	}
 	
 	@Bean
-	@Scope ("prototype")
+	@Scope (ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 	public SettingsGuiToolController settingsGuiToolController() {
 		return new SettingsGuiToolController();
 	}
@@ -71,19 +72,19 @@ public class FxmlConfiguration {
 	}
 	
 	@Bean
-	@Scope ("prototype")
+	@Scope (ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 	public AddProjectController addProjectController() {
 		return new AddProjectController();
 	}
 	
 	@Bean
-	@Scope ("prototype")
+	@Scope (ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 	public CompressionMiningController compressionMiningController() {
 		return new CompressionMiningController();
 	}
 	
 	@Bean
-	@Scope ("prototype")
+	@Scope (ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 	public BrowseController browseController() {
 		return new BrowseController();
 	}

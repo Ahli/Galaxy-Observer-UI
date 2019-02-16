@@ -1,14 +1,17 @@
-package interfacebuilder.base_ui;
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+package interfacebuilder.integration.kryo;
 
 import java.util.Arrays;
 import java.util.Objects;
 
-public class KryoUiCatalogMetaInfo {
+public class KryoGameInfo {
 	private final String gameName;
 	private final boolean isPtr;
 	private final int[] version;
 	
-	public KryoUiCatalogMetaInfo(final int[] version, final String gameName, final boolean isPtr) {
+	public KryoGameInfo(final int[] version, final String gameName, final boolean isPtr) {
 		this.version = version;
 		this.gameName = gameName;
 		this.isPtr = isPtr;
@@ -31,14 +34,14 @@ public class KryoUiCatalogMetaInfo {
 		if (obj == null) {
 			return false;
 		}
-		if (!(obj instanceof KryoUiCatalogMetaInfo)) {
+		if (!(obj instanceof KryoGameInfo)) {
 			return false;
 		}
 		if (obj == this) {
 			return true;
 		}
 		final Object[] signatureFields = getSignatureFields();
-		final Object[] thatSignatureFields = ((KryoUiCatalogMetaInfo) obj).getSignatureFields();
+		final Object[] thatSignatureFields = ((KryoGameInfo) obj).getSignatureFields();
 		for (int i = 0; i < signatureFields.length; i++) {
 			if (!(signatureFields[i] instanceof Object[])) {
 				if (!Objects.equals(signatureFields[i], thatSignatureFields[i])) {

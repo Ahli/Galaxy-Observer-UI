@@ -201,7 +201,7 @@ public class HomeController implements Updateable {
 		dialog.initOwner(addProject.getScene().getWindow());
 		final Optional<Project> result = dialog.showAndWait();
 		if (result.isPresent()) {
-			logger.trace("dialog 'add project' result: " + result.get());
+			logger.trace("dialog 'add project' result: {}", () -> result.get());
 			projectsObservable.add(result.get());
 		}
 	}
@@ -222,7 +222,7 @@ public class HomeController implements Updateable {
 			((AddProjectController) loader.getController()).setProjectToEdit(project);
 			final Optional<Project> result = dialog.showAndWait();
 			if (result.isPresent()) {
-				logger.trace("dialog 'edit project' result: " + result.get());
+				logger.trace("dialog 'edit project' result: {}", () -> result.get());
 				updateProjectList();
 			}
 		}

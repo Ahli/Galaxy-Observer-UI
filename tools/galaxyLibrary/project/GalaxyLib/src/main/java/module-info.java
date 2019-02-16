@@ -25,4 +25,5 @@ module GalaxyLib {
 	
 	opens com.ahli.galaxy.ui;
 	opens com.ahli.galaxy.ui.abstracts;
+	opens com.ahli.galaxy.ui.interfaces;
 }

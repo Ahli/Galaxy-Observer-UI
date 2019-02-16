@@ -153,7 +153,7 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 		// ruleset file
 		if (rulesetFile.exists()) {
 			do {
-				backupFile = new File(directoryPath + File.separator + "MPQEditor_Ruleset" + "_" + i + ".tmp");
+				backupFile = new File(directoryPath + File.separator + "MPQEditor_Ruleset_" + i + ".tmp");
 				i++;
 				if (i > 999) {
 					throw new IOException("Could not find unique name for MPQEditor_Ruleset.ini's backup copy.");
@@ -167,7 +167,7 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 		if (iniFile.exists()) {
 			i = 0;
 			do {
-				backupFile = new File(directoryPath + File.separator + "MPQEditor" + "_" + i + ".tmp");
+				backupFile = new File(directoryPath + File.separator + "MPQEditor_" + i + ".tmp");
 				i++;
 				if (i > 999) {
 					throw new IOException("Could not find unique name for MPQEditor.ini's backup copy.");
@@ -185,9 +185,8 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 	 */
 	private void applyChangesToFiles() throws IOException {
 		if (!iniFile.exists()) {
-			logger.error(
-					"MpqEditor's ini file does not exist. It would be located at '" + iniFile.getAbsolutePath() + "'" +
-							". The editor will run with its factory settings.");
+			logger.error("MpqEditor's ini file does not exist. It would be located at '" + iniFile.getAbsolutePath() +
+					"'. The editor will run with its factory settings.");
 			return;
 		}
 		int gameId = 6;

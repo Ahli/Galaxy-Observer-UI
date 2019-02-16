@@ -53,7 +53,7 @@ public final class StylizedTextAreaAppender extends AbstractAppender {
 	 * @param ignoreExceptions
 	 */
 	protected StylizedTextAreaAppender(final String name, final Filter filter,
-			final Layout<? extends Serializable> layout, final boolean ignoreExceptions, final Property[] properties) {
+			final Layout<? extends Serializable> layout, final boolean ignoreExceptions, final Property... properties) {
 		super(name, filter, layout, ignoreExceptions, properties);
 	}
 	
@@ -71,16 +71,14 @@ public final class StylizedTextAreaAppender extends AbstractAppender {
 	 */
 	@PluginFactory
 	public static StylizedTextAreaAppender createAppender(@PluginAttribute ("name") final String name,
-			@PluginElement ("Layout") Layout<? extends Serializable> layout,
+			@PluginElement ("Layout") final Layout<? extends Serializable> layout,
 			@PluginElement ("Filter") final Filter filter) {
 		if (name == null) {
 			LOGGER.error("No name provided for StylizedTextAreaAppender");
 			return null;
 		}
-		if (layout == null) {
-			layout = PatternLayout.createDefaultLayout();
-		}
-		return new StylizedTextAreaAppender(name, filter, layout, true, Property.EMPTY_ARRAY);
+		final var resultLayout = layout == null ? PatternLayout.createDefaultLayout() : layout;
+		return new StylizedTextAreaAppender(name, filter, resultLayout, true, Property.EMPTY_ARRAY);
 	}
 	
 	

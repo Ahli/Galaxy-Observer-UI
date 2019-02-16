@@ -18,6 +18,7 @@ import interfacebuilder.integration.FileService;
 import interfacebuilder.integration.JarHelper;
 import interfacebuilder.integration.ReplayFinder;
 import interfacebuilder.integration.SettingsIniInterface;
+import interfacebuilder.integration.kryo.KryoService;
 import interfacebuilder.projects.ProjectService;
 import interfacebuilder.ui.progress.StylizedTextAreaAppenderThreadPoolExecutor;
 import org.springframework.context.annotation.Bean;
@@ -181,5 +182,10 @@ public class AppConfiguration {
 	@Bean
 	public DiscCacheService discCacheService() {
 		return new DiscCacheService();
+	}
+	
+	@Bean
+	public KryoService kryoService() {
+		return new KryoService();
 	}
 }

@@ -172,6 +172,9 @@ public class InterfaceBuilderApp extends Application {
 							}
 						} catch (final IOException e) {
 							// client closed connection
+							if (logger.isTraceEnabled()) {
+								logger.trace("client closed connection.");
+							}
 						} finally {
 							clientSocket.close();
 						}
@@ -425,7 +428,7 @@ public class InterfaceBuilderApp extends Application {
 		try (final InputStream is = appContext.getResource("view/Navigation.fxml").getInputStream()) {
 			root = loader.load(is);
 			navigationController = loader.getController();
-		} catch (final IOException | NullPointerException e) {
+		} catch (final IOException e) {
 			logger.error("Failed to load Navigation.fxml:", e);
 			throw new IOException("Failed to load Navigation.fxml.", e);
 		}

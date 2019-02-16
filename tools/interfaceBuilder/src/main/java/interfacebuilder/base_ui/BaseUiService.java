@@ -9,11 +9,16 @@ import com.ahli.galaxy.game.def.SC2GameDef;
 import com.ahli.galaxy.game.def.abstracts.GameDef;
 import com.ahli.galaxy.ui.UICatalogImpl;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
 import interfacebuilder.InterfaceBuilderApp;
 import interfacebuilder.compress.GameService;
 import interfacebuilder.config.ConfigService;
 import interfacebuilder.integration.FileService;
 import interfacebuilder.integration.SettingsIniInterface;
+import interfacebuilder.integration.kryo.KryoGameInfo;
+import interfacebuilder.integration.kryo.KryoService;
 import interfacebuilder.projects.enums.Game;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOCase;
@@ -40,11 +45,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.InvalidParameterException;
 import java.util.Collection;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.zip.DeflaterInputStream;
+import java.util.zip.DeflaterOutputStream;
 
 public class BaseUiService {
 	private static final String UNKNOWN_GAME_EXCEPTION = "Unknown Game";
@@ -60,6 +68,8 @@ public class BaseUiService {
 	private FileService fileService;
 	@Autowired
 	private DiscCacheService discCacheService;
+	@Autowired
+	private KryoService kryoService;
 	
 	/**
 	 * Checks if the specified game's baseUI is older than the game files.
@@ -70,19 +80,18 @@ public class BaseUiService {
 	 * @return true, if outdated
 	 */
 	public boolean isOutdated(final Game game, final boolean usePtr, final boolean useX64) throws IOException {
-		final String gamePath = getGamePath(game, usePtr);
 		final GameDef gameDef = gameService.getGameDef(game);
-		final String supportDir = (useX64 ? gameDef.getSupportDirectoryX64() : gameDef.getSupportDirectoryX32());
-		final String switcherExe = (useX64 ? gameDef.getSwitcherExeNameX64() : gameDef.getSwitcherExeNameX32());
-		final File updatedExe = new File(gamePath + File.separator + supportDir + File.separator + switcherExe);
 		final File gameBaseUI = new File(configService.getBaseUiPath(gameDef));
 		
-		if (!gameBaseUI.exists()) {
+		if (!gameBaseUI.exists() || fileService.isEmptyDirectory(gameBaseUI)) {
 			return true;
 		}
 		
-		return fileService.isEmptyDirectory(gameBaseUI) ||
-				!fileService.directoryFilesAreUpToDate(updatedExe.lastModified(), gameBaseUI);
+		final String supportDir = (useX64 ? gameDef.getSupportDirectoryX64() : gameDef.getSupportDirectoryX32());
+		final String switcherExe = (useX64 ? gameDef.getSwitcherExeNameX64() : gameDef.getSwitcherExeNameX32());
+		final String gamePath = getGamePath(game, usePtr);
+		final File updatedExe = new File(gamePath + File.separator + supportDir + File.separator + switcherExe);
+		return !fileService.directoryFilesAreUpToDate(updatedExe.lastModified(), gameBaseUI);
 	}
 	
 	/**
@@ -155,7 +164,11 @@ public class BaseUiService {
 		}
 		
 		final int[] version = getVersion(gameDef, usePtr);
-		writeToMetaFile(destination, gameDef.getName(), version, usePtr);
+		try {
+			writeToMetaFile(destination, gameDef.getName(), version, usePtr);
+		} catch (final IOException e) {
+			logger.error("Failed to write metafile: ", e);
+		}
 	}
 	
 	/**
@@ -242,8 +255,8 @@ public class BaseUiService {
 			
 			final ResourceEntry[] entries = ResourceHelper.findResources(rd, ResourceType.VERSION_INFO);
 			
-			for (int i = 0; i < entries.length; i++) {
-				final byte[] data = entries[i].getData();
+			for (final ResourceEntry entry : entries) {
+				final byte[] data = entry.getData();
 				final VersionInfo version = ResourceParser.readVersionInfo(data);
 				
 				final StringFileInfo strings = version.getStringFileInfo();
@@ -268,11 +281,36 @@ public class BaseUiService {
 		return versions;
 	}
 	
-	private void writeToMetaFile(final File destination, final String gameName, final int[] version,
-			final boolean usePtr) {
+	private void writeToMetaFile(final File directory, final String gameName, final int[] version, final boolean isPtr)
+			throws IOException {
 		
-		Paths.get(destination.getAbsolutePath(), ".meta");
-		// TODO write a metaFile that is expandable & contains same info as catalogMetaInfo
+		final Path path = Paths.get(directory.getAbsolutePath(), ".meta");
+		final KryoGameInfo gameInfo = new KryoGameInfo(version, gameName, isPtr);
+		try (final Output output = new Output(new DeflaterOutputStream(Files.newOutputStream(path)))) {
+			final Kryo kryo = kryoService.getKryoForBaseUiMetaFile();
+			kryo.writeObject(output, gameInfo);
+		}
+	}
+	
+	private KryoGameInfo readMetaFile(final File directory) throws IOException {
+		final Path path = Paths.get(directory.getAbsolutePath(), ".meta");
+		try (final Input input = new Input(new DeflaterInputStream(Files.newInputStream(path)))) {
+			final Kryo kryo = kryoService.getKryoForBaseUiMetaFile();
+			return kryo.readObject(input, KryoGameInfo.class);
+		}
+	}
+	
+	/**
+	 * @param cacheFile
+	 * @param metaFileDir
+	 * @return
+	 */
+	public boolean isUpToDate(final String cacheFile, final String metaFileDir) {
+		
+		discCacheService.get()
+		
+		
+		return false;
 	}
 	
 	/**

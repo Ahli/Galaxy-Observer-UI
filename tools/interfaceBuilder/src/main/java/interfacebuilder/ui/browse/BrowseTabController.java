@@ -40,6 +40,7 @@ import java.util.Set;
 public class BrowseTabController implements Updateable {
 	private static final Logger logger = LogManager.getLogger(BrowseTabController.class);
 	private static final String GAME_UI = "GameUI";
+	private static final String SPACE_HIVEN_SPACE = " - ";
 	//	private final StringProperty filterProp = new SimpleStringProperty();
 	@FXML
 	private Label pathLabel;
@@ -235,17 +236,21 @@ public class BrowseTabController implements Updateable {
 			if (el instanceof UIFrame) {
 				final UIFrame elem = (UIFrame) el;
 				UIAnchorSide side = UIAnchorSide.TOP;
-				map.put("Anchor-Top", elem.getAnchorRelative(side) + " - " + elem.getAnchorPos(side) + " - " +
-						elem.getAnchorOffset(side));
+				map.put("Anchor-Top",
+						elem.getAnchorRelative(side) + SPACE_HIVEN_SPACE + elem.getAnchorPos(side) + SPACE_HIVEN_SPACE +
+								elem.getAnchorOffset(side));
 				side = UIAnchorSide.LEFT;
-				map.put("Anchor-Left", elem.getAnchorRelative(side) + " - " + elem.getAnchorPos(side) + " - " +
-						elem.getAnchorOffset(side));
+				map.put("Anchor-Left",
+						elem.getAnchorRelative(side) + SPACE_HIVEN_SPACE + elem.getAnchorPos(side) + SPACE_HIVEN_SPACE +
+								elem.getAnchorOffset(side));
 				side = UIAnchorSide.BOTTOM;
-				map.put("Anchor-Bottom", elem.getAnchorRelative(side) + " - " + elem.getAnchorPos(side) + " - " +
-						elem.getAnchorOffset(side));
+				map.put("Anchor-Bottom",
+						elem.getAnchorRelative(side) + SPACE_HIVEN_SPACE + elem.getAnchorPos(side) + SPACE_HIVEN_SPACE +
+								elem.getAnchorOffset(side));
 				side = UIAnchorSide.RIGHT;
-				map.put("Anchor-Right", elem.getAnchorRelative(side) + " - " + elem.getAnchorPos(side) + " - " +
-						elem.getAnchorOffset(side));
+				map.put("Anchor-Right",
+						elem.getAnchorRelative(side) + SPACE_HIVEN_SPACE + elem.getAnchorPos(side) + SPACE_HIVEN_SPACE +
+								elem.getAnchorOffset(side));
 				for (final UIAttribute attr : elem.getAttributes()) {
 					map.put(attr.getName(), prettyPrint(attr));
 				}

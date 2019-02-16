@@ -42,7 +42,7 @@ public class ProjectServiceTest {
 		when(projectRepoMock.findAll()).thenReturn(Arrays.asList(project1, project2));
 		
 		final int numberOfProjects = projectService.getAllProjects().size();
-		assertEquals(2, numberOfProjects);
+		assertEquals(2, numberOfProjects, "not fetching all existing projects");
 	}
 	
 	@Test
@@ -52,7 +52,7 @@ public class ProjectServiceTest {
 		when(projectRepoMock.save(project)).thenReturn(project);
 		
 		final Project savedProject = projectService.saveProject(project);
-		assertEquals(project, savedProject);
+		assertEquals(project, savedProject, "saving altered project");
 	}
 	
 }

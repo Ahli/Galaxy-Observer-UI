@@ -42,6 +42,7 @@ module interfacex.builder {
 	exports interfacebuilder.config to spring.beans, spring.context;
 	opens interfacebuilder.build to spring.core;
 	opens interfacebuilder.base_ui to spring.core, com.esotericsoftware.kryo;
+	opens interfacebuilder.integration.kryo to spring.core, com.esotericsoftware.kryo;
 	opens view;
 	opens i18n;
 	opens res; // not sure if required atm

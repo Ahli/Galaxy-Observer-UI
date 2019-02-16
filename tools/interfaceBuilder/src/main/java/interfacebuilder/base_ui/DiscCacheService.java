@@ -3,21 +3,14 @@
 
 package interfacebuilder.base_ui;
 
-import com.ahli.galaxy.ui.UIAnimation;
-import com.ahli.galaxy.ui.UIAttribute;
-import com.ahli.galaxy.ui.UICatalogImpl;
-import com.ahli.galaxy.ui.UIConstant;
-import com.ahli.galaxy.ui.UIController;
-import com.ahli.galaxy.ui.UIFrame;
-import com.ahli.galaxy.ui.UIState;
-import com.ahli.galaxy.ui.UIStateGroup;
-import com.ahli.galaxy.ui.UITemplate;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.KryoException;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import interfacebuilder.config.ConfigService;
+import interfacebuilder.integration.kryo.KryoService;
+import interfacebuilder.integration.kryo.KryoGameInfo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,30 +19,32 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
 public class DiscCacheService {
-	private static final Logger logger = LogManager.getLogger(BaseUiService.class);
+	private static final Logger logger = LogManager.getLogger(DiscCacheService.class);
 	@Autowired
 	private ConfigService configService;
+	@Autowired
+	private KryoService kryoService;
 	
 	/**
 	 * @param catalog
 	 * @param gameDefName
 	 * @throws IOException
 	 */
-	public void put(final UICatalog catalog, final String gameDefName, final boolean isPtr, final int[] version) throws IOException {
+	public void put(final UICatalog catalog, final String gameDefName, final boolean isPtr, final int[] version)
+			throws IOException {
 		final File f = getCacheFile(gameDefName, isPtr);
 		final Path p = f.toPath();
 		Files.deleteIfExists(p);
 		
-		KryoUiCatalogMetaInfo metaInfo = new KryoUiCatalogMetaInfo(version, gameDefName, isPtr);
+		final KryoGameInfo metaInfo = new KryoGameInfo(version, gameDefName, isPtr);
 		
 		try (final DeflaterOutputStream out = new DeflaterOutputStream(Files.newOutputStream(p))) {
 			try (final Output output = new Output(out)) {
-				final Kryo kryo = getKryo();
+				final Kryo kryo = kryoService.getKryoForUICatalog();
 				kryo.writeObject(output, catalog);
 				kryo.writeObject(output, metaInfo);
 			}
@@ -66,23 +61,6 @@ public class DiscCacheService {
 		return new File(path);
 	}
 	
-	private Kryo getKryo() {
-		final Kryo kryo = new Kryo();
-		kryo.register(UICatalogImpl.class);
-		kryo.register(ArrayList.class);
-		kryo.register(UITemplate.class);
-		kryo.register(String[].class);
-		kryo.register(UIFrame.class);
-		kryo.register(UIAttribute.class);
-		kryo.register(UIConstant.class);
-		kryo.register(UIState.class);
-		kryo.register(UIController.class);
-		kryo.register(UIAnimation.class);
-		kryo.register(UIStateGroup.class);
-		kryo.register(KryoUiCatalogMetaInfo.class);
-		kryo.setReferences(true);
-		return kryo;
-	}
 	
 	/**
 	 * @param gameDefName
@@ -97,7 +75,7 @@ public class DiscCacheService {
 		
 		try (final InflaterInputStream in = new InflaterInputStream(Files.newInputStream(p))) {
 			try (final Input input = new Input(in)) {
-				final Kryo kryo = getKryo();
+				final Kryo kryo = kryoService.getKryoForUICatalog();
 				return kryo.readObject(input, clazz);
 			} catch (final KryoException e) {
 				Files.deleteIfExists(p);

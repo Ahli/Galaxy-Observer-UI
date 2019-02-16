@@ -44,9 +44,9 @@ public class CommandLineParams {
 	 * @return String following the equal sign for the specified parameter
 	 */
 	private String getParamsValue(final String[] params, final String paramNameAndEqualSign) {
-		for (int i = 0; i < params.length; i++) {
-			if (params[i].startsWith(paramNameAndEqualSign)) {
-				return params[i].substring(paramNameAndEqualSign.length() + 1);
+		for (final String param : params) {
+			if (param.startsWith(paramNameAndEqualSign)) {
+				return param.substring(paramNameAndEqualSign.length() + 1);
 			}
 		}
 		return null;
@@ -55,12 +55,13 @@ public class CommandLineParams {
 	/**
 	 * ParamPath might be some layout or folder within the interface, so it is cut down to the interface base path.
 	 *
-	 * @param str
+	 * @param path
 	 * 		interfacebuilder's compileParam's value
 	 * @return shortens the path to the Interface root folder
 	 */
-	private String getInterfaceRootFromPath(String str) {
-		if (str != null) {
+	private String getInterfaceRootFromPath(final String path) {
+		String str = path;
+		if (path != null) {
 			while (str.length() > 0 && !str.endsWith("Interface")) {
 				final int lastIndex = str.lastIndexOf(File.separatorChar);
 				if (lastIndex != -1) {

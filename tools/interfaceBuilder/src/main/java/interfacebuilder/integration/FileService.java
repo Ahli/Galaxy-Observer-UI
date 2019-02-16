@@ -55,16 +55,17 @@ public class FileService {
 	 * @param path
 	 * @return
 	 */
-	public File cutTillValidDirectory(String path) {
+	public File cutTillValidDirectory(final String path) {
 		File f = new File(path);
 		if (!f.isDirectory()) {
 			final char sep = File.separatorChar;
 			int i;
+			String pathTmp = path;
 			do {
-				i = path.lastIndexOf(sep);
+				i = pathTmp.lastIndexOf(sep);
 				if (i != -1) {
-					path = path.substring(0, i);
-					f = new File(path);
+					pathTmp = pathTmp.substring(0, i);
+					f = new File(pathTmp);
 				} else {
 					f = null;
 					break;
