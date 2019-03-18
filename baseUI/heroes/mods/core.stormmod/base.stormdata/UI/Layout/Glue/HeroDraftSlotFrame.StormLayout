@@ -268,11 +268,35 @@
         <Key type="Curve" time="1.5" value="255" inout="Linear" />
         <Key type="Curve" time="2.0" value="0" inout="Linear,Slow" />
       </Controller>
-      <Controller type="Property" property="AcceptsMouse" end="Pause">
-        <Key type="Property" time="0" value="False" />
-        <Key type="Property" time="3.0" value="True" />
+      <Controller type="State" stateGroup="IntroShowing" end="Pause">
+        <Key type="Identifier" time="0" value="True" />
+        <Key type="Identifier" time="3.0" value="False" />
       </Controller>
     </Animation>
+    <StateGroup name="IntroShowing">
+      <DefaultState val="False" />
+      <State name="True" />
+      <State name="False" />
+    </StateGroup>
+    <StateGroup name="TooltipMode">
+      <DefaultState val="DisableDraftSlotTooltip" />
+      <State name="DisableTooltipInTournamentMode">
+        <When type="Property" frame="$parent/$parent" IsTournamentSpectator="True" />
+        <Action type="SetProperty" frame="$this" AcceptsMouse="false" />
+        <Action type="SetProperty" frame="$this" AcceptsMouseTooltip="false" />
+      </State>
+      <State name="EnableDraftSlotTooltip">
+        <When type="StateGroup" frame="$this" IntroShowing="False" />
+        <When type="StateGroup" frame="$parent" IntroShowing="False" />
+        <When type="Property" frame="PortraitContainer" Visible="True" />
+        <Action type="SetProperty" frame="$this" AcceptsMouse="true" />
+        <Action type="SetProperty" frame="$this" AcceptsMouseTooltip="true" />
+      </State>
+      <State name="DisableDraftSlotTooltip">
+        <Action type="SetProperty" frame="$this" AcceptsMouse="false" />
+        <Action type="SetProperty" frame="$this" AcceptsMouseTooltip="false" />
+      </State>
+    </StateGroup>
     <Animation name="ReadySelected">
       <Event event="Ready" action="Reset,Play" />
       <Event event="NotReady" action="Stop" frame="$parent" />
@@ -290,7 +314,7 @@
       <Width val="232" />
       <Height val="252" />
       <HitTestTexture val="@UI/Storm_UI_Glues_Draft_Portrait_Hittest_Left" />
-      <TooltipAnchorPosition val="MiddleRight" />
+      <TooltipAnchorPosition val="RightToRight | BottomToBottom" />
     </Frame>
     <Frame type="Frame" name="AnchorFrame">
       <Anchor side="Top" relative="$parent" pos="Mid" offset="0" />
@@ -311,7 +335,7 @@
         <Action type="SendEvent" event="MyTurn" />
       </State>
       <State name="NormalBorder">
-        <When type="AnimationState" TeamState="MyTeam" />
+        <When type="AnimationState" ActiveRoundTeam="MyTeam" />
         <Action type="SendEvent" event="MyTeamTurn" />
       </State>
       <State name="NormalBorder2">
@@ -971,7 +995,7 @@
           <When type="AnimationState" frame="$parent" BanChooserState="BanChooserBanning" />
         </State>
         <State name="BanChooserOnMyTeamTurn">
-          <When type="AnimationState" frame="$parent" TeamState="MyTeam" />
+          <When type="AnimationState" frame="$parent" ActiveRoundTeam="MyTeam" />
           <When type="AnimationState" frame="$parent" BanChooserState="BanChooserOn" />
         </State>
         <State name="BanChooserOn">
@@ -1163,6 +1187,39 @@
       <PresenceId val="{$parent/@PresenceId}" />
       <ContextMenu val="$ancestor[@type=HeroDraftPanel]/VoiceOnlyContextMenu" />
     </Frame>
+    <Frame type="Frame" name="PreferredRoleContainer">
+      <Anchor side="Top" relative="$parent/AnchorFrame" pos="Mid" offset="67" />
+      <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Mid" offset="67" />
+      <Anchor side="Left" relative="$parent/AnchorFrame" pos="Max" offset="15" />
+      <Width val="400" />
+      <Height val="200" />
+      <Visible val="true" />
+      <Unclipped val="true" />
+      <Frame type="PreferredRoleTileList" name="PreferredRoleContainer" template="HeroPreferredRoleContainer/HeroPreferredRoleContainerDraft">
+        <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
+        <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+        <PreferredRoleObject val="{$parent/$parent/BattleUserFrame/@PreferredRoleObject}" />
+        <Visible val="false" />
+      </Frame>
+      <StateGroup name="SelectedState">
+        <DefaultState val="NotSelected" />
+        <State name="NotStormLeague">
+          <When type="Property" frame="$BattleUI" operator="NotEqual" CurrentQueue="StormLeague" />
+        </State>
+        <State name="HideForObserver">
+          <When type="Property" frame="$ancestor[@type=HeroDraftSlotFrame]/$parent/$parent" IsLocalParticipant="false" />
+        </State>
+        <State name="Selected">
+          <When type="StateGroup" frame="$ancestor[@type=HeroDraftSlotFrame]" SlotVisualState="Selected" />
+        </State>
+        <State name="SelectedNotYourTurn">
+          <When type="StateGroup" frame="$ancestor[@type=HeroDraftSlotFrame]" SlotVisualState="SelectedNotYourTurn" />
+        </State>
+        <State name="NotSelected">
+          <Action type="SetProperty" frame="PreferredRoleContainer" Visible="true" />
+        </State>
+      </StateGroup>
+    </Frame>
     <StateGroup name="NameLabelState">
       <State name="SelectedNotYourTurn">
         <Action type="SetProperty" frame="NameLabel" Style="HeroDraftPlayerLeftName_Disabled" />
@@ -1255,7 +1312,7 @@
       <Anchor side="Left" relative="$parent" pos="Mid" offset="13" />
       <Anchor side="Right" relative="$parent" pos="Mid" offset="13" />
       <HitTestTexture val="@UI/Storm_UI_Glues_Draft_Portrait_Hittest_Right" />
-      <TooltipAnchorPosition val="MiddleLeft" />
+      <TooltipAnchorPosition val="LeftToLeft | BottomToBottom" />
     </Frame>
     <Frame type="Image" name="WhiteOutImage">
       <TextureCoords top="0" left="1" bottom="1" right="0" />

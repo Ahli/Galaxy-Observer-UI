@@ -5,6 +5,55 @@
   <Constant name="BackgroundTileLeftHorizontalSpacing" val="-10" />
   <Constant name="BackgroundTileRightHorizontalSpacing" val="10" />
   <Constant name="DraftTileVerticalSpacing" val="-188" />
+  <Frame type="HeroDraftTooltip" name="HeroDraftTooltipTemplate" template="StandardTooltip/StandardTooltip">
+    <MaxWidth val="300" />
+    <MaxHeight val="400" />
+    <FadeTime val="0" />
+    <PositionFixed val="False" />
+    <Insets top="10" left="0" bottom="10" right="0" />
+    <Frame type="Frame" name="SizingFrame">
+      <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+      <Anchor side="Right" relative="$parent/PlayerNameLabel" pos="Max" offset="15" />
+      <Anchor side="Bottom" relative="$parent/PlayerNameLabel" pos="Max" offset="10" />
+      <Visible val="false" />
+    </Frame>
+    <StateGroup name="Visibility">
+      <DefaultState val="HasHero" />
+      <State name="EmptyHero">
+        <When type="Property" frame="$this" Hero="" />
+        <Action type="SetProperty" frame="HeroContainerFrame" Visible="False" />
+        <Action type="SetProperty" frame="SpacingFrame" Width="1" />
+      </State>
+      <State name="HasHero">
+        <Action type="SetProperty" frame="HeroContainerFrame" Visible="True" />
+        <Action type="SetProperty" frame="SpacingFrame" Width="52" />
+      </State>
+    </StateGroup>
+    <Frame type="Frame" name="SpacingFrame">
+      <Anchor side="Top" relative="$parent" pos="Min" offset="8" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="11" />
+      <Width val="52" />
+      <Visible val="{$parent/HeroContainerFrame/@Visible}" />
+    </Frame>
+    <Frame type="HeroContainerFrame" name="HeroContainerFrame">
+      <Anchor side="Top" relative="$parent/PlayerNameLabel" pos="Min" offset="-10" />
+      <Anchor side="Right" relative="$parent/PlayerNameLabel" pos="Min" offset="0" />
+      <Width val="62" />
+      <Height val="62" />
+      <Hero val="{$parent/@Hero}" />
+      <CollapseLayout val="True" />
+      <Frame type="HeroImage" name="RoleIcon">
+        <Anchor relative="$parent" />
+        <HeroImageType val="RoleIcon" />
+      </Frame>
+    </Frame>
+    <Frame type="Label" name="PlayerNameLabel">
+      <Anchor side="Top" relative="$parent/SpacingFrame" pos="Min" offset="0" />
+      <Anchor side="Left" relative="$parent/SpacingFrame" pos="Max" offset="0" />
+      <Text val="{$parent/@Tooltip}" />
+    </Frame>
+  </Frame>
   <Frame type="Button" name="SwapButtonStateTemplate">
     <StateGroup name="PropagateHover">
       <State name="NoHover">
@@ -129,7 +178,16 @@
       <Controller type="Event" end="Pause" frame="BackgroundTile0">
         <Key type="Event" time="3.6" event="Intro" />
       </Controller>
+      <Controller type="State" stateGroup="IntroShowing" end="Pause">
+        <Key type="Identifier" time="0" value="True" />
+        <Key type="Identifier" time="3.6" value="False" />
+      </Controller>
     </Animation>
+    <StateGroup name="IntroShowing">
+      <DefaultState val="False" />
+      <State name="True" />
+      <State name="False" />
+    </StateGroup>
     <StateGroup name="MyTurnState">
       <DefaultState val="DimmedBorder" />
       <State name="DraftNotStarted">
@@ -141,7 +199,7 @@
         <Action type="SendEvent" event="ShowActiveBorder" />
       </State>
       <State name="MyTeamTurn">
-        <When type="AnimationState" TeamState="MyTeam" frame="Slot0" />
+        <When type="AnimationState" ActiveRoundTeam="MyTeam" frame="Slot0" />
         <Action type="SendEvent" event="ShowActiveBorder" />
       </State>
       <State name="DimmedBorder">
@@ -150,6 +208,7 @@
     </StateGroup>
   </Frame>
   <Frame type="BattleLobbyTeamPanel" name="HeroDraftTeamPanelLeftTemplate" template="BattleLobbyTeamPanel/HeroDraftTeamPanelTemplate">
+    <Frame type="HeroDraftTooltip" name="HeroDraftTooltip" template="BattleLobbyTeamPanel/HeroDraftTooltipTemplate" />
     <Frame type="Image" name="BackgroundTileGlow">
       <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
       <Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
@@ -220,6 +279,7 @@
       <Frame type="Label" name="DraftFillNameLabel">
         <Text val="@UI/DraftPanel/EnemyPlayerFiller1" />
       </Frame>
+      <TooltipFrame val="HeroDraftTooltip" />
     </Frame>
     <Frame type="HeroDraftSlotFrame" name="Slot1" template="HeroDraftSlotFrame/HeroDraftSlotFrameLeftTemplate">
       <Anchor side="Bottom" relative="$parent/Slot2" pos="Max" offset="#DraftTileVerticalSpacing" />
@@ -228,6 +288,7 @@
       <Frame type="Label" name="DraftFillNameLabel">
         <Text val="@UI/DraftPanel/EnemyPlayerFiller2" />
       </Frame>
+      <TooltipFrame val="HeroDraftTooltip" />
     </Frame>
     <Frame type="HeroDraftSlotFrame" name="Slot2" template="HeroDraftSlotFrame/HeroDraftSlotFrameLeftTemplate">
       <Anchor side="Bottom" relative="$parent/Slot3" pos="Max" offset="#DraftTileVerticalSpacing" />
@@ -236,6 +297,7 @@
       <Frame type="Label" name="DraftFillNameLabel">
         <Text val="@UI/DraftPanel/EnemyPlayerFiller3" />
       </Frame>
+      <TooltipFrame val="HeroDraftTooltip" />
     </Frame>
     <Frame type="HeroDraftSlotFrame" name="Slot3" template="HeroDraftSlotFrame/HeroDraftSlotFrameLeftTemplate">
       <Anchor side="Bottom" relative="$parent/Slot4" pos="Max" offset="#DraftTileVerticalSpacing" />
@@ -244,6 +306,7 @@
       <Frame type="Label" name="DraftFillNameLabel">
         <Text val="@UI/DraftPanel/EnemyPlayerFiller4" />
       </Frame>
+      <TooltipFrame val="HeroDraftTooltip" />
     </Frame>
     <Frame type="HeroDraftSlotFrame" name="Slot4" template="HeroDraftSlotFrame/HeroDraftSlotFrameLeftTemplate">
       <Anchor side="Bottom" relative="$parent" pos="Max" offset="-68" />
@@ -252,9 +315,30 @@
       <Frame type="Label" name="DraftFillNameLabel">
         <Text val="@UI/DraftPanel/EnemyPlayerFiller5" />
       </Frame>
+      <TooltipFrame val="HeroDraftTooltip" />
     </Frame>
+    <StateGroup name="TeamHoveredState">
+      <DefaultState val="NotHovered" />
+      <State name="Hovered0">
+        <When type="Property" frame="Slot0" IsHovering="true" />
+      </State>
+      <State name="Hovered1">
+        <When type="Property" frame="Slot1" IsHovering="true" />
+      </State>
+      <State name="Hovered2">
+        <When type="Property" frame="Slot2" IsHovering="true" />
+      </State>
+      <State name="Hovered3">
+        <When type="Property" frame="Slot3" IsHovering="true" />
+      </State>
+      <State name="Hovered4">
+        <When type="Property" frame="Slot4" IsHovering="true" />
+      </State>
+      <State name="NotHovered" />
+    </StateGroup>
   </Frame>
   <Frame type="BattleLobbyTeamPanel" name="HeroDraftTeamPanelRightTemplate" template="BattleLobbyTeamPanel/HeroDraftTeamPanelTemplate">
+    <Frame type="HeroDraftTooltip" name="HeroDraftTooltip" template="BattleLobbyTeamPanel/HeroDraftTooltipTemplate" />
     <Frame type="Image" name="BackgroundTileGlow">
       <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
       <Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
@@ -324,6 +408,7 @@
       <Frame type="Label" name="DraftFillNameLabel">
         <Text val="@UI/DraftPanel/EnemyPlayerFiller1" />
       </Frame>
+      <TooltipFrame val="HeroDraftTooltip" />
     </Frame>
     <Frame type="HeroDraftSlotFrame" name="Slot1" template="HeroDraftSlotFrame/HeroDraftSlotFrameRightTemplate">
       <Anchor side="Bottom" relative="$parent/Slot2" pos="Max" offset="#DraftTileVerticalSpacing" />
@@ -331,6 +416,7 @@
       <Frame type="Label" name="DraftFillNameLabel">
         <Text val="@UI/DraftPanel/EnemyPlayerFiller2" />
       </Frame>
+      <TooltipFrame val="HeroDraftTooltip" />
     </Frame>
     <Frame type="HeroDraftSlotFrame" name="Slot2" template="HeroDraftSlotFrame/HeroDraftSlotFrameRightTemplate">
       <Anchor side="Bottom" relative="$parent/Slot3" pos="Max" offset="#DraftTileVerticalSpacing" />
@@ -338,6 +424,7 @@
       <Frame type="Label" name="DraftFillNameLabel">
         <Text val="@UI/DraftPanel/EnemyPlayerFiller3" />
       </Frame>
+      <TooltipFrame val="HeroDraftTooltip" />
     </Frame>
     <Frame type="HeroDraftSlotFrame" name="Slot3" template="HeroDraftSlotFrame/HeroDraftSlotFrameRightTemplate">
       <Anchor side="Bottom" relative="$parent/Slot4" pos="Max" offset="#DraftTileVerticalSpacing" />
@@ -345,6 +432,7 @@
       <Frame type="Label" name="DraftFillNameLabel">
         <Text val="@UI/DraftPanel/EnemyPlayerFiller4" />
       </Frame>
+      <TooltipFrame val="HeroDraftTooltip" />
     </Frame>
     <Frame type="HeroDraftSlotFrame" name="Slot4" template="HeroDraftSlotFrame/HeroDraftSlotFrameRightTemplate">
       <Anchor side="Bottom" relative="$parent" pos="Max" offset="-68" />
@@ -352,7 +440,27 @@
       <Frame type="Label" name="DraftFillNameLabel">
         <Text val="@UI/DraftPanel/EnemyPlayerFiller5" />
       </Frame>
+      <TooltipFrame val="HeroDraftTooltip" />
     </Frame>
+    <StateGroup name="TeamHoveredState">
+      <DefaultState val="NotHovered" />
+      <State name="Hovered0">
+        <When type="Property" frame="Slot0" IsHovering="true" />
+      </State>
+      <State name="Hovered1">
+        <When type="Property" frame="Slot1" IsHovering="true" />
+      </State>
+      <State name="Hovered2">
+        <When type="Property" frame="Slot2" IsHovering="true" />
+      </State>
+      <State name="Hovered3">
+        <When type="Property" frame="Slot3" IsHovering="true" />
+      </State>
+      <State name="Hovered4">
+        <When type="Property" frame="Slot4" IsHovering="true" />
+      </State>
+      <State name="NotHovered" />
+    </StateGroup>
   </Frame>
   <Frame type="BattleLobbyTeamPanel" name="CoinTossTeamPanelTemplate">
     <Height val="100" />
