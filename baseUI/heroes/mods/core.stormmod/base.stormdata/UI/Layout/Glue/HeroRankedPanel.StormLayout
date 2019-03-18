@@ -1,65 +1,173 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Desc>
   <DescFlags val="Locked" />
-  <Frame type="NydusLinkButton" name="LeaderBoardsButton">
-    <NydusLink val="LeaderBoards" />
-    <UseBrowser val="true" />
-    <Tooltip val="@UI/RankedPlay/LeaderBoards/Tooltip" />
+  <Constant name="PlayModeInfoButtonOffset" val="25" />
+  <Frame type="Button" name="InfoButtonTemplate" template="HeroSelectPanel/HeroAttributeButtonTemplate">
     <ClickSound val="@UI_BNet_Generic_01" />
-    <Width val="60" />
-    <Height val="60" />
-    <Frame type="Frame" name="IconAnchor">
-      <Anchor side="Top" relative="$parent" pos="Mid" offset="0" />
-      <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0" />
-      <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
-      <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
+    <Toggleable val="False" />
+    <TooltipAnchorPosition val="TopCenter" />
+    <Frame type="Image" name="BaseButtonImage">
+      <Texture val="@UI/Storm_UI_Play_HeroAttributes_Button_Maps_Normal" />
     </Frame>
-    <Frame type="Image" name="NormalImage">
-      <Anchor side="Top" relative="$parent/IconAnchor" pos="Mid" offset="0" />
-      <Anchor side="Bottom" relative="$parent/IconAnchor" pos="Mid" offset="0" />
-      <Anchor side="Left" relative="$parent/IconAnchor" pos="Mid" offset="0" />
-      <Anchor side="Right" relative="$parent/IconAnchor" pos="Mid" offset="0" />
-      <Texture val="@UI/Storm_UI_Ranked_SeasonProgress_Leaderboards_Button" />
-      <TextureType val="Normal" />
-      <DesaturateOnDisable val="false" />
+    <Frame type="Image" name="DisabledButtonImage">
+      <Texture val="@UI/Storm_UI_Play_HeroAttributes_Button_Maps_Disabled" />
     </Frame>
-    <Frame type="Image" name="HoverImage">
-      <Anchor relative="$parent/NormalImage" />
-      <TextureType val="Normal" />
-      <DesaturateOnDisable val="false" />
-      <ColorAdjustMode val="AddSelf" />
-      <AdjustmentColor val="50,255,255,255" />
-      <Frame type="PropertyBind" name="BindTexture">
-        <Anchor relative="$parent" />
-        <Source frame="$parent/$parent/NormalImage" property="Texture" />
-        <Target frame="$parent" property="Texture" />
-      </Frame>
+    <Frame type="Image" name="HoverButtonImage">
+      <Texture val="@UI/Storm_UI_Play_HeroAttributes_Button_Maps_Hover" />
     </Frame>
-    <Frame type="Image" name="DarkenImage">
-      <Anchor relative="$parent/NormalImage" />
-      <TextureType val="Normal" />
-      <DesaturateOnDisable val="false" />
-      <ColorAdjustMode val="Fill" />
-      <AdjustmentColor val="100,0,0,0" />
-      <Visible val="false" />
-      <Frame type="PropertyBind" name="BindTexture">
-        <Anchor relative="$parent" />
-        <Source frame="$parent/$parent/NormalImage" property="Texture" />
-        <Target frame="$parent" property="Texture" />
-      </Frame>
+    <Frame type="Image" name="ToggledButtonImage">
+      <Texture val="@UI/Storm_UI_Play_HeroAttributes_Button_Maps_Selected" />
     </Frame>
-    <StateGroup name="ButtonState">
-      <State name="Pushed">
-        <When type="AnimationState" buttonState="Pushed" />
-        <Action type="SetProperty" frame="DarkenImage" visible="true" />
+    <Frame type="Label" name="Label">
+      <Anchor side="Top" relative="$parent/BaseButtonImage" pos="Max" offset="-25" />
+      <Anchor side="Left" relative="$parent/HitTestFrame" pos="Min" offset="-4" />
+      <Anchor side="Right" relative="$parent/HitTestFrame" pos="Max" offset="4" />
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
+      <ScaleText val="True" />
+      <Options val="ScaleToPreventTruncation" />
+      <Style val="HeroSelectPanelButtonLabel" />
+    </Frame>
+  </Frame>
+  <Frame type="Frame" name="RankContainerBaseTemplate">
+    <Width val="600" />
+    <Frame type="PartyMemberFrame" name="BattleUserFrame">
+      <Anchor side="Top" relative="$parent/NameContainer/HeroUserLabel" pos="Min" offset="0" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="120" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="-120" />
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
+    </Frame>
+    <StateGroup name="MemberOnline">
+      <State name="Online">
+        <When type="Property" frame="BattleUserFrame" operator="Equal" PartyMemberStatus="Online" />
+        <Action type="SetProperty" frame="NameContainer" Visible="True" />
+        <Action type="SetProperty" frame="BattleUserFrame" AcceptsMouse="True" />
       </State>
     </StateGroup>
+    <Frame type="Frame" name="NameContainer">
+      <Anchor relative="$parent" offset="0" />
+      <Visible val="false" />
+      <Frame type="Image" name="NameUnderlineImage">
+        <Anchor side="Top" relative="$parent/UserDetailsSpacer" pos="Min" offset="0" />
+        <Anchor side="Left" relative="$parent/UserDetailsSpacer" pos="Mid" offset="0" />
+        <Anchor side="Right" relative="$parent/UserDetailsSpacer" pos="Mid" offset="0" />
+        <Texture val="@UI/Storm_UI_Play_HeroSelect_Nameplate_Line_Off" />
+      </Frame>
+      <Frame type="Frame" name="UserDetailsSpacer">
+        <Anchor side="Top" relative="$parent" pos="Min" offset="56" />
+        <Anchor side="Bottom" relative="$parent" pos="Min" offset="56" />
+        <Anchor side="Left" relative="$parent" pos="Min" offset="20" />
+        <Anchor side="Right" relative="$parent" pos="Max" offset="-20" />
+        <Height val="14" />
+        <Visible val="False" />
+      </Frame>
+      <Frame type="Label" name="HeroUserLabel">
+        <Anchor side="Bottom" relative="$parent/UserDetailsSpacer" pos="Min" offset="2" />
+        <Anchor side="Left" relative="$parent/UserDetailsSpacer" pos="Mid" offset="0" />
+        <Anchor side="Right" relative="$parent/UserDetailsSpacer" pos="Mid" offset="0" />
+        <Height val="30" />
+        <Style val="HeroSelectNameplatePartyNameLabel" />
+        <Text val="{$parent/$parent/BattleUserFrame/@DisplayName}" />
+        <AcceptsMouseTooltip val="True" />
+        <Options val="Ellipsis|TooltipIfTruncated" />
+      </Frame>
+      <Frame type="Image" name="BoostIcon">
+        <Anchor side="Left" relative="$parent/HeroUserLabel" pos="Max" offset="-1" />
+        <Anchor side="Bottom" relative="$parent/HeroUserLabel" pos="Max" offset="-3" />
+        <Texture val="@UI/Storm_UI_Boost_Icon_Small" />
+        <Width val="20" />
+        <Height val="20" />
+      </Frame>
+      <StateGroup name="BoostState">
+        <DefaultState val="NoBoost" />
+        <State name="Boost">
+          <When type="Property" frame="$parent/BattleUserFrame" HasActiveBoost="True" />
+          <When type="Property" frame="HeroUserLabel" Visible="True" />
+          <Action type="SetAutoSizeClamps" frame="HeroUserLabel" maxWidth="273" />
+          <Action type="SetAnchor" frame="HeroUserLabel" side="Left" relative="$parent/UserDetailsSpacer" pos="Mid" offset="-12" />
+          <Action type="SetAnchor" frame="HeroUserLabel" side="Right" relative="$parent/UserDetailsSpacer" pos="Mid" offset="-12" />
+          <Action type="SetProperty" frame="BoostIcon" Visible="True" />
+        </State>
+        <State name="NoBoost">
+          <Action type="SetAutoSizeClamps" frame="HeroUserLabel" maxWidth="304" />
+          <Action type="SetAnchor" frame="HeroUserLabel" side="Left" relative="$parent/UserDetailsSpacer" pos="Mid" offset="0" />
+          <Action type="SetAnchor" frame="HeroUserLabel" side="Right" relative="$parent/UserDetailsSpacer" pos="Mid" offset="0" />
+          <Action type="SetProperty" frame="BoostIcon" Visible="False" />
+        </State>
+      </StateGroup>
+    </Frame>
   </Frame>
-  <Frame type="NydusLinkButton" name="RankedGuideButton" template="HeroRankedPanel/LeaderBoardsButton">
-    <NydusLink val="RankedGuide" />
-    <Tooltip val="@UI/RankedPlay/RankedGuide/Tooltip" />
-    <Frame type="Image" name="NormalImage">
-      <Texture val="@UI/Storm_UI_Ranked_SeasonProgress_RankedGuide_Button" />
+  <Frame type="Frame" name="RankContainerPartyTemplate" template="HeroRankedPanel/RankContainerBaseTemplate">
+    <Frame type="PartyMemberFrame" name="BattleUserFrame">
+      <Anchor side="Left" relative="$parent" pos="Min" offset="130" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="-130" />
+      <Anchor side="Bottom" relative="$parent/BannerImage" pos="Max" offset="0" />
+    </Frame>
+    <Frame type="BlurFrame" name="BannerImageBlur">
+      <Height val="538" />
+      <Anchor side="Bottom" relative="$parent/BannerImage" pos="Max" offset="-1" />
+      <Anchor side="Left" relative="$parent/BannerImage" pos="Min" offset="-4" />
+      <Anchor side="Right" relative="$parent/BannerImage" pos="Max" offset="5" />
+      <Visible val="{$parent/NameContainer/@Visible}" />
+      <BlurAmount val="0.6" />
+      <AlphaMaskTexture val="@UI/Storm_UI_StormLeague_Banner_Blur" />
+      <RenderType val="HDR" />
+    </Frame>
+    <Frame type="Image" name="BannerImage">
+      <Anchor side="Bottom" relative="$parent/RankBadge" pos="Max" offset="155" />
+      <Anchor side="Right" relative="$parent/RankBadge" pos="Mid" offset="0" />
+      <Anchor side="Left" relative="$parent/RankBadge" pos="Mid" offset="0" />
+      <Texture val="@UI/Storm_UI_StormLeague_Banner_Small" />
+      <Visible val="{$parent/NameContainer/@Visible}" />
+      <RenderType val="HDR" />
+    </Frame>
+    <Frame type="RankBadge" name="RankBadge" template="RankBadgeTemplates/RankBadgeSmallTemplate">
+      <Anchor side="Top" relative="$parent" pos="Min" offset="62" />
+      <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
+      <Visible val="{$parent/NameContainer/@Visible}" />
+      <RankOverride val="{$parent/BattleUserFrame/@PlayerRank}" />
+    </Frame>
+    <Frame type="Image" name="DescriptionDividerImage">
+      <Anchor side="Top" relative="$parent/BannerImage" pos=".43" offset="0" />
+      <Anchor side="Left" relative="$parent/BannerImage" pos="Mid" offset="0" />
+      <Anchor side="Right" relative="$parent/BannerImage" pos="Mid" offset="0" />
+      <Width val="180" />
+      <ScaleHeightToTexture val="True" />
+      <Texture val="@UI/Storm_UI_Ranked_ModeBackground_Divider" />
+      <Visible val="{$parent/NameContainer/@Visible}" />
+    </Frame>
+    <Frame type="Label" name="GamesRecordLabel">
+      <Anchor side="Bottom" relative="$parent/DescriptionDividerImage" pos="Min" offset="4" />
+      <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
+      <Style val="HeroLobbyRankedHeroLeagueRecordParty" />
+      <AcceptsMouseTooltip val="true" />
+      <TooltipAnchorPosition val="MiddleRight" />
+      <Visible val="{$parent/NameContainer/@Visible}" />
+      <Text val="{TextFormatter/@Text}" />
+      <Tooltip val="{TooltipFormatter/@Text}" />
+      <Frame type="TextFormatFrame" name="TextFormatter">
+        <Anchor relative="$parent" />
+        <Visible val="false" />
+        <FormatText val="@UI/RankedPlay/GamesRecordHeroLeague" />
+        <Replacement val="{$parent/$parent/BattleUserFrame/@Wins}" index="0" />
+      </Frame>
+      <Frame type="TextFormatFrame" name="TooltipFormatter">
+        <Anchor relative="$parent" />
+        <Visible val="false" />
+        <FormatText val="@UI/RankedPlay/GamesRecordHeroLeagueTooltip" />
+        <Replacement val="{$parent/$parent/BattleUserFrame/@Wins}" index="0" />
+        <Replacement val="{$parent/$parent/BattleUserFrame/@Losses}" index="1" />
+        <Replacement val="{$parent/$parent/BattleUserFrame/@Total}" index="2" />
+        <Replacement val="{$parent/$parent/BattleUserFrame/@WinRate}" index="3" />
+      </Frame>
+    </Frame>
+    <Frame type="PreferredRoleTileList" name="PreferredRoleContainer" template="HeroPreferredRoleContainer/HeroPreferredRoleContainerPartyMember">
+      <Anchor side="Top" relative="$parent/DescriptionDividerImage" pos="Max" offset="-35" />
+      <Anchor side="Left" relative="$parent/BannerImage" pos="Mid" offset="0" />
+      <Anchor side="Right" relative="$parent/BannerImage" pos="Mid" offset="0" />
+      <PreferredRoleObject val="{$parent/BattleUserFrame/@PreferredRoleObject}" />
+      <Visible val="{$parent/NameContainer/@Visible}" />
     </Frame>
   </Frame>
   <Frame type="AnchoredPopup" name="RankedReadyButtonAnchoredPopupTemplate" template="StandardPopupTooltip/ReadyButtonAnchoredPopupTemplate">
@@ -195,7 +303,7 @@
     <StateGroup name="ShowPopup">
       <DefaultState val="Hidden" />
       <State name="Shown">
-        <When type="Property" frame="$RankedPanel_TeamLeagueBadge" showPopup="true" />
+        <When type="Property" frame="$RankedPanel_StormLeagueBadge" showPopup="true" />
         <Action type="SetProperty" frame="$this" show="true" />
       </State>
       <State name="Hidden">
@@ -218,7 +326,7 @@
     <StateGroup name="TitleStyle">
       <DefaultState val="Normal" />
       <State name="Demotion">
-        <When type="Property" frame="$RankedPanel_TeamLeagueBadge" PromotionState="DemotionNextGame" />
+        <When type="Property" frame="$RankedPanel_StormLeagueBadge" PromotionState="DemotionNextGame" />
         <Action type="SetProperty" frame="Container/TitleLabel" style="RankedBadge_Demotion_Tooltip_Title_Left" />
       </State>
       <State name="Normal">
@@ -227,17 +335,17 @@
     </StateGroup>
     <Frame type="PropertyBind" name="PropertyBindTitle">
       <Anchor relative="$parent" />
-      <Source frame="$RankedPanel_TeamLeagueBadge" property="PopupTitle" />
+      <Source frame="$RankedPanel_StormLeagueBadge" property="PopupTitle" />
       <Target frame="$parent/Container/TitleLabel" property="Text" />
     </Frame>
     <Frame type="PropertyBind" name="PropertyBindText">
       <Anchor relative="$parent" />
-      <Source frame="$RankedPanel_TeamLeagueBadge" property="PopupText" />
+      <Source frame="$RankedPanel_StormLeagueBadge" property="PopupText" />
       <Target frame="$parent/Container/BodyLabel" property="Text" />
     </Frame>
     <Animation name="OnDismiss">
       <Event event="Dismiss" action="Play" />
-      <Controller type="Event" end="Stop" frame="$RankedPanel_TeamLeagueBadge">
+      <Controller type="Event" end="Stop" frame="$RankedPanel_StormLeagueBadge">
         <Key type="Event" time="0" event="FirstTimeExplanationDismissed" />
       </Controller>
     </Animation>
@@ -258,27 +366,6 @@
         <Key type="Sound" time="0.0" sound="@UI_Gluescreen_Transition_HeroLeague" />
       </Controller>
     </Animation>
-    <Animation name="ToggleGameMode">
-      <Event event="RankedPlayTeamLeagueActive" action="Restart,Play" />
-      <Event event="RankedPlayHeroLeagueActive" action="DirectionReverse,Play" />
-      <Controller type="Event" end="Stop" frame="$this/LeagueTypes/HeroLeague">
-        <Key type="Event" time="0" event="Selected" />
-        <Key type="Event" time=".01" event="Deselected" />
-      </Controller>
-      <Controller type="Event" end="Stop" frame="$this/LeagueTypes/TeamLeague">
-        <Key type="Event" time="0" event="Deselected" />
-        <Key type="Event" time=".01" event="Selected" />
-      </Controller>
-    </Animation>
-    <Animation name="NoGameModeActive">
-      <Event event="RankedPlayNoActiveQueue" action="Restart,Play" />
-      <Controller type="Event" end="Stop" frame="$this/LeagueTypes/HeroLeague">
-        <Key type="Event" time="0" event="Deselected" />
-      </Controller>
-      <Controller type="Event" end="Stop" frame="$this/LeagueTypes/TeamLeague">
-        <Key type="Event" time="0" event="Deselected" />
-      </Controller>
-    </Animation>
     <Frame type="Image" name="RankedVignette">
       <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
       <Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
@@ -286,210 +373,273 @@
       <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
       <Texture val="@UI/Storm_Lobby_Unranked_Vignette" />
     </Frame>
-    <Frame type="Frame" name="LeagueTypes">
-      <Anchor side="Top" relative="$parent" pos="Min" offset="150" />
-      <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
-      <Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
+    <Frame Type="BattleUserContextMenu" name="RankedPanelContextMenu" template="BattleUserContextMenu/BattleUserContextMenu">
+      <Anchor side="Top" relative="$parent" pos="Max" offset="0" />
       <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
-      <Frame type="Image" name="FloorBackground">
-        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
+    </Frame>
+    <Frame type="Frame" name="RankContainerParty4" template="HeroRankedPanel/RankContainerPartyTemplate">
+      <Anchor side="Top" relative="$parent/RankContainerParty0" pos="Min" offset="0" />
+      <Anchor side="Bottom" relative="$parent/RankContainerParty0" pos="Max" offset="0" />
+      <Anchor side="Right" relative="$parent/Spacer_2_4" pos="Min" offset="0" />
+      <Frame type="BattleUserFrame" name="BattleUserFrame">
+        <PresenceId val="{$PartyUI/@MemberPresenceIds[4]}" />
+        <ContextMenu val="$ancestor[@type=HeroRankedPanel]/RankedPanelContextMenu" />
+      </Frame>
+    </Frame>
+    <Frame type="AspectRatioFrame" name="Spacer_2_4">
+      <Anchor side="Top" relative="$parent/RankContainerParty0" pos="Min" offset="0" />
+      <Anchor side="Bottom" relative="$parent/RankContainerParty0" pos="Max" offset="0" />
+      <Anchor side="Right" relative="$parent/RankContainerParty2" pos="Min" offset="265" />
+      <MinVisibleAspectRatio val="1.5" />
+      <Width val="33" />
+      <CollapseLayout val="true" />
+    </Frame>
+    <Frame type="AspectRatioFrame" name="Spacer_1_3">
+      <Anchor side="Top" relative="$parent/RankContainerParty0" pos="Min" offset="0" />
+      <Anchor side="Bottom" relative="$parent/RankContainerParty0" pos="Max" offset="0" />
+      <Anchor side="Left" relative="$parent/RankContainerParty1" pos="Max" offset="-265" />
+      <MinVisibleAspectRatio val="1.5" />
+      <Width val="33" />
+      <CollapseLayout val="true" />
+    </Frame>
+    <Frame type="Frame" name="RankContainerParty3" template="HeroRankedPanel/RankContainerPartyTemplate">
+      <Anchor side="Top" relative="$parent/RankContainerParty0" pos="Min" offset="0" />
+      <Anchor side="Bottom" relative="$parent/RankContainerParty0" pos="Max" offset="0" />
+      <Anchor side="Left" relative="$parent/Spacer_1_3" pos="Max" offset="0" />
+      <Frame type="BattleUserFrame" name="BattleUserFrame">
+        <PresenceId val="{$PartyUI/@MemberPresenceIds[3]}" />
+        <ContextMenu val="$ancestor[@type=HeroRankedPanel]/RankedPanelContextMenu" />
+      </Frame>
+    </Frame>
+    <Frame type="Frame" name="RankContainerParty2" template="HeroRankedPanel/RankContainerPartyTemplate">
+      <Anchor side="Top" relative="$parent/RankContainerParty0" pos="Min" offset="0" />
+      <Anchor side="Bottom" relative="$parent/RankContainerParty0" pos="Max" offset="0" />
+      <Anchor side="Right" relative="$parent/Spacer_0_2" pos="Min" offset="0" />
+      <Frame type="BattleUserFrame" name="BattleUserFrame">
+        <PresenceId val="{$PartyUI/@MemberPresenceIds[2]}" />
+        <ContextMenu val="$ancestor[@type=HeroRankedPanel]/RankedPanelContextMenu" />
+      </Frame>
+    </Frame>
+    <Frame type="AspectRatioFrame" name="Spacer_0_2">
+      <Anchor side="Top" relative="$parent/RankContainerParty0" pos="Min" offset="0" />
+      <Anchor side="Bottom" relative="$parent/RankContainerParty0" pos="Max" offset="0" />
+      <Anchor side="Right" relative="$parent/RankContainerParty0" pos="Min" offset="225" />
+      <MinVisibleAspectRatio val="1.5" />
+      <Width val="33" />
+      <CollapseLayout val="true" />
+    </Frame>
+    <Frame type="AspectRatioFrame" name="Spacer_0_1">
+      <Anchor side="Top" relative="$parent/RankContainerParty0" pos="Min" offset="0" />
+      <Anchor side="Bottom" relative="$parent/RankContainerParty0" pos="Max" offset="0" />
+      <Anchor side="Left" relative="$parent/RankContainerParty0" pos="Max" offset="-225" />
+      <MinVisibleAspectRatio val="1.5" />
+      <Width val="33" />
+      <CollapseLayout val="true" />
+    </Frame>
+    <Frame type="Frame" name="RankContainerParty1" template="HeroRankedPanel/RankContainerPartyTemplate">
+      <Anchor side="Top" relative="$parent/RankContainerParty0" pos="Min" offset="0" />
+      <Anchor side="Bottom" relative="$parent/RankContainerParty0" pos="Max" offset="0" />
+      <Anchor side="Left" relative="$parent/Spacer_0_1" pos="Max" offset="0" />
+      <Frame type="BattleUserFrame" name="BattleUserFrame">
+        <PresenceId val="{$PartyUI/@MemberPresenceIds[1]}" />
+        <ContextMenu val="$ancestor[@type=HeroRankedPanel]/RankedPanelContextMenu" />
+      </Frame>
+    </Frame>
+    <Frame type="Frame" name="RankContainerParty0" template="HeroRankedPanel/RankContainerBaseTemplate">
+      <Anchor side="Top" relative="$parent/LeagueContainerLocal" pos="Min" offset="-60" />
+      <Anchor side="Bottom" relative="$parent/LeagueContainerLocal" pos="Max" offset="0" />
+      <Anchor side="Left" relative="$parent/LeagueContainerLocal" pos="Mid" offset="0" />
+      <Anchor side="Right" relative="$parent/LeagueContainerLocal" pos="Mid" offset="0" />
+      <Frame type="BattleUserFrame" name="BattleUserFrame">
+        <PresenceId val="{$BattleUI/@LocalToonPresenceId}" />
+        <ContextMenu val="$ancestor[@type=HeroRankedPanel]/RankedPanelContextMenu" />
+      </Frame>
+    </Frame>
+    <Frame type="HeroRankedLeagueContainer" name="LeagueContainerLocal" template="HeroRankedLeagueContainer/HeroRankedLeagueContainerTemplate">
+      <Anchor side="Top" relative="$parent" pos="Min" offset="200" />
+      <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
+      <QueueTag val="RnkX" />
+      <Frame type="RankBadge" name="RankBadge">
+        <Handle val="RankedPanel_StormLeagueBadge" />
+      </Frame>
+      <Frame type="Frame" name="RankBadgePopupAnchor">
+        <Anchor side="Top" relative="$parent/RankBadge/AnchorFrame" pos="Min" offset="0" />
+        <Anchor side="Left" relative="$parent/RankBadge/AnchorFrame" pos="Min" offset="10" />
+        <Anchor side="Bottom" relative="$parent/RankBadge/AnchorFrame" pos="Max" offset="0" />
+        <Anchor side="Right" relative="$parent/RankBadge/AnchorFrame" pos="Max" offset="-10" />
+        <TooltipAnchorPosition val="MiddleRight" />
+        <Frame type="AnchoredPopup" name="TeamAnchoredPopup" template="HeroRankedPanel/TeamAnchoredPopupTemplate" />
+      </Frame>
+      <Frame type="Label" name="GamesRecordLabel">
+        <Anchor side="Bottom" relative="$parent/DescriptionDividerImage" pos="Min" offset="6" />
         <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
         <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
-        <Width val="0" />
-        <Texture val="@UI/Storm_UI_Ranked_BackgroundFloor" />
-        <RenderType val="HDR" />
-      </Frame>
-      <Frame type="HeroRankedLeagueContainer" name="HeroLeague" template="HeroRankedLeagueContainer/HeroRankedLeagueContainerTemplate">
-        <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
-        <Anchor side="Right" relative="$parent" pos="Mid" offset="-5" />
-        <QueueTag val="RnkS" />
-        <Animation name="LeagueType">
-          <Event event="OnShown" action="Play" />
-          <Controller type="Event" end="Stop">
-            <Key type="Event" time="0" event="HeroLeague" />
-          </Controller>
-        </Animation>
-        <Frame type="RankBadge" name="RankBadge">
-          <Handle val="RankedPanel_HeroLeagueBadge" />
+        <Style val="HeroLobbyRankedHeroLeagueRecord" />
+        <AcceptsMouseTooltip val="true" />
+        <TooltipAnchorPosition val="MiddleRight" />
+        <Text val="{TextFormatter/@Text}" />
+        <Tooltip val="{TooltipFormatter/@Text}" />
+        <Frame type="TextFormatFrame" name="TextFormatter">
+          <Anchor relative="$parent" />
+          <Visible val="false" />
+          <FormatText val="@UI/RankedPlay/GamesRecordHeroLeague" />
+          <Replacement val="{$ancestor[@type=HeroRankedPanel]/RankContainerParty0/BattleUserFrame/@Wins}" index="0" />
         </Frame>
-        <Frame type="Frame" name="RankBadgePopupAnchor">
-          <Anchor side="Top" relative="$parent/RankBadge/AnchorFrame" pos="Min" offset="0" />
-          <Anchor side="Left" relative="$parent/RankBadge/AnchorFrame" pos="Min" offset="10" />
-          <Anchor side="Bottom" relative="$parent/RankBadge/AnchorFrame" pos="Max" offset="0" />
-          <Anchor side="Right" relative="$parent/RankBadge/AnchorFrame" pos="Max" offset="-10" />
-          <TooltipAnchorPosition val="MiddleLeft" />
-          <Frame type="AnchoredPopup" name="HeroAnchoredPopup" template="HeroRankedPanel/HeroAnchoredPopupTemplate" />
+        <Frame type="TextFormatFrame" name="TooltipFormatter">
+          <Anchor relative="$parent" />
+          <Visible val="false" />
+          <FormatText val="@UI/RankedPlay/GamesRecordHeroLeagueTooltip" />
+          <Replacement val="{$ancestor[@type=HeroRankedPanel]/RankContainerParty0/BattleUserFrame/@Wins}" index="0" />
+          <Replacement val="{$ancestor[@type=HeroRankedPanel]/RankContainerParty0/BattleUserFrame/@Losses}" index="1" />
+          <Replacement val="{$ancestor[@type=HeroRankedPanel]/RankContainerParty0/BattleUserFrame/@Total}" index="2" />
+          <Replacement val="{$ancestor[@type=HeroRankedPanel]/RankContainerParty0/BattleUserFrame/@WinRate}" index="3" />
         </Frame>
       </Frame>
-      <Frame type="HeroRankedLeagueContainer" name="TeamLeague" template="HeroRankedLeagueContainer/TeamRankedLeagueContainerTemplate">
-        <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
-        <Anchor side="Left" relative="$parent" pos="Mid" offset="5" />
-        <QueueTag val="RnkP" />
-        <Animation name="LeagueType">
-          <Event event="OnShown" action="Play" />
-          <Controller type="Event" end="Stop">
-            <Key type="Event" time="0" event="TeamLeague" />
-          </Controller>
-        </Animation>
-        <Frame type="RankBadge" name="RankBadge">
-          <Handle val="RankedPanel_TeamLeagueBadge" />
-        </Frame>
-        <Frame type="Frame" name="RankBadgePopupAnchor">
-          <Anchor side="Top" relative="$parent/RankBadge/AnchorFrame" pos="Min" offset="0" />
-          <Anchor side="Left" relative="$parent/RankBadge/AnchorFrame" pos="Min" offset="10" />
-          <Anchor side="Bottom" relative="$parent/RankBadge/AnchorFrame" pos="Max" offset="0" />
-          <Anchor side="Right" relative="$parent/RankBadge/AnchorFrame" pos="Max" offset="-10" />
-          <TooltipAnchorPosition val="MiddleRight" />
-          <Frame type="AnchoredPopup" name="TeamAnchoredPopup" template="HeroRankedPanel/TeamAnchoredPopupTemplate" />
-        </Frame>
-      </Frame>
-      <Animation name="StartShine">
-        <Event event="OnShown" action="Play" frame="$ancestor[@type=HeroRankedPanel]" />
-        <Controller type="Event" end="Stop" frame="TeamLeague/RankBadge">
-          <Key type="Event" time="0" event="StartShine" />
-        </Controller>
-        <Controller type="Event" end="Stop" frame="HeroLeague/RankBadge">
-          <Key type="Event" time="0.30" event="StartShine" />
+    </Frame>
+    <Frame type="PreferredRoleTileList" name="PreferredRoleLocalSelectionFrame" template="HeroPreferredRoleContainer/HeroPreferredRoleContainer">
+      <Anchor side="Bottom" relative="$parent/LeagueContainerLocal" pos="Max" offset="-242" />
+      <Anchor side="Left" relative="$parent/LeagueContainerLocal" pos="Mid" offset="0" />
+      <Anchor side="Right" relative="$parent/LeagueContainerLocal" pos="Mid" offset="0" />
+      <PreferredRoleObject val="{$ancestor[@type=HeroRankedPanel]/RankContainerParty0/BattleUserFrame/@PreferredRoleObject}" />
+    </Frame>
+    <Animation name="StartShine">
+      <Event event="OnShown" action="Play" frame="$this" />
+      <Controller type="Event" end="Stop" frame="LeagueContainerLocal/RankBadge">
+        <Key type="Event" time="0" event="StartShine" />
+      </Controller>
+    </Animation>
+    <Frame type="CutsceneFrame" name="FogCutscene">
+      <Anchor side="Top" relative="$parent" pos="Min" offset="150" />
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="100" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+      <Height val="1500" />
+      <RenderType val="HDR" />
+      <AutoPlay val="true" />
+      <Alpha val="150" />
+      <Preload val="false" />
+      <Animation name="OnShown">
+        <Event event="OnShown" action="Reset,Play" />
+        <Controller type="Cutscene" end="Stop">
+          <Key type="Cutscene" time="0.0" action="SetCutscene" file="Cutscenes/UI_GroundFog_Blue.StormCutscene" />
+          <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="Stand Start" />
+          <Key type="Cutscene" time="0.0" action="Play" />
         </Controller>
       </Animation>
-      <Frame type="CutsceneFrame" name="FogCutscene">
-        <Anchor side="Bottom" relative="$parent" pos="Max" offset="100" />
-        <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
-        <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
-        <Height val="1500" />
-        <RenderType val="HDR" />
-        <AutoPlay val="true" />
-        <Alpha val="150" />
-        <Preload val="false" />
-        <Animation name="OnShown">
-          <Event event="OnShown" action="Reset,Play" />
-          <Controller type="Cutscene" end="Stop">
-            <Key type="Cutscene" time="0.0" action="SetCutscene" file="Cutscenes/UI_GroundFog_Blue.StormCutscene" />
-            <Key type="Cutscene" time="0.0" action="Bookmark" bookmark="Stand Start" />
-            <Key type="Cutscene" time="0.0" action="Play" />
-          </Controller>
-        </Animation>
+    </Frame>
+    <Frame type="Label" name="SeasonLabel">
+      <Anchor side="Bottom" relative="$parent/SeasonRemainingTimeLabel" pos="Min" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
+      <Style val="HeroLobbyRankedHeroLeagueSeason" />
+      <Text val="{$parent/@SeasonName}" />
+    </Frame>
+    <Frame type="Label" name="SeasonRemainingTimeLabel">
+      <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
+      <Style val="HeroLobbyRankedHeroLeagueTimeRemaining" />
+      <Text val="{FormatFrame/@Text}" />
+      <Frame type="TextFormatFrame" name="FormatFrame">
+        <Anchor relative="$parent" />
+        <FormatText val="@UI/RankedPlay/RemainingTime" />
+        <Replacement val="{$ancestor[@type=HeroRankedPanel]/@RemainingTime}" index="0" />
+      </Frame>
+      <StateGroup name="BottomAnchor">
+        <DefaultState val="Default" />
+        <State name="Default">
+          <Action type="SetAnchor" side="Bottom" relative="$parent/ReadyButtonContainer" pos="Min" offset="-10" />
+        </State>
+        <State name="ShiftedUp">
+          <When type="Property" frame="$parent/ReadyButtonNotificationContainer" Visible="True" />
+          <Action type="SetAnchor" side="Bottom" relative="$parent/ReadyButtonContainer" pos="Min" offset="-90" />
+        </State>
+      </StateGroup>
+    </Frame>
+    <Frame type="NydusLinkButton" name="LeaderBoardsButton" template="HeroRankedPanel/InfoButtonTemplate">
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="25" />
+      <NydusLink val="LeaderBoards" />
+      <UseBrowser val="true" />
+      <BrowserPurpose val="LeaderBoards" />
+      <ReportsStats val="true" />
+      <Tooltip val="@UI/RankedPlay/LeaderBoards/Tooltip" />
+      <Handle val="HeroRankedPanel_LeaderBoardsButton" />
+      <Frame type="Image" name="BaseButtonImage">
+        <Texture val="@UI/Storm_UI_Play_HeroAttributes_Button_Leaderboards_Normal" />
+      </Frame>
+      <Frame type="Image" name="DisabledButtonImage">
+        <Texture val="@UI/Storm_UI_Play_HeroAttributes_Button_Leaderboards_Disabled" />
+      </Frame>
+      <Frame type="Image" name="HoverButtonImage">
+        <Texture val="@UI/Storm_UI_Play_HeroAttributes_Button_Leaderboards_Hover" />
+      </Frame>
+      <Frame type="Image" name="ToggledButtonImage">
+        <Texture val="@UI/Storm_UI_Play_HeroAttributes_Button_Leaderboards_Selected" />
+      </Frame>
+      <Frame type="Label" name="Label">
+        <Text val="@UI/RankedPlay/Leaderboards" />
       </Frame>
     </Frame>
-    <Frame type="BlurFrame" name="BlurFrame" template="StandardTemplates/FullscreenBlurFrame">
-      <Anchor relative="$parent/SeasonProgressBackgroundImage" offset="-3" />
-      <AlphaMaskTexture val="@UI/Storm_UI_Ranked_SeasonProgressBackgroundAlpha" />
-      <BlurAmount val="0.2" />
-      <RenderType val="HDR" />
+    <Frame type="NydusLinkButton" name="RankedGuideButton" template="HeroRankedPanel/InfoButtonTemplate">
+      <Anchor side="Bottom" relative="$parent/LeaderBoardsButton" pos="Max" offset="0" />
+      <Anchor side="Left" relative="$parent/LeaderBoardsButton" pos="Mid" offset="#PlayModeInfoButtonOffset" />
+      <NydusLink val="RankedGuide" />
+      <UseBrowser val="true" />
+      <BrowserPurpose val="RankedGuide" />
+      <ReportsStats val="true" />
+      <Tooltip val="@UI/RankedPlay/RankedGuide/Tooltip" />
+      <Handle val="HeroRankedPanel_RankedGuideButton" />
+      <Frame type="Image" name="BaseButtonImage">
+        <Texture val="@UI/Storm_UI_Play_HeroAttributes_Button_RankedGuide_Normal" />
+      </Frame>
+      <Frame type="Image" name="DisabledButtonImage">
+        <Texture val="@UI/Storm_UI_Play_HeroAttributes_Button_RankedGuide_Disabled" />
+      </Frame>
+      <Frame type="Image" name="HoverButtonImage">
+        <Texture val="@UI/Storm_UI_Play_HeroAttributes_Button_RankedGuide_Hover" />
+      </Frame>
+      <Frame type="Image" name="ToggledButtonImage">
+        <Texture val="@UI/Storm_UI_Play_HeroAttributes_Button_RankedGuide_Selected" />
+      </Frame>
+      <Frame type="Label" name="Label">
+        <Text val="@UI/RankedPlay/RankedGuide" />
+      </Frame>
     </Frame>
-    <Frame type="Image" name="SeasonProgressBackgroundDarken">
-      <Anchor relative="$parent/BlurFrame" offset="0" />
-      <Color val="090417" />
-      <Alpha val="180" />
-      <AlphaMaskTexture val="@UI/Storm_UI_Ranked_SeasonProgressBackgroundAlpha" />
+    <Frame type="Button" name="MapRotationButton" template="HeroRankedPanel/InfoButtonTemplate">
+      <Anchor side="Bottom" relative="$parent/LeaderBoardsButton" pos="Max" offset="0" />
+      <Anchor side="Left" relative="$parent/RankedGuideButton" pos="Mid" offset="#PlayModeInfoButtonOffset" />
+      <Toggleable val="True" />
+      <Tooltip val="@UI/RankedPlay/MapsRotation/Tooltip" />
+      <Frame type="Image" name="BaseButtonImage">
+        <Texture val="@UI/Storm_UI_Play_HeroAttributes_Button_Maps_Normal" />
+      </Frame>
+      <Frame type="Image" name="DisabledButtonImage">
+        <Texture val="@UI/Storm_UI_Play_HeroAttributes_Button_Maps_Disabled" />
+      </Frame>
+      <Frame type="Image" name="HoverButtonImage">
+        <Texture val="@UI/Storm_UI_Play_HeroAttributes_Button_Maps_Hover" />
+      </Frame>
+      <Frame type="Image" name="ToggledButtonImage">
+        <Texture val="@UI/Storm_UI_Play_HeroAttributes_Button_Maps_Selected" />
+      </Frame>
+      <Frame type="Label" name="Label">
+        <Text val="@UI/RankedPlay/MapsRotation" />
+      </Frame>
+      <StateGroup name="MapsListPopupState">
+        <DefaultState val="Hide" />
+        <State name="Show">
+          <When type="Property" Toggled="True" />
+          <Action type="SendEvent" frame="$parent/MapRotationPanel" event="Show" />
+        </State>
+        <State name="Hide">
+          <Action type="SendEvent" frame="$parent/MapRotationPanel" event="Hide" />
+        </State>
+      </StateGroup>
     </Frame>
-    <Frame type="Image" name="SeasonProgressBackgroundImage">
-      <Anchor side="Bottom" relative="$parent/LeagueTypes/HeroLeague" pos="Max" offset="18" />
-      <Anchor side="Right" relative="$parent/LeagueTypes" pos="Mid" offset="0" />
-      <Anchor side="Left" relative="$parent/LeagueTypes" pos="Mid" offset="0" />
-      <RenderType val="LDR" />
-      <Texture val="@UI/Storm_UI_Ranked_SeasonProgressBackground" />
-      <Width val="894" />
-      <TextureType val="Nineslice" />
-      <Frame type="ProgressBar" name="SeasonProgressBar">
-        <Anchor side="Left" relative="$parent" pos="Min" offset="7" />
-        <Anchor side="Bottom" relative="$parent" pos="Max" offset="-2" />
-        <Anchor side="Right" relative="$parent" pos="Max" offset="-7" />
-        <Height val="36" />
-        <AcceptsMouseTooltip val="True" />
-        <TooltipAnchorPosition val="TopCenter" />
-        <UseFillContainer val="true" />
-        <FillInset val="0.0" />
-        <MinValue val="-.10" />
-        <MaxValue val="1.00" />
-        <Value val="1.0" />
-        <Frame type="Frame" name="FillImageContainer">
-          <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
-          <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
-          <Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
-          <Frame type="Image" name="FillImage">
-            <Anchor relative="$parent" />
-            <Texture val="@UI/Storm_UI_Ranked_SeasonProgressBar" />
-            <TextureType val="Nineslice" />
-          </Frame>
-          <Frame type="Image" name="SeasonProgressBarSubGlowImage">
-            <Anchor side="Top" relative="$parent/FillImage" pos="Mid" offset="0" />
-            <Anchor side="Bottom" relative="$parent/FillImage" pos="Mid" offset="0" />
-            <Anchor side="Right" relative="$parent/FillImage" pos="Max" offset="23" />
-            <Unclipped val="true" />
-            <Texture val="@UI/Storm_UI_Ranked_SeasonProgressBar_SubGlow" />
-            <BlendMode val="Add" />
-            <Animation name="Pulse">
-              <Event event="OnShown" action="Play" />
-              <Controller type="Fade" end="PingPong">
-                <Key type="Curve" time="0" value="200" inout="Linear,Slow" />
-                <Key type="Curve" time=".4" value="255" inout="Slow,Linear" />
-              </Controller>
-            </Animation>
-          </Frame>
-        </Frame>
-      </Frame>
-      <Frame type="Label" name="SeasonLabel">
-        <Anchor side="Top" relative="$parent" pos="Mid" offset="-8" />
-        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="-8" />
-        <Anchor side="Right" relative="$parent" pos="Mid" offset="-30" />
-        <Anchor side="Left" relative="$parent" pos="Mid" offset="-30" />
-        <Style val="HeroLobbyRankedHeroLeagueSeason" />
-        <Text val="@UI/RankedPlay/CurrentSeasonDates" />
-      </Frame>
-      <Frame type="NydusLinkButton" name="LeaderBoardsButton" template="HeroRankedPanel/LeaderBoardsButton">
-        <Anchor side="Top" relative="$parent/SeasonLabel" pos="Mid" offset="0" />
-        <Anchor side="Bottom" relative="$parent/SeasonLabel" pos="Mid" offset="0" />
-        <Anchor side="Left" relative="$parent/SeasonLabel" pos="Max" offset="10" />
-        <Handle val="HeroRankedPanel_LeaderBoardsButton" />
-        <ReportsStats val="true" />
-        <BrowserPurpose val="LeaderBoards" />
-      </Frame>
-      <Frame type="NydusLinkButton" name="RankedGuideButton" template="HeroRankedPanel/RankedGuideButton">
-        <Anchor side="Top" relative="$parent/SeasonLabel" pos="Mid" offset="0" />
-        <Anchor side="Bottom" relative="$parent/SeasonLabel" pos="Mid" offset="0" />
-        <Anchor side="Left" relative="$parent/LeaderBoardsButton" pos="Max" offset="0" />
-        <Handle val="HeroRankedPanel_RankedGuideButton" />
-        <ReportsStats val="true" />
-        <BrowserPurpose val="RankedGuide" />
-      </Frame>
-      <Frame type="Button" name="MapRotationButton">
-        <Anchor side="Top" relative="$parent/SeasonLabel" pos="Mid" offset="0" />
-        <Anchor side="Bottom" relative="$parent/SeasonLabel" pos="Mid" offset="0" />
-        <Anchor side="Left" relative="$parent/RankedGuideButton" pos="Max" offset="0" />
-        <Width val="60" />
-        <Height val="60" />
-        <TooltipAnchorPosition val="TopCenter" />
-        <TooltipFrame val="MapRotationTooltip" />
-        <Frame type="Frame" name="IconAnchor">
-          <Anchor side="Top" relative="$parent" pos="Mid" offset="0" />
-          <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0" />
-          <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
-          <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
-        </Frame>
-        <Frame type="Image" name="NormalImage">
-          <Anchor side="Top" relative="$parent/IconAnchor" pos="Mid" offset="0" />
-          <Anchor side="Bottom" relative="$parent/IconAnchor" pos="Mid" offset="0" />
-          <Anchor side="Left" relative="$parent/IconAnchor" pos="Mid" offset="0" />
-          <Anchor side="Right" relative="$parent/IconAnchor" pos="Mid" offset="0" />
-          <Texture val="@UI/Storm_UI_Ranked_SeasonProgress_MapRotation_Button" />
-          <TextureType val="Normal" />
-          <DesaturateOnDisable val="false" />
-        </Frame>
-        <Frame type="Image" name="HoverImage">
-          <Anchor relative="$parent/NormalImage" />
-          <TextureType val="Normal" />
-          <DesaturateOnDisable val="false" />
-          <ColorAdjustMode val="AddSelf" />
-          <AdjustmentColor val="50,255,255,255" />
-          <Frame type="PropertyBind" name="BindTexture">
-            <Anchor relative="$parent" />
-            <Source frame="$parent/$parent/NormalImage" property="Texture" />
-            <Target frame="$parent" property="Texture" />
-          </Frame>
-        </Frame>
-      </Frame>
-      <Frame type="MapRotationTooltip" name="MapRotationTooltip" template="MapRotationTooltip/MapRotationTooltipTemplate" />
+    <Frame type="MapRotationPanel" name="MapRotationPanel" template="MapRotationPanel/MapRotationPanelTemplate">
+      <Anchor side="Bottom" relative="$parent/MapRotationButton" pos="Min" offset="#HeroSelectPanelBottom" />
+      <Anchor side="Left" relative="$parent/LeaderBoardsButton" pos="Min" offset="35" />
     </Frame>
     <Frame type="Frame" name="AnchoredPopupAnchorFrame">
       <Anchor side="Top" relative="$this" pos="Max" offset="0" />
@@ -501,20 +651,6 @@
       <TooltipAnchorPosition val="TopCenter" />
       <Frame type="AnchoredPopup" name="ReadyRequirementsPopup" template="HeroRankedPanel/RankedReadyButtonAnchoredPopupTemplate" />
     </Frame>
-    <StateGroup name="ShowModeState">
-      <DefaultState val="HideUnknownModeWarning" />
-      <State name="ShowUnknownModeWarning">
-        <When type="Property" frame="$this" LastSoloModeUnknown="True" />
-        <When type="Property" frame="LeagueTypes/HeroLeague" IsSelected="False" />
-        <When type="Property" frame="LeagueTypes/TeamLeague" IsSelected="False" />
-        <Action type="SetState" frame="LeagueTypes/HeroLeague" group="WarningState" state="True" />
-        <Action type="SetState" frame="LeagueTypes/TeamLeague" group="WarningState" state="True" />
-      </State>
-      <State name="HideUnknownModeWarning">
-        <Action type="SetState" frame="LeagueTypes/HeroLeague" group="WarningState" state="False" />
-        <Action type="SetState" frame="LeagueTypes/TeamLeague" group="WarningState" state="False" />
-      </State>
-    </StateGroup>
     <Frame type="Frame" name="ReadyButtonContainer" template="MatchmakingPanel/ReadyButtonContainerTemplate">
       <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
       <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
@@ -605,6 +741,11 @@
         <Tooltip val="{$parent/TooltipHandler/@Tooltip}" />
       </Frame>
       <StateGroup name="TooltipStates">
+        <State name="LeagueDifference">
+          <When type="AnimationState" ReadyNotification="LeagueDifference" />
+          <Action type="SetProperty" frame="TooltipHandler" Visible="false" />
+          <Action type="SetProperty" frame="QuestWarningTooltipHandler" Visible="true" />
+        </State>
         <State name="QuestWarning">
           <When type="AnimationState" ReadyNotification="QuestWarning" />
           <Action type="SetProperty" frame="TooltipHandler" Visible="false" />
