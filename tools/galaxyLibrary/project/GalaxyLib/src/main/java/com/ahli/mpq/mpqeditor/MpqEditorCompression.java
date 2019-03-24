@@ -26,4 +26,5 @@ public enum MpqEditorCompression {
 	/**
 	 * Uses the existing settings files.
 	 */
-	SYSTEM_DEFAULT}
+	SYSTEM_DEFAULT
+}

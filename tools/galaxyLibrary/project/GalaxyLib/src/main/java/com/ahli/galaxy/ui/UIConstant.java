@@ -27,6 +27,11 @@ public class UIConstant extends UIElement {
 		super(name);
 	}
 	
+	public UIConstant(final String name, final String value) {
+		super(name);
+		this.value = value;
+	}
+	
 	/**
 	 * Returns a deep clone of this.
 	 */

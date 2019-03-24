@@ -7,9 +7,16 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public class KryoGameInfo {
-	private final String gameName;
-	private final boolean isPtr;
-	private final int[] version;
+	private int[] version;
+	private String gameName;
+	private boolean isPtr;
+	
+	public KryoGameInfo() {
+		// required for Kryo
+		gameName = "";
+		isPtr = false;
+		version = new int[4];
+	}
 	
 	public KryoGameInfo(final int[] version, final String gameName, final boolean isPtr) {
 		this.version = version;
@@ -21,12 +28,24 @@ public class KryoGameInfo {
 		return gameName;
 	}
 	
+	public void setGameName(final String gameName) {
+		this.gameName = gameName;
+	}
+	
 	public boolean isPtr() {
 		return isPtr;
 	}
 	
+	public void setPtr(final boolean isPtr) {
+		this.isPtr = isPtr;
+	}
+	
 	public int[] getVersion() {
 		return version;
+	}
+	
+	public void setVersion(final int[] version) {
+		this.version = version;
 	}
 	
 	@Override
@@ -43,13 +62,57 @@ public class KryoGameInfo {
 		final Object[] signatureFields = getSignatureFields();
 		final Object[] thatSignatureFields = ((KryoGameInfo) obj).getSignatureFields();
 		for (int i = 0; i < signatureFields.length; i++) {
-			if (!(signatureFields[i] instanceof Object[])) {
-				if (!Objects.equals(signatureFields[i], thatSignatureFields[i])) {
+			final var thisObj = signatureFields[i];
+			final var thatObj = thatSignatureFields[i];
+			final boolean objectArray = thisObj instanceof Object[];
+			final boolean isArray = thisObj.getClass().isArray();
+			if (!(objectArray || isArray)) {
+				if (!Objects.equals(thisObj, thatObj)) {
 					return false;
 				}
 			} else {
-				if (!Arrays.deepEquals((Object[]) signatureFields[i], (Object[]) thatSignatureFields[i])) {
-					return false;
+				if (objectArray) {
+					if (!Arrays.deepEquals((Object[]) thisObj, (Object[]) thatObj)) {
+						return false;
+					}
+				} else {
+					final var typeThis = thisObj.getClass().getComponentType();
+					if (!typeThis.equals(thatObj.getClass().getComponentType())) {
+						return false;
+					}
+					
+					if (typeThis.equals(int[].class)) {
+						if (!Arrays.equals((int[]) thisObj, (int[]) thatObj)) {
+							return false;
+						}
+					} else if (typeThis.equals(boolean[].class)) {
+						if (!Arrays.equals((boolean[]) thisObj, (boolean[]) thatObj)) {
+							return false;
+						}
+					} else if (typeThis.equals(short[].class)) {
+						if (!Arrays.equals((short[]) thisObj, (short[]) thatObj)) {
+							return false;
+						}
+					} else if (typeThis.equals(char[].class)) {
+						if (!Arrays.equals((char[]) thisObj, (char[]) thatObj)) {
+							return false;
+						}
+					} else if (typeThis.equals(byte[].class)) {
+						if (!Arrays.equals((byte[]) thisObj, (byte[]) thatObj)) {
+							return false;
+						}
+					} else if (typeThis.equals(long[].class)) {
+						if (!Arrays.equals((long[]) thisObj, (long[]) thatObj)) {
+							return false;
+						}
+					} else if (typeThis.equals(float[].class)) {
+						if (!Arrays.equals((float[]) thisObj, (float[]) thatObj)) {
+							return false;
+						}
+					} else if (typeThis.equals(double[].class) &&
+							!Arrays.equals((double[]) thisObj, (double[]) thatObj)) {
+						return false;
+					}
 				}
 			}
 		}
@@ -63,5 +126,10 @@ public class KryoGameInfo {
 	@Override
 	public int hashCode() {
 		return Objects.hash(getSignatureFields());
+	}
+	
+	@Override
+	public String toString() {
+		return "KryoGameInfo{gameName=" + gameName + ", isPtr=" + isPtr + ", version=" + Arrays.toString(version) + "}";
 	}
 }

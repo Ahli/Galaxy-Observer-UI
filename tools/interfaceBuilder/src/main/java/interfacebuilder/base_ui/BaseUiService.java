@@ -10,8 +10,6 @@ import com.ahli.galaxy.game.def.abstracts.GameDef;
 import com.ahli.galaxy.ui.UICatalogImpl;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
 import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
 import interfacebuilder.InterfaceBuilderApp;
 import interfacebuilder.compress.GameService;
 import interfacebuilder.config.ConfigService;
@@ -45,18 +43,19 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.InvalidParameterException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.zip.DeflaterInputStream;
-import java.util.zip.DeflaterOutputStream;
 
 public class BaseUiService {
 	private static final String UNKNOWN_GAME_EXCEPTION = "Unknown Game";
 	private static final Logger logger = LogManager.getLogger(BaseUiService.class);
+	private static final String META_FILE_NAME = ".meta";
 	
 	private final InterfaceBuilderApp app = InterfaceBuilderApp.getInstance();
 	
@@ -76,10 +75,9 @@ public class BaseUiService {
 	 *
 	 * @param game
 	 * @param usePtr
-	 * @param useX64
 	 * @return true, if outdated
 	 */
-	public boolean isOutdated(final Game game, final boolean usePtr, final boolean useX64) throws IOException {
+	public boolean isOutdated(final Game game, final boolean usePtr) throws IOException {
 		final GameDef gameDef = gameService.getGameDef(game);
 		final File gameBaseUI = new File(configService.getBaseUiPath(gameDef));
 		
@@ -87,11 +85,69 @@ public class BaseUiService {
 			return true;
 		}
 		
-		final String supportDir = (useX64 ? gameDef.getSupportDirectoryX64() : gameDef.getSupportDirectoryX32());
-		final String switcherExe = (useX64 ? gameDef.getSwitcherExeNameX64() : gameDef.getSwitcherExeNameX32());
-		final String gamePath = getGamePath(game, usePtr);
-		final File updatedExe = new File(gamePath + File.separator + supportDir + File.separator + switcherExe);
-		return !fileService.directoryFilesAreUpToDate(updatedExe.lastModified(), gameBaseUI);
+		final File baseUiMetaFileDir = new File(configService.getBaseUiPath(gameDef));
+		final KryoGameInfo baseUiInfo;
+		try {
+			baseUiInfo = readMetaFile(baseUiMetaFileDir);
+		} catch (final IOException e) {
+			final String msg = "Failed to read Game Info from extracted base UI.";
+			logger.warn(msg);
+			logger.trace(msg, e);
+			return true;
+		}
+		final int[] versionBaseUi = baseUiInfo.getVersion();
+		final int[] versionExe = getVersion(gameDef, usePtr);
+		
+		boolean isUpToDate = true;
+		for (int i = 0; i < versionExe.length && isUpToDate; ++i) {
+			isUpToDate = versionExe[0] == versionBaseUi[0];
+		}
+		
+		return !isUpToDate;
+	}
+	
+	private KryoGameInfo readMetaFile(final File directory) throws IOException {
+		final Path path = Paths.get(directory.getAbsolutePath(), META_FILE_NAME);
+		final Kryo kryo = kryoService.getKryoForBaseUiMetaFile();
+		final List<Class<? extends Object>> payloadClasses = new ArrayList<>();
+		payloadClasses.add(KryoGameInfo.class);
+		return (KryoGameInfo) kryoService.get(path, payloadClasses, kryo).get(0);
+	}
+	
+	public int[] getVersion(final GameDef gameDef, final boolean isPtr) {
+		final int[] versions = new int[4];
+		final Path path = Paths.get(gameService.getGameDirPath(gameDef, isPtr), gameDef.getSupportDirectoryX64(),
+				gameDef.getSwitcherExeNameX64());
+		try {
+			final PE pe = PEParser.parse(path.toFile());
+			final ResourceDirectory rd = pe.getImageData().getResourceTable();
+			
+			final ResourceEntry[] entries = ResourceHelper.findResources(rd, ResourceType.VERSION_INFO);
+			
+			for (final ResourceEntry entry : entries) {
+				final byte[] data = entry.getData();
+				final VersionInfo version = ResourceParser.readVersionInfo(data);
+				
+				final StringFileInfo strings = version.getStringFileInfo();
+				final StringTable table = strings.getTable(0);
+				for (int j = 0; j < table.getCount(); j++) {
+					final String key = table.getString(j).getKey();
+					if ("FileVersion".equals(key)) {
+						final String value = table.getString(j).getValue();
+						logger.trace("found FileVersion={}", () -> value);
+						
+						final String[] parts = value.split("\\.");
+						for (int k = 0; k < 4; k++) {
+							versions[k] = Integer.parseInt(parts[k]);
+						}
+						return versions;
+					}
+				}
+			}
+		} catch (final IOException e) {
+			logger.error("Error attempting to parse FileVersion from game's exe: ", e);
+		}
+		return versions;
 	}
 	
 	/**
@@ -245,72 +301,14 @@ public class BaseUiService {
 		return retry;
 	}
 	
-	public int[] getVersion(final GameDef gameDef, final boolean isPtr) {
-		final int[] versions = new int[4];
-		final Path path = Paths.get(gameService.getGameDirPath(gameDef, isPtr), gameDef.getSupportDirectoryX64(),
-				gameDef.getSwitcherExeNameX64());
-		try {
-			final PE pe = PEParser.parse(path.toFile());
-			final ResourceDirectory rd = pe.getImageData().getResourceTable();
-			
-			final ResourceEntry[] entries = ResourceHelper.findResources(rd, ResourceType.VERSION_INFO);
-			
-			for (final ResourceEntry entry : entries) {
-				final byte[] data = entry.getData();
-				final VersionInfo version = ResourceParser.readVersionInfo(data);
-				
-				final StringFileInfo strings = version.getStringFileInfo();
-				final StringTable table = strings.getTable(0);
-				for (int j = 0; j < table.getCount(); j++) {
-					final String key = table.getString(j).getKey();
-					if ("FileVersion".equals(key)) {
-						final String value = table.getString(j).getValue();
-						logger.trace("found FileVersion={}", () -> value);
-						
-						final String[] parts = value.split("\\.");
-						for (int k = 0; k < 4; k++) {
-							versions[k] = Integer.parseInt(parts[k]);
-						}
-						return versions;
-					}
-				}
-			}
-		} catch (final IOException e) {
-			logger.error("Error attempting to parse FileVersion from game's exe: ", e);
-		}
-		return versions;
-	}
-	
 	private void writeToMetaFile(final File directory, final String gameName, final int[] version, final boolean isPtr)
 			throws IOException {
-		
-		final Path path = Paths.get(directory.getAbsolutePath(), ".meta");
-		final KryoGameInfo gameInfo = new KryoGameInfo(version, gameName, isPtr);
-		try (final Output output = new Output(new DeflaterOutputStream(Files.newOutputStream(path)))) {
-			final Kryo kryo = kryoService.getKryoForBaseUiMetaFile();
-			kryo.writeObject(output, gameInfo);
-		}
-	}
-	
-	private KryoGameInfo readMetaFile(final File directory) throws IOException {
-		final Path path = Paths.get(directory.getAbsolutePath(), ".meta");
-		try (final Input input = new Input(new DeflaterInputStream(Files.newInputStream(path)))) {
-			final Kryo kryo = kryoService.getKryoForBaseUiMetaFile();
-			return kryo.readObject(input, KryoGameInfo.class);
-		}
-	}
-	
-	/**
-	 * @param cacheFile
-	 * @param metaFileDir
-	 * @return
-	 */
-	public boolean isUpToDate(final String cacheFile, final String metaFileDir) {
-		
-		discCacheService.get()
-		
-		
-		return false;
+		final Path path = Paths.get(directory.getAbsolutePath(), META_FILE_NAME);
+		final KryoGameInfo metaInfo = new KryoGameInfo(version, gameName, isPtr);
+		final List<Object> payload = new ArrayList<>();
+		payload.add(metaInfo);
+		final Kryo kryo = kryoService.getKryoForBaseUiMetaFile();
+		kryoService.put(path, payload, kryo);
 	}
 	
 	/**
@@ -338,18 +336,18 @@ public class BaseUiService {
 					boolean needToParseAgain = true;
 					final boolean isPtr = !(game.getGameDef() instanceof SC2GameDef) &&
 							configService.getIniSettings().isHeroesPtrActive();
-					if (discCacheService.exists(gameName, isPtr)) {
-						// load from cache
-						try {
-							uiCatalog = discCacheService.get(gameName, isPtr, UICatalogImpl.class);
+					try {
+						if (cacheIsUpToDateCheckException(game.getGameDef(), isPtr)) {
+							// load from cache
+							uiCatalog = discCacheService.getCachedBaseUi(gameName, isPtr).getCatalog();
 							game.setUiCatalog(uiCatalog);
 							needToParseAgain = false;
 							if (logger.isTraceEnabled()) {
 								logger.trace("Loaded baseUI for '" + gameName + "' from cache");
 							}
-						} catch (final IOException e) {
-							logger.warn("ERROR: loading cached base UI failed.", e);
 						}
+					} catch (final IOException e) {
+						logger.warn("ERROR: loading cached base UI failed.", e);
 					}
 					if (needToParseAgain) {
 						// parse baseUI
@@ -404,6 +402,17 @@ public class BaseUiService {
 		});
 	}
 	
+	public boolean cacheIsUpToDateCheckException(final GameDef gameDef, final boolean usePtr) {
+		try {
+			return cacheIsUpToDate(gameDef, usePtr);
+		} catch (final NoSuchFileException e) {
+			logger.trace("No cache exists for " + gameDef.getName());
+		} catch (final IOException e) {
+			logger.info("Failed to check cache status of " + gameDef.getName() + ":", e);
+		}
+		return false;
+	}
+	
 	/**
 	 * Adds a task to the executor.
 	 *
@@ -413,6 +422,34 @@ public class BaseUiService {
 		if (followupTask != null) {
 			app.getExecutor().execute(followupTask);
 		}
+	}
+	
+	public boolean cacheIsUpToDate(final GameDef gameDef, final boolean usePtr) throws IOException {
+		final File baseUiMetaFileDir = new File(configService.getBaseUiPath(gameDef));
+		final File cacheFile = discCacheService.getCacheFile(gameDef.getName(), usePtr);
+		return cacheIsUpToDate(cacheFile.toPath(), baseUiMetaFileDir);
+	}
+	
+	/**
+	 * @param cacheFile
+	 * @param metaFileDir
+	 * @return
+	 */
+	public boolean cacheIsUpToDate(final Path cacheFile, final File metaFileDir) throws IOException {
+		final KryoGameInfo baseUiInfo = readMetaFile(metaFileDir);
+		final KryoGameInfo cacheInfo = discCacheService.getCachedBaseUi(cacheFile).getGameInfo();
+		
+		final int[] versionCache = cacheInfo.getVersion();
+		final int[] versionBaseUi = baseUiInfo.getVersion();
+		
+		boolean isUpToDate = true;
+		for (int i = 0; i < versionCache.length && isUpToDate; ++i) {
+			isUpToDate = versionCache[0] == versionBaseUi[0];
+		}
+		if (logger.isTraceEnabled()) {
+			logger.trace("Cache and baseUI versions match: " + isUpToDate);
+		}
+		return isUpToDate;
 	}
 	
 }

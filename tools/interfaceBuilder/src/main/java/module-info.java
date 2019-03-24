@@ -12,6 +12,7 @@ module interfacex.builder {
 	requires org.apache.commons.io;
 	requires org.apache.logging.log4j;
 	requires org.apache.logging.log4j.core;
+	requires jakarta.activation;
 	requires org.hibernate.orm.core;
 	requires spring.beans;
 	requires spring.boot.autoconfigure;
@@ -28,8 +29,6 @@ module interfacex.builder {
 	
 	// fix: spring boot not finding sqlexception
 	requires java.sql;
-	// fix spring boot not finding jaxbexception
-	requires java.xml.bind;
 	// fix spring boot not finding bytebuddy classes for hibernate configuration
 	requires net.bytebuddy;
 	
@@ -43,6 +42,7 @@ module interfacex.builder {
 	opens interfacebuilder.build to spring.core;
 	opens interfacebuilder.base_ui to spring.core, com.esotericsoftware.kryo;
 	opens interfacebuilder.integration.kryo to spring.core, com.esotericsoftware.kryo;
+	exports interfacebuilder.integration.kryo;
 	opens view;
 	opens i18n;
 	opens res; // not sure if required atm

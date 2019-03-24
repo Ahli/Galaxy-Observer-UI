@@ -482,7 +482,7 @@ public class InterfaceBuilderApp extends Application {
 	
 	private void checkBaseUiUpdate() {
 		try {
-			if (baseUiService.isOutdated(Game.SC2, false, configService.getIniSettings().isSc64bit())) {
+			if (baseUiService.isOutdated(Game.SC2, false)) {
 				navigationController.appendNotification(
 						new Notification(Messages.getString("browse.notification.sc2OutOfDate"),
 								NavigationController.BROWSE_TAB));
@@ -491,7 +491,7 @@ public class InterfaceBuilderApp extends Application {
 			logger.error("Error during SC2 baseUI update check.", e);
 		}
 		try {
-			if (baseUiService.isOutdated(Game.HEROES, false, true)) {
+			if (baseUiService.isOutdated(Game.HEROES, false)) {
 				navigationController.appendNotification(
 						new Notification(Messages.getString("browse.notification.heroesOutOfDate"),
 								NavigationController.BROWSE_TAB));
@@ -500,7 +500,7 @@ public class InterfaceBuilderApp extends Application {
 			logger.error("Error during Heroes baseUI update check.", e);
 		}
 		try {
-			if (baseUiService.isOutdated(Game.HEROES, true, true)) {
+			if (baseUiService.isOutdated(Game.HEROES, true)) {
 				navigationController.appendNotification(
 						new Notification(Messages.getString("browse.notification.heroesPtrOutOfDate"),
 								NavigationController.BROWSE_TAB));

@@ -3,14 +3,13 @@
 
 package interfacebuilder.base_ui;
 
+import com.ahli.galaxy.ui.UICatalogImpl;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
 import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.KryoException;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
 import interfacebuilder.config.ConfigService;
-import interfacebuilder.integration.kryo.KryoService;
+import interfacebuilder.integration.kryo.KryoCachedBaseUi;
 import interfacebuilder.integration.kryo.KryoGameInfo;
+import interfacebuilder.integration.kryo.KryoService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +18,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.zip.DeflaterOutputStream;
-import java.util.zip.InflaterInputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DiscCacheService {
 	private static final Logger logger = LogManager.getLogger(DiscCacheService.class);
@@ -41,21 +40,22 @@ public class DiscCacheService {
 		Files.deleteIfExists(p);
 		
 		final KryoGameInfo metaInfo = new KryoGameInfo(version, gameDefName, isPtr);
+		final List<Object> payload = new ArrayList<>();
+		payload.add(new KryoCachedBaseUi(metaInfo, (UICatalogImpl) catalog));
 		
-		try (final DeflaterOutputStream out = new DeflaterOutputStream(Files.newOutputStream(p))) {
-			try (final Output output = new Output(out)) {
-				final Kryo kryo = kryoService.getKryoForUICatalog();
-				kryo.writeObject(output, catalog);
-				kryo.writeObject(output, metaInfo);
-			}
-		}
+		final Kryo kryo = kryoService.getKryoForUICatalog();
+		kryoService.put(p, payload, kryo);
+		logger.info("Cached UI for " + gameDefName + " - templates=" + catalog.getTemplates().size() +
+				", blizzOnlyTemplates=" + catalog.getBlizzOnlyTemplates().size() + ", constants=" +
+				catalog.getConstants().size() + ", blzzOnlyConstants=" + catalog.getBlizzOnlyConstants().size() +
+				", devLayouts=" + catalog.getDevLayouts().size());
 	}
 	
 	/**
 	 * @param gameDefName
 	 * @return
 	 */
-	private File getCacheFile(final String gameDefName, final boolean isPtr) {
+	public File getCacheFile(final String gameDefName, final boolean isPtr) {
 		final String path =
 				configService.getCachePath() + File.separator + gameDefName + (isPtr ? " PTR" : "") + ".kryo";
 		return new File(path);
@@ -65,23 +65,21 @@ public class DiscCacheService {
 	/**
 	 * @param gameDefName
 	 * @param isPtr
-	 * @param clazz
-	 * @param <T>
 	 * @return
 	 * @throws IOException
 	 */
-	public <T> T get(final String gameDefName, final boolean isPtr, final Class<T> clazz) throws IOException {
-		final Path p = getCacheFile(gameDefName, isPtr).toPath();
-		
-		try (final InflaterInputStream in = new InflaterInputStream(Files.newInputStream(p))) {
-			try (final Input input = new Input(in)) {
-				final Kryo kryo = kryoService.getKryoForUICatalog();
-				return kryo.readObject(input, clazz);
-			} catch (final KryoException e) {
-				Files.deleteIfExists(p);
-				throw new IOException(e);
-			}
-		}
+	public KryoCachedBaseUi getCachedBaseUi(final String gameDefName, final boolean isPtr) throws IOException {
+		return getCachedBaseUi(getCacheFile(gameDefName, isPtr).toPath());
+	}
+	
+	public KryoCachedBaseUi getCachedBaseUi(final Path path) throws IOException {
+		final Kryo kryo = kryoService.getKryoForUICatalog();
+		final List<Class<? extends Object>> payloadClasses = new ArrayList<>();
+		//		payloadClasses.add(UICatalogImpl.class);
+		//		payloadClasses.add(KryoGameInfo.class);
+		//		return kryoService.get(path, payloadClasses, kryo);
+		payloadClasses.add(KryoCachedBaseUi.class);
+		return (KryoCachedBaseUi) kryoService.get(path, payloadClasses, kryo).get(0);
 	}
 	
 	/**
@@ -107,4 +105,5 @@ public class DiscCacheService {
 	public boolean exists(final String gameDefName, final boolean isPtr) {
 		return getCacheFile(gameDefName, isPtr).exists();
 	}
+	
 }

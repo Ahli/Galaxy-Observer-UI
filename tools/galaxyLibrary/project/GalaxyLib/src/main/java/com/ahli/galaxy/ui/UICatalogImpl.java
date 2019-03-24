@@ -373,8 +373,8 @@ public class UICatalogImpl implements UICatalog {
 	}
 	
 	@Override
-	public void setTemplates(final List<UITemplate> templates2) {
-		templates = templates2;
+	public void setTemplates(final List<UITemplate> templates) {
+		this.templates = templates;
 	}
 	
 	@Override
@@ -383,8 +383,8 @@ public class UICatalogImpl implements UICatalog {
 	}
 	
 	@Override
-	public void setBlizzOnlyTemplates(final List<UITemplate> blizzOnlyTemplates2) {
-		blizzOnlyTemplates = blizzOnlyTemplates2;
+	public void setBlizzOnlyTemplates(final List<UITemplate> blizzOnlyTemplates) {
+		this.blizzOnlyTemplates = blizzOnlyTemplates;
 	}
 	
 	@Override
@@ -393,8 +393,8 @@ public class UICatalogImpl implements UICatalog {
 	}
 	
 	@Override
-	public void setConstants(final List<UIConstant> constants2) {
-		constants = constants2;
+	public void setConstants(final List<UIConstant> constants) {
+		this.constants = constants;
 	}
 	
 	@Override
@@ -403,8 +403,8 @@ public class UICatalogImpl implements UICatalog {
 	}
 	
 	@Override
-	public void setBlizzOnlyConstants(final List<UIConstant> blizzOnlyConstants2) {
-		blizzOnlyConstants = blizzOnlyConstants2;
+	public void setBlizzOnlyConstants(final List<UIConstant> blizzOnlyConstants) {
+		this.blizzOnlyConstants = blizzOnlyConstants;
 	}
 	
 	@Override

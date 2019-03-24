@@ -62,7 +62,7 @@ public class StylizedTextAreaAppenderThreadPoolExecutor extends ThreadPoolExecut
 		
 		if (cleanUpTask != null && r != cleanUpTask) {
 			final int count = getActiveCount() - 1; // subtract this task
-			if (count <= 0) {
+			if (count <= 0 && getQueue().isEmpty()) {
 				execute(cleanUpTask);
 			}
 		}

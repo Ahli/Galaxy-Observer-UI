@@ -154,14 +154,14 @@ public class LayoutExtensionReader {
 		}
 	}
 	
-	private String getValueAfterEqualsChar(String part){
+	private String getValueAfterEqualsChar(String part) {
 		return part.substring(1 + part.indexOf('=')).trim();
 	}
 	
-	private String getValueWithinQuotes(String part){
+	private String getValueWithinQuotes(String part) {
 		final int quoteEnd = part.lastIndexOf('"');
 		final int quoteStart = part.indexOf('"');
-		if(quoteStart < 0 || quoteStart >= quoteEnd){
+		if (quoteStart < 0 || quoteStart >= quoteEnd) {
 			return null;
 		}
 		return part.substring(quoteStart + 1, quoteEnd);
