@@ -48,6 +48,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -97,10 +98,14 @@ public class BaseUiService {
 		}
 		final int[] versionBaseUi = baseUiInfo.getVersion();
 		final int[] versionExe = getVersion(gameDef, usePtr);
-		
 		boolean isUpToDate = true;
 		for (int i = 0; i < versionExe.length && isUpToDate; ++i) {
-			isUpToDate = versionExe[0] == versionBaseUi[0];
+			isUpToDate = versionExe[i] <= versionBaseUi[i];
+		}
+		if (logger.isTraceEnabled()) {
+			logger.trace(
+					"Exe version check - exe=" + Arrays.toString(versionExe) + " - " + Arrays.toString(versionBaseUi) +
+							" - upToDate=" + isUpToDate);
 		}
 		
 		return !isUpToDate;
