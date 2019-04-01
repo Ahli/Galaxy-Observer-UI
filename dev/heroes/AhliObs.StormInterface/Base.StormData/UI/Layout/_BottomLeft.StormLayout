@@ -27,24 +27,6 @@
 	<Constant name="chargeCooldownProgressHeight" val="38"/>
 	
 	
-
-	<Frame type="CommandPanel" name="RollinAnimDisabler">
-		<Animation name="RollIn">
-			<Controller name="Fade_0" type="Fade" end="Pause" frame="$this/CommandButton15">
-				<Key type="Curve" time="0.0" value="0" inout="Linear,Step" />
-				<Key type="Curve" time="0.01" value="255" inout="Linear,Step" />
-			</Controller>
-			<Controller name="Animation_0" type="Animation" end="stop" frame="$FKeyButtonPulse1" Animation="ButtonPulse">
-				<Key type="Animation" time="0" action="Reset" />
-			</Controller>
-			<Controller name="Animation_1" type="Animation" end="stop" frame="$FKeyButtonPulse2" Animation="ButtonPulse">
-				<Key type="Animation" time="0" action="Reset" />
-			</Controller>
-			<Controller name="Animation_2" type="Animation" end="stop" frame="$FKeyButtonPulse3" Animation="ButtonPulse">
-				<Key type="Animation" time="0" action="Reset" />
-			</Controller>
-		</Animation>
-	</Frame>
 	
 	<Frame type="UnitStatusValidatorAnimElement" name="UnitStatusDebuffTemplate">
 		<Width val="183"/>
@@ -907,8 +889,11 @@
 			<Frame type="CommandButton" name="CommandButton15">
 				<Anchor side="Top" relative="$parent/CommandButton05" pos="Min" offset="9999"/> <!-- offset to hide button on other maps -->
 				<Anchor side="Left" relative="$parent/CommandButton13" pos="Max" offset="0"/>
+				<Anchor side="Right" relative="$this" pos="Max" offset="0"/>
+				<Anchor side="Bottom" relative="$this" pos="Max" offset="0"/>
 				<Width val="#commandButtonWidth"/>
 				<Height val="#commandButtonHeight"/>
+				<!-- BUG: This frame is altered upon entering player vision => child elements should not rely on parent for their size -->
 				
 				<!-- mod's Assets.txt:
 				132x132 UI/Storm_UI_InGame_AbilityButtonBorder_Terran=Assets/Textures/Storm_UI_InGame_AbilityButtonBorder_Terran.dds
@@ -918,24 +903,17 @@
 				132x132 UI/Storm_UI_InGame_AbilityButtonBorder_Terran_Off=Assets/Textures/Storm_UI_InGame_AbilityButtonBorder_Terran_Off.dds
 				76x76 UI/Storm_UI_InGame_AbilityButton_NuclearStrike=Assets/Textures/Storm_UI_InGame_AbilityButton_NuclearStrike.dds
 				-->
-				<Frame type="Image" name="DisabledLockOverlay">
-					<!--<Texture val="@UI/HUD_Btn_BG_Ability_Locked"/>-->
-					<!--<Width val="#commandButtonWidth"/>
-					<Height val="#commandButtonHeight"/>-->
-					<Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
-					<Anchor side="Bottom" relative="$parent" pos="Max" offset="-5"/>
-					<Anchor side="Left" relative="$parent" pos="Min" offset="5"/>
-					<Anchor side="Right" relative="$parent" pos="Max" offset="-5"/>
-					<Unclipped val="true"/>
-				</Frame>
+
 				<Frame type="Image" name="GameButtonDefaultBorder">
+					<Anchor relative="$parent/NormalImage" offset="13" />
 					<Width val="#commandButtonDfltBorderWidth"/>
 					<Height val="#commandButtonDfltBorderHeight"/>
-					<Anchor side="Top" relative="$parent/NormalImage" pos="Mid" offset="0"/>
-					<Anchor side="Bottom" relative="$parent/NormalImage" pos="Mid" offset="0"/>
 					<Unclipped val="true"/>
 				</Frame>
 				<Frame type="Image" name="GameButtonDefaultHoverBorder">
+					<Anchor relative="$parent/NormalImage" offset="13" />
+					<Width val="#commandButtonDfltBorderWidth"/>
+					<Height val="#commandButtonDfltBorderHeight"/>
 					<Unclipped val="true"/>
 				</Frame>
 				<Frame type="CommandHotkeyFrame" name="HotkeyFrame">
@@ -951,22 +929,21 @@
 				</Frame>
 				<!-- default inset is 10 => 5 -->
 				<Frame type="Image" name="NormalImage">
-					<Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
-					<Anchor side="Bottom" relative="$parent" pos="Max" offset="-5"/>
-					<Anchor side="Left" relative="$parent" pos="Min" offset="5"/>
-					<Anchor side="Right" relative="$parent" pos="Max" offset="-5"/>
+					<Anchor side="Top" relative="$parent/$parent/CommandButton00" pos="Min" offset="5"/>
+					<Anchor side="Left" relative="$parent/$parent/CommandButton13" pos="Max" offset="0"/>
+					<Anchor side="Bottom" relative="$this" pos="Max" offset="0"/>
+					<Anchor side="Right" relative="$this" pos="Max" offset="0"/>
+					<Width val="42"/>
+					<Height val="42"/>
 					<Unclipped val="true"/>
 				</Frame>
 				<!-- default inset is 15 => 0 -->
 				<Frame type="Frame" name="HitTestFrame">
-					<Anchor relative="$parent"/>
+					<Anchor relative="$parent/NormalImage" offset="5" />
 				</Frame>
 				<!-- default inset is 15 => 5 -->
 				<Frame type="Image" name="IconBackground">
-					<Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
-					<Anchor side="Bottom" relative="$parent" pos="Max" offset="-5"/>
-					<Anchor side="Left" relative="$parent" pos="Min" offset="5"/>
-					<Anchor side="Right" relative="$parent" pos="Max" offset="-5"/>
+					<Anchor relative="$parent/NormalImage" offset="0" />
 					<Unclipped val="true"/>
 				</Frame>
 				<!-- @Override -->
@@ -982,6 +959,9 @@
 					</State>
 				</StateGroup>
 				<Frame type="Image" name="DisabledLockOverlay">
+					<Anchor relative="$parent/NormalImage" offset="0" />
+					<Unclipped val="true"/>
+					<!--<Texture val="@UI/HUD_Btn_BG_Ability_Locked"/>-->
 					<Animation name="Fade">
 						<Controller type="Fade" name="Fade_1" layer="1" end="Pause">
 							<Key type="Curve" time="0" value="255" />
