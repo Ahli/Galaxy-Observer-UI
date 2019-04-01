@@ -586,11 +586,14 @@ public class InterfaceBuilderApp extends Application {
 		
 		executor.setCleanUpTask(() -> {
 			// free space of baseUI
-			logger.info("Deallocating baseUI");
-			mpqBuilderService.getGameData(Game.SC2).setUiCatalog(null);
-			mpqBuilderService.getGameData(Game.HEROES).setUiCatalog(null);
-			// GC1 is the default GC and can now release RAM -> actually good to do after a task
-			System.gc();
+			if (executor.getQueue().isEmpty() && executor.getActiveCount() <= 1) {
+				logger.info("Deallocating baseUI");
+				mpqBuilderService.getGameData(Game.SC2).setUiCatalog(null);
+				mpqBuilderService.getGameData(Game.HEROES).setUiCatalog(null);
+				// GC1 is the default GC and can now release RAM -> actually good to do after a task because we use a
+				// lot of RAM for the UIs
+				System.gc();
+			}
 		});
 	}
 	

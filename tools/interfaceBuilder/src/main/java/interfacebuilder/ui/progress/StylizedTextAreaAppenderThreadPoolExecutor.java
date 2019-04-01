@@ -3,6 +3,9 @@
 
 package interfacebuilder.ui.progress;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -14,6 +17,8 @@ import java.util.concurrent.TimeUnit;
  * which Thread created which log message.
  */
 public class StylizedTextAreaAppenderThreadPoolExecutor extends ThreadPoolExecutor {
+	private static final Logger logger = LogManager.getLogger(StylizedTextAreaAppenderThreadPoolExecutor.class);
+	
 	private Runnable cleanUpTask;
 	
 	/**
@@ -62,7 +67,9 @@ public class StylizedTextAreaAppenderThreadPoolExecutor extends ThreadPoolExecut
 		
 		if (cleanUpTask != null && r != cleanUpTask) {
 			final int count = getActiveCount() - 1; // subtract this task
-			if (count <= 0 && getQueue().isEmpty()) {
+			final boolean isEmpty = getQueue().isEmpty();
+			logger.trace("other threads={}, queueIsEmpty={}", () -> (count), () -> isEmpty);
+			if (count <= 0 && isEmpty) {
 				execute(cleanUpTask);
 			}
 		}
