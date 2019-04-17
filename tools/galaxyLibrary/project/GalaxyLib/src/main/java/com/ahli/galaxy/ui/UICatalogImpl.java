@@ -243,6 +243,24 @@ public class UICatalogImpl implements UICatalog {
 		this.curBasePath = curBasePath;
 	}
 	
+	@Override
+	public UITemplate getTemplateOfPath(final String path) {
+		final int i = path.indexOf('/');
+		final String file = path.substring(0, i);
+		for (final var template : templates) {
+			if (template.getFileName().equalsIgnoreCase(file)) {
+				return template;
+			}
+		}
+		for (final var template : blizzOnlyTemplates) {
+			if (template.getFileName().equalsIgnoreCase(file)) {
+				logger.error("ERROR: cannot modify Blizzard-only Template: " + template.getFileName());
+				return null;
+			}
+		}
+		return null;
+	}
+	
 	/**
 	 * @param fileName
 	 * @param thisElem

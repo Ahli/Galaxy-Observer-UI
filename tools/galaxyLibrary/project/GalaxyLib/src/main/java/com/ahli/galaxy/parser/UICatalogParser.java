@@ -69,8 +69,8 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	private String raceId;
 	private String consoleSkinId;
 	
-	// private UITemplate curTemplate;
-	// private boolean editingMode;
+	private UITemplate curTemplate;
+	private boolean editingMode;
 	private String curFileName;
 	
 	public UICatalogParser(final UICatalog catalog, final XmlParser parser) {
@@ -111,7 +111,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			curLevel = level;
 			curElement = null;
 			// default editing mode unless the parsed aspect defines another one
-			// editingMode = false;
+			editingMode = false;
 			if (logger.isTraceEnabled()) {
 				logger.trace("resetting path to root");
 			}
@@ -153,9 +153,9 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		// contain file=, e.g. for cutscene frames)
 		if ((i = attrTypes.indexOf(FILE)) != -1 && !KEY.equals(tagName) && !ACTION.equals(tagName)) {
 			if (level == 2) {
-				// editingMode = true;
+				editingMode = true;
 				// TODO edit existing template
-				// curTemplate = getUITemplateOfPath
+				curTemplate = catalog.getTemplateOfPath(attrValues.get(i));
 			} else {
 				logger.error("unexpected attribute 'file=' found in " + curElement);
 			}
