@@ -144,5 +144,5 @@ public interface UICatalog extends DeepCopyable {
 	
 	void processInclude(String path, boolean isDevLayout, String raceId, String consoleSkinId);
 	
-	UITemplate getTemplateOfPath(final String s);
+	UITemplate getTemplateOfPath(final String file);
 }

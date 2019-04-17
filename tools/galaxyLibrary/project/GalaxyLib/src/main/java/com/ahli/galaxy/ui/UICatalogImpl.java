@@ -244,9 +244,7 @@ public class UICatalogImpl implements UICatalog {
 	}
 	
 	@Override
-	public UITemplate getTemplateOfPath(final String path) {
-		final int i = path.indexOf('/');
-		final String file = path.substring(0, i);
+	public UITemplate getTemplateOfPath(final String file) {
 		for (final var template : templates) {
 			if (template.getFileName().equalsIgnoreCase(file)) {
 				return template;
@@ -258,6 +256,7 @@ public class UICatalogImpl implements UICatalog {
 				return null;
 			}
 		}
+		logger.error("ERROR: cannot find Layout file: " + file);
 		return null;
 	}
 	
