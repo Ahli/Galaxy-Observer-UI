@@ -69,7 +69,7 @@ public class StylizedTextAreaAppenderThreadPoolExecutor extends ThreadPoolExecut
 			final int count = getActiveCount() - 1; // subtract this task
 			final boolean isEmpty = getQueue().isEmpty();
 			logger.trace("other threads={}, queueIsEmpty={}", () -> (count), () -> isEmpty);
-			if (count <= 0 && isEmpty) {
+			if (count <= 0 && isEmpty && !isTerminating()) {
 				execute(cleanUpTask);
 			}
 		}
