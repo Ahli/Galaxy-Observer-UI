@@ -1,7 +1,7 @@
 // This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-package com.ahli.hotkeyUi.application;
+package com.ahli.hotkey_ui.application;
 
 import com.ahli.galaxy.archive.ComponentsListReader;
 import com.ahli.galaxy.archive.DescIndexData;
@@ -9,14 +9,14 @@ import com.ahli.galaxy.game.def.HeroesGameDef;
 import com.ahli.galaxy.game.def.SC2GameDef;
 import com.ahli.galaxy.game.def.abstracts.GameDef;
 import com.ahli.galaxy.ui.DescIndexReader;
-import com.ahli.hotkeyUi.application.controller.MenuBarController;
-import com.ahli.hotkeyUi.application.controller.TabsController;
-import com.ahli.hotkeyUi.application.galaxy.ext.LayoutExtensionReader;
-import com.ahli.hotkeyUi.application.i18n.Messages;
-import com.ahli.hotkeyUi.application.integration.JarHelper;
-import com.ahli.hotkeyUi.application.model.ValueDef;
-import com.ahli.hotkeyUi.application.ui.Alerts;
-import com.ahli.hotkeyUi.application.ui.ShowToUserException;
+import com.ahli.hotkey_ui.application.controller.MenuBarController;
+import com.ahli.hotkey_ui.application.controller.TabsController;
+import com.ahli.hotkey_ui.application.galaxy.ext.LayoutExtensionReader;
+import com.ahli.hotkey_ui.application.i18n.Messages;
+import com.ahli.hotkey_ui.application.integration.JarHelper;
+import com.ahli.hotkey_ui.application.model.ValueDef;
+import com.ahli.hotkey_ui.application.ui.Alerts;
+import com.ahli.hotkey_ui.application.ui.ShowToUserException;
 import com.ahli.mpq.MpqEditorInterface;
 import com.ahli.mpq.MpqException;
 import com.ahli.mpq.mpqeditor.MpqEditorCompression;
@@ -112,7 +112,7 @@ public class SettingsEditorApplication extends Application {
 	public void start(final Stage primaryStage) {
 		try {
 			Thread.currentThread().setName("UI");
-			logger.trace("start function called after {}ms.", () -> (System.nanoTime() - appStartTime) / 1000000);
+			logger.trace("start function called after {}ms.", () -> (System.nanoTime() - appStartTime) / 1_000_000);
 			Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 			this.primaryStage = primaryStage;
 			primaryStage.setMaximized(true);
@@ -124,7 +124,7 @@ public class SettingsEditorApplication extends Application {
 			
 			final long time = System.nanoTime();
 			initRootLayout();
-			logger.trace("initialized root layout within {}ms.", () -> (System.nanoTime() - time) / 1000000);
+			logger.trace("initialized root layout within {}ms.", () -> (System.nanoTime() - time) / 1_000_000);
 			
 			// Load Tab layout from fxml file
 			final long time2 = System.nanoTime();
@@ -136,7 +136,7 @@ public class SettingsEditorApplication extends Application {
 				tabPane = loader.load(is);
 			}
 			
-			logger.trace("initialized tab layout within {}ms.", () -> (System.nanoTime() - time2) / 1000000);
+			logger.trace("initialized tab layout within {}ms.", () -> (System.nanoTime() - time2) / 1_000_000);
 			rootLayout.setCenter(tabPane);
 			tabsCtrl = loader.getController();
 			tabsCtrl.setMainApp(this);
@@ -164,12 +164,12 @@ public class SettingsEditorApplication extends Application {
 			final long time3 = System.nanoTime();
 			primaryStage.show();
 			primaryStage.setOpacity(1);
-			logger.trace("executed root layout stage.show() within {}", () -> (System.nanoTime() - time3) / 1000000);
+			logger.trace("executed root layout stage.show() within {}", () -> (System.nanoTime() - time3) / 1_000_000);
 			
 			// hide apps splash screen image
 			Platform.runLater(new SplashScreenHider());
 			
-			logger.trace("finished app initialization after {}", () -> (System.nanoTime() - appStartTime) / 1000000);
+			logger.trace("finished app initialization after {}", () -> (System.nanoTime() - appStartTime) / 1_000_000);
 			
 			initMpqInterface();
 			
@@ -187,7 +187,9 @@ public class SettingsEditorApplication extends Application {
 			primaryStage.getIcons()
 					.add(new Image(SettingsEditorApplication.class.getResourceAsStream("/res/ahliLogo.png")));
 		} catch (final NullPointerException e) {
-			logger.error("Error loading resource");
+			final String msg = "Error loading resource";
+			logger.error(msg);
+			logger.trace(msg, e);
 			primaryStage.getIcons().add(new Image("ahliLogo.png"));
 		}
 	}
@@ -206,13 +208,13 @@ public class SettingsEditorApplication extends Application {
 		try (final InputStream is = SettingsEditorApplication.class.getResourceAsStream("/view/RootLayout.fxml")) {
 			rootLayout = loader.load(is);
 		}
-		logger.trace("initialized root layout fxml within {}ms.", () -> (System.nanoTime() - time) / 1000000);
+		logger.trace("initialized root layout fxml within {}ms.", () -> (System.nanoTime() - time) / 1_000_000);
 		
 		// get Controller
 		final long time2 = System.nanoTime();
 		mbarCtrl = loader.getController();
 		mbarCtrl.setMainApp(this);
-		logger.trace("received root layout controller within {}ms.", () -> (System.nanoTime() - time2) / 1000000);
+		logger.trace("received root layout controller within {}ms.", () -> (System.nanoTime() - time2) / 1_000_000);
 		
 		// Show the scene containing the root layout.
 		final Scene scene = new Scene(rootLayout);
@@ -230,16 +232,16 @@ public class SettingsEditorApplication extends Application {
 			logger.trace("apply Chinese css");
 			scene.getStylesheets().add(SettingsEditorApplication.class.getResource("/i18n/china.css").toExternalForm());
 		}
-		logger.trace("initialized root layout css within {}ms.", () -> (System.nanoTime() - time3) / 1000000);
+		logger.trace("initialized root layout css within {}ms.", () -> (System.nanoTime() - time3) / 1_000_000);
 		
 		final long time4 = System.nanoTime();
 		primaryStage.setTitle(Messages.getString("Main.observerUiSettingsEditorTitle"));
 		primaryStage.setScene(scene);
-		logger.trace("executed root layout setScene+title within {}ms.", () -> (System.nanoTime() - time4) / 1000000);
+		logger.trace("executed root layout setScene+title within {}ms.", () -> (System.nanoTime() - time4) / 1_000_000);
 		
 		final long time5 = System.nanoTime();
 		updateMenuBar();
-		logger.trace("updateMenuBar within {}ms.", () -> (System.nanoTime() - time5) / 1000000);
+		logger.trace("updateMenuBar within {}ms.", () -> (System.nanoTime() - time5) / 1_000_000);
 	}
 	
 	/**
@@ -341,7 +343,7 @@ public class SettingsEditorApplication extends Application {
 			logger.error(ExceptionUtils.getStackTrace(e), e);
 			showErrorAlert(e);
 		}
-		logger.trace("opened mpq within {}ms.", () -> (System.nanoTime() - time) / 1000000);
+		logger.trace("opened mpq within {}ms.", () -> (System.nanoTime() - time) / 1_000_000);
 	}
 	
 	/**
@@ -358,7 +360,7 @@ public class SettingsEditorApplication extends Application {
 	 * @return
 	 */
 	public boolean isValidOpenedDocPath() {
-		return openedDocPath != null && !openedDocPath.equals("");
+		return openedDocPath != null && !"".equals(openedDocPath);
 	}
 	
 	/**
@@ -525,7 +527,7 @@ public class SettingsEditorApplication extends Application {
 				logger.trace("File to open was null, most likely due to 'cancel'.");
 			}
 		}
-		logger.trace("opened mpq within {}ms.", () -> (System.nanoTime() - time) / 1000000);
+		logger.trace("opened mpq within {}ms.", () -> (System.nanoTime() - time) / 1_000_000);
 	}
 	
 	/**
@@ -533,10 +535,13 @@ public class SettingsEditorApplication extends Application {
 	 * @return
 	 * @throws ShowToUserException
 	 */
-	private boolean isNameSpaceHeroes(final MpqEditorInterface mpqi) throws ShowToUserException {
+	private static boolean isNameSpaceHeroes(final MpqEditorInterface mpqi) throws ShowToUserException {
 		try {
 			return mpqi.isHeroesMpq();
 		} catch (final MpqException e) {
+			if (logger.isTraceEnabled()) {
+				logger.trace("Error while checking if namespace is heroes", e);
+			}
 			// special case to show readable error to user
 			throw new ShowToUserException(Messages.getString("Main.OpenedFileNoComponentList"));
 		}

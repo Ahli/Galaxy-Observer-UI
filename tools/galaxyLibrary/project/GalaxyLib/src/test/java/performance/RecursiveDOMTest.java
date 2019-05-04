@@ -9,6 +9,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -26,7 +27,7 @@ public class RecursiveDOMTest {
 		final long endMem;
 		int iterations = 0;
 		try {
-			Thread.sleep(1000);
+			Thread.sleep(1_000);
 		} catch (final InterruptedException e1) {
 			e1.printStackTrace();
 			Thread.currentThread().interrupt();
@@ -41,9 +42,11 @@ public class RecursiveDOMTest {
 		final DocumentBuilder dBuilder;
 		
 		try {
-			dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+			final DocumentBuilderFactory dbFac = DocumentBuilderFactory.newInstance();
+			dbFac.setAttribute(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+			dBuilder = dbFac.newDocumentBuilder();
 			// for (int i = 0; i < 1000; i++) {
-			while (System.currentTimeMillis() - startTime < 60000) {
+			while (System.currentTimeMillis() - startTime < 60_000) {
 				list.clear();
 				loadRecursiveXML(dBuilder, f);
 				iterations++;
@@ -71,7 +74,7 @@ public class RecursiveDOMTest {
 		System.out.println("iterations: " + iterations);
 		
 		try {
-			Thread.sleep(1000);
+			Thread.sleep(1_000);
 		} catch (final InterruptedException e1) {
 			e1.printStackTrace();
 			Thread.currentThread().interrupt();

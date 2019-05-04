@@ -1,7 +1,7 @@
 // This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-package com.ahli.hotkeyUi.application.ui;
+package com.ahli.hotkey_ui.application.ui;
 
 /**
  * An Exception that is meant to be shown to the user of the application. The Exception should be localized.

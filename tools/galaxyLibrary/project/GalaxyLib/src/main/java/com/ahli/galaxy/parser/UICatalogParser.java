@@ -152,23 +152,48 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		// file in attributes or template (filtering out key and action tags as they can
 		// contain file=, e.g. for cutscene frames)
 		if ((i = attrTypes.indexOf(FILE)) != -1 && !KEY.equals(tagName) && !ACTION.equals(tagName)) {
-			if (level == 2) {
-				editingMode = true;
-				// TODO edit existing template
-				curTemplate = catalog.getTemplateOfPath(attrValues.get(i));
+			if (level != 2) {
+				logger.warn("WARNING: Unexpected attribute 'file=' found in " + curElement);
+			}
+			// TODO enable to test modification of existing templates, feature is incomplete
+			//			editingMode = true;
+			curTemplate = catalog.getTemplateOfPath(attrValues.get(i));
+		}
+		String name = ((i = attrTypes.indexOf(NAME)) != -1) ?
+				catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout, consoleSkinId) : null;
+		
+		UIElement newElem = null;
+		
+		// open existing element, if editing mode is enabled
+		if (editingMode && curTemplate != null) {
+			if (name == null) {
+				logger.error("Template is used without defining a name.");
+				name = "UnnamedFrame" + Math.random();
+			}
+			
+			// newElement needs to be the current element
+			newElem = curTemplate.getElement().receiveFrameFromPath(name);
+			// curElement needs to be the parent of that frame
+			final int j = name.lastIndexOf('/');
+			if (j > 0) {
+				final String parentName = name.substring(0, j);
+				curElement = curTemplate.getElement().receiveFrameFromPath(parentName);
 			} else {
-				logger.error("unexpected attribute 'file=' found in " + curElement);
+				curElement = curTemplate.getElement();
 			}
 		}
-		final String name = ((i = attrTypes.indexOf(NAME)) != -1) ?
-				catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout, consoleSkinId) : null;
-		// TODO editingMode retrieving existing element if possible
 		
-		// TODO copy template settings, if template used in existing frame
+		// handle template attribute
+		i = attrTypes.indexOf(TEMPLATE);
+		//		if(editingMode && newElem != null){
+		// TODO copy template settings, if template used in existing frame & editing mode
+		// copy template into newElem
+		// }
 		
 		// create from template (actions may use template= and need to be ignored)
-		UIElement newElem = ((i = attrTypes.indexOf(TEMPLATE)) != -1 && !ACTION.equals(tagName)) ?
-				instanciateTemplate(attrValues.get(i), name) : null;
+		if (i != -1 && newElem == null) {
+			newElem = (!ACTION.equals(tagName)) ? instanciateTemplate(attrValues.get(i), name) : null;
+		}
 		
 		// use lowercase for cases!
 		switch (tagName) {
@@ -176,11 +201,15 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				if (newElem == null) {
 					newElem = new UIFrame(name);
 				}
-				final String type = ((i = attrTypes.indexOf(TYPE)) != -1) ?
+				String type = ((i = attrTypes.indexOf(TYPE)) != -1) ?
 						catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout, consoleSkinId) : null;
-				//				if (!checkFrameTypeCompatibility(type, ((UIFrame) newElem).getType())) {
-				//					logger.error("ERROR: The type of the frame is not compatible with the used template.");
-				//				}
+				if (type == null) {
+					logger.error("Unknown type defined in child element of: " + curElement);
+					type = "Frame";
+				}
+				//	if (!checkFrameTypeCompatibility(type, ((UIFrame) newElem).getType())) {
+				//		logger.error("ERROR: The type of the frame is not compatible with the used template.");
+				//	}
 				((UIFrame) newElem).setType(type);
 				// add to parent
 				if (curElement != null) {
@@ -432,7 +461,12 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				if (logger.isTraceEnabled()) {
 					logger.trace("relative=" + relative + ", offset=" + offset);
 				}
-				frame.setAnchor(relative, offset);
+				if (relative == null) {
+					logger.error("'Anchor' attribute has no 'relative' attribute defined in parent element: " +
+							curElement.getName());
+				} else {
+					frame.setAnchor(relative, offset);
+				}
 			} else {
 				UIAnchorSide sideVal = null;
 				if (side.compareToIgnoreCase(LEFT) == 0) {
@@ -444,12 +478,29 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				} else if (side.compareToIgnoreCase(TOP) == 0) {
 					sideVal = UIAnchorSide.TOP;
 				} else {
-					logger.error("'Anchor' attribute has unrecognizable value for 'side='. Value is '" + side + "'.");
+					logger.error("'Anchor' attribute has unrecognizable value for 'side='. Value is '" + side +
+							"' in parent element: " + curElement.getName());
 				}
 				if (sideVal != null) {
-					frame.setAnchorOffset(sideVal, offset);
-					frame.setAnchorPos(sideVal, pos);
-					frame.setAnchorRelative(sideVal, relative);
+					if (offset == null) {
+						logger.error("'Anchor' attribute has no 'offset' attribute defined in parent element: " +
+								curElement.getName());
+					} else {
+						if (pos == null) {
+							logger.error("'Anchor' attribute has no 'pos' attribute defined in parent element: " +
+									curElement.getName());
+						} else {
+							if (relative == null) {
+								logger.error(
+										"'Anchor' attribute has no 'relative' attribute defined in parent element: " +
+												curElement.getName());
+							} else {
+								frame.setAnchorOffset(sideVal, offset);
+								frame.setAnchorPos(sideVal, pos);
+								frame.setAnchorRelative(sideVal, relative);
+							}
+						}
+					}
 				}
 			}
 		}

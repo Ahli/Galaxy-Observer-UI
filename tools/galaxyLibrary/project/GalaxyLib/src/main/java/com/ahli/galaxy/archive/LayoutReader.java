@@ -11,6 +11,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -54,7 +55,9 @@ public final class LayoutReader {
 		final String nameWOfileEnding =
 				nameWithFileEnding.substring(0, Math.max(0, nameWithFileEnding.lastIndexOf('.')));
 		
-		final DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+		final DocumentBuilderFactory dbFac = DocumentBuilderFactory.newInstance();
+		dbFac.setAttribute(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+		final DocumentBuilder dBuilder = dbFac.newDocumentBuilder();
 		final Document doc = dBuilder.parse(f);
 		
 		final ArrayList<String> list = new ArrayList<>();
@@ -259,7 +262,9 @@ public final class LayoutReader {
 	 */
 	public static List<String> getLayoutsConstantDefinitions(final File f)
 			throws ParserConfigurationException, SAXException, IOException {
-		final DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+		final DocumentBuilderFactory dbFac = DocumentBuilderFactory.newInstance();
+		dbFac.setAttribute(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+		final DocumentBuilder dBuilder = dbFac.newDocumentBuilder();
 		final Document doc = dBuilder.parse(f);
 		
 		return getLayoutsConstantDefinitions(doc);

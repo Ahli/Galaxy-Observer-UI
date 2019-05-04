@@ -15,6 +15,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -127,8 +128,9 @@ public class CompileService {
 	 */
 	private void verifyXml(final Collection<File> files)
 			throws IOException, SAXException, ParserConfigurationException {
-		final DocumentBuilder dBuilder;
-		dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+		final DocumentBuilderFactory dbFac = DocumentBuilderFactory.newInstance();
+		dbFac.setAttribute(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+		final DocumentBuilder dBuilder = dbFac.newDocumentBuilder();
 		dBuilder.setErrorHandler(new SilentXmlSaxErrorHandler());
 		for (final File file : files) {
 			dBuilder.parse(file);

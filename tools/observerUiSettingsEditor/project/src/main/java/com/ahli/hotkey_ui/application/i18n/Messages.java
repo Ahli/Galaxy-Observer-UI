@@ -1,7 +1,7 @@
 // This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-package com.ahli.hotkeyUi.application.i18n;
+package com.ahli.hotkey_ui.application.i18n;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -39,6 +39,7 @@ public final class Messages {
 		try {
 			return resourceBundle.getString(key);
 		} catch (final MissingResourceException e) {
+			logger.error("ERROR: failed to String for " + key, e);
 			return '!' + key + '!';
 		}
 	}

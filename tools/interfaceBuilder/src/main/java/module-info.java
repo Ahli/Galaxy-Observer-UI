@@ -22,6 +22,7 @@ module interfacex.builder {
 	requires spring.data.commons;
 	requires spring.data.jpa;
 	requires spring.tx;
+	requires com.fasterxml.classmate;
 	requires CascExplorerConfigFileEdit;
 	requires GalaxyLib;
 	requires com.esotericsoftware.kryo;

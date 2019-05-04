@@ -25,24 +25,22 @@ public class FilterableTreeItem <T> extends TreeItem<T> {
 		sourceList = FXCollections.observableArrayList();
 		final FilteredList<TreeItem<T>> filteredList = new FilteredList<>(sourceList);
 		
-		filteredList.predicateProperty().bind(Bindings.createObjectBinding(() -> {
-			return child -> {
-				// Set the predicate of child items to force filtering
-				if (child instanceof FilterableTreeItem) {
-					final FilterableTreeItem<T> filterableChild = (FilterableTreeItem<T>) child;
-					filterableChild.setPredicate(predicate.get());
-				}
-				// If there is no predicate, keep this tree item
-				if (predicate.get() == null) {
-					return true;
-				}
-				// If there are children, keep this tree item
-				if (!child.getChildren().isEmpty()) {
-					return true;
-				}
-				// Otherwise ask the TreeItemPredicate
-				return predicate.get().test(this, child.getValue());
-			};
+		filteredList.predicateProperty().bind(Bindings.createObjectBinding(() -> child -> {
+			// Set the predicate of child items to force filtering
+			if (child instanceof FilterableTreeItem) {
+				final FilterableTreeItem<T> filterableChild = (FilterableTreeItem<T>) child;
+				filterableChild.setPredicate(predicate.get());
+			}
+			// If there is no predicate, keep this tree item
+			if (predicate.get() == null) {
+				return true;
+			}
+			// If there are children, keep this tree item
+			if (!child.getChildren().isEmpty()) {
+				return true;
+			}
+			// Otherwise ask the TreeItemPredicate
+			return predicate.get().test(this, child.getValue());
 		}, predicate));
 		
 		setHiddenFieldChildren(filteredList);

@@ -12,6 +12,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -48,7 +49,9 @@ public final class DescIndexReader {
 			throws SAXException, IOException, ParserConfigurationException {
 		final ArrayList<String> list = new ArrayList<>();
 		
-		final DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+		final DocumentBuilderFactory dbFac = DocumentBuilderFactory.newInstance();
+		dbFac.setAttribute(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+		final DocumentBuilder dBuilder = dbFac.newDocumentBuilder();
 		logger.trace("reading layouts from descIndexFile: {}", () -> f);
 		final Document doc = dBuilder.parse(f);
 		
@@ -56,7 +59,7 @@ public final class DescIndexReader {
 		final NodeList nodeList = doc.getElementsByTagName("*");
 		for (int i = 0, len = nodeList.getLength(); i < len; i++) {
 			final Node node = nodeList.item(i);
-			if (node.getNodeName().equalsIgnoreCase("Include")) {
+			if ("Include".equalsIgnoreCase(node.getNodeName())) {
 				final NamedNodeMap attributes = node.getAttributes();
 				final String path = attributes.item(0).getNodeValue();
 				

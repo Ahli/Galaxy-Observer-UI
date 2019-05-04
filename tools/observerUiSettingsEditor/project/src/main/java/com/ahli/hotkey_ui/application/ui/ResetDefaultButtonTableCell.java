@@ -1,9 +1,9 @@
 // This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-package com.ahli.hotkeyUi.application.ui;
+package com.ahli.hotkey_ui.application.ui;
 
-import com.ahli.hotkeyUi.application.model.ValueDef;
+import com.ahli.hotkey_ui.application.model.ValueDef;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;

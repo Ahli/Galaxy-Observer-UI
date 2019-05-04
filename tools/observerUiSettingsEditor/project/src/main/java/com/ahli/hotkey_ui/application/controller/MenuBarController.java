@@ -1,11 +1,11 @@
 // This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-package com.ahli.hotkeyUi.application.controller;
+package com.ahli.hotkey_ui.application.controller;
 
-import com.ahli.hotkeyUi.application.SettingsEditorApplication;
-import com.ahli.hotkeyUi.application.i18n.Messages;
-import com.ahli.hotkeyUi.application.ui.Alerts;
+import com.ahli.hotkey_ui.application.SettingsEditorApplication;
+import com.ahli.hotkey_ui.application.i18n.Messages;
+import com.ahli.hotkey_ui.application.ui.Alerts;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.MenuItem;

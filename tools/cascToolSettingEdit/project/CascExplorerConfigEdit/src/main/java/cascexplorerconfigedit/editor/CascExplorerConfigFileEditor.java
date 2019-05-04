@@ -46,7 +46,10 @@ public final class CascExplorerConfigFileEditor {
 	public static void write(final File f, final String storagePath, final String onlineMode, final String product,
 			final String locale) {
 		try (final InputStream is = Files.newInputStream(f.toPath())) {
-			final DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+			final DocumentBuilderFactory dbFac = DocumentBuilderFactory.newInstance();
+			dbFac.setAttribute(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+			final DocumentBuilder dBuilder = dbFac.newDocumentBuilder();
+			
 			final Document doc = dBuilder.parse(is);
 			
 			// edit document

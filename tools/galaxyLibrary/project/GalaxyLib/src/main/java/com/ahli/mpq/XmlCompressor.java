@@ -62,7 +62,9 @@ public final class XmlCompressor {
 		
 		final Collection<File> filesOfCache = FileUtils.listFiles(new File(cachePath), null, true);
 		
-		final DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+		final DocumentBuilderFactory dbFac = DocumentBuilderFactory.newInstance();
+		dbFac.setAttribute(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+		final DocumentBuilder dBuilder = dbFac.newDocumentBuilder();
 		// provide error handler that does not print incompatible files into console
 		dBuilder.setErrorHandler(new SilentXmlSaxErrorHandler());
 		

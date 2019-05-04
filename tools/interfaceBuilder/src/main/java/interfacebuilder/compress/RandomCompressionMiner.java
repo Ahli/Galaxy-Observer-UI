@@ -174,7 +174,9 @@ public class RandomCompressionMiner {
 				if (rule != null) {
 					clean.add(rule);
 				} else {
-					logger.trace("removing null entry from ruleset");
+					if (logger.isTraceEnabled()) {
+						logger.trace("removing null entry from ruleset");
+					}
 				}
 			}
 		}
@@ -274,68 +276,12 @@ public class RandomCompressionMiner {
 	
 	private MpqEditorCompressionRule getDefaultRule(final Path path, final File sourceDir) {
 		final var rule = new MpqEditorCompressionRuleMask(getFileMask(path, sourceDir));
-		switch (path.getFileName().toString()) {
-			case "DocumentHeader":
-				rule.setSingleUnit(true).setCompress(true).setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2);
-				break;
-			case "DocumentInfo":
-				rule.setSingleUnit(true).setCompress(true).setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2);
-				break;
-			case "MapInfo":
-				rule.setSingleUnit(true).setCompress(true).setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2);
-				break;
-			case "Objects":
-				rule.setSingleUnit(true).setCompress(true).setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2);
-				break;
-			case "PaintedPathingLayer":
-				rule.setSingleUnit(true).setCompress(true).setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2);
-				break;
-			case "Regions":
-				rule.setSingleUnit(true).setCompress(true).setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2);
-				break;
-			case "t3CellFlags":
-				rule.setSingleUnit(true).setCompress(true).setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2);
-				break;
-			case "t3FluffDoodad":
-				rule.setSingleUnit(true).setCompress(true).setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2);
-				break;
-			case "t3HardTile":
-				rule.setSingleUnit(true).setCompress(true).setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2);
-				break;
-			case "t3HeightMap":
-				rule.setSingleUnit(true).setCompress(true).setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2);
-				break;
-			case "t3SyncCliffLevel":
-				rule.setSingleUnit(true).setCompress(true).setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2);
-				break;
-			case "t3SyncHeightMap":
-				rule.setSingleUnit(true).setCompress(true).setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2);
-				break;
-			case "t3SyncTextureInfo":
-				rule.setSingleUnit(true).setCompress(true).setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2);
-				break;
-			case "t3TextureMasks":
-				rule.setSingleUnit(true).setCompress(true).setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2);
-				break;
-			case "t3VertCol":
-				rule.setSingleUnit(true).setCompress(true).setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2);
-				break;
-			case "t3Water":
-				rule.setSingleUnit(true).setCompress(true).setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2);
-				break;
-			case "Triggers":
-				rule.setSingleUnit(true).setCompress(true).setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2);
-				break;
-			case "Attributes":
-				rule.setSingleUnit(true).setCompress(true).setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2);
-				break;
-			default:
-				rule.setSingleUnit(true).setCompress(true).setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2);
-				if (path.endsWith(".ogg") || path.endsWith(".ogv") || path.endsWith(".wav") || path.endsWith(".txt") ||
-						path.endsWith(".swf") || path.endsWith(".ttf") || path.endsWith(".otf") ||
-						path.endsWith(".m3")) {
-					rule.setCompressionMethod(MpqEditorCompressionRuleMethod.ZLIB);
-				}
+		rule.setSingleUnit(true).setCompress(true);
+		if (path.endsWith(".ogg") || path.endsWith(".ogv") || path.endsWith(".wav") || path.endsWith(".txt") ||
+				path.endsWith(".swf") || path.endsWith(".ttf") || path.endsWith(".otf") || path.endsWith(".m3")) {
+			rule.setCompressionMethod(MpqEditorCompressionRuleMethod.ZLIB);
+		} else {
+			rule.setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2);
 		}
 		return rule;
 	}

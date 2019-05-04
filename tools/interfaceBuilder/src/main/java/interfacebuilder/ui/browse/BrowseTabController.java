@@ -82,6 +82,7 @@ public class BrowseTabController implements Updateable {
 			final String selectedTemplateRootElem = templateDropdown.getSelectionModel().getSelectedItem();
 			final UITemplate template = templateMap.get(selectedTemplateRootElem);
 			final long start = System.currentTimeMillis();
+			framesTotal = 0;
 			createTree(template);
 			logger.info("Tree creation: " + (System.currentTimeMillis() - start) + "ms , " + framesTotal + " frames");
 		}));

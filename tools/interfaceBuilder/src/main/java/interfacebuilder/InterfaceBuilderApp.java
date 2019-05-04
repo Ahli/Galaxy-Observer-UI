@@ -328,8 +328,8 @@ public class InterfaceBuilderApp extends Application {
 			if (params.getParamCompilePath().contains(File.separator + "heroes" + File.separator)) {
 				// Heroes
 				isHeroes = true;
-				gameDef = gameService.getGameDef(Game.HEROES);
-				final boolean isPtr = settings.isHeroesPtrActive();
+				gameDef = gameService.getNewGameDef(Game.HEROES);
+				final boolean isPtr = baseUiService.isHeroesPtrActive();
 				final String supportDir = gameDef.getSupportDirectoryX64();
 				final String swicherExe = gameDef.getSwitcherExeNameX64();
 				gamePath =
@@ -338,7 +338,7 @@ public class InterfaceBuilderApp extends Application {
 			} else {
 				// SC2
 				isHeroes = false;
-				gameDef = gameService.getGameDef(Game.SC2);
+				gameDef = gameService.getNewGameDef(Game.SC2);
 				final boolean is64bit = settings.isSc64bit();
 				final String supportDir = is64bit ? gameDef.getSupportDirectoryX64() : gameDef.getSupportDirectoryX32();
 				final String swicherExe = is64bit ? gameDef.getSwitcherExeNameX64() : gameDef.getSwitcherExeNameX32();

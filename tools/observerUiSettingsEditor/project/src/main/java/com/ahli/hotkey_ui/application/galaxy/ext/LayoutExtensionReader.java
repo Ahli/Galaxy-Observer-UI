@@ -1,9 +1,9 @@
 // This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-package com.ahli.hotkeyUi.application.galaxy.ext;
+package com.ahli.hotkey_ui.application.galaxy.ext;
 
-import com.ahli.hotkeyUi.application.model.ValueDef;
+import com.ahli.hotkey_ui.application.model.ValueDef;
 import com.ahli.util.SilentXmlSaxErrorHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -29,7 +29,6 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
@@ -44,6 +43,24 @@ public class LayoutExtensionReader {
 	
 	public LayoutExtensionReader() {
 		// nothing to do
+	}
+	
+	/**
+	 * @param nodes
+	 * @param name
+	 * @return
+	 */
+	private static Node getNamedItemIgnoreCase(final NamedNodeMap nodes, final String name) {
+		final Node node = nodes.getNamedItem(name);
+		if (node == null) {
+			for (int i = 0, len = nodes.getLength(); i < len; i++) {
+				final Node curNode = nodes.item(i);
+				if (name.equalsIgnoreCase(curNode.getNodeName())) {
+					return curNode;
+				}
+			}
+		}
+		return node;
 	}
 	
 	/**
@@ -83,13 +100,15 @@ public class LayoutExtensionReader {
 	 * @throws ParserConfigurationException
 	 * @throws SAXException
 	 */
-	public void processLayoutFiles(final Collection<File> layoutFiles)
-			throws ParserConfigurationException, SAXException {
+	public void processLayoutFiles(final Iterable<File> layoutFiles) throws ParserConfigurationException, SAXException {
 		if (logger.isInfoEnabled()) {
 			logger.info("Scanning for XML file...");
 		}
 		
-		final DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+		final DocumentBuilderFactory dbFac = DocumentBuilderFactory.newInstance();
+		dbFac.setAttribute(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+		final DocumentBuilder dBuilder = dbFac.newDocumentBuilder();
+		
 		// provide error handler that does not print incompatible files into
 		// console
 		dBuilder.setErrorHandler(new SilentXmlSaxErrorHandler());
@@ -154,11 +173,11 @@ public class LayoutExtensionReader {
 		}
 	}
 	
-	private String getValueAfterEqualsChar(String part) {
+	private String getValueAfterEqualsChar(final String part) {
 		return part.substring(1 + part.indexOf('=')).trim();
 	}
 	
-	private String getValueWithinQuotes(String part) {
+	private String getValueWithinQuotes(final String part) {
 		final int quoteEnd = part.lastIndexOf('"');
 		final int quoteStart = part.indexOf('"');
 		if (quoteStart < 0 || quoteStart >= quoteEnd) {
@@ -341,13 +360,13 @@ public class LayoutExtensionReader {
 	 * @throws IOException
 	 * @throws SAXException
 	 */
-	public void updateLayoutFiles(final Collection<File> layoutFiles)
-			throws ParserConfigurationException, SAXException {
+	public void updateLayoutFiles(final Iterable<File> layoutFiles) throws ParserConfigurationException, SAXException {
 		if (logger.isInfoEnabled()) {
 			logger.info("Scanning for XML file...");
 		}
-		
-		final DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+		final DocumentBuilderFactory dbFac = DocumentBuilderFactory.newInstance();
+		dbFac.setAttribute(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+		final DocumentBuilder dBuilder = dbFac.newDocumentBuilder();
 		// provide error handler that does not print incompatible files into console
 		dBuilder.setErrorHandler(new SilentXmlSaxErrorHandler());
 		
@@ -443,24 +462,6 @@ public class LayoutExtensionReader {
 				logger.warn("Constant has no 'name' attribute defined.");
 			}
 		}
-	}
-	
-	/**
-	 * @param nodes
-	 * @param name
-	 * @return
-	 */
-	private Node getNamedItemIgnoreCase(final NamedNodeMap nodes, final String name) {
-		final Node node = nodes.getNamedItem(name);
-		if (node == null) {
-			for (int i = 0, len = nodes.getLength(); i < len; i++) {
-				final Node curNode = nodes.item(i);
-				if (name.equalsIgnoreCase(curNode.getNodeName())) {
-					return curNode;
-				}
-			}
-		}
-		return node;
 	}
 	
 	/**

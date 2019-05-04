@@ -23,7 +23,7 @@ public class RecursiveVtdTest {
 		final long endMem;
 		int iterations = 0;
 		try {
-			Thread.sleep(1000);
+			Thread.sleep(1_000);
 		} catch (final InterruptedException e1) {
 			e1.printStackTrace();
 			Thread.currentThread().interrupt();
@@ -40,7 +40,7 @@ public class RecursiveVtdTest {
 		try {
 			vtd = new VTDGen();
 			// for (int i = 0; i < 1000; i++) {
-			while (System.currentTimeMillis() - startTime < 60000) {
+			while (System.currentTimeMillis() - startTime < 60_000) {
 				list.clear();
 				loadRecursiveXML(vtd, f);
 				iterations++;
@@ -68,7 +68,7 @@ public class RecursiveVtdTest {
 		System.out.println("iterations: " + iterations);
 		
 		try {
-			Thread.sleep(1000);
+			Thread.sleep(1_000);
 		} catch (final InterruptedException e1) {
 			e1.printStackTrace();
 			Thread.currentThread().interrupt();

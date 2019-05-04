@@ -1,12 +1,12 @@
 // This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-package com.ahli.hotkeyUi.application.controller;
+package com.ahli.hotkey_ui.application.controller;
 
-import com.ahli.hotkeyUi.application.SettingsEditorApplication;
-import com.ahli.hotkeyUi.application.i18n.Messages;
-import com.ahli.hotkeyUi.application.model.ValueDef;
-import com.ahli.hotkeyUi.application.ui.ResetDefaultButtonTableCell;
+import com.ahli.hotkey_ui.application.SettingsEditorApplication;
+import com.ahli.hotkey_ui.application.i18n.Messages;
+import com.ahli.hotkey_ui.application.model.ValueDef;
+import com.ahli.hotkey_ui.application.ui.ResetDefaultButtonTableCell;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;

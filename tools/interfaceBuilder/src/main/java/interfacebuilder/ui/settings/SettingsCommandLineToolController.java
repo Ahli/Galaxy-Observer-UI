@@ -12,8 +12,6 @@ import javafx.scene.control.RadioButton;
 public class SettingsCommandLineToolController extends SettingsAutoSaveController {
 	
 	@FXML
-	private CheckBox heroesPtrActive;
-	@FXML
 	private CheckBox buildUnprotectedToo;
 	@FXML
 	private RadioButton compressMpqBlizz;
@@ -49,7 +47,6 @@ public class SettingsCommandLineToolController extends SettingsAutoSaveControlle
 		compressXml.setSelected(settings.isCmdLineCompressXml());
 		initCompressMpq(settings.getCmdLineCompressMpq());
 		buildUnprotectedToo.setSelected(settings.isCmdLineBuildUnprotectedToo());
-		heroesPtrActive.setSelected(settings.isHeroesPtrActive());
 	}
 	
 	/**
@@ -156,10 +153,4 @@ public class SettingsCommandLineToolController extends SettingsAutoSaveControlle
 		persistSettingsIni();
 	}
 	
-	@FXML
-	public void onHeroesPtrActiveClick(final ActionEvent actionEvent) {
-		final boolean val = ((CheckBox) actionEvent.getSource()).selectedProperty().getValue();
-		configService.getIniSettings().setIsHeroesPtrActive(val);
-		persistSettingsIni();
-	}
 }

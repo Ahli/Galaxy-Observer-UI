@@ -11,6 +11,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -64,6 +65,7 @@ public final class ComponentsListReader {
 			throws ParserConfigurationException, SAXException, IOException {
 		// find the type in the xml
 		final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		factory.setAttribute(XMLConstants.FEATURE_SECURE_PROCESSING, true);
 		factory.setIgnoringComments(true);
 		final DocumentBuilder dBuilder = factory.newDocumentBuilder();
 		final Document doc = dBuilder.parse(f);
@@ -74,7 +76,7 @@ public final class ComponentsListReader {
 			final Node node = nodeList.item(i);
 			final Node attrZero = node.getAttributes().item(0);
 			// first attribute's name is Type & value must be as specified
-			if (attrZero.getNodeName().equals("Type") && attrZero.getNodeValue().equals(typeVal)) {
+			if ("Type".equals(attrZero.getNodeName()) && attrZero.getNodeValue().equals(typeVal)) {
 				// the text is the value between the tags
 				return node.getTextContent();
 			}

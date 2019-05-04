@@ -13,6 +13,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -48,7 +49,9 @@ public class XmlParserDom extends XmlParserAbstract {
 	private void init() {
 		try {
 			if (dBuilder == null) {
-				dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+				final DocumentBuilderFactory dbFac = DocumentBuilderFactory.newInstance();
+				dbFac.setAttribute(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+				dBuilder = dbFac.newDocumentBuilder();
 			}
 		} catch (final ParserConfigurationException e) {
 			logger.error(e);

@@ -25,7 +25,7 @@ public class GameService {
 	 * @return
 	 */
 	public ModData getModData(final Game game) {
-		return new ModData(new GameData(getGameDef(game)));
+		return new ModData(new GameData(getNewGameDef(game)));
 	}
 	
 	/**
@@ -34,7 +34,7 @@ public class GameService {
 	 * @param game
 	 * @return
 	 */
-	public GameDef getGameDef(final Game game) {
+	public GameDef getNewGameDef(final Game game) {
 		final GameDef gameDef;
 		switch (game) {
 			case SC2:

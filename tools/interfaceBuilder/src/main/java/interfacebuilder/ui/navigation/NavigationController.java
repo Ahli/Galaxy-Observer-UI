@@ -163,7 +163,7 @@ public class NavigationController {
 	 * @param contentIndex
 	 */
 	private void markTab(final int contentIndex) {
-		selectedMarker.setLayoutY(8 + contentIndex * 28);
+		selectedMarker.setLayoutY(8.0 + contentIndex * 28.0);
 	}
 	
 	/**

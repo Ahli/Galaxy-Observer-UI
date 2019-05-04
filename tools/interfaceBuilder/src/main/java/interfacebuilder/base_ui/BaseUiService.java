@@ -5,7 +5,6 @@ package interfacebuilder.base_ui;
 
 import cascexplorerconfigedit.editor.CascExplorerConfigFileEditor;
 import com.ahli.galaxy.game.GameData;
-import com.ahli.galaxy.game.def.SC2GameDef;
 import com.ahli.galaxy.game.def.abstracts.GameDef;
 import com.ahli.galaxy.ui.UICatalogImpl;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
@@ -14,7 +13,6 @@ import interfacebuilder.InterfaceBuilderApp;
 import interfacebuilder.compress.GameService;
 import interfacebuilder.config.ConfigService;
 import interfacebuilder.integration.FileService;
-import interfacebuilder.integration.SettingsIniInterface;
 import interfacebuilder.integration.kryo.KryoGameInfo;
 import interfacebuilder.integration.kryo.KryoService;
 import interfacebuilder.projects.enums.Game;
@@ -79,7 +77,7 @@ public class BaseUiService {
 	 * @return true, if outdated
 	 */
 	public boolean isOutdated(final Game game, final boolean usePtr) throws IOException {
-		final GameDef gameDef = gameService.getGameDef(game);
+		final GameDef gameDef = gameService.getNewGameDef(game);
 		final File gameBaseUI = new File(configService.getBaseUiPath(gameDef));
 		
 		if (!gameBaseUI.exists() || fileService.isEmptyDirectory(gameBaseUI)) {
@@ -156,28 +154,6 @@ public class BaseUiService {
 	}
 	
 	/**
-	 * Returns the game path.
-	 *
-	 * @param game
-	 * @param usePtr
-	 * @return
-	 */
-	private String getGamePath(final Game game, final boolean usePtr) {
-		final SettingsIniInterface iniSettings = configService.getIniSettings();
-		final String gamePath;
-		if (game.equals(Game.SC2)) {
-			gamePath = iniSettings.getSc2Path();
-		} else {
-			if (game.equals(Game.HEROES)) {
-				gamePath = usePtr ? iniSettings.getHeroesPtrPath() : iniSettings.getHeroesPath();
-			} else {
-				throw new InvalidParameterException(UNKNOWN_GAME_EXCEPTION);
-			}
-		}
-		return gamePath;
-	}
-	
-	/**
 	 * Creates Tasks that will extract the base UI for a specified game.
 	 *
 	 * @param game
@@ -188,7 +164,7 @@ public class BaseUiService {
 		prepareCascExplorerConfig(game, usePtr);
 		
 		final ThreadPoolExecutor executor = InterfaceBuilderApp.getInstance().getExecutor();
-		final GameDef gameDef = gameService.getGameDef(game);
+		final GameDef gameDef = gameService.getNewGameDef(game);
 		final File destination = new File(configService.getBaseUiPath(gameDef));
 		
 		try {
@@ -339,8 +315,15 @@ public class BaseUiService {
 					final long startTime = System.currentTimeMillis();
 					logger.info("Loading baseUI for " + gameName);
 					boolean needToParseAgain = true;
-					final boolean isPtr = !(game.getGameDef() instanceof SC2GameDef) &&
-							configService.getIniSettings().isHeroesPtrActive();
+					
+					/*!(game.getNewGameDef() instanceof SC2GameDef) &&*/
+					final String baseUiPath = configService.getBaseUiPath(game.getGameDef());
+					boolean isPtr = false;
+					try {
+						isPtr = isPtr(new File(baseUiPath));
+					} catch (final IOException e) {
+						// do nothing
+					}
 					try {
 						if (cacheIsUpToDateCheckException(game.getGameDef(), isPtr)) {
 							// load from cache
@@ -407,6 +390,10 @@ public class BaseUiService {
 		});
 	}
 	
+	public boolean isPtr(final File baseUiDirectory) throws IOException {
+		return readMetaFile(baseUiDirectory).isPtr();
+	}
+	
 	public boolean cacheIsUpToDateCheckException(final GameDef gameDef, final boolean usePtr) {
 		try {
 			return cacheIsUpToDate(gameDef, usePtr);
@@ -457,4 +444,14 @@ public class BaseUiService {
 		return isUpToDate;
 	}
 	
+	public boolean isHeroesPtrActive() {
+		final File baseUiMetaFileDir = new File(configService.getBaseUiPath(gameService.getNewGameDef(Game.HEROES)));
+		try {
+			final KryoGameInfo baseUiInfo = readMetaFile(baseUiMetaFileDir);
+			return baseUiInfo.isPtr();
+		} catch (final IOException e) {
+			logger.error("ERROR while checking if ptr is active via baseUI cache file");
+		}
+		return false;
+	}
 }

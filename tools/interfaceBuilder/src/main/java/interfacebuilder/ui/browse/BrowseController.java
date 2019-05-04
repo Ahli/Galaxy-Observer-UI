@@ -57,6 +57,10 @@ public class BrowseController implements Updateable {
 	@FXML
 	public ListView<Project> projectListView;
 	@FXML
+	public Label sc2BaseUiDetailsLabel;
+	@FXML
+	public Label heroesBaseUiDetailsLabel;
+	@FXML
 	private TabPane tabPane;
 	@FXML
 	private Label ptrStatusLabel;
@@ -89,7 +93,7 @@ public class BrowseController implements Updateable {
 		controllers = new ArrayList<>();
 		heroesChoiceBox.setItems(
 				FXCollections.observableArrayList(Messages.getString("browse.live"), Messages.getString("browse.ptr")));
-		final boolean ptrActive = configService.getIniSettings().isHeroesPtrActive();
+		final boolean ptrActive = baseUiService.isHeroesPtrActive();
 		heroesChoiceBox.getSelectionModel().select(ptrActive ? 1 : 0);
 		updatePtrStatusLabel(ptrActive);
 		
@@ -152,7 +156,35 @@ public class BrowseController implements Updateable {
 	
 	@Override
 	public void update() {
-		updatePtrStatusLabel(configService.getIniSettings().isHeroesPtrActive());
+		updatePtrStatusLabel(baseUiService.isHeroesPtrActive());
+		updateBaseUiDetails();
+	}
+	
+	private void updateBaseUiDetails() {
+		sc2BaseUiDetailsLabel.setText(buildBaseUiDetailsString(Game.SC2, false));
+		heroesBaseUiDetailsLabel.setText(buildBaseUiDetailsString(Game.HEROES, baseUiService.isHeroesPtrActive()));
+	}
+	
+	private String buildBaseUiDetailsString(final Game game, final boolean isPtr) {
+		final StringBuilder sb = new StringBuilder();
+		final int[] version = baseUiService.getVersion(gameService.getNewGameDef(game), isPtr);
+		for (final int v : version) {
+			sb.append(v).append('.');
+		}
+		sb.deleteCharAt(sb.length() - 1);
+		if (isPtr) {
+			sb.append(" - PTR");
+		}
+		try {
+			if (baseUiService.isOutdated(game, isPtr)) {
+				sb.append(" - requires update");
+			} else {
+				sb.append(" - up to date");
+			}
+		} catch (final IOException e) {
+			sb.append(" - could not check game version");
+		}
+		return sb.toString();
 	}
 	
 	public void extractBaseUiSc2() {

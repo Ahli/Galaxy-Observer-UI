@@ -41,13 +41,10 @@ public class SettingsIniInterface {
 	private static final String COMPRESS_MPQ = "compressMPQ";
 	private static final String BUILD_UNPROTECTED_TOO = "buildUnprotectedToo";
 	private static final String UTF_8 = "UTF-8";
-	private static final String CATEGORY_INTERNAL_VARIABLES = "InternalVariables";
-	private static final String HEROES_PTR_ACTIVE = "HeroesPTRactive";
 	private String settingsFilePath;
 	private String sc2Path = "";
 	private String heroesPath = "";
 	private String heroesPtrPath = "";
-	private boolean heroesPtrActive;
 	private boolean sc2X64;
 	private boolean cmdLineVerifyXml = true;
 	private boolean cmdLineRepairLayoutOrder = true;
@@ -129,9 +126,6 @@ public class SettingsIniInterface {
 		guiCompressXml = section.getBoolean(COMPRESS_XML, true);
 		guiCompressMpq = section.getInt(COMPRESS_MPQ, 3);
 		guiBuildUnprotectedToo = section.getBoolean(BUILD_UNPROTECTED_TOO, false);
-		
-		section = ini.getSection(CATEGORY_INTERNAL_VARIABLES);
-		heroesPtrActive = section.getBoolean(HEROES_PTR_ACTIVE, false);
 	}
 	
 	/**
@@ -185,9 +179,6 @@ public class SettingsIniInterface {
 		section.setProperty(COMPRESS_XML, guiCompressXml);
 		section.setProperty(COMPRESS_MPQ, guiCompressMpq);
 		section.setProperty(BUILD_UNPROTECTED_TOO, guiBuildUnprotectedToo);
-		
-		section = ini.getSection(CATEGORY_INTERNAL_VARIABLES);
-		section.setProperty(HEROES_PTR_ACTIVE, heroesPtrActive);
 	}
 	
 	/**
@@ -318,20 +309,6 @@ public class SettingsIniInterface {
 	 */
 	public void setHeroesPtrPath(final String heroesPtrPath) {
 		this.heroesPtrPath = heroesPtrPath;
-	}
-	
-	/**
-	 * @return
-	 */
-	public boolean isHeroesPtrActive() {
-		return heroesPtrActive;
-	}
-	
-	/**
-	 * @param heroesPtrActive
-	 */
-	public void setIsHeroesPtrActive(final boolean heroesPtrActive) {
-		this.heroesPtrActive = heroesPtrActive;
 	}
 	
 	/**

@@ -1,7 +1,5 @@
 package javax.xml.bind;
 
-import java.io.PrintWriter;
-
 public class JAXBException extends Exception {
 	
 	static final long serialVersionUID = -5621384651494307979L;
@@ -116,41 +114,4 @@ public class JAXBException extends Exception {
 				super.toString() + "\n - with linked exception:\n[" + linkedException.toString() + "]";
 	}
 	
-	/**
-	 * Prints this JAXBException and its stack trace (including the stack trace of the linkedException if it is
-	 * non-null) to the PrintStream.
-	 *
-	 * @param s
-	 * 		PrintStream to use for output
-	 */
-	@Override
-	public void printStackTrace(final java.io.PrintStream s) {
-		super.printStackTrace(s);
-	}
-	
-	/**
-	 * Prints this JAXBException and its stack trace (including the stack trace of the linkedException if it is
-	 * non-null) to {@code System.err}.
-	 */
-	@Override
-	public void printStackTrace() {
-		super.printStackTrace();
-	}
-	
-	/**
-	 * Prints this JAXBException and its stack trace (including the stack trace of the linkedException if it is
-	 * non-null) to the PrintWriter.
-	 *
-	 * @param s
-	 * 		PrintWriter to use for output
-	 */
-	@Override
-	public void printStackTrace(final PrintWriter s) {
-		super.printStackTrace(s);
-	}
-	
-	@Override
-	public Throwable getCause() {
-		return linkedException;
-	}
 }

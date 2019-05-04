@@ -1,9 +1,9 @@
 // This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-package com.ahli.hotkeyUi.application.ui;
+package com.ahli.hotkey_ui.application.ui;
 
-import com.ahli.hotkeyUi.application.i18n.Messages;
+import com.ahli.hotkey_ui.application.i18n.Messages;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
@@ -46,7 +46,7 @@ public final class Alerts {
 		alert.initOwner(owner);
 		alert.setTitle(title);
 		alert.setHeaderText(header);
-		logger.trace("created yesNoCancelAlert within {}ms.", () -> (System.nanoTime() - time) / 1000000);
+		logger.trace("created yesNoCancelAlert within {}ms.", () -> (System.nanoTime() - time) / 1_000_000);
 		return alert;
 	}
 	
@@ -65,7 +65,7 @@ public final class Alerts {
 		alert.initOwner(owner);
 		alert.setTitle(title);
 		alert.setHeaderText(header);
-		logger.trace("created errorAlert within {}", () -> (System.nanoTime() - time) / 1000000);
+		logger.trace("created errorAlert within {}", () -> (System.nanoTime() - time) / 1_000_000);
 		return alert;
 	}
 	
@@ -88,7 +88,7 @@ public final class Alerts {
 		alert.initOwner(owner);
 		alert.setTitle(title);
 		alert.setHeaderText(header);
-		logger.trace("created warningAlert within {}ms.", () -> (System.nanoTime() - time) / 1000000);
+		logger.trace("created warningAlert within {}ms.", () -> (System.nanoTime() - time) / 1_000_000);
 		return alert;
 	}
 	
@@ -112,7 +112,7 @@ public final class Alerts {
 			alert.setGraphic(new ImageView(imageUrl));
 		}
 		alert.getDialogPane().setPrefSize(480, 360);
-		logger.trace("initialized about-alert within {}ms.", () -> (System.nanoTime() - time) / 1000000);
+		logger.trace("initialized about-alert within {}ms.", () -> (System.nanoTime() - time) / 1_000_000);
 		return alert;
 	}
 	
@@ -147,7 +147,7 @@ public final class Alerts {
 		
 		// Set expandable Exception into the dialog pane.
 		alert.getDialogPane().setExpandableContent(expContent);
-		logger.trace("created exceptionAlert within {}ms.", () -> (System.nanoTime() - time) / 1000000);
+		logger.trace("created exceptionAlert within {}ms.", () -> (System.nanoTime() - time) / 1_000_000);
 		
 		return alert;
 	}
