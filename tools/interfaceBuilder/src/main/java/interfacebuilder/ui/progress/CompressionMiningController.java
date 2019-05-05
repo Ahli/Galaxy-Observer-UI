@@ -180,7 +180,6 @@ public class CompressionMiningController implements Updateable {
 		task = () -> {
 			try {
 				long bestSize;
-				// TODO too complex?
 				{
 					final RuleSet bestCompressionRuleSet = projectService.fetchBestCompressionRuleSet(project);
 					

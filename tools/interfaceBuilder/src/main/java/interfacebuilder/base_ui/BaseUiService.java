@@ -435,7 +435,7 @@ public class BaseUiService {
 		
 		boolean isUpToDate = true;
 		for (int i = 0; i < versionCache.length && isUpToDate; ++i) {
-			isUpToDate = versionCache[0] == versionBaseUi[0];
+			isUpToDate = versionCache[i] == versionBaseUi[i];
 		}
 		if (logger.isTraceEnabled()) {
 			logger.trace("Cache and baseUI versions match: " + isUpToDate);
