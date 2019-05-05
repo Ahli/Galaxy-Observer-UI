@@ -74,7 +74,8 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 	 * @param originalFileName
 	 * @throws IOException
 	 */
-	private void restoreFileFromBackUp(final File backUpFileName, final File originalFileName) throws IOException {
+	private static void restoreFileFromBackUp(final File backUpFileName, final File originalFileName)
+			throws IOException {
 		if (backUpFileName != null && backUpFileName.exists()) {
 			if (originalFileName.exists()) {
 				Files.delete(originalFileName.toPath());
@@ -213,7 +214,7 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 	 * @param compression
 	 * @return
 	 */
-	private int getGameIdPropertyValue(final MpqEditorCompression compression) {
+	private static int getGameIdPropertyValue(final MpqEditorCompression compression) {
 		switch (compression) {
 			case BLIZZARD_SC2_HEROES:
 				return 11;

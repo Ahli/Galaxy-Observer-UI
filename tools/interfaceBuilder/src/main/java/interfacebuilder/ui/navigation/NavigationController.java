@@ -108,15 +108,15 @@ public class NavigationController {
 		notificationBar.setVisible(false);
 		notificationBar.managedProperty().bind(notificationBar.visibleProperty());
 		notificationBar.setBackground(new Background(
-				new BackgroundFill(Color.color(211d / 256d, 168d / 255d, 3d / 255d), CornerRadii.EMPTY, Insets.EMPTY)));
+				new BackgroundFill(Color.color(211D / 256D, 168D / 255D, 3D / 255D), CornerRadii.EMPTY, Insets.EMPTY)));
 		selectedMarker.setBackground(new Background(
-				new BackgroundFill(Color.color(211d / 256d, 168d / 255d, 3d / 255d), CornerRadii.EMPTY, Insets.EMPTY)));
+				new BackgroundFill(Color.color(211D / 256D, 168D / 255D, 3D / 255D), CornerRadii.EMPTY, Insets.EMPTY)));
 		
 		// content pages
-		initFXML("view/Content_Home.fxml", 0);
-		initFXML("view/Content_TabPane.fxml", 1);
-		initFXML("view/Content_UiBrowser.fxml", 2);
-		initFXML("view/Content_Settings.fxml", 3);
+		initFXML("classpath:view/Content_Home.fxml", 0);
+		initFXML("classpath:view/Content_TabPane.fxml", 1);
+		initFXML("classpath:view/Content_UiBrowser.fxml", 2);
+		initFXML("classpath:view/Content_Settings.fxml", 3);
 		
 		// make tabPane visible
 		showPanelContent(HOME_TAB);

@@ -36,7 +36,7 @@ public class RandomCompressionMiner {
 	private MpqEditorCompressionRule[] rules;
 	private long bestSize;
 	private MpqEditorCompressionRule[] bestRuleSet;
-	private boolean oldRulesetHadMissingFiles = false;
+	private boolean oldRulesetHadMissingFiles;
 	
 	/**
 	 * Creates a Miner with a ruleset whose entries all refer to exactly a single file within the source location.
@@ -134,7 +134,7 @@ public class RandomCompressionMiner {
 	 * @param cacheDir
 	 * @return
 	 */
-	private MpqEditorCompressionRule[] addRulesForFiles(final MpqEditorCompressionRule[] oldBestRuleset,
+	private static MpqEditorCompressionRule[] addRulesForFiles(final MpqEditorCompressionRule[] oldBestRuleset,
 			final List<File> untrackedFiles, final File cacheDir) {
 		final int oldRuleCount = oldBestRuleset.length;
 		final MpqEditorCompressionRule[] merged = new MpqEditorCompressionRule[oldRuleCount + untrackedFiles.size()];
@@ -189,7 +189,7 @@ public class RandomCompressionMiner {
 	 * @param rules
 	 * @return
 	 */
-	private MpqEditorCompressionRule[] deepCopy(final MpqEditorCompressionRule... rules) {
+	private static MpqEditorCompressionRule[] deepCopy(final MpqEditorCompressionRule... rules) {
 		final int len = rules.length;
 		final MpqEditorCompressionRule[] clone = new MpqEditorCompressionRule[len];
 		for (int i = 0; i < len; i++) {
@@ -266,7 +266,7 @@ public class RandomCompressionMiner {
 	 * 		cache directory containing the map
 	 * @return true if file exists within the cache and is not a directory
 	 */
-	private boolean isValidFileSpecificMask(final String mask, final File cacheDir) {
+	private static boolean isValidFileSpecificMask(final String mask, final File cacheDir) {
 		if (mask.contains("*")) {
 			return false;
 		}
@@ -274,7 +274,7 @@ public class RandomCompressionMiner {
 		return referencedFile.exists() && referencedFile.isFile();
 	}
 	
-	private MpqEditorCompressionRule getDefaultRule(final Path path, final File sourceDir) {
+	private static MpqEditorCompressionRule getDefaultRule(final Path path, final File sourceDir) {
 		final var rule = new MpqEditorCompressionRuleMask(getFileMask(path, sourceDir));
 		rule.setSingleUnit(true).setCompress(true);
 		if (path.endsWith(".ogg") || path.endsWith(".ogv") || path.endsWith(".wav") || path.endsWith(".txt") ||

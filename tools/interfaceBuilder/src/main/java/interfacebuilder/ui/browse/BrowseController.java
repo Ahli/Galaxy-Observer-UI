@@ -183,6 +183,9 @@ public class BrowseController implements Updateable {
 			}
 		} catch (final IOException e) {
 			sb.append(" - could not check game version");
+			if (logger.isTraceEnabled()) {
+				logger.trace("Error: could not check game version", e);
+			}
 		}
 		return sb.toString();
 	}
@@ -222,8 +225,8 @@ public class BrowseController implements Updateable {
 		Updateable controller = null;
 		try {
 			final FXMLLoader loader = new FXMLSpringLoader(appContext);
-			final Node content =
-					loader.load(appContext.getResource("view/Content_UiBrowser_BrowseTab.fxml").getInputStream());
+			final Node content = loader.load(
+					appContext.getResource("classpath:view/Content_UiBrowser_BrowseTab.fxml").getInputStream());
 			controller = loader.getController();
 			controllers.add(controller);
 			final Tab newTab = new Tab(name, content);

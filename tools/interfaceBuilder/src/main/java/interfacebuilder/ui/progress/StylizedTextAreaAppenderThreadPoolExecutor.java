@@ -3,6 +3,7 @@
 
 package interfacebuilder.ui.progress;
 
+import interfacebuilder.integration.log4j.StylizedTextAreaAppender;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

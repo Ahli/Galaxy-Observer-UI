@@ -19,6 +19,10 @@ public class AppPreloader extends Preloader {
 	private static final Logger logger = LogManager.getLogger(AppPreloader.class);
 	private Stage stage;
 	
+	public AppPreloader() {
+		// nothing to do
+	}
+	
 	@Override
 	public void start(final Stage stage) {
 		this.stage = stage;
@@ -39,7 +43,7 @@ public class AppPreloader extends Preloader {
 	
 	@Override
 	public void handleStateChangeNotification(final StateChangeNotification info) {
-		if (info.getType().equals(StateChangeNotification.Type.BEFORE_START)) {
+		if (info.getType() == StateChangeNotification.Type.BEFORE_START) {
 			stage.hide();
 		}
 	}

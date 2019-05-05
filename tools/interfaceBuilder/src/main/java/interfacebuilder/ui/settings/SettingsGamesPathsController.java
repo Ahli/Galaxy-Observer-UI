@@ -92,8 +92,8 @@ public class SettingsGamesPathsController extends SettingsAutoSaveController {
 	}
 	
 	@FXML
-	public void onSc2ArchitectureChange(final ActionEvent event) {
-		final boolean val = ((CheckBox) event.getSource()).selectedProperty().getValue();
+	public void onSc2ArchitectureChange(final ActionEvent actionEvent) {
+		final boolean val = ((CheckBox) actionEvent.getSource()).selectedProperty().getValue();
 		configService.getIniSettings().setSc2Is64Bit(val);
 		persistSettingsIni();
 	}
@@ -145,7 +145,7 @@ public class SettingsGamesPathsController extends SettingsAutoSaveController {
 	 * 		label set visible if invalid, can be null
 	 * @return whether the path belongs to that game directory or not
 	 */
-	private boolean validatePath(final String path, final String switcher, final Label invalidLabel) {
+	private static boolean validatePath(final String path, final String switcher, final Label invalidLabel) {
 		boolean valid = false;
 		if (path != null) {
 			valid = switcherExists(path, switcher, false) ||
@@ -163,7 +163,8 @@ public class SettingsGamesPathsController extends SettingsAutoSaveController {
 	 * @param is64bit
 	 * @return
 	 */
-	private boolean switcherExists(final String gameDirectoryPath, final String switcherName, final boolean is64bit) {
+	private static boolean switcherExists(final String gameDirectoryPath, final String switcherName,
+			final boolean is64bit) {
 		return new File(
 				gameDirectoryPath + File.separator + "Support" + (is64bit ? "64" : "") + File.separator + switcherName)
 				.exists();

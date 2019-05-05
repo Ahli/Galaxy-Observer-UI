@@ -88,7 +88,7 @@ public class ProjectService {
 	 * @param projects
 	 * @param useCmdLineSettings
 	 */
-	public void build(final List<Project> projects, final boolean useCmdLineSettings) {
+	public void build(final Iterable<Project> projects, final boolean useCmdLineSettings) {
 		for (final Project project : projects) {
 			mpqBuilderService.build(project, useCmdLineSettings);
 		}
@@ -110,7 +110,7 @@ public class ProjectService {
 	 * @return list of Projects with matching path
 	 */
 	public List<Project> getProjectsOfPath(final String path) {
-		return projectRepo.findAll(new Example<Project>() {
+		return projectRepo.findAll(new Example<>() {
 			@Override
 			public Project getProbe() {
 				return new Project(null, path, null);

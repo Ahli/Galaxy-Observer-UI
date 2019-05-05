@@ -82,6 +82,16 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		
 	}
 	
+	/**
+	 * @param type
+	 * @param type2
+	 * @return
+	 */
+	private static boolean checkFrameTypeCompatibility(final String type, final String type2) {
+		// TODO
+		return true;
+	}
+	
 	public void parseFile(final File f, final String raceId, final boolean isDevLayout, final String consoleSkinId)
 			throws IOException {
 		this.raceId = raceId;
@@ -533,7 +543,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	 * @param newName
 	 * @return
 	 */
-	private UIElement instanciateTemplateFromList(final List<UITemplate> templates, final String fileName,
+	private static UIElement instanciateTemplateFromList(final List<UITemplate> templates, final String fileName,
 			final String path, final String newName) {
 		final String newPath = UIElement.removeLeftPathLevel(path);
 		
@@ -559,7 +569,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	 * @param controllers
 	 * @return
 	 */
-	private String getImplicitName(final String type, final List<UIController> controllers) {
+	private static String getImplicitName(final String type, final List<UIController> controllers) {
 		if (logger.isTraceEnabled()) {
 			logger.trace("Constructing implicit controller name");
 		}
@@ -580,16 +590,6 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			logger.trace("Implicit controller name existing: {}", () -> name);
 			i++;
 		}
-	}
-	
-	/**
-	 * @param type
-	 * @param type2
-	 * @return
-	 */
-	private boolean checkFrameTypeCompatibility(final String type, final String type2) {
-		// TODO
-		return true;
 	}
 	
 	@Override

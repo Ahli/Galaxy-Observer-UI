@@ -89,6 +89,50 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	}
 	
 	/**
+	 * Returns path with suffix via changing file name.
+	 *
+	 * @param absolutePath
+	 * @return
+	 */
+	private static String getPathWithUnprotectedSuffix(final String absolutePath) {
+		final int i = absolutePath.lastIndexOf('.');
+		return absolutePath.substring(0, i < 0 ? absolutePath.length() : i) + "_unprtctd" +
+				(i < 0 ? "" : absolutePath.substring(i));
+	}
+	
+	/**
+	 * Deletes a file of the specified path.
+	 *
+	 * @param path
+	 * 		file path
+	 * @throws MpqException
+	 * 		if file is existing but could not be deleted
+	 */
+	private static void deleteFile(final String path) throws MpqException {
+		final File fup = new File(path);
+		if (fup.exists()) {
+			if (fup.isFile()) {
+				if (fup.canWrite()) {
+					try {
+						Files.delete(fup.toPath());
+					} catch (final IOException e) {
+						final String msg = "ERROR: Could not delete file '" + path + "'.";
+						logger.error(msg, e);
+						throw new MpqException(
+								String.format(Messages.getString("MpqInterface.CouldNotOverwriteFile"), path), e);
+					}
+				} else {
+					throw new MpqException(
+							"ERROR: Could not delete file '" + path + "'." + " It might be used by another process.");
+				}
+			} else {
+				throw new MpqException(
+						"ERROR: Could not delete file '" + path + "'. A directory with the same name exists.");
+			}
+		}
+	}
+	
+	/**
 	 * Returns the cache path as String.
 	 *
 	 * @return cache path as String
@@ -202,50 +246,6 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 			deleteFile(absolutePath);
 			
 			buildMpqWithCompression(compressMpq, absolutePath, fileCount);
-		}
-	}
-	
-	/**
-	 * Returns path with suffix via changing file name.
-	 *
-	 * @param absolutePath
-	 * @return
-	 */
-	private String getPathWithUnprotectedSuffix(final String absolutePath) {
-		final int i = absolutePath.lastIndexOf('.');
-		return absolutePath.substring(0, i < 0 ? absolutePath.length() : i) + "_unprtctd" +
-				(i < 0 ? "" : absolutePath.substring(i));
-	}
-	
-	/**
-	 * Deletes a file of the specified path.
-	 *
-	 * @param path
-	 * 		file path
-	 * @throws MpqException
-	 * 		if file is existing but could not be deleted
-	 */
-	private void deleteFile(final String path) throws MpqException {
-		final File fup = new File(path);
-		if (fup.exists()) {
-			if (fup.isFile()) {
-				if (fup.canWrite()) {
-					try {
-						Files.delete(fup.toPath());
-					} catch (final IOException e) {
-						final String msg = "ERROR: Could not delete file '" + path + "'.";
-						logger.error(msg, e);
-						throw new MpqException(
-								String.format(Messages.getString("MpqInterface.CouldNotOverwriteFile"), path), e);
-					}
-				} else {
-					throw new MpqException(
-							"ERROR: Could not delete file '" + path + "'." + " It might be used by another process.");
-				}
-			} else {
-				throw new MpqException(
-						"ERROR: Could not delete file '" + path + "'. A directory with the same name exists.");
-			}
 		}
 	}
 	
@@ -398,7 +398,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 				deleteDir(f);
 			} catch (final IOException e) {
 				if (logger.isTraceEnabled()) {
-					logger.error("clearing Cache FAILED");
+					logger.error("clearing Cache FAILED", e);
 				}
 				return false;
 			}

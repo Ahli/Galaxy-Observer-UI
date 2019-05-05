@@ -14,21 +14,21 @@ public class HeroesGameDef extends GameDef {
 	 *
 	 */
 	public HeroesGameDef() {
-		setName("Heroes of the Storm");
-		setNameHandle("heroes");
-		setModFileEnding("stormmod");
-		setCoreModsOrDirectories("core.stormmod", "heroesdata.stormmod", "heromods");
-		setDefaultRaceId("Terr");
-		setDefaultConsoleSkinId("ClassicTerran");
-		setDocumentsGameDirectoryName("Heroes of the Storm");
-		setLayoutFileEnding("stormlayout");
-		setBaseDataFolderName("base.stormdata");
-		setRootExeName("Heroes of the Storm.exe");
-		setPtrRootExeName("Heroes of the Storm Public Test.exe");
-		setSwitcherExeNameX32("HeroesSwitcher.exe");
-		setSwitcherExeNameX64("HeroesSwitcher_x64.exe");
-		setSupportDirectoryX32("Support");
-		setSupportDirectoryX64("Support64");
+		name = "Heroes of the Storm";
+		nameHandle = "heroes";
+		modFileEnding = "stormmod";
+		coreModsOrDirectories = new String[] { "core.stormmod", "heroesdata.stormmod", "heromods" };
+		defaultRaceId = "Terr";
+		defaultConsoleSkinId = "ClassicTerran";
+		documentsGameDirectoryName = "Heroes of the Storm";
+		layoutFileEnding = "stormlayout";
+		baseDataFolderName = "base.stormdata";
+		rootExeName = "Heroes of the Storm.exe";
+		ptrRootExeName = "Heroes of the Storm Public Test.exe";
+		switcherExeNameX32 = "HeroesSwitcher.exe";
+		switcherExeNameX64 = "HeroesSwitcher_x64.exe";
+		supportDirectoryX32 = "Support";
+		supportDirectoryX64 = "Support64";
 	}
 	
 }

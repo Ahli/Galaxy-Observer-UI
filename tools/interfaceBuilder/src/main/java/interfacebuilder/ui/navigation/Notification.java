@@ -11,8 +11,8 @@ public class Notification {
 	private int navPageIndex;
 	
 	public Notification(final String text, final int navPageIndex) {
-		setText(text);
-		setNavPageIndex(navPageIndex);
+		this.text = text;
+		this.navPageIndex = navPageIndex;
 	}
 	
 	public String getText() {

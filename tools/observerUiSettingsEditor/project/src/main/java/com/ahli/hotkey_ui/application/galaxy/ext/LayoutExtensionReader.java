@@ -63,6 +63,19 @@ public class LayoutExtensionReader {
 		return node;
 	}
 	
+	private static String getValueAfterEqualsChar(final String part) {
+		return part.substring(1 + part.indexOf('=')).trim();
+	}
+	
+	private static String getValueWithinQuotes(final String part) {
+		final int quoteEnd = part.lastIndexOf('"');
+		final int quoteStart = part.indexOf('"');
+		if (quoteStart < 0 || quoteStart >= quoteEnd) {
+			return null;
+		}
+		return part.substring(quoteStart + 1, quoteEnd);
+	}
+	
 	/**
 	 * @return the hotkeys
 	 */
@@ -171,19 +184,6 @@ public class LayoutExtensionReader {
 				readComments(curNode.getChildNodes());
 			}
 		}
-	}
-	
-	private String getValueAfterEqualsChar(final String part) {
-		return part.substring(1 + part.indexOf('=')).trim();
-	}
-	
-	private String getValueWithinQuotes(final String part) {
-		final int quoteEnd = part.lastIndexOf('"');
-		final int quoteStart = part.indexOf('"');
-		if (quoteStart < 0 || quoteStart >= quoteEnd) {
-			return null;
-		}
-		return part.substring(quoteStart + 1, quoteEnd);
 	}
 	
 	/**

@@ -42,5 +42,4 @@ public class FXMLSpringLoader extends FXMLLoader implements ApplicationContextAw
 		}
 	}
 	
-	
 }

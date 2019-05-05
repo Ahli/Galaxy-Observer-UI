@@ -9,6 +9,7 @@ import interfacebuilder.projects.ProjectService;
 import interfacebuilder.projects.enums.Game;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -56,14 +57,14 @@ public class AddProjectController {
 		gameDropdown.getSelectionModel().select(0);
 	}
 	
-	public void addProjectAction(final ActionEvent actionEvent) {
+	public void addProjectAction(final Event event) {
 		logger.trace("add project dialog creates project instance");
 		final String name = projectNameLabel.getText();
 		final String path = projectPathLabel.getText();
 		final Game game = gameDropdown.getValue();
 		if (game == null) {
 			// eat event before it reaches the resultConverter
-			actionEvent.consume();
+			event.consume();
 			return;
 		}
 		if (project == null) {

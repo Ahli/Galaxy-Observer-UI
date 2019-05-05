@@ -9,23 +9,23 @@ import java.util.Arrays;
  * @author Ahli
  */
 public abstract class GameDef {
-	private String[] coreModsOrDirectories;
-	private String defaultRaceId = "Terr";
-	private String defaultConsoleSkinId = "ClassicTerran";
-	private String documentsGameDirectoryName = "StarCraft II";
-	private String documentsInterfaceSubdirectoryName = "Interfaces";
-	private String modFileEnding = ".SC2Mod";
-	private String modsSubDirectory = "mods";
-	private String name = "StarCraft II";
-	private String nameHandle = "sc2";
-	private String layoutFileEnding = ".SC2Layout";
-	private String baseDataFolderName = "Base.SC2Data";
-	private String rootExeName = "StarCraft II.exe";
-	private String ptrRootExeName = "StarCraft II Public Test.exe";
-	private String switcherExeNameX32 = "SC2Switcher.exe";
-	private String switcherExeNameX64 = "SC2Switcher_x64.exe";
-	private String supportDirectoryX32 = "Support";
-	private String supportDirectoryX64 = "Support64";
+	protected String[] coreModsOrDirectories;
+	protected String defaultRaceId = "Terr";
+	protected String defaultConsoleSkinId = "ClassicTerran";
+	protected String documentsGameDirectoryName = "StarCraft II";
+	protected String documentsInterfaceSubdirectoryName = "Interfaces";
+	protected String modFileEnding = ".sc2mod";
+	protected String modsSubDirectory = "mods";
+	protected String name = "StarCraft II";
+	protected String nameHandle = "sc2";
+	protected String layoutFileEnding = ".SC2Layout";
+	protected String baseDataFolderName = "base.sc2data";
+	protected String rootExeName = "StarCraft II.exe";
+	protected String ptrRootExeName = "StarCraft II Public Test.exe";
+	protected String switcherExeNameX32 = "SC2Switcher.exe";
+	protected String switcherExeNameX64 = "SC2Switcher_x64.exe";
+	protected String supportDirectoryX32 = "Support";
+	protected String supportDirectoryX64 = "Support64";
 	
 	/**
 	 * @return the layoutFileEnding

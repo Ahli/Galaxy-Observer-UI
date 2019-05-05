@@ -9,6 +9,7 @@ import java.io.File;
 import java.util.Map;
 
 public class CommandLineParams {
+	public static final String PARAM_PREFIX = "--";
 	private static final String COMPILE_RUN = "compileRun";
 	private static final String COMPILE = "compile";
 	private static final String EQUAL = "=";
@@ -22,16 +23,16 @@ public class CommandLineParams {
 	
 	public CommandLineParams(final String... params) {
 		wasStartedWithParameters = (params.length > 0);
-		String paramCompilePathTmp = getParamsValue(params, "--" + COMPILE_RUN + EQUAL);
+		String paramCompilePathTmp = getParamsValue(params, PARAM_PREFIX + COMPILE_RUN + EQUAL);
 		if (paramCompilePathTmp != null) {
 			compileAndRun = true;
 		} else {
-			paramCompilePathTmp = getParamsValue(params, "--" + COMPILE);
+			paramCompilePathTmp = getParamsValue(params, PARAM_PREFIX + COMPILE + EQUAL);
 			compileAndRun = false;
 		}
 		paramCompilePath = getInterfaceRootFromPath(paramCompilePathTmp);
 		hasParamCompilePath = (paramCompilePath != null);
-		paramRunPath = getParamsValue(params, RUN);
+		paramRunPath = getParamsValue(params, PARAM_PREFIX + RUN + EQUAL);
 	}
 	
 	/**
@@ -43,10 +44,10 @@ public class CommandLineParams {
 	 * 		parameter name and equal sign
 	 * @return String following the equal sign for the specified parameter
 	 */
-	private String getParamsValue(final String[] params, final String paramNameAndEqualSign) {
+	private static String getParamsValue(final String[] params, final String paramNameAndEqualSign) {
 		for (final String param : params) {
 			if (param.startsWith(paramNameAndEqualSign)) {
-				return param.substring(paramNameAndEqualSign.length() + 1);
+				return param.substring(paramNameAndEqualSign.length());
 			}
 		}
 		return null;
@@ -59,7 +60,7 @@ public class CommandLineParams {
 	 * 		interfacebuilder's compileParam's value
 	 * @return shortens the path to the Interface root folder
 	 */
-	private String getInterfaceRootFromPath(final String path) {
+	private static String getInterfaceRootFromPath(final String path) {
 		String str = path;
 		if (path != null) {
 			while (str.length() > 0 && !str.endsWith("Interface")) {
@@ -90,7 +91,7 @@ public class CommandLineParams {
 			compileAndRun = false;
 		}
 		paramCompilePath = getInterfaceRootFromPath(paramCompilePathTmp);
-		hasParamCompilePath = (paramCompilePathTmp != null);
+		hasParamCompilePath = (paramCompilePath != null);
 		
 		// RUN PARAM
 		// --run="F:\Games\Heroes of the Storm\Support\HeroesSwitcher.exe"

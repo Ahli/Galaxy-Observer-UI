@@ -83,6 +83,10 @@ public class CompressionMiningController implements Updateable {
 	private Runnable task;
 	private RandomCompressionMiner expCompMiner;
 	
+	public CompressionMiningController() {
+		// nothing to do
+	}
+	
 	/**
 	 * Automatically called by FxmlLoader
 	 */
@@ -178,17 +182,20 @@ public class CompressionMiningController implements Updateable {
 				long bestSize;
 				// TODO too complex?
 				{
+					final RuleSet bestCompressionRuleSet = projectService.fetchBestCompressionRuleSet(project);
+					
 					final ModData mod = gameService.getModData(project.getGame());
 					final GameDef gameDef = mod.getGameData().getGameDef();
 					final File projectSource = new File(project.getProjectPath());
-					final File f = new File(configService.getDocumentsPath() + File.separator +
+					final File modTargetFile = new File(configService.getDocumentsPath() + File.separator +
 							gameDef.getDocumentsGameDirectoryName() + File.separator +
 							gameDef.getDocumentsInterfaceSubdirectoryName() + File.separator + projectSource.getName());
-					mod.setTargetFile(f);
+					mod.setTargetFile(modTargetFile);
 					mod.setSourceDirectory(projectSource);
-					final RuleSet bestCompressionRuleSet = projectService.fetchBestCompressionRuleSet(project);
+					
 					final MpqEditorCompressionRule[] prevBestCompressionRules =
 							(bestCompressionRuleSet != null) ? bestCompressionRuleSet.getCompressionRules() : null;
+					
 					expCompMiner = new RandomCompressionMiner(mod, configService.getMpqCachePath(),
 							configService.getMpqEditorPath(), prevBestCompressionRules, fileService);
 					bestSize = expCompMiner.getBestSize();

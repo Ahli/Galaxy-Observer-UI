@@ -56,8 +56,6 @@ public class BaseUiService {
 	private static final Logger logger = LogManager.getLogger(BaseUiService.class);
 	private static final String META_FILE_NAME = ".meta";
 	
-	private final InterfaceBuilderApp app = InterfaceBuilderApp.getInstance();
-	
 	@Autowired
 	private ConfigService configService;
 	@Autowired
@@ -239,12 +237,12 @@ public class BaseUiService {
 		CascExplorerConfigFileEditor.write(configFile, storagePath, onlineMode, product, locale);
 	}
 	
-	private String[] getQueryMasks(final Game game) {
+	private static String[] getQueryMasks(final Game game) {
 		switch (game) {
 			case SC2:
 				return new String[] { "*.SC2Layout", "*Assets.txt", "*.SC2Style" };
 			case HEROES:
-				return new String[] { "*.stormlayout", "*assets.txt", "*.stormstyle" };
+				return new String[] { "*.StormLayout", "*Assets.txt", "*.StormStyle" };
 			default:
 				throw new InvalidParameterException(UNKNOWN_GAME_EXCEPTION);
 		}
@@ -258,7 +256,7 @@ public class BaseUiService {
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	private boolean extract(final File extractorExe, final String mask, final File destination)
+	private static boolean extract(final File extractorExe, final String mask, final File destination)
 			throws IOException, InterruptedException {
 		final ProcessBuilder pb =
 				new ProcessBuilder(extractorExe.getAbsolutePath(), mask, destination + File.separator, "enUS", "None");
@@ -302,7 +300,7 @@ public class BaseUiService {
 	 */
 	public void parseBaseUI(final GameData game, final Runnable followupTask) {
 		// create tasks for the worker pool
-		app.getExecutor().execute(() -> {
+		InterfaceBuilderApp.getInstance().getExecutor().execute(() -> {
 			// lock per game
 			synchronized (game.getGameDef().getName()) {
 				UICatalog uiCatalog = game.getUiCatalog();
@@ -340,6 +338,7 @@ public class BaseUiService {
 					if (needToParseAgain) {
 						// parse baseUI
 						uiCatalog = new UICatalogImpl();
+						final var app = InterfaceBuilderApp.getInstance();
 						app.printInfoLogMessageToGeneral("Starting to parse base " + gameName + " UI.");
 						app.addThreadLoggerTab(Thread.currentThread().getName(),
 								game.getGameDef().getNameHandle() + "UI", true);
@@ -412,7 +411,7 @@ public class BaseUiService {
 	 */
 	private void addTaskToExecutor(final Runnable followupTask) {
 		if (followupTask != null) {
-			app.getExecutor().execute(followupTask);
+			InterfaceBuilderApp.getInstance().getExecutor().execute(followupTask);
 		}
 	}
 	
@@ -450,7 +449,7 @@ public class BaseUiService {
 			final KryoGameInfo baseUiInfo = readMetaFile(baseUiMetaFileDir);
 			return baseUiInfo.isPtr();
 		} catch (final IOException e) {
-			logger.error("ERROR while checking if ptr is active via baseUI cache file");
+			logger.error("ERROR while checking if ptr is active via baseUI cache file", e);
 		}
 		return false;
 	}

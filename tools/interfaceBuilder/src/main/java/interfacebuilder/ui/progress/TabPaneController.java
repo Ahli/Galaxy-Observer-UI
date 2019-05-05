@@ -4,6 +4,7 @@
 package interfacebuilder.ui.progress;
 
 import interfacebuilder.InterfaceBuilderApp;
+import interfacebuilder.integration.log4j.StylizedTextAreaAppender;
 import interfacebuilder.ui.settings.Updateable;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;

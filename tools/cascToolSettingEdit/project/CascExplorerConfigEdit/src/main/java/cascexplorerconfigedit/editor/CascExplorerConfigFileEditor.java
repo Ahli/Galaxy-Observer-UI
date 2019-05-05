@@ -100,7 +100,7 @@ public final class CascExplorerConfigFileEditor {
 		final NodeList children = settingNode.getChildNodes();
 		for (int a = 0; a < children.getLength(); a++) {
 			final Node curChild = children.item(a);
-			if (curChild.getNodeName().equalsIgnoreCase("value")) {
+			if ("value".equalsIgnoreCase(curChild.getNodeName())) {
 				curChild.setTextContent(newSettingVal);
 				break;
 			}

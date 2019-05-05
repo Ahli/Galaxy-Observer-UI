@@ -39,7 +39,7 @@ public final class Messages {
 		try {
 			return resourceBundle.getString(key);
 		} catch (final MissingResourceException e) {
-			logger.error("ERROR: failed to String for " + key, e);
+			logger.error("ERROR: failed to receive String for " + key, e);
 			return '!' + key + '!';
 		}
 	}

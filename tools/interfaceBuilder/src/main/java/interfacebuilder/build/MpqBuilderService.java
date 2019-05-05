@@ -32,13 +32,11 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystemException;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class MpqBuilderService {
 	private static final Logger logger = LogManager.getLogger(MpqBuilderService.class);
-	
-	private final InterfaceBuilderApp app = InterfaceBuilderApp.getInstance();
 	
 	@Autowired
 	private ConfigService configService;
@@ -136,7 +134,7 @@ public class MpqBuilderService {
 	 */
 	private void buildSpecificUI(final File interfaceDirectory, final GameData game, final boolean useCmdLineSettings,
 			final Project project) {
-		if (app.getExecutor().isShutdown()) {
+		if (InterfaceBuilderApp.getInstance().getExecutor().isShutdown()) {
 			logger.error("ERROR: Executor shut down. Skipping building a UI...");
 			return;
 		}
@@ -159,9 +157,10 @@ public class MpqBuilderService {
 		}
 		
 		// create tasks for the worker pool
-		app.getExecutor().execute(() -> {
+		InterfaceBuilderApp.getInstance().getExecutor().execute(() -> {
 			try {
-				app.addThreadLoggerTab(Thread.currentThread().getName(), interfaceDirectory.getName(), false);
+				InterfaceBuilderApp.getInstance()
+						.addThreadLoggerTab(Thread.currentThread().getName(), interfaceDirectory.getName(), false);
 				// create unique cache path
 				final MpqEditorInterface threadsMpqInterface =
 						new MpqEditorInterface(configService.getMpqCachePath() + Thread.currentThread().getId(),
@@ -257,7 +256,7 @@ public class MpqBuilderService {
 			final boolean compressXml, final int compressMpq, final boolean buildUnprotectedToo,
 			final boolean repairLayoutOrder, final boolean verifyLayout, final boolean verifyXml, final Project project)
 			throws IOException, InterruptedException {
-		app.printInfoLogMessageToGeneral(sourceFile.getName() + " started construction.");
+		InterfaceBuilderApp.getInstance().printInfoLogMessageToGeneral(sourceFile.getName() + " started construction.");
 		
 		final GameDef gameDef = game.getGameDef();
 		
@@ -355,15 +354,17 @@ public class MpqBuilderService {
 			mpqi.buildMpq(targetPath, sourceFile.getName(), compressXml, getCompressionModeOfSetting(compressMpq),
 					buildUnprotectedToo);
 			
-			project.setLastBuildDate(new Date());
+			project.setLastBuildDateTime(LocalDateTime.now());
 			final long size = new File(targetPath + File.separator + sourceFile.getName()).length();
 			project.setLastBuildSize(size);
 			logger.info("Finished building... " + sourceFile.getName() + ". Size: " + (size / 1024) + " " + "kb");
 			projectService.saveProject(project);
-			app.printInfoLogMessageToGeneral(sourceFile.getName() + " finished construction.");
+			InterfaceBuilderApp.getInstance()
+					.printInfoLogMessageToGeneral(sourceFile.getName() + " finished construction.");
 		} catch (final IOException | MpqException e) {
 			logger.error("ERROR: unable to construct final Interface file.", e);
-			app.printErrorLogMessageToGeneral(sourceFile.getName() + " could not be created.");
+			InterfaceBuilderApp.getInstance()
+					.printErrorLogMessageToGeneral(sourceFile.getName() + " could not be created.");
 		}
 	}
 	
@@ -374,7 +375,7 @@ public class MpqBuilderService {
 	 */
 	private void addTaskToExecutor(final Runnable followupTask) {
 		if (followupTask != null) {
-			app.getExecutor().execute(followupTask);
+			InterfaceBuilderApp.getInstance().getExecutor().execute(followupTask);
 		}
 	}
 	
@@ -382,7 +383,7 @@ public class MpqBuilderService {
 	 * @param compressMpqSetting
 	 * @return
 	 */
-	private MpqEditorCompression getCompressionModeOfSetting(final int compressMpqSetting) {
+	private static MpqEditorCompression getCompressionModeOfSetting(final int compressMpqSetting) {
 		switch (compressMpqSetting) {
 			case 0:
 				return MpqEditorCompression.NONE;

@@ -17,7 +17,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table (name = "project")
@@ -36,8 +36,8 @@ public class Project {
 	@Column (length = 8, nullable = false)
 	private Game game;
 	
-	@Column
-	private Date lastBuildDate;
+	@Column (name = "lastBuildDate")
+	private LocalDateTime lastBuildDateTime;
 	
 	@Column
 	private Long lastBuildSize;
@@ -92,12 +92,12 @@ public class Project {
 		this.name = name;
 	}
 	
-	public Date getLastBuildDate() {
-		return lastBuildDate;
+	public LocalDateTime getLastBuildDateTime() {
+		return lastBuildDateTime;
 	}
 	
-	public void setLastBuildDate(final Date lastBuildDate) {
-		this.lastBuildDate = lastBuildDate;
+	public void setLastBuildDateTime(final LocalDateTime lastBuildDateTime) {
+		this.lastBuildDateTime = lastBuildDateTime;
 	}
 	
 	public Long getLastBuildSize() {

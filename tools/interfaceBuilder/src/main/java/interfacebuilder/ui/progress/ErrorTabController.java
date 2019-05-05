@@ -109,7 +109,7 @@ public final class ErrorTabController {
 	}
 	
 	private void setIconAppearance(final State newState, final FontAwesomeIcon icon, final Color color) {
-		if (!state.equals(newState)) {
+		if (state != newState) {
 			state = newState;
 			if (newState == State.RUNNING || newState == State.NOT_STARTED || showResultIcon) {
 				final FontAwesomeIconView iconView = new FontAwesomeIconView(icon);

@@ -64,10 +64,35 @@ public class BrowseTabController implements Updateable {
 	private ComboBox<String> templateDropdown;
 	//	private AutoCompletionBinding<String> templateDropdownAutoCompleteBinding;
 	private Map<String, UITemplate> templateMap;
-	private int framesTotal = 0;
+	private int framesTotal;
 	//	private Runnable queryRunnable;
 	//	private Thread queryThread;
 	private UICatalog uiCatalog;
+	
+	public BrowseTabController() {
+		// nothing to do
+	}
+	
+	private static String prettyPrintAttributeStringList(final List<String> attributes) {
+		if (attributes.size() == 2 && "val".equals(attributes.get(0))) {
+			return attributes.get(1);
+		}
+		final StringBuilder str = new StringBuilder();
+		str.append(attributes.get(0)).append('=').append(attributes.get(1));
+		final String separator = ", ";
+		for (int i = 2, len = attributes.size(); i < len; i += 2) {
+			str.append(separator).append(attributes.get(i)).append('=').append(attributes.get(i + 1));
+		}
+		return str.toString();
+	}
+	
+	private static StringBuilder addParentPath(final StringBuilder sb, final TreeItem<UIElement> elem) {
+		if (elem.getParent() != null) {
+			addParentPath(sb, elem.getParent());
+			sb.append(" > ");
+		}
+		return sb.append(elem.getValue().getName());
+	}
 	
 	/**
 	 * Automatically called by FxmlLoader
@@ -233,7 +258,7 @@ public class BrowseTabController implements Updateable {
 		} else {
 			final UIElement el = selected.getValue();
 			// TODO maybe use something different that holds entries
-			final Map<String, String> map = new HashMap<>((framesTotal * 75 / 100) + 1, 0.75f);
+			final Map<String, String> map = new HashMap<>((framesTotal * 75 / 100) + 1, 0.75F);
 			if (el instanceof UIFrame) {
 				final UIFrame elem = (UIFrame) el;
 				UIAnchorSide side = UIAnchorSide.TOP;
@@ -311,30 +336,9 @@ public class BrowseTabController implements Updateable {
 		return prettyPrintAttributeStringList(attr.getKeyValues());
 	}
 	
-	private String prettyPrintAttributeStringList(final List<String> attributes) {
-		if (attributes.size() == 2 && attributes.get(0).equals("val")) {
-			return attributes.get(1);
-		}
-		final StringBuilder str = new StringBuilder();
-		str.append(attributes.get(0)).append('=').append(attributes.get(1));
-		final String separator = ", ";
-		for (int i = 2, len = attributes.size(); i < len; i += 2) {
-			str.append(separator).append(attributes.get(i)).append('=').append(attributes.get(i + 1));
-		}
-		return str.toString();
-	}
-	
 	private void updatePath(final TreeItem<UIElement> elem) {
 		final String path = elem != null ? addParentPath(new StringBuilder(), elem).toString() : "";
 		pathLabel.setText(path);
-	}
-	
-	private StringBuilder addParentPath(final StringBuilder sb, final TreeItem<UIElement> elem) {
-		if (elem.getParent() != null) {
-			addParentPath(sb, elem.getParent());
-			sb.append(" > ");
-		}
-		return sb.append(elem.getValue().getName());
 	}
 	
 	/**

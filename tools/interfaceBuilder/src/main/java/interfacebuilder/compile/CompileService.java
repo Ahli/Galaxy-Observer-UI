@@ -106,7 +106,7 @@ public class CompileService {
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	private void manageOrderOfLayoutFiles(final DescIndexData descIndex)
+	private static void manageOrderOfLayoutFiles(final DescIndexData descIndex)
 			throws ParserConfigurationException, SAXException, IOException {
 		// manage order of layout files in DescIndex
 		descIndex.orderLayoutFiles();
@@ -119,14 +119,14 @@ public class CompileService {
 	 * @param uiCatalog
 	 * @return clone of the CatalogUI
 	 */
-	private UICatalog getClonedUICatalog(final UICatalog uiCatalog) {
+	private static UICatalog getClonedUICatalog(final UICatalog uiCatalog) {
 		return (UICatalog) uiCatalog.deepCopy();
 	}
 	
 	/**
 	 * Verifies the syntax of the xml document.
 	 */
-	private void verifyXml(final Collection<File> files)
+	private static void verifyXml(final Collection<File> files)
 			throws IOException, SAXException, ParserConfigurationException {
 		final DocumentBuilderFactory dbFac = DocumentBuilderFactory.newInstance();
 		dbFac.setAttribute(XMLConstants.FEATURE_SECURE_PROCESSING, true);

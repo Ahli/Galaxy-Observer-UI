@@ -59,11 +59,11 @@ public class GameService {
 	public String getGameItemPath(final Game game) {
 		switch (game) {
 			case SC2:
-				return "res/sc2.png";
+				return "classpath:res/sc2.png";
 			case HEROES:
-				return "res/heroes.png";
+				return "classpath:res/heroes.png";
 			default:
-				return "res/ahli.png";
+				return "classpath:res/ahli.png";
 		}
 	}
 	

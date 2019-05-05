@@ -1,5 +1,5 @@
 package javax.xml.bind;
 
 public interface ValidationEventHandler {
-	public boolean handleEvent(ValidationEvent event);
+	boolean handleEvent(ValidationEvent event);
 }

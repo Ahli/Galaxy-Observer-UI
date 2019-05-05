@@ -7,17 +7,20 @@ import com.ahli.galaxy.game.def.abstracts.GameDef;
 import interfacebuilder.base_ui.BaseUiService;
 import interfacebuilder.build.MpqBuilderService;
 import interfacebuilder.compress.GameService;
+import interfacebuilder.config.AppConfiguration;
 import interfacebuilder.config.ConfigService;
+import interfacebuilder.config.FxmlConfiguration;
 import interfacebuilder.i18n.Messages;
 import interfacebuilder.integration.CommandLineParams;
 import interfacebuilder.integration.ReplayFinder;
 import interfacebuilder.integration.SettingsIniInterface;
+import interfacebuilder.integration.log4j.InterProcessCommunicationAppender;
+import interfacebuilder.integration.log4j.StylizedTextAreaAppender;
 import interfacebuilder.projects.enums.Game;
 import interfacebuilder.ui.FXMLSpringLoader;
 import interfacebuilder.ui.navigation.NavigationController;
 import interfacebuilder.ui.navigation.Notification;
 import interfacebuilder.ui.progress.ErrorTabController;
-import interfacebuilder.ui.progress.StylizedTextAreaAppender;
 import interfacebuilder.ui.progress.StylizedTextAreaAppenderThreadPoolExecutor;
 import interfacebuilder.ui.progress.TabPaneController;
 import javafx.animation.FadeTransition;
@@ -44,7 +47,7 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Import;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -56,6 +59,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -69,16 +73,15 @@ import java.util.concurrent.TimeUnit;
  */
 
 @EnableAutoConfiguration
-@ComponentScan (basePackages = "interfacebuilder")
+@Import ( { AppConfiguration.class, FxmlConfiguration.class })
 public class InterfaceBuilderApp extends Application {
 	private static final Logger logger = LogManager.getLogger(InterfaceBuilderApp.class);
+	public static boolean javaFxInitialized;
 	private static InterfaceBuilderApp instance;
 	private static ServerSocket serverSocket;
-	
 	//	static {
 	//				System.setProperty("log4j2.debug", "true");
 	//	}
-	
 	private final List<ErrorTabController> errorTabControllers = new ArrayList<>();
 	@Autowired
 	private ReplayFinder replayFinder;
@@ -96,6 +99,10 @@ public class InterfaceBuilderApp extends Application {
 	private Stage primaryStage;
 	private NavigationController navigationController;
 	
+	public InterfaceBuilderApp() {
+		// nothing to do
+	}
+	
 	/**
 	 * Entry point of the App.
 	 *
@@ -103,26 +110,19 @@ public class InterfaceBuilderApp extends Application {
 	 * 		command line arguments
 	 */
 	public static void main(final String[] args) {
-		
-		if (!initInterProcessCommunication(args, 12317)) {
-			return;
+		if (initInterProcessCommunication(args, 12317)) {
+			// this is the server
+			logger.trace("System's Log4j2 Configuration File: {}", () -> System.getProperty("log4j.configurationFile"));
+			logger.info("Launch arguments: " + Arrays.toString(args));
+			logger.info("Max Heap Space: " + Runtime.getRuntime().maxMemory() / 1_048_576L + "mb.");
+			
+			// set preloader while booting javafx
+			System.setProperty("javafx.preloader", AppPreloader.class.getCanonicalName());
+			
+			// initialize JavaFX
+			launch(args);
 		}
-		
-		logger.trace("trace log visible");
-		logger.debug("debug log visible");
-		logger.info("info log visible");
-		logger.warn("warn log visible");
-		logger.error("error log visible");
-		logger.fatal("fatal log visible");
-		
-		logger.trace("Configuration File of System: {}", () -> System.getProperty("log4j.configurationFile"));
-		logger.info("Launch arguments: " + Arrays.toString(args));
-		logger.info("Max Heap Space: " + Runtime.getRuntime().maxMemory() / 1048576L + "mb.");
-		
-		System.setProperty("javafx.preloader", AppPreloader.class.getCanonicalName());
-		
-		
-		launch(args);
+		// else: this is the client and communication with the server ended already -> exit
 	}
 	
 	/**
@@ -140,12 +140,26 @@ public class InterfaceBuilderApp extends Application {
 		} catch (final IOException e) {
 			// port taken, so app is already running
 			logger.info("App already running. Passing over command line arguments.");
+			
 			try (final Socket socket = new Socket(InetAddress.getByAddress(new byte[] { 127, 0, 0, 1 }), port)) {
-				final PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-				// sending parameters
-				final String command = Arrays.toString(args);
-				logger.info("Sending: " + command);
-				out.println(command);
+				try (final PrintWriter out = new PrintWriter(socket.getOutputStream(), true, StandardCharsets.UTF_8);
+				     final BufferedReader in = new BufferedReader(
+						     new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8))) {
+					// sending parameters
+					final String command = Arrays.toString(args);
+					logger.info("Sending: " + command);
+					out.println(command);
+					
+					// receive answers
+					String inputLine;
+					while ((inputLine = in.readLine()) != null) {
+						if ("#BYE".equals(inputLine)) {
+							return false;
+						} else {
+							logger.info(inputLine);
+						}
+					}
+				}
 			} catch (final IOException e1) {
 				logger.fatal("Exception while sending parameters to primary instance.", e1);
 			}
@@ -159,12 +173,12 @@ public class InterfaceBuilderApp extends Application {
 				while (true) {
 					try {
 						clientSocket = InterfaceBuilderApp.serverSocket.accept();
-						try (final PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-						     final BufferedReader in = new BufferedReader(
-								     new InputStreamReader(clientSocket.getInputStream()))) {
+						try (final PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true,
+								StandardCharsets.UTF_8); final BufferedReader in = new BufferedReader(
+								new InputStreamReader(clientSocket.getInputStream(), StandardCharsets.UTF_8))) {
+							InterProcessCommunicationAppender.setPrintWriter(out);
 							String inputLine;
 							while ((inputLine = in.readLine()) != null) {
-								out.println(inputLine);
 								logger.info("received message from client: " + inputLine);
 								final List<String> params =
 										Arrays.asList(inputLine.substring(1, inputLine.length() - 1).split(", "));
@@ -176,6 +190,7 @@ public class InterfaceBuilderApp extends Application {
 								logger.trace("client closed connection.");
 							}
 						} finally {
+							InterProcessCommunicationAppender.setPrintWriter(null);
 							clientSocket.close();
 						}
 					} catch (final IOException e) {
@@ -208,6 +223,9 @@ public class InterfaceBuilderApp extends Application {
 		
 		if (params.isHasParamCompilePath()) {
 			buildStartReplayExit(InterfaceBuilderApp.getInstance().getPrimaryStage(), params);
+		} else {
+			// end communication as no task was given
+			InterProcessCommunicationAppender.sendTerminationSignal();
 		}
 	}
 	
@@ -241,6 +259,8 @@ public class InterfaceBuilderApp extends Application {
 					Thread.currentThread().interrupt();
 				} catch (final Exception e) {
 					logger.fatal("FATAL ERROR: ", e);
+				} finally {
+					InterProcessCommunicationAppender.sendTerminationSignal();
 				}
 			}
 		}.start();
@@ -293,6 +313,8 @@ public class InterfaceBuilderApp extends Application {
 				}
 			}
 		}
+		// allow client to exit
+		InterProcessCommunicationAppender.sendTerminationSignal();
 	}
 	
 	/**
@@ -378,11 +400,48 @@ public class InterfaceBuilderApp extends Application {
 		});
 	}
 	
+	@Override
+	public void init() {
+		// initialize Spring
+		try {
+			appContext =
+					SpringApplication.run(InterfaceBuilderApp.class, getParameters().getRaw().toArray(new String[0]));
+		} catch (final IllegalStateException e) {
+			logger.fatal(e);
+			throw e;
+		}
+		// trigger autowiring of this JavaFX-created instance
+		final AutowireCapableBeanFactory autowireCapableBeanFactory = appContext.getAutowireCapableBeanFactory();
+		autowireCapableBeanFactory.autowireBean(this);
+		autowireCapableBeanFactory.initializeBean(this, getClass().getName());
+		
+		executor.setCleanUpTask(() -> {
+			// free space of baseUI
+			if (executor.getQueue().isEmpty() && executor.getActiveCount() <= 1) {
+				logger.info("Deallocating baseUI");
+				mpqBuilderService.getGameData(Game.SC2).setUiCatalog(null);
+				mpqBuilderService.getGameData(Game.HEROES).setUiCatalog(null);
+				// GC1 is the default GC and can now release RAM -> actually good to do after a task because we use a
+				// lot of RAM for the UIs
+				System.gc();
+			}
+		});
+	}
+	
 	/**
 	 * Called when the App is starting within the UI Thread.
 	 */
 	@Override
 	public void start(final Stage primaryStage) throws Exception {
+		if (instance == null) {
+			instance = this;
+			logger.trace("Application singleton successfull.");
+		} else {
+			logger.error("Application cannot be started multiple times.");
+			throw new ExceptionInInitializerError("Application cannot be started multiple times.");
+		}
+		
+		javaFxInitialized = true;
 		Thread.currentThread().setName("UI");
 		Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 		this.primaryStage = primaryStage;
@@ -425,7 +484,7 @@ public class InterfaceBuilderApp extends Application {
 		// Build Navigation
 		final BorderPane root;
 		final FXMLLoader loader = new FXMLSpringLoader(appContext);
-		try (final InputStream is = appContext.getResource("view/Navigation.fxml").getInputStream()) {
+		try (final InputStream is = appContext.getResource("classpath:view/Navigation.fxml").getInputStream()) {
 			root = loader.load(is);
 			navigationController = loader.getController();
 		} catch (final IOException e) {
@@ -434,14 +493,16 @@ public class InterfaceBuilderApp extends Application {
 		}
 		final Scene scene = new Scene(root, 1200, 600);
 		
-		scene.getStylesheets().add(appContext.getResource("view/application.css").getURI().toString());
-		scene.getStylesheets().add(appContext.getResource("view/textStyles.css").getURI().toString());
+		scene.getStylesheets().add(appContext.getResource("classpath:view/application.css").getURI().toString());
+		scene.getStylesheets().add(appContext.getResource("classpath:view/textStyles.css").getURI().toString());
 		
 		// app icon
 		try {
 			primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/res/ahli.png")));
 		} catch (final Exception e) {
-			logger.error("Failed to load ahli.png");
+			final String msg = "Failed to load ahli.png";
+			logger.error(msg);
+			logger.trace(msg, e);
 		}
 		primaryStage.setMaximized(true);
 		primaryStage.setScene(scene);
@@ -561,42 +622,6 @@ public class InterfaceBuilderApp extends Application {
 		return TabPaneController.getInstance().getTabPane();
 	}
 	
-	
-	@Override
-	public void init() {
-		if (instance == null) {
-			instance = this;
-			logger.trace("Application singleton successfull.");
-		} else {
-			logger.error("Application cannot be started multiple times.");
-			throw new ExceptionInInitializerError("Application cannot be started multiple times.");
-		}
-		// start Spring
-		try {
-			appContext =
-					SpringApplication.run(InterfaceBuilderApp.class, getParameters().getRaw().toArray(new String[0]));
-		} catch (final IllegalStateException e) {
-			logger.fatal(e);
-			throw e;
-		}
-		// trigger autowiring of this JavaFX-created instance
-		final AutowireCapableBeanFactory autowireCapableBeanFactory = appContext.getAutowireCapableBeanFactory();
-		autowireCapableBeanFactory.autowireBean(this);
-		autowireCapableBeanFactory.initializeBean(this, getClass().getName());
-		
-		executor.setCleanUpTask(() -> {
-			// free space of baseUI
-			if (executor.getQueue().isEmpty() && executor.getActiveCount() <= 1) {
-				logger.info("Deallocating baseUI");
-				mpqBuilderService.getGameData(Game.SC2).setUiCatalog(null);
-				mpqBuilderService.getGameData(Game.HEROES).setUiCatalog(null);
-				// GC1 is the default GC and can now release RAM -> actually good to do after a task because we use a
-				// lot of RAM for the UIs
-				System.gc();
-			}
-		});
-	}
-	
 	/**
 	 * Adds an ErrorTabController.
 	 *
@@ -630,7 +655,7 @@ public class InterfaceBuilderApp extends Application {
 		try {
 			serverSocket.close();
 		} catch (final IOException e) {
-			logger.error("ERROR: Server Socket had exception when closing: e");
+			logger.error("ERROR: Server Socket had exception when closing.", e);
 		}
 		logger.info("App is about to shut down.");
 		if (!executor.isShutdown()) {

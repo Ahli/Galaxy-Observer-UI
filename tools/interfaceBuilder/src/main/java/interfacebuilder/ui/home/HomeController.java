@@ -46,7 +46,7 @@ import org.springframework.context.ApplicationContext;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -85,10 +85,10 @@ public class HomeController implements Updateable {
 	private ProjectService projectService;
 	@Autowired
 	private FileService fileService;
-	
-	private ObservableList<Project> projectsObservable;
 	@Autowired
 	private GameService gameService;
+	
+	private ObservableList<Project> projectsObservable;
 	
 	
 	/**
@@ -149,8 +149,9 @@ public class HomeController implements Updateable {
 			selectedPanel.setVisible(true);
 			final Project p = selectedItems.get(0);
 			selectedName.setText(p.getName());
-			final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-			selectedBuildDate.setText(p.getLastBuildDate() == null ? "-" : formatter.format(p.getLastBuildDate()));
+			final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+			selectedBuildDate
+					.setText(p.getLastBuildDateTime() == null ? "-" : p.getLastBuildDateTime().format(formatter));
 			selectedBuildSize.setText(
 					p.getLastBuildSize() == null ? "-" : String.format("%,d", p.getLastBuildSize() / 1024) + " kb");
 			try {
@@ -197,7 +198,7 @@ public class HomeController implements Updateable {
 	public void addProjectAction() throws IOException {
 		final FXMLLoader loader = new FXMLSpringLoader(appContext);
 		final Dialog<Project> dialog =
-				loader.load(appContext.getResource("view/Home_AddProject.fxml").getInputStream());
+				loader.load(appContext.getResource("classpath:view/Home_AddProject.fxml").getInputStream());
 		dialog.initOwner(addProject.getScene().getWindow());
 		final Optional<Project> result = dialog.showAndWait();
 		if (result.isPresent()) {
@@ -217,7 +218,7 @@ public class HomeController implements Updateable {
 			final Project project = projects.get(0);
 			final FXMLLoader loader = new FXMLSpringLoader(appContext);
 			final Dialog<Project> dialog =
-					loader.load(appContext.getResource("view/Home_AddProject.fxml").getInputStream());
+					loader.load(appContext.getResource("classpath:view/Home_AddProject.fxml").getInputStream());
 			dialog.initOwner(addProject.getScene().getWindow());
 			((AddProjectController) loader.getController()).setProjectToEdit(project);
 			final Optional<Project> result = dialog.showAndWait();
@@ -294,7 +295,7 @@ public class HomeController implements Updateable {
 			final Project project = selectedItems.get(0);
 			final FXMLLoader loader = new FXMLSpringLoader(appContext);
 			final Dialog<Project> dialog =
-					loader.load(appContext.getResource("view/Home_ViewRuleSet.fxml").getInputStream());
+					loader.load(appContext.getResource("classpath:view/Home_ViewRuleSet.fxml").getInputStream());
 			((ViewRuleSetController) loader.getController()).setProject(project);
 			dialog.initOwner(addProject.getScene().getWindow());
 			dialog.showAndWait();
@@ -310,8 +311,8 @@ public class HomeController implements Updateable {
 			final Project project = selectedItems.get(0);
 			// init UI as Tab in Progress
 			final FXMLLoader loader = new FXMLSpringLoader(appContext);
-			final Parent content =
-					loader.load(appContext.getResource("view/ProgressTab_CompressionMining.fxml").getInputStream());
+			final Parent content = loader.load(
+					appContext.getResource("classpath:view/ProgressTab_CompressionMining.fxml").getInputStream());
 			final Tab newTab = new Tab();
 			newTab.setContent(content);
 			newTab.setText(String.format("%s Compression Mining", project.getName()));

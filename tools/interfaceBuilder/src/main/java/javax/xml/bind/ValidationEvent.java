@@ -7,11 +7,11 @@ public interface ValidationEvent {
 	
 	public static final int FATAL_ERROR = 2;
 	
-	public int getSeverity();
+	int getSeverity();
 	
-	public String getMessage();
+	String getMessage();
 	
-	public Throwable getLinkedException();
+	Throwable getLinkedException();
 	
-	public ValidationEventLocator getLocator();
+	ValidationEventLocator getLocator();
 }

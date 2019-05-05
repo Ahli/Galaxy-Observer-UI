@@ -256,7 +256,7 @@ public class UICatalogImpl implements UICatalog {
 				return null;
 			}
 		}
-		logger.error("ERROR: cannot find Layout file: " + file);
+		logger.warn("WARN: cannot find Layout file: " + file);
 		return null;
 	}
 	
@@ -315,7 +315,7 @@ public class UICatalogImpl implements UICatalog {
 	 * @param listOfConstants
 	 * @return
 	 */
-	private boolean removeConstantFromList(final String name, final List<UIConstant> listOfConstants) {
+	private static boolean removeConstantFromList(final String name, final List<UIConstant> listOfConstants) {
 		boolean result = false;
 		for (int i = listOfConstants.size() - 1; i >= 0; i--) {
 			final UIConstant curConst = listOfConstants.get(i);

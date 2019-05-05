@@ -46,14 +46,18 @@ module interfacex.builder {
 	exports interfacebuilder.integration.kryo;
 	opens view;
 	opens i18n;
-	opens res; // not sure if required atm
+	opens res;
 	opens interfacebuilder.ui.navigation to spring.core, javafx.fxml;
 	opens interfacebuilder.ui.home to spring.core, javafx.fxml;
 	opens interfacebuilder.ui.settings to spring.core, javafx.fxml;
 	opens interfacebuilder.ui.browse to spring.core, javafx.fxml;
-	// open to log4j to maybe fix the appender
-	opens interfacebuilder.ui.progress to javafx.fxml, org.apache.logging.log4j, spring.core;
-	exports interfacebuilder.ui.progress to org.apache.logging.log4j.core;
+	opens interfacebuilder.ui.progress to javafx.fxml, spring.core;
+	exports interfacebuilder.integration.log4j to org.apache.logging.log4j.core;
 	exports interfacebuilder.integration;
 	exports interfacebuilder.ui.navigation;
+	
+	// spring actuator for testing
+	//	requires spring.boot.actuator;
+	//	requires spring.boot.actuator.autoconfigure;
+	//	requires spring.boot.starter.actuator;
 }
