@@ -469,4 +469,23 @@ public class BrowseTabController implements Updateable {
 			}
 		}
 	}
+	
+	/**
+	 * Clears the data to be garbage collected. For some reason, there is a memory leak that prevents this controller
+	 * from being garbage collected.
+	 */
+	public void clear() {
+		pathLabel = null;
+		columnAttributes = null;
+		columnValues = null;
+		fileDropdown = null;
+		frameTree = null;
+		frameTreeContainer = null;
+		hiddenTreeChildMap = null;
+		tableView = null;
+		treeFilter = null;
+		templateDropdown = null;
+		templateMap = null;
+		uiCatalog = null;
+	}
 }

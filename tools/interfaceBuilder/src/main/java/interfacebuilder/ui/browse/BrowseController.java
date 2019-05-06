@@ -86,6 +86,10 @@ public class BrowseController implements Updateable {
 	
 	private List<Updateable> controllers;
 	
+	public BrowseController() {
+		// nothing to do
+	}
+	
 	/**
 	 * Automatically called by FxmlLoader
 	 */
@@ -235,7 +239,14 @@ public class BrowseController implements Updateable {
 			// context menu with close option
 			final ContextMenu contextMenu = new ContextMenu();
 			final MenuItem closeItem = new MenuItem(Messages.getString("contextmenu.close"));
-			closeItem.setOnAction(event -> tabPane.getTabs().remove(newTab));
+			final Updateable controllerRef = controller;
+			closeItem.setOnAction(event -> {
+				tabPane.getTabs().remove(newTab);
+				controllers.remove(controllerRef);
+				if (controllerRef instanceof BrowseTabController) {
+					((BrowseTabController) controllerRef).clear();
+				}
+			});
 			contextMenu.getItems().addAll(closeItem);
 			newTab.setContextMenu(contextMenu);
 			

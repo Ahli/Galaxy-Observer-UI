@@ -1,17 +1,24 @@
 module interfacex.builder {
+	// javafx
 	requires java.desktop;
 	requires java.persistence;
 	requires java.xml;
 	requires core;
-	requires de.jensd.fx.glyphs.fontawesome;
 	requires javafx.base;
 	requires javafx.controls;
 	requires javafx.fxml;
 	requires javafx.graphics;
+	requires de.jensd.fx.glyphs.fontawesome;
+	
+	// misc
 	requires org.apache.commons.configuration2;
 	requires org.apache.commons.io;
 	requires org.apache.logging.log4j;
 	requires org.apache.logging.log4j.core;
+	requires com.esotericsoftware.kryo;
+	requires pecoff4j;
+	
+	// spring
 	requires jakarta.activation;
 	requires org.hibernate.orm.core;
 	requires spring.beans;
@@ -23,15 +30,12 @@ module interfacex.builder {
 	requires spring.data.jpa;
 	requires spring.tx;
 	requires com.fasterxml.classmate;
+	requires net.bytebuddy;
+	requires java.sql;
+	
+	// own projects
 	requires CascExplorerConfigFileEdit;
 	requires GalaxyLib;
-	requires com.esotericsoftware.kryo;
-	requires pecoff4j;
-	
-	// fix: spring boot not finding sqlexception
-	requires java.sql;
-	// fix spring boot not finding bytebuddy classes for hibernate configuration
-	requires net.bytebuddy;
 	
 	// log4j export is a test to fix stylized text area appender
 	exports interfacebuilder to javafx.graphics, javafx.fxml, spring.context;
