@@ -25,6 +25,9 @@ import org.springframework.context.annotation.Scope;
 @Configuration
 public class FxmlConfiguration {
 	
+	// Prototype Scope should be used for everything but controllers that should remain alive long
+	// If it is not a prototype, the bean will not be garbage collected when not used anymore.
+	
 	@Bean
 	@Scope (ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 	public ViewRuleSetController viewRuleSetController() {
@@ -90,6 +93,7 @@ public class FxmlConfiguration {
 	}
 	
 	@Bean
+	@Scope (ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 	public BrowseTabController browseTabController() {
 		return new BrowseTabController();
 	}

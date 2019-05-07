@@ -243,9 +243,6 @@ public class BrowseController implements Updateable {
 			closeItem.setOnAction(event -> {
 				tabPane.getTabs().remove(newTab);
 				controllers.remove(controllerRef);
-				if (controllerRef instanceof BrowseTabController) {
-					((BrowseTabController) controllerRef).clear();
-				}
 			});
 			contextMenu.getItems().addAll(closeItem);
 			newTab.setContextMenu(contextMenu);
