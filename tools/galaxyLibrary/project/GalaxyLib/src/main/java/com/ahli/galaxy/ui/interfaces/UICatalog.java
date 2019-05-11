@@ -3,6 +3,8 @@
 
 package com.ahli.galaxy.ui.interfaces;
 
+import com.ahli.galaxy.parser.UICatalogParser;
+import com.ahli.galaxy.parser.interfaces.ParsedXmlConsumer;
 import com.ahli.galaxy.ui.UIConstant;
 import com.ahli.galaxy.ui.UITemplate;
 import com.ahli.galaxy.ui.abstracts.UIElement;
@@ -13,6 +15,7 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 
 public interface UICatalog extends DeepCopyable {
@@ -24,9 +27,9 @@ public interface UICatalog extends DeepCopyable {
 	Object deepCopy();
 	
 	/**
-	 * Clears the XML DOM Parser to release its memory.
+	 * Sets/Clears the XML Parser.
 	 */
-	void clearParser();
+	void setParser(UICatalogParser parser);
 	
 	/**
 	 * @param f
@@ -44,17 +47,21 @@ public interface UICatalog extends DeepCopyable {
 			throws SAXException, IOException, ParserConfigurationException, InterruptedException;
 	
 	/**
-	 * @param f
+	 * @param p
 	 * 		layout file to process
 	 * @param raceId
 	 * 		to use to check constants starting with ##
+	 * @param isDevLayout
+	 * @param consoleSkinId
+	 * @param parser
 	 * @throws SAXException
 	 * @throws IOException
 	 * @throws ParserConfigurationException
 	 * @throws UIException
 	 * @throws InterruptedException
 	 */
-	void processLayoutFile(File f, String raceId, boolean isDevLayout, String consoleSkinId) throws IOException;
+	void processLayoutFile(Path p, String raceId, boolean isDevLayout, String consoleSkinId, ParsedXmlConsumer parser)
+			throws IOException;
 	
 	/**
 	 * @param constantRef
@@ -145,4 +152,9 @@ public interface UICatalog extends DeepCopyable {
 	void processInclude(String path, boolean isDevLayout, String raceId, String consoleSkinId);
 	
 	UITemplate getTemplateOfPath(final String file);
+	
+	/**
+	 * Post process the parsed UICatalog.
+	 */
+	void postProcessParsing();
 }

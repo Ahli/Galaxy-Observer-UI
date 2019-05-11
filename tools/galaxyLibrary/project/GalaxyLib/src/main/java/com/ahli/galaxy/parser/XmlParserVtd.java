@@ -14,9 +14,9 @@ import com.ximpleware.VTDNav;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,17 +59,17 @@ public class XmlParserVtd extends XmlParserAbstract {
 	
 	@Override
 	public void clear() {
-		consumer = null;
 		vtd = null;
 		attrTypes = null;
 		attrValues = null;
+		consumer = null;
 	}
 	
 	@Override
-	public void parseFile(final File f) throws IOException {
-		logger.trace("parsing layout file: {}", () -> f.getName());
+	public void parseFile(final Path p) throws IOException {
+		logger.trace("parsing layout file: {}", () -> p.getFileName());
 		try {
-			final byte[] bytes = readBinary(f);
+			final byte[] bytes = Files.readAllBytes(p);
 			// setdoc causes a nullpointer error due to an internal bug
 			vtd.setDoc_BR(bytes);
 			vtd.parse(false);
@@ -96,7 +96,4 @@ public class XmlParserVtd extends XmlParserAbstract {
 		consumer.endLayoutFile();
 	}
 	
-	private static byte[] readBinary(final File f) throws IOException {
-		return Files.readAllBytes(f.toPath());
-	}
 }

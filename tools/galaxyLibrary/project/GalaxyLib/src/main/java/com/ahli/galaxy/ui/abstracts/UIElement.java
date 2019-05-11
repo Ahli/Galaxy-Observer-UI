@@ -75,9 +75,20 @@ public abstract class UIElement implements DeepCopyable {
 	}
 	
 	/**
-	 * Returns all child UIElements.
+	 * Returns all child UIElements. Changes to the returned list are reflected in this Object.
+	 * <p>
+	 * The returned list may be empty. Calling this may cause the allocated memory to grow as the empty list is saved.
+	 * To avoid allocating more memory, call getChildrenRaw().
 	 *
-	 * @return
+	 * @return List with child elements. Never returns null. The list is not a duplicate.
 	 */
 	public abstract List<UIElement> getChildren();
+	
+	/**
+	 * Returns all child UIElements or null. Changes to the returned list are reflected in this Object.
+	 *
+	 * @return List with child elements. May return null instead of an empty list. The list is not a duplicate.
+	 */
+	public abstract List<UIElement> getChildrenRaw();
+	
 }

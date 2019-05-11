@@ -29,7 +29,7 @@ public class UIConstant extends UIElement {
 	
 	public UIConstant(final String name, final String value) {
 		super(name);
-		this.value = value;
+		this.value = value.intern();
 	}
 	
 	/**
@@ -54,7 +54,7 @@ public class UIConstant extends UIElement {
 	 * 		the value to set
 	 */
 	public void setValue(final String value) {
-		this.value = value;
+		this.value = value.intern();
 	}
 	
 	/**
@@ -74,6 +74,11 @@ public class UIConstant extends UIElement {
 	@Override
 	public List<UIElement> getChildren() {
 		return Collections.emptyList();
+	}
+	
+	@Override
+	public List<UIElement> getChildrenRaw() {
+		return null;
 	}
 	
 	@Override

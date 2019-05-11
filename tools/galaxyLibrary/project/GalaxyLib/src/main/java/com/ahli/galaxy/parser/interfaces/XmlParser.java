@@ -3,8 +3,8 @@
 
 package com.ahli.galaxy.parser.interfaces;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 /**
  * Interface for Parser
@@ -16,13 +16,13 @@ public interface XmlParser {
 	/**
 	 * Parses a file and calls a consumer.
 	 *
-	 * @param f
+	 * @param p
 	 * @throws IOException
 	 */
-	void parseFile(final File f) throws IOException;
+	void parseFile(final Path p) throws IOException;
 	
 	/**
-	 * Release allocated resources.
+	 * Release the allocated resources.
 	 */
 	void clear();
 	

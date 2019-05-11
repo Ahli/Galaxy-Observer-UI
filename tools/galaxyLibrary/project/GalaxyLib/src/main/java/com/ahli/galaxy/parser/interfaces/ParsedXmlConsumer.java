@@ -5,12 +5,17 @@ package com.ahli.galaxy.parser.interfaces;
 
 import com.ahli.galaxy.ui.exception.UIException;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 
 public interface ParsedXmlConsumer {
+	
+	void parseFile(Path p, String raceId, boolean isDevLayout, String consoleSkinId) throws IOException;
 	
 	void parse(int level, String lowerCase, List<String> attrTypes, List<String> attrValues) throws UIException;
 	
 	void endLayoutFile();
 	
+	void deduplicate();
 }

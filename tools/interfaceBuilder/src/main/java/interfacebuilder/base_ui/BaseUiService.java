@@ -6,6 +6,8 @@ package interfacebuilder.base_ui;
 import cascexplorerconfigedit.editor.CascExplorerConfigFileEditor;
 import com.ahli.galaxy.game.GameData;
 import com.ahli.galaxy.game.def.abstracts.GameDef;
+import com.ahli.galaxy.parser.UICatalogParser;
+import com.ahli.galaxy.parser.XmlParserVtd;
 import com.ahli.galaxy.ui.UICatalogImpl;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
 import com.esotericsoftware.kryo.Kryo;
@@ -325,7 +327,7 @@ public class BaseUiService {
 					try {
 						if (cacheIsUpToDateCheckException(game.getGameDef(), isPtr)) {
 							// load from cache
-							uiCatalog = discCacheService.getCachedBaseUi(gameName, isPtr).getCatalog();
+							uiCatalog = discCacheService.getCachedBaseUi(gameName, isPtr);
 							game.setUiCatalog(uiCatalog);
 							needToParseAgain = false;
 							if (logger.isTraceEnabled()) {
@@ -338,6 +340,7 @@ public class BaseUiService {
 					if (needToParseAgain) {
 						// parse baseUI
 						uiCatalog = new UICatalogImpl();
+						uiCatalog.setParser(new UICatalogParser(uiCatalog, new XmlParserVtd(), true));
 						final var app = InterfaceBuilderApp.getInstance();
 						app.printInfoLogMessageToGeneral("Starting to parse base " + gameName + " UI.");
 						app.addThreadLoggerTab(Thread.currentThread().getName(),
@@ -364,13 +367,14 @@ public class BaseUiService {
 											game.getGameDef().getDefaultConsoleSkinId());
 								}
 							}
+							uiCatalog.postProcessParsing();
 							game.setUiCatalog(uiCatalog);
 						} catch (final SAXException | IOException | ParserConfigurationException e) {
 							logger.error("ERROR parsing base UI catalog for '" + gameName + "'.", e);
 						} catch (final InterruptedException e) {
 							Thread.currentThread().interrupt();
 						} finally {
-							uiCatalog.clearParser();
+							uiCatalog.setParser(null);
 						}
 						final String msg = "Finished parsing base UI for " + gameName + ".";
 						logger.info(msg);
@@ -417,8 +421,8 @@ public class BaseUiService {
 	
 	public boolean cacheIsUpToDate(final GameDef gameDef, final boolean usePtr) throws IOException {
 		final File baseUiMetaFileDir = new File(configService.getBaseUiPath(gameDef));
-		final File cacheFile = discCacheService.getCacheFile(gameDef.getName(), usePtr);
-		return cacheIsUpToDate(cacheFile.toPath(), baseUiMetaFileDir);
+		final Path cacheFilePath = discCacheService.getCacheFilePath(gameDef.getName(), usePtr);
+		return cacheIsUpToDate(cacheFilePath, baseUiMetaFileDir);
 	}
 	
 	/**
@@ -428,7 +432,7 @@ public class BaseUiService {
 	 */
 	public boolean cacheIsUpToDate(final Path cacheFile, final File metaFileDir) throws IOException {
 		final KryoGameInfo baseUiInfo = readMetaFile(metaFileDir);
-		final KryoGameInfo cacheInfo = discCacheService.getCachedBaseUi(cacheFile).getGameInfo();
+		final KryoGameInfo cacheInfo = discCacheService.getCachedBaseUiInfo(cacheFile);
 		
 		final int[] versionCache = cacheInfo.getVersion();
 		final int[] versionBaseUi = baseUiInfo.getVersion();

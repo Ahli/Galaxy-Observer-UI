@@ -14,7 +14,7 @@ import java.util.Objects;
  * @author Ahli
  */
 public class UIAnimation extends UIElement {
-	private List<UIController> controllers;
+	private List<UIElement> controllers;
 	private List<UIAttribute> events;
 	private boolean nextEventsAdditionShouldOverride;
 	private UIAttribute driver;
@@ -69,7 +69,7 @@ public class UIAnimation extends UIElement {
 	/**
 	 * @return the controllers
 	 */
-	public List<UIController> getControllers() {
+	public List<UIElement> getControllers() {
 		return controllers;
 	}
 	
@@ -77,7 +77,7 @@ public class UIAnimation extends UIElement {
 	 * @param controllers
 	 * 		the controllers to set
 	 */
-	public void setControllers(final List<UIController> controllers) {
+	public void setControllers(final List<UIElement> controllers) {
 		this.controllers = controllers;
 	}
 	
@@ -102,22 +102,6 @@ public class UIAnimation extends UIElement {
 	public void addEvent(final UIAttribute newEvent) {
 		events.add(newEvent);
 	}
-	
-	//	/**
-	//	 * @param key
-	//	 * @return
-	//	 */
-	//	public UIAttribute getValue(final String key) {
-	//		int i;
-	//		Pair<String, UIAttribute> p;
-	//		for (i = 0; i < events.size(); i++) {
-	//			p = events.get(i);
-	//			if (p.getKey().equals(key)) {
-	//				return p.getValue();
-	//			}
-	//		}
-	//		return null;
-	//	}
 	
 	/**
 	 * @return
@@ -178,7 +162,12 @@ public class UIAnimation extends UIElement {
 	
 	@Override
 	public List<UIElement> getChildren() {
-		return new ArrayList<>(controllers);
+		return controllers;
+	}
+	
+	@Override
+	public List<UIElement> getChildrenRaw() {
+		return controllers;
 	}
 	
 	@Override

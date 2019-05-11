@@ -17,8 +17,8 @@ import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -68,17 +68,17 @@ public class XmlParserDom extends XmlParserAbstract {
 	
 	@Override
 	public void clear() {
-		consumer = null;
 		dBuilder = null;
 		attrTypes = null;
 		attrValues = null;
+		consumer = null;
 	}
 	
 	@Override
-	public void parseFile(final File f) throws IOException {
-		logger.trace("parsing layout file: {}", () -> f.getName());
+	public void parseFile(final Path p) throws IOException {
+		logger.trace("parsing layout file: {}", () -> p.getFileName());
 		try {
-			final NodeList elements = dBuilder.parse(f).getElementsByTagName(ANY_TAG);
+			final NodeList elements = dBuilder.parse(p.toFile()).getElementsByTagName(ANY_TAG);
 			Node node;
 			NamedNodeMap attributes;
 			Node attr;

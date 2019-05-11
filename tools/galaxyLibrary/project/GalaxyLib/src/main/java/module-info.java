@@ -5,6 +5,7 @@ module GalaxyLib {
 	requires org.apache.commons.lang3;
 	requires transitive org.apache.logging.log4j;
 	requires vtd.xml;
+	requires core;
 	
 	exports com.ahli.galaxy;
 	exports com.ahli.galaxy.archive;

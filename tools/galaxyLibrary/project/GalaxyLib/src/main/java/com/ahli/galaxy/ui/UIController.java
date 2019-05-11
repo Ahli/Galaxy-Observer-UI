@@ -164,6 +164,11 @@ public class UIController extends UIElement {
 	}
 	
 	@Override
+	public List<UIElement> getChildrenRaw() {
+		return null;
+	}
+	
+	@Override
 	public boolean equals(final Object obj) {
 		if (obj == null) {
 			return false;
@@ -191,7 +196,7 @@ public class UIController extends UIElement {
 	}
 	
 	private Object[] getSignatureFields() {
-		return new Object[] { getName(), keys, nextAdditionShouldOverride, nameIsImplicit };
+		return new Object[] { getName(), keys, nextAdditionShouldOverride, nameIsImplicit, attributesKeyValueList };
 	}
 	
 	@Override

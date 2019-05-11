@@ -116,6 +116,11 @@ public class UIAttribute extends UIElement {
 	}
 	
 	@Override
+	public List<UIElement> getChildrenRaw() {
+		return null;
+	}
+	
+	@Override
 	public boolean equals(final Object obj) {
 		if (obj == null) {
 			return false;

@@ -7,7 +7,6 @@ import com.ahli.galaxy.ui.abstracts.UIElement;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -16,7 +15,7 @@ import java.util.Objects;
  */
 public class UIStateGroup extends UIElement {
 	private String defaultState;
-	private List<UIState> states;
+	private List<UIElement> states;
 	
 	public UIStateGroup() {
 		super(null);
@@ -70,7 +69,7 @@ public class UIStateGroup extends UIElement {
 	/**
 	 * @return the states
 	 */
-	public List<UIState> getStates() {
+	public List<UIElement> getStates() {
 		return states;
 	}
 	
@@ -78,7 +77,7 @@ public class UIStateGroup extends UIElement {
 	 * @param states
 	 * 		the states to set
 	 */
-	public void setStates(final List<UIState> states) {
+	public void setStates(final List<UIElement> states) {
 		this.states = states;
 	}
 	
@@ -114,9 +113,14 @@ public class UIStateGroup extends UIElement {
 	@Override
 	public List<UIElement> getChildren() {
 		if (states == null) {
-			return Collections.emptyList();
+			states = new ArrayList<>(0);
 		}
-		return new ArrayList<>(states);
+		return states;
+	}
+	
+	@Override
+	public List<UIElement> getChildrenRaw() {
+		return states;
 	}
 	
 	@Override

@@ -7,7 +7,6 @@ import com.ahli.galaxy.ui.UICatalogImpl;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
 import com.esotericsoftware.kryo.Kryo;
 import interfacebuilder.config.ConfigService;
-import interfacebuilder.integration.kryo.KryoCachedBaseUi;
 import interfacebuilder.integration.kryo.KryoGameInfo;
 import interfacebuilder.integration.kryo.KryoService;
 import org.apache.logging.log4j.LogManager;
@@ -18,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,19 +35,19 @@ public class DiscCacheService {
 	 */
 	public void put(final UICatalog catalog, final String gameDefName, final boolean isPtr, final int[] version)
 			throws IOException {
-		final File f = getCacheFile(gameDefName, isPtr);
-		final Path p = f.toPath();
+		final Path p = getCacheFilePath(gameDefName, isPtr);
 		Files.deleteIfExists(p);
 		
 		final KryoGameInfo metaInfo = new KryoGameInfo(version, gameDefName, isPtr);
 		final List<Object> payload = new ArrayList<>();
-		payload.add(new KryoCachedBaseUi(metaInfo, (UICatalogImpl) catalog));
+		payload.add(metaInfo);
+		payload.add(catalog);
 		
 		final Kryo kryo = kryoService.getKryoForUICatalog();
 		kryoService.put(p, payload, kryo);
 		logger.info("Cached UI for " + gameDefName + " - templates=" + catalog.getTemplates().size() +
 				", blizzOnlyTemplates=" + catalog.getBlizzOnlyTemplates().size() + ", constants=" +
-				catalog.getConstants().size() + ", blzzOnlyConstants=" + catalog.getBlizzOnlyConstants().size() +
+				catalog.getConstants().size() + ", blizzOnlyConstants=" + catalog.getBlizzOnlyConstants().size() +
 				", devLayouts=" + catalog.getDevLayouts().size());
 	}
 	
@@ -55,10 +55,8 @@ public class DiscCacheService {
 	 * @param gameDefName
 	 * @return
 	 */
-	public File getCacheFile(final String gameDefName, final boolean isPtr) {
-		final String path =
-				configService.getCachePath() + File.separator + gameDefName + (isPtr ? " PTR" : "") + ".kryo";
-		return new File(path);
+	public Path getCacheFilePath(final String gameDefName, final boolean isPtr) {
+		return Paths.get(configService.getCachePath() + File.separator + gameDefName + (isPtr ? " PTR" : "") + ".kryo");
 	}
 	
 	
@@ -68,18 +66,24 @@ public class DiscCacheService {
 	 * @return
 	 * @throws IOException
 	 */
-	public KryoCachedBaseUi getCachedBaseUi(final String gameDefName, final boolean isPtr) throws IOException {
-		return getCachedBaseUi(getCacheFile(gameDefName, isPtr).toPath());
+	public UICatalog getCachedBaseUi(final String gameDefName, final boolean isPtr) throws IOException {
+		return getCachedBaseUi(getCacheFilePath(gameDefName, isPtr));
 	}
 	
-	public KryoCachedBaseUi getCachedBaseUi(final Path path) throws IOException {
+	public UICatalog getCachedBaseUi(final Path path) throws IOException {
 		final Kryo kryo = kryoService.getKryoForUICatalog();
 		final List<Class<? extends Object>> payloadClasses = new ArrayList<>();
-		//		payloadClasses.add(UICatalogImpl.class);
-		//		payloadClasses.add(KryoGameInfo.class);
-		//		return kryoService.get(path, payloadClasses, kryo);
-		payloadClasses.add(KryoCachedBaseUi.class);
-		return (KryoCachedBaseUi) kryoService.get(path, payloadClasses, kryo).get(0);
+		payloadClasses.add(KryoGameInfo.class);
+		payloadClasses.add(UICatalogImpl.class);
+		return (UICatalog) kryoService.get(path, payloadClasses, kryo).get(1);
+	}
+	
+	public KryoGameInfo getCachedBaseUiInfo(final Path path) throws IOException {
+		final Kryo kryo = kryoService.getKryoForUICatalog();
+		final List<Class<? extends Object>> payloadClasses = new ArrayList<>();
+		payloadClasses.add(KryoGameInfo.class);
+		payloadClasses.add(UICatalogImpl.class);
+		return (KryoGameInfo) kryoService.get(path, payloadClasses, kryo, 0).get(0);
 	}
 	
 	/**
@@ -88,12 +92,12 @@ public class DiscCacheService {
 	 * @throws IOException
 	 */
 	public void remove(final String gameDefName, final boolean isPtr) throws IOException {
-		final File f = getCacheFile(gameDefName, isPtr);
-		if (f.exists()) {
-			Files.delete(f.toPath());
-			logger.trace("Cleaning cache of {} in {}", () -> gameDefName, f::getAbsolutePath);
+		final Path p = getCacheFilePath(gameDefName, isPtr);
+		if (Files.exists(p)) {
+			Files.delete(p);
+			logger.trace("Cleaning cache of {} in {}", () -> gameDefName, p::toAbsolutePath);
 		} else {
-			logger.trace("Could not find cache of {} in {} to clean it", () -> gameDefName, f::getAbsolutePath);
+			logger.trace("Could not find cache of {} in {} to clean it", () -> gameDefName, p::toAbsolutePath);
 		}
 	}
 	
@@ -103,7 +107,7 @@ public class DiscCacheService {
 	 * @return
 	 */
 	public boolean exists(final String gameDefName, final boolean isPtr) {
-		return getCacheFile(gameDefName, isPtr).exists();
+		return Files.exists(getCacheFilePath(gameDefName, isPtr));
 	}
 	
 }

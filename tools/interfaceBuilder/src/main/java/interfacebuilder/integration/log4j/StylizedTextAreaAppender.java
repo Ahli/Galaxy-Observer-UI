@@ -42,7 +42,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
          printObject = true)
 public final class StylizedTextAreaAppender extends AbstractAppender {
 	/* THashMap is more memory efficient than Java's one */
-	private static final Map<String, ErrorTabController> workerTaskControllers = new THashMap<>();
+	private static final Map<String, ErrorTabController> workerTaskControllers = new THashMap<>(4);
 	private static ErrorTabController generalController;
 	private final ReadWriteLock rwLock = new ReentrantReadWriteLock();
 	private final Lock readLock = rwLock.readLock();

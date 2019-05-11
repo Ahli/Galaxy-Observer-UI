@@ -5,6 +5,8 @@ package interfacebuilder.compile;
 
 import com.ahli.galaxy.ModData;
 import com.ahli.galaxy.archive.DescIndexData;
+import com.ahli.galaxy.parser.UICatalogParser;
+import com.ahli.galaxy.parser.XmlParserVtd;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
 import com.ahli.util.SilentXmlSaxErrorHandler;
 import org.apache.commons.io.FileUtils;
@@ -70,11 +72,14 @@ public class CompileService {
 				logger.info("BaseUI Cloning took " + executionTime + "ms.");
 				startTime = System.currentTimeMillis();
 				
+				catalogClone.setParser(new UICatalogParser(catalogClone, new XmlParserVtd(), true));
+				
 				// apply mod's UI
 				final File descIndexFile = new File(
 						mod.getMpqCacheDirectory() + File.separator + mod.getDescIndexData().getDescIndexIntPath());
 				catalogClone.processDescIndex(descIndexFile, raceId, consoleSkinId);
-				catalogClone.clearParser();
+				catalogClone.postProcessParsing();
+				catalogClone.setParser(null);
 				
 				executionTime = (System.currentTimeMillis() - startTime);
 				logger.info("Validating Layouts took " + executionTime + "ms.");

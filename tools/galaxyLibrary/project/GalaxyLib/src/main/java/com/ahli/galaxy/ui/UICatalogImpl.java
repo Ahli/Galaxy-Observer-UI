@@ -5,6 +5,7 @@ package com.ahli.galaxy.ui;
 
 import com.ahli.galaxy.parser.UICatalogParser;
 import com.ahli.galaxy.parser.XmlParserVtd;
+import com.ahli.galaxy.parser.interfaces.ParsedXmlConsumer;
 import com.ahli.galaxy.parser.interfaces.XmlParser;
 import com.ahli.galaxy.ui.abstracts.UIElement;
 import com.ahli.galaxy.ui.exception.UIException;
@@ -17,6 +18,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -104,8 +106,8 @@ public class UICatalogImpl implements UICatalog {
 	}
 	
 	@Override
-	public void clearParser() {
-		parser = null;
+	public void setParser(final UICatalogParser parser) {
+		this.parser = parser;
 	}
 	
 	@Override
@@ -126,12 +128,18 @@ public class UICatalogImpl implements UICatalog {
 		
 		processLayouts(combinedList, basePath, raceId, consoleSkinId);
 		
-		//		printDebugStats();
+		if (logger.isTraceEnabled()) {
+			logger.trace(
+					"UICatalogSizes: " + templates.size() + " " + blizzOnlyTemplates.size() + " " + constants.size() +
+							" " + blizzOnlyConstants.size() + " " + blizzOnlyLayouts.size());
+		}
 	}
 	
 	/**
 	 * @param toProcessList
 	 * @param basePath
+	 * @param raceId
+	 * @param consoleSkinId
 	 * @throws InterruptedException
 	 * 		if the current thread was interrupted
 	 */
@@ -161,13 +169,12 @@ public class UICatalogImpl implements UICatalog {
 			}
 			if (lastIndex != -1) {
 				curBasePath = basePathTemp;
-				final File layoutFile = new File(basePathTemp + File.separator + intPath);
+				final Path layoutFilePath = Paths.get(basePathTemp + File.separator + intPath);
 				try {
-					processLayoutFile(layoutFile, raceId, isDevLayout, consoleSkinId);
+					processLayoutFile(layoutFilePath, raceId, isDevLayout, consoleSkinId, parser);
 				} catch (final IOException e) {
-					logger.error(
-							"ERROR: encountered an Exception while processing the layout file '" + layoutFile + "'.",
-							e);
+					logger.error("ERROR: encountered an Exception while processing the layout file '" + layoutFilePath +
+							"'.", e);
 				}
 				if (Thread.interrupted()) {
 					throw new InterruptedException();
@@ -177,22 +184,9 @@ public class UICatalogImpl implements UICatalog {
 	}
 	
 	@Override
-	public void processLayoutFile(final File f, final String raceId, final boolean isDevLayout,
-			final String consoleSkinId) throws IOException {
-		prepareParser();
-		parser.parseFile(f, raceId, isDevLayout, consoleSkinId);
-	}
-	
-	private void prepareParser() {
-		if (parser == null) {
-			parser = new UICatalogParser(this, new XmlParserVtd(null));
-		}
-	}
-	
-	public void printDebugStats() {
-		logger.info(
-				"UICatalogSizes: " + templates.size() + " " + blizzOnlyTemplates.size() + " " + constants.size() + " " +
-						blizzOnlyConstants.size() + " " + blizzOnlyLayouts.size());
+	public void processLayoutFile(final Path p, final String raceId, final boolean isDevLayout,
+			final String consoleSkinId, final ParsedXmlConsumer parser) throws IOException {
+		parser.parseFile(p, raceId, isDevLayout, consoleSkinId);
 	}
 	
 	@Override
@@ -219,11 +213,11 @@ public class UICatalogImpl implements UICatalog {
 				return;
 			}
 		}
-		final File file = new File(basePathTemp + File.separator + path);
+		final Path filePath = Paths.get(basePathTemp, path);
 		final XmlParser xmlParser = new XmlParserVtd();
-		final UICatalogParser parserTemp = new UICatalogParser(this, xmlParser);
+		final UICatalogParser parserTemp = new UICatalogParser(this, xmlParser, true);
 		try {
-			parserTemp.parseFile(file, raceId, isDevLayout, consoleSkinId);
+			parserTemp.parseFile(filePath, raceId, isDevLayout, consoleSkinId);
 		} catch (final IOException e) {
 			logger.error("ERROR: while parsing include appearing within usual layouts.", e);
 		}
@@ -258,6 +252,13 @@ public class UICatalogImpl implements UICatalog {
 		}
 		logger.warn("WARN: cannot find Layout file: " + file);
 		return null;
+	}
+	
+	@Override
+	public void postProcessParsing() {
+		if (parser != null) {
+			parser.deduplicate();
+		}
 	}
 	
 	/**

@@ -9,9 +9,10 @@ import com.ximpleware.ParseException;
 import com.ximpleware.VTDGen;
 import com.ximpleware.VTDNav;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,9 +33,8 @@ public class RecursiveVtdTest {
 		final Runtime rt = Runtime.getRuntime();
 		final long startMem = rt.totalMemory() - rt.freeMemory();
 		final long startTime = System.currentTimeMillis();
-		final File f = new File(
-				"D:\\Galaxy-Observer-UI\\baseUI\\heroes\\mods\\core.stormmod\\base.stormdata\\UI\\Layout\\UI\\GameUI" +
-						".StormLayout");
+		final Path p = Paths.get(
+				"D:\\Galaxy-Observer-UI\\baseUI\\heroes\\mods\\core.stormmod\\base.stormdata\\UI\\Layout\\UI\\GameUI.StormLayout");
 		final VTDGen vtd;
 		
 		try {
@@ -42,7 +42,7 @@ public class RecursiveVtdTest {
 			// for (int i = 0; i < 1000; i++) {
 			while (System.currentTimeMillis() - startTime < 60_000) {
 				list.clear();
-				loadRecursiveXML(vtd, f);
+				loadRecursiveXML(vtd, p);
 				iterations++;
 				// if (i % 100 == 0) {
 				// endMem = rt.totalMemory() - rt.freeMemory();
@@ -75,7 +75,7 @@ public class RecursiveVtdTest {
 		}
 	}
 	
-	public static void loadRecursiveXML(final VTDGen vtd, final File f)
+	public static void loadRecursiveXML(final VTDGen vtd, final Path p)
 			throws NavException, IOException, ParseException {
 		// long startTime = System.currentTimeMillis();
 		// if (!vtd.parseFile(f.getPath(), false)) {
@@ -88,7 +88,7 @@ public class RecursiveVtdTest {
 		// final ByteBuffer buffer2 = ByteBuffer.allocate((int) channel.size());
 		// channel.read(buffer2);
 		
-		final byte[] bytes = readBinary(f);
+		final byte[] bytes = Files.readAllBytes(p);
 		// setdoc causes a nullpointer error due to an internal bug
 		vtd.setDoc_BR(bytes);
 		vtd.parse(false);
@@ -140,9 +140,5 @@ public class RecursiveVtdTest {
 				// System.out.println(attrName + "=" + attrVal + " @ " + executionTime);
 			}
 		}
-	}
-	
-	static byte[] readBinary(final File f) throws IOException {
-		return Files.readAllBytes(f.toPath());
 	}
 }

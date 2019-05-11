@@ -18,13 +18,17 @@ import java.util.Objects;
  * performance improvements
  */
 public class UIFrame extends UIElement {
+	public static final String ZERO = "0";
 	private static final String THIS = "$this";
-	private static final String[] POSI = { "Min", "Max" };
-	private static final String ZERO = "0";
+	private static final String MIN = "MIN";
+	private static final String MAX = "MAX";
+	private static final String[] DFLT_POS = { MIN, MIN, MAX, MAX };
+	private static final String[] DFLT_OFFSET = { ZERO, ZERO, ZERO, ZERO };
+	private static final String[] DFLT_RELATIVE = { THIS, THIS, THIS, THIS };
 	
-	private final String[] pos = new String[4];
-	private final String[] offset = new String[4];
-	private final String[] relative = new String[4];
+	private String[] pos = new String[4];
+	private String[] offset = new String[4];
+	private String[] relative = new String[4];
 	
 	private List<UIAttribute> attributes;
 	private String type;
@@ -41,18 +45,9 @@ public class UIFrame extends UIElement {
 	 * Initializes variables
 	 */
 	private void init() {
-		relative[0] = THIS;
-		relative[1] = THIS;
-		relative[2] = THIS;
-		relative[3] = THIS;
-		pos[0] = POSI[0];
-		pos[1] = POSI[0];
-		pos[2] = POSI[1];
-		pos[3] = POSI[1];
-		offset[0] = ZERO;
-		offset[1] = ZERO;
-		offset[2] = ZERO;
-		offset[3] = ZERO;
+		relative = DFLT_RELATIVE;
+		pos = DFLT_POS;
+		offset = DFLT_OFFSET;
 	}
 	
 	/**
@@ -109,10 +104,14 @@ public class UIFrame extends UIElement {
 				clone.attributes.add((UIAttribute) attributes.get(i).deepCopy());
 			}
 		}
-		for (int i = 0; i <= 3; i++) {
-			clone.relative[i] = relative[i];
-			clone.offset[i] = offset[i];
-			clone.pos[i] = pos[i];
+		if (relative != DFLT_RELATIVE) {
+			System.arraycopy(relative, 0, clone.relative, 0, 4);
+		}
+		if (offset != DFLT_OFFSET) {
+			System.arraycopy(offset, 0, clone.offset, 0, 4);
+		}
+		if (pos != DFLT_POS) {
+			System.arraycopy(pos, 0, clone.pos, 0, 4);
 		}
 		return clone;
 	}
@@ -132,9 +131,6 @@ public class UIFrame extends UIElement {
 		this.type = type.intern();
 	}
 	
-	/**
-	 * @return list of children
-	 */
 	@Override
 	public List<UIElement> getChildren() {
 		if (children == null) {
@@ -148,6 +144,11 @@ public class UIFrame extends UIElement {
 	 */
 	public void setChildren(final List<UIElement> children) {
 		this.children = children;
+	}
+	
+	@Override
+	public List<UIElement> getChildrenRaw() {
+		return children;
 	}
 	
 	/**
@@ -223,24 +224,28 @@ public class UIFrame extends UIElement {
 	 * @param offset
 	 */
 	public void setAnchor(final String relative, final String offset) {
-		this.relative[0] = relative.intern();
-		this.relative[1] = this.relative[0];
-		this.relative[2] = this.relative[0];
-		this.relative[3] = this.relative[0];
-		pos[0] = POSI[0].intern();
-		pos[1] = pos[0];
-		pos[2] = POSI[1].intern();
-		pos[3] = pos[2];
-		if (offset != null) {
+		pos = DFLT_POS;
+		if (THIS.equalsIgnoreCase(relative)) {
+			this.relative = DFLT_RELATIVE;
+		} else {
+			if (this.relative == DFLT_RELATIVE) {
+				this.relative = new String[] { THIS, THIS, THIS, THIS };
+			}
+			this.relative[0] = relative.intern();
+			this.relative[1] = this.relative[0];
+			this.relative[2] = this.relative[0];
+			this.relative[3] = this.relative[0];
+		}
+		if (offset == null || ZERO.equals(offset)) {
+			this.offset = DFLT_OFFSET;
+		} else {
+			if (this.offset == DFLT_OFFSET) {
+				this.offset = new String[] { ZERO, ZERO, ZERO, ZERO };
+			}
 			this.offset[0] = offset.intern();
 			this.offset[1] = this.offset[0];
 			this.offset[2] = Integer.toString((Integer.parseInt(offset) * (-1))).intern();
 			this.offset[3] = this.offset[2];
-		} else {
-			this.offset[0] = ZERO;
-			this.offset[1] = ZERO;
-			this.offset[2] = ZERO;
-			this.offset[3] = ZERO;
 		}
 	}
 	
@@ -261,7 +266,17 @@ public class UIFrame extends UIElement {
 	 * @param relative
 	 */
 	public void setAnchorRelative(final UIAnchorSide side, final String relative) {
-		this.relative[side.ordinal()] = relative.intern();
+		if (this.relative == DFLT_RELATIVE) {
+			if (THIS.equalsIgnoreCase(relative)) {
+				return;
+			}
+			this.relative = new String[] { THIS, THIS, THIS, THIS };
+		}
+		this.relative[side.ordinal()] = THIS.equalsIgnoreCase(relative) ? THIS : relative.intern();
+		if (THIS.equalsIgnoreCase(this.relative[0]) && THIS.equalsIgnoreCase(this.relative[1]) &&
+				THIS.equalsIgnoreCase(this.relative[2]) && THIS.equalsIgnoreCase(this.relative[3])) {
+			this.relative = DFLT_RELATIVE;
+		}
 	}
 	
 	/**
@@ -269,7 +284,16 @@ public class UIFrame extends UIElement {
 	 * @param pos
 	 */
 	public void setAnchorPos(final UIAnchorSide side, final String pos) {
-		this.pos[side.ordinal()] = pos.intern();
+		if (this.pos == DFLT_POS) {
+			if (DFLT_POS[side.ordinal()].equalsIgnoreCase(pos)) {
+				return;
+			}
+			this.pos = new String[] { MIN, MIN, MAX, MAX };
+		}
+		this.pos[side.ordinal()] = MAX.equalsIgnoreCase(pos) ? MAX : MIN.equalsIgnoreCase(pos) ? MIN : pos.intern();
+		if (MIN.equals(this.pos[0]) && MIN.equals(this.pos[1]) && MAX.equals(this.pos[2]) && MAX.equals(this.pos[3])) {
+			this.pos = DFLT_POS;
+		}
 	}
 	
 	/**
@@ -277,7 +301,17 @@ public class UIFrame extends UIElement {
 	 * @param offset
 	 */
 	public void setAnchorOffset(final UIAnchorSide side, final String offset) {
-		this.offset[side.ordinal()] = offset.intern();
+		if (this.offset == DFLT_OFFSET) {
+			if (ZERO.equals(offset)) {
+				return;
+			}
+			this.offset = new String[] { ZERO, ZERO, ZERO, ZERO };
+		}
+		this.offset[side.ordinal()] = ZERO.equals(offset) ? ZERO : offset.intern();
+		if (ZERO.equals(this.offset[0]) && ZERO.equals(this.offset[1]) && ZERO.equals(this.offset[2]) &&
+				ZERO.equals(this.offset[3])) {
+			this.offset = DFLT_OFFSET;
+		}
 	}
 	
 	/**
