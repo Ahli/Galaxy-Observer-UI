@@ -21,6 +21,7 @@ module interfacex.builder {
 	
 	// spring
 	requires jakarta.activation;
+	requires java.xml.bind; // provices javax/xml/jaxbexception
 	requires org.hibernate.orm.core;
 	requires spring.beans;
 	requires spring.boot.autoconfigure;
