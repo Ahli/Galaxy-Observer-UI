@@ -1,5 +1,6 @@
 package interfacebuilder.integration.kryo;
 
+import com.ahli.util.StringInterner;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
@@ -18,7 +19,7 @@ public class InternStringSerializer extends ImmutableSerializer<String> {
 	
 	@Override
 	public String read(final Kryo kryo, final Input input, final Class<? extends String> type) {
-		return input.readString().intern();
+		return StringInterner.intern(input.readString());
 	}
 	
 }

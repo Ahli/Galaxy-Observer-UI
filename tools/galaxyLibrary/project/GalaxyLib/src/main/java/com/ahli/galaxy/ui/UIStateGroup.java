@@ -4,6 +4,7 @@
 package com.ahli.galaxy.ui;
 
 import com.ahli.galaxy.ui.abstracts.UIElement;
+import com.ahli.util.StringInterner;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -63,7 +64,7 @@ public class UIStateGroup extends UIElement {
 	 * 		the defaultState to set
 	 */
 	public void setDefaultState(final String defaultState) {
-		this.defaultState = defaultState.intern();
+		this.defaultState = StringInterner.intern(defaultState);
 	}
 	
 	/**

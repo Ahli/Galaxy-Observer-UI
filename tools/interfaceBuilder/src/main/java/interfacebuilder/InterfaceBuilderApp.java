@@ -4,6 +4,7 @@
 package interfacebuilder;
 
 import com.ahli.galaxy.game.def.abstracts.GameDef;
+import com.ahli.util.StringInterner;
 import interfacebuilder.base_ui.BaseUiService;
 import interfacebuilder.build.MpqBuilderService;
 import interfacebuilder.compress.GameService;
@@ -418,12 +419,22 @@ public class InterfaceBuilderApp extends Application {
 		executor.setCleanUpTask(() -> {
 			// free space of baseUI
 			if (executor.getQueue().isEmpty() && executor.getActiveCount() <= 1) {
-				logger.info("Deallocating baseUI");
+				logger.info("Freeing up resources");
 				mpqBuilderService.getGameData(Game.SC2).setUiCatalog(null);
 				mpqBuilderService.getGameData(Game.HEROES).setUiCatalog(null);
 				// GC1 is the default GC and can now release RAM -> actually good to do after a task because we use a
 				// lot of RAM for the UIs
-				System.gc();
+				// Weak References survive 3 garbage collections by default
+				for (int i = 0; i < 3; ++i) {
+					System.gc();
+				}
+				try {
+					Thread.sleep(200);
+					// clean up StringInterner's weak references that the GC removed
+					StringInterner.cleanUpGarbage();
+				} catch (final InterruptedException e) {
+					Thread.currentThread().interrupt();
+				}
 			}
 		});
 	}

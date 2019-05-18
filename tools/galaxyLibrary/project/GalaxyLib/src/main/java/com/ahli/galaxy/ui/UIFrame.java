@@ -4,6 +4,7 @@
 package com.ahli.galaxy.ui;
 
 import com.ahli.galaxy.ui.abstracts.UIElement;
+import com.ahli.util.StringInterner;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -128,7 +129,7 @@ public class UIFrame extends UIElement {
 	 * 		the type to set
 	 */
 	public void setType(final String type) {
-		this.type = type.intern();
+		this.type = StringInterner.intern(type);
 	}
 	
 	@Override
@@ -231,7 +232,7 @@ public class UIFrame extends UIElement {
 			if (this.relative == DFLT_RELATIVE) {
 				this.relative = new String[] { THIS, THIS, THIS, THIS };
 			}
-			this.relative[0] = relative.intern();
+			this.relative[0] = StringInterner.intern(relative);
 			this.relative[1] = this.relative[0];
 			this.relative[2] = this.relative[0];
 			this.relative[3] = this.relative[0];
@@ -242,9 +243,9 @@ public class UIFrame extends UIElement {
 			if (this.offset == DFLT_OFFSET) {
 				this.offset = new String[] { ZERO, ZERO, ZERO, ZERO };
 			}
-			this.offset[0] = offset.intern();
+			this.offset[0] = StringInterner.intern(offset);
 			this.offset[1] = this.offset[0];
-			this.offset[2] = Integer.toString((Integer.parseInt(offset) * (-1))).intern();
+			this.offset[2] = StringInterner.intern(Integer.toString((Integer.parseInt(offset) * (-1))));
 			this.offset[3] = this.offset[2];
 		}
 	}
@@ -272,7 +273,7 @@ public class UIFrame extends UIElement {
 			}
 			this.relative = new String[] { THIS, THIS, THIS, THIS };
 		}
-		this.relative[side.ordinal()] = THIS.equalsIgnoreCase(relative) ? THIS : relative.intern();
+		this.relative[side.ordinal()] = THIS.equalsIgnoreCase(relative) ? THIS : StringInterner.intern(relative);
 		if (THIS.equalsIgnoreCase(this.relative[0]) && THIS.equalsIgnoreCase(this.relative[1]) &&
 				THIS.equalsIgnoreCase(this.relative[2]) && THIS.equalsIgnoreCase(this.relative[3])) {
 			this.relative = DFLT_RELATIVE;
@@ -290,7 +291,8 @@ public class UIFrame extends UIElement {
 			}
 			this.pos = new String[] { MIN, MIN, MAX, MAX };
 		}
-		this.pos[side.ordinal()] = MAX.equalsIgnoreCase(pos) ? MAX : MIN.equalsIgnoreCase(pos) ? MIN : pos.intern();
+		this.pos[side.ordinal()] =
+				MAX.equalsIgnoreCase(pos) ? MAX : MIN.equalsIgnoreCase(pos) ? MIN : StringInterner.intern(pos);
 		if (MIN.equals(this.pos[0]) && MIN.equals(this.pos[1]) && MAX.equals(this.pos[2]) && MAX.equals(this.pos[3])) {
 			this.pos = DFLT_POS;
 		}
@@ -307,7 +309,7 @@ public class UIFrame extends UIElement {
 			}
 			this.offset = new String[] { ZERO, ZERO, ZERO, ZERO };
 		}
-		this.offset[side.ordinal()] = ZERO.equals(offset) ? ZERO : offset.intern();
+		this.offset[side.ordinal()] = ZERO.equals(offset) ? ZERO : StringInterner.intern(offset);
 		if (ZERO.equals(this.offset[0]) && ZERO.equals(this.offset[1]) && ZERO.equals(this.offset[2]) &&
 				ZERO.equals(this.offset[3])) {
 			this.offset = DFLT_OFFSET;

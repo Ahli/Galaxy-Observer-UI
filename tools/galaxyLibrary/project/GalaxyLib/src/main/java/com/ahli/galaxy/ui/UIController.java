@@ -4,6 +4,7 @@
 package com.ahli.galaxy.ui;
 
 import com.ahli.galaxy.ui.abstracts.UIElement;
+import com.ahli.util.StringInterner;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -107,11 +108,11 @@ public class UIController extends UIElement {
 		}
 		if (i >= len) {
 			// not found
-			attributesKeyValueList.add(key.intern());
-			attributesKeyValueList.add(value.intern());
+			attributesKeyValueList.add(StringInterner.intern(key));
+			attributesKeyValueList.add(StringInterner.intern(value));
 			return null;
 		} else {
-			return attributesKeyValueList.set(i, value.intern());
+			return attributesKeyValueList.set(i, StringInterner.intern(value));
 		}
 	}
 	

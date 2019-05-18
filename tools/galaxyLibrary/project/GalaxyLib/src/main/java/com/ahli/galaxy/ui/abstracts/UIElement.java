@@ -4,6 +4,7 @@
 package com.ahli.galaxy.ui.abstracts;
 
 import com.ahli.util.DeepCopyable;
+import com.ahli.util.StringInterner;
 
 import java.util.List;
 
@@ -21,7 +22,7 @@ public abstract class UIElement implements DeepCopyable {
 	 * 		element's name
 	 */
 	public UIElement(final String name) {
-		this.name = name != null ? name.intern() : null;
+		this.name = name != null ? StringInterner.intern(name) : null;
 	}
 	
 	/**
@@ -56,7 +57,7 @@ public abstract class UIElement implements DeepCopyable {
 	 * 		the name to set
 	 */
 	public void setName(final String name) {
-		this.name = name != null ? name.intern() : null;
+		this.name = name != null ? StringInterner.intern(name) : null;
 	}
 	
 	/**

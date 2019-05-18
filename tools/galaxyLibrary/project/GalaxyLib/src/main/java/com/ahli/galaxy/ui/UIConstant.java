@@ -4,6 +4,7 @@
 package com.ahli.galaxy.ui;
 
 import com.ahli.galaxy.ui.abstracts.UIElement;
+import com.ahli.util.StringInterner;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -29,7 +30,7 @@ public class UIConstant extends UIElement {
 	
 	public UIConstant(final String name, final String value) {
 		super(name);
-		this.value = value.intern();
+		this.value = StringInterner.intern(value);
 	}
 	
 	/**
@@ -54,7 +55,7 @@ public class UIConstant extends UIElement {
 	 * 		the value to set
 	 */
 	public void setValue(final String value) {
-		this.value = value.intern();
+		this.value = StringInterner.intern(value);
 	}
 	
 	/**
