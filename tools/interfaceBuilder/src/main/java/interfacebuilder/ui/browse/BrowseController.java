@@ -4,7 +4,7 @@
 package interfacebuilder.ui.browse;
 
 import com.ahli.galaxy.ModData;
-import com.ahli.galaxy.archive.ComponentsListReader;
+import com.ahli.galaxy.archive.ComponentsListReaderDom;
 import com.ahli.galaxy.archive.DescIndexData;
 import com.ahli.galaxy.game.GameData;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
@@ -298,7 +298,7 @@ public class BrowseController implements Updateable {
 				
 				try {
 					descIndexData.setDescIndexPathAndClear(
-							ComponentsListReader.getDescIndexPath(componentListFile, mod.getGameData().getGameDef()));
+							ComponentsListReaderDom.getDescIndexPath(componentListFile, mod.getGameData().getGameDef()));
 				} catch (final ParserConfigurationException | SAXException | IOException e) {
 					logger.error("ERROR: unable to read DescIndex path.", e);
 					continue;

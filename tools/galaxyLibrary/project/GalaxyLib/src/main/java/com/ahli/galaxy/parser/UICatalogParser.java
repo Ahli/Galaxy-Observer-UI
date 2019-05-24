@@ -150,19 +150,15 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		}
 		
 		// close action of states to enable overriding of whens/actions on next edit
-		int i;
-		{
-			int stateLevel;
-			for (i = statesToClose.size() - 1; i >= 0; i--) {
-				stateLevel = statesToCloseLevel.get(i);
-				if (stateLevel >= level) {
-					final UIState state = statesToClose.get(i);
-					state.setNextAdditionShouldOverrideActions(true);
-					state.setNextAdditionShouldOverrideWhens(true);
-					statesToClose.remove(i);
-					statesToCloseLevel.remove(i);
-					i--;
-				}
+		int i = statesToClose.size() - 1;
+		for (; i >= 0; i--) {
+			if (statesToCloseLevel.get(i) >= level) {
+				final UIState state = statesToClose.get(i);
+				state.setNextAdditionShouldOverrideActions(true);
+				state.setNextAdditionShouldOverrideWhens(true);
+				statesToClose.remove(i);
+				statesToCloseLevel.remove(i);
+				i--;
 			}
 		}
 		
@@ -226,16 +222,17 @@ public class UICatalogParser implements ParsedXmlConsumer {
 						catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout, consoleSkinId) : null;
 				if (type == null) {
 					logger.error("Unknown type defined in child element of: " + curElement);
-					type = "Frame";
+					type = FRAME;
 				}
-				if (!checkFrameTypeCompatibility(type, ((UIFrame) newElem).getType())) {
+				final var newElemUiFrame = ((UIFrame) newElem);
+				if (!checkFrameTypeCompatibility(type, newElemUiFrame.getType())) {
 					logger.warn("WARN: The type of the frame is not compatible with the used template.");
 				}
-				((UIFrame) newElem).setType(type);
+				newElemUiFrame.setType(type);
 				// add to parent
 				if (curElement != null) {
 					if (curElement instanceof UIFrame) {
-						((UIFrame) curElement).getChildren().add(newElem);
+						curElement.getChildren().add(newElem);
 					} else {
 						logger.error("Frame appearing in unexpected parent element: " + curElement);
 					}
@@ -271,9 +268,9 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				if (curElement != null) {
 					if (curElement instanceof UIAnimation) {
 						((UIAnimation) curElement).getControllers().add((UIController) newElem);
-						
+						final var newElemUiController = ((UIController) newElem);
 						for (int j = 0, len = attrValues.size(); j < len; j++) {
-							((UIController) newElem).addValue(attrTypes.get(j), attrValues.get(j));
+							newElemUiController.addValue(attrTypes.get(j), attrValues.get(j));
 						}
 						
 						if (name == null) {
@@ -290,7 +287,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				// add to parent
 				if (curElement != null) {
 					if (curElement instanceof UIFrame) {
-						((UIFrame) curElement).getChildren().add(newElem);
+						curElement.getChildren().add(newElem);
 					} else {
 						logger.error("Animation appearing in unexpected parent element: " + curElement);
 					}
@@ -318,7 +315,8 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					logger.error("Constant '" + name + "' has no value defined");
 					return;
 				}
-				((UIConstant) newElem).setValue(val);
+				final var newElemUiConstant = ((UIConstant) newElem);
+				newElemUiConstant.setValue(val);
 				if (paramDeduplicate) {
 					final UIElement refToDuplicate = addedFinalElements.get(newElem);
 					if (refToDuplicate != null) {
@@ -329,7 +327,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 						addedFinalElements.put(newElem, newElem);
 					}
 				}
-				catalog.addConstant((UIConstant) newElem, curIsDevLayout);
+				catalog.addConstant(newElemUiConstant, curIsDevLayout);
 				return;
 			case DESC:
 				// nothing to do
@@ -344,14 +342,14 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					final boolean isDevLayout = curIsDevLayout || attrTypes.contains(REQUIREDTOLOAD);
 					catalog.processInclude(path, isDevLayout, raceId, consoleSkinId);
 				}
-				
 				break;
 			default:
 				// attribute or something unknown that will cause an error
 				newElem = new UIAttribute(tagName);
 				i = 0;
+				final var newElemUiAttr = (UIAttribute) newElem;
 				for (final int len = attrTypes.size(); i < len; i++) {
-					((UIAttribute) newElem).addValue(attrTypes.get(i),
+					newElemUiAttr.addValue(attrTypes.get(i),
 							catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout, consoleSkinId));
 				}
 				if (paramDeduplicate) {

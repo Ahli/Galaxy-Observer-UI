@@ -3,7 +3,7 @@
 
 package com.ahli.hotkey_ui.application;
 
-import com.ahli.galaxy.archive.ComponentsListReader;
+import com.ahli.galaxy.archive.ComponentsListReaderDom;
 import com.ahli.galaxy.archive.DescIndexData;
 import com.ahli.galaxy.game.def.HeroesGameDef;
 import com.ahli.galaxy.game.def.SC2GameDef;
@@ -490,7 +490,7 @@ public class SettingsEditorApplication extends Application {
 				final GameDef game = isNamespaceHeroes ? new HeroesGameDef() : new SC2GameDef();
 				
 				// load desc index from mpq
-				descIndex.setDescIndexPathAndClear(ComponentsListReader.getDescIndexPath(componentListFile, game));
+				descIndex.setDescIndexPathAndClear(ComponentsListReaderDom.getDescIndexPath(componentListFile, game));
 				
 				final File descIndexFile = mpqi.getFilePathFromMpq(descIndex.getDescIndexIntPath()).toFile();
 				descIndex.addLayoutIntPath(DescIndexReader.getLayoutPathList(descIndexFile, true));

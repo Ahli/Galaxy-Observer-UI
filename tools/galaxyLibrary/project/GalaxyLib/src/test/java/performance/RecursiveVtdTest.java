@@ -88,9 +88,8 @@ public class RecursiveVtdTest {
 		// final ByteBuffer buffer2 = ByteBuffer.allocate((int) channel.size());
 		// channel.read(buffer2);
 		
-		final byte[] bytes = Files.readAllBytes(p);
 		// setdoc causes a nullpointer error due to an internal bug
-		vtd.setDoc_BR(bytes);
+		vtd.setDoc_BR(Files.readAllBytes(p));
 		vtd.parse(false);
 		// vtd.setDoc_BR(bytes);
 		// channel.close();

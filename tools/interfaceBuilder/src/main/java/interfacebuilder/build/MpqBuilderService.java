@@ -4,7 +4,7 @@
 package interfacebuilder.build;
 
 import com.ahli.galaxy.ModData;
-import com.ahli.galaxy.archive.ComponentsListReader;
+import com.ahli.galaxy.archive.ComponentsListReaderDom;
 import com.ahli.galaxy.archive.DescIndexData;
 import com.ahli.galaxy.game.GameData;
 import com.ahli.galaxy.game.def.abstracts.GameDef;
@@ -328,7 +328,7 @@ public class MpqBuilderService {
 		mod.setDescIndexData(descIndexData);
 		
 		try {
-			descIndexData.setDescIndexPathAndClear(ComponentsListReader.getDescIndexPath(componentListFile, gameDef));
+			descIndexData.setDescIndexPathAndClear(ComponentsListReaderDom.getDescIndexPath(componentListFile, gameDef));
 		} catch (final ParserConfigurationException | SAXException | IOException e) {
 			final String msg = "ERROR: unable to read DescIndex path.";
 			logger.error(msg, e);

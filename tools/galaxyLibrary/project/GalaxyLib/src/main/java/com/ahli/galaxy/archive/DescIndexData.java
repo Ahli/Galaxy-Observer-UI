@@ -197,10 +197,10 @@ public class DescIndexData {
 		List<String> curConstants;
 		for (final Pair<Path, String> pair : fileIntPathList) {
 			final File f = pair.getKey().toFile();
-			curConstants = LayoutReader.getLayoutsConstantDefinitions(f);
+			curConstants = LayoutReaderDom.getLayoutsConstantDefinitions(f);
 			
 			// add calculated list of dependencies from layout file
-			layoutDeps = LayoutReader.getDependencyLayouts(f, curConstants);
+			layoutDeps = LayoutReaderDom.getDependencyLayouts(f, curConstants);
 			if (logger.isTraceEnabled()) {
 				logger.trace("Dependencies found: " + layoutDeps);
 			}

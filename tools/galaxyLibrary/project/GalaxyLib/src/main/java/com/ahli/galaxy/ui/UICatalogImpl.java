@@ -80,8 +80,8 @@ public class UICatalogImpl implements UICatalog {
 	public Object deepCopy() {
 		// clone with additional space for templates and constants
 		final UICatalogImpl clone =
-				new UICatalogImpl(templates.size() * 3 / 2 + 1, blizzOnlyTemplates.size(), constants.size() * 3 / 2 + 1,
-						blizzOnlyConstants.size(), blizzOnlyLayouts.size());
+				new UICatalogImpl(templates.size() /** 3 / 2 + 1*/, blizzOnlyTemplates.size(), constants.size()
+						/** 3 / 2 + 1*/, blizzOnlyConstants.size(), blizzOnlyLayouts.size());
 		// testing shows that iterators are not faster and are not thread safe
 		int i;
 		int len;

@@ -119,6 +119,14 @@ public class LayoutExtensionReader {
 		}
 		
 		final DocumentBuilderFactory dbFac = DocumentBuilderFactory.newInstance();
+		dbFac.setNamespaceAware(false);
+		dbFac.setValidating(false);
+		dbFac.setAttribute("http://xml.org/sax/features/external-general-entities", false);
+		dbFac.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+		dbFac.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+		dbFac.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+		dbFac.setXIncludeAware(false);
+		dbFac.setExpandEntityReferences(false);
 		dbFac.setAttribute(XMLConstants.FEATURE_SECURE_PROCESSING, true);
 		final DocumentBuilder dBuilder = dbFac.newDocumentBuilder();
 		
@@ -365,6 +373,14 @@ public class LayoutExtensionReader {
 			logger.info("Scanning for XML file...");
 		}
 		final DocumentBuilderFactory dbFac = DocumentBuilderFactory.newInstance();
+		dbFac.setNamespaceAware(false);
+		dbFac.setValidating(false);
+		dbFac.setAttribute("http://xml.org/sax/features/external-general-entities", false);
+		dbFac.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+		dbFac.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+		dbFac.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+		dbFac.setXIncludeAware(false);
+		dbFac.setExpandEntityReferences(false);
 		dbFac.setAttribute(XMLConstants.FEATURE_SECURE_PROCESSING, true);
 		final DocumentBuilder dBuilder = dbFac.newDocumentBuilder();
 		// provide error handler that does not print incompatible files into console

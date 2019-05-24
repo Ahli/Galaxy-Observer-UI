@@ -292,7 +292,7 @@ public class UIFrame extends UIElement {
 			this.pos = new String[] { MIN, MIN, MAX, MAX };
 		}
 		this.pos[side.ordinal()] =
-				MAX.equalsIgnoreCase(pos) ? MAX : MIN.equalsIgnoreCase(pos) ? MIN : StringInterner.intern(pos);
+				MAX.equalsIgnoreCase(pos) ? MAX : (MIN.equalsIgnoreCase(pos) ? MIN : StringInterner.intern(pos));
 		if (MIN.equals(this.pos[0]) && MIN.equals(this.pos[1]) && MAX.equals(this.pos[2]) && MAX.equals(this.pos[3])) {
 			this.pos = DFLT_POS;
 		}
