@@ -28,6 +28,15 @@ import java.util.stream.Stream;
  * This miner searches for a better compression via randomized rules.
  */
 public class RandomCompressionMiner {
+	private static final String OGG = ".ogg";
+	private static final String OGV = ".ogv";
+	private static final String WAV = ".wav";
+	private static final String TXT = ".txt";
+	private static final String SWF = ".swf";
+	private static final String TTF = ".ttf";
+	private static final String OTF = ".otf";
+	private static final String M_3 = ".m3";
+	private static final String WILDCARD = "*";
 	private static final Logger logger = LogManager.getLogger(RandomCompressionMiner.class);
 	private final ModData mod;
 	private final MpqEditorInterface mpqInterface;
@@ -267,7 +276,7 @@ public class RandomCompressionMiner {
 	 * @return true if file exists within the cache and is not a directory
 	 */
 	private static boolean isValidFileSpecificMask(final String mask, final File cacheDir) {
-		if (mask.contains("*")) {
+		if (mask.contains(WILDCARD)) {
 			return false;
 		}
 		final File referencedFile = new File(cacheDir.getAbsolutePath() + File.separator + mask);
@@ -277,8 +286,8 @@ public class RandomCompressionMiner {
 	private static MpqEditorCompressionRule getDefaultRule(final Path path, final File sourceDir) {
 		final var rule = new MpqEditorCompressionRuleMask(getFileMask(path, sourceDir));
 		rule.setSingleUnit(true).setCompress(true);
-		if (path.endsWith(".ogg") || path.endsWith(".ogv") || path.endsWith(".wav") || path.endsWith(".txt") ||
-				path.endsWith(".swf") || path.endsWith(".ttf") || path.endsWith(".otf") || path.endsWith(".m3")) {
+		if (path.endsWith(OGG) || path.endsWith(OGV) || path.endsWith(WAV) || path.endsWith(TXT) ||
+				path.endsWith(SWF) || path.endsWith(TTF) || path.endsWith(OTF) || path.endsWith(M_3)) {
 			rule.setCompressionMethod(MpqEditorCompressionRuleMethod.ZLIB);
 		} else {
 			rule.setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2);

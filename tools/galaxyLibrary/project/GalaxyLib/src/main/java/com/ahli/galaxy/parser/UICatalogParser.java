@@ -315,12 +315,12 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					logger.error("Constant '" + name + "' has no value defined");
 					return;
 				}
-				final var newElemUiConstant = ((UIConstant) newElem);
+				var newElemUiConstant = ((UIConstant) newElem);
 				newElemUiConstant.setValue(val);
 				if (paramDeduplicate) {
 					final UIElement refToDuplicate = addedFinalElements.get(newElem);
 					if (refToDuplicate != null) {
-						newElem = refToDuplicate;
+						newElemUiConstant = (UIConstant) refToDuplicate;
 						deduplicatedElements.add(refToDuplicate);
 						constantDeduplications++;
 					} else {

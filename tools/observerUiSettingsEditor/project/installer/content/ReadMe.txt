@@ -8,7 +8,7 @@ Legal Information
 -----------------
 Use at your own risk. This software is free to use.
 Do not duplicate, copy, steal, sell, eat, etc.
-Copyright 2018 <Christoph Ahlers>
+Copyright 2019 <Christoph Ahlers>
 
 
 What does it do?

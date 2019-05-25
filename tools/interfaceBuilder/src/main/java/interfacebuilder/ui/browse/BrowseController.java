@@ -297,8 +297,8 @@ public class BrowseController implements Updateable {
 				mod.setComponentListFile(componentListFile);
 				
 				try {
-					descIndexData.setDescIndexPathAndClear(
-							ComponentsListReaderDom.getDescIndexPath(componentListFile, mod.getGameData().getGameDef()));
+					descIndexData.setDescIndexPathAndClear(ComponentsListReaderDom
+							.getDescIndexPath(componentListFile, mod.getGameData().getGameDef()));
 				} catch (final ParserConfigurationException | SAXException | IOException e) {
 					logger.error("ERROR: unable to read DescIndex path.", e);
 					continue;

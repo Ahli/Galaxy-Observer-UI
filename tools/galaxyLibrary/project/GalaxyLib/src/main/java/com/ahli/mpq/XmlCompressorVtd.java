@@ -30,6 +30,7 @@ import java.util.Locale;
 
 /**
  * TODO improve, it is ba
+ *
  * @author Ahli
  */
 public final class XmlCompressorVtd {

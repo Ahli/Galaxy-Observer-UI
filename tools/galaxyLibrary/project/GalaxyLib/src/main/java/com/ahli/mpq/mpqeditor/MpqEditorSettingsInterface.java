@@ -34,6 +34,16 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 	private static final String APPDATA = "APPDATA";
 	private static final String NO_COMPRESSION_CUSTOM_RULE = "0x01000000, 0x00000002, 0xFFFFFFFF";
 	private static final String DEFAULT = "Default";
+	private static final String MPQ_VERSION = "MpqVersion";
+	private static final String ATTR_FLAGS = "AttrFlags";
+	private static final String SECTOR_SIZE = "SectorSize";
+	private static final String RAW_CHUNK_SIZE = "RawChunkSize";
+	private static final String CUSTOM_RULES = "CustomRules";
+	private static final String SPACESPACEEQUALSSPACE = "  = ";
+	private static final String EMPTY_STRING = "";
+	private static final String GAME_ID = "GameId";
+	private static final String OPTIONS = "Options";
+	private static final String UTF_8 = "UTF-8";
 	private final File iniFile;
 	private final File rulesetFile;
 	private File iniFileBackUp;
@@ -192,14 +202,14 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 		}
 		int gameId = 6;
 		try {
-			final INIBuilderParameters params = new Parameters().ini().setFile(iniFile).setEncoding("UTF-8");
+			final INIBuilderParameters params = new Parameters().ini().setFile(iniFile).setEncoding(UTF_8);
 			final FileBasedConfigurationBuilder<INIConfiguration> b =
 					new FileBasedConfigurationBuilder<>(INIConfiguration.class).configure(params);
 			final INIConfiguration ini = b.getConfiguration();
 			
-			final SubnodeConfiguration options = ini.getSection("Options");
+			final SubnodeConfiguration options = ini.getSection(OPTIONS);
 			gameId = getGameIdPropertyValue(compression);
-			options.setProperty("GameId", gameId);
+			options.setProperty(GAME_ID, gameId);
 			b.save();
 		} catch (final ConfigurationException e) {
 			logger.error("Error while applying custom ruleset usage entry.", e);
@@ -246,11 +256,13 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 		if (ini == null) {
 			ini = new INIConfiguration();
 		}
-		final SubnodeConfiguration section = ini.getSection("CustomRules");
-		section.setProperty("MpqVersion", 1);
-		section.setProperty("AttrFlags", 5);
-		section.setProperty("SectorSize", 16384);
-		section.setProperty("RawChunkSize", 0);
+		final SubnodeConfiguration section = ini.getSection(CUSTOM_RULES);
+		section.setProperty(MPQ_VERSION, 3); // possible: 0,1,2,3 (higher has bigger header); sc2 maps use 3
+		// 1 adds longer archives, 2 adds replacement that is supposed to be more effective, 3 adds more like md5
+		section.setProperty(ATTR_FLAGS, 0); // default 5 "(attributes)" file becomes shorter, 0 = no file
+		// (Attributes) file is not required for at least Obs UI
+		section.setProperty(SECTOR_SIZE, 16384); // default 16384, 1024-4096 made AhliObs bigger, SC2 maps use 16384
+		section.setProperty(RAW_CHUNK_SIZE, 0); // default 0
 		
 		switch (compression) {
 			case CUSTOM:
@@ -288,7 +300,8 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 		if (compression == MpqEditorCompression.CUSTOM) {
 			final List<String> editedLines;
 			try (final Stream<String> lineStream = Files.lines(rulesetFilePath)) {
-				editedLines = lineStream.map(line -> line.replace("  = ", "")).collect(Collectors.toList());
+				editedLines = lineStream.map(line -> line.replace(SPACESPACEEQUALSSPACE, EMPTY_STRING))
+						.collect(Collectors.toList());
 			}
 			try (final BufferedWriter bw = Files.newBufferedWriter(rulesetFilePath)) {
 				final String separator = System.lineSeparator();

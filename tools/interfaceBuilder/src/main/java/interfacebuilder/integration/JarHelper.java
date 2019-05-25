@@ -9,7 +9,6 @@ import org.springframework.boot.system.ApplicationHome;
 
 import java.io.File;
 import java.net.URI;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -47,8 +46,7 @@ public final class JarHelper {
 		logger.trace("Attempt#1 java.class.path: {}", () -> dir.toString());
 		
 		// check if started in eclipse
-		final String targetClasses = File.separator + "target" + File.separator + "classes";
-		final int i = str.indexOf(targetClasses);
+		final int i = str.indexOf(File.separator + "target" + File.separator + "classes");
 		if (i > 0) {
 			final String check = str.substring(0, i);
 			logger.trace("target/classes location: {}", () -> check);
@@ -89,16 +87,16 @@ public final class JarHelper {
 				str = str.substring(0, str.length() - 3);
 			}
 			
-			final URL url = aclass.getProtectionDomain().getCodeSource().getLocation();
+			//			final URL url = aclass.getProtectionDomain().getCodeSource().getLocation();
 			// class returns "rsrc:./", if 2nd option during jar export was
 			// chosen
-			if (!url.toString().startsWith("rsrc:./")) {
+/*			if (!url.toString().startsWith("rsrc:./")) {
 				// wild guess that we are in test environment
 				str += "/testEnv/dev/";
 				if (logger.isTraceEnabled()) {
 					logger.trace("assuming Test Environment: " + str);
 				}
-			}
+			}*/
 			
 		} else {
 			if (str.contains(".jar;")) {
