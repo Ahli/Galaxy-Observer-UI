@@ -6,6 +6,7 @@ package interfacebuilder.config;
 import interfacebuilder.ui.browse.BrowseController;
 import interfacebuilder.ui.browse.BrowseTabController;
 import interfacebuilder.ui.home.AddProjectController;
+import interfacebuilder.ui.home.AddProjectDialogController;
 import interfacebuilder.ui.home.HomeController;
 import interfacebuilder.ui.home.ViewRuleSetController;
 import interfacebuilder.ui.navigation.NavigationController;
@@ -78,6 +79,12 @@ public class FxmlConfiguration {
 	@Scope (ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 	public AddProjectController addProjectController() {
 		return new AddProjectController();
+	}
+	
+	@Bean
+	@Scope (ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+	public AddProjectDialogController addProjectDialogController() {
+		return new AddProjectDialogController();
 	}
 	
 	@Bean

@@ -5,12 +5,10 @@ package interfacebuilder.ui.navigation;
 
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
-import interfacebuilder.InterfaceBuilderApp;
 import interfacebuilder.ui.FXMLSpringLoader;
 import interfacebuilder.ui.settings.Updateable;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -127,9 +125,8 @@ public class NavigationController {
 	 */
 	private void initFXML(final String path, final int index) {
 		try {
-			final FXMLLoader loader = new FXMLSpringLoader(appContext);
-			contentPages[index] =
-					loader.load(InterfaceBuilderApp.getInstance().getAppContext().getResource(path).getInputStream());
+			final FXMLSpringLoader loader = new FXMLSpringLoader(appContext);
+			contentPages[index] = loader.load(path);
 			final Object controller = loader.getController();
 			controllers[index] = (controller instanceof Updateable) ? (Updateable) controller : null;
 		} catch (final IOException e) {

@@ -18,7 +18,7 @@ import java.util.Locale;
  * now.
  */
 public class FXMLSpringLoader extends FXMLLoader implements ApplicationContextAware {
-	private boolean contextSet;
+	private ApplicationContext context;
 	
 	public FXMLSpringLoader(final ApplicationContext applicationContext) {
 		setApplicationContext(applicationContext);
@@ -26,15 +26,28 @@ public class FXMLSpringLoader extends FXMLLoader implements ApplicationContextAw
 	
 	@Override
 	public void setApplicationContext(final ApplicationContext applicationContext) {
+		context = applicationContext;
 		setControllerFactory(applicationContext::getBean);
 		setResources(
 				new MessageSourceResourceBundle(applicationContext.getBean(MessageSource.class), Locale.getDefault()));
-		contextSet = true;
+	}
+	
+	public <T> T load(final String resourceLocation) throws IOException {
+		if (context != null) {
+			final var res = context.getResource(resourceLocation);
+			super.setLocation(res.getURL());
+			try (final InputStream is = res.getInputStream()) {
+				return load(is);
+			}
+		} else {
+			throw new IllegalStateException(
+					"Spring context was not set. Use 'new FXMLLoader', if no Spring Bean is desired.");
+		}
 	}
 	
 	@Override
 	public <T> T load(final InputStream inputStream) throws IOException {
-		if (contextSet) {
+		if (context != null) {
 			return super.load(inputStream);
 		} else {
 			throw new IllegalStateException(

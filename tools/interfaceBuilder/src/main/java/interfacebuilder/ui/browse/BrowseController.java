@@ -24,7 +24,6 @@ import interfacebuilder.ui.settings.Updateable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ContextMenu;
@@ -228,9 +227,8 @@ public class BrowseController implements Updateable {
 	private Updateable createTab(final String name) {
 		Updateable controller = null;
 		try {
-			final FXMLLoader loader = new FXMLSpringLoader(appContext);
-			final Node content = loader.load(
-					appContext.getResource("classpath:view/Content_UiBrowser_BrowseTab.fxml").getInputStream());
+			final FXMLSpringLoader loader = new FXMLSpringLoader(appContext);
+			final Node content = loader.load("classpath:view/Content_UiBrowser_BrowseTab.fxml");
 			controller = loader.getController();
 			controllers.add(controller);
 			final Tab newTab = new Tab(name, content);

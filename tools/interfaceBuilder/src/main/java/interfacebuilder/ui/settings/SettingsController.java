@@ -3,12 +3,10 @@
 
 package interfacebuilder.ui.settings;
 
-import interfacebuilder.InterfaceBuilderApp;
 import interfacebuilder.ui.FXMLSpringLoader;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.ScrollPane;
@@ -72,7 +70,7 @@ public class SettingsController implements Updateable {
 	 */
 	private void loadSettingsContent(final TreeItem<String> category) {
 		final Parent content;
-		final FXMLLoader loader = new FXMLSpringLoader(appContext);
+		final FXMLSpringLoader loader = new FXMLSpringLoader(appContext);
 		final Object controller;
 		switch (getCategoryIndex(category)) {
 			case 0:
@@ -117,9 +115,9 @@ public class SettingsController implements Updateable {
 	 * @param path
 	 * @return
 	 */
-	private static Parent initFXML(final FXMLLoader loader, final String path) {
+	private static Parent initFXML(final FXMLSpringLoader loader, final String path) {
 		try {
-			return loader.load(InterfaceBuilderApp.getInstance().getAppContext().getResource(path).getInputStream());
+			return loader.load(path);
 		} catch (final IOException e) {
 			logger.error("failed to load FXML: " + path + ".", e);
 		}

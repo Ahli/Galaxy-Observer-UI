@@ -29,7 +29,6 @@ import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.application.Preloader;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -53,7 +52,6 @@ import org.springframework.context.annotation.Import;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
@@ -494,9 +492,9 @@ public class InterfaceBuilderApp extends Application {
 		
 		// Build Navigation
 		final BorderPane root;
-		final FXMLLoader loader = new FXMLSpringLoader(appContext);
-		try (final InputStream is = appContext.getResource("classpath:view/Navigation.fxml").getInputStream()) {
-			root = loader.load(is);
+		final FXMLSpringLoader loader = new FXMLSpringLoader(appContext);
+		try {
+			root = loader.load("classpath:view/Navigation.fxml");
 			navigationController = loader.getController();
 		} catch (final IOException e) {
 			logger.error("Failed to load Navigation.fxml:", e);

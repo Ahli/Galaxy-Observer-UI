@@ -29,8 +29,6 @@ public class AddProjectController {
 	private static final Logger logger = LogManager.getLogger(AddProjectController.class);
 	
 	@FXML
-	private Dialog<Project> dialog;
-	@FXML
 	private ChoiceBox<Game> gameDropdown;
 	@FXML
 	private TextField projectPathLabel;
@@ -40,42 +38,8 @@ public class AddProjectController {
 	private ProjectService projectService;
 	@Autowired
 	private FileService fileService;
+	private Dialog<Project> dialog;
 	private Project project;
-	
-	/**
-	 * Automatically called by FxmlLoader
-	 */
-	public void initialize() {
-		dialog.setTitle("Add Observer Interface Project...");
-		final DialogPane dialogPane = dialog.getDialogPane();
-		dialogPane.getButtonTypes().addAll(ButtonType.APPLY, ButtonType.CANCEL);
-		final Button okBttn = (Button) dialogPane.lookupButton(ButtonType.APPLY);
-		okBttn.addEventFilter(ActionEvent.ACTION, this::addProjectAction);
-		dialog.setResultConverter(param -> project);
-		
-		gameDropdown.setItems(FXCollections.observableArrayList(Game.SC2, Game.HEROES));
-		gameDropdown.getSelectionModel().select(0);
-	}
-	
-	public void addProjectAction(final Event event) {
-		logger.trace("add project dialog creates project instance");
-		final String name = projectNameLabel.getText();
-		final String path = projectPathLabel.getText();
-		final Game game = gameDropdown.getValue();
-		if (game == null) {
-			// eat event before it reaches the resultConverter
-			event.consume();
-			return;
-		}
-		if (project == null) {
-			project = new Project(name, path, game);
-		} else {
-			project.setGame(game);
-			project.setName(name);
-			project.setProjectPath(path);
-		}
-		project = projectService.saveProject(project);
-	}
 	
 	public void browsePathAction() {
 		final DirectoryChooser directoryChooser = new DirectoryChooser();
@@ -94,6 +58,11 @@ public class AddProjectController {
 		return projectPathLabel.getScene().getWindow();
 	}
 	
+	/**
+	 * Set a project to be edited.
+	 *
+	 * @param project
+	 */
 	public void setProjectToEdit(final Project project) {
 		this.project = project;
 		dialog.setTitle("Edit Observer Interface Project...");
@@ -102,4 +71,52 @@ public class AddProjectController {
 		gameDropdown.getSelectionModel().select(project.getGame());
 	}
 	
+	/**
+	 * Initialize this Controller and sets its dialog.
+	 *
+	 * @param dialog
+	 */
+	public void initialize(final Dialog<Project> dialog) {
+		this.dialog = dialog;
+		initialize();
+	}
+	
+	/**
+	 * Automatically called by FxmlLoader
+	 */
+	private void initialize() {
+		if (dialog != null) {
+			dialog.setTitle("Add Observer Interface Project...");
+			final DialogPane dialogPane = dialog.getDialogPane();
+			dialogPane.getButtonTypes().addAll(ButtonType.APPLY, ButtonType.CANCEL);
+			final Button okBttn = (Button) dialogPane.lookupButton(ButtonType.APPLY);
+			okBttn.addEventFilter(ActionEvent.ACTION, this::addProjectAction);
+			dialog.setResultConverter(param -> project);
+			
+			gameDropdown.setItems(FXCollections.observableArrayList(Game.SC2, Game.HEROES));
+			gameDropdown.getSelectionModel().select(0);
+		}
+	}
+	
+	public void addProjectAction(final Event event) {
+		if (logger.isTraceEnabled()) {
+			logger.trace("add project action event fired");
+		}
+		final String name = projectNameLabel.getText();
+		final String path = projectPathLabel.getText();
+		final Game game = gameDropdown.getValue();
+		if (game == null) {
+			// eat event before it reaches the resultConverter
+			event.consume();
+			return;
+		}
+		if (project == null) {
+			project = new Project(name, path, game);
+		} else {
+			project.setGame(game);
+			project.setName(name);
+			project.setProjectPath(path);
+		}
+		project = projectService.saveProject(project);
+	}
 }

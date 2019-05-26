@@ -18,7 +18,6 @@ import javafx.beans.InvalidationListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -196,9 +195,8 @@ public class HomeController implements Updateable {
 	 * @throws IOException
 	 */
 	public void addProjectAction() throws IOException {
-		final FXMLLoader loader = new FXMLSpringLoader(appContext);
-		final Dialog<Project> dialog =
-				loader.load(appContext.getResource("classpath:view/Home_AddProject.fxml").getInputStream());
+		final FXMLSpringLoader loader = new FXMLSpringLoader(appContext);
+		final Dialog<Project> dialog = loader.load("classpath:view/Home_AddProjectDialog.fxml");
 		dialog.initOwner(addProject.getScene().getWindow());
 		final Optional<Project> result = dialog.showAndWait();
 		if (result.isPresent()) {
@@ -216,11 +214,10 @@ public class HomeController implements Updateable {
 		final List<Project> projects = selectionList.getSelectionModel().getSelectedItems();
 		if (projects.size() == 1) {
 			final Project project = projects.get(0);
-			final FXMLLoader loader = new FXMLSpringLoader(appContext);
-			final Dialog<Project> dialog =
-					loader.load(appContext.getResource("classpath:view/Home_AddProject.fxml").getInputStream());
+			final FXMLSpringLoader loader = new FXMLSpringLoader(appContext);
+			final Dialog<Project> dialog = loader.load("classpath:view/Home_AddProjectDialog.fxml");
 			dialog.initOwner(addProject.getScene().getWindow());
-			((AddProjectController) loader.getController()).setProjectToEdit(project);
+			((AddProjectDialogController) loader.getController()).getContentController().setProjectToEdit(project);
 			final Optional<Project> result = dialog.showAndWait();
 			if (result.isPresent()) {
 				logger.trace("dialog 'edit project' result: {}", () -> result.get());
@@ -293,9 +290,8 @@ public class HomeController implements Updateable {
 		final List<Project> selectedItems = selectionList.getSelectionModel().getSelectedItems();
 		if (selectedItems.size() == 1) {
 			final Project project = selectedItems.get(0);
-			final FXMLLoader loader = new FXMLSpringLoader(appContext);
-			final Dialog<Project> dialog =
-					loader.load(appContext.getResource("classpath:view/Home_ViewRuleSet.fxml").getInputStream());
+			final FXMLSpringLoader loader = new FXMLSpringLoader(appContext);
+			final Dialog<Project> dialog = loader.load("classpath:view/Home_ViewRuleSet.fxml");
 			((ViewRuleSetController) loader.getController()).setProject(project);
 			dialog.initOwner(addProject.getScene().getWindow());
 			dialog.showAndWait();
@@ -310,9 +306,8 @@ public class HomeController implements Updateable {
 		if (selectedItems.size() == 1) {
 			final Project project = selectedItems.get(0);
 			// init UI as Tab in Progress
-			final FXMLLoader loader = new FXMLSpringLoader(appContext);
-			final Parent content = loader.load(
-					appContext.getResource("classpath:view/ProgressTab_CompressionMining.fxml").getInputStream());
+			final FXMLSpringLoader loader = new FXMLSpringLoader(appContext);
+			final Parent content = loader.load("classpath:view/ProgressTab_CompressionMining.fxml");
 			final Tab newTab = new Tab();
 			newTab.setContent(content);
 			newTab.setText(String.format("%s Compression Mining", project.getName()));
