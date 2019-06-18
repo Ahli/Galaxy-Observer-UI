@@ -35,39 +35,11 @@
       </Controller>
       <Controller type="Fade" end="Pause" frame="CloseButton">
         <Key type="Curve" time="0" value="0" inout="Fast" />
-        <Key type="Curve" time="3" value="0" inout="Fast" />
-        <Key type="Curve" time="3.5" value="255" inout="Slow" />
-      </Controller>
-      <Controller type="Fade" end="Pause" frame="TempMCsButton">
-        <Key type="Curve" time="0" value="0" inout="Fast" />
-        <Key type="Curve" time="3" value="0" inout="Fast" />
-        <Key type="Curve" time="3.5" value="255" inout="Slow" />
-      </Controller>
-      <Controller type="Fade" end="Pause" frame="IntroTempButton">
-        <Key type="Curve" time="0" value="0" inout="Fast" />
-        <Key type="Curve" time="3" value="0" inout="Fast" />
-        <Key type="Curve" time="3.5" value="255" inout="Slow" />
-      </Controller>
-      <Controller type="Fade" end="Pause" frame="DoorsTempButton">
-        <Key type="Curve" time="0" value="0" inout="Fast" />
-        <Key type="Curve" time="3" value="0" inout="Fast" />
-        <Key type="Curve" time="3.5" value="255" inout="Slow" />
-      </Controller>
-      <Controller type="Fade" end="Pause" frame="TempQuestsHideAllButton">
-        <Key type="Curve" time="0" value="0" inout="Fast" />
-        <Key type="Curve" time="3" value="0" inout="Fast" />
-        <Key type="Curve" time="3.5" value="255" inout="Slow" />
-      </Controller>
-      <Controller type="Fade" end="Pause" frame="TempQuestsAnimButton">
-        <Key type="Curve" time="0" value="0" inout="Fast" />
-        <Key type="Curve" time="3" value="0" inout="Fast" />
-        <Key type="Curve" time="3.5" value="255" inout="Slow" />
+        <Key type="Curve" time="1" value="0" inout="Fast" />
+        <Key type="Curve" time="1.5" value="255" inout="Slow" />
       </Controller>
       <Controller type="Event" end="Stop" frame="DialogFrame">
         <Key type="Event" time="0" event="OpenDialogAnim" />
-      </Controller>
-      <Controller type="Event" end="Stop" frame="QuestPanel">
-        <Key type="Event" time="0" event="BeginAnimations" />
       </Controller>
     </Animation>
     <Frame type="Frame" name="ContentAnchorFrame">
@@ -98,6 +70,7 @@
     </Frame>
     <Frame type="Frame" name="BackgroundImage">
       <Anchor relative="$parent/ContentAnchorFrame" />
+      <Alpha val="{$MechaQuestPanel/@Alpha}" />
       <Frame type="Image" name="WarehouseImage">
         <Anchor relative="$parent" />
         <Texture val="@UI/Storm_UI_Mecha_Background" />
@@ -253,6 +226,33 @@
     </Frame>
     <Frame type="Frame" name="QuestPanel" template="MechaEventQuestPanel/MechaQuestPanelTemplate">
       <Anchor relative="$parent/ContentAnchorFrame" />
+      <Handle val="MechaQuestPanel" />
+      <Animation name="OnShown">
+        <Event event="OnShown" action="Reset,Play" />
+        <Event event="StopOnShownAnim" action="Stop" />
+        <Controller type="Fade" end="Pause">
+          <Key type="Curve" time="0" value="0" inout="linear" />
+          <Key type="Curve" time="0.05" value="0" inout="linear" />
+          <Key type="Curve" time="0.075" value="255" inout="linear" />
+          <Key type="Curve" time="0.10" value="100" inout="linear" />
+          <Key type="Curve" time="0.125" value="255" inout="linear" />
+          <Key type="Curve" time="0.150" value="100" inout="linear" />
+          <Key type="Curve" time="0.185" value="255" inout="linear" />
+          <Key type="Curve" time="0.230" value="100" inout="linear" />
+          <Key type="Curve" time="0.270" value="255" inout="linear" />
+        </Controller>
+        <Controller type="Event" end="Stop">
+          <Key type="Event" time="0" event="HideEverything" />
+          <Key type="Event" time="1" event="PlayQuestsBirth" />
+        </Controller>
+      </Animation>
+      <Animation name="OnHidden">
+        <Event event="OnHidden" action="Reset,Play" />
+        <Controller type="Event" end="Stop">
+          <Key type="Event" time="0" event="StopOnShownAnim" />
+          <Key type="Event" time="0" event="HideEverything" />
+        </Controller>
+      </Animation>
     </Frame>
     <Frame type="Frame" name="MCFrame">
       <Anchor relative="$parent" />
@@ -270,21 +270,13 @@
       <Animation name="OnShown">
         <Event event="OnShown" action="Reset, Play" />
         <Controller type="Event" end="Stop" frame="$parent/QuestPanel">
+          <Key type="Event" time="0" event="StopOnShownAnim" />
           <Key type="Event" time="0" event="HideEverything" />
-        </Controller>
-      </Animation>
-      <Animation name="OnHidden">
-        <Event event="OnHidden" action="Reset, Play" />
-        <Controller type="Event" end="Stop" frame="$parent/QuestPanel">
-          <Key type="Event" time="0" event="PlayQuestsBirth" />
         </Controller>
       </Animation>
       <Animation name="EventIntro">
         <Event event="EmceeIntro" action="Reset, Play" />
         <Event event="OnHidden" action="Stop" />
-        <Controller type="Event" end="Stop" frame="$parent/QuestPanel">
-          <Key type="Event" time="0" event="HideEverything" />
-        </Controller>
         <Controller type="Visibility" end="Pause">
           <Key type="Bool" time="2" value="true" />
         </Controller>
@@ -292,8 +284,23 @@
           <Key type="Text" time="2" Text="@UI/QuestLine/Event/Mecha/Emcee/VallaIntro1" />
           <Key type="Text" time="6.1" Text="@UI/QuestLine/Event/Mecha/Emcee/VallaIntro2" />
         </Controller>
+        <Controller type="Visibility" frame="VallaMC/Label" end="Pause">
+          <Key type="Bool" time="0" Value="false" />
+          <Key type="Bool" time="2" Value="true" />
+          <Key type="Bool" time="6.1" Value="false" />
+          <Key type="Bool" time="6.1" Value="true" />
+        </Controller>
         <Controller type="Text" frame="YrelMC/Label" end="Pause">
           <Key type="Text" time="4.4" Text="@UI/QuestLine/Event/Mecha/Emcee/YrelIntro1" />
+        </Controller>
+        <Controller type="Visibility" frame="YrelMC/Label" end="Pause">
+          <Key type="Bool" time="0" Value="false" />
+          <Key type="Bool" time="4.4" Value="true" />
+        </Controller>
+        <Controller type="Sound" end="Stop">
+          <Key type="Sound" time="2" sound="*@UI_Mecha19_Quest_Text_Scroll_Valla_Sound" />
+          <Key type="Sound" time="4.4" sound="*@UI_Mecha19_Quest_Text_Scroll_Yrel_Sound" />
+          <Key type="Sound" time="6.1" sound="*@UI_Mecha19_Quest_Text_Scroll_Valla_Sound" />
         </Controller>
         <Controller type="Visibility" frame="ContinueButton" end="Pause">
           <Key type="Bool" time="7" value="true" />
@@ -305,9 +312,6 @@
       <Animation name="RepairComplete">
         <Event event="EmceeRepairComplete" frame="$MechaEventPopup" action="Reset, Play" />
         <Event event="OnHidden" action="Stop" />
-        <Controller type="Event" end="Stop" frame="$parent/QuestPanel">
-          <Key type="Event" time="0" event="HideEverything" />
-        </Controller>
         <Controller type="Visibility" end="Pause">
           <Key type="Bool" time="2" value="true" />
         </Controller>
@@ -315,15 +319,19 @@
           <Key type="Text" time="2" Text="@UI/QuestLine/Event/Mecha/Emcee/YrelRepair1" />
         </Controller>
         <Controller type="Visibility" frame="YrelMC/Label" end="Pause">
-          <Key type="Bool" time="0" value="false" />
-          <Key type="Bool" time="0.1" value="true" />
+          <Key type="Bool" time="0" Value="false" />
+          <Key type="Bool" time="2" Value="true" />
         </Controller>
         <Controller type="Text" frame="VallaMC/Label" end="Pause">
           <Key type="Text" time="4.4" Text="@UI/QuestLine/Event/Mecha/Emcee/VallaRpair1" />
         </Controller>
         <Controller type="Visibility" frame="VallaMC/Label" end="Pause">
-          <Key type="Bool" time="0" value="false" />
-          <Key type="Bool" time="0.1" value="true" />
+          <Key type="Bool" time="0" Value="false" />
+          <Key type="Bool" time="4.4" Value="true" />
+        </Controller>
+        <Controller type="Sound" end="Stop">
+          <Key type="Sound" time="2" sound="*@UI_Mecha19_Quest_Text_Scroll_Yrel_Sound" />
+          <Key type="Sound" time="4.4" sound="*@UI_Mecha19_Quest_Text_Scroll_Valla_Sound" />
         </Controller>
         <Controller type="Visibility" frame="ContinueButton" end="Pause">
           <Key type="Bool" time="6" value="true" />
@@ -332,32 +340,30 @@
       <Animation name="UpgradeComplete">
         <Event event="EmceeUpgradeComplete" frame="$MechaEventPopup" action="Reset, Play" />
         <Event event="OnHidden" action="Stop" />
-        <Controller type="Event" end="Stop" frame="$parent/QuestPanel">
-          <Key type="Event" time="0" event="HideEverything" />
-        </Controller>
         <Controller type="Visibility" end="Pause">
           <Key type="Bool" time="2" value="true" />
         </Controller>
         <Controller type="Text" frame="VallaMC/Label" end="Pause">
           <Key type="Text" time="2" Text="@UI/QuestLine/Event/Mecha/Emcee/VallaUpgrade1" />
+          <Key type="Text" time="6.1" Text="@UI/QuestLine/Event/Mecha/Emcee/VallaUpgrade2" />
         </Controller>
         <Controller type="Visibility" frame="VallaMC/Label" end="Pause">
-          <Key type="Bool" time="0" value="false" />
-          <Key type="Bool" time="0.1" value="true" />
+          <Key type="Bool" time="0" Value="false" />
+          <Key type="Bool" time="2" Value="true" />
+          <Key type="Bool" time="6.1" Value="false" />
+          <Key type="Bool" time="6.1" Value="true" />
         </Controller>
         <Controller type="Text" frame="YrelMC/Label" end="Pause">
           <Key type="Text" time="4.4" Text="@UI/QuestLine/Event/Mecha/Emcee/YrelUpgrade1" />
         </Controller>
         <Controller type="Visibility" frame="YrelMC/Label" end="Pause">
-          <Key type="Bool" time="0" value="false" />
-          <Key type="Bool" time="0.1" value="true" />
+          <Key type="Bool" time="0" Value="false" />
+          <Key type="Bool" time="4.4" Value="true" />
         </Controller>
-        <Controller type="Text" frame="VallaMC/Label" end="Pause">
-          <Key type="Text" time="6.1" Text="@UI/QuestLine/Event/Mecha/Emcee/VallaUpgrade2" />
-        </Controller>
-        <Controller type="Visibility" frame="VallaMC/Label" end="Pause">
-          <Key type="Bool" time="0" value="false" />
-          <Key type="Bool" time="0.1" value="true" />
+        <Controller type="Sound" end="Stop">
+          <Key type="Sound" time="2" sound="*@UI_Mecha19_Quest_Text_Scroll_Valla_Sound" />
+          <Key type="Sound" time="4.4" sound="*@UI_Mecha19_Quest_Text_Scroll_Yrel_Sound" />
+          <Key type="Sound" time="6.1" sound="*@UI_Mecha19_Quest_Text_Scroll_Valla_Sound" />
         </Controller>
         <Controller type="Visibility" frame="ContinueButton" end="Pause">
           <Key type="Bool" time="7" value="true" />
@@ -366,39 +372,34 @@
       <Animation name="RepeatableComplete">
         <Event event="EmceeRepeatableComplete" frame="$MechaEventPopup" action="Reset, Play" />
         <Event event="OnHidden" action="Stop" />
-        <Controller type="Event" end="Stop" frame="$parent/QuestPanel">
-          <Key type="Event" time="0" event="HideEverything" />
-        </Controller>
         <Controller type="Visibility" end="Pause">
           <Key type="Bool" time="2" value="true" />
         </Controller>
         <Controller type="Text" frame="VallaMC/Label" end="Pause">
           <Key type="Text" time="2" Text="@UI/QuestLine/Event/Mecha/Emcee/VallaRepeatable1" />
-        </Controller>
-        <Controller type="Visibility" frame="VallaMC/Label" end="Pause">
-          <Key type="Bool" time="0" value="false" />
-          <Key type="Bool" time="0.1" value="true" />
-        </Controller>
-        <Controller type="Text" frame="YrelMC/Label" end="Pause">
-          <Key type="Text" time="4.4" Text="@UI/QuestLine/Event/Mecha/Emcee/YrelRepeatable1" />
-        </Controller>
-        <Controller type="Visibility" frame="YrelMC/Label" end="Pause">
-          <Key type="Bool" time="0" value="false" />
-          <Key type="Bool" time="0.1" value="true" />
-        </Controller>
-        <Controller type="Text" frame="VallaMC/Label" end="Pause">
           <Key type="Text" time="6.1" Text="@UI/QuestLine/Event/Mecha/Emcee/VallaRepeatable2" />
         </Controller>
         <Controller type="Visibility" frame="VallaMC/Label" end="Pause">
-          <Key type="Bool" time="0" value="false" />
-          <Key type="Bool" time="0.1" value="true" />
+          <Key type="Bool" time="0" Value="false" />
+          <Key type="Bool" time="2" Value="true" />
+          <Key type="Bool" time="6.1" Value="false" />
+          <Key type="Bool" time="6.1" Value="true" />
         </Controller>
         <Controller type="Text" frame="YrelMC/Label" end="Pause">
+          <Key type="Text" time="4.4" Text="@UI/QuestLine/Event/Mecha/Emcee/YrelRepeatable1" />
           <Key type="Text" time="8.3" Text="@UI/QuestLine/Event/Mecha/Emcee/YrelRepeatable2" />
         </Controller>
         <Controller type="Visibility" frame="YrelMC/Label" end="Pause">
-          <Key type="Bool" time="0" value="false" />
-          <Key type="Bool" time="0.1" value="true" />
+          <Key type="Bool" time="0" Value="false" />
+          <Key type="Bool" time="4.4" Value="true" />
+          <Key type="Bool" time="8.3" Value="false" />
+          <Key type="Bool" time="8.3" Value="true" />
+        </Controller>
+        <Controller type="Sound" end="Stop">
+          <Key type="Sound" time="2" sound="*@UI_Mecha19_Quest_Text_Scroll_Valla_Sound" />
+          <Key type="Sound" time="4.4" sound="*@UI_Mecha19_Quest_Text_Scroll_Yrel_Sound" />
+          <Key type="Sound" time="6.1" sound="*@UI_Mecha19_Quest_Text_Scroll_Valla_Sound" />
+          <Key type="Sound" time="8.3" sound="*@UI_Mecha19_Quest_Text_Scroll_Yrel_Sound" />
         </Controller>
         <Controller type="Visibility" frame="ContinueButton" end="Pause">
           <Key type="Bool" time="9" value="true" />
@@ -407,9 +408,6 @@
       <Animation name="AllBaseComplete">
         <Event event="EmceeAllBaseQuestsComplete" frame="$MechaEventPopup" action="Reset, Play" />
         <Event event="OnHidden" action="Stop" />
-        <Controller type="Event" end="Stop" frame="$parent/QuestPanel">
-          <Key type="Event" time="0" event="HideEverything" />
-        </Controller>
         <Controller type="Visibility" end="Pause">
           <Key type="Bool" time="2" value="true" />
         </Controller>
@@ -417,15 +415,19 @@
           <Key type="Text" time="2" Text="@UI/QuestLine/Event/Mecha/Emcee/YrelAllBaseComplete" />
         </Controller>
         <Controller type="Visibility" frame="YrelMC/Label" end="Pause">
-          <Key type="Bool" time="0" value="false" />
-          <Key type="Bool" time="0.1" value="true" />
+          <Key type="Bool" time="0" Value="false" />
+          <Key type="Bool" time="2" Value="true" />
         </Controller>
         <Controller type="Text" frame="VallaMC/Label" end="Pause">
           <Key type="Text" time="4.4" Text="@UI/QuestLine/Event/Mecha/Emcee/VallaAllBaseComplete" />
         </Controller>
         <Controller type="Visibility" frame="VallaMC/Label" end="Pause">
-          <Key type="Bool" time="0" value="false" />
-          <Key type="Bool" time="0.1" value="true" />
+          <Key type="Bool" time="0" Value="false" />
+          <Key type="Bool" time="4.4" Value="true" />
+        </Controller>
+        <Controller type="Sound" end="Stop">
+          <Key type="Sound" time="2" sound="*@UI_Mecha19_Quest_Text_Scroll_Yrel_Sound" />
+          <Key type="Sound" time="4.4" sound="*@UI_Mecha19_Quest_Text_Scroll_Valla_Sound" />
         </Controller>
         <Controller type="Visibility" frame="ContinueButton" end="Pause">
           <Key type="Bool" time="6" value="true" />
@@ -434,10 +436,6 @@
       <Animation name="AllQuestsComplete">
         <Event event="EmceeAllRepeatableQuestsComplete" frame="$MechaEventPopup" action="Reset, Play" />
         <Event event="OnHidden" action="Stop" />
-        <Controller type="Event" end="Stop" frame="$parent/QuestPanel">
-          <Key type="Event" time="0" event="HideEverything" />
-          <Key type="Event" time="0" event="HideEverything" />
-        </Controller>
         <Controller type="Visibility" end="Pause">
           <Key type="Bool" time="2" value="true" />
         </Controller>
@@ -445,15 +443,19 @@
           <Key type="Text" time="2" Text="@UI/QuestLine/Event/Mecha/Emcee/VallaAllQuestsComplete" />
         </Controller>
         <Controller type="Visibility" frame="VallaMC/Label" end="Pause">
-          <Key type="Bool" time="0" value="false" />
-          <Key type="Bool" time="0.1" value="true" />
+          <Key type="Bool" time="0" Value="false" />
+          <Key type="Bool" time="2" Value="true" />
         </Controller>
         <Controller type="Text" frame="YrelMC/Label" end="Pause">
           <Key type="Text" time="4.4" Text="@UI/QuestLine/Event/Mecha/Emcee/YrelAllQuestsComplete" />
         </Controller>
         <Controller type="Visibility" frame="YrelMC/Label" end="Pause">
-          <Key type="Bool" time="0" value="false" />
-          <Key type="Bool" time="0.1" value="true" />
+          <Key type="Bool" time="0" Value="false" />
+          <Key type="Bool" time="4.4" Value="true" />
+        </Controller>
+        <Controller type="Sound" end="Stop">
+          <Key type="Sound" time="2" sound="*@UI_Mecha19_Quest_Text_Scroll_Valla_Sound" />
+          <Key type="Sound" time="4.4" sound="*@UI_Mecha19_Quest_Text_Scroll_Yrel_Sound" />
         </Controller>
         <Controller type="Visibility" frame="ContinueButton" end="Pause">
           <Key type="Bool" time="6" value="true" />
@@ -468,14 +470,14 @@
         <Text val="@UI/Continue_Control" />
         <Animation name="OnClick">
           <Event event="OnClick" action="Reset, Play" />
+          <Controller type="Event" end="Stop" frame="$MechaQuestPanel">
+            <Key type="Event" time="0" event="PlayQuestsBirth" />
+          </Controller>
           <Controller type="Event" frame="$MechaEventPopup" end="Stop">
             <Key type="Event" time="0" Event="EmceeClosed" />
           </Controller>
           <Controller type="Visibility" frame="$parent" end="Pause">
             <Key type="Bool" time="0" value="false" />
-          </Controller>
-          <Controller type="Event" end="Stop" frame="$parent/$parent/QuestPanel">
-            <Key type="Event" time="0" event="PlayQuestsBirth" />
           </Controller>
         </Animation>
       </Frame>
@@ -494,6 +496,9 @@
         <Visible val="False" />
         <Animation name="ShowClosedDoors">
           <Event event="ShowDoors" action="Reset,Play" />
+          <Controller type="Visibility" end="Pause">
+            <Key type="Bool" time="0" value="True" />
+          </Controller>
           <Controller type="Anchor" end="Pause" side="Left" frame="$this" relative="true">
             <Key type="Curve" time="0" value="750" inout="Linear" />
           </Controller>
@@ -503,11 +508,7 @@
           <Controller type="Anchor" end="Pause" side="Left" frame="$this" relative="true">
             <Key type="Curve" time="0" value="750" inout="Linear" />
             <Key type="Curve" time="1.15" value="750" inout="Slow" />
-            <Key type="Curve" time="1.45" value="350" inout="Slow" />
-            <Key type="Curve" time="1.55" value="380" inout="Slow" />
-            <Key type="Curve" time="1.65" value="100" inout="Slow" />
-            <Key type="Curve" time="1.75" value="120" inout="Slow" />
-            <Key type="Curve" time="1.85" value="80" inout="Slow" />
+            <Key type="Curve" time="1.55" value="300" inout="Fast" />
             <Key type="Curve" time="1.95" value="0" inout="Slow" />
           </Controller>
         </Animation>
@@ -579,6 +580,9 @@
         <Visible val="False" />
         <Animation name="ShowClosedDoors">
           <Event event="ShowDoors" action="Reset,Play" />
+          <Controller type="Visibility" end="Pause">
+            <Key type="Bool" time="0" value="True" />
+          </Controller>
           <Controller type="Anchor" end="Pause" side="Right" frame="$this" relative="true">
             <Key type="Curve" time="0" value="-750" inout="Linear" />
           </Controller>
@@ -588,11 +592,7 @@
           <Controller type="Anchor" end="Pause" side="Right" frame="$this" relative="true">
             <Key type="Curve" time="0" value="-750" inout="Linear" />
             <Key type="Curve" time="1.15" value="-750" inout="Slow" />
-            <Key type="Curve" time="1.45" value="-350" inout="Slow" />
-            <Key type="Curve" time="1.55" value="-380" inout="Slow" />
-            <Key type="Curve" time="1.65" value="-100" inout="Slow" />
-            <Key type="Curve" time="1.75" value="-120" inout="Slow" />
-            <Key type="Curve" time="1.85" value="-80" inout="Slow" />
+            <Key type="Curve" time="1.55" value="-300" inout="Fast" />
             <Key type="Curve" time="1.95" value="0" inout="Slow" />
           </Controller>
         </Animation>
@@ -657,6 +657,7 @@
       <Frame type="Image" name="BlackBackground">
         <Anchor relative="$parent" />
         <Color val="000000" />
+        <Alpha val="0" />
       </Frame>
       <Frame type="Image" name="EventIntroPage3">
         <Anchor relative="$parent" />
@@ -669,14 +670,7 @@
           <Visible val="False" />
           <WriteOutText val="true" />
           <WriteOutTextDuration val="#IntroTextDuration" />
-          <Text val="@UI/QuestLine/Event/Mecha/Intro3" />
           <Style val="MechaEventIntroSubtitles" />
-          <Animation name="PlayTextSounds">
-            <Event event="OnShown" action="Reset,Play" />
-            <Controller type="Sound" end="Stop">
-              <Key type="Sound" time="0" sound="*@UI_Mecha19_Quest_Text_Scroll_Sound" />
-            </Controller>
-          </Animation>
         </Frame>
       </Frame>
       <Frame type="Image" name="EventIntroPage2">
@@ -690,14 +684,7 @@
           <Visible val="False" />
           <WriteOutText val="true" />
           <WriteOutTextDuration val="#IntroTextDuration" />
-          <Text val="@UI/QuestLine/Event/Mecha/Intro2" />
           <Style val="MechaEventIntroSubtitles" />
-          <Animation name="PlayTextSounds">
-            <Event event="OnShown" action="Reset,Play" />
-            <Controller type="Sound" end="Stop">
-              <Key type="Sound" time="0" sound="*@UI_Mecha19_Quest_Text_Scroll_Sound" />
-            </Controller>
-          </Animation>
         </Frame>
       </Frame>
       <Frame type="Image" name="EventIntroPage1">
@@ -711,93 +698,97 @@
           <Visible val="False" />
           <WriteOutText val="true" />
           <WriteOutTextDuration val="#IntroTextDuration" />
-          <Text val="@UI/QuestLine/Event/Mecha/Intro1" />
           <Style val="MechaEventIntroSubtitles" />
-          <Animation name="PlayTextSounds">
-            <Event event="OnShown" action="Reset,Play" />
-            <Controller type="Sound" end="Stop">
-              <Key type="Sound" time="0" sound="*@UI_Mecha19_Quest_Text_Scroll_Sound" />
-            </Controller>
-          </Animation>
         </Frame>
       </Frame>
       <Animation name="PlayEventIntroSequence">
         <Event event="PlayEventIntro" action="Reset,Play" />
-        <Event event="StopEventIntro" action="Reset,Stop" />
+        <Event event="StopEventIntro" action="Stop" />
         <Event event="EmceeIntro" frame="$MechaEventPopup" action="Reset, Play" />
         <Controller type="Visibility" end="Pause">
           <Key type="Bool" time="0" value="True" />
         </Controller>
-        <Controller type="Visibility" frame="$parent/QuestPanel" end="Pause">
-          <Key type="Bool" time="0" value="False" />
-          <Key type="Bool" time="24" value="True" />
-        </Controller>
-        <Controller type="Fade" end="Pause">
-          <Key type="Curve" time="0" value="0" inout="Fast" />
-          <Key type="Curve" time="1.1" value="0" inout="Fast" />
-          <Key type="Curve" time="1.1" value="255" inout="Fast" />
+        <Controller type="Fade" frame="BlackBackground" end="Stop">
+          <Key type="Curve" time="0" value="0" inout="Step" />
+          <Key type="Curve" time="1" value="0" inout="Step" />
+          <Key type="Curve" time="1" value="255" inout="Step,Fast" />
+          <Key type="Curve" time="33.5" value="255" inout="Slow" />
+          <Key type="Curve" time="34" value="0" inout="Slow" />
         </Controller>
         <Controller type="Fade" frame="EventIntroPage1" end="Pause">
-          <Key type="Curve" time="0" value="255" inout="Fast" />
-          <Key type="Curve" time="8" value="255" inout="Slow" />
-          <Key type="Curve" time="8.5" value="0" inout="Slow" />
+          <Key type="Curve" time="0" value="0" inout="Fast" />
+          <Key type="Curve" time="1" value="0" inout="Fast" />
+          <Key type="Curve" time="1.5" value="255" inout="Fast" />
+          <Key type="Curve" time="11.5" value="255" inout="Slow" />
+          <Key type="Curve" time="12" value="0" inout="Slow" />
         </Controller>
         <Controller type="Visibility" frame="EventIntroPage1/IntroText" end="Pause">
           <Key type="Bool" time="0" value="False" />
-          <Key type="Bool" time="1" value="True" />
+          <Key type="Bool" time="2" value="False" />
+          <Key type="Bool" time="2" value="True" />
+        </Controller>
+        <Controller type="Property" frame="EventIntroPage1/IntroText" property="Text" end="Stop">
+          <Key type="Property" time="2" value="@UI/QuestLine/Event/Mecha/Intro1" />
+          <Key type="Property" time="12" value="" />
         </Controller>
         <Controller type="Fade" frame="EventIntroPage2" end="Pause">
           <Key type="Curve" time="0" value="0" inout="Fast" />
-          <Key type="Curve" time="8.5" value="0" inout="Fast" />
-          <Key type="Curve" time="9" value="255" inout="Slow" />
-          <Key type="Curve" time="15" value="255" inout="Slow" />
-          <Key type="Curve" time="15.5" value="0" inout="Slow" />
+          <Key type="Curve" time="12" value="0" inout="Fast" />
+          <Key type="Curve" time="12.5" value="255" inout="Slow" />
+          <Key type="Curve" time="22.5" value="255" inout="Slow" />
+          <Key type="Curve" time="23" value="0" inout="Slow" />
         </Controller>
         <Controller type="Visibility" frame="EventIntroPage2/IntroText" end="Pause">
           <Key type="Bool" time="0" value="False" />
-          <Key type="Bool" time="9.5" value="True" />
+          <Key type="Bool" time="13" value="False" />
+          <Key type="Bool" time="13" value="True" />
+        </Controller>
+        <Controller type="Property" frame="EventIntroPage2/IntroText" property="Text" end="Stop">
+          <Key type="Property" time="13" value="@UI/QuestLine/Event/Mecha/Intro2" />
+          <Key type="Property" time="23" value="" />
         </Controller>
         <Controller type="Fade" frame="EventIntroPage3" end="Pause">
           <Key type="Curve" time="0" value="0" inout="Fast" />
-          <Key type="Curve" time="15.5" value="0" inout="Fast" />
-          <Key type="Curve" time="16" value="255" inout="Slow" />
-          <Key type="Curve" time="24" value="255" inout="Slow" />
-          <Key type="Curve" time="24.5" value="0" inout="Slow" />
+          <Key type="Curve" time="23" value="0" inout="Fast" />
+          <Key type="Curve" time="23.5" value="255" inout="Slow" />
+          <Key type="Curve" time="33.5" value="255" inout="Slow" />
+          <Key type="Curve" time="34" value="0" inout="Slow" />
         </Controller>
         <Controller type="Visibility" frame="EventIntroPage3/IntroText" end="Pause">
           <Key type="Bool" time="0" value="False" />
-          <Key type="Bool" time="16.5" value="True" />
+          <Key type="Bool" time="24" value="False" />
+          <Key type="Bool" time="24" value="True" />
         </Controller>
-        <Controller type="Fade" frame="BlackBackground" end="Pause">
-          <Key type="Curve" time="0" value="255" inout="Fast" />
-          <Key type="Curve" time="24" value="255" inout="Slow" />
-          <Key type="Curve" time="24.5" value="0" inout="Slow" />
-        </Controller>
-        <Controller type="Visibility" end="Pause" frame="DoorLeft">
-          <Key type="Bool" time="0" value="False" />
-          <Key type="Bool" time="0.1" value="True" />
-        </Controller>
-        <Controller type="Visibility" end="Pause" frame="DoorRight">
-          <Key type="Bool" time="0" value="False" />
-          <Key type="Bool" time="0.1" value="True" />
+        <Controller type="Property" frame="EventIntroPage3/IntroText" property="Text" end="Stop">
+          <Key type="Property" time="24" value="@UI/QuestLine/Event/Mecha/Intro3" />
+          <Key type="Property" time="34" value="" />
         </Controller>
         <Controller type="Event" end="Stop" frame="DoorLeft">
-          <Key type="Event" time="0" event="ShowDoors" />
+          <Key type="Event" time="33.5" event="ShowDoors" />
+          <Key type="Event" time="34" event="OpenDoors" />
         </Controller>
         <Controller type="Event" end="Stop" frame="DoorRight">
-          <Key type="Event" time="0" event="ShowDoors" />
-        </Controller>
-        <Controller type="Event" end="Stop" frame="DoorLeft">
-          <Key type="Event" time="24.5" event="OpenDoors" />
-        </Controller>
-        <Controller type="Event" end="Stop" frame="DoorRight">
-          <Key type="Event" time="24.5" event="OpenDoors" />
+          <Key type="Event" time="33.5" event="ShowDoors" />
+          <Key type="Event" time="34" event="OpenDoors" />
         </Controller>
         <Controller type="Sound" end="Stop">
-          <Key type="Sound" time="24.5" sound="*@UI_Mecha19_Quest_Doors_Open_Sound" />
+          <Key type="Sound" time="2" sound="*@UI_Mecha19_Quest_Text_Scroll_Sound" />
+          <Key type="Sound" time="13" sound="*@UI_Mecha19_Quest_Text_Scroll_Sound" />
+          <Key type="Sound" time="24" sound="*@UI_Mecha19_Quest_Text_Scroll_Sound" />
+          <Key type="Sound" time="34" sound="*@UI_Mecha19_Quest_Doors_Open_Sound" />
+        </Controller>
+        <Controller type="Visibility" frame="$MechaQuestPanel" end="Pause">
+          <Key type="Bool" time="0" value="False" />
+          <Key type="Bool" time="34" value="True" />
         </Controller>
         <Controller type="Event" end="Stop" frame="$MechaEmceeFrame">
-          <Key type="Event" time="26" Event="EmceeIntro" />
+          <Key type="Event" time="34" Event="EmceeIntro" />
+        </Controller>
+        <Controller type="Event" end="Stop" frame="$MechaQuestPanel">
+          <Key type="Event" time="2.1" event="StopOnShownAnim" />
+          <Key type="Event" time="2.1" event="HideEverything" />
+          <Key type="Event" time="34.1" event="StopOnShownAnim" />
+          <Key type="Event" time="34.1" event="HideEverything" />
         </Controller>
       </Animation>
     </Frame>
@@ -945,91 +936,6 @@
         <Unclipped val="True" />
       </Frame>
     </Frame>
-    <Frame type="Button" name="TempMCsButton" template="StandardTemplates/StandardButtonMiniTemplate">
-      <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
-      <Anchor side="Top" relative="$parent" pos="Min" offset="200" />
-      <Visible val="true" />
-      <Text val="Show/Hide MCs" />
-      <Animation name="OnClick">
-        <Event event="OnClick" action="Reset, Play" />
-        <Controller type="Visibility" frame="$MechaEmceeFrame" end="Pause">
-          <Key type="Bool" time="0" value="true" />
-        </Controller>
-        <Controller type="Visibility" frame="$MechaEmceeFrame/ContinueButton" end="Pause">
-          <Key type="Bool" time="0" value="true" />
-        </Controller>
-      </Animation>
-    </Frame>
-    <Frame type="Button" name="IntroTempButton" template="StandardTemplates/StandardButtonMiniTemplate">
-      <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
-      <Anchor side="Top" relative="$parent/TempMCsButton" pos="Max" offset="-30" />
-      <Text val="Play Intro" />
-      <Animation name="CloseAnim">
-        <Event event="OnClick" action="Reset, Play" />
-        <Controller type="Event" end="Stop" frame="$parent/EventIntroFrame">
-          <Key type="Event" time="0" event="PlayEventIntro" />
-        </Controller>
-      </Animation>
-    </Frame>
-    <Frame type="Button" name="DoorsTempButton" template="StandardTemplates/StandardButtonMiniTemplate">
-      <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
-      <Anchor side="Top" relative="$parent/IntroTempButton" pos="Max" offset="-30" />
-      <Text val="Play Doors Anim" />
-      <Animation name="CloseAnim">
-        <Event event="OnClick" action="Reset, Play" />
-        <Controller type="Visibility" frame="$parent/EventIntroFrame" end="Pause">
-          <Key type="Bool" time="0" value="False" />
-          <Key type="Bool" time=".01" value="True" />
-        </Controller>
-        <Controller type="Visibility" frame="$parent/EventIntroFrame/BlackBackground" end="Pause">
-          <Key type="Bool" time="0" value="False" />
-        </Controller>
-        <Controller type="Visibility" end="Pause" frame="$parent/EventIntroFrame/DoorLeft">
-          <Key type="Bool" time="0" value="False" />
-          <Key type="Bool" time="0.01" value="True" />
-        </Controller>
-        <Controller type="Visibility" end="Pause" frame="$parent/EventIntroFrame/DoorRight">
-          <Key type="Bool" time="0" value="False" />
-          <Key type="Bool" time="0.01" value="True" />
-        </Controller>
-        <Controller type="Event" end="Stop" frame="$parent/EventIntroFrame/DoorLeft">
-          <Key type="Event" time="0" event="ShowDoors" />
-          <Key type="Event" time="0" event="OpenDoors" />
-        </Controller>
-        <Controller type="Event" end="Stop" frame="$parent/EventIntroFrame/DoorRight">
-          <Key type="Event" time="0" event="ShowDoors" />
-          <Key type="Event" time="0" event="OpenDoors" />
-        </Controller>
-        <Controller type="Sound" end="Stop">
-          <Key type="Sound" time="0" sound="*@UI_Mecha19_Quest_Doors_Open_Sound" />
-        </Controller>
-      </Animation>
-    </Frame>
-    <Frame type="Button" name="TempQuestsHideAllButton" template="StandardTemplates/StandardButtonMiniTemplate">
-      <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
-      <Anchor side="Top" relative="$parent/DoorsTempButton" pos="Max" offset="-30" />
-      <Text val="Hide All Quests" />
-      <Animation name="CloseAnim">
-        <Event event="OnClick" action="Reset, Play" />
-        <Controller type="Event" end="Stop" frame="$parent/QuestPanel">
-          <Key type="Event" time="0" event="HideEverything" />
-        </Controller>
-      </Animation>
-    </Frame>
-    <Frame type="Button" name="TempQuestsAnimButton" template="StandardTemplates/StandardButtonMiniTemplate">
-      <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
-      <Anchor side="Top" relative="$parent/TempQuestsHideAllButton" pos="Max" offset="-30" />
-      <Text val="Play Quests Birth" />
-      <Animation name="CloseAnim">
-        <Event event="OnClick" action="Reset, Play" />
-        <Controller type="Event" end="Stop" frame="$parent/QuestPanel">
-          <Key type="Event" time="0" event="PlayQuestsBirth" />
-        </Controller>
-        <Controller type="Sound" end="Stop">
-          <Key type="Sound" time="0" sound="*@UI_Mecha19_Quest_Hex_Birth_Sound" />
-        </Controller>
-      </Animation>
-    </Frame>
     <Frame type="Button" name="CloseButton">
       <Anchor side="Top" relative="$parent/BackgroundImage" pos="Min" offset="-5" />
       <Anchor side="Right" relative="$parent/BackgroundImage" pos="Max" offset="5" />
@@ -1070,9 +976,6 @@
         <Event event="OnClick" action="Restart,Play" />
         <Controller type="Event" frame="$parent/$parent" end="Pause">
           <Key type="Event" time="0" event="DismissDialog" />
-        </Controller>
-        <Controller type="Event" frame="$parent/EventIntroFrame" end="Stop">
-          <Key type="Event" time="0" event="StopEventIntro" />
         </Controller>
         <Controller type="Event" frame="$parent/EventIntroFrame" end="Stop">
           <Key type="Event" time="0" event="StopEventIntro" />
