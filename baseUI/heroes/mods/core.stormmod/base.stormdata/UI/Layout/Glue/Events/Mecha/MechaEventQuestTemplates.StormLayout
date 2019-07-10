@@ -7,7 +7,7 @@
   <Constant name="MechaButtonCompleted" val="F0F0F0" />
   <Frame type="StandardTooltip" name="MechaEventTooltipTemplate">
     <MinHeight val="50" />
-    <MinWidth val="390" />
+    <MinWidth val="430" />
     <Insets top="15" left="25" bottom="15" right="25" />
     <Frame type="Image" name="TooltipBackgroundTemplate">
       <Anchor relative="$parent" />
@@ -293,8 +293,12 @@
         <ReplacedName index="1" val="questDesc" />
         <Replacement index="2" val="{$ancestor[@type=QuestProxyFrame]/@ProgressPercentString}" />
         <ReplacedName index="2" val="progress" />
-        <Replacement index="3" val="{$parent/RewardsFormatter/@Text}" />
-        <ReplacedName index="3" val="rewards" />
+        <Replacement index="3" val="{$ancestor[@type=QuestProxyFrame]/$parent/RepeatableLimitProxy/@ProgressEarned}" />
+        <ReplacedName index="3" val="repeated" />
+        <Replacement index="4" val="{$parent/RewardsFormatter/@Text}" />
+        <ReplacedName index="4" val="rewards" />
+        <Replacement index="5" val="{$parent/SuffixFormatter/@Text}" />
+        <ReplacedName index="5" val="suffix" />
       </Frame>
       <Frame type="TextFormatFrame" name="RewardsFormatter">
         <Anchor relative="$parent" />
@@ -306,14 +310,22 @@
         <Replacement index="3" val="{$ancestor[@type=QuestProxyFrame]/$parent/Node2/@Reward}" />
         <ReplacedName index="3" val="reward3" />
       </Frame>
+      <Frame type="TextFormatFrame" name="SuffixFormatter">
+        <Anchor relative="$parent" />
+      </Frame>
       <Frame type="StandardTooltip" name="MechaContentTooltip" template="MechaEventQuestTemplates/MechaEventTooltipTemplate" />
       <StateGroup name="QuestSelectabilityStates">
-        <State name="Disabled">
+        <State name="Disabled_LimitReached">
+          <When type="Property" frame="$parent" QuestState="Inactive" />
+          <When type="Property" frame="$parent" operator="GreaterThan" EarnedCount="0" />
+          <Action type="SetProperty" frame="TooltipFormatter" FormatText="@UI/QuestLine/Event/Mecha/Board/QuestButtonTooltip/RepeatableLimit" />
+        </State>
+        <State name="Disabled_SelectionDisabled">
           <When type="Property" frame="$QuestUI" IsQuestSelectable="False" />
           <When type="Property" frame="$parent" IsFocused="False" />
           <When type="Property" frame="$parent" QuestState="Active" />
           <Action type="SetProperty" Enabled="False" />
-          <Action type="SetProperty" Tooltip="@UI/QuestLine/Event/Mecha/Board/QuestButtonTooltip/Disabled" />
+          <Action type="SetProperty" frame="SuffixFormatter" FormatText="@UI/QuestLine/Event/Mecha/Board/QuestButtonTooltip/Repeatable/SuffixDisabled" />
         </State>
         <DefaultState val="Enabled" />
         <State name="Enabled" />
@@ -334,6 +346,17 @@
       <State name="NotAccepts" />
     </StateGroup>
     <StateGroup name="NodeQuestStates">
+      <State name="LimitReached">
+        <When type="Property" QuestState="Inactive" />
+        <When type="Property" operator="GreaterThan" EarnedCount="0" />
+        <Action type="SetState" group="ButtonInteractable" state="Interactable" />
+        <Action type="SetProperty" frame="FocusQuestButton/NormalImage" Texture="@UI/Storm_UI_Mecha_QuestButton_Completed" />
+        <Action type="SetProperty" frame="FocusQuestButton/HoverImage" Texture="@UI/Storm_UI_Mecha_QuestButton_Completed" />
+        <Action type="SetProperty" frame="FocusQuestButton/QuestIcon" Visible="True" />
+        <Action type="SetProperty" frame="FocusQuestButton/LockedIcon" Visible="False" />
+        <Action type="SetProperty" frame="FocusQuestButton/CompletedIcon" Visible="False" />
+        <Action type="SetProperty" frame="FocusQuestButton/ArrowsFrame" Visible="False" />
+      </State>
       <State name="ActiveRepeated">
         <When type="Property" QuestState="Active" />
         <When type="Property" operator="GreaterThan" EarnedCount="0" />
@@ -438,16 +461,7 @@
     <Frame type="QuestProxyFrame" name="Node2" template="MechaEventQuestTemplates/MechaQuestNodeTemplate">
       <Frame type="FocusQuestButton" name="FocusQuestButton">
         <Frame type="TextFormatFrame" name="TooltipFormatter">
-          <StateGroup name="TooltipStates">
-            <State name="NotEarned">
-              <When type="Property" frame="$parent/$parent" EarnedCount="0" />
-              <Action type="SetProperty" FormatText="@UI/QuestLine/Event/Mecha/Board/QuestButtonTooltip/Repeatable/Unearned" />
-            </State>
-            <DefaultState val="Earned" />
-            <State name="Earned">
-              <Action type="SetProperty" FormatText="@UI/QuestLine/Event/Mecha/Board/QuestButtonTooltip/Repeatable/Earned" />
-            </State>
-          </StateGroup>
+          <FormatText val="@UI/QuestLine/Event/Mecha/Board/QuestButtonTooltip/Repeatable" />
         </Frame>
       </Frame>
       <StateGroup name="NodeQuestIconStates">
@@ -473,7 +487,15 @@
           <When type="Property" frame="FocusQuestButton" Toggled="true" />
           <Action type="SetProperty" frame="FocusQuestButton/QuestIcon" texture="@UI/Storm_UI_Mecha_QuestButton_Icon_Repeat_Active" />
         </State>
+        <State name="LimitReached">
+          <When type="Property" QuestState="Inactive" />
+          <When type="Property" operator="GreaterThan" EarnedCount="0" />
+          <Action type="SetProperty" frame="FocusQuestButton/QuestIcon" texture="@UI/Storm_UI_Mecha_QuestButton_Icon_Limit" />
+        </State>
       </StateGroup>
+    </Frame>
+    <Frame type="QuestProxyFrame" name="RepeatableLimitProxy">
+      <Anchor relative="$parent" />
     </Frame>
     <StateGroup name="RenderPriorityStates">
       <State name="ActiveNode2">
@@ -779,6 +801,10 @@
         <When type="Property" frame="RepairQuestFrame" IsFocused="false" />
         <When type="Property" frame="UpgradeQuestFrame" IsFocused="false" />
         <When type="Property" frame="CompleteQuestFrame" IsFocused="false" />
+      </State>
+      <State name="LimitReached">
+        <When type="Property" frame="CompleteQuestFrame" QuestState="Inactive" />
+        <When type="Property" frame="CompleteQuestFrame" IsFocused="True" />
       </State>
       <DefaultState val="Focused" />
       <State name="Focused" />
