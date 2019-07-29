@@ -230,66 +230,6 @@
       <Target frame="$parent/Container/BodyLabel" property="Text" />
     </Frame>
   </Frame>
-  <Frame type="AnchoredPopup" name="HeroAnchoredPopupTemplate" template="StandardPopupTooltip/AnchoredPopupRightArrowTemplate">
-    <MinWidth val="425" />
-    <Frame type="Frame" name="Container">
-      <Frame type="Label" name="TitleLabel">
-        <Style val="RankedBadge_Promotion_Tooltip_Title_Left" />
-      </Frame>
-      <Frame type="Label" name="BodyLabel">
-        <Style val="RankedBadge_Tooltip_Text" />
-      </Frame>
-    </Frame>
-    <StateGroup name="ShowPopup">
-      <DefaultState val="Hidden" />
-      <State name="Shown">
-        <When type="Property" frame="$RankedPanel_HeroLeagueBadge" showPopup="true" />
-        <Action type="SetProperty" frame="$this" show="true" />
-      </State>
-      <State name="Hidden">
-        <Action type="SetProperty" frame="$this" show="false" />
-      </State>
-    </StateGroup>
-    <Animation name="TransitionOut">
-      <Event event="Hide" action="Restart,Play" frame="$ScreenPlay_HeroRankedPanel" />
-      <Controller type="Event" end="Stop">
-        <Key type="Event" time="0" event="Hide" />
-      </Controller>
-    </Animation>
-    <Animation name="TransitionIn">
-      <Event event="Show" action="Restart,Play" frame="$ScreenPlay_HeroRankedPanel" />
-      <Controller type="Fade" end="Pause">
-        <Key type="Curve" time="0.0" value="0" inout="Linear,Slow" />
-        <Key type="Curve" time="0.4" value="255" inout="Slow" />
-      </Controller>
-    </Animation>
-    <StateGroup name="TitleStyle">
-      <DefaultState val="Normal" />
-      <State name="Demotion">
-        <When type="Property" frame="$RankedPanel_HeroLeagueBadge" PromotionState="DemotionNextGame" />
-        <Action type="SetProperty" frame="Container/TitleLabel" style="RankedBadge_Demotion_Tooltip_Title_Left" />
-      </State>
-      <State name="Normal">
-        <Action type="SetProperty" frame="Container/TitleLabel" style="RankedBadge_Promotion_Tooltip_Title_Left" />
-      </State>
-    </StateGroup>
-    <Frame type="PropertyBind" name="PropertyBindTitle">
-      <Anchor relative="$parent" />
-      <Source frame="$RankedPanel_HeroLeagueBadge" property="PopupTitle" />
-      <Target frame="$parent/Container/TitleLabel" property="Text" />
-    </Frame>
-    <Frame type="PropertyBind" name="PropertyBindText">
-      <Anchor relative="$parent" />
-      <Source frame="$RankedPanel_HeroLeagueBadge" property="PopupText" />
-      <Target frame="$parent/Container/BodyLabel" property="Text" />
-    </Frame>
-    <Animation name="OnDismiss">
-      <Event event="Dismiss" action="Play" />
-      <Controller type="Event" end="Stop" frame="$RankedPanel_HeroLeagueBadge">
-        <Key type="Event" time="0" event="FirstTimeExplanationDismissed" />
-      </Controller>
-    </Animation>
-  </Frame>
   <Frame type="AnchoredPopup" name="TeamAnchoredPopupTemplate" template="StandardPopupTooltip/AnchoredPopupLeftArrowTemplate">
     <MinWidth val="425" />
     <Frame type="Frame" name="Container">
@@ -323,16 +263,6 @@
         <Key type="Curve" time="0.4" value="255" inout="Slow" />
       </Controller>
     </Animation>
-    <StateGroup name="TitleStyle">
-      <DefaultState val="Normal" />
-      <State name="Demotion">
-        <When type="Property" frame="$RankedPanel_StormLeagueBadge" PromotionState="DemotionNextGame" />
-        <Action type="SetProperty" frame="Container/TitleLabel" style="RankedBadge_Demotion_Tooltip_Title_Left" />
-      </State>
-      <State name="Normal">
-        <Action type="SetProperty" frame="Container/TitleLabel" style="RankedBadge_Promotion_Tooltip_Title_Left" />
-      </State>
-    </StateGroup>
     <Frame type="PropertyBind" name="PropertyBindTitle">
       <Anchor relative="$parent" />
       <Source frame="$RankedPanel_StormLeagueBadge" property="PopupTitle" />
@@ -556,9 +486,29 @@
         </State>
       </StateGroup>
     </Frame>
+    <Frame type="Control" name="RankedQuest" template="RankedQuestTemplate/RankedQuestProgressTemplate">
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="-31" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="45" />
+      <Frame type="ProgressBar" name="ProgressBar">
+        <Value val="{$ancestor[@type=HeroRankedPanel]/@RankedQuestProgress}" />
+      </Frame>
+      <Frame type="QuestProxyFrame" name="ActiveRankedQuestProxy">
+        <QuestId val="{$ancestor[@type=HeroRankedPanel]/@RankedQuestInProgress}" />
+      </Frame>
+      <StateGroup name="PopupState">
+        <DefaultState val="Hide" />
+        <State name="Show">
+          <When type="Property" Hovering="True" />
+          <Action type="SendEvent" frame="$parent/RankedQuestPanel" event="Show" />
+        </State>
+        <State name="Hide">
+          <Action type="SendEvent" frame="$parent/RankedQuestPanel" event="Hide" />
+        </State>
+      </StateGroup>
+    </Frame>
     <Frame type="NydusLinkButton" name="LeaderBoardsButton" template="HeroRankedPanel/InfoButtonTemplate">
       <Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
-      <Anchor side="Left" relative="$parent" pos="Min" offset="25" />
+      <Anchor side="Left" relative="$parent/RankedQuest" pos="Max" offset="0" />
       <NydusLink val="LeaderBoards" />
       <UseBrowser val="true" />
       <BrowserPurpose val="LeaderBoards" />
@@ -640,6 +590,10 @@
     <Frame type="MapRotationPanel" name="MapRotationPanel" template="MapRotationPanel/MapRotationPanelTemplate">
       <Anchor side="Bottom" relative="$parent/MapRotationButton" pos="Min" offset="#HeroSelectPanelBottom" />
       <Anchor side="Left" relative="$parent/LeaderBoardsButton" pos="Min" offset="35" />
+    </Frame>
+    <Frame type="Frame" name="RankedQuestPanel" template="RankedQuestTemplate/RankedQuestPanelTemplate">
+      <Anchor side="Bottom" relative="$parent/RankedQuest" pos="Min" offset="#HeroSelectPanelBottom" />
+      <Anchor side="Left" relative="$parent/RankedQuest" pos="Min" offset="35" />
     </Frame>
     <Frame type="Frame" name="AnchoredPopupAnchorFrame">
       <Anchor side="Top" relative="$this" pos="Max" offset="0" />

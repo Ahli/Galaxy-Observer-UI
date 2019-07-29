@@ -720,16 +720,6 @@
         <Action type="SetProperty" frame="$this" show="false" />
       </State>
     </StateGroup>
-    <StateGroup name="TitleStyle">
-      <DefaultState val="Normal" />
-      <State name="Demotion">
-        <When type="Property" frame="$PlayerRewardPanel_RankScoreFrame" PromotionState="DemotionNextGame" />
-        <Action type="SetProperty" frame="Container/TitleLabel" style="RankedBadge_Demotion_Tooltip_Title_Left" />
-      </State>
-      <State name="Normal">
-        <Action type="SetProperty" frame="Container/TitleLabel" style="RankedBadge_Promotion_Tooltip_Title_Left" />
-      </State>
-    </StateGroup>
     <Frame type="PropertyBind" name="PropertyBindTitle">
       <Anchor relative="$parent" />
       <Source frame="$PlayerRewardPanel_RankScoreFrame" property="PopupTitle" />
@@ -2650,41 +2640,6 @@
         <Style val="ScoreLevelTitle" />
         <RenderType val="LDR" />
       </Frame>
-      <Frame type="Label" name="PromotionLabel">
-        <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
-        <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
-        <Anchor side="Top" relative="$parent/NameLabel" pos="Max" offset="0" />
-        <Unclipped val="True" />
-        <Text val="Promotion Game" />
-        <Style val="RankedBadge_Promotion_Label" />
-        <RenderType val="LDR" />
-        <StateGroup name="PromotionState">
-          <DefaultState val="None" />
-          <State name="PromotionNextGame">
-            <When type="Property" frame="$ancestor[@type=PlayerRewardsPanel]" RankedPromotionState="PromotionNextGame" />
-            <Action type="SetProperty" text="@UI/RankedPlay/PromotionNextGame" />
-            <Action type="SetProperty" style="RankedBadge_Promotion_Label" />
-          </State>
-          <State name="DemotionNextGame">
-            <When type="Property" frame="$ancestor[@type=PlayerRewardsPanel]" RankedPromotionState="DemotionNextGame" />
-            <Action type="SetProperty" text="@UI/RankedPlay/DemotionNextGame" />
-            <Action type="SetProperty" style="RankedBadge_Demotion_Label" />
-          </State>
-          <State name="Promotion">
-            <When type="Property" frame="$ancestor[@type=PlayerRewardsPanel]" RankedPromotionState="Promotion" />
-            <Action type="SetProperty" text="@UI/RankedPlay/Promotion" />
-            <Action type="SetProperty" style="RankedBadge_Promotion_Label" />
-          </State>
-          <State name="Demotion">
-            <When type="Property" frame="$ancestor[@type=PlayerRewardsPanel]" RankedPromotionState="Demotion" />
-            <Action type="SetProperty" text="@UI/RankedPlay/Demotion" />
-            <Action type="SetProperty" style="RankedBadge_Demotion_Label" />
-          </State>
-          <State name="None">
-            <Action type="SetProperty" text="" />
-          </State>
-        </StateGroup>
-      </Frame>
     </Frame>
     <Frame type="Frame" name="LossForgivenessIcon" template="PlayerRewardsPanel/LossForgivenessIconTemplate">
       <Anchor side="Top" relative="$parent/RankScoreFrame/BadgeContainer" pos="Min" offset="64" />
@@ -2873,14 +2828,18 @@
             <Action type="SetProperty" CountdownSound="UI_BNet_ProgressionCounter_Loop3" />
           </State>
         </StateGroup>
-        <Animation name="CountUp">
+        <Animation name="CountdownStarting">
           <Event event="CountdownStarting" action="Reset,Play" frame="$parent/$parent/RankScoreFrame" />
+          <Controller type="Event" end="Pause" frame="$parent/$parent">
+            <Key type="Event" time="0.5" event="StartRankCountingAnimation" />
+            <Key type="Event" time="2.0" event="ResumeScoreAnimation" />
+          </Controller>
+        </Animation>
+        <Animation name="CountUp">
+          <Event event="RankCountdownStarting" action="Reset,Play" frame="$parent/$parent/RankScoreFrame" />
           <Controller type="Counter" end="Pause">
             <Key type="Curve" time="0.0" value="0.0" inout="Linear,Slow" />
             <Key type="Curve" time="3.5" value="1.0" inout="Slow,Linear" />
-          </Controller>
-          <Controller type="Event" end="Pause" frame="$parent/$parent">
-            <Key type="Event" time="2.0" event="ResumeScoreAnimation" />
           </Controller>
         </Animation>
       </Frame>
@@ -3356,18 +3315,6 @@
         <When type="Property" frame="RankScoreFrame" PromotionState="Demotion" />
         <When type="Property" frame="RankScoreFrame" inheritedVisible="true" />
         <Action type="PlaySound" sound="*@UI_BNet_Progression_Levelup_RankedBadge_Decline_Start" />
-      </State>
-      <State name="EnterPromotionReady">
-        <When type="Property" frame="RankScoreFrame" PromotionState="PromotionNextGame" />
-        <When type="Property" frame="RankScoreFrame" inheritedVisible="true" />
-        <Action type="PlaySound" sound="*@UI_BNet_Progression_Promotion_Loop" />
-        <Action type="PlaySound" sound="*@UI_BNet_Progression_Promotion_Loop_End" on="Exit" />
-      </State>
-      <State name="EnterDemotionReady">
-        <When type="Property" frame="RankScoreFrame" PromotionState="DemotionNextGame" />
-        <When type="Property" frame="RankScoreFrame" inheritedVisible="true" />
-        <Action type="PlaySound" sound="*@UI_BNet_Progression_Demotion_Loop" />
-        <Action type="PlaySound" sound="*@UI_BNet_Progression_Demotion_Loop_End" on="Exit" />
       </State>
     </StateGroup>
     <StateGroup name="RankCountingSound">
