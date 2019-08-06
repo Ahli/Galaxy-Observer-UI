@@ -42,7 +42,7 @@ public class ConcurrentWeakWeakHashMap <K> implements ConcurrentMap<K, K> {
 	private final ReferenceQueue<K> queue = new ReferenceQueue<>();
 	
 	public ConcurrentWeakWeakHashMap() {
-		this(8, 0.9f, 1);
+		this(8, 0.9F, 1);
 	}
 	
 	public ConcurrentWeakWeakHashMap(final int initialCapacity, final float loadFactor, final int concurrencyLevel) {
@@ -220,7 +220,7 @@ public class ConcurrentWeakWeakHashMap <K> implements ConcurrentMap<K, K> {
 		};
 	}
 	
-	private static class WeakReferenceWithHash <T> extends java.lang.ref.WeakReference<T> {
+	private static final class WeakReferenceWithHash <T> extends java.lang.ref.WeakReference<T> {
 		
 		private final int hashCode;
 		

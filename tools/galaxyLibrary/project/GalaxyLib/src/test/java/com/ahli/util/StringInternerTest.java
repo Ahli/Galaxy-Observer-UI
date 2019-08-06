@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith (MockitoExtension.class)
-class StringInternerTest {
+final class StringInternerTest {
 	
 	//	@BeforeEach
 	//	public void initMocks() {

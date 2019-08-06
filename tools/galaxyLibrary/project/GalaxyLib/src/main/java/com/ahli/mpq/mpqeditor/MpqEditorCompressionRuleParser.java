@@ -24,23 +24,23 @@ public final class MpqEditorCompressionRuleParser {
 	}
 	
 	private static MpqEditorCompressionRule parseRuleMask(final String ruleString) throws IOException {
-		final int start = ruleString.indexOf(':') + 1;
 		final int end = ruleString.indexOf('=');
 		if (end < 0) {
 			throw new IOException(String.format("Unable to parse Compression Rule: %s", ruleString));
 		}
+		final int start = ruleString.indexOf(':') + 1;
 		final MpqEditorCompressionRule rule = new MpqEditorCompressionRuleMask(ruleString.substring(start, end));
 		parseAbstractFields(rule, ruleString);
 		return rule;
 	}
 	
 	private static MpqEditorCompressionRule parseRuleSize(final String ruleString) throws IOException {
-		final int start = ruleString.indexOf(':') + 1;
 		final int dividerIndex = ruleString.indexOf('-');
 		final int end = ruleString.indexOf('=');
 		if (dividerIndex < 0 || end < 0 || dividerIndex + 1 >= end) {
 			throw new IOException(String.format("Unable to parse Compression Rule: %s", ruleString));
 		}
+		final int start = ruleString.indexOf(':') + 1;
 		final int minSize = Integer.parseInt(ruleString.substring(start, dividerIndex));
 		final int maxSize = Integer.parseInt(ruleString.substring(dividerIndex + 1, end));
 		final MpqEditorCompressionRule rule = new MpqEditorCompressionRuleSize(minSize, maxSize);

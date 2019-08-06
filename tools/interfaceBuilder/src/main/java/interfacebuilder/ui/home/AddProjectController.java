@@ -41,6 +41,10 @@ public class AddProjectController {
 	private Dialog<Project> dialog;
 	private Project project;
 	
+	public AddProjectController(){
+		// nothing to do
+	}
+	
 	public void browsePathAction() {
 		final DirectoryChooser directoryChooser = new DirectoryChooser();
 		directoryChooser.setTitle("Select an existing Observer UI's directory.");
@@ -102,14 +106,14 @@ public class AddProjectController {
 		if (logger.isTraceEnabled()) {
 			logger.trace("add project action event fired");
 		}
-		final String name = projectNameLabel.getText();
-		final String path = projectPathLabel.getText();
 		final Game game = gameDropdown.getValue();
 		if (game == null) {
 			// eat event before it reaches the resultConverter
 			event.consume();
 			return;
 		}
+		final String name = projectNameLabel.getText();
+		final String path = projectPathLabel.getText();
 		if (project == null) {
 			project = new Project(name, path, game);
 		} else {

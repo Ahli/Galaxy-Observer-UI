@@ -68,7 +68,7 @@ public class RecursiveDOMTest {
 			e.printStackTrace();
 		}
 		
-		final long executionTime = (System.currentTimeMillis() - startTime);
+		final long executionTime = System.currentTimeMillis() - startTime;
 		endMem = rt.totalMemory() - rt.freeMemory();
 		if (iterations != 0) {
 			System.out.println(

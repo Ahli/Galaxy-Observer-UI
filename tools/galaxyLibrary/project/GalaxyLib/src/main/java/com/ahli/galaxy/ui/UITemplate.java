@@ -27,6 +27,7 @@ public class UITemplate implements DeepCopyable {
 	}
 	
 	public UITemplate() {
+		// nothing to do
 	}
 	
 	/**

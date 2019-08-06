@@ -16,9 +16,6 @@ import com.ximpleware.XPathParseException;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.w3c.dom.Comment;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -26,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Collection;
-import java.util.Locale;
 
 /**
  * TODO improve, it is ba
@@ -114,49 +110,6 @@ public final class XmlCompressorVtd {
 			} catch (final ModifyException | XPathParseException | XPathEvalException | NavException | IOException | TranscodeException e) {
 				logger.error("ERROR: while compressing xml file " + curFile.getAbsolutePath(), e);
 			}
-		}
-	}
-	
-	/**
-	 * @param childNodes
-	 * @param ignoreCount
-	 */
-	private static void removeCommentsInChildNodes(final NodeList childNodes, int ignoreCount) {
-		for (int i = 0; i < childNodes.getLength(); i++) {
-			final Node curNode = childNodes.item(i);
-			
-			if (curNode.getNodeType() == Node.COMMENT_NODE) {
-				if (ignoreCount == 0) {
-					
-					// keep hotkeys/settings definition alive
-					final Comment comment = (Comment) curNode;
-					final String text = comment.getData().trim().toLowerCase(Locale.ENGLISH);
-					if (!text.contains(AHLI_HOTKEY) && !text.contains(AHLI_SETTING)) {
-						
-						curNode.getParentNode().removeChild(curNode);
-						
-					}
-					
-				} else {
-					ignoreCount--;
-				}
-			} else {
-				removeCommentsInChildNodes(curNode.getChildNodes(), ignoreCount);
-			}
-		}
-	}
-	
-	/**
-	 * @param node
-	 */
-	public static void trimWhitespace(final Node node) {
-		final NodeList childNodes = node.getChildNodes();
-		for (int i = 0; i < childNodes.getLength(); i++) {
-			final Node child = childNodes.item(i);
-			if (child.getNodeType() == Node.TEXT_NODE) {
-				child.setTextContent(child.getTextContent().trim());
-			}
-			trimWhitespace(child);
 		}
 	}
 	

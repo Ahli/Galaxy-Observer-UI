@@ -17,6 +17,7 @@ public class AddProjectDialogController {
 	
 	
 	public AddProjectDialogController() {
+		// nothing to do
 	}
 	
 	public AddProjectController getContentController() {

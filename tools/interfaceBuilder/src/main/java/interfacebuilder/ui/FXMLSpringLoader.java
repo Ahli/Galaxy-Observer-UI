@@ -21,15 +21,19 @@ public class FXMLSpringLoader extends FXMLLoader implements ApplicationContextAw
 	private ApplicationContext context;
 	
 	public FXMLSpringLoader(final ApplicationContext applicationContext) {
-		setApplicationContext(applicationContext);
+		setApplicationContextPrivate(applicationContext);
 	}
 	
-	@Override
-	public void setApplicationContext(final ApplicationContext applicationContext) {
+	private void setApplicationContextPrivate(final ApplicationContext applicationContext) {
 		context = applicationContext;
 		setControllerFactory(applicationContext::getBean);
 		setResources(
 				new MessageSourceResourceBundle(applicationContext.getBean(MessageSource.class), Locale.getDefault()));
+	}
+	
+	@Override
+	public void setApplicationContext(final ApplicationContext applicationContext) {
+		setApplicationContextPrivate(applicationContext);
 	}
 	
 	public <T> T load(final String resourceLocation) throws IOException {

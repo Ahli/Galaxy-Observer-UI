@@ -75,6 +75,7 @@ import java.util.concurrent.TimeUnit;
 @Import ( { AppConfiguration.class, FxmlConfiguration.class })
 public class InterfaceBuilderApp extends Application {
 	private static final Logger logger = LogManager.getLogger(InterfaceBuilderApp.class);
+	public static final String FATAL_ERROR = "FATAL ERROR: ";
 	public static boolean javaFxInitialized;
 	private static InterfaceBuilderApp instance;
 	private static ServerSocket serverSocket;
@@ -194,9 +195,9 @@ public class InterfaceBuilderApp extends Application {
 						}
 					} catch (final IOException e) {
 						final String message = e.getMessage();
-						if ("Socket is closed".equals(message) || "socket closed".equals(message) ||
+						if ("socket closed".equalsIgnoreCase(message) || "Socket is closed".equals(message) ||
 								("Interrupted function call: accept failed").equals(message)) {
-							// close thread, socket was closed
+							// close thread, socket was closed ("socket closed" ignores case for JDK 13+)
 							return;
 						}
 						logger.error("I/O Exception while waiting for client connections.", e);
@@ -257,7 +258,7 @@ public class InterfaceBuilderApp extends Application {
 				} catch (final InterruptedException e) {
 					Thread.currentThread().interrupt();
 				} catch (final Exception e) {
-					logger.fatal("FATAL ERROR: ", e);
+					logger.fatal(FATAL_ERROR, e);
 				} finally {
 					InterProcessCommunicationAppender.sendTerminationSignal();
 				}
@@ -297,7 +298,7 @@ public class InterfaceBuilderApp extends Application {
 							delay.setOnFinished(event -> primaryStage.close());
 							delay.play();
 						} catch (final Exception e) {
-							logger.fatal("FATAL ERROR: ", e);
+							logger.fatal(FATAL_ERROR, e);
 						}
 					});
 				} else {
@@ -306,7 +307,7 @@ public class InterfaceBuilderApp extends Application {
 						try {
 							primaryStage.close();
 						} catch (final Exception e) {
-							logger.fatal("FATAL ERROR: ", e);
+							logger.fatal(FATAL_ERROR, e);
 						}
 					});
 				}
@@ -394,7 +395,7 @@ public class InterfaceBuilderApp extends Application {
 			try {
 				logger.info(msg);
 			} catch (final Exception e) {
-				logger.fatal("FATAL ERROR: ", e);
+				logger.fatal(FATAL_ERROR, e);
 			}
 		});
 	}
@@ -619,7 +620,7 @@ public class InterfaceBuilderApp extends Application {
 			try {
 				getTabPane().getTabs().add(newTab);
 			} catch (final Exception e) {
-				logger.fatal("FATAL ERROR: ", e);
+				logger.fatal(FATAL_ERROR, e);
 			}
 		});
 	}
@@ -651,7 +652,7 @@ public class InterfaceBuilderApp extends Application {
 			try {
 				logger.error(msg);
 			} catch (final Exception e) {
-				logger.fatal("FATAL ERROR: ", e);
+				logger.fatal(FATAL_ERROR, e);
 			}
 		});
 	}

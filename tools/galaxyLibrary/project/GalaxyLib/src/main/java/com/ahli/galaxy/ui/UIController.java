@@ -166,7 +166,7 @@ public class UIController extends UIElement {
 	
 	@Override
 	public List<UIElement> getChildrenRaw() {
-		return null;
+		return null; // returning null is desired here
 	}
 	
 	@Override

@@ -16,6 +16,7 @@ public abstract class MpqEditorCompressionRule implements DeepCopyable {
 	private MpqEditorCompressionRuleMethod compressionMethod = MpqEditorCompressionRuleMethod.NONE;
 	
 	public MpqEditorCompressionRule() {
+		// nothing to do
 	}
 	
 	/**

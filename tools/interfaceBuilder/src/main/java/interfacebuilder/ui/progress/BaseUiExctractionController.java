@@ -9,12 +9,9 @@ import interfacebuilder.integration.FileService;
 import interfacebuilder.ui.settings.Updateable;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class BaseUiExctractionController implements Updateable {
-	private static final Logger logger = LogManager.getLogger(BaseUiExctractionController.class);
 	
 	@FXML
 	public Label titleLabel;
@@ -34,12 +31,12 @@ public class BaseUiExctractionController implements Updateable {
 	 * Automatically called by FxmlLoader
 	 */
 	public void initialize() {
-		
+		// nothing to do
 	}
 	
 	@Override
 	public void update() {
-		// nothing to do?
+		// nothing to do
 	}
 	
 }

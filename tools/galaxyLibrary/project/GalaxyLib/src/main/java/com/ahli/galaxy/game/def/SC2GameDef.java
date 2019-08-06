@@ -14,6 +14,7 @@ public class SC2GameDef extends GameDef {
 	 *
 	 */
 	public SC2GameDef() {
+		super();
 		name = "StarCraft II";
 		nameHandle = "sc2";
 		modFileEnding = "SC2Mod";

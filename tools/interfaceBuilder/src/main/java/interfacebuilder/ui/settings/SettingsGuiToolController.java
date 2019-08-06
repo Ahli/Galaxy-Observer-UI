@@ -30,6 +30,10 @@ public class SettingsGuiToolController extends SettingsAutoSaveController {
 	@FXML
 	private CheckBox checkXml;
 	
+	public SettingsGuiToolController() {
+		// nothing to do
+	}
+	
 	/**
 	 * Automatically called by FxmlLoader
 	 */

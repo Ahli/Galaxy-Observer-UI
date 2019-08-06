@@ -374,7 +374,7 @@ public class MpqBuilderService {
 	 *
 	 * @param followupTask
 	 */
-	private void addTaskToExecutor(final Runnable followupTask) {
+	private static void addTaskToExecutor(final Runnable followupTask) {
 		if (followupTask != null) {
 			InterfaceBuilderApp.getInstance().getExecutor().execute(followupTask);
 		}

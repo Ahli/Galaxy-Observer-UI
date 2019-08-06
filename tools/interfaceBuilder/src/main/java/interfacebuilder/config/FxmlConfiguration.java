@@ -8,6 +8,8 @@ import interfacebuilder.ui.browse.BrowseTabController;
 import interfacebuilder.ui.home.AddProjectController;
 import interfacebuilder.ui.home.AddProjectDialogController;
 import interfacebuilder.ui.home.HomeController;
+import interfacebuilder.ui.home.NewProjectController;
+import interfacebuilder.ui.home.NewProjectDialogController;
 import interfacebuilder.ui.home.ViewRuleSetController;
 import interfacebuilder.ui.navigation.NavigationController;
 import interfacebuilder.ui.progress.CompressionMiningController;
@@ -73,6 +75,18 @@ public class FxmlConfiguration {
 	@Bean
 	public TabPaneController tabPaneController() {
 		return new TabPaneController();
+	}
+	
+	@Bean
+	@Scope (ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+	public NewProjectController newProjectController() {
+		return new NewProjectController();
+	}
+	
+	@Bean
+	@Scope (ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+	public NewProjectDialogController newProjectDialogController() {
+		return new NewProjectDialogController();
 	}
 	
 	@Bean

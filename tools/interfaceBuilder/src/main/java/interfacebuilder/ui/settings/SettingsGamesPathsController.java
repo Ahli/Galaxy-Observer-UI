@@ -38,6 +38,10 @@ public class SettingsGamesPathsController extends SettingsAutoSaveController {
 	@Autowired
 	private FileService fileService;
 	
+	public SettingsGamesPathsController() {
+		// nothing to do
+	}
+	
 	/**
 	 * Automatically called by FxmlLoader
 	 */

@@ -26,14 +26,14 @@ public class Project {
 	@GeneratedValue (strategy = GenerationType.AUTO)
 	private Integer id;
 	
-	@Column (unique = false, length = 30, nullable = false)
+	@Column (unique = false, nullable = false, length = 30)
 	private String name;
 	
-	@Column (unique = true, length = 255, nullable = false)
+	@Column (unique = true, nullable = false/*, length = 255*/)
 	private String projectPath;
 	
 	@Enumerated (EnumType.STRING)
-	@Column (length = 8, nullable = false)
+	@Column (nullable = false, length = 8)
 	private Game game;
 	
 	@Column (name = "lastBuildDate")
@@ -42,7 +42,7 @@ public class Project {
 	@Column
 	private Long lastBuildSize;
 	
-	@OneToOne (fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToOne (cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
 	private RuleSet bestCompressionRuleSet;
 	
 	public Project() {

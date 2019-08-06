@@ -6,6 +6,7 @@ package interfacebuilder.projects;
 import com.ahli.galaxy.game.GameData;
 import interfacebuilder.build.MpqBuilderService;
 import interfacebuilder.compress.RuleSet;
+import interfacebuilder.projects.enums.Game;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOCase;
 import org.apache.commons.io.filefilter.IOFileFilter;
@@ -15,12 +16,21 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Iterator;
 import java.util.List;
 
@@ -139,5 +149,27 @@ public class ProjectService {
 			project.setBestCompressionRuleSet(project2.getBestCompressionRuleSet());
 		}
 		return project.getBestCompressionRuleSet();
+	}
+	
+	public void createTemplateProjectFiles(final Project project) throws IOException {
+		final String intPath;
+		if (project.getGame() == Game.SC2) {
+			intPath = "classpath:res/templates/sc2/interface";
+		} else {
+			intPath = "classpath:res/templates/heroes/interface";
+		}
+		final Path projPath = Path.of(project.getProjectPath());
+		final var resolver = new PathMatchingResourcePatternResolver();
+		logger.trace("creating template");
+		for (final Resource res : resolver.getResources(intPath)) {
+			logger.trace("writing file " + intPath);
+			try (final InputStream in = new BufferedInputStream(res.getInputStream(), 1024);
+			     final OutputStream out = Files.newOutputStream(projPath)) {
+				
+				Files.copy(in, Path.of(projPath + File.separator + res.getFilename()),
+						StandardCopyOption.REPLACE_EXISTING);
+			}
+		}
+		logger.trace("create template finished");
 	}
 }

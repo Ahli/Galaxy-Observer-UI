@@ -14,6 +14,7 @@ public class HeroesGameDef extends GameDef {
 	 *
 	 */
 	public HeroesGameDef() {
+		super();
 		name = "Heroes of the Storm";
 		nameHandle = "heroes";
 		modFileEnding = "stormmod";

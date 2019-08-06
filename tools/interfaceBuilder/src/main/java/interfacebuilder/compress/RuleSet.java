@@ -35,7 +35,19 @@ public class RuleSet {
 	}
 	
 	public RuleSet(final MpqEditorCompressionRule... compressionRules) {
-		setCompressionRules(compressionRules);
+		setCompressionRulesPrivate(compressionRules);
+	}
+	
+	@Transient
+	private void setCompressionRulesPrivate(final MpqEditorCompressionRule... compressionRules) {
+		this.compressionRules = compressionRules;
+		
+		// update string representation in DB
+		final String[] rulesStrings = new String[compressionRules.length];
+		for (int i = 0; i < compressionRules.length; i++) {
+			rulesStrings[i] = compressionRules[i].toString();
+		}
+		compressionRulesString = Arrays.asList(rulesStrings);
 	}
 	
 	public Long getId() {
@@ -60,14 +72,7 @@ public class RuleSet {
 	
 	@Transient
 	public void setCompressionRules(final MpqEditorCompressionRule... compressionRules) {
-		this.compressionRules = compressionRules;
-		
-		// update string representation in DB
-		final String[] rulesStrings = new String[compressionRules.length];
-		for (int i = 0; i < compressionRules.length; i++) {
-			rulesStrings[i] = compressionRules[i].toString();
-		}
-		compressionRulesString = Arrays.asList(rulesStrings);
+		setCompressionRulesPrivate(compressionRules);
 	}
 	
 	public List<String> getCompressionRulesString() {

@@ -69,7 +69,7 @@ public class SettingsIniInterface {
 	public SettingsIniInterface(final String settingsFilePath) {
 		this.settingsFilePath = settingsFilePath;
 		try {
-			readSettingsFromFile();
+			readSettingsFromFilePrivate();
 		} catch (final IOException e) {
 			logger.error(
 					String.format("Failed to load settings from ini at construction. Filepath=%s", settingsFilePath),
@@ -83,7 +83,7 @@ public class SettingsIniInterface {
 	 * @throws IOException
 	 * 		when there is an error reading the file
 	 */
-	public void readSettingsFromFile() throws IOException {
+	private void readSettingsFromFilePrivate() throws IOException {
 		final File f = new File(settingsFilePath);
 		if (f.exists()) {
 			try {
@@ -143,6 +143,7 @@ public class SettingsIniInterface {
 			// load current file
 			ini = b.getConfiguration();
 		} catch (final ConfigurationException e) {
+			logger.trace("Failed to load ini file.", e);
 			// create new one if not present
 			ini = new INIConfiguration();
 		}
@@ -179,6 +180,16 @@ public class SettingsIniInterface {
 		section.setProperty(COMPRESS_XML, guiCompressXml);
 		section.setProperty(COMPRESS_MPQ, guiCompressMpq);
 		section.setProperty(BUILD_UNPROTECTED_TOO, guiBuildUnprotectedToo);
+	}
+	
+	/**
+	 * Read all Settings from the Settings file. If that file does not exist, it will be created.
+	 *
+	 * @throws IOException
+	 * 		when there is an error reading the file
+	 */
+	public void readSettingsFromFile() throws IOException {
+		readSettingsFromFilePrivate();
 	}
 	
 	/**

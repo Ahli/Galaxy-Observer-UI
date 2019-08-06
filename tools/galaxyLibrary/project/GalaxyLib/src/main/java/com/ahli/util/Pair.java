@@ -99,7 +99,7 @@ public class Pair <K, V> {
 		}
 		if (o instanceof Pair) {
 			final Pair<?, ?> pair = (Pair<?, ?>) o;
-			return key != null ? key.equals(pair.key) : pair.key == null;
+			return key != null ? key.equals(pair.key) : (pair.key == null);
 		}
 		return false;
 	}

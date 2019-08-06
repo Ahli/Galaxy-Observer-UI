@@ -93,8 +93,8 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		statesToCloseLevel = new ArrayList<>();
 		addedFinalElements = new HashMap<>();
 		paramDeduplicate = deduplicate;
-		addedElements = deduplicate ? new ArrayList<>(35000) : null;
-		deduplicatedElements = deduplicate ? new THashSet<>(13000) : null;
+		addedElements = deduplicate ? new ArrayList<>(35_000) : null;
+		deduplicatedElements = deduplicate ? new THashSet<>(13_000) : null;
 		parser.setConsumer(this);
 	}
 	
@@ -224,7 +224,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					logger.error("Unknown type defined in child element of: " + curElement);
 					type = FRAME;
 				}
-				final var newElemUiFrame = ((UIFrame) newElem);
+				final var newElemUiFrame = (UIFrame) newElem;
 				if (!checkFrameTypeCompatibility(type, newElemUiFrame.getType())) {
 					logger.warn("WARN: The type of the frame is not compatible with the used template.");
 				}
@@ -268,7 +268,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				if (curElement != null) {
 					if (curElement instanceof UIAnimation) {
 						((UIAnimation) curElement).getControllers().add((UIController) newElem);
-						final var newElemUiController = ((UIController) newElem);
+						final var newElemUiController = (UIController) newElem;
 						for (int j = 0, len = attrValues.size(); j < len; j++) {
 							newElemUiController.addValue(attrTypes.get(j), attrValues.get(j));
 						}
@@ -315,7 +315,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					logger.error("Constant '" + name + "' has no value defined");
 					return;
 				}
-				var newElemUiConstant = ((UIConstant) newElem);
+				var newElemUiConstant = (UIConstant) newElem;
 				newElemUiConstant.setValue(val);
 				if (paramDeduplicate) {
 					final UIElement refToDuplicate = addedFinalElements.get(newElem);
@@ -575,7 +575,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	 *
 	 * @param thisElem
 	 */
-	private void setImplicitControllerNames(final UIAnimation thisElem) {
+	private static void setImplicitControllerNames(final UIAnimation thisElem) {
 		if (logger.isTraceEnabled()) {
 			logger.trace("Setting implicit controller names for UIAnimation " + thisElem.getName());
 		}
@@ -598,7 +598,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	 * @param newName
 	 * @return
 	 */
-	private UIElement instanciateTemplateFromList(final List<UITemplate> templates, final String fileName,
+	private static UIElement instanciateTemplateFromList(final List<UITemplate> templates, final String fileName,
 			final String path, final String newName) {
 		final String newPath = UIElement.removeLeftPathLevel(path);
 		
@@ -651,42 +651,42 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		}
 	}
 	
-	private void addToAddedElements(final UIElement elem) {
-		addedElements.add(elem);
-		if (elem instanceof UIState) {
-			final UIState state = (UIState) elem;
-			addedElements.addAll(state.getActions());
-			addedElements.addAll(state.getWhens());
-		} else if (elem instanceof UIFrame) {
-			final UIFrame frame = (UIFrame) elem;
-			addedElements.addAll(frame.getAttributes());
-			final List<UIElement> childrenRaw = frame.getChildrenRaw();
-			if (childrenRaw != null) {
-				for (final UIElement child : childrenRaw) {
-					addToAddedElements(child);
-				}
-			}
-		} else if (elem instanceof UIStateGroup) {
-			final UIStateGroup stateGroup = (UIStateGroup) elem;
-			addedElements.addAll(stateGroup.getStates());
-		} else if (elem instanceof UIController) {
-			final UIController controller = (UIController) elem;
-			addedElements.addAll(controller.getKeys());
-		} else if (elem instanceof UIAnimation) {
-			final UIAnimation anim = (UIAnimation) elem;
-			final UIAttribute driver = anim.getDriver();
-			if (driver != null) {
-				addedElements.add(driver);
-			}
-			for (final UIElement event : anim.getEvents()) {
-				addToAddedElements(event);
-			}
-			for (final UIElement controller : anim.getControllers()) {
-				addToAddedElements(controller);
-			}
-		}
-		// Constants and Attributes do not contain any further elements
-	}
+	//	private void addToAddedElements(final UIElement elem) {
+	//		addedElements.add(elem);
+	//		if (elem instanceof UIState) {
+	//			final UIState state = (UIState) elem;
+	//			addedElements.addAll(state.getActions());
+	//			addedElements.addAll(state.getWhens());
+	//		} else if (elem instanceof UIFrame) {
+	//			final UIFrame frame = (UIFrame) elem;
+	//			addedElements.addAll(frame.getAttributes());
+	//			final List<UIElement> childrenRaw = frame.getChildrenRaw();
+	//			if (childrenRaw != null) {
+	//				for (final UIElement child : childrenRaw) {
+	//					addToAddedElements(child);
+	//				}
+	//			}
+	//		} else if (elem instanceof UIStateGroup) {
+	//			final UIStateGroup stateGroup = (UIStateGroup) elem;
+	//			addedElements.addAll(stateGroup.getStates());
+	//		} else if (elem instanceof UIController) {
+	//			final UIController controller = (UIController) elem;
+	//			addedElements.addAll(controller.getKeys());
+	//		} else if (elem instanceof UIAnimation) {
+	//			final UIAnimation anim = (UIAnimation) elem;
+	//			final UIAttribute driver = anim.getDriver();
+	//			if (driver != null) {
+	//				addedElements.add(driver);
+	//			}
+	//			for (final UIElement event : anim.getEvents()) {
+	//				addToAddedElements(event);
+	//			}
+	//			for (final UIElement controller : anim.getControllers()) {
+	//				addToAddedElements(controller);
+	//			}
+	//		}
+	//		// Constants and Attributes do not contain any further elements
+	//	}
 	
 	@Override
 	public void endLayoutFile() {
@@ -709,7 +709,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			logger.info("elements added that can be deduplicated during postprocessing: " + addedElements.size());
 			logger.info("unique elements added that were deduplicated during parsing: " + addedFinalElements.size());
 			addedElements = null;
-			toDeduplicate = new ArrayDeque<>(74000);
+			toDeduplicate = new ArrayDeque<>(74_000);
 			// replace instancesb
 			
 			toDeduplicate.addAll(catalog.getTemplates());

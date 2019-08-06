@@ -323,6 +323,7 @@ public class BaseUiService {
 						isPtr = isPtr(new File(baseUiPath));
 					} catch (final IOException e) {
 						// do nothing
+						logger.trace("Ignoring error in isPtr() check on baseUiPath.", e);
 					}
 					try {
 						if (cacheIsUpToDateCheckException(game.getGameDef(), isPtr)) {
@@ -401,7 +402,7 @@ public class BaseUiService {
 		try {
 			return cacheIsUpToDate(gameDef, usePtr);
 		} catch (final NoSuchFileException e) {
-			logger.trace("No cache exists for " + gameDef.getName());
+			logger.trace("No cache exists for " + gameDef.getName(), e);
 		} catch (final IOException e) {
 			logger.info("Failed to check cache status of " + gameDef.getName() + ":", e);
 		}

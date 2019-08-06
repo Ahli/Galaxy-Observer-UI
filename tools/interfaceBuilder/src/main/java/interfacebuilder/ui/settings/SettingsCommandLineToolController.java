@@ -30,6 +30,10 @@ public class SettingsCommandLineToolController extends SettingsAutoSaveControlle
 	@FXML
 	private CheckBox checkXml;
 	
+	public SettingsCommandLineToolController() {
+		// nothing to do
+	}
+	
 	/**
 	 * Automatically called by FxmlLoader
 	 */

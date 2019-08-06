@@ -196,9 +196,6 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	 */
 	public void buildMpq(final String absolutePath, final boolean compressXml, final MpqEditorCompression compressMpq,
 			final boolean buildUnprotectedToo) throws IOException, InterruptedException, MpqException {
-		// add 2 to be sure to have enough space for listfile and attributes
-		final int fileCount = 2 + getFileCountInFolder(new File(mpqCachePath));
-		
 		// create parent directory
 		final File targetFile = new File(absolutePath);
 		final File parentFolder = targetFile.getParentFile();
@@ -213,6 +210,9 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 			throw new MpqException(String.format(Messages.getString("MpqInterface.CouldNotCreatePath"),
 					parentFolder.getAbsolutePath()));
 		}
+		
+		// add 2 to be sure to have enough space for listfile and attributes
+		final int fileCount = 2 + getFileCountInFolder(new File(mpqCachePath));
 		
 		if (compressXml) {
 			
@@ -557,7 +557,9 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	public boolean isHeroesMpq() throws MpqException {
 		File f = new File(mpqCachePath + File.separator + "ComponentList.StormComponents");
 		if (!f.exists() || f.isDirectory()) {
-			logger.trace("file not found in archive: " + f.getAbsolutePath());
+			if (logger.isTraceEnabled()) {
+				logger.trace("file not found in archive: " + f.getAbsolutePath());
+			}
 			f = new File(mpqCachePath + File.separator + "ComponentList.SC2Components");
 			if (!f.exists() || f.isDirectory()) {
 				logger.error("ERROR: archive has no ComponentList file.");

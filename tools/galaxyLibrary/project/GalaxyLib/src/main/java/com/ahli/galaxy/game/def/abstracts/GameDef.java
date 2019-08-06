@@ -27,6 +27,10 @@ public abstract class GameDef {
 	protected String supportDirectoryX32 = "Support";
 	protected String supportDirectoryX64 = "Support64";
 	
+	public GameDef() {
+		// nothing to do
+	}
+	
 	/**
 	 * @return the layoutFileEnding
 	 */

@@ -32,6 +32,10 @@ public class SettingsController implements Updateable {
 	@FXML
 	private ScrollPane contentContainer;
 	
+	public SettingsController() {
+		// nothing to do
+	}
+	
 	/**
 	 * Automatically called by FxmlLoader
 	 */

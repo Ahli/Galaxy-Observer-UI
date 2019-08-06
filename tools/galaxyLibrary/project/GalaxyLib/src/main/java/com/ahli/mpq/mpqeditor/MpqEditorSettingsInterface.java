@@ -243,7 +243,7 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 		INIConfiguration ini = null;
 		if (rulesetFile.exists()) {
 			try {
-				final INIBuilderParameters params = new Parameters().ini().setFile(rulesetFile).setEncoding("UTF-8");
+				final INIBuilderParameters params = new Parameters().ini().setFile(rulesetFile).setEncoding(UTF_8);
 				final FileBasedConfigurationBuilder<INIConfiguration> b =
 						new FileBasedConfigurationBuilder<>(INIConfiguration.class).configure(params);
 				ini = b.getConfiguration();
@@ -261,7 +261,7 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 		// 1 adds longer archives, 2 adds replacement that is supposed to be more effective, 3 adds more like md5
 		section.setProperty(ATTR_FLAGS, 0); // default 5 "(attributes)" file becomes shorter, 0 = no file
 		// (Attributes) file is not required for at least Obs UI
-		section.setProperty(SECTOR_SIZE, 16384); // default 16384, 1024-4096 made AhliObs bigger, SC2 maps use 16384
+		section.setProperty(SECTOR_SIZE, 16_384); // default 16384, 1024-4096 made AhliObs bigger, SC2 maps use 16384
 		section.setProperty(RAW_CHUNK_SIZE, 0); // default 0
 		
 		switch (compression) {

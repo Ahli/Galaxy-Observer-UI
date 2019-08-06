@@ -52,6 +52,10 @@ public class ViewRuleSetController {
 	@Autowired
 	private ProjectService projectService;
 	
+	public ViewRuleSetController() {
+		// nothing to do
+	}
+	
 	/**
 	 * Automatically called by FxmlLoader
 	 */

@@ -14,6 +14,10 @@ import org.xml.sax.SAXParseException;
  */
 public class SilentXmlSaxErrorHandler implements ErrorHandler {
 	
+	public SilentXmlSaxErrorHandler() {
+		// nothing to do
+	}
+	
 	@Override
 	public void warning(final SAXParseException e) {
 		// do nothing to be silent

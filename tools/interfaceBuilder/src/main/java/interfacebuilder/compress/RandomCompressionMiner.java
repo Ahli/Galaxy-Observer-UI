@@ -165,7 +165,7 @@ public class RandomCompressionMiner {
 	 * @param dirty
 	 * @return
 	 */
-	private MpqEditorCompressionRule[] removeUnusedMaskEnries(final MpqEditorCompressionRule[] dirty,
+	private static MpqEditorCompressionRule[] removeUnusedMaskEnries(final MpqEditorCompressionRule[] dirty,
 			final File cacheDir) {
 		final List<MpqEditorCompressionRule> clean = new ArrayList<>();
 		String mask;

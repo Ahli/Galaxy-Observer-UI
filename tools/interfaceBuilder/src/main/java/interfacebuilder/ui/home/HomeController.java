@@ -69,6 +69,8 @@ public class HomeController implements Updateable {
 	@FXML
 	private Label selectedBuildSize;
 	@FXML
+	private Button newProject;
+	@FXML
 	private Button addProject;
 	@FXML
 	private Button removeProject;
@@ -89,6 +91,9 @@ public class HomeController implements Updateable {
 	
 	private ObservableList<Project> projectsObservable;
 	
+	public HomeController(){
+		// nothing to do
+	}
 	
 	/**
 	 * Automatically called by FxmlLoader
@@ -152,7 +157,7 @@ public class HomeController implements Updateable {
 			selectedBuildDate
 					.setText(p.getLastBuildDateTime() == null ? "-" : p.getLastBuildDateTime().format(formatter));
 			selectedBuildSize.setText(
-					p.getLastBuildSize() == null ? "-" : String.format("%,d", p.getLastBuildSize() / 1024) + " kb");
+					p.getLastBuildSize() == null ? "-" : (String.format("%,d", p.getLastBuildSize() / 1024) + " kb"));
 			try {
 				final File f = new File(p.getProjectPath());
 				selectedDirFiles.setText(String.format("%,d", fileService.getFileCountOfDirectory(f)) + " files");
@@ -160,6 +165,7 @@ public class HomeController implements Updateable {
 			} catch (final IOException e) {
 				selectedDirSize.setText("-");
 				selectedDirFiles.setText("-");
+				logger.trace("Error updating selected details panel.", e);
 			}
 			selectedPath.setText(p.getProjectPath());
 			try {
@@ -201,6 +207,22 @@ public class HomeController implements Updateable {
 		final Optional<Project> result = dialog.showAndWait();
 		if (result.isPresent()) {
 			logger.trace("dialog 'add project' result: {}", () -> result.get());
+			projectsObservable.add(result.get());
+		}
+	}
+	
+	/**
+	 * Create a new Project from a template and add it to the list.
+	 *
+	 * @throws IOException
+	 */
+	public void newProjectAction() throws IOException {
+		final FXMLSpringLoader loader = new FXMLSpringLoader(appContext);
+		final Dialog<Project> dialog = loader.load("classpath:view/Home_NewProjectDialog.fxml");
+		dialog.initOwner(newProject.getScene().getWindow());
+		final Optional<Project> result = dialog.showAndWait();
+		if (result.isPresent()) {
+			logger.trace("dialog 'new project' result: {}", () -> result.get());
 			projectsObservable.add(result.get());
 		}
 	}
