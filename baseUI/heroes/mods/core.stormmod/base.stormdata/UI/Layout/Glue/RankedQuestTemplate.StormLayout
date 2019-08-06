@@ -22,13 +22,11 @@
     <Width val="215" />
     <Height val="300" />
     <Frame type="ProgressBar" name="ProgressBar">
-      <Anchor side="Bottom" relative="$parent" pos="Max" offset="-33" />
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="-40" />
       <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
       <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
       <Width val="215" />
       <Height val="215" />
-      <MinValue val="0" />
-      <MaxValue val="1.00" />
       <Circular val="true" />
       <CircularStart val="200" />
       <CircularEndOffset val="320" />
@@ -46,21 +44,33 @@
       </Frame>
     </Frame>
     <Frame type="Label" name="ProgressLabel">
-      <Anchor side="Top" relative="$parent/ProgressBar" pos="Max" offset="-29" />
+      <Anchor side="Top" relative="$parent/ProgressBar" pos="Max" offset="-8" />
+      <Anchor side="Bottom" relative="$parent/ProgressBar" pos="Max" offset="-8" />
       <Anchor side="Left" relative="$parent/ProgressBar" pos="Mid" offset="1" />
       <Anchor side="Right" relative="$parent/ProgressBar" pos="Mid" offset="1" />
-      <Width val="60" />
+      <Height val="30" />
+      <Width val="72" />
       <Style val="HeroesBrawlPanel_QuestProgress" />
       <Text val="{ProgressFormatter/@Text}" />
       <Options val="ScaleToPreventTruncation" />
       <Frame type="TextFormatFrame" name="ProgressFormatter">
         <Anchor relative="$parent" />
         <FormatText val="@UI/Quest/Progress" />
-        <Replacement index="0" val="{$parent/$parent/ActiveRankedQuestProxy/@ProgressEarned}" />
+        <Replacement index="0" val="{$ancestor[@type=HeroRankedPanel]/@RankedQuestlineProgressEarned}" />
         <ReplacedName index="0" val="earned" />
-        <Replacement index="1" val="{$parent/$parent/ActiveRankedQuestProxy/@ProgressTotal}" />
+        <Replacement index="1" val="{$ancestor[@type=HeroRankedPanel]/@RankedQuestlineProgressTotal}" />
         <ReplacedName index="1" val="total" />
       </Frame>
+    </Frame>
+    <Frame type="Label" name="ProgressTypeLabel">
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="-58" />
+      <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
+      <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
+      <Width val="80" />
+      <Style val="HeroesBrawlPanel_QuestProgressType" />
+      <Text val="@UI/QuestObjective/Wins" />
+      <Options val="ScaleToPreventTruncation" />
+      <Visible val="{$parent/ProgressLabel/@Visible}" />
     </Frame>
     <Frame type="Image" name="CompleteIcon">
       <Anchor side="Top" relative="$parent/ProgressLabel" pos="Mid" offset="-3" />
@@ -70,12 +80,9 @@
       <Texture val="@UI/Storm_UI_Ranked_Season_Quest_Check_Mark" />
       <Visible val="False" />
     </Frame>
-    <Frame type="QuestProxyFrame" name="ActiveRankedQuestProxy">
-      <Anchor relative="$parent" />
-    </Frame>
     <StateGroup name="CompletionStates">
       <State name="Complete">
-        <When type="Property" frame="ProgressBar" Value="1" />
+        <When type="Property" frame="ProgressBar" ProgressPercent="1" />
         <Action type="SetProperty" frame="ProgressLabel" Visible="False" />
         <Action type="SetProperty" frame="CompleteIcon" Visible="True" />
       </State>
@@ -92,18 +99,22 @@
       <Animation name="BobAnim">
         <Event event="OnShown" action="Reset,Play" />
         <Controller type="Anchor" side="Top" relative="true" end="PingPong">
-          <Key type="Curve" time="0" value="-3" inout="Slow" />
-          <Key type="Curve" time="3" value="3" inout="Slow" />
+          <Key type="Curve" time="0" value="-2" inout="Slow" />
+          <Key type="Curve" time="3" value="2" inout="Slow" />
         </Controller>
         <Controller type="Anchor" side="Bottom" relative="true" end="PingPong">
-          <Key type="Curve" time="0" value="-3" inout="Slow" />
-          <Key type="Curve" time="3" value="3" inout="Slow" />
+          <Key type="Curve" time="0" value="-2" inout="Slow" />
+          <Key type="Curve" time="3" value="2" inout="Slow" />
         </Controller>
       </Animation>
+      <Frame type="Image" name="TextureRotationAnchor">
+        <Anchor relative="$parent" />
+        <Texture val="@UI/Storm_UI_Blank" />
+      </Frame>
       <Frame type="Image" name="SettingBack">
         <Anchor relative="$parent/Setting" />
-        <Rotation val="{$parent/Setting/@Rotation}" />
         <Texture val="@UI/Storm_UI_Ranked_Season_Quest_Metal_Back" />
+        <TextureCoordRotation val="{$parent/TextureRotationAnchor/@Rotation}" />
         <SubpixelRendering val="True" />
       </Frame>
       <Frame type="Image" name="Gem">
@@ -120,24 +131,49 @@
         <Texture val="@UI/Storm_UI_Ranked_Season_Quest_Metal_Front" />
         <ColorAdjustMode val="AddSelf" />
         <SubpixelRendering val="True" />
+        <TextureCoordRotation val="{$parent/TextureRotationAnchor/@Rotation}" />
+      </Frame>
+      <Frame type="Image" name="SettingShimmer">
+        <Anchor relative="$parent/Setting" />
+        <SubpixelRendering val="True" />
+        <LayerCount val="2" />
+        <Texture val="@UI/Storm_UI_Ranked_Season_Quest_Metal_Front_Mask" layer="0" />
+        <TextureCoordRotation val="{$parent/TextureRotationAnchor/@Rotation}" layer="0" />
+        <AlphaLayer val="True" layer="0" />
+        <Texture val="@UI/Storm_UI_Ranked_Season_Quest_Metal_Front_Shimmer" layer="1" />
+        <TextureCoords top="0" left="0" bottom="1" right="1" layer="1" />
+        <BlendMode val="Add" layer="1" />
+        <Animation name="ShimmerAnim">
+          <Event event="OnShown" action="Reset,Play" />
+          <Controller type="LayerUV" layer="1" side="Left" relative="True" sidelock="True" end="Loop">
+            <Key type="Curve" time="0" value="1" inout="step,slow" />
+            <Key type="Curve" time="2" value="-1" inout="fast,step" />
+            <Key type="Curve" time="9" value="-1" inout="step" />
+          </Controller>
+          <Controller type="Fade" layer="1" end="Loop">
+            <Key type="Curve" time="0" value="255" inout="step,slow" />
+            <Key type="Curve" time="2" value="200" inout="fast,step" />
+            <Key type="Curve" time="9" value="200" inout="step" />
+          </Controller>
+        </Animation>
       </Frame>
       <Frame type="Frame" name="LightningContainer">
         <Anchor relative="$parent" />
         <Visible val="False" />
         <Frame type="Image" name="LightningFx1" template="RankedQuestTemplate/LightningFxTemplate">
           <Anchor relative="$parent" />
-          <Rotation val="{$parent/$parent/Setting/@Rotation}" />
           <Texture val="@UI/Storm_UI_Ranked_Season_Quest_Lightning_01" />
+          <TextureCoordRotation val="{$parent/$parent/TextureRotationAnchor/@Rotation}" />
         </Frame>
         <Frame type="Image" name="LightningFx2" template="RankedQuestTemplate/LightningFxTemplate">
           <Anchor relative="$parent" />
           <Texture val="@UI/Storm_UI_Ranked_Season_Quest_Lightning_02" />
-          <Rotation val="{$parent/LightningFx1/@Rotation}" />
+          <TextureCoordRotation val="{$parent/$parent/TextureRotationAnchor/@Rotation}" />
         </Frame>
         <Frame type="Image" name="LightningFx3" template="RankedQuestTemplate/LightningFxTemplate">
           <Anchor relative="$parent" />
           <Texture val="@UI/Storm_UI_Ranked_Season_Quest_Lightning_03" />
-          <Rotation val="{$parent/LightningFx1/@Rotation}" />
+          <TextureCoordRotation val="{$parent/$parent/TextureRotationAnchor/@Rotation}" />
         </Frame>
         <Animation name="LightningAnim">
           <Event event="OnShown" action="Play" />
@@ -183,9 +219,9 @@
       <Animation name="RotationAnim">
         <Event event="RotationStart" action="Play" />
         <Event event="RotationStop" action="Stop" />
-        <Controller type="Rotation" frame="Setting" end="Loop">
+        <Controller type="Rotation" frame="TextureRotationAnchor" end="Loop">
           <Key type="Curve" time="0" value="0" />
-          <Key type="Curve" time="30" value="-360" />
+          <Key type="Curve" time="30" value="360" />
         </Controller>
       </Animation>
       <Animation name="GlowSetting1">
@@ -193,7 +229,7 @@
         <Event event="GlowStop" action="Stop" />
         <Controller type="AdjustmentColor" frame="Setting" end="Loop">
           <Key type="Curve" time="0" value="00FFFFFF" inout="Slow" />
-          <Key type="Curve" time="3" value="40FFFFFF" inout="Slow" />
+          <Key type="Curve" time="3" value="30FFFFFF" inout="Slow" />
           <Key type="Curve" time="6" value="00FFFFFF" inout="Slow" />
         </Controller>
       </Animation>
@@ -202,7 +238,7 @@
         <Event event="GlowStop" action="Stop" />
         <Controller type="AdjustmentColor" frame="Setting" end="Loop">
           <Key type="Curve" time="0" value="00FFFFFF" inout="Slow" />
-          <Key type="Curve" time="2" value="00FFFFFF" inout="Slow" />
+          <Key type="Curve" time="2" value="10FFFFFF" inout="Slow" />
           <Key type="Curve" time="4" value="00FFFFFF" inout="Slow" />
         </Controller>
       </Animation>
@@ -226,7 +262,7 @@
       </Animation>
       <StateGroup name="ProgressStates">
         <State name="Quest1">
-          <When type="Property" frame="$ancestor[@type=HeroRankedPanel]" RankedQuestProgress=".25" operator="LessThan" />
+          <When type="Property" frame="$ancestor[@type=HeroRankedPanel]" RankedQuestlineProgress=".25" operator="LessThan" />
           <Action type="SetProperty" frame="Gem" Visible="False" />
           <Action type="SetProperty" frame="Setting" Texture="@UI/Storm_UI_Ranked_Season_Quest_Metal_Dull_Front" />
           <Action type="SendEvent" event="RotationStop" />
@@ -234,7 +270,7 @@
           <Action type="SendEvent" event="GlowSetting1" />
         </State>
         <State name="Quest2">
-          <When type="Property" frame="$ancestor[@type=HeroRankedPanel]" RankedQuestProgress=".5" operator="LessThan" />
+          <When type="Property" frame="$ancestor[@type=HeroRankedPanel]" RankedQuestlineProgress=".5" operator="LessThan" />
           <Action type="SetProperty" frame="Gem" Texture="@UI/Storm_UI_Ranked_Season_Quest_Gem_Dull" />
           <Action type="SetProperty" frame="Setting" Texture="@UI/Storm_UI_Ranked_Season_Quest_Metal_Dull_Front" />
           <Action type="SendEvent" event="RotationStop" />
@@ -243,14 +279,14 @@
           <Action type="SendEvent" event="GlowGem2" />
         </State>
         <State name="Quest3">
-          <When type="Property" frame="$ancestor[@type=HeroRankedPanel]" RankedQuestProgress=".75" operator="LessThan" />
+          <When type="Property" frame="$ancestor[@type=HeroRankedPanel]" RankedQuestlineProgress=".75" operator="LessThan" />
           <Action type="SendEvent" event="RotationStop" />
           <Action type="SendEvent" event="GlowStop" />
           <Action type="SendEvent" event="GlowSetting2" />
           <Action type="SendEvent" event="GlowGem3" />
         </State>
         <State name="Quest4">
-          <When type="Property" frame="$ancestor[@type=HeroRankedPanel]" RankedQuestProgress="1" operator="LessThan" />
+          <When type="Property" frame="$ancestor[@type=HeroRankedPanel]" RankedQuestlineProgress="1" operator="LessThan" />
           <Action type="SendEvent" event="RotationStart" />
           <Action type="SendEvent" event="GlowStop" />
           <Action type="SendEvent" event="GlowSetting2" />
@@ -268,9 +304,10 @@
     </Frame>
     <Frame type="Label" name="Label">
       <Anchor side="Top" relative="$parent" pos="Min" offset="272" />
-      <Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
       <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
       <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+      <Height val="48" />
+      <Unclipped val="True" />
       <Style val="HeroSelectPanelButtonLabel" />
       <Text val="@UI/RankedPlay/QuestTitle" />
     </Frame>
@@ -482,6 +519,25 @@
           <ScaleHeightToTexture val="True" />
           <Texture val="@UI/Storm_UI_Ranked_Season_Quest_Eligible_Rewards_BG" />
           <Unclipped val="True" />
+          <Alpha val="90" />
+        </Frame>
+        <Frame type="Image" name="BorderImageGlow">
+          <Anchor relative="$parent/BorderImage" />
+          <Unclipped val="True" />
+          <LayerCount val="2" />
+          <Texture val="@UI/storm_ui_hud_fx_valeera_smoke" layer="0" />
+          <WrapUV val="True" layer="0" />
+          <AlphaLayer val="True" layer="0" />
+          <TextureCoords top="0" left="0" bottom=".25" right="1.5" layer="0" />
+          <TextureCoordRotation val="45" layer="0" />
+          <Texture val="@UI/Storm_UI_Ranked_Season_Quest_Eligible_Rewards_BG" layer="1" />
+          <Animation name="MaskAnimation">
+            <Event event="OnShown" action="Reset, Play" />
+            <Controller type="LayerUV" side="Right" relative="False" sidelock="True" end="Loop" layer="0">
+              <Key type="Curve" time="0" value="1" />
+              <Key type="Curve" time="22" value="-1" />
+            </Controller>
+          </Animation>
         </Frame>
         <Frame type="Label" name="Label">
           <Anchor relative="$parent" offset="0" />
