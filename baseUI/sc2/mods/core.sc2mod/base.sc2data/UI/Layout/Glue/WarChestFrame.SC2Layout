@@ -441,7 +441,10 @@
             </State>
             
             <State name="Unowned">
-                <Action type="SetProperty" frame="$this" Texture="@UI/SC2_UI_Collection_WarChest_ProgressLines_Vertical_Unowned"/>
+                <!-- <Action type="SetProperty" frame="$this" Texture="@UI/SC2_UI_Collection_WarChest_ProgressLines_Vertical_Unowned"/> -->
+                <!-- With the addition of the free track, the player should always own the War Chest so there is no reason to have this state, keeping
+                it in case we need to remove the free track at some point but making this state display the line as owned. -->
+                <Action type="SetProperty" frame="$this" Texture="@UI/SC2_UI_Collection_WarChest_ProgressLines_Vertical_Owned"/>
             </State>
         </StateGroup>
     </Frame>
@@ -451,14 +454,19 @@
         <Anchor side="Bottom" relative="$WarChestAnchorFrame" pos="Mid" offset="0"/>
         <Anchor side="Left" relative="$WarChestNodeProgressIndicatorLineAnchor" pos="Max" offset="0"/>
         <Width val="20"/>
-        <Height val="388"/>
+        <Height val="528"/>
         
         <Frame type="Image" name="LineTop" template="WarChestFrame/WarChestVerticalLineTemplate">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$TerranWarChest/OwnedStateSizingFrame" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$FreeWarChest/OwnedStateSizingFrame" pos="Min" offset="0"/>
         </Frame>
         
         <Frame type="Image" name="LineTopMiddle" template="WarChestFrame/WarChestVerticalLineTemplate">
+            <Anchor side="Top" relative="$FreeWarChest/OwnedStateSizingFrame" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$TerranWarChest/OwnedStateSizingFrame" pos="Min" offset="0"/>
+        </Frame>
+        
+        <Frame type="Image" name="LineMiddleMiddle" template="WarChestFrame/WarChestVerticalLineTemplate">
             <Anchor side="Top" relative="$TerranWarChest/OwnedStateSizingFrame" pos="Max" offset="0"/>
             <Anchor side="Bottom" relative="$ZergWarChest/OwnedStateSizingFrame" pos="Min" offset="0"/>
         </Frame>
@@ -921,6 +929,48 @@
         </Frame>
     </Frame>
     
+    <Frame type="Frame" name="WarChestFreeStartingNodeTemplate" template="WarChestFrame/WarChestTerranStartingNodeTemplate">
+        
+        <Frame type="GameContentDialogButton" name="WarChestRaceButton">
+			<Enabled val="false"/>
+            <GameContent val=""/>
+            
+            <Frame type="Image" name="NormalImage">
+                <Texture val="@UI/SC2_UI_Collection_WarChest_RaceButton" layer="3"/>
+            </Frame>
+            
+            <Frame type="Image" name="HoverImage">
+                <Texture val="@UI/SC2_UI_Collection_WarChest_RaceButton_Hover" layer="3"/>
+            </Frame>
+			
+            <StateGroup name="ButtonIconStateGroup">
+                <DefaultState val="Normal"/>
+                
+                <State name="Disabled">
+                    <When type="Property" Enabled="true"/>
+                    <Action type="SetProperty" frame="RaceIcon" Texture="@UI/SC2_UI_Collection_WarChest_RaceIconFree_Disabled"/>
+                    <Action type="SetProperty" frame="$parent/WarChestRaceDisabledButton" Visible="true"/>
+                </State>
+                
+                <State name="Hover">
+                    <When type="Property" Hovering="true"/>
+                    <Action type="SetProperty" frame="RaceIcon" Texture="@UI/SC2_UI_Collection_WarChest_RaceIconFree_Hover"/>
+                    <Action type="SetProperty" frame="$parent/WarChestRaceDisabledButton" Visible="false"/>
+                </State>
+                
+                <State name="Normal">
+                    <Action type="SetProperty" frame="RaceIcon" Texture="@UI/SC2_UI_Collection_WarChest_RaceIconFree"/>
+                    <Action type="SetProperty" frame="$parent/WarChestRaceDisabledButton" Visible="false"/>
+                </State>
+            </StateGroup>
+        </Frame>
+    
+        <Frame type="WarChestTierFrame" name="WarChestTierFrame">
+			<TooltipFrame val="WarChestFreeStartingNodeTooltip"/>
+            <RewardGroup val="Free"/>
+        </Frame>
+    </Frame>
+    
     <Frame type="Frame" name="WarChestProtossStartingNodeTemplate" template="WarChestFrame/WarChestTerranStartingNodeTemplate">
         
         <Frame type="GameContentDialogButton" name="WarChestRaceButton">
@@ -1285,15 +1335,21 @@
             <Height val="58"/>
             
             <StateGroup name="OwnedState">
-                <DefaultState val="Unowned"/>
+                <DefaultState val="Owned"/>
                 
-                <State name="Owned">
+                <!-- <State name="Owned">
                     <When type="Property" frame="$parent/WarChestNode0/WarChestOwnedAchievement" Awarded="True"/>
                     <Action type="SetProperty" frame="$this" Height="58"/>
-                </State>
+                </State> -->
                 
                 <State name="Unowned">
+                    <When type="Property" frame="$parent/WarChestNode0/WarChestOwnedAchievement" Awarded="False"/>
+                    <When type="Property" frame="$parent/WarChestNode0/WarChestTierFrame" RewardGroup="Free" operator="NotEqual"/>
                     <Action type="SetProperty" frame="$this" Height="48"/>
+                </State>
+                
+                <State name="Owned">
+                    <Action type="SetProperty" frame="$this" Height="58"/>
                 </State>
             </StateGroup>
         </Frame>
@@ -1609,12 +1665,36 @@
     
     <!-- 
     =====================
+    FREE WAR CHEST TEMPLATE
+    =====================
+    -->
+    <Frame type="Frame" name="FreeWarChestTemplate" template="WarChestFrame/WarChestRaceTemplate">
+        <Anchor side="Top" relative="$parent/WarChestAnchorFrame" pos="Mid" offset="-210"/>
+        <Anchor side="Bottom" relative="$parent/WarChestAnchorFrame" pos="Mid" offset="-210"/>
+        <Anchor side="Left" relative="$parent/WarChestAnchorFrame" pos="Min" offset="-198"/>
+        <Handle val="FreeWarChest"/>
+
+        <Frame type="Frame" name="WarChestNode0">
+            <Frame type="WarChestTierFrame" name="WarChestTierFrame">
+                <RewardGroup val="Free"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="Frame" name="WarChestFreeStartingNode" template="WarChestFrame/WarChestFreeStartingNodeTemplate">
+            <Anchor side="Top" relative="$parent/WarChestNode0" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/WarChestNode0" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/WarChestNode0" pos="Min" offset="81"/>
+        </Frame>
+    </Frame>
+    
+    <!-- 
+    =====================
     TERRAN WAR CHEST TEMPLATE
     =====================
     -->
     <Frame type="Frame" name="TerranWarChestTemplate" template="WarChestFrame/WarChestRaceTemplate">
-        <Anchor side="Top" relative="$parent/WarChestAnchorFrame" pos="Mid" offset="-140"/>
-        <Anchor side="Bottom" relative="$parent/WarChestAnchorFrame" pos="Mid" offset="-140"/>
+        <Anchor side="Top" relative="$parent/WarChestAnchorFrame" pos="Mid" offset="-70"/>
+        <Anchor side="Bottom" relative="$parent/WarChestAnchorFrame" pos="Mid" offset="-70"/>
         <Anchor side="Left" relative="$parent/WarChestAnchorFrame" pos="Min" offset="-198"/>
         <Handle val="TerranWarChest"/>
 
@@ -1637,8 +1717,8 @@
     =====================
     -->
     <Frame type="Frame" name="ZergWarChestTemplate" template="WarChestFrame/WarChestRaceTemplate">
-        <Anchor side="Top" relative="$parent/WarChestAnchorFrame" pos="Mid" offset="0"/>
-        <Anchor side="Bottom" relative="$parent/WarChestAnchorFrame" pos="Mid" offset="0"/>
+        <Anchor side="Top" relative="$parent/WarChestAnchorFrame" pos="Mid" offset="70"/>
+        <Anchor side="Bottom" relative="$parent/WarChestAnchorFrame" pos="Mid" offset="70"/>
         <Anchor side="Left" relative="$parent/TerranWarChest" pos="Min" offset="0"/>
         <Handle val="ZergWarChest"/>
 
@@ -1661,8 +1741,8 @@
     =====================
     -->
     <Frame type="Frame" name="ProtossWarChestTemplate" template="WarChestFrame/WarChestRaceTemplate">
-        <Anchor side="Top" relative="$parent/WarChestAnchorFrame" pos="Mid" offset="140"/>
-        <Anchor side="Bottom" relative="$parent/WarChestAnchorFrame" pos="Mid" offset="140"/>
+        <Anchor side="Top" relative="$parent/WarChestAnchorFrame" pos="Mid" offset="210"/>
+        <Anchor side="Bottom" relative="$parent/WarChestAnchorFrame" pos="Mid" offset="210"/>
         <Anchor side="Left" relative="$parent/TerranWarChest" pos="Min" offset="0"/>
         <Handle val="ProtossWarChest"/>
 
@@ -1888,12 +1968,13 @@
                     <Action type="SetProperty" Text="{$this/EndedTimeFormatFrame/@Text}"/>
                 </State>
                 
-                <State name="PurchaseableNotOwned">
+                <!-- This state is no longer needed with the free track -->
+                <!-- <State name="PurchaseableNotOwned">
                     <When type="StateGroup" frame="$TerranWarChest/WarChestNode0" OwnedState="NotOwned"/>
                     <When type="StateGroup" frame="$ZergWarChest/WarChestNode0" OwnedState="NotOwned"/>
                     <When type="StateGroup" frame="$ProtossWarChest/WarChestNode0" OwnedState="NotOwned"/>
                     <Action type="SetProperty" Text="@UI/ScreenCollection/WarChest/Subtitle"/>
-                </State>
+                </State> -->
                 
                 <State name="Owned">
                     <Action type="SetProperty" Text="{$this/OwnedTimeFormatFrame/@Text}"/>
@@ -1953,6 +2034,10 @@
         </Frame>
         
         <Frame type="Frame" name="PhaseFrames" template="WarChestPhaseFrameTemplate/PhaseFramesContainerTemplate"/>
+        
+        <Frame type="Frame" name="FreeWarChest" template="WarChestFrame/FreeWarChestTemplate">
+            <Handle val="FreeWarChest"/>
+        </Frame>
         
         <Frame type="Frame" name="TerranWarChest" template="WarChestFrame/TerranWarChestTemplate">
             <Handle val="TerranWarChest"/>
@@ -2378,6 +2463,7 @@
         
         <Frame type="WarChestTierTooltip" name="WarchestTierNodeTooltip" template="WarChestNodeTooltipTemplate/WarChestTierNodeTooltipTemplate"/>
         <Frame type="WarChestTierTooltip" name="WarchestStartingNodeTooltip" template="WarChestNodeTooltipTemplate/WarChestStartingNodeTooltipTemplate"/>
+        <Frame type="WarChestTierTooltip" name="WarchestFreeStartingNodeTooltip" template="WarChestNodeTooltipTemplate/WarChestFreeStartingNodeTooltipTemplate"/>
 
         
 
