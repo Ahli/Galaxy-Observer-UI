@@ -38,21 +38,21 @@ import java.util.Map;
 import java.util.Set;
 
 public class BrowseTabController implements Updateable {
-	public static final String PATH_SEPARATOR = " > ";
-	public static final String ANCHOR_RIGHT = "Anchor-Right";
-	public static final String DEFAULT_STATE = "DefaultState";
-	public static final String STATE_PREFIX = "State ";
-	public static final String DRIVER = "Driver";
-	public static final String EVENT_PREFIX = "Event ";
-	public static final String ANCHOR_TOP = "Anchor-Top";
-	public static final String ANCHOR_LEFT = "Anchor-Left";
-	public static final String ANCHOR_BOTTOM = "Anchor-Bottom";
-	public static final String KEY_PREFIX = "Key ";
-	public static final String WHEN_PREFIX = "When ";
-	public static final String ACTION_PREFIX = "Action ";
-	public static final String EMPTY_STRING = "";
-	public static final String VAL = "val";
-	public static final String ATTRIBUTE_SEPARATOR = ", ";
+	private static final String PATH_SEPARATOR = " > ";
+	private static final String ANCHOR_RIGHT = "Anchor-Right";
+	private static final String DEFAULT_STATE = "DefaultState";
+	private static final String STATE_PREFIX = "State ";
+	private static final String DRIVER = "Driver";
+	private static final String EVENT_PREFIX = "Event ";
+	private static final String ANCHOR_TOP = "Anchor-Top";
+	private static final String ANCHOR_LEFT = "Anchor-Left";
+	private static final String ANCHOR_BOTTOM = "Anchor-Bottom";
+	private static final String KEY_PREFIX = "Key ";
+	private static final String WHEN_PREFIX = "When ";
+	private static final String ACTION_PREFIX = "Action ";
+	private static final String EMPTY_STRING = "";
+	private static final String VAL = "val";
+	private static final String ATTRIBUTE_SEPARATOR = ", ";
 	private static final Logger logger = LogManager.getLogger(BrowseTabController.class);
 	private static final String GAME_UI = "GameUI";
 	private static final String SPACE_HIVEN_SPACE = " - ";
@@ -120,7 +120,7 @@ public class BrowseTabController implements Updateable {
 			final long start = System.currentTimeMillis();
 			framesTotal = 0;
 			createTree(template);
-			logger.info("Tree creation: " + (System.currentTimeMillis() - start) + "ms , " + framesTotal + " frames");
+			logger.info("Tree creation: {}ms , {} frames", (System.currentTimeMillis() - start), framesTotal);
 		}));
 		frameTree.getSelectionModel().selectedItemProperty()
 				.addListener((observable, oldValue, newValue) -> showInTableView(newValue));
@@ -146,23 +146,23 @@ public class BrowseTabController implements Updateable {
 		final String filterUpper = filter.toUpperCase();
 		
 		final long midTime = System.currentTimeMillis();
-		logger.info("filter-show: " + filterUpper + ", preparation: " + (midTime - startTime));
+		logger.info("filter-show: {}, preparation: {}", filterUpper, (midTime - startTime));
 		filterTreeShow(filterUpper);
 		final long midTime2 = System.currentTimeMillis();
-		logger.info("filter-show execution: " + (midTime2 - midTime));
+		logger.info("filter-show execution: {}", (midTime2 - midTime));
 		if (!filterUpper.isEmpty()) {
-			logger.info("filter-hide: " + filterUpper);
+			logger.info("filter-hide: {}", filterUpper);
 			filterTreeHide(filterUpper, frameTree.getRoot());
 		}
 		final long midTime3 = System.currentTimeMillis();
-		logger.info("filter-hide execution: " + (midTime3 - midTime2));
+		logger.info("filter-hide execution: {}", (midTime3 - midTime2));
 		
 		// release memory
 		if (hiddenTreeChildMap.isEmpty()) {
 			hiddenTreeChildMap = null;
 		}
 		
-		logger.info("filter cleanup: " + (System.currentTimeMillis() - midTime3));
+		logger.info("filter cleanup: {}", (System.currentTimeMillis() - midTime3));
 	}
 	
 	private void filterTreeShow(final String queryUpper) {
@@ -228,7 +228,7 @@ public class BrowseTabController implements Updateable {
 					}
 					siblings.remove(elem);
 				} else {
-					logger.info("root? ", name);
+					logger.info("root? {}", name);
 				}
 			}
 		}

@@ -39,6 +39,10 @@ public class DescIndexData {
 			"<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\r\n<Desc>\r\n";
 	
 	private static final Logger logger = LogManager.getLogger(DescIndexData.class);
+	private static final String CHECKED_WITH_DEPENDENCY_AND_I_J_I2 =
+			"checked {} with dependency {} and {} i={} j={} i2={}";
+	private static final String FILE_INT_PATH_LIST = "fileIntPathList: {}";
+	
 	private final MpqInterface mpqi;
 	private final List<Pair<Path, String>> fileIntPathList;
 	private String descIndexIntPath;
@@ -134,8 +138,8 @@ public class DescIndexData {
 		fileIntPathList.add(new Pair<>(p, intPath2));
 		
 		if (logger.isTraceEnabled()) {
-			logger.trace("added Layout path: " + intPath2);
-			logger.trace("added File path: " + p);
+			logger.trace("added Layout path: {}", intPath2);
+			logger.trace("added File path: {}", p);
 		}
 	}
 	
@@ -176,7 +180,7 @@ public class DescIndexData {
 			
 			bw.write(DESC);
 		} catch (final IOException e) {
-			logger.error("ERROR writing DescIndex to disc" + e);
+			logger.error("ERROR writing DescIndex to disc.", e);
 			throw e;
 		}
 	}
@@ -202,7 +206,7 @@ public class DescIndexData {
 			// add calculated list of dependencies from layout file
 			layoutDeps = LayoutReaderDom.getDependencyLayouts(f, curConstants);
 			if (logger.isTraceEnabled()) {
-				logger.trace("Dependencies found: " + layoutDeps);
+				logger.trace("Dependencies found: {}", layoutDeps);
 			}
 			
 			ownConstants.add(curConstants);
@@ -212,7 +216,7 @@ public class DescIndexData {
 		boolean insertOccurred = true;
 		for (int counter = 0; insertOccurred && counter < Math.pow(fileIntPathList.size(), 4); counter++) {
 			if (logger.isTraceEnabled()) {
-				logger.trace("counter=" + counter);
+				logger.trace("counter={}", counter);
 			}
 			insertOccurred = false;
 			for (int i = 0; i < dependencies.size(); i++) {
@@ -226,7 +230,7 @@ public class DescIndexData {
 					
 					if (curDependencyTo.startsWith(STRING2)) {
 						if (logger.isTraceEnabled()) {
-							logger.trace("DEPENDENCY: " + curDependencyTo);
+							logger.trace("DEPENDENCY: {}", curDependencyTo);
 						}
 						while (curDependencyTo.startsWith(STRING2)) {
 							curDependencyTo = curDependencyTo.substring(1);
@@ -255,17 +259,17 @@ public class DescIndexData {
 							for (int i2 = i + 1; i2 < dependencies.size(); i2++) {
 								final Pair<Path, String> otherPair = fileIntPathList.get(i2);
 								String fileName = otherPair.getKey().getFileName().toString();
-								int dotIndex = fileName.lastIndexOf('.');
+								final int dotIndex = fileName.lastIndexOf('.');
 								if (dotIndex > 0) {
 									fileName = fileName.substring(0, dotIndex);
 								}
 								for (final String constant : ownConstants.get(i2)) {
 									if (constant.equals(curDependencyTo)) {
 										if (logger.isTraceEnabled()) {
-											logger.trace("checked " + fileIntPathList.get(i).getKey().getFileName() +
-													" with dependency " + curDependencyTo + " and " + constant + " " +
-													"i=" + i + " j=" + j + " i2=" + i2);
-											logger.trace("fileIntPathList:" + fileIntPathList);
+											logger.trace(CHECKED_WITH_DEPENDENCY_AND_I_J_I2,
+													fileIntPathList.get(i).getKey().getFileName(), curDependencyTo,
+													constant, i, j, i2);
+											logger.trace(FILE_INT_PATH_LIST, fileIntPathList);
 										}
 										// i's needs to be inserted after i2
 										dependencies.remove(i);
@@ -275,16 +279,16 @@ public class DescIndexData {
 										fileIntPathList.add(i, pair);
 										//constantDefinedBefore = true;
 										if (logger.isTraceEnabled()) {
-											logger.trace("inserted " + fileIntPathList.get(i).getKey().getFileName() +
-													" after " + fileName);
-											logger.trace("fileIntPathList: " + fileIntPathList);
+											logger.trace("inserted {} after {}",
+													fileIntPathList.get(i).getKey().getFileName(), fileName);
+											logger.trace(FILE_INT_PATH_LIST, fileIntPathList);
 										}
 										break y;
 									} else {
 										if (logger.isTraceEnabled()) {
-											logger.trace("checked " + fileIntPathList.get(i).getKey().getFileName() +
-													" with dependency " + curDependencyTo + " and " + constant + " " +
-													"i=" + i + " j=" + j + " i2=" + i2);
+											logger.trace(CHECKED_WITH_DEPENDENCY_AND_I_J_I2,
+													fileIntPathList.get(i).getKey().getFileName(), curDependencyTo,
+													constant, i, j, i2);
 										}
 									}
 								}
@@ -303,7 +307,7 @@ public class DescIndexData {
 		insertOccurred = true;
 		for (int counter = 0; insertOccurred && counter < Math.pow(fileIntPathList.size(), 4); counter++) {
 			if (logger.isTraceEnabled()) {
-				logger.trace("counter=" + counter);
+				logger.trace("counter={}", counter);
 			}
 			insertOccurred = false;
 			x:
@@ -321,17 +325,17 @@ public class DescIndexData {
 						for (int i2 = i + 1; i2 < dependencies.size(); i2++) {
 							final Pair<Path, String> otherPair = fileIntPathList.get(i2);
 							String fileName = otherPair.getKey().getFileName().toString();
-							int dotIndex = fileName.lastIndexOf('.');
+							final int dotIndex = fileName.lastIndexOf('.');
 							if (dotIndex >= 0) {
 								fileName = fileName.substring(0, dotIndex);
 							}
 							
 							if (fileName.equals(curDependencyTo)) {
 								if (logger.isTraceEnabled()) {
-									logger.trace("checked " + fileIntPathList.get(i).getKey().getFileName() +
-											" with dependency " + curDependencyTo + " and " + fileName + " i=" + i +
-											" j=" + j + " i2=" + i2);
-									logger.trace("fileIntPathList:" + fileIntPathList);
+									logger.trace(CHECKED_WITH_DEPENDENCY_AND_I_J_I2,
+											fileIntPathList.get(i).getKey().getFileName(), curDependencyTo, fileName, i,
+											j, i2);
+									logger.trace(FILE_INT_PATH_LIST, fileIntPathList);
 								}
 								// i's needs to be inserted after i2
 								dependencies.remove(i);
@@ -341,16 +345,16 @@ public class DescIndexData {
 								fileIntPathList.add(i, pair);
 								insertOccurred = true;
 								if (logger.isTraceEnabled()) {
-									logger.trace("inserted " + fileIntPathList.get(i).getKey().getFileName() + " " +
-											"after " + fileName);
-									logger.trace("fileIntPathList: " + fileIntPathList);
+									logger.trace("inserted {} after {}", fileIntPathList.get(i).getKey().getFileName(),
+											fileName);
+									logger.trace(FILE_INT_PATH_LIST, fileIntPathList);
 								}
 								break x;
 							} else {
 								if (logger.isTraceEnabled()) {
-									logger.trace("checked " + fileIntPathList.get(i).getKey().getFileName() +
-											" with dependency " + curDependencyTo + " and " + fileName + " i=" + i +
-											" j=" + j + " i2=" + i2);
+									logger.trace(CHECKED_WITH_DEPENDENCY_AND_I_J_I2,
+											fileIntPathList.get(i).getKey().getFileName(), curDependencyTo, fileName, i,
+											j, i2);
 								}
 							}
 						}

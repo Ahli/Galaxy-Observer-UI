@@ -97,7 +97,7 @@ public final class LayoutReaderDom {
 							if (!layoutName.equalsIgnoreCase(nameWOfileEnding) &&
 									!doesNameAppearInList(layoutName, list)) {
 								if (logger.isTraceEnabled()) {
-									logger.trace(nameWOfileEnding + " has dependency to " + layoutName);
+									logger.trace("{} has dependency to {}", nameWOfileEnding, layoutName);
 								}
 								list.add(layoutName);
 							}
@@ -116,7 +116,7 @@ public final class LayoutReaderDom {
 			
 			if (logger.isTraceEnabled()) {
 				for (final String str : ownConstants) {
-					logger.trace(nameWOfileEnding + " defines constant " + str);
+					logger.trace("{} defines constant {}", nameWOfileEnding, str);
 				}
 			}
 		}
@@ -148,7 +148,7 @@ public final class LayoutReaderDom {
 				if (attrName.startsWith(CONSTANT_MARKER) && !doesNameAppearInList(attrName, usedConstants) &&
 						!doesConstantNameAppearInList(attrName, ownConstants)) {
 					if (logger.isTraceEnabled()) {
-						logger.trace(nameWOfileEnding + " uses undefined constant " + attrName);
+						logger.trace("{} uses undefined constant {}", nameWOfileEnding, attrName);
 					}
 					usedConstants.add(attrName);
 					list.add(attrName);
@@ -157,7 +157,7 @@ public final class LayoutReaderDom {
 				if (attrValue.startsWith(CONSTANT_MARKER) && !doesNameAppearInList(attrValue, usedConstants) &&
 						!doesConstantNameAppearInList(attrValue, ownConstants)) {
 					if (logger.isTraceEnabled()) {
-						logger.trace(nameWOfileEnding + " uses undefined constant " + attrValue);
+						logger.trace("{} uses undefined constant {}", nameWOfileEnding, attrValue);
 					}
 					usedConstants.add(attrValue);
 					list.add(attrValue);

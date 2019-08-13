@@ -28,6 +28,8 @@ import java.util.stream.Stream;
  * This miner searches for a better compression via randomized rules.
  */
 public class RandomCompressionMiner {
+	private static final String STAR = "*";
+	private static final String EMPTY_STRING = "";
 	private static final String OGG = ".ogg";
 	private static final String OGV = ".ogv";
 	private static final String WAV = ".wav";
@@ -36,7 +38,7 @@ public class RandomCompressionMiner {
 	private static final String TTF = ".ttf";
 	private static final String OTF = ".otf";
 	private static final String M_3 = ".m3";
-	private static final String WILDCARD = "*";
+	private static final String WILDCARD = STAR;
 	private static final Logger logger = LogManager.getLogger(RandomCompressionMiner.class);
 	private final ModData mod;
 	private final MpqEditorInterface mpqInterface;
@@ -176,7 +178,7 @@ public class RandomCompressionMiner {
 					clean.add(rule);
 				} else {
 					if (logger.isTraceEnabled()) {
-						logger.trace("removing rule from ruleset due to invalid mask: " + mask);
+						logger.trace("removing rule from ruleset due to invalid mask: {}", mask);
 					}
 				}
 			} else {
@@ -243,10 +245,10 @@ public class RandomCompressionMiner {
 	}
 	
 	private static boolean containsFile(final MpqEditorCompressionRule[] rules, final Path p) {
-		for (final var rule : rules) {
+		for (final MpqEditorCompressionRule rule : rules) {
 			if (rule instanceof MpqEditorCompressionRuleMask) {
 				final String cleanedMask =
-						File.separator + ((MpqEditorCompressionRuleMask) rule).getMask().replace("*", "");
+						File.separator + ((MpqEditorCompressionRuleMask) rule).getMask().replace(STAR, EMPTY_STRING);
 				if (p.toString().endsWith(cleanedMask)) {
 					return true;
 				}

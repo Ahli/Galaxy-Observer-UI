@@ -26,7 +26,7 @@ public class Project {
 	@GeneratedValue (strategy = GenerationType.AUTO)
 	private Integer id;
 	
-	@Column (unique = false, nullable = false, length = 30)
+	@Column (/*unique = false,*/ nullable = false, length = 30)
 	private String name;
 	
 	@Column (unique = true, nullable = false/*, length = 255*/)

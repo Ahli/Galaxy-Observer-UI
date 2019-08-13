@@ -9,11 +9,13 @@ import com.ahli.galaxy.ui.UIFrame;
 import com.ahli.galaxy.ui.exception.UIException;
 import com.esotericsoftware.kryo.Kryo;
 import interfacebuilder.InterfaceBuilderApp;
+import interfacebuilder.projects.ProjectJpaRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,8 +30,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest (classes = InterfaceBuilderApp.class)
 public class KryoServiceTest {
 	
+	@MockBean
+	private ProjectJpaRepository projectRepoMock;
+	
 	@Autowired
-	KryoService kryoService;
+	private KryoService kryoService;
 	
 	@Test
 	public void testMetaFile() throws IOException {

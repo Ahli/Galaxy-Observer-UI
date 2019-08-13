@@ -139,8 +139,7 @@ public class MpqBuilderService {
 			return;
 		}
 		if (!interfaceDirectory.exists() || !interfaceDirectory.isDirectory()) {
-			logger.error(
-					"ERROR: Can't build UI from file '" + interfaceDirectory + "', expected an existing directory.");
+			logger.error("ERROR: Can't build UI from file '{}', expected an existing directory.", interfaceDirectory);
 			return;
 		}
 		final boolean verifyLayout;
@@ -153,7 +152,7 @@ public class MpqBuilderService {
 		if (game.getUiCatalog() == null && verifyLayout) {
 			// parse default UI
 			throw new IllegalStateException(
-					"Base UI of game '" + game.getGameDef().getName() + "' has not been parsed.");
+					String.format("Base UI of game '%s' has not been parsed.", game.getGameDef().getName()));
 		}
 		
 		// create tasks for the worker pool
@@ -343,13 +342,13 @@ public class MpqBuilderService {
 			logger.error("unable to read Layout paths", e);
 		}
 		
-		logger.info("Compiling... " + sourceFile.getName());
+		logger.info("Compiling... {}", sourceFile.getName());
 		
 		// perform checks/improvements on code
 		compileService.compile(mod, configService.getRaceId(), repairLayoutOrder, verifyLayout, verifyXml,
 				configService.getConsoleSkinId());
 		
-		logger.info("Building... " + sourceFile.getName());
+		logger.info("Building... {}", sourceFile.getName());
 		
 		try {
 			mpqi.buildMpq(targetPath, sourceFile.getName(), compressXml, getCompressionModeOfSetting(compressMpq),
@@ -358,7 +357,7 @@ public class MpqBuilderService {
 			project.setLastBuildDateTime(LocalDateTime.now());
 			final long size = new File(targetPath + File.separator + sourceFile.getName()).length();
 			project.setLastBuildSize(size);
-			logger.info("Finished building... " + sourceFile.getName() + ". Size: " + (size / 1024) + " " + "kb");
+			logger.info("Finished building... {}. Size: {}kb", sourceFile.getName(), size / 1024);
 			projectService.saveProject(project);
 			InterfaceBuilderApp.getInstance()
 					.printInfoLogMessageToGeneral(sourceFile.getName() + " finished construction.");

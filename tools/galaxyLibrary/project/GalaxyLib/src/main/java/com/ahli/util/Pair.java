@@ -3,6 +3,8 @@
 
 package com.ahli.util;
 
+import java.util.Objects;
+
 /**
  * <p> A convenience class to represent name-value pairs. </p>
  */
@@ -97,9 +99,9 @@ public class Pair <K, V> {
 		if (this == o) {
 			return true;
 		}
-		if (o instanceof Pair) {
+		if (o != null && getClass() == o.getClass()) {
 			final Pair<?, ?> pair = (Pair<?, ?>) o;
-			return key != null ? key.equals(pair.key) : (pair.key == null);
+			return Objects.equals(key, pair.key);
 		}
 		return false;
 	}

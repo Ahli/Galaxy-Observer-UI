@@ -87,7 +87,7 @@ public class SettingsIniInterface {
 		final File f = new File(settingsFilePath);
 		if (f.exists()) {
 			try {
-				logger.info("Loading settings from: " + settingsFilePath);
+				logger.info("Loading settings from: {}", settingsFilePath);
 				final INIBuilderParameters params = new Parameters().ini().setFile(f).setEncoding(UTF_8);
 				final FileBasedConfigurationBuilder<INIConfiguration> b =
 						new FileBasedConfigurationBuilder<>(INIConfiguration.class).configure(params);

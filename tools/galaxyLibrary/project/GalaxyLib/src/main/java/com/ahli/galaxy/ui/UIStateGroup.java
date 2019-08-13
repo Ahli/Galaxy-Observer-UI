@@ -129,7 +129,7 @@ public class UIStateGroup extends UIElement {
 		if (obj == null) {
 			return false;
 		}
-		if (!(obj instanceof UIStateGroup)) {
+		if (getClass() != obj.getClass()) {
 			return false;
 		}
 		if (obj == this) {

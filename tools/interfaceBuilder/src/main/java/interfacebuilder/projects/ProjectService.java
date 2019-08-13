@@ -160,9 +160,11 @@ public class ProjectService {
 		}
 		final Path projPath = Path.of(project.getProjectPath());
 		final var resolver = new PathMatchingResourcePatternResolver();
-		logger.trace("creating template");
+		if (logger.isTraceEnabled()) {
+			logger.trace("creating template");
+		}
 		for (final Resource res : resolver.getResources(intPath)) {
-			logger.trace("writing file " + intPath);
+			logger.trace("writing file {}", () -> intPath);
 			try (final InputStream in = new BufferedInputStream(res.getInputStream(), 1024);
 			     final OutputStream out = Files.newOutputStream(projPath)) {
 				
@@ -170,6 +172,8 @@ public class ProjectService {
 						StandardCopyOption.REPLACE_EXISTING);
 			}
 		}
-		logger.trace("create template finished");
+		if (logger.isTraceEnabled()) {
+			logger.trace("create template finished");
+		}
 	}
 }

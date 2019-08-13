@@ -42,8 +42,8 @@ public class AutoCompleteTextField extends TextField {
 				if (getText().length() == 0) {
 					entriesPopup.hide();
 				} else {
-					final List<String> searchResult = new ArrayList<>();
-					searchResult.addAll(entries.subSet(getText(), getText() + Character.MAX_VALUE));
+					final List<String> searchResult =
+							new ArrayList<>(entries.subSet(getText(), getText() + Character.MAX_VALUE));
 					if (entries.isEmpty()) {
 						entriesPopup.hide();
 					} else {

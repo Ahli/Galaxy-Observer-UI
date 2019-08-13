@@ -21,9 +21,9 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
@@ -33,11 +33,18 @@ import java.util.List;
 import java.util.Locale;
 
 public class LayoutExtensionReader {
-	public static final String CONSTANT = "constant";
-	public static final String DEFAULT = "default";
-	public static final String DESCRIPTION = "description";
+	private static final String CONSTANT = "constant";
+	private static final String DEFAULT = "default";
+	private static final String DESCRIPTION = "description";
+	private static final String HOTKEY_SETTING_REGEX = "(?=@hotkey|@setting)/i";
+	private static final String HOTKEY = "@hotkey";
+	private static final String SETTING = "@setting";
+	private static final String CONSTANT_DEFAULT_DESCRIPTION_REGEX = "(?i)(?=(constant|default|description)[\\s]*=)";
+	private static final String EMPTY_STRING = "";
+	private static final String NAME = "name";
+	private static final String VAL = "val";
+	private static final String ERROR_PARSING_FILE = "Error parsing file.";
 	private static final Logger logger = LogManager.getLogger(LayoutExtensionReader.class);
-	
 	private List<ValueDef> hotkeys = new ArrayList<>();
 	private List<ValueDef> settings = new ArrayList<>();
 	
@@ -122,7 +129,7 @@ public class LayoutExtensionReader {
 		dbFac.setNamespaceAware(false);
 		dbFac.setValidating(false);
 		dbFac.setAttribute("http://xml.org/sax/features/external-general-entities", false);
-		dbFac.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+		dbFac.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, EMPTY_STRING);
 		dbFac.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
 		dbFac.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
 		dbFac.setXIncludeAware(false);
@@ -139,12 +146,15 @@ public class LayoutExtensionReader {
 			try {
 				doc = dBuilder.parse(curFile);
 			} catch (final SAXParseException | IOException e) {
+				if (logger.isTraceEnabled()) {
+					logger.trace(ERROR_PARSING_FILE, e);
+				}
 				// couldn't parse, most likely no XML file
 				continue;
 			}
 			
 			if (logger.isDebugEnabled()) {
-				logger.debug("comments - processing file: " + curFile.getPath());
+				logger.debug("comments - processing file: {}", curFile.getPath());
 			}
 			
 			// read comments
@@ -158,12 +168,15 @@ public class LayoutExtensionReader {
 				// parse XML file
 				doc = dBuilder.parse(curFile);
 			} catch (final SAXParseException | IOException e) {
+				if (logger.isTraceEnabled()) {
+					logger.trace(ERROR_PARSING_FILE, e);
+				}
 				// couldn't parse, most likely no XML file
 				continue;
 			}
 			
 			if (logger.isDebugEnabled()) {
-				logger.debug("constants - processing file: " + curFile.getPath());
+				logger.debug("constants - processing file: {}", curFile.getPath());
 			}
 			
 			// read constants
@@ -207,66 +220,66 @@ public class LayoutExtensionReader {
 		logger.debug("textInput:{}", () -> textInput);
 		try {
 			// split at keywords @hotkey or @setting without removing, case insensitive
-			for (String text : textInput.split("(?=@hotkey|@setting)/i")) {
+			for (String text : textInput.split(HOTKEY_SETTING_REGEX)) {
 				if (logger.isDebugEnabled()) {
-					logger.debug("token start:" + text);
+					logger.debug("token start:{}", text);
 				}
 				text = text.trim();
 				
-				constant = "";
-				description = "";
-				defaultValue = "";
+				constant = EMPTY_STRING;
+				description = EMPTY_STRING;
+				defaultValue = EMPTY_STRING;
 				
-				final boolean isHotkey = text.toLowerCase(Locale.ROOT).startsWith("@hotkey");
-				final boolean isSetting = text.toLowerCase(Locale.ROOT).startsWith("@setting");
+				final boolean isHotkey = text.toLowerCase(Locale.ROOT).startsWith(HOTKEY);
+				final boolean isSetting = text.toLowerCase(Locale.ROOT).startsWith(SETTING);
 				
 				if (isHotkey || isSetting) {
 					if (logger.isDebugEnabled()) {
 						logger.debug("detected hotkey or setting");
 					}
 					// move behind keyword
-					final int pos = isHotkey ? "@hotkey".length() : "@setting".length();
+					final int pos = isHotkey ? HOTKEY.length() : SETTING.length();
 					String toProcess = text.substring(pos);
 					
 					// move beyond '('
 					toProcess = toProcess.substring(1 + toProcess.indexOf('(')).trim();
 					
 					// split at keyword
-					for (String part : toProcess.split("(?i)(?=(constant|default|description)[\\s]*=)")) {
+					for (String part : toProcess.split(CONSTANT_DEFAULT_DESCRIPTION_REGEX)) {
 						part = part.trim();
 						final String partLower = part.toLowerCase(Locale.ROOT);
 						if (logger.isTraceEnabled()) {
-							logger.trace("part: " + part);
+							logger.trace("part: {}", part);
 						}
 						if (partLower.startsWith(CONSTANT)) {
 							// move beyond '='
 							part = getValueAfterEqualsChar(part);
 							constant = getValueWithinQuotes(part);
 							if (logger.isTraceEnabled()) {
-								logger.trace("constant = " + constant);
+								logger.trace("constant = {}", constant);
 							}
 						} else if (partLower.startsWith(DEFAULT)) {
 							// move beyond '='
 							part = getValueAfterEqualsChar(part);
 							defaultValue = getValueWithinQuotes(part);
 							if (logger.isTraceEnabled()) {
-								logger.trace("default = " + defaultValue);
+								logger.trace("default = {}", defaultValue);
 							}
 						} else if (partLower.startsWith(DESCRIPTION)) {
 							// move beyond '='
 							part = getValueAfterEqualsChar(part);
 							description = getValueWithinQuotes(part);
 							if (logger.isTraceEnabled()) {
-								logger.trace("description = " + description);
+								logger.trace("description = {}", description);
 							}
 						}
 					}
 					
-					if (constant != null && !"".equals(constant)) {
+					if (constant != null && !EMPTY_STRING.equals(constant)) {
 						if (isHotkey) {
-							addHotkeyValueDef(constant, description, defaultValue, "");
+							addHotkeyValueDef(constant, description, defaultValue, EMPTY_STRING);
 						} else {
-							addSettingValueDef(constant, description, defaultValue, "");
+							addSettingValueDef(constant, description, defaultValue, EMPTY_STRING);
 						}
 					}
 				}
@@ -318,14 +331,14 @@ public class LayoutExtensionReader {
 	 * @param node
 	 */
 	public void processConstant(final Node node) {
-		final Node nameAttrNode = getNamedItemIgnoreCase(node.getAttributes(), "name");
+		final Node nameAttrNode = getNamedItemIgnoreCase(node.getAttributes(), NAME);
 		if (nameAttrNode != null) {
 			final String name = nameAttrNode.getNodeValue();
-			final Node valAttrNode = getNamedItemIgnoreCase(node.getAttributes(), "val");
+			final Node valAttrNode = getNamedItemIgnoreCase(node.getAttributes(), VAL);
 			if (valAttrNode != null) {
 				final String val = valAttrNode.getNodeValue();
 				if (logger.isDebugEnabled()) {
-					logger.debug("Constant: name = " + name + ", val = " + val);
+					logger.debug("Constant: name = {}, val = {}", name, val);
 				}
 				setValueDefCurValue(name, val);
 			} else {
@@ -358,7 +371,7 @@ public class LayoutExtensionReader {
 			}
 		}
 		if (logger.isDebugEnabled()) {
-			logger.debug("no ValueDef found with name: " + name);
+			logger.debug("no ValueDef found with name: {}", name);
 		}
 	}
 	
@@ -376,7 +389,7 @@ public class LayoutExtensionReader {
 		dbFac.setNamespaceAware(false);
 		dbFac.setValidating(false);
 		dbFac.setAttribute("http://xml.org/sax/features/external-general-entities", false);
-		dbFac.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+		dbFac.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, EMPTY_STRING);
 		dbFac.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
 		dbFac.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
 		dbFac.setXIncludeAware(false);
@@ -398,11 +411,14 @@ public class LayoutExtensionReader {
 					// parse XML file
 					doc = dBuilder.parse(curFile);
 				} catch (final SAXParseException | IOException e) {
+					if (logger.isTraceEnabled()) {
+						logger.trace(ERROR_PARSING_FILE, e);
+					}
 					continue;
 				}
 				
 				if (logger.isDebugEnabled()) {
-					logger.debug("processing file: " + curFile.getPath());
+					logger.debug("processing file: {}", curFile.getPath());
 				}
 				
 				// process files
@@ -413,11 +429,11 @@ public class LayoutExtensionReader {
 				// write DOM back to XML
 				try {
 					transformer.transform(new DOMSource(doc), new StreamResult(curFile));
-				} catch (final TransformerFactoryConfigurationError | TransformerException e) {
+				} catch (final TransformerException e) {
 					logger.error("Transforming to generate XML file failed.", e);
 				}
 			}
-		} catch (final TransformerFactoryConfigurationError | TransformerException e) {
+		} catch (final TransformerConfigurationException e) {
 			logger.error("Transforming to generate XML file failed.", e);
 		}
 	}
@@ -445,17 +461,17 @@ public class LayoutExtensionReader {
 	 * @param node
 	 */
 	private void modifyConstant(final Node node) {
-		final Node nameAttrNode = getNamedItemIgnoreCase(node.getAttributes(), "name");
+		final Node nameAttrNode = getNamedItemIgnoreCase(node.getAttributes(), NAME);
 		if (nameAttrNode != null) {
 			final String name = nameAttrNode.getNodeValue();
-			final Node valAttrNode = getNamedItemIgnoreCase(node.getAttributes(), "val");
+			final Node valAttrNode = getNamedItemIgnoreCase(node.getAttributes(), VAL);
 			if (valAttrNode != null) {
 				final String val = valAttrNode.getNodeValue();
 				
 				for (final ValueDef item : hotkeys) {
 					if (item.getId().equalsIgnoreCase(name)) {
 						if (logger.isDebugEnabled()) {
-							logger.debug("updating hotkey constant: " + name + ", with val: " + val);
+							logger.debug("updating hotkey constant: {}, with val: {}", name, val);
 						}
 						valAttrNode.setNodeValue(item.getValue());
 					}
@@ -463,7 +479,7 @@ public class LayoutExtensionReader {
 				for (final ValueDef item : settings) {
 					if (item.getId().equalsIgnoreCase(name)) {
 						if (logger.isDebugEnabled()) {
-							logger.debug("updating setting constant:" + name + ", with val: " + val);
+							logger.debug("updating setting constant: {}, with val: {}", name, val);
 						}
 						valAttrNode.setNodeValue(item.getValue());
 					}

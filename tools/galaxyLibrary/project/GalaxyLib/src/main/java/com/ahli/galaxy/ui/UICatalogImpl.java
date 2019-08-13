@@ -157,13 +157,13 @@ public class UICatalogImpl implements UICatalog {
 				if (lastIndex != -1) {
 					basePathTemp = basePathTemp.substring(0, lastIndex);
 					if (logger.isTraceEnabled()) {
-						logger.trace("basePathTemp=" + basePathTemp);
+						logger.trace("basePathTemp={}", basePathTemp);
 					}
 				} else {
 					if (!isDevLayout) {
-						logger.error("ERROR: Cannot find layout file: " + intPath);
+						logger.error("ERROR: Cannot find layout file: {}", intPath);
 					} else {
-						logger.warn("WARNING: Cannot find Blizz-only layout file: " + intPath + ", so this is fine.");
+						logger.warn("WARNING: Cannot find Blizz-only layout file: {}, so this is fine.", intPath);
 					}
 				}
 			}
@@ -173,8 +173,8 @@ public class UICatalogImpl implements UICatalog {
 				try {
 					processLayoutFile(layoutFilePath, raceId, isDevLayout, consoleSkinId, parser);
 				} catch (final IOException e) {
-					logger.error("ERROR: encountered an Exception while processing the layout file '" + layoutFilePath +
-							"'.", e);
+					logger.error(String.format("ERROR: encountered an Exception while processing the layout file '%s'.",
+							layoutFilePath), e);
 				}
 				if (Thread.interrupted()) {
 					throw new InterruptedException();
@@ -202,13 +202,13 @@ public class UICatalogImpl implements UICatalog {
 			if (lastIndex != -1) {
 				basePathTemp = basePathTemp.substring(0, lastIndex);
 				if (logger.isTraceEnabled()) {
-					logger.trace("basePathTemp=" + basePathTemp);
+					logger.trace("basePathTemp={}", basePathTemp);
 				}
 			} else {
 				if (!isDevLayout) {
-					logger.error("ERROR: Cannot find layout file: " + path);
+					logger.error("ERROR: Cannot find layout file: {}", path);
 				} else {
-					logger.warn("WARNING: Cannot find Blizz-only layout file: " + path + ", so this is fine.");
+					logger.warn("WARNING: Cannot find Blizz-only layout file: {}, so this is fine.", path);
 				}
 				return;
 			}
@@ -246,11 +246,11 @@ public class UICatalogImpl implements UICatalog {
 		}
 		for (final var template : blizzOnlyTemplates) {
 			if (template.getFileName().equalsIgnoreCase(file)) {
-				logger.error("ERROR: cannot modify Blizzard-only Template: " + template.getFileName());
+				logger.error("ERROR: cannot modify Blizzard-only Template: {}", template.getFileName());
 				return null;
 			}
 		}
-		logger.warn("WARN: cannot find Layout file: " + file);
+		logger.warn("WARN: cannot find Layout file: {}", file);
 		return null;
 	}
 	
@@ -296,8 +296,8 @@ public class UICatalogImpl implements UICatalog {
 			removeConstantFromList(name, constants);
 			constants.add(constant);
 			if (removedBlizzOnly) {
-				logger.warn("WARNING: constant '" + name +
-						"' overrides value from Blizz-only constant, so this might be fine.");
+				logger.warn("WARNING: constant '{}' overrides value from Blizz-only constant, so this might be fine.",
+						name);
 			}
 		} else {
 			// is blizz-only layout
@@ -305,8 +305,9 @@ public class UICatalogImpl implements UICatalog {
 			final boolean removedGeneral = removeConstantFromList(name, constants);
 			blizzOnlyConstants.add(constant);
 			if (removedGeneral) {
-				logger.warn("WARNING: constant '" + name +
-						"' from Blizz-only layout overrides a general constant, so this might be fine.");
+				logger.warn(
+						"WARNING: constant '{}' from Blizz-only layout overrides a general constant, so this might be fine.",
+						name);
 			}
 		}
 	}
@@ -365,13 +366,13 @@ public class UICatalogImpl implements UICatalog {
 				}
 			}
 		} else if (i >= 4) {
-			logger.error("ERROR: Encountered a constant definition with three #'" + constantRef +
-					"' when its maximum is two '#'.");
+			logger.error("ERROR: Encountered a constant definition with three #'{}' when its maximum is two '#'.",
+					constantRef);
 		}
 		
 		if (!isDevLayout) {
-			logger.warn("WARNING: Did not find a constant definition for '" + constantRef + "', so '" + constantName +
-					"' is used instead.");
+			logger.warn("WARNING: Did not find a constant definition for '{}', so '{}' is used instead.", constantRef,
+					constantName);
 		} else {
 			// inside blizz-only
 			for (final UIConstant c : blizzOnlyConstants) {
@@ -379,8 +380,9 @@ public class UICatalogImpl implements UICatalog {
 					return c.getValue();
 				}
 			}
-			logger.warn("WARNING: Did not find a constant definition for '" + constantRef +
-					"', but it is a Blizz-only layout, so this is fine.");
+			logger.warn(
+					"WARNING: Did not find a constant definition for '{}', but it is a Blizz-only layout, so this is fine.",
+					constantRef);
 		}
 		return constantName;
 	}
@@ -440,7 +442,7 @@ public class UICatalogImpl implements UICatalog {
 		if (obj == null) {
 			return false;
 		}
-		if (!(obj instanceof UICatalogImpl)) {
+		if (getClass() != obj.getClass()) {
 			return false;
 		}
 		if (obj == this) {
@@ -451,12 +453,12 @@ public class UICatalogImpl implements UICatalog {
 		for (int i = 0; i < signatureFields.length; i++) {
 			if (!(signatureFields[i] instanceof Object[])) {
 				if (!Objects.equals(signatureFields[i], thatSignatureFields[i])) {
-					logger.info("equals=false - object - i=" + i);
+					logger.info("equals=false - object - i={}", i);
 					return false;
 				}
 			} else {
 				if (!Arrays.deepEquals((Object[]) signatureFields[i], (Object[]) thatSignatureFields[i])) {
-					logger.info("equals=false - array - i=" + i);
+					logger.info("equals=false - array - i={}", i);
 					return false;
 				}
 			}

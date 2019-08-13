@@ -206,7 +206,7 @@ public class CompressionMiningController implements Updateable {
 						projectService.saveProject(project);
 					}
 				}
-				logger.info(String.format("Best size before mining: %s kb.", bestSize / 1024));
+				logger.info("Best size before mining: {} kb.", bestSize / 1024);
 				updateUiRules(expCompMiner.getBestRuleSet());
 				updateUiSizeToBeat(bestSize);
 				long lastSize;
@@ -217,7 +217,7 @@ public class CompressionMiningController implements Updateable {
 					updateUiAttemptSize(lastSize, attempts);
 					if (lastSize < bestSize) {
 						bestSize = lastSize;
-						logger.info(String.format("Mined better compression of size %s kb.", lastSize / 1024));
+						logger.info("Mined better compression of size {} kb.", lastSize / 1024);
 						project.setBestCompressionRuleSet(new RuleSet(comprMiner.getBestRuleSet()));
 						projectService.saveProject(project);
 						updateUiSizeToBeat(lastSize);
@@ -250,7 +250,7 @@ public class CompressionMiningController implements Updateable {
 		if (expCompMiner != null) {
 			final long newBest = expCompMiner.getBestSize();
 			expCompMiner = null;
-			logger.info(String.format("Currently best Compression produces archives of size: %s kb", newBest / 1024));
+			logger.info("Currently best Compression produces archives of size: {} kb", newBest / 1024);
 		}
 		miningButton.setText(Messages.getString("progress.compressionMining.startMining"));
 	}

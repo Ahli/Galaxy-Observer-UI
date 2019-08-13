@@ -174,7 +174,7 @@ public class UIController extends UIElement {
 		if (obj == null) {
 			return false;
 		}
-		if (!(obj instanceof UIController)) {
+		if (getClass() != obj.getClass()) {
 			return false;
 		}
 		if (obj == this) {

@@ -44,12 +44,15 @@ module interfacex.builder {
 	opens interfacebuilder to javafx.fxml, spring.core, spring.beans;
 	opens interfacebuilder.config to spring.core;
 	opens interfacebuilder.compress to org.hibernate.orm.core, spring.core;
-	opens interfacebuilder.projects to org.hibernate.orm.core, spring.core, spring.beans;
+	// open to unnamed for unit test
+	opens interfacebuilder.projects; // to org.hibernate.orm.core, spring.core, spring.beans;
 	exports interfacebuilder.config to spring.beans, spring.context;
 	opens interfacebuilder.build to spring.core;
 	opens interfacebuilder.base_ui to spring.core, com.esotericsoftware.kryo;
-	opens interfacebuilder.integration.kryo to spring.core, com.esotericsoftware.kryo;
+	// open to unnamed for unit test
+	opens interfacebuilder.integration.kryo; //to spring.core, com.esotericsoftware.kryo;
 	exports interfacebuilder.integration.kryo;
+	opens interfacebuilder.integration; // for unit test
 	opens view;
 	opens i18n;
 	opens res;
@@ -61,6 +64,20 @@ module interfacex.builder {
 	exports interfacebuilder.integration.log4j to org.apache.logging.log4j.core;
 	exports interfacebuilder.integration;
 	exports interfacebuilder.ui.navigation;
+	
+	// for public API only
+	exports interfacebuilder.ui.progress;
+	exports interfacebuilder.projects;
+	exports interfacebuilder.compress;
+	exports interfacebuilder.projects.enums;
+	
+	// for beans
+	exports interfacebuilder.build;
+	exports interfacebuilder.compile;
+	exports interfacebuilder.base_ui;
+	exports interfacebuilder.ui.home;
+	exports interfacebuilder.ui.settings;
+	exports interfacebuilder.ui.browse;
 	
 	// spring actuator for testing
 	//	requires spring.boot.actuator;

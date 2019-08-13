@@ -119,7 +119,7 @@ public class MenuBarController {
 		try {
 			imgUrl = SettingsEditorApplication.class.getResource("/res/ahliLogo.png").toString();
 		} catch (final NullPointerException e) {
-			logger.error("Error loading resource");
+			logger.error("Error loading resource", e);
 			imgUrl = "/ahliLogo.png";
 		}
 		

@@ -43,7 +43,26 @@ public class FilterableTreeItem <T> extends TreeItem<T> {
 			return predicate.get().test(this, child.getValue());
 		}, predicate));
 		
-		setHiddenFieldChildren(filteredList);
+		setHiddenFieldChildrenPrivate(filteredList);
+	}
+	
+	/**
+	 * Set the hidden private field {@link TreeItem} children through reflection and hook the hidden {@link
+	 * ListChangeListener} in {@link TreeItem} childrenListener to the list
+	 */
+	private void setHiddenFieldChildrenPrivate(final ObservableList<TreeItem<T>> list) {
+		final Field children = ReflectionUtils.findField(getClass(), "children");
+		if (children != null) {
+			children.setAccessible(true);
+			ReflectionUtils.setField(children, this, list);
+		}
+		
+		final Field childrenListener1 = ReflectionUtils.findField(getClass(), "childrenListener");
+		if (childrenListener1 != null) {
+			childrenListener1.setAccessible(true);
+			final Object childrenListener = ReflectionUtils.getField(childrenListener1, this);
+			list.addListener((ListChangeListener<? super TreeItem<T>>) childrenListener);
+		}
 	}
 	
 	/**
@@ -51,15 +70,7 @@ public class FilterableTreeItem <T> extends TreeItem<T> {
 	 * ListChangeListener} in {@link TreeItem} childrenListener to the list
 	 */
 	protected void setHiddenFieldChildren(final ObservableList<TreeItem<T>> list) {
-		final Field children = ReflectionUtils.findField(getClass(), "children");
-		children.setAccessible(true);
-		ReflectionUtils.setField(children, this, list);
-		
-		final Field childrenListener1 = ReflectionUtils.findField(getClass(), "childrenListener");
-		childrenListener1.setAccessible(true);
-		final Object childrenListener = ReflectionUtils.getField(childrenListener1, this);
-		
-		list.addListener((ListChangeListener<? super TreeItem<T>>) childrenListener);
+		setHiddenFieldChildrenPrivate(list);
 	}
 	
 	/**

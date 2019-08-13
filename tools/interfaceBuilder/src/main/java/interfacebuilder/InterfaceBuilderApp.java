@@ -46,6 +46,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoConfiguration;
+import org.springframework.boot.autoconfigure.http.HttpMessageConvertersAutoConfiguration;
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import org.springframework.boot.autoconfigure.jmx.JmxAutoConfiguration;
+import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.servlet.HttpEncodingAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.servlet.MultipartAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Import;
 
@@ -71,11 +81,14 @@ import java.util.concurrent.TimeUnit;
  * @author Ahli
  */
 
-@EnableAutoConfiguration
+@EnableAutoConfiguration (exclude = { MultipartAutoConfiguration.class, JmxAutoConfiguration.class,
+		DispatcherServletAutoConfiguration.class, ErrorMvcAutoConfiguration.class, HttpEncodingAutoConfiguration.class,
+		HttpMessageConvertersAutoConfiguration.class, JacksonAutoConfiguration.class,
+		PropertyPlaceholderAutoConfiguration.class, ThymeleafAutoConfiguration.class, WebMvcAutoConfiguration.class })
 @Import ( { AppConfiguration.class, FxmlConfiguration.class })
 public class InterfaceBuilderApp extends Application {
-	private static final Logger logger = LogManager.getLogger(InterfaceBuilderApp.class);
 	public static final String FATAL_ERROR = "FATAL ERROR: ";
+	private static final Logger logger = LogManager.getLogger(InterfaceBuilderApp.class);
 	public static boolean javaFxInitialized;
 	private static InterfaceBuilderApp instance;
 	private static ServerSocket serverSocket;
@@ -109,12 +122,12 @@ public class InterfaceBuilderApp extends Application {
 	 * @param args
 	 * 		command line arguments
 	 */
-	public static void main(final String[] args) {
+	public static void init(final String[] args) {
 		if (initInterProcessCommunication(args, 12317)) {
 			// this is the server
 			logger.trace("System's Log4j2 Configuration File: {}", () -> System.getProperty("log4j.configurationFile"));
-			logger.info("Launch arguments: " + Arrays.toString(args));
-			logger.info("Max Heap Space: " + Runtime.getRuntime().maxMemory() / 1_048_576L + "mb.");
+			logger.info("Launch arguments: {}", () -> Arrays.toString(args));
+			logger.info("Max Heap Space: {}mb.", Runtime.getRuntime().maxMemory() / 1_048_576L);
 			
 			// set preloader while booting javafx
 			System.setProperty("javafx.preloader", AppPreloader.class.getCanonicalName());
@@ -138,6 +151,9 @@ public class InterfaceBuilderApp extends Application {
 			logger.fatal("Could not retrieve localhost address.", e);
 			return false;
 		} catch (final IOException e) {
+			if (logger.isTraceEnabled()) {
+				logger.trace("Server socket error.", e);
+			}
 			// port taken, so app is already running
 			logger.info("App already running. Passing over command line arguments.");
 			
@@ -147,7 +163,7 @@ public class InterfaceBuilderApp extends Application {
 						     new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8))) {
 					// sending parameters
 					final String command = Arrays.toString(args);
-					logger.info("Sending: " + command);
+					logger.info("Sending: {}", command);
 					out.println(command);
 					
 					// receive answers
@@ -179,7 +195,7 @@ public class InterfaceBuilderApp extends Application {
 							InterProcessCommunicationAppender.setPrintWriter(out);
 							String inputLine;
 							while ((inputLine = in.readLine()) != null) {
-								logger.info("received message from client: " + inputLine);
+								logger.info("received message from client: {}", inputLine);
 								final List<String> params =
 										Arrays.asList(inputLine.substring(1, inputLine.length() - 1).split(", "));
 								getInstance().executeCommand(params);
@@ -187,7 +203,7 @@ public class InterfaceBuilderApp extends Application {
 						} catch (final IOException e) {
 							// client closed connection
 							if (logger.isTraceEnabled()) {
-								logger.trace("client closed connection.");
+								logger.trace("client closed connection.", e);
 							}
 						} finally {
 							InterProcessCommunicationAppender.setPrintWriter(null);
@@ -367,11 +383,11 @@ public class InterfaceBuilderApp extends Application {
 				gamePath = settings.getSc2Path() + File.separator + supportDir + File.separator + swicherExe;
 			}
 		}
-		logger.info("Game location: " + gamePath);
+		logger.info("Game location: {}", gamePath);
 		
 		final File replay = replayFinder.getLastUsedOrNewestReplay(isHeroes, configService.getDocumentsPath());
 		if (replay != null && replay.exists() && replay.isFile()) {
-			logger.info("Starting game with replay: " + replay.getName());
+			logger.info("Starting game with replay: {}", replay.getName());
 			final String cmd = "cmd /C start \"\" \"" + gamePath + "\" \"" + replay.getAbsolutePath() + "\"";
 			try {
 				Runtime.getRuntime().exec(cmd);
@@ -536,18 +552,18 @@ public class InterfaceBuilderApp extends Application {
 	 * Prints variables into console.
 	 */
 	private void printVariables(final CommandLineParams params) {
-		logger.info("basePath: " + configService.getBasePath());
-		logger.info("documentsPath: " + configService.getDocumentsPath());
+		logger.info("basePath: {}", configService.getBasePath());
+		logger.info("documentsPath: {}", configService.getDocumentsPath());
 		final String paramCompilePath = params.getParamCompilePath();
 		if (paramCompilePath != null) {
-			logger.info("compile param path: " + paramCompilePath);
+			logger.info("compile param path: {}", paramCompilePath);
 			if (params.isCompileAndRun()) {
 				logger.info("run after compile: true");
 			}
 		}
 		final String paramRunPath = params.getParamRunPath();
 		if (paramRunPath != null) {
-			logger.info("run param path: " + paramRunPath);
+			logger.info("run param path: {}", paramRunPath);
 		}
 	}
 	
@@ -682,10 +698,6 @@ public class InterfaceBuilderApp extends Application {
 		}
 		logger.info("App waves Goodbye!");
 		appContext.stop();
-	}
-	
-	public ConfigurableApplicationContext getAppContext() {
-		return appContext;
 	}
 	
 	public NavigationController getNavigationController() {

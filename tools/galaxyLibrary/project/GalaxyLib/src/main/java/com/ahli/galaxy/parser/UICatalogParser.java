@@ -138,13 +138,13 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				// curLevel - 2 because root is level 2 on list index 0
 				curElement = curPath.get(curLevel - 2);
 				if (logger.isTraceEnabled()) {
-					logger.trace("shrinking path: curElement=" + curElement + ", level=" + curLevel);
-					logger.trace("path  pre-dropLast: " + curPath);
+					logger.trace("shrinking path: curElement={}, level={}", curElement, curLevel);
+					logger.trace("path  pre-dropLast: {}", curPath);
 				}
 				curPath.remove(curPath.size() - 1);
 				
 				if (logger.isTraceEnabled()) {
-					logger.trace("path afterDropLast: " + curPath);
+					logger.trace("path afterDropLast: {}", curPath);
 				}
 			}
 		}
@@ -166,7 +166,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		// contain file=, e.g. for cutscene frames)
 		if ((i = attrTypes.indexOf(FILE)) != -1 && !KEY.equals(tagName) && !ACTION.equals(tagName)) {
 			if (level != 2) {
-				logger.warn("WARNING: Unexpected attribute 'file=' found in " + curElement);
+				logger.warn("WARNING: Unexpected attribute 'file=' found in {}", curElement);
 			}
 			// TODO enable to test modification of existing templates, feature is incomplete
 			//			editingMode = true;
@@ -221,7 +221,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				String type = ((i = attrTypes.indexOf(TYPE)) != -1) ?
 						catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout, consoleSkinId) : null;
 				if (type == null) {
-					logger.error("Unknown type defined in child element of: " + curElement);
+					logger.error("Unknown type defined in child element of: {}", curElement);
 					type = FRAME;
 				}
 				final var newElemUiFrame = (UIFrame) newElem;
@@ -234,7 +234,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					if (curElement instanceof UIFrame) {
 						curElement.getChildren().add(newElem);
 					} else {
-						logger.error("Frame appearing in unexpected parent element: " + curElement);
+						logger.error("Frame appearing in unexpected parent element: {}", curElement);
 					}
 				}
 				break;
@@ -277,7 +277,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 							setImplicitControllerNames((UIAnimation) curElement);
 						}
 					} else {
-						logger.error("Controller appearing in unexpected parent element: " + curElement);
+						logger.error("Controller appearing in unexpected parent element: {}", curElement);
 					}
 				}
 				break;
@@ -289,7 +289,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					if (curElement instanceof UIFrame) {
 						curElement.getChildren().add(newElem);
 					} else {
-						logger.error("Animation appearing in unexpected parent element: " + curElement);
+						logger.error("Animation appearing in unexpected parent element: {}", curElement);
 					}
 				}
 				break;
@@ -301,7 +301,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					if (curElement instanceof UIFrame) {
 						((UIFrame) curElement).getChildren().add(newElem);
 					} else {
-						logger.error("StateGroup appearing in unexpected parent element: " + curElement);
+						logger.error("StateGroup appearing in unexpected parent element: {}", curElement);
 					}
 				}
 				break;
@@ -312,7 +312,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				final String val = ((i = attrTypes.indexOf(VAL)) != -1) ?
 						catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout, consoleSkinId) : null;
 				if (val == null) {
-					logger.error("Constant '" + name + "' has no value defined");
+					logger.error("Constant '{}' has no value defined", name);
 					return;
 				}
 				var newElemUiConstant = (UIConstant) newElem;
@@ -329,11 +329,8 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				}
 				catalog.addConstant(newElemUiConstant, curIsDevLayout);
 				return;
-			case DESC:
-				// nothing to do
-				return;
-			case DESCFLAGS:
-				// locked or internal
+			case DESC:      // nothing to do
+			case DESCFLAGS: // locked or internal
 				return;
 			case INCLUDE:
 				final int j = attrTypes.indexOf(PATH);
@@ -374,14 +371,14 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					} else if (tagName.equals(DRIVER)) {
 						((UIAnimation) curElement).setDriver((UIAttribute) newElem);
 					} else {
-						logger.error("found an attribute that cannot be added to UIAnimation: " + newElem.toString());
+						logger.error("found an attribute that cannot be added to UIAnimation: {}", newElem);
 					}
 				} else if (curElement instanceof UIController) {
 					// Controller's keys
 					if (tagName.equals(KEY)) {
 						((UIController) curElement).getKeys().add((UIAttribute) newElem);
 					} else {
-						logger.error("found an attribute that cannot be added to UIController: " + newElem.toString());
+						logger.error("found an attribute that cannot be added to UIController: {}", newElem);
 					}
 				} else if (curElement instanceof UIStateGroup) {
 					if (tagName.equals(DEFAULTSTATE)) {
@@ -392,7 +389,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 							logger.error("found <DefaultState> in <StateGroup '{}'> without val", curElement.getName());
 						}
 					} else {
-						logger.error("found an attribute that cannot be added to UIController: " + newElem.toString());
+						logger.error("found an attribute that cannot be added to UIController: {}", newElem);
 					}
 				} else if (curElement instanceof UIState) {
 					if (tagName.equals(WHEN)) {
@@ -400,10 +397,10 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					} else if (tagName.equals(ACTION)) {
 						((UIState) curElement).getActions().add((UIAttribute) newElem);
 					} else {
-						logger.error("found an attribute that cannot be added to UIState: " + newElem.toString());
+						logger.error("found an attribute that cannot be added to UIState: {}", newElem);
 					}
 				} else {
-					logger.error("found an attribute that cannot be added to anything: " + newElem.toString());
+					logger.error("found an attribute that cannot be added to anything: {}", newElem);
 				}
 				
 				newElem = null;
@@ -414,13 +411,13 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		if (level == 2) {
 			if (newElem != null) {
 				if (logger.isTraceEnabled()) {
-					logger.trace("adding new template: " + curFileName + " with " + newElem.getName());
+					logger.trace("adding new template: {} with {}", curFileName, newElem.getName());
 				}
 				// curTemplate =
 				catalog.addTemplate(curFileName, newElem, curIsDevLayout);
 			} else {
 				if (logger.isTraceEnabled()) {
-					logger.trace("skipped creating a template because newElem was null. curFileName: " + curFileName);
+					logger.trace("skipped creating a template because newElem was null. curFileName: {}", curFileName);
 				}
 			}
 		}
@@ -447,13 +444,13 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		}
 		
 		if (logger.isTraceEnabled()) {
-			logger.trace("Instanciating Template of path " + path);
+			logger.trace("Instanciating Template of path {}", path);
 		}
 		path = path.replace('\\', '/');
 		final int seperatorIndex = path.indexOf('/');
 		if (seperatorIndex < 0) {
-			logger.error("ERROR: Template paths must follow the pattern 'FileName/FrameName'. Found '" + path + "' " +
-					"instead.");
+			logger.error("ERROR: Template paths must follow the pattern 'FileName/FrameName'. Found '{}' instead.",
+					path);
 			return null;
 		}
 		final String fileName = path.substring(0, seperatorIndex);
@@ -467,19 +464,19 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			templateInstance = instanciateTemplateFromList(catalog.getBlizzOnlyTemplates(), fileName, path, newName);
 			if (templateInstance != null) {
 				if (!curIsDevLayout) {
-					logger.error(
-							"ERROR: the non-Blizz-only frame '" + curElement + "' uses a Blizz-only template '" + path +
-									"'.");
+					logger.error("ERROR: the non-Blizz-only frame '{}' uses a Blizz-only template '{}'.", curElement,
+							path);
 				}
 				return templateInstance;
 			}
 		}
 		// template does not exist or its layout was not loaded, yet
 		if (!curIsDevLayout) {
-			logger.error("ERROR: Template of path '" + path + "' could not be found.");
+			logger.error("ERROR: Template of path '{}' could not be found.", path);
 		} else {
-			logger.warn("WARNING: Template of path '" + path +
-					"' could not be found, but we are creating a Blizz-only layout, so this is fine.");
+			logger.warn(
+					"WARNING: Template of path '{}' could not be found, but we are creating a Blizz-only layout, so this is fine.",
+					path);
 		}
 		return null;
 	}
@@ -519,16 +516,16 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			final UIFrame frame = (UIFrame) curElement;
 			if (side == null) {
 				if (logger.isTraceEnabled()) {
-					logger.trace("relative=" + relative + ", offset=" + offset);
+					logger.trace("relative={}, offset={}", relative, offset);
 				}
 				if (relative == null) {
-					logger.error("'Anchor' attribute has no 'relative' attribute defined in parent element: " +
+					logger.error("'Anchor' attribute has no 'relative' attribute defined in parent element: {}",
 							curElement.getName());
 				} else {
 					try {
 						frame.setAnchor(relative, offset);
 					} catch (final NumberFormatException e) {
-						logger.error("A frame's offset '" + offset + "' is not a numerical value. Using 0 instead.");
+						logger.error("A frame's offset '{}' is not a numerical value. Using 0 instead.", offset);
 						frame.setAnchorOffset(UIAnchorSide.RIGHT, UIFrame.ZERO);
 						frame.setAnchorOffset(UIAnchorSide.BOTTOM, UIFrame.ZERO);
 					}
@@ -544,22 +541,23 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				} else if (side.compareToIgnoreCase(TOP) == 0) {
 					sideVal = UIAnchorSide.TOP;
 				} else {
-					logger.error("'Anchor' attribute has unrecognizable value for 'side='. Value is '" + side +
-							"' in parent element: " + curElement.getName());
+					logger.error(
+							"'Anchor' attribute has unrecognizable value for 'side='. Value is '{}' in parent element: {}",
+							side, curElement.getName());
 				}
 				if (sideVal != null) {
 					if (offset == null) {
-						logger.error("'Anchor' attribute has no 'offset' attribute defined in parent element: " +
+						logger.error("'Anchor' attribute has no 'offset' attribute defined in parent element: {}",
 								curElement.getName());
 					} else {
 						if (pos == null) {
-							logger.error("'Anchor' attribute has no 'pos' attribute defined in parent element: " +
+							logger.error("'Anchor' attribute has no 'pos' attribute defined in parent element: {}",
 									curElement.getName());
 						} else {
 							if (relative == null) {
 								logger.error(
-										"'Anchor' attribute has no 'relative' attribute defined in parent element: " +
-												curElement.getName());
+										"'Anchor' attribute has no 'relative' attribute defined in parent element: {}",
+										curElement.getName());
 							} else {
 								frame.setAnchor(sideVal, relative, pos, offset);
 							}
@@ -577,7 +575,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	 */
 	private static void setImplicitControllerNames(final UIAnimation thisElem) {
 		if (logger.isTraceEnabled()) {
-			logger.trace("Setting implicit controller names for UIAnimation " + thisElem.getName());
+			logger.trace("Setting implicit controller names for UIAnimation {}", thisElem.getName());
 		}
 		final List<UIElement> controllers = thisElem.getControllers();
 		for (final UIElement uiElem : controllers) {
@@ -706,8 +704,8 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			for (final UIElement elem : addedElements) {
 				addedFinalElements.putIfAbsent(elem, elem);
 			}
-			logger.info("elements added that can be deduplicated during postprocessing: " + addedElements.size());
-			logger.info("unique elements added that were deduplicated during parsing: " + addedFinalElements.size());
+			logger.info("elements added that can be deduplicated during postprocessing: {}", addedElements.size());
+			logger.info("unique elements added that were deduplicated during parsing: {}", addedFinalElements.size());
 			addedElements = null;
 			toDeduplicate = new ArrayDeque<>(74_000);
 			// replace instancesb
@@ -719,9 +717,10 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				maxDequeSize = Math.max(maxDequeSize, toDeduplicate.size());
 				deduplicate(toDeduplicate.pop());
 			}
-			logger.info("postProcessDeduplications: " + postProcessDeduplications + ", attributeDeduplications: " +
-					attributeDeduplications + ", constantsDeduplications=" + constantDeduplications + ", " +
-					"maxDequeSize: " + maxDequeSize + ", totalDeduplicatedElements: " + deduplicatedElements.size());
+			logger.info(
+					"postProcessDeduplications: {}, attributeDeduplications: {}, constantsDeduplications={}, maxDequeSize: {}, totalDeduplicatedElements: {}",
+					postProcessDeduplications, attributeDeduplications, constantDeduplications, maxDequeSize,
+					deduplicatedElements.size());
 		}
 	}
 	
@@ -738,7 +737,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				obj instanceof UIState)) {
 			// attributes, constants, controllers do not contain any deduplicated objects
 			// attributes and constants can be deduplicated when initially created
-			logger.error("Object cannot be handled in dedpuplication: " + obj.toString());
+			logger.error("Object cannot be handled in dedpuplication: {},", obj);
 		}
 	}
 	

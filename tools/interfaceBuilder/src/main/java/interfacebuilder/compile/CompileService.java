@@ -60,7 +60,7 @@ public class CompileService {
 				startTime = System.currentTimeMillis();
 				manageOrderOfLayoutFiles(descIndex);
 				executionTime = (System.currentTimeMillis() - startTime);
-				logger.info("Checking and repairing the Layout order took " + executionTime + "ms.");
+				logger.info("Checking and repairing the Layout order took {}ms.", executionTime);
 			}
 			if (verifyLayout) {
 				startTime = System.currentTimeMillis();
@@ -69,7 +69,7 @@ public class CompileService {
 				catalogClone = getClonedUICatalog(mod.getGameData().getUiCatalog());
 				
 				executionTime = (System.currentTimeMillis() - startTime);
-				logger.info("BaseUI Cloning took " + executionTime + "ms.");
+				logger.info("BaseUI Cloning took {}ms.", executionTime);
 				startTime = System.currentTimeMillis();
 				
 				catalogClone.setParser(new UICatalogParser(catalogClone, new XmlParserVtd(), true));
@@ -82,7 +82,7 @@ public class CompileService {
 				catalogClone.setParser(null);
 				
 				executionTime = (System.currentTimeMillis() - startTime);
-				logger.info("Validating Layouts took " + executionTime + "ms.");
+				logger.info("Validating Layouts took {}ms.", executionTime);
 			} else {
 				if (!repairLayoutOrder && verifyXml) {
 					// only verify XML and nothing else

@@ -352,7 +352,7 @@ public class UIFrame extends UIElement {
 		if (obj == null) {
 			return false;
 		}
-		if (!(obj instanceof UIFrame)) {
+		if (getClass() != obj.getClass()) {
 			return false;
 		}
 		if (obj == this) {

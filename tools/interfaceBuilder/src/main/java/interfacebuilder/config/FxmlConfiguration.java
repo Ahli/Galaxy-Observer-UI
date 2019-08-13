@@ -33,89 +33,89 @@ public class FxmlConfiguration {
 	
 	@Bean
 	@Scope (ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-	public ViewRuleSetController viewRuleSetController() {
+	protected ViewRuleSetController viewRuleSetController() {
 		return new ViewRuleSetController();
 	}
 	
 	@Bean
-	public NavigationController navigationController() {
+	protected NavigationController navigationController() {
 		return new NavigationController();
 	}
 	
 	@Bean
 	@Scope (ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-	public HomeController homeController() {
+	protected HomeController homeController() {
 		return new HomeController();
 	}
 	
 	@Bean
 	@Scope (ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-	public SettingsCommandLineToolController settingsCommandLineToolController() {
+	protected SettingsCommandLineToolController settingsCommandLineToolController() {
 		return new SettingsCommandLineToolController();
 	}
 	
 	@Bean
 	@Scope (ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-	public SettingsController settingsController() {
+	protected SettingsController settingsController() {
 		return new SettingsController();
 	}
 	
 	@Bean
 	@Scope (ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-	public SettingsGamesPathsController settingsGamesPathsController() {
+	protected SettingsGamesPathsController settingsGamesPathsController() {
 		return new SettingsGamesPathsController();
 	}
 	
 	@Bean
 	@Scope (ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-	public SettingsGuiToolController settingsGuiToolController() {
+	protected SettingsGuiToolController settingsGuiToolController() {
 		return new SettingsGuiToolController();
 	}
 	
 	@Bean
-	public TabPaneController tabPaneController() {
+	protected TabPaneController tabPaneController() {
 		return new TabPaneController();
 	}
 	
 	@Bean
 	@Scope (ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-	public NewProjectController newProjectController() {
+	protected NewProjectController newProjectController() {
 		return new NewProjectController();
 	}
 	
 	@Bean
 	@Scope (ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-	public NewProjectDialogController newProjectDialogController() {
+	protected NewProjectDialogController newProjectDialogController() {
 		return new NewProjectDialogController();
 	}
 	
 	@Bean
 	@Scope (ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-	public AddProjectController addProjectController() {
+	protected AddProjectController addProjectController() {
 		return new AddProjectController();
 	}
 	
 	@Bean
 	@Scope (ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-	public AddProjectDialogController addProjectDialogController() {
+	protected AddProjectDialogController addProjectDialogController() {
 		return new AddProjectDialogController();
 	}
 	
 	@Bean
 	@Scope (ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-	public CompressionMiningController compressionMiningController() {
+	protected CompressionMiningController compressionMiningController() {
 		return new CompressionMiningController();
 	}
 	
 	@Bean
 	@Scope (ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-	public BrowseController browseController() {
+	protected BrowseController browseController() {
 		return new BrowseController();
 	}
 	
 	@Bean
 	@Scope (ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-	public BrowseTabController browseTabController() {
+	protected BrowseTabController browseTabController() {
 		return new BrowseTabController();
 	}
 }

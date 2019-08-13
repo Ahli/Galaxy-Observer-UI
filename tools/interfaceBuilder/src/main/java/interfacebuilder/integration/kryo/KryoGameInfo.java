@@ -53,7 +53,7 @@ public class KryoGameInfo {
 		if (obj == null) {
 			return false;
 		}
-		if (!(obj instanceof KryoGameInfo)) {
+		if (getClass() != obj.getClass()) {
 			return false;
 		}
 		if (obj == this) {

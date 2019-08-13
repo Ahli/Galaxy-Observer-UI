@@ -41,7 +41,7 @@ public class AddProjectController {
 	private Dialog<Project> dialog;
 	private Project project;
 	
-	public AddProjectController(){
+	public AddProjectController() {
 		// nothing to do
 	}
 	

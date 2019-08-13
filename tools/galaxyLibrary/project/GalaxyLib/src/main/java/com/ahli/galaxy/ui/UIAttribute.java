@@ -126,7 +126,7 @@ public class UIAttribute extends UIElement {
 		if (obj == null) {
 			return false;
 		}
-		if (!(obj instanceof UIAttribute)) {
+		if (getClass() != obj.getClass()) {
 			return false;
 		}
 		if (obj == this) {

@@ -35,7 +35,9 @@ public final class JarHelper {
 	 * @return File at base path
 	 */
 	public static File getJarDir(final Class<?> aclass) {
-		logger.trace("_FINDING JAR'S PATH");
+		if (logger.isTraceEnabled()) {
+			logger.trace("_FINDING JAR'S PATH");
+		}
 		
 		
 		// ATTEMPT #1
@@ -102,7 +104,7 @@ public final class JarHelper {
 			if (str.contains(".jar;")) {
 				str = str.substring(0, str.indexOf(".jar"));
 				if (logger.isTraceEnabled()) {
-					logger.trace("path before .jar: " + str);
+					logger.trace("path before .jar: {}", str);
 				}
 				final int lastFileSepIndex = str.lastIndexOf(File.separator);
 				if (lastFileSepIndex >= 0) {
@@ -112,7 +114,7 @@ public final class JarHelper {
 			
 		}
 		if (logger.isTraceEnabled()) {
-			logger.trace("_RESULT PATH: " + str);
+			logger.trace("_RESULT PATH: {}", str);
 		}
 		
 		return new File(str);

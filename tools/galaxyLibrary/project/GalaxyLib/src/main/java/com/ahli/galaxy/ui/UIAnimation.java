@@ -175,7 +175,7 @@ public class UIAnimation extends UIElement {
 		if (obj == null) {
 			return false;
 		}
-		if (!(obj instanceof UIAnimation)) {
+		if (getClass() != obj.getClass()) {
 			return false;
 		}
 		if (obj == this) {

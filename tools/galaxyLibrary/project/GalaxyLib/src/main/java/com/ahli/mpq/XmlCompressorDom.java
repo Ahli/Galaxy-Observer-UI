@@ -88,6 +88,9 @@ public final class XmlCompressorDom {
 				doc = dBuilder.parse(is);
 				
 			} catch (final SAXParseException | IOException e) {
+				if (logger.isTraceEnabled()) {
+					logger.trace("Error while compressing xml.", e);
+				}
 				continue;
 			}
 			

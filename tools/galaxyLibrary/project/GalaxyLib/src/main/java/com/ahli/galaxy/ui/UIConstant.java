@@ -87,7 +87,7 @@ public class UIConstant extends UIElement {
 		if (obj == null) {
 			return false;
 		}
-		if (!(obj instanceof UIConstant)) {
+		if (getClass() != obj.getClass()) {
 			return false;
 		}
 		if (obj == this) {

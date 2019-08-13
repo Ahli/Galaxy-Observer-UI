@@ -52,10 +52,12 @@ final class StringInternerTest {
 		secondInterned = null;
 		
 		int i = 0;
-		while (referenceQueue.poll() == null) {
+		final int maxAttempts = 100;
+		while (referenceQueue.poll() == null && i < maxAttempts) {
 			++i;
 			System.gc();
 		}
-		assertTrue(i < 100, "GC did not remove the WeakReference at first attempt");
+		// fails on J9 JDK
+		assertTrue(i < maxAttempts, "GC did not remove the WeakReference at first attempt");
 	}
 }

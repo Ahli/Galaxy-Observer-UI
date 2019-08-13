@@ -70,7 +70,7 @@ public class TabsController {
 								super.updateItem(item, false);
 								if (!equals) {
 									if (logger.isTraceEnabled()) {
-										logger.trace("update wrapping table cell - newLabel " + item);
+										logger.trace("update wrapping table cell - newLabel {}", item);
 									}
 									final Label l = new Label(item);
 									l.setWrapText(true);
@@ -147,7 +147,7 @@ public class TabsController {
 				if (!t.getOldValue().equals(t.getNewValue())) {
 					t.getTableView().getItems().get(t.getTablePosition().getRow()).setValue(t.getNewValue());
 					if (logger.isTraceEnabled()) {
-						logger.trace("write hotkey val: " + t.getNewValue());
+						logger.trace("write hotkey val: {}", t.getNewValue());
 					}
 					getMain().notifyFileDataWasChanged();
 				}
@@ -169,7 +169,7 @@ public class TabsController {
 				if (!t.getOldValue().equals(t.getNewValue())) {
 					t.getTableView().getItems().get(t.getTablePosition().getRow()).setValue(t.getNewValue());
 					if (logger.isTraceEnabled()) {
-						logger.trace("write setting val: " + t.getNewValue());
+						logger.trace("write setting val: {}", t.getNewValue());
 					}
 					getMain().notifyFileDataWasChanged();
 				}

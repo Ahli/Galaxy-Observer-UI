@@ -79,7 +79,7 @@ public class ReplayFinder {
 			}
 		}
 		if (logger.isTraceEnabled()) {
-			logger.trace("replayPath: " + replayPath);
+			logger.trace("replayPath: {}", replayPath);
 		}
 		if (replayPath == null) {
 			return null;
@@ -114,7 +114,7 @@ public class ReplayFinder {
 				FileUtils.listFiles(new File(basePath), TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
 		
 		if (logger.isTraceEnabled()) {
-			logger.trace("# Replays found: " + allReplays.size());
+			logger.trace("# Replays found: {}", allReplays.size());
 		}
 		
 		long newestDate = Long.MIN_VALUE;
@@ -123,17 +123,17 @@ public class ReplayFinder {
 			// check extension of file
 			final String curReplayName = curReplay.getName();
 			if (logger.isTraceEnabled()) {
-				logger.trace("curReplay name: " + curReplayName);
+				logger.trace("curReplay name: {}", curReplayName);
 			}
 			final String extension = FilenameUtils.getExtension(curReplayName);
 			if (logger.isTraceEnabled()) {
-				logger.trace("extension: " + extension);
+				logger.trace("extension: {}", extension);
 			}
 			if (curReplay.isFile() && extension.equalsIgnoreCase(extensions[0])) {
 				// check date
 				final long curDate = curReplay.lastModified();
 				if (logger.isTraceEnabled()) {
-					logger.trace("curDate: " + curDate);
+					logger.trace("curDate: {}", curDate);
 				}
 				if (curDate > newestDate) {
 					newestDate = curDate;
@@ -142,7 +142,7 @@ public class ReplayFinder {
 			}
 		}
 		if (newestReplay != null) {
-			logger.info("newest Replay: " + newestReplay.getName());
+			logger.info("newest Replay: {}", newestReplay.getName());
 		}
 		return newestReplay;
 	}

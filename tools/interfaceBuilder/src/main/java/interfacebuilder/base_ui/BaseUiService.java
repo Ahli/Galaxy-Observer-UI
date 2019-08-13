@@ -160,7 +160,7 @@ public class BaseUiService {
 	 * @param usePtr
 	 */
 	public void extract(final Game game, final boolean usePtr) {
-		logger.info(String.format("Extracting baseUI for %s", game.toString()));
+		logger.info("Extracting baseUI for {}", game);
 		prepareCascExplorerConfig(game, usePtr);
 		
 		final ThreadPoolExecutor executor = InterfaceBuilderApp.getInstance().getExecutor();
@@ -169,7 +169,7 @@ public class BaseUiService {
 		
 		try {
 			if (!destination.exists() && !destination.mkdirs()) {
-				logger.error(String.format("Directory %s could not be created.", destination));
+				logger.error("Directory {} could not be created.", destination);
 				return;
 			}
 			fileService.cleanDirectory(destination);
@@ -309,11 +309,11 @@ public class BaseUiService {
 				final String gameName = game.getGameDef().getName();
 				if (uiCatalog != null) {
 					if (logger.isTraceEnabled()) {
-						logger.trace("Aborting parsing baseUI for '" + gameName + "' as was already parsed.");
+						logger.trace("Aborting parsing baseUI for '{}' as was already parsed.", gameName);
 					}
 				} else {
 					final long startTime = System.currentTimeMillis();
-					logger.info("Loading baseUI for " + gameName);
+					logger.info("Loading baseUI for {}", gameName);
 					boolean needToParseAgain = true;
 					
 					/*!(game.getNewGameDef() instanceof SC2GameDef) &&*/
@@ -332,7 +332,7 @@ public class BaseUiService {
 							game.setUiCatalog(uiCatalog);
 							needToParseAgain = false;
 							if (logger.isTraceEnabled()) {
-								logger.trace("Loaded baseUI for '" + gameName + "' from cache");
+								logger.trace("Loaded baseUI for '{}' from cache", gameName);
 							}
 						}
 					} catch (final IOException e) {
@@ -360,10 +360,10 @@ public class BaseUiService {
 								
 								final Collection<File> descIndexFiles =
 										FileUtils.listFiles(directory, fileFilter, TrueFileFilter.INSTANCE);
-								logger.info("number of descIndexFiles found: " + descIndexFiles.size());
+								logger.info("number of descIndexFiles found: {}", descIndexFiles.size());
 								
 								for (final File descIndexFile : descIndexFiles) {
-									logger.info("parsing descIndexFile '" + descIndexFile.getPath() + "'");
+									logger.info("parsing descIndexFile '{}'", descIndexFile.getPath());
 									uiCatalog.processDescIndex(descIndexFile, game.getGameDef().getDefaultRaceId(),
 											game.getGameDef().getDefaultConsoleSkinId());
 								}
@@ -387,7 +387,7 @@ public class BaseUiService {
 						}
 					}
 					final long executionTime = (System.currentTimeMillis() - startTime);
-					logger.info("Loading BaseUI for '" + gameName + "' took " + executionTime + "ms.");
+					logger.info("Loading BaseUI for '{}' took {}ms.", gameName, executionTime);
 				}
 			}
 			addTaskToExecutor(followupTask);
@@ -443,7 +443,7 @@ public class BaseUiService {
 			isUpToDate = versionCache[i] == versionBaseUi[i];
 		}
 		if (logger.isTraceEnabled()) {
-			logger.trace("Cache and baseUI versions match: " + isUpToDate);
+			logger.trace("Cache and baseUI versions match: {}", isUpToDate);
 		}
 		return isUpToDate;
 	}

@@ -91,7 +91,7 @@ public class HomeController implements Updateable {
 	
 	private ObservableList<Project> projectsObservable;
 	
-	public HomeController(){
+	public HomeController() {
 		// nothing to do
 	}
 	

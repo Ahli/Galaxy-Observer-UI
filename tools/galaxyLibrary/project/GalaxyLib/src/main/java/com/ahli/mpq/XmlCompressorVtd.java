@@ -25,7 +25,7 @@ import java.nio.file.Files;
 import java.util.Collection;
 
 /**
- * TODO improve, it is ba
+ * TODO improve, it is bad at compressing
  *
  * @author Ahli
  */
@@ -67,6 +67,9 @@ public final class XmlCompressorVtd {
 				vtd.setDoc_BR(Files.readAllBytes(curFile.toPath()));
 				vtd.parse(false);
 			} catch (final IOException | ParseException e) {
+				if (logger.isTraceEnabled()) {
+					logger.trace("Error while compressing xml.", e);
+				}
 				continue;
 			}
 			

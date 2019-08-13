@@ -155,7 +155,7 @@ public class UIState extends UIElement {
 		if (obj == null) {
 			return false;
 		}
-		if (!(obj instanceof UIState)) {
+		if (getClass() != obj.getClass()) {
 			return false;
 		}
 		if (obj == this) {

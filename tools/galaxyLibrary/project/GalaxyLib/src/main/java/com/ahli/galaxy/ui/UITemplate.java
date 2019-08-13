@@ -109,7 +109,7 @@ public class UITemplate implements DeepCopyable {
 		if (obj == null) {
 			return false;
 		}
-		if (!(obj instanceof UITemplate)) {
+		if (getClass() != obj.getClass()) {
 			return false;
 		}
 		if (obj == this) {

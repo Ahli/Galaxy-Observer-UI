@@ -223,10 +223,10 @@ public class SettingsEditorApplication extends Application {
 				.add(SettingsEditorApplication.class.getResource("/view/application.css").toExternalForm());
 		
 		if (logger.isTraceEnabled()) {
-			logger.trace("installed font families: " + Font.getFamilies());
-			logger.trace("Locale dflt is '" + Locale.getDefault() + "'");
-			logger.trace("Locale of Messages.class is '" + Messages.getBundle().getLocale() + "'");
-			logger.trace("Locale china: " + Locale.SIMPLIFIED_CHINESE);
+			logger.trace("installed font families: {}", Font.getFamilies());
+			logger.trace("Locale dflt is '{}'", Locale.getDefault());
+			logger.trace("Locale of Messages.class is '{}'", Messages.getBundle().getLocale());
+			logger.trace("Locale china: {}", Locale.SIMPLIFIED_CHINESE);
 		}
 		if (Messages.checkIfTargetResourceIsUsed(Locale.CHINA)) {
 			logger.trace("apply Chinese css");
@@ -288,7 +288,7 @@ public class SettingsEditorApplication extends Application {
 		mpqi = new MpqEditorInterface(cachePath, mpqEditorPath);
 		final File f = new File(mpqEditorPath);
 		if (!f.exists() || !f.isFile()) {
-			logger.error("Could not find MPQEditor.exe within its expected path: " + mpqEditorPath);
+			logger.error("Could not find MPQEditor.exe within its expected path: {}", mpqEditorPath);
 			final String title = Messages.getString("Main.warningAlertTitle");
 			final String content = String.format(Messages.getString("Main.couldNotFindMpqEditor"), mpqEditorPath);
 			final Alert alert = Alerts.buildWarningAlert(primaryStage, title, title, content);

@@ -48,8 +48,6 @@ public final class InterProcessCommunicationAppender extends AbstractAppender {
 		if (instance == null) {
 			instance = this;
 		} else {
-			//			throw new ExceptionInInitializerError(
-			//					"InterProcessCommunicationAppender cannot be instanciated multiple times.");
 			System.err.println("INTER PROCESS COMMUNICATION APPENDER instanciated multiple times!");
 		}
 	}

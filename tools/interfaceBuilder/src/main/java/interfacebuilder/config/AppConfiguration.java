@@ -35,117 +35,117 @@ import java.util.concurrent.TimeUnit;
 public class AppConfiguration {
 	
 	@Bean
-	public GameData sc2BaseGameData() {
+	protected GameData sc2BaseGameData() {
 		return new GameData(sc2GameDef());
 	}
 	
 	@Bean
-	public GameDef sc2GameDef() {
+	protected GameDef sc2GameDef() {
 		return new SC2GameDef();
 	}
 	
 	@Bean
-	public GameData heroesBaseGameData() {
+	protected GameData heroesBaseGameData() {
 		return new GameData(heroesGameDef());
 	}
 	
 	@Bean
-	public GameDef heroesGameDef() {
+	protected GameDef heroesGameDef() {
 		return new HeroesGameDef();
 	}
 	
 	@Bean
-	public String documentsPath() {
+	protected String documentsPath() {
 		return new JFileChooser().getFileSystemView().getDefaultDirectory().toString();
 	}
 	
 	@Bean
-	public String cachePath() {
+	protected String cachePath() {
 		return System.getProperty("user.home") + File.separator + ".GalaxyObsUI" + File.separator + "cache";
 	}
 	
 	@Bean
-	public MpqEditorInterface mpqEditorInterface() {
+	protected MpqEditorInterface mpqEditorInterface() {
 		return new MpqEditorInterface(mpqCachePath(), mpqEditorPath());
 	}
 	
 	@Bean
-	public String mpqCachePath() {
+	protected String mpqCachePath() {
 		return tempDirectory() + "ObserverInterfaceBuilder" + File.separator + "_ExtractedMpq";
 	}
 	
 	@Bean
-	public String mpqEditorPath() {
+	protected String mpqEditorPath() {
 		return basePath().getParent() + File.separator + "tools" + File.separator + "plugins" + File.separator + "mpq" +
 				File.separator + "MPQEditor.exe";
 	}
 	
 	@Bean
-	public String tempDirectory() {
+	protected String tempDirectory() {
 		return System.getProperty("java.io.tmpdir");
 	}
 	
 	@Bean
-	public File basePath() {
+	protected File basePath() {
 		return JarHelper.getJarDir(InterfaceBuilderApp.class);
 	}
 	
 	@Bean
-	public File cascExtractorConfigFile() {
+	protected File cascExtractorConfigFile() {
 		return new File(
 				basePath().getParent() + File.separator + "tools" + File.separator + "plugins" + File.separator +
 						"casc" + File.separator + "CASCConsole.exe.config");
 	}
 	
 	@Bean
-	public File cascExtractorConsoleExeFile() {
+	protected File cascExtractorConsoleExeFile() {
 		return new File(
 				basePath().getParent() + File.separator + "tools" + File.separator + "plugins" + File.separator +
 						"casc" + File.separator + "CASCConsole.exe");
 	}
 	
 	@Bean
-	public String raceId() {
+	protected String raceId() {
 		return "Terr";
 	}
 	
 	@Bean
-	public String consoleSkinId() {
+	protected String consoleSkinId() {
 		return "ClassicTerran";
 	}
 	
 	@Bean
-	public MpqBuilderService mpqBuilderService() {
+	protected MpqBuilderService mpqBuilderService() {
 		return new MpqBuilderService();
 	}
 	
 	@Bean
-	public ConfigService configService() {
+	protected ConfigService configService() {
 		return new ConfigService();
 	}
 	
 	@Bean
-	public CompileService compileService() {
+	protected CompileService compileService() {
 		return new CompileService();
 	}
 	
 	@Bean
-	public ProjectService projectService() {
+	protected ProjectService projectService() {
 		return new ProjectService();
 	}
 	
 	@Bean
-	public FileService fileService() {
+	protected FileService fileService() {
 		return new FileService();
 	}
 	
 	@Bean
-	public ReplayFinder replayService() {
+	protected ReplayFinder replayService() {
 		return new ReplayFinder();
 	}
 	
 	@Bean
-	public StylizedTextAreaAppenderThreadPoolExecutor threadPoolExecutor() {
+	protected StylizedTextAreaAppenderThreadPoolExecutor threadPoolExecutor() {
 		final int maxThreads = Math.max(1, Runtime.getRuntime().availableProcessors() / 2);
 		final StylizedTextAreaAppenderThreadPoolExecutor executor =
 				new StylizedTextAreaAppenderThreadPoolExecutor(maxThreads, maxThreads, 5000L, TimeUnit.MILLISECONDS,
@@ -155,37 +155,37 @@ public class AppConfiguration {
 	}
 	
 	@Bean
-	public SettingsIniInterface settingsIniInterface() {
+	protected SettingsIniInterface settingsIniInterface() {
 		return new SettingsIniInterface(iniSettingsPath());
 	}
 	
 	@Bean
-	public String iniSettingsPath() {
+	protected String iniSettingsPath() {
 		return basePath().getParent() + File.separator + "settings.ini";
 	}
 	
 	@Bean
-	public String baseUiPath() {
+	protected String baseUiPath() {
 		return basePath().getParent() + File.separator + "baseUI";
 	}
 	
 	@Bean
-	public GameService gameService() {
+	protected GameService gameService() {
 		return new GameService();
 	}
 	
 	@Bean
-	public BaseUiService baseUiService() {
+	protected BaseUiService baseUiService() {
 		return new BaseUiService();
 	}
 	
 	@Bean
-	public DiscCacheService discCacheService() {
+	protected DiscCacheService discCacheService() {
 		return new DiscCacheService();
 	}
 	
 	@Bean
-	public KryoService kryoService() {
+	protected KryoService kryoService() {
 		return new KryoService();
 	}
 }
