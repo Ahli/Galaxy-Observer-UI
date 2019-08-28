@@ -46,16 +46,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoConfiguration;
-import org.springframework.boot.autoconfigure.http.HttpMessageConvertersAutoConfiguration;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.autoconfigure.jmx.JmxAutoConfiguration;
-import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
-import org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration;
-import org.springframework.boot.autoconfigure.web.servlet.HttpEncodingAutoConfiguration;
-import org.springframework.boot.autoconfigure.web.servlet.MultipartAutoConfiguration;
-import org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration;
-import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Import;
 
@@ -81,10 +71,22 @@ import java.util.concurrent.TimeUnit;
  * @author Ahli
  */
 
-@EnableAutoConfiguration (exclude = { MultipartAutoConfiguration.class, JmxAutoConfiguration.class,
-		DispatcherServletAutoConfiguration.class, ErrorMvcAutoConfiguration.class, HttpEncodingAutoConfiguration.class,
-		HttpMessageConvertersAutoConfiguration.class, JacksonAutoConfiguration.class,
-		PropertyPlaceholderAutoConfiguration.class, ThymeleafAutoConfiguration.class, WebMvcAutoConfiguration.class })
+@EnableAutoConfiguration (excludeName = { // exclude based on beans in context on runtime
+		"org.springframework.boot.autoconfigure.aop.AopAutoConfiguration", // not required
+		//"org.springframework.boot.autoconfigure.context.ConfigurationPropertiesAutoConfiguration", // required for Resources
+		//"org.springframework.boot.autoconfigure.context.MessageSourceAutoConfiguration", // req for Resources
+		"org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoConfiguration",
+		"org.springframework.boot.autoconfigure.dao.PersistenceExceptionTranslationAutoConfiguration",
+		//"org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration", // required for JPA Repository
+		"org.springframework.boot.autoconfigure.info.ProjectInfoAutoConfiguration",
+		//"org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration", // req
+		"org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration",
+		"org.springframework.boot.autoconfigure.jdbc.JdbcTemplateAutoConfiguration",
+		//"org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration", // req
+		"org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration",
+		"org.springframework.boot.autoconfigure.task.TaskSchedulingAutoConfiguration",
+		//"org.springframework.boot.autoconfigure.transaction.TransactionAutoConfiguration", // req
+		"org.springframework.boot.autoconfigure.transaction.jta.JtaAutoConfiguration" })
 @Import ( { AppConfiguration.class, FxmlConfiguration.class })
 public class InterfaceBuilderApp extends Application {
 	public static final String FATAL_ERROR = "FATAL ERROR: ";
