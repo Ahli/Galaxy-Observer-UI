@@ -113,6 +113,9 @@ public class NewProjectController {
 		project = projectService.saveProject(project);
 		try {
 			projectService.createTemplateProjectFiles(project);
+			if (logger.isTraceEnabled()) {
+				logger.trace("new project template created");
+			}
 		} catch (final IOException e) {
 			logger.error("ERROR: Could not create template project.", e);
 			// TODO popup dialog

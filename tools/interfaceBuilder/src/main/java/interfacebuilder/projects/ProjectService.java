@@ -27,7 +27,6 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -38,8 +37,8 @@ import java.util.List;
  * ProjectService manages Observer Interface project related tasks.
  */
 public class ProjectService {
+	public static final String DIRECTORY_SYMBOL = "/";
 	private static final Logger logger = LogManager.getLogger(ProjectService.class);
-	
 	@Autowired
 	private ProjectJpaRepository projectRepo;
 	
@@ -151,25 +150,38 @@ public class ProjectService {
 		return project.getBestCompressionRuleSet();
 	}
 	
+	/**
+	 * @param project
+	 * @throws IOException
+	 */
 	public void createTemplateProjectFiles(final Project project) throws IOException {
-		final String intPath;
+		final String jarIntPath;
 		if (project.getGame() == Game.SC2) {
-			intPath = "classpath:res/templates/sc2/interface";
+			jarIntPath = "templates/sc2/interface/";
 		} else {
-			intPath = "classpath:res/templates/heroes/interface";
+			jarIntPath = "templates/heroes/interface/";
 		}
+		
 		final Path projPath = Path.of(project.getProjectPath());
 		final var resolver = new PathMatchingResourcePatternResolver();
 		if (logger.isTraceEnabled()) {
 			logger.trace("creating template");
 		}
-		for (final Resource res : resolver.getResources(intPath)) {
-			logger.trace("writing file {}", () -> intPath);
-			try (final InputStream in = new BufferedInputStream(res.getInputStream(), 1024);
-			     final OutputStream out = Files.newOutputStream(projPath)) {
-				
-				Files.copy(in, Path.of(projPath + File.separator + res.getFilename()),
-						StandardCopyOption.REPLACE_EXISTING);
+		final int jarIntPathLen = jarIntPath.length();
+		for (final Resource res : resolver.getResources("classpath*:" + jarIntPath + "**")) {
+			final String uri = res.getURI().toString();
+			logger.trace("extracting file {}", () -> uri);
+			final int i = uri.indexOf(jarIntPath);
+			final String intPath = uri.substring(i + jarIntPathLen);
+			final Path path = Path.of(projPath + File.separator + intPath);
+			logger.trace("writing file {}", () -> path);
+			if (!uri.endsWith(DIRECTORY_SYMBOL)) {
+				Files.createDirectories(path.getParent());
+				try (final InputStream in = new BufferedInputStream(res.getInputStream(), 1024)) {
+					Files.copy(in, path, StandardCopyOption.REPLACE_EXISTING);
+				}
+			} else {
+				Files.createDirectories(path);
 			}
 		}
 		if (logger.isTraceEnabled()) {
