@@ -17,16 +17,16 @@ import com.ahli.galaxy.ui.UITemplate;
 import com.ahli.galaxy.ui.abstracts.UIElement;
 import com.ahli.galaxy.ui.exception.UIException;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
-import gnu.trove.set.hash.THashSet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.collections.impl.map.mutable.UnifiedMap;
+import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -91,10 +91,10 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		this.parser = parser;
 		statesToClose = new ArrayList<>();
 		statesToCloseLevel = new ArrayList<>();
-		addedFinalElements = new HashMap<>();
+		addedFinalElements = new UnifiedMap<>();
 		paramDeduplicate = deduplicate;
 		addedElements = deduplicate ? new ArrayList<>(35_000) : null;
-		deduplicatedElements = deduplicate ? new THashSet<>(13_000) : null;
+		deduplicatedElements = deduplicate ? new UnifiedSet<>(13_000) : null;
 		parser.setConsumer(this);
 	}
 	

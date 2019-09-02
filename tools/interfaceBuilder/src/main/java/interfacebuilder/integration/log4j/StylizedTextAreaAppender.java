@@ -3,7 +3,6 @@
 
 package interfacebuilder.integration.log4j;
 
-import gnu.trove.map.hash.THashMap;
 import interfacebuilder.ui.progress.ErrorTabController;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
@@ -24,6 +23,7 @@ import org.apache.logging.log4j.core.config.plugins.PluginAttribute;
 import org.apache.logging.log4j.core.config.plugins.PluginElement;
 import org.apache.logging.log4j.core.config.plugins.PluginFactory;
 import org.apache.logging.log4j.core.layout.PatternLayout;
+import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
@@ -42,7 +42,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
          printObject = true)
 public final class StylizedTextAreaAppender extends AbstractAppender {
 	/* THashMap is more memory efficient than Java's one */
-	private static final Map<String, ErrorTabController> workerTaskControllers = new THashMap<>(4);
+	private static final Map<String, ErrorTabController> workerTaskControllers = new UnifiedMap<>(4);
 	private static ErrorTabController generalController;
 	private final ReadWriteLock rwLock = new ReentrantReadWriteLock();
 	private final Lock readLock = rwLock.readLock();

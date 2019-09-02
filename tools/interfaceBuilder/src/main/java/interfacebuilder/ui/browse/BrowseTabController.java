@@ -13,7 +13,6 @@ import com.ahli.galaxy.ui.UIStateGroup;
 import com.ahli.galaxy.ui.UITemplate;
 import com.ahli.galaxy.ui.abstracts.UIElement;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
-import gnu.trove.map.hash.THashMap;
 import interfacebuilder.ui.settings.Updateable;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
@@ -29,10 +28,10 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.collections.impl.map.mutable.UnifiedMap;
+import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -109,7 +108,7 @@ public class BrowseTabController implements Updateable {
 	 * Automatically called by FxmlLoader
 	 */
 	public void initialize() {
-		templateMap = new HashMap<>();
+		templateMap = new UnifiedMap<>();
 		fileDropdown.setOnAction(actionEvent -> Platform.runLater(() -> {
 			final String selectedFile = fileDropdown.getSelectionModel().getSelectedItem();
 			updateTemplateDropdown(selectedFile);
@@ -141,7 +140,7 @@ public class BrowseTabController implements Updateable {
 	private void filterTree(final String filter/*, final String filterBefore*/) {
 		final long startTime = System.currentTimeMillis();
 		if (hiddenTreeChildMap == null) {
-			hiddenTreeChildMap = new HashMap<>();
+			hiddenTreeChildMap = new UnifiedMap<>();
 		}
 		final String filterUpper = filter.toUpperCase();
 		
@@ -242,7 +241,7 @@ public class BrowseTabController implements Updateable {
 		} else {
 			final UIElement el = selected.getValue();
 			// TODO maybe use something different that holds entries
-			final Map<String, String> map = new THashMap<>((framesTotal * 75 / 100) + 1, 0.75F);
+			final Map<String, String> map = new UnifiedMap<>((framesTotal * 75 / 100) + 1, 0.75F);
 			if (el instanceof UIFrame) {
 				final UIFrame elem = (UIFrame) el;
 				UIAnchorSide side = UIAnchorSide.TOP;
@@ -367,7 +366,7 @@ public class BrowseTabController implements Updateable {
 	 */
 	private void updateDropdowns() {
 		if (uiCatalog != null) {
-			final Set<String> fileNamesSet = new HashSet<>();
+			final Set<String> fileNamesSet = new UnifiedSet<>(uiCatalog.getTemplates().size());
 			for (final UITemplate template : uiCatalog.getTemplates()) {
 				fileNamesSet.add(template.getFileName());
 			}
