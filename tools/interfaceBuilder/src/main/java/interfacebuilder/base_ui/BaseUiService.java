@@ -18,6 +18,7 @@ import interfacebuilder.integration.FileService;
 import interfacebuilder.integration.kryo.KryoGameInfo;
 import interfacebuilder.integration.kryo.KryoService;
 import interfacebuilder.projects.enums.Game;
+import interfacebuilder.ui.progress.Appender;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOCase;
 import org.apache.commons.io.IOUtils;
@@ -159,7 +160,7 @@ public class BaseUiService {
 	 * @param game
 	 * @param usePtr
 	 */
-	public void extract(final Game game, final boolean usePtr) {
+	public void extract(final Game game, final boolean usePtr, final Appender[] outputs) {
 		logger.info("Extracting baseUI for {}", game);
 		prepareCascExplorerConfig(game, usePtr);
 		
@@ -181,12 +182,15 @@ public class BaseUiService {
 		
 		final File extractorExe = configService.getCascExtractorConsoleExeFile();
 		final String[] queryMasks = getQueryMasks(game);
+		int i = 0;
 		for (final String mask : queryMasks) {
+			i++;
+			final Appender out = outputs[i];
 			final Runnable task = () -> {
 				try {
-					if (extract(extractorExe, mask, destination)) {
+					if (extract(extractorExe, mask, destination, out)) {
 						Thread.sleep(50);
-						if (extract(extractorExe, mask, destination)) {
+						if (extract(extractorExe, mask, destination, out)) {
 							logger.warn(
 									"Extraction failed due to a file access. Try closing the Battle.net App, if it is running and this fails to extract all files.");
 						}
@@ -254,12 +258,13 @@ public class BaseUiService {
 	 * @param extractorExe
 	 * @param mask
 	 * @param destination
+	 * @param out
 	 * @return
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	private static boolean extract(final File extractorExe, final String mask, final File destination)
-			throws IOException, InterruptedException {
+	private static boolean extract(final File extractorExe, final String mask, final File destination,
+			final Appender out) throws IOException, InterruptedException {
 		final ProcessBuilder pb =
 				new ProcessBuilder(extractorExe.getAbsolutePath(), mask, destination + File.separator, "enUS", "None");
 		// put error and normal output into the same stream
@@ -275,7 +280,11 @@ public class BaseUiService {
 				if (log.contains("Unhandled Exception: System.IO.IOException: The process cannot access the file")) {
 					retry = true;
 				} else {
-					logger.info(log);
+					if (out != null) {
+						out.append(log);
+					} else {
+						logger.info(log);
+					}
 				}
 			} while (process.isAlive());
 		}

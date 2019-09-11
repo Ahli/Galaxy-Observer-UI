@@ -9,6 +9,7 @@ import com.ahli.galaxy.archive.DescIndexData;
 import com.ahli.galaxy.game.GameData;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
 import com.ahli.mpq.MpqEditorInterface;
+import interfacebuilder.InterfaceBuilderApp;
 import interfacebuilder.base_ui.BaseUiService;
 import interfacebuilder.build.MpqBuilderService;
 import interfacebuilder.compile.CompileService;
@@ -16,11 +17,15 @@ import interfacebuilder.compress.GameService;
 import interfacebuilder.config.ConfigService;
 import interfacebuilder.i18n.Messages;
 import interfacebuilder.integration.FileService;
+import interfacebuilder.integration.log4j.StylizedTextAreaAppender;
 import interfacebuilder.projects.Project;
 import interfacebuilder.projects.ProjectService;
 import interfacebuilder.projects.enums.Game;
 import interfacebuilder.ui.FXMLSpringLoader;
+import interfacebuilder.ui.progress.BaseUiExctractionController;
+import interfacebuilder.ui.progress.ErrorTabController;
 import interfacebuilder.ui.settings.Updateable;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -31,10 +36,12 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.image.ImageView;
+import javafx.scene.text.TextFlow;
 import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -49,6 +56,8 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+
+import static interfacebuilder.InterfaceBuilderApp.FATAL_ERROR;
 
 public class BrowseController implements Updateable {
 	private static final Logger logger = LogManager.getLogger(BrowseController.class);
@@ -194,13 +203,69 @@ public class BrowseController implements Updateable {
 	}
 	
 	public void extractBaseUiSc2() {
-		baseUiService.extract(Game.SC2, false);
+		try {
+			extractBaseUi(Game.SC2, false);
+		} catch (final IOException e) {
+			logger.error("Error extracting Heroes Base UI.", e);
+			// TODO show dialog
+		}
+	}
+	
+	private void extractBaseUi(final Game game, final boolean usePtr) throws IOException {
+		final ObservableList<Tab> tabs = InterfaceBuilderApp.getInstance().getTabPane().getTabs();
+		final Tab newTab = new Tab();
+		
+		final TextFlow newTxtArea = new TextFlow();
+		newTxtArea.getStyleClass().add("styled-text-area");
+		final ErrorTabController errorTabCtrl = new ErrorTabController(newTab, newTxtArea, true, false, true);
+		errorTabCtrl.setRunning(true);
+		
+		newTab.setText("Extract SC2");
+		tabs.add(newTab);
+		
+		final ScrollPane scrollPane = new ScrollPane(newTxtArea);
+		scrollPane.getStyleClass().add("virtualized-scroll-pane");
+		newTab.setContent(scrollPane);
+		
+		// context menu with close option
+		final ContextMenu contextMenu = new ContextMenu();
+		final MenuItem closeItem = new MenuItem(Messages.getString("contextmenu.close"));
+		closeItem.setOnAction(event -> InterfaceBuilderApp.getInstance().getTabPane().getTabs().remove(newTab));
+		contextMenu.getItems().addAll(closeItem);
+		newTab.setContextMenu(contextMenu);
+		
+		final FXMLSpringLoader loader = new FXMLSpringLoader(appContext);
+		loader.load("classpath:view/ProgressTab_ExtractBaseUi.fxml");
+		final BaseUiExctractionController extractionController = loader.getController();
+		controllers.add(extractionController);
+		extractionController.start(game, usePtr);
+		
+		for (final String threadName : extractionController.getThreadNames()) {
+			StylizedTextAreaAppender.setWorkerTaskController(errorTabCtrl, threadName);
+		}
+		
+		// runlater needs to appear below the edits above, else it might be added before
+		// which results in UI edits not in UI thread -> error
+		Platform.runLater(() -> {
+			try {
+				extractionController.loggingArea.getChildren().add(scrollPane);
+				InterfaceBuilderApp.getInstance().getTabPane().getTabs().add(newTab);
+			} catch (final Exception e) {
+				logger.fatal(FATAL_ERROR, e);
+			}
+		});
+		
 	}
 	
 	public void extractBaseUiHeroes() {
-		final boolean usePtr = heroesChoiceBox.getSelectionModel().getSelectedIndex() != 0;
-		baseUiService.extract(Game.HEROES, usePtr);
-		updatePtrStatusLabel(usePtr);
+		try {
+			final boolean usePtr = heroesChoiceBox.getSelectionModel().getSelectedIndex() != 0;
+			extractBaseUi(Game.HEROES, usePtr);
+			updatePtrStatusLabel(usePtr);
+		} catch (final IOException e) {
+			logger.error("Error extracting Heroes Base UI.", e);
+			// TODO show dialog
+		}
 	}
 	
 	@FXML
