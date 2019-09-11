@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+
+    <Frame type="Button" name="CloseButtonTemplate">
+        <Width val="13"/>
+        <Height val="12"/>
+        <ClickSound val="@UI_BNet_Generic_01"/>
+        
+        <Frame type="Image" name="NormalImage">
+            <Anchor relative="$parent"/>
+            <Texture val="Assets/Textures/UI_Glues_BlueButtons_SocialCloseIcon_Hover.dds"/>
+            <Color val="68,139,226"/>
+        </Frame>
+        
+        <Frame type="Image" name="HoverImage">
+            <Anchor relative="$parent"/>
+            <Texture val="Assets/Textures/UI_Glues_BlueButtons_SocialCloseIcon_Hover.dds"/>
+        </Frame>
+    </Frame>
+
+    <Frame type="CheckoutBrowserDialog" name="CheckoutBrowserDialog">
+        <HookupAlias original="Button" alias="CloseButton"/>
+        <Anchor relative="$parent"/>
+        <RenderType val="LDR"/>
+
+        <Animation name="DialogAnimation">
+            <Event event="OnShown" action="DirectionForward,Play"/>
+            <Event event="DialogDismissed" action="DirectionReverse,Play"/>
+            <Controller type="Fade" end="Pause">
+                <Key type="Curve" time="0" value="0" inout="Linear,Slow"/>
+                <Key type="Curve" time=".4" value="255" inout="Slow,Linear"/>
+            </Controller>
+            <Controller type="Blur" end="Pause">
+                <Key type="Curve" time="0" value="2" inout="Linear"/>
+                <Key type="Curve" time=".2" value="0" inout="Linear"/>
+            </Controller>
+        </Animation>
+
+        <Frame type="BlurFrame" name="FullscreenBlurFrame" template="StandardTemplates/FullscreenBlurFrame">
+            <Anchor relative="$parent/BackgroundFrame"/>
+            <Animation name="DialogAnimation">
+                <Event event="OnShown" action="DirectionForward,Play"/>
+                <Event event="DialogDismissed" action="DirectionReverse,Play" frame="$parent"/>
+                <Controller type="Blur" end="Pause">
+                    <Key type="Curve" time="0" value="0.0" inout="Linear,Auto"/>
+                    <Key type="Curve" time="0.2" value="0.93" inout="Auto,Linear"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="Image" name="FullscreenBlackoutImage">
+            <Anchor relative="$parent"/>
+            <Color val="0, 0, 0"/>
+            
+            <Animation name="DialogAnimation">
+                <Event event="OnShown" action="Reset,DirectionForward,Play" frame="$parent"/>
+                <Event event="DialogDismissed" action="DirectionReverse,Play" frame="$parent"/>
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0.0" inout="Linear,Auto"/>
+                    <Key type="Curve" time="0.2" value="127" inout="Auto,Linear"/>
+                </Controller>
+                <Controller type="Sound" end="Pause">
+                    <Key type="Sound" time="0.00" sound="@UI_BNet_Menu_Show" direction="Forward"/>
+                    <Key type="Sound" time="0.175" sound="@UI_BNet_Menu_Hide" direction="Reverse"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Image" name="LeftBGGlowPattern">
+            <Anchor side="Top" relative="$parent/Border" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/Border" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/Border" pos="Min" offset="20"/>
+            <Texture val="@UI/Glues_Battlenet_DialogBox_BackGlow"/>
+        </Frame>
+
+        <Frame type="Image" name="RightBGGlowPattern">
+            <Anchor side="Top" relative="$parent/Border" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/Border" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/Border" pos="Max" offset="-20"/>
+            <Texture val="@UI/Glues_Battlenet_DialogBox_BackGlow"/>
+            <TextureCoords top="0.0" left="1.0" bottom="1.0" right="0.0"/>
+        </Frame>
+
+        <Frame type="Image" name="BackgroundFrame">
+            <!--  Change the dimensions/anchoring of BackgroundFrame to change the whole dialog  -->
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="-350"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="350"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="-400"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="400"/>
+            <AnchorUseDeviceOffset val="True"/>
+            <Color val="002650"/>
+            <Alpha val="255"/>
+
+            <Animation name="DialogAnimation">
+                <Event event="OnShown" action="DirectionForward,Play" frame="$parent"/>
+                <Event event="DialogDismissed" action="DirectionReverse,Play" frame="$parent"/>
+                <Controller type="Anchor" end="Pause" side="Top" relative="true">
+                    <Key type="Curve" time="0" value="-20" inout="Linear,Slow"/>
+                    <Key type="Curve" time=".2" value="0" inout="Slow,Linear"/>
+                </Controller>
+                <Controller type="Anchor" end="Pause" side="Bottom" relative="true">
+                    <Key type="Curve" time="0" value="40" inout="Linear"/>
+                    <Key type="Curve" time=".2" value="0" inout="Slow,Linear"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Label" name="TitleLabel">
+            <Anchor side="Top" relative="$parent/BackgroundFrame" pos="Min" offset="14"/>
+            <Anchor side="Left" relative="$parent/BackgroundFrame" pos="Min" offset="26"/>
+            <Anchor side="Right" relative="$parent/BackgroundFrame" pos="Max" offset="-10"/>
+        </Frame>
+
+        <Frame type="Label" name="MessageLabel">
+            <Anchor relative="$parent/TitleLabel"/>
+        </Frame>
+
+        <StateGroup name="BrowserState">
+            <DefaultState val="Rendering"/>
+            <State name="HasError">
+                <When type="Property" frame="CheckoutBrowser" Error="True"/>
+                <Action type="SetProperty" frame="ErrorContainer" Visible="true"/>
+                <Action type="SetProperty" frame="CheckoutBrowser/BrowserImage" Visible="false"/>
+                <Action type="SetProperty" frame="IdleSpinner" Visible="false"/>
+                <Action type="SetProperty" frame="ErrorContainer/DescriptionLabel" Text="@UI/ProductPurchase/GeneralError"/>
+            </State>
+            <State name="InvalidParams">
+                <When type="Property" frame="$this" State="ErrorInvalidParams"/>
+                <Action type="SetProperty" frame="ErrorContainer" Visible="true"/>
+                <Action type="SetProperty" frame="CheckoutBrowser/BrowserImage" Visible="false"/>
+                <Action type="SetProperty" frame="IdleSpinner" Visible="false"/>
+                <Action type="SetProperty" frame="ErrorContainer/DescriptionLabel" Text="@UI/ProductPurchase/InvalidProduct"/>
+            </State>
+            <State name="ErrorSSOTokenFailed">
+                <When type="Property" frame="$this" State="ErrorSSOTokenFailed"/>
+                <Action type="SetProperty" frame="ErrorContainer" Visible="true"/>
+                <Action type="SetProperty" frame="CheckoutBrowser/BrowserImage" Visible="false"/>
+                <Action type="SetProperty" frame="IdleSpinner" Visible="false"/>
+                <Action type="SetProperty" frame="ErrorContainer/DescriptionLabel" Text="@UI/ProductPurchase/SSOTokenGenerationFailed"/>
+            </State>
+            <State name="RequestingSSOToken">
+                <When type="Property" frame="$this" State="RequestingSSOToken"/>
+                <Action type="SetProperty" frame="ErrorContainer" Visible="false"/>
+                <Action type="SetProperty" frame="CheckoutBrowser/BrowserImage" Visible="false"/>
+                <Action type="SetProperty" frame="IdleSpinner" Visible="true"/>
+            </State>
+            <State name="Loading">
+                <When type="Property" frame="CheckoutBrowser" Loading="True"/>
+                <Action type="SetProperty" frame="ErrorContainer" Visible="false"/>
+                <Action type="SetProperty" frame="CheckoutBrowser/BrowserImage" Visible="false"/>
+                <Action type="SetProperty" frame="IdleSpinner" Visible="true"/>
+            </State>
+            <State name="IsNavigating">
+                <When type="Property" frame="CheckoutBrowser" Navigating="True"/>
+                <Action type="SetProperty" frame="ErrorContainer" Visible="false"/>
+                <Action type="SetProperty" frame="CheckoutBrowser/BrowserImage" Visible="false"/>
+                <Action type="SetProperty" frame="IdleSpinner" Visible="false"/>
+            </State>
+            <State name="Rendering">
+                <Action type="SetProperty" frame="ErrorContainer" Visible="false"/>
+                <Action type="SetProperty" frame="CheckoutBrowser/BrowserImage" Visible="true"/>
+                <Action type="SetProperty" frame="IdleSpinner" Visible="false"/>
+            </State>
+        </StateGroup>
+
+        <Frame type="CheckoutBrowser" name="CheckoutBrowser">
+            <Anchor side="Top" relative="$parent/BackgroundFrame" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/BackgroundFrame" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/BackgroundFrame" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent/BackgroundFrame" pos="Max" offset="0"/>
+            <RejectsFocus val="false"/>
+            <BlocksShortcuts val="true"/>
+            <StickyFocus val="true"/>
+            <SnapToDevicePixels val="true"/>
+            <AnchorUseDeviceOffset val="true"/>
+            <ExternalLinksUseOSBrowser val="true"/>
+
+            <Frame type="Image" name="BrowserImage">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="1"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="1"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-1"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-1"/>
+                <Visible val="false"/>
+                <AnchorUseDeviceOffset val="True"/>
+                <SnapToDevicePixels val="True"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="Image" name="Border">
+            <Anchor side="Top" relative="$parent/CheckoutBrowser" pos="Min" offset="-14"/>
+            <Anchor side="Left" relative="$parent/CheckoutBrowser" pos="Min" offset="-14"/>
+            <Anchor side="Bottom" relative="$parent/CheckoutBrowser" pos="Max" offset="14"/>
+            <Anchor side="Right" relative="$parent/CheckoutBrowser" pos="Max" offset="14"/>
+            <Texture val="@UI/Glues_Battlenet_DialogBox_StandardBorder_NoGlow"/>
+            <TextureType val="NineSlice"/>
+        </Frame>
+
+        <Frame type="Frame" name="IdleSpinner" template="StandardBattlenetTemplates/IdleSpinnerTemplate">
+            <Anchor side="Top" relative="$parent/CheckoutBrowser" pos="Mid" offset="-40"/>
+            <Anchor side="Left" relative="$parent/CheckoutBrowser" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/CheckoutBrowser" pos="Mid" offset="0"/>
+            <Visible val="false"/>
+        </Frame>
+
+        <Frame type="Frame" name="ErrorContainer">
+            <Anchor relative="$parent/CheckoutBrowser"/>
+            <Visible val="false"/>
+
+            <Frame type="Image" name="BackgroundImage">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <!--<Texture val="@UI/CheckoutBrowser_Background"/>-->
+                <ScaleHeightToTexture val="true"/>
+                <AcceptsMouse val="true"/>
+            </Frame>
+
+            <Frame type="Label" name="DescriptionLabel">
+                <Anchor side="Top" relative="$parent" pos="0.35" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="30"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-30"/>
+                <!--<Style val="CheckoutBrowserErrorMessage"/>
+                <Text val="@UI/ProductPurchase/GeneralError"/>-->
+            </Frame>
+
+            <Animation name="OnShown">
+                <Event event="OnShown" action="Reset,Play"/>
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0" value="0" inout="Linear,Slow"/>
+                    <Key type="Curve" time="0.5" value="0" inout="Linear,Slow"/>
+                    <Key type="Curve" time=".9" value="255" inout="Slow,Linear"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <Frame type="Button" name="CloseButton" template="CheckoutBrowserDialog/CloseButtonTemplate">
+            <Anchor side="Top" relative="$parent/CheckoutBrowser" pos="Min" offset="10"/>
+            <Anchor side="Right" relative="$parent/CheckoutBrowser" pos="Max" offset="-8"/>
+            <Shortcut val="@UI/ScreenNavigationBack_Hotkey"/>
+            <RenderPriority val="520"/>
+        </Frame>
+    </Frame>
+</Desc>
