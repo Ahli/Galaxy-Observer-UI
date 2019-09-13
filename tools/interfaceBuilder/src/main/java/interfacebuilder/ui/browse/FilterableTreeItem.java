@@ -50,6 +50,7 @@ public class FilterableTreeItem <T> extends TreeItem<T> {
 	 * Set the hidden private field {@link TreeItem} children through reflection and hook the hidden {@link
 	 * ListChangeListener} in {@link TreeItem} childrenListener to the list
 	 */
+	@SuppressWarnings ("unchecked")
 	private void setHiddenFieldChildrenPrivate(final ObservableList<TreeItem<T>> list) {
 		final Field children = ReflectionUtils.findField(getClass(), "children");
 		if (children != null) {

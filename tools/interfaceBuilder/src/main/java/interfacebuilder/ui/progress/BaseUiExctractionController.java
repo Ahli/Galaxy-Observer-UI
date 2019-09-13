@@ -12,7 +12,7 @@ import interfacebuilder.projects.enums.Game;
 import interfacebuilder.ui.settings.Updateable;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.TextFlow;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -20,7 +20,8 @@ public class BaseUiExctractionController implements Updateable {
 	
 	private static int threadCount;
 	private final String[] threadNames;
-	public Pane loggingArea;
+	@FXML
+	public VBox loggingArea;
 	@FXML
 	private Label titleLabel;
 	@FXML

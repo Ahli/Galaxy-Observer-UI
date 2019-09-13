@@ -15,7 +15,10 @@ import com.ahli.galaxy.ui.abstracts.UIElement;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
 import interfacebuilder.ui.settings.Updateable;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -35,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 
 public class BrowseTabController implements Updateable {
 	private static final String PATH_SEPARATOR = " > ";
@@ -55,6 +59,7 @@ public class BrowseTabController implements Updateable {
 	private static final Logger logger = LogManager.getLogger(BrowseTabController.class);
 	private static final String GAME_UI = "GameUI";
 	private static final String SPACE_HIVEN_SPACE = " - ";
+	private final StringProperty queryString;
 	@FXML
 	private Label pathLabel;
 	@FXML
@@ -67,7 +72,6 @@ public class BrowseTabController implements Updateable {
 	private TableColumn<Map.Entry<String, String>, String> columnValues;
 	@FXML
 	private TreeView<UIElement> frameTree;
-	private Map<TreeItem<UIElement>, List<TreeItem<UIElement>>> hiddenTreeChildMap;
 	@FXML
 	private ComboBox<String> fileDropdown;
 	@FXML
@@ -78,6 +82,7 @@ public class BrowseTabController implements Updateable {
 	
 	public BrowseTabController() {
 		// nothing to do
+		queryString = new SimpleStringProperty("");
 	}
 	
 	private static String prettyPrintAttributeStringList(final List<String> attributes) {
@@ -131,107 +136,16 @@ public class BrowseTabController implements Updateable {
 		columnAttributes.sortTypeProperty().set(TableColumn.SortType.ASCENDING);
 		tableView.getSortOrder().add(columnAttributes);
 		
-		treeFilter.textProperty().addListener((observable, oldValue, newValue) -> filterTree(newValue/*, oldValue*/));
+		treeFilter.textProperty().addListener((observable, oldValue, newValue) -> filterTree(newValue));
 	}
 	
 	/**
 	 * @param filter
 	 */
-	private void filterTree(final String filter/*, final String filterBefore*/) {
+	private void filterTree(final String filter) {
 		final long startTime = System.currentTimeMillis();
-		if (hiddenTreeChildMap == null) {
-			hiddenTreeChildMap = new UnifiedMap<>();
-		}
-		final String filterUpper = filter.toUpperCase();
-		
-		final long midTime = System.currentTimeMillis();
-		logger.info("filter-show: {}, preparation: {}", filterUpper, (midTime - startTime));
-		filterTreeShow(filterUpper);
-		final long midTime2 = System.currentTimeMillis();
-		logger.info("filter-show execution: {}", (midTime2 - midTime));
-		if (!filterUpper.isEmpty()) {
-			logger.info("filter-hide: {}", filterUpper);
-			filterTreeHide(filterUpper, frameTree.getRoot());
-		}
-		final long midTime3 = System.currentTimeMillis();
-		logger.info("filter-hide execution: {}", (midTime3 - midTime2));
-		
-		// release memory
-		if (hiddenTreeChildMap.isEmpty()) {
-			hiddenTreeChildMap = null;
-		}
-		
-		logger.info("filter cleanup: {}", (System.currentTimeMillis() - midTime3));
-	}
-	
-	private void filterTreeShow(final String queryUpper) {
-		List<TreeItem<UIElement>> children;
-		for (final var entry : Set.copyOf(hiddenTreeChildMap.entrySet())) {
-			children = entry.getValue();
-			final TreeItem<UIElement> parent = entry.getKey();
-			final var visibleChildren = parent.getChildren();
-			
-			final int lenTotal = children.size();
-			int indexVisible = 0;
-			int sizeVisible = visibleChildren.size();
-			boolean hasNoInvisChildLeft = true;
-			TreeItem<UIElement> visChild;
-			for (int i = 0; i < lenTotal; i++) {
-				visChild = indexVisible < sizeVisible ? visibleChildren.get(indexVisible) : null;
-				final TreeItem<UIElement> child = children.get(i);
-				if (child != visChild) {
-					final UIElement elem = child.getValue();
-					final String name = elem.getName();
-					if (name != null && name.toUpperCase().contains(queryUpper)) {
-						// is a match -> make visible
-						visibleChildren.add(indexVisible, child);
-						sizeVisible++;
-						indexVisible++;
-					} else {
-						// no match -> remain invisible
-						hasNoInvisChildLeft = false;
-					}
-				} else {
-					// already visible -> compare next
-					indexVisible++;
-				}
-			}
-			// clear the list, if possible
-			if (hasNoInvisChildLeft) {
-				hiddenTreeChildMap.remove(parent);
-			}
-		}
-	}
-	
-	private boolean filterTreeHide(final String queryUpper, final TreeItem<UIElement> elem) {
-		final var children = elem.getChildren();
-		if (!children.isEmpty()) {
-			for (int i = 0, len = children.size(); i < len; i++) {
-				if (filterTreeHide(queryUpper, children.get(i))) {
-					i--;
-					len--;
-				}
-			}
-		}
-		boolean removed = false;
-		if (children.isEmpty()) {
-			final String name = elem.getValue().getName();
-			if (name == null || !name.toUpperCase().contains(queryUpper)) {
-				removed = true;
-				final var parent = elem.getParent();
-				if (parent != null) {
-					final var siblings = parent.getChildren();
-					if (!hiddenTreeChildMap.containsKey(parent)) {
-						final List<TreeItem<UIElement>> siblingsCopy = new ArrayList<>(siblings);
-						hiddenTreeChildMap.put(parent, siblingsCopy);
-					}
-					siblings.remove(elem);
-				} else {
-					logger.info("root? {}", name);
-				}
-			}
-		}
-		return removed;
+		queryString.set(filter.toUpperCase());
+		logger.info("filter apply: {}ms", (System.currentTimeMillis() - startTime));
 	}
 	
 	private void showInTableView(final TreeItem<UIElement> selected) {
@@ -321,10 +235,26 @@ public class BrowseTabController implements Updateable {
 	private void createTree(final UITemplate template) {
 		if (template != null) {
 			final UIElement rootElement = template.getElement();
-			final TreeItem<UIElement> rootItem = new TreeItem<>(rootElement);
+			final FilterableTreeItem<UIElement> rootItem = new FilterableTreeItem<>(rootElement);
+			
+			// set filter predicate
+			rootItem.predicateProperty()
+					.bind(Bindings.createObjectBinding(() -> TreeItemPredicate.create(new Predicate<>() {
+						@Override
+						public boolean test(final UIElement element) {
+							if (queryString.getValue().length() == 0) {
+								return true;
+							}
+							final String name = element.getName();
+							return name != null &&
+									// name.toUpperCase().contains(queryUpper) == queryString.getValue();
+									name.toUpperCase().contains(queryString.getValue());
+						}
+					}), queryString));
+			
 			frameTree.setRoot(rootItem);
 			framesTotal += 1;
-			final ObservableList<TreeItem<UIElement>> treeItemChildren = rootItem.getChildren();
+			final ObservableList<TreeItem<UIElement>> treeItemChildren = rootItem.getInternalChildren();
 			for (final UIElement child : rootElement.getChildren()) {
 				createTree(child, treeItemChildren);
 			}
@@ -340,10 +270,10 @@ public class BrowseTabController implements Updateable {
 	 * @param parentsChildren
 	 */
 	private void createTree(final UIElement element, final ObservableList<TreeItem<UIElement>> parentsChildren) {
-		final TreeItem<UIElement> treeItem = new TreeItem<>(element);
+		final FilterableTreeItem<UIElement> treeItem = new FilterableTreeItem<>(element);
 		parentsChildren.add(treeItem);
 		framesTotal += 1;
-		final ObservableList<TreeItem<UIElement>> treeItemChildren = treeItem.getChildren();
+		final ObservableList<TreeItem<UIElement>> treeItemChildren = treeItem.getInternalChildren();
 		final List<UIElement> children = element.getChildrenRaw();
 		if (children != null) {
 			for (final UIElement child : children) {

@@ -184,8 +184,8 @@ public class BaseUiService {
 		final String[] queryMasks = getQueryMasks(game);
 		int i = 0;
 		for (final String mask : queryMasks) {
-			i++;
 			final Appender out = outputs[i];
+			i++;
 			final Runnable task = () -> {
 				try {
 					if (extract(extractorExe, mask, destination, out)) {

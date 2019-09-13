@@ -41,6 +41,7 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.TextFlow;
 import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
@@ -92,6 +93,8 @@ public class BrowseController implements Updateable {
 	@Autowired
 	private FileService fileService;
 	
+	// prevent GC of controllers
+	@SuppressWarnings ("MismatchedQueryAndUpdateOfCollection")
 	private List<Updateable> controllers;
 	
 	public BrowseController() {
@@ -220,12 +223,11 @@ public class BrowseController implements Updateable {
 		final ErrorTabController errorTabCtrl = new ErrorTabController(newTab, newTxtArea, true, false, true);
 		errorTabCtrl.setRunning(true);
 		
-		newTab.setText("Extract SC2");
+		newTab.setText("Extract " + game.name());
 		tabs.add(newTab);
 		
 		final ScrollPane scrollPane = new ScrollPane(newTxtArea);
 		scrollPane.getStyleClass().add("virtualized-scroll-pane");
-		newTab.setContent(scrollPane);
 		
 		// context menu with close option
 		final ContextMenu contextMenu = new ContextMenu();
@@ -235,7 +237,8 @@ public class BrowseController implements Updateable {
 		newTab.setContextMenu(contextMenu);
 		
 		final FXMLSpringLoader loader = new FXMLSpringLoader(appContext);
-		loader.load("classpath:view/ProgressTab_ExtractBaseUi.fxml");
+		final var rootNode = loader.<AnchorPane>load("classpath:view/ProgressTab_ExtractBaseUi.fxml");
+		newTab.setContent(rootNode);
 		final BaseUiExctractionController extractionController = loader.getController();
 		controllers.add(extractionController);
 		extractionController.start(game, usePtr);
