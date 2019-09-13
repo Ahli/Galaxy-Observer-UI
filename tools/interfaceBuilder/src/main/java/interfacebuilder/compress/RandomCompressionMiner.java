@@ -29,7 +29,6 @@ import java.util.stream.Stream;
  */
 public class RandomCompressionMiner {
 	private static final String STAR = "*";
-	private static final String EMPTY_STRING = "";
 	private static final String OGG = ".ogg";
 	private static final String OGV = ".ogv";
 	private static final String WAV = ".wav";
@@ -248,7 +247,7 @@ public class RandomCompressionMiner {
 		for (final MpqEditorCompressionRule rule : rules) {
 			if (rule instanceof MpqEditorCompressionRuleMask) {
 				final String cleanedMask =
-						File.separator + ((MpqEditorCompressionRuleMask) rule).getMask().replace(STAR, EMPTY_STRING);
+						File.separator + ((MpqEditorCompressionRuleMask) rule).getMask().replace(STAR, "");
 				if (p.toString().endsWith(cleanedMask)) {
 					return true;
 				}

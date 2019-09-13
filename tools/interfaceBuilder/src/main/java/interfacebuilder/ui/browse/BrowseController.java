@@ -21,6 +21,7 @@ import interfacebuilder.integration.log4j.StylizedTextAreaAppender;
 import interfacebuilder.projects.Project;
 import interfacebuilder.projects.ProjectService;
 import interfacebuilder.projects.enums.Game;
+import interfacebuilder.ui.Alerts;
 import interfacebuilder.ui.FXMLSpringLoader;
 import interfacebuilder.ui.progress.BaseUiExctractionController;
 import interfacebuilder.ui.progress.ErrorTabController;
@@ -210,7 +211,7 @@ public class BrowseController implements Updateable {
 			extractBaseUi(Game.SC2, false);
 		} catch (final IOException e) {
 			logger.error("Error extracting Heroes Base UI.", e);
-			// TODO show dialog
+			Alerts.buildExceptionAlert(InterfaceBuilderApp.getInstance().getPrimaryStage(), e);
 		}
 	}
 	
@@ -267,7 +268,7 @@ public class BrowseController implements Updateable {
 			updatePtrStatusLabel(usePtr);
 		} catch (final IOException e) {
 			logger.error("Error extracting Heroes Base UI.", e);
-			// TODO show dialog
+			Alerts.buildExceptionAlert(InterfaceBuilderApp.getInstance().getPrimaryStage(), e);
 		}
 	}
 	

@@ -284,7 +284,12 @@ public class InterfaceBuilderApp extends Application {
 		}.start();
 	}
 	
-	private Stage getPrimaryStage() {
+	/**
+	 * Returns the primary Stage of the App.
+	 *
+	 * @return
+	 */
+	public Stage getPrimaryStage() {
 		return primaryStage;
 	}
 	

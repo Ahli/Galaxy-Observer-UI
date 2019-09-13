@@ -22,13 +22,15 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
@@ -53,7 +55,6 @@ public class BrowseTabController implements Updateable {
 	private static final String KEY_PREFIX = "Key ";
 	private static final String WHEN_PREFIX = "When ";
 	private static final String ACTION_PREFIX = "Action ";
-	private static final String EMPTY_STRING = "";
 	private static final String VAL = "val";
 	private static final String ATTRIBUTE_SEPARATOR = ", ";
 	private static final Logger logger = LogManager.getLogger(BrowseTabController.class);
@@ -61,7 +62,7 @@ public class BrowseTabController implements Updateable {
 	private static final String SPACE_HIVEN_SPACE = " - ";
 	private final StringProperty queryString;
 	@FXML
-	private Label pathLabel;
+	private TextFlow pathTextFlow;
 	@FXML
 	private TextField treeFilter;
 	@FXML
@@ -154,8 +155,7 @@ public class BrowseTabController implements Updateable {
 			tableView.getItems().clear();
 		} else {
 			final UIElement el = selected.getValue();
-			// TODO maybe use something different that holds entries
-			final Map<String, String> map = new UnifiedMap<>((framesTotal * 75 / 100) + 1, 0.75F);
+			final Map<String, String> map = new UnifiedMap<>();
 			if (el instanceof UIFrame) {
 				final UIFrame elem = (UIFrame) el;
 				UIAnchorSide side = UIAnchorSide.TOP;
@@ -225,13 +225,23 @@ public class BrowseTabController implements Updateable {
 	}
 	
 	private void updatePath(final TreeItem<UIElement> elem) {
-		final String path = elem != null ? addParentPath(new StringBuilder(), elem).toString() : EMPTY_STRING;
-		pathLabel.setText(path);
+		final ObservableList<Node> children = pathTextFlow.getChildren();
+		children.clear();
+		final var header = new Text("Path: ");
+		header.setStyle("-fx-font-weight: bold; -fx-fill: white; -fx-font-smoothing-type: lcd;");
+		children.add(header);
+		if (elem != null) {
+			final String path = addParentPath(new StringBuilder(), elem).toString();
+			final var text = new Text(path);
+			text.setStyle("-fx-fill: white; -fx-font-smoothing-type: lcd;");
+			children.add(text);
+		}
 	}
 	
 	/**
 	 * @param template
 	 */
+	@SuppressWarnings ("squid:S1604") // replace anonymous class with lambda suggestion
 	private void createTree(final UITemplate template) {
 		if (template != null) {
 			final UIElement rootElement = template.getElement();
@@ -240,15 +250,13 @@ public class BrowseTabController implements Updateable {
 			// set filter predicate
 			rootItem.predicateProperty()
 					.bind(Bindings.createObjectBinding(() -> TreeItemPredicate.create(new Predicate<>() {
+						/* do not turn the Predicate into a lambda -> for some reason it becomes 2-3x slower except
+						for first usage */
 						@Override
 						public boolean test(final UIElement element) {
-							if (queryString.getValue().length() == 0) {
-								return true;
-							}
-							final String name = element.getName();
-							return name != null &&
-									// name.toUpperCase().contains(queryUpper) == queryString.getValue();
-									name.toUpperCase().contains(queryString.getValue());
+							/* I could not get this code any faster than this form (caching toUpperString() was not faster) */
+							return queryString.getValue().isEmpty() || (element.getName() != null &&
+									element.getName().toUpperCase().contains(queryString.getValue()));
 						}
 					}), queryString));
 			
@@ -259,10 +267,10 @@ public class BrowseTabController implements Updateable {
 				createTree(child, treeItemChildren);
 			}
 			rootItem.expandedProperty().setValue(true);
+			frameTree.getSelectionModel().select(0);
 		} else {
 			frameTree.setRoot(null);
 		}
-		frameTree.getSelectionModel().select(0);
 	}
 	
 	/**

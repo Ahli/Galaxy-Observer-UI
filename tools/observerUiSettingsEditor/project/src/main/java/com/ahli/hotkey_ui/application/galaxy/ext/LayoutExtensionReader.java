@@ -40,7 +40,6 @@ public class LayoutExtensionReader {
 	private static final String HOTKEY = "@hotkey";
 	private static final String SETTING = "@setting";
 	private static final String CONSTANT_DEFAULT_DESCRIPTION_REGEX = "(?i)(?=(constant|default|description)[\\s]*=)";
-	private static final String EMPTY_STRING = "";
 	private static final String NAME = "name";
 	private static final String VAL = "val";
 	private static final String ERROR_PARSING_FILE = "Error parsing file.";
@@ -129,7 +128,7 @@ public class LayoutExtensionReader {
 		dbFac.setNamespaceAware(false);
 		dbFac.setValidating(false);
 		dbFac.setAttribute("http://xml.org/sax/features/external-general-entities", false);
-		dbFac.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, EMPTY_STRING);
+		dbFac.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
 		dbFac.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
 		dbFac.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
 		dbFac.setXIncludeAware(false);
@@ -226,9 +225,9 @@ public class LayoutExtensionReader {
 				}
 				text = text.trim();
 				
-				constant = EMPTY_STRING;
-				description = EMPTY_STRING;
-				defaultValue = EMPTY_STRING;
+				constant = "";
+				description = "";
+				defaultValue = "";
 				
 				final boolean isHotkey = text.toLowerCase(Locale.ROOT).startsWith(HOTKEY);
 				final boolean isSetting = text.toLowerCase(Locale.ROOT).startsWith(SETTING);
@@ -275,11 +274,11 @@ public class LayoutExtensionReader {
 						}
 					}
 					
-					if (constant != null && !EMPTY_STRING.equals(constant)) {
+					if (constant != null && !"".equals(constant)) {
 						if (isHotkey) {
-							addHotkeyValueDef(constant, description, defaultValue, EMPTY_STRING);
+							addHotkeyValueDef(constant, description, defaultValue, "");
 						} else {
-							addSettingValueDef(constant, description, defaultValue, EMPTY_STRING);
+							addSettingValueDef(constant, description, defaultValue, "");
 						}
 					}
 				}
@@ -389,7 +388,7 @@ public class LayoutExtensionReader {
 		dbFac.setNamespaceAware(false);
 		dbFac.setValidating(false);
 		dbFac.setAttribute("http://xml.org/sax/features/external-general-entities", false);
-		dbFac.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, EMPTY_STRING);
+		dbFac.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
 		dbFac.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
 		dbFac.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
 		dbFac.setXIncludeAware(false);

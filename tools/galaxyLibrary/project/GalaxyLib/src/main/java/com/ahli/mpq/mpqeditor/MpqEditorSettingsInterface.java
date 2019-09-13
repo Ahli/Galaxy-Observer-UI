@@ -40,7 +40,6 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 	private static final String RAW_CHUNK_SIZE = "RawChunkSize";
 	private static final String CUSTOM_RULES = "CustomRules";
 	private static final String SPACESPACEEQUALSSPACE = "  = ";
-	private static final String EMPTY_STRING = "";
 	private static final String GAME_ID = "GameId";
 	private static final String OPTIONS = "Options";
 	private static final String UTF_8 = "UTF-8";
@@ -300,8 +299,8 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 		if (compression == MpqEditorCompression.CUSTOM) {
 			final List<String> editedLines;
 			try (final Stream<String> lineStream = Files.lines(rulesetFilePath)) {
-				editedLines = lineStream.map(line -> line.replace(SPACESPACEEQUALSSPACE, EMPTY_STRING))
-						.collect(Collectors.toList());
+				editedLines =
+						lineStream.map(line -> line.replace(SPACESPACEEQUALSSPACE, "")).collect(Collectors.toList());
 			}
 			try (final BufferedWriter bw = Files.newBufferedWriter(rulesetFilePath)) {
 				final String separator = System.lineSeparator();
