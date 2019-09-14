@@ -174,13 +174,11 @@ public class BrowseTabController implements Updateable {
 						tableView.setPlaceholder(tableViewPlaceholderText);
 						final int selectedIndex = frameTree.getSelectionModel().getSelectedIndex();
 						frameTree.scrollTo(selectedIndex);
-						if (selectedIndex < 0) {
-							// clear tableview & path as the selected item is not visible
-							showInTableView(null);
-						}
+						// clear tableview & path if the selected item is not visible OR re-show it when visible
+						showInTableView(selectedIndex < 0 ? null : selectedItem);
 					});
 					queryRunning = false;
-				}, "BrowseQueryThread").start();
+				}, "BrowseFilter").start();
 			}
 		}
 	}

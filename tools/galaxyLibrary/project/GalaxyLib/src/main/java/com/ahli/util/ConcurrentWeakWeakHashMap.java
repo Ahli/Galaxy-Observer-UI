@@ -110,7 +110,7 @@ public class ConcurrentWeakWeakHashMap <K> implements ConcurrentMap<K, K> {
 		return map.containsValue(newKeyByObj(value));
 	}
 	
-	private WeakReferenceWithHash newKeyByObj(final Object obj) {
+	private WeakReferenceWithHash<?> newKeyByObj(final Object obj) {
 		return new WeakReferenceWithHash(obj, queue);
 	}
 	
@@ -232,9 +232,9 @@ public class ConcurrentWeakWeakHashMap <K> implements ConcurrentMap<K, K> {
 		@Override
 		public boolean equals(final Object obj) {
 			return obj != null && obj.getClass() == getClass() &&
-					((this == obj || super.get() == ((WeakReferenceWithHash) obj).get()) ||
-							(hashCode == ((WeakReferenceWithHash) obj).hashCode &&
-									Objects.equals(super.get(), ((WeakReferenceWithHash) obj).get())));
+					((this == obj || super.get() == ((WeakReferenceWithHash<?>) obj).get()) ||
+							(hashCode == ((WeakReferenceWithHash<?>) obj).hashCode &&
+									Objects.equals(super.get(), ((WeakReferenceWithHash<?>) obj).get())));
 		}
 		
 		@Override
@@ -271,6 +271,7 @@ public class ConcurrentWeakWeakHashMap <K> implements ConcurrentMap<K, K> {
 		}
 		
 		@Override
+		@SuppressWarnings ("squid:S2272") // does not throw NoSuchElementException
 		public final T next() {
 			final T next = strongNext;
 			advance();
