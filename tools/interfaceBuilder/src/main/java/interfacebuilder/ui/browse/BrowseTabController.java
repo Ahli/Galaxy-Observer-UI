@@ -80,6 +80,7 @@ public class BrowseTabController implements Updateable {
 	private Map<String, UITemplate> templateMap;
 	private int framesTotal;
 	private UICatalog uiCatalog;
+	private volatile boolean queryRunning;
 	
 	public BrowseTabController() {
 		// nothing to do
@@ -144,9 +145,39 @@ public class BrowseTabController implements Updateable {
 	 * @param filter
 	 */
 	private void filterTree(final String filter) {
-		final long startTime = System.currentTimeMillis();
-		queryString.set(filter.toUpperCase());
-		logger.info("filter apply: {}ms", (System.currentTimeMillis() - startTime));
+		synchronized (BrowseTabController.class) {
+			if (!queryRunning) {
+				queryRunning = true;
+				final var root = frameTree.getRoot();
+				final var selectedItem = frameTree.getSelectionModel().getSelectedItem();
+				final var tableViewPlaceholderText = tableView.getPlaceholder();
+				tableView.setPlaceholder(new Text(""));
+				frameTree.setRoot(null);
+				
+				new Thread(() -> {
+					String queuedQuery = filter;
+					while (queuedQuery != null) {
+						final long startTime = System.currentTimeMillis();
+						final String str = queuedQuery;
+						queuedQuery = null;
+						queryString.set(str.toUpperCase());
+						logger.info("filter apply: {}ms", (System.currentTimeMillis() - startTime));
+					}
+					Platform.runLater(() -> {
+						frameTree.setRoot(root);
+						frameTree.getSelectionModel().select(selectedItem);
+						tableView.setPlaceholder(tableViewPlaceholderText);
+						final int selectedIndex = frameTree.getSelectionModel().getSelectedIndex();
+						frameTree.scrollTo(selectedIndex);
+						if (selectedIndex < 0) {
+							// clear tableview & path as the selected item is not visible
+							showInTableView(null);
+						}
+					});
+					queryRunning = false;
+				}, "BrowseQueryThread").start();
+			}
+		}
 	}
 	
 	private void showInTableView(final TreeItem<UIElement> selected) {
@@ -225,17 +256,19 @@ public class BrowseTabController implements Updateable {
 	}
 	
 	private void updatePath(final TreeItem<UIElement> elem) {
-		final ObservableList<Node> children = pathTextFlow.getChildren();
-		children.clear();
-		final var header = new Text("Path: ");
-		header.setStyle("-fx-font-weight: bold; -fx-fill: white; -fx-font-smoothing-type: lcd;");
-		children.add(header);
-		if (elem != null) {
-			final String path = addParentPath(new StringBuilder(), elem).toString();
-			final var text = new Text(path);
-			text.setStyle("-fx-fill: white; -fx-font-smoothing-type: lcd;");
-			children.add(text);
-		}
+		Platform.runLater(() -> {
+			final ObservableList<Node> children = pathTextFlow.getChildren();
+			children.clear();
+			final var header = new Text("Path: ");
+			header.setStyle("-fx-font-weight: bold; -fx-fill: white; -fx-font-smoothing-type: lcd;");
+			children.add(header);
+			if (elem != null) {
+				final String path = addParentPath(new StringBuilder(), elem).toString();
+				final var text = new Text(path);
+				text.setStyle("-fx-fill: white; -fx-font-smoothing-type: lcd;");
+				children.add(text);
+			}
+		});
 	}
 	
 	/**

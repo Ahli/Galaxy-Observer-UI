@@ -7,8 +7,6 @@ import javafx.scene.control.TreeItem;
 
 import java.util.function.Predicate;
 
-//public interface TreeItemPredicate <T> extends BiPredicate<TreeItem<?>, T> {}
-
 @FunctionalInterface
 public interface TreeItemPredicate <T> {
 	/**
