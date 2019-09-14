@@ -139,6 +139,11 @@ public class BrowseTabController implements Updateable {
 		tableView.getSortOrder().add(columnAttributes);
 		
 		treeFilter.textProperty().addListener((observable, oldValue, newValue) -> filterTree(newValue));
+		
+		final ObservableList<Node> children = pathTextFlow.getChildren();
+		final var header = new Text("Path: ");
+		header.setStyle("-fx-font-weight: bold; -fx-fill: white; -fx-font-smoothing-type: lcd;");
+		children.add(header);
 	}
 	
 	/**
@@ -256,19 +261,16 @@ public class BrowseTabController implements Updateable {
 	}
 	
 	private void updatePath(final TreeItem<UIElement> elem) {
-		Platform.runLater(() -> {
-			final ObservableList<Node> children = pathTextFlow.getChildren();
-			children.clear();
-			final var header = new Text("Path: ");
-			header.setStyle("-fx-font-weight: bold; -fx-fill: white; -fx-font-smoothing-type: lcd;");
-			children.add(header);
-			if (elem != null) {
-				final String path = addParentPath(new StringBuilder(), elem).toString();
-				final var text = new Text(path);
-				text.setStyle("-fx-fill: white; -fx-font-smoothing-type: lcd;");
-				children.add(text);
-			}
-		});
+		final ObservableList<Node> children = pathTextFlow.getChildren();
+		if (children.size() > 1) {
+			children.remove(1);
+		}
+		if (elem != null) {
+			final String path = addParentPath(new StringBuilder(), elem).toString();
+			final var text = new Text(path);
+			text.setStyle("-fx-fill: white; -fx-font-smoothing-type: lcd;");
+			children.add(text);
+		}
 	}
 	
 	/**
