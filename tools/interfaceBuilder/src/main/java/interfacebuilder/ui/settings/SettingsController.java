@@ -24,6 +24,7 @@ public class SettingsController implements Updateable {
 	/*
 	categories: 0=GamePaths, 1=GuiMmode, 2=CommandLineMode
 	 */
+	@SuppressWarnings ("unchecked")
 	private final TreeItem<String>[] categories = new TreeItem[3];
 	@Autowired
 	private ApplicationContext appContext;
