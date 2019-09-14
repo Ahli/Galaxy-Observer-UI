@@ -511,9 +511,6 @@ public class InterfaceBuilderApp extends Application {
 	 * 		when loading the UI definition fails
 	 */
 	private void initGUI(final Stage primaryStage) throws IOException {
-		// UI layout: borderPane -center-> tabPane (via layout) -tab_0-> virtualizedScrollPane -> StyleClassedTextArea
-		//                       -left-> navigation button bar
-		
 		// Build Navigation
 		final BorderPane root;
 		final FXMLSpringLoader loader = new FXMLSpringLoader(appContext);

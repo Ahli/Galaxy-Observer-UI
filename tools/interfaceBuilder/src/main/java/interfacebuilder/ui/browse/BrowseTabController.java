@@ -27,10 +27,12 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
@@ -81,9 +83,9 @@ public class BrowseTabController implements Updateable {
 	private int framesTotal;
 	private UICatalog uiCatalog;
 	private volatile boolean queryRunning;
+	private TextFlowFactory flowFactory;
 	
 	public BrowseTabController() {
-		// nothing to do
 		queryString = new SimpleStringProperty("");
 	}
 	
@@ -115,6 +117,18 @@ public class BrowseTabController implements Updateable {
 	 * Automatically called by FxmlLoader
 	 */
 	public void initialize() {
+		// tree
+		flowFactory = new TextFlowFactory();
+		frameTree.getSelectionModel().selectedItemProperty()
+				.addListener((observable, oldValue, newValue) -> showInTableView(newValue));
+		frameTree.setCellFactory(new Callback<>() {
+			@Override
+			public TreeCell<UIElement> call(final TreeView<UIElement> treeView) {
+				return new CustomTreeCell(flowFactory);
+			}
+		});
+		
+		// dropdowns
 		templateMap = new UnifiedMap<>();
 		fileDropdown.setOnAction(actionEvent -> Platform.runLater(() -> {
 			final String selectedFile = fileDropdown.getSelectionModel().getSelectedItem();
@@ -128,9 +142,8 @@ public class BrowseTabController implements Updateable {
 			createTree(template);
 			logger.info("Tree creation: {}ms , {} frames", (System.currentTimeMillis() - start), framesTotal);
 		}));
-		frameTree.getSelectionModel().selectedItemProperty()
-				.addListener((observable, oldValue, newValue) -> showInTableView(newValue));
 		
+		// table
 		columnAttributes.setCellValueFactory(p -> new SimpleObjectProperty<>(p.getValue().getKey()));
 		columnValues.setCellValueFactory(p -> new SimpleObjectProperty<>(p.getValue().getValue()));
 		columnAttributes.prefWidthProperty().bind(tableView.widthProperty().divide(3));
@@ -138,8 +151,10 @@ public class BrowseTabController implements Updateable {
 		columnAttributes.sortTypeProperty().set(TableColumn.SortType.ASCENDING);
 		tableView.getSortOrder().add(columnAttributes);
 		
+		// filter
 		treeFilter.textProperty().addListener((observable, oldValue, newValue) -> filterTree(newValue));
 		
+		// Path header
 		final ObservableList<Node> children = pathTextFlow.getChildren();
 		final var header = new Text("Path: ");
 		header.setStyle("-fx-font-weight: bold; -fx-fill: white; -fx-font-smoothing-type: lcd;");
@@ -165,6 +180,7 @@ public class BrowseTabController implements Updateable {
 						final long startTime = System.currentTimeMillis();
 						final String str = queuedQuery;
 						queuedQuery = null;
+						flowFactory.setHighlight(str);
 						queryString.set(str.toUpperCase());
 						logger.info("filter apply: {}ms", (System.currentTimeMillis() - startTime));
 					}
@@ -173,7 +189,8 @@ public class BrowseTabController implements Updateable {
 						frameTree.getSelectionModel().select(selectedItem);
 						tableView.setPlaceholder(tableViewPlaceholderText);
 						final int selectedIndex = frameTree.getSelectionModel().getSelectedIndex();
-						frameTree.scrollTo(selectedIndex);
+						// scroll to slightly above the selected item
+						frameTree.scrollTo(Math.max(selectedIndex - 4, 0));
 						// clear tableview & path if the selected item is not visible OR re-show it when visible
 						showInTableView(selectedIndex < 0 ? null : selectedItem);
 					});
@@ -289,7 +306,9 @@ public class BrowseTabController implements Updateable {
 						public boolean test(final UIElement element) {
 							/* I could not get this code any faster than this form (caching toUpperString() was not faster) */
 							return queryString.getValue().isEmpty() || (element.getName() != null &&
-									element.getName().toUpperCase().contains(queryString.getValue()));
+									element.getName().toUpperCase().contains(queryString.getValue())) ||
+									(element instanceof UIFrame && ((UIFrame) element).getType().toUpperCase()
+											.contains(queryString.getValue()));
 						}
 					}), queryString));
 			
