@@ -82,8 +82,17 @@ public class BrowseTabController implements Updateable {
 	private Map<String, UITemplate> templateMap;
 	private int framesTotal;
 	private UICatalog uiCatalog;
+	/**
+	 * Indicates that the filter query Thread is still working on searches.
+	 */
 	private volatile boolean queryRunning;
 	private TextFlowFactory flowFactory;
+	/**
+	 * Value used for the next Query executed. This needs to be on the controller instance's scope, so it can be
+	 * overridden to skip unnecessary searches.
+	 */
+	@SuppressWarnings ("squid:S1450") // no, it cannot be made local.
+	private volatile String queriedFilter;
 	
 	public BrowseTabController() {
 		queryString = new SimpleStringProperty("");
@@ -166,6 +175,7 @@ public class BrowseTabController implements Updateable {
 	 */
 	private void filterTree(final String filter) {
 		synchronized (BrowseTabController.class) {
+			queriedFilter = filter;
 			if (!queryRunning) {
 				queryRunning = true;
 				final var root = frameTree.getRoot();
@@ -175,15 +185,15 @@ public class BrowseTabController implements Updateable {
 				frameTree.setRoot(null);
 				
 				new Thread(() -> {
-					String queuedQuery = filter;
-					while (queuedQuery != null) {
+					String str = null;
+					while (!queriedFilter.equals(str)) {
 						final long startTime = System.currentTimeMillis();
-						final String str = queuedQuery;
-						queuedQuery = null;
+						str = queriedFilter;
 						flowFactory.setHighlight(str);
 						queryString.set(str.toUpperCase());
-						logger.info("filter apply: {}ms", (System.currentTimeMillis() - startTime));
+						logger.info("filter apply: {}ms - {}", (System.currentTimeMillis() - startTime), str);
 					}
+					final String strFinal = str;
 					Platform.runLater(() -> {
 						frameTree.setRoot(root);
 						frameTree.getSelectionModel().select(selectedItem);
@@ -193,8 +203,11 @@ public class BrowseTabController implements Updateable {
 						frameTree.scrollTo(Math.max(selectedIndex - 4, 0));
 						// clear tableview & path if the selected item is not visible OR re-show it when visible
 						showInTableView(selectedIndex < 0 ? null : selectedItem);
+						queryRunning = false;
+						if (!queryRunning && !queriedFilter.equals(strFinal)) {
+							logger.error("Query set, but Filter Thread is dead. -> does this happen?");
+						}
 					});
-					queryRunning = false;
 				}, "BrowseFilter").start();
 			}
 		}
@@ -302,9 +315,11 @@ public class BrowseTabController implements Updateable {
 					.bind(Bindings.createObjectBinding(() -> TreeItemPredicate.create(new Predicate<>() {
 						/* do not turn the Predicate into a lambda -> for some reason it becomes 2-3x slower except
 						for first usage */
+						@SuppressWarnings ("squid:S1067") // reduce number of conditional operators
 						@Override
 						public boolean test(final UIElement element) {
-							/* I could not get this code any faster than this form (caching toUpperString() was not faster) */
+							/* I could not get this code any faster than this form (caching toUpperCase() was not
+							faster) */
 							return queryString.getValue().isEmpty() || (element.getName() != null &&
 									element.getName().toUpperCase().contains(queryString.getValue())) ||
 									(element instanceof UIFrame && ((UIFrame) element).getType().toUpperCase()
