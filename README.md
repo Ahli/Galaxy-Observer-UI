@@ -22,7 +22,7 @@ To compile a selected archive and start a replay, consult the 'ReadMe.txt' in th
 ### Tools-Developer Installation:
 Required Software (for Windows):
 * [Java 13](https://jdk.java.net/13/)
-* Java IDE, for example [Eclipse for Java Developers](http://www.eclipse.org/downloads/eclipse-packages/)
+* Java IDE, for example [IntelliJ](https://www.jetbrains.com/idea/download/#section=windows) or [Eclipse for Java Developers](https://www.eclipse.org/downloads/eclipse-packages/)
 * A text editor preferably with XML syntax support, e.g. [Notepad++](https://notepad-plus-plus.org/) with the [NppExec plugin](https://sourceforge.net/projects/npp-plugins/files/NppExec/) or alternatively [VSCode](https://code.visualstudio.com) with [Talv's SC2Layout plugin](https://github.com/Talv/sc2-layouts)
 * Git or some of its GUI software like [Sourcetree](https://www.sourcetreeapp.com/).
 * [NSIS](https://nsis.sourceforge.io/Main_Page) to create installers for Settings Editor
@@ -31,7 +31,7 @@ Required Software (for Windows):
 1. Install Java.
 2. Install Git and clone this repository.
 3. Install Notepad++ and its NppExec plugin.
-    To install the plugin, place it within the 'plugins' folder of notepad++'s install directory.
+    To install the plugin via Notepad's Plugin Admin dialog. Then configure the plugin with the parameters suggested in dev/ReadMe.txt.
     Alternatively, use [VSCode](https://code.visualstudio.com) and install [Talv's plugin for SC2Layout files](https://github.com/Talv/sc2-layouts)
 4. Install your Java IDE
 5. Install NSIS
