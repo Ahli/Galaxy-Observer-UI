@@ -58,6 +58,6 @@ final class StringInternerTest {
 			System.gc();
 		}
 		// fails on J9 JDK
-		assertTrue(i < maxAttempts, "GC did not remove the WeakReference at first attempt");
+		assertTrue(i < maxAttempts, "GC did not remove the WeakReference within " + maxAttempts + " attempts");
 	}
 }
