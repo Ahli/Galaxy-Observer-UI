@@ -97,6 +97,11 @@ public class UIAttribute extends UIElement {
 		return null;
 	}
 	
+	/**
+	 * Returns a List of Key-Value pairs. Every key is followed by an entry for its value.
+	 *
+	 * @return
+	 */
 	public List<String> getKeyValues() {
 		return keyValueList;
 	}

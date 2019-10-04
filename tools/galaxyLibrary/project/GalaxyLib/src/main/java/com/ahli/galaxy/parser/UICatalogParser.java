@@ -166,7 +166,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	private static UIElement instanciateTemplateFromList(final List<UITemplate> templates, final String fileName,
 			final String path, final String newName) {
 		final UIElement frameFromPath = findTemplateFromList(templates, fileName, path);
-		final UIElement clone = (UIElement) frameFromPath.deepCopy();
+		final UIElement clone = frameFromPath != null ? (UIElement) frameFromPath.deepCopy() : null;
 		if (clone != null) {
 			clone.setName(newName);
 			//				if (paramDeduplicate) {
@@ -295,7 +295,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			
 			// newElement needs to be the current element
 			for (final var template : potentiallyEditedTemplates) {
-				final UIElement editedElem = template.getElement().receiveFrameFromPath(name);
+				final UIElement editedElem = template.receiveFrameFromPath(name);
 				if (editedElem != null) {
 					newElem = editedElem;
 					curTemplate = template; // entering that template
@@ -307,7 +307,10 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			final int j = name.lastIndexOf('/');
 			if (j > 0) {
 				final String parentName = name.substring(0, j);
-				curElement = curTemplate.getElement().receiveFrameFromPath(parentName);
+				if (curTemplate == null) {
+					logger.error("CurTemplate is null, but there is a path in the name {}", name);
+				}
+				curElement = curTemplate.receiveFrameFromPath(parentName);
 			} else {
 				// newElem has no parent, it is the template's root
 				curElement = null;
@@ -714,7 +717,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	}
 	
 	/**
-	 * Copies a template's element into the target element.
+	 * Copies a template's element into the target element. Iteratively calls all child elements to do the same.
 	 *
 	 * @param templateElem
 	 * @param targetElem
@@ -726,22 +729,79 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		if (logger.isTraceEnabled()) {
 			logger.trace("Applying template {} to element {}", templateElem.getName(), targetElem.getName());
 		}
-		final List<UIElement> templateChildren = new ArrayList<>();
 		
-		// TODO
-		if(templateElem instanceof UIFrame){
+		final List<UIElement> templateChildren;
 		
-		} else if (templateElem instanceof UIAttribute){
-		
+		if (templateElem instanceof UIFrame) {
+			final UIFrame frame = (UIFrame) templateElem;
+			templateChildren = frame.getChildrenRaw();
+			if (targetElem instanceof UIFrame) {
+				final UIFrame target = (UIFrame) targetElem;
+				// TODO do not set the undefined anchors (-> track if a side was defined or is on the initial value)
+				target.setAnchor(UIAnchorSide.TOP, frame.getAnchorRelative(UIAnchorSide.TOP),
+						frame.getAnchorPos(UIAnchorSide.TOP), frame.getAnchorOffset(UIAnchorSide.TOP));
+				target.setAnchor(UIAnchorSide.LEFT, frame.getAnchorRelative(UIAnchorSide.LEFT),
+						frame.getAnchorPos(UIAnchorSide.LEFT), frame.getAnchorOffset(UIAnchorSide.LEFT));
+				target.setAnchor(UIAnchorSide.BOTTOM, frame.getAnchorRelative(UIAnchorSide.BOTTOM),
+						frame.getAnchorPos(UIAnchorSide.BOTTOM), frame.getAnchorOffset(UIAnchorSide.BOTTOM));
+				target.setAnchor(UIAnchorSide.RIGHT, frame.getAnchorRelative(UIAnchorSide.RIGHT),
+						frame.getAnchorPos(UIAnchorSide.RIGHT), frame.getAnchorOffset(UIAnchorSide.RIGHT));
+				
+				copyAttributes(frame.getAttributes(), target.getAttributes());
+			} else {
+				logger.error("Attempting to apply a template of type {} to a different type.", "Frame");
+			}
+			
+			
+			//		} else if (templateElem instanceof UIAttribute) {
+			//			final UIAttribute attr = (UIAttribute) templateElem;
+			//			templateChildren = attr.getChildrenRaw();
+		} else if (templateElem instanceof UIStateGroup) {
+			final UIStateGroup stateGroup = (UIStateGroup) templateElem;
+			templateChildren = stateGroup.getChildrenRaw();
+			// TODO
+		} else if (templateElem instanceof UIController) {
+			final UIController stateGroup = (UIController) templateElem;
+			templateChildren = stateGroup.getChildrenRaw();
+			// TODO
+		} else if (templateElem instanceof UIAnimation) {
+			final UIAnimation stateGroup = (UIAnimation) templateElem;
+			templateChildren = stateGroup.getChildrenRaw();
+			// TODO
+		} else if (templateElem instanceof UIState) {
+			final UIState stateGroup = (UIState) templateElem;
+			templateChildren = stateGroup.getChildrenRaw();
+			// TODO
+		} else {
+			templateChildren = null;
 		}
 		
-		
-		
 		// copy template's children
-		for (final var templateChild : templateChildren) {
-			if (templateChild.getName() != null) {
-				final UIElement targetChild = targetElem.receiveFrameFromPath(templateChild.getName());
-				applyTemplateElementToElement(templateChild, targetChild);
+		if (templateChildren != null) {
+			for (final var templateChild : templateChildren) {
+				if (templateChild.getName() != null) {
+					final UIElement targetChild = targetElem.receiveFrameFromPath(templateChild.getName());
+					applyTemplateElementToElement(templateChild, targetChild);
+				}
+			}
+		}
+	}
+	
+	private void copyAttributes(final List<UIAttribute> attributesSource, final List<UIAttribute> attributesTarget) {
+		for (final UIAttribute attrSource : attributesSource) {
+			boolean edited = false;
+			
+			// TODO modify existing attributes
+			targetloop:
+			for (final UIAttribute attrTarget : attributesTarget) {
+				final var targetKeyValList = attrTarget.getKeyValues();
+				for (int i = 0; i < targetKeyValList.size(); i += 2) {
+					final String key = targetKeyValList.get(i);
+					if (key.equals()) {
+						edited = true;
+						break targetloop;
+					}
+				}
 			}
 		}
 	}
