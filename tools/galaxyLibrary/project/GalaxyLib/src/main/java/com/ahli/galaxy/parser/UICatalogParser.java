@@ -98,6 +98,113 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		parser.setConsumer(this);
 	}
 	
+	/**
+	 * @param typeTemplate
+	 * @param typeFrame
+	 * @return
+	 */
+	private static boolean checkFrameTypeCompatibility(final String typeTemplate, final String typeFrame) {
+		// TODO
+		return true;
+	}
+	
+	/**
+	 * Set the implicit names of controllers in animations.
+	 *
+	 * @param thisElem
+	 */
+	private static void setImplicitControllerNames(final UIAnimation thisElem) {
+		if (logger.isTraceEnabled()) {
+			logger.trace("Setting implicit controller names for UIAnimation {}", thisElem.getName());
+		}
+		final List<UIElement> controllers = thisElem.getControllers();
+		for (final UIElement uiElem : controllers) {
+			final UIController contr = (UIController) uiElem;
+			if (contr.getName() == null) {
+				final String type = contr.getValue(TYPE);
+				logger.trace("type = {}", () -> type);
+				contr.setName(getImplicitName(type, controllers));
+				contr.setNameIsImplicit(true);
+			}
+		}
+	}
+	
+	/**
+	 * Returns the UIElement that resides in the specified UITemplates under the specified path and the specified file
+	 * name.
+	 *
+	 * @param templates
+	 * @param fileName
+	 * @param path
+	 * @return
+	 */
+	private static UIElement findTemplateFromList(final Iterable<UITemplate> templates, final String fileName,
+			final String path) {
+		final String newPath = UIElement.removeLeftPathLevel(path);
+		
+		for (final UITemplate curTemplate : templates) {
+			if (curTemplate.getFileName().equalsIgnoreCase(fileName)) {
+				// found a template file
+				final UIElement frameFromPath = curTemplate.receiveFrameFromPath(newPath);
+				
+				if (frameFromPath != null) {
+					return frameFromPath;
+				}
+				// else not the correct template
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * @param templates
+	 * @param fileName
+	 * @param path
+	 * @param newName
+	 * @return
+	 */
+	private static UIElement instanciateTemplateFromList(final List<UITemplate> templates, final String fileName,
+			final String path, final String newName) {
+		final UIElement frameFromPath = findTemplateFromList(templates, fileName, path);
+		final UIElement clone = (UIElement) frameFromPath.deepCopy();
+		if (clone != null) {
+			clone.setName(newName);
+			//				if (paramDeduplicate) {
+			//					addToAddedElements(clone); // not necessary as the parent is deduplicated right
+			//					// now and elements are not modified atm.
+			//				}
+		}
+		return clone;
+	}
+	
+	/**
+	 * @param type
+	 * @param controllers
+	 * @return
+	 */
+	private static String getImplicitName(final String type, final List<UIElement> controllers) {
+		if (logger.isTraceEnabled()) {
+			logger.trace("Constructing implicit controller name");
+		}
+		if (type == null) {
+			logger.error("'type=\"...\"' of Controller is not set or invalid.");
+			return "";
+		}
+		
+		int i = 0;
+		while (true) {
+			final String name = type + "_" + i;
+			
+			if (controllers.stream()
+					.noneMatch(t -> t.getName() != null && t.getName().compareToIgnoreCase(name) == 0)) {
+				logger.trace("Constructing implicit controller name: {}", () -> name);
+				return name;
+			}
+			logger.trace("Implicit controller name existing: {}", () -> name);
+			i++;
+		}
+	}
+	
 	@Override
 	public void parseFile(final Path p, final String raceId, final boolean isDevLayout, final String consoleSkinId)
 			throws IOException {
@@ -126,7 +233,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			// root
 			curPath.clear();
 			curLevel = level;
-			curElement = null;
+			curElement = null; // no parent frame
 			// default editing mode unless the parsed aspect defines another one
 			editingMode = false;
 			if (logger.isTraceEnabled()) {
@@ -162,6 +269,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			}
 		}
 		
+		UITemplate[] potentiallyEditedTemplates = null;
 		// file in attributes or template (filtering out key and action tags as they can
 		// contain file=, e.g. for cutscene frames)
 		if ((i = attrTypes.indexOf(FILE)) != -1 && !KEY.equals(tagName) && !ACTION.equals(tagName)) {
@@ -169,8 +277,8 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				logger.warn("WARNING: Unexpected attribute 'file=' found in {}", curElement);
 			}
 			// TODO enable to test modification of existing templates, feature is incomplete
-			//			editingMode = true;
-			curTemplate = catalog.getTemplateOfPath(attrValues.get(i));
+			editingMode = true;
+			potentiallyEditedTemplates = catalog.getTemplatesOfPath(attrValues.get(i));
 		}
 		String name = ((i = attrTypes.indexOf(NAME)) != -1) ?
 				catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout, consoleSkinId) : null;
@@ -178,36 +286,49 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		UIElement newElem = null;
 		
 		// open existing element, if editing mode is enabled
-		if (editingMode && curTemplate != null) {
+		if (potentiallyEditedTemplates != null) {
+			// This is the editing mode!
 			if (name == null) {
 				logger.error("Template is used without defining a name.");
 				name = "UnnamedFrame" + Math.random();
 			}
 			
 			// newElement needs to be the current element
-			newElem = curTemplate.getElement().receiveFrameFromPath(name);
+			for (final var template : potentiallyEditedTemplates) {
+				final UIElement editedElem = template.getElement().receiveFrameFromPath(name);
+				if (editedElem != null) {
+					newElem = editedElem;
+					curTemplate = template; // entering that template
+					break;
+				}
+			}
+			
 			// curElement needs to be the parent of that frame
 			final int j = name.lastIndexOf('/');
 			if (j > 0) {
 				final String parentName = name.substring(0, j);
 				curElement = curTemplate.getElement().receiveFrameFromPath(parentName);
 			} else {
-				curElement = curTemplate.getElement();
+				// newElem has no parent, it is the template's root
+				curElement = null;
 			}
 		}
 		
 		// handle template attribute
 		i = attrTypes.indexOf(TEMPLATE);
-		//		if(editingMode && newElem != null){
-		// TODO copy template settings, if template used in existing frame & editing mode
-		// copy template into newElem
-		// }
-		
-		// create from template (actions may use template= and need to be ignored)
-		if (i != -1 && newElem == null) {
-			newElem = (!ACTION.equals(tagName)) ? instanciateTemplate(attrValues.get(i), name) : null;
+		if (i != -1) {
 			if (newElem != null) {
-				registerInstance(newElem);
+				// This is editing mode!
+				// recursively copy template (attrValues.get(i))'s attributes into existing frame (= newElem)
+				applyTemplateElementToElement(attrValues.get(i), newElem);
+				
+				// TODO this needs to become a new template, too!
+			} else {
+				// create from template (actions may use template= and need to be ignored)
+				newElem = (!ACTION.equals(tagName)) ? instanciateTemplate(attrValues.get(i), name) : null;
+				if (newElem != null) {
+					registerInstance(newElem);
+				}
 			}
 		}
 		
@@ -433,6 +554,40 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		
 	}
 	
+	private void applyTemplateElementToElement(final String pathParam, final UIElement targetElem) {
+		if (logger.isTraceEnabled()) {
+			logger.trace("Applying Template of path {} to element {} - searching the template", pathParam,
+					targetElem.getName());
+		}
+		final String path = pathParam.replace('\\', '/');
+		final int seperatorIndex = path.indexOf('/');
+		if (seperatorIndex < 0) {
+			logger.error("ERROR: Template paths must follow the pattern 'FileName/FrameName'. Found '{}' instead.",
+					path);
+			return;
+		}
+		final String fileName = path.substring(0, seperatorIndex);
+		
+		// 1. check templates
+		UIElement templateInstance = findTemplateFromList(catalog.getTemplates(), fileName, path);
+		if (templateInstance == null) {
+			// 2. if fail -> check dev templates
+			templateInstance = findTemplateFromList(catalog.getBlizzOnlyTemplates(), fileName, path);
+		}
+		if (templateInstance == null) {
+			// template does not exist or its layout was not loaded, yet
+			if (!curIsDevLayout) {
+				logger.error("ERROR: Template of path '{}' could not be found.", path);
+			} else {
+				logger.warn(
+						"WARNING: Template of path '{}' could not be found, but we are creating a Blizz-only layout, so this is fine.",
+						path);
+			}
+		} else {
+			applyTemplateElementToElement(templateInstance, targetElem);
+		}
+	}
+	
 	/**
 	 * @param path
 	 * @param newName
@@ -485,16 +640,6 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		if (paramDeduplicate) {
 			addedElements.add(newElem);
 		}
-	}
-	
-	/**
-	 * @param typeTemplate
-	 * @param typeFrame
-	 * @return
-	 */
-	private static boolean checkFrameTypeCompatibility(final String typeTemplate, final String typeFrame) {
-		// TODO
-		return true;
 	}
 	
 	/**
@@ -569,83 +714,35 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	}
 	
 	/**
-	 * Set the implicit names of controllers in animations.
+	 * Copies a template's element into the target element.
 	 *
-	 * @param thisElem
+	 * @param templateElem
+	 * @param targetElem
 	 */
-	private static void setImplicitControllerNames(final UIAnimation thisElem) {
+	private void applyTemplateElementToElement(final UIElement templateElem, final UIElement targetElem) {
+		if (targetElem == null) {
+			return;
+		}
 		if (logger.isTraceEnabled()) {
-			logger.trace("Setting implicit controller names for UIAnimation {}", thisElem.getName());
+			logger.trace("Applying template {} to element {}", templateElem.getName(), targetElem.getName());
 		}
-		final List<UIElement> controllers = thisElem.getControllers();
-		for (final UIElement uiElem : controllers) {
-			final UIController contr = (UIController) uiElem;
-			if (contr.getName() == null) {
-				final String type = contr.getValue(TYPE);
-				logger.trace("type = {}", () -> type);
-				contr.setName(getImplicitName(type, controllers));
-				contr.setNameIsImplicit(true);
-			}
-		}
-	}
-	
-	/**
-	 * @param templates
-	 * @param fileName
-	 * @param path
-	 * @param newName
-	 * @return
-	 */
-	private static UIElement instanciateTemplateFromList(final List<UITemplate> templates, final String fileName,
-			final String path, final String newName) {
-		final String newPath = UIElement.removeLeftPathLevel(path);
+		final List<UIElement> templateChildren = new ArrayList<>();
 		
-		for (final UITemplate curTemplate : templates) {
-			if (curTemplate.getFileName().equalsIgnoreCase(fileName)) {
-				// found template file
-				final UIElement frameFromPath = curTemplate.receiveFrameFromPath(newPath);
-				
-				if (frameFromPath == null) {
-					// not the correct template
-					continue;
-				}
-				final UIElement clone = (UIElement) frameFromPath.deepCopy();
-				clone.setName(newName);
-				//				if (paramDeduplicate) {
-				//					addToAddedElements(clone); // not necessary as the parent is deduplicated right
-				//					// now and elements are not modified atm.
-				//				}
-				return clone;
-			}
-		}
-		return null;
-	}
-	
-	/**
-	 * @param type
-	 * @param controllers
-	 * @return
-	 */
-	private static String getImplicitName(final String type, final List<UIElement> controllers) {
-		if (logger.isTraceEnabled()) {
-			logger.trace("Constructing implicit controller name");
-		}
-		if (type == null) {
-			logger.error("'type=\"...\"' of Controller is not set or invalid.");
-			return "";
+		// TODO
+		if(templateElem instanceof UIFrame){
+		
+		} else if (templateElem instanceof UIAttribute){
+		
 		}
 		
-		int i = 0;
-		while (true) {
-			final String name = type + "_" + i;
-			
-			if (controllers.stream()
-					.noneMatch(t -> t.getName() != null && t.getName().compareToIgnoreCase(name) == 0)) {
-				logger.trace("Constructing implicit controller name: {}", () -> name);
-				return name;
+		
+		
+		// copy template's children
+		for (final var templateChild : templateChildren) {
+			if (templateChild.getName() != null) {
+				final UIElement targetChild = targetElem.receiveFrameFromPath(templateChild.getName());
+				applyTemplateElementToElement(templateChild, targetChild);
 			}
-			logger.trace("Implicit controller name existing: {}", () -> name);
-			i++;
 		}
 	}
 	

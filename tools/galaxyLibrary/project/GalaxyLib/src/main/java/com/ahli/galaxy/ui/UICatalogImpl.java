@@ -238,20 +238,23 @@ public class UICatalogImpl implements UICatalog {
 	}
 	
 	@Override
-	public UITemplate getTemplateOfPath(final String file) {
+	public UITemplate[] getTemplatesOfPath(final String file) {
+		final List<UITemplate> foundTemplates = new ArrayList<>();
 		for (final var template : templates) {
 			if (template.getFileName().equalsIgnoreCase(file)) {
-				return template;
+				foundTemplates.add(template);
 			}
 		}
 		for (final var template : blizzOnlyTemplates) {
 			if (template.getFileName().equalsIgnoreCase(file)) {
 				logger.error("ERROR: cannot modify Blizzard-only Template: {}", template.getFileName());
-				return null;
+				break;
 			}
 		}
-		logger.warn("WARN: cannot find Layout file: {}", file);
-		return null;
+		if (foundTemplates.isEmpty()) {
+			logger.warn("WARN: cannot find Layout file: {}", file);
+		}
+		return foundTemplates.toArray(new UITemplate[0]);
 	}
 	
 	@Override

@@ -151,7 +151,7 @@ public interface UICatalog extends DeepCopyable {
 	
 	void processInclude(String path, boolean isDevLayout, String raceId, String consoleSkinId);
 	
-	UITemplate getTemplateOfPath(final String file);
+	UITemplate[] getTemplatesOfPath(final String file);
 	
 	/**
 	 * Post process the parsed UICatalog.
