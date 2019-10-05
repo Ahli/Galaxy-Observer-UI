@@ -289,13 +289,13 @@
 			<VersusModePlayerSide val="Right"/>
 
 			<Frame type="Image" name="PortraitCutoutBG">
-				<Anchor side="Left" relative="$this" pos="Min" offset="0"/>
 				<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+				<Anchor side="Left" relative="$this" pos="Min" offset="0"/>
 			</Frame>
 
 			<Frame type="PlayerLogoImageFrame" name="PortraitCutout">
-				<Anchor side="Left" relative="$this" pos="Min" offset="0"/>
 				<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+				<Anchor side="Left" relative="$this" pos="Min" offset="0"/>
 				<VersusModePlayerSide val="Right"/>
 			</Frame>
 
@@ -305,14 +305,14 @@
 				<VersusModePlayerSide val="Right"/>
 
 				<Frame type="Label" name="LogoLabel">
-					<Anchor side="Left" relative="$this" pos="Min" offset="0"/>
 					<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+					<Anchor side="Left" relative="$this" pos="Min" offset="0"/>
 				</Frame>
 			</Frame>
 
 			<Frame type="PlayerLogoImageFrame" name="Flag">
-				<Anchor side="Left" relative="$this" pos="Min" offset="0"/>
 				<Anchor side="Right" relative="$parent/PlayerName" pos="Min" offset="-40"/>
+				<Anchor side="Left" relative="$this" pos="Min" offset="0"/>
 				<VersusModePlayerSide val="Right"/>
 			</Frame>
 
@@ -322,8 +322,8 @@
 				<VersusModePlayerSide val="Right"/>
 
 				<Frame type="Label" name="LogoLabel">
-					<Anchor side="Left" relative="$this" pos="Min" offset="0"/>
 					<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+					<Anchor side="Left" relative="$this" pos="Min" offset="0"/>
 				</Frame>
 			</Frame>
 
@@ -333,8 +333,8 @@
 				<VersusModePlayerSide val="Right"/>
 
 				<Frame type="Image" name="LogoImage">
-					<Anchor side="Left" relative="$this" pos="Min" offset="0"/>
 					<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+					<Anchor side="Left" relative="$this" pos="Min" offset="0"/>
 				</Frame>
 			</Frame>
 
@@ -580,6 +580,8 @@
 
 	</Frame>
 	<Frame type="ToggleControl" name="PlayerIntroPanelTemplate_Left1">
+		<Enabled val="true"/>
+		
 		<Frame type="PlayerFrame" name="PlayerIntroPlayerFrame" template="_bottomPanel/PlayerFrame_Left1">
 
 			<Frame type="PlayerLogoImageFrame" name="PortraitCutout" template="_bottomPanel/PlayerFrame_Left1">
@@ -621,6 +623,8 @@
 
 	</Frame>
 	<Frame type="ToggleControl" name="PlayerIntroPanelTemplate_Right0">
+		<Enabled val="true"/>
+		
 		<Frame type="PlayerFrame" name="PlayerIntroPlayerFrame" template="_bottomPanel/PlayerFrame_Right0">
 
 			<Frame type="PlayerLogoImageFrame" name="PortraitCutout" template="_bottomPanel/PlayerFrame_Right0">
@@ -707,7 +711,8 @@
 
 		<!-- Apply Template for player -->
 		<Frame type="ToggleControl" name="PlayerIntro1" template="_PlayerIntroPanel/PlayerIntroPanelTemplate_L">
-			<LinkedModalFrame val="$parent/PlayerIntro2"/>
+			<LinkedModalFrame val="$parent/PlayerIntro2_L"/>
+			<LinkedModalFrame val="$parent/PlayerIntro2_R"/>
 			<LinkedModalFrame val="$parent/PlayerIntro3"/>
 			<LinkedModalFrame val="$parent/PlayerIntro4"/>
 			<LinkedModalFrame val="$parent/FullscreenUpperContainer/PlayerStatPanel/StatResourcesFrame"/>
@@ -739,18 +744,18 @@
 					<When type="Property" frame="PlayerIntroPlayerFrame/FlavorText/LogoLabel" text=""/>
 					<When type="Property" frame="PlayerIntroPlayerFrame/RankValue/LogoLabel" text=""/>
 					<When type="Property" frame="PlayerIntroPlayerFrame/ScoreValue/LogoLabel" text=""/>
-					<Action type="SetProperty" frame="$this" enabled="false"/>
-					<Action type="SetProperty" frame="$this" visible="false"/>
+					<Action type="SetProperty" frame="$this" undo="true" enabled="false"/>
+					<Action type="SetProperty" frame="$this" undo="true" visible="false"/>
 				</State>
 				<State name="UseMod">
 				</State>
 			</StateGroup>
 		</Frame>
 
-		<!-- Apply Template for side and then player -->
-		<!-- FIX: base template instead of side's template as the template is only applyable once... transitioning between them causes an ininite anchor cycle bug -->
-		<Frame type="ToggleControl" name="PlayerIntro2" template="_PlayerIntroPanel/PlayerIntroPanelTemplate_Base">
+		<!-- Apply Template for player (there are 2 versions, because transitioning between them has anchor issues I cannot resolve) -->
+		<Frame type="ToggleControl" name="PlayerIntro2_L" template="_PlayerIntroPanel/PlayerIntroPanelTemplate_L">
 			<LinkedModalFrame val="$parent/PlayerIntro1"/>
+			<LinkedModalFrame val="$parent/PlayerIntro2_R"/>
 			<LinkedModalFrame val="$parent/PlayerIntro3"/>
 			<LinkedModalFrame val="$parent/PlayerIntro4"/>
 			<LinkedModalFrame val="$parent/FullscreenUpperContainer/PlayerStatPanel/StatResourcesFrame"/>
@@ -767,11 +772,13 @@
             <LinkedModalFrame val="$parent/FullscreenUpperContainer/GraphContainer/IncomeGraph"/>
             <LinkedModalFrame val="$parent/FullscreenUpperContainer/GraphContainer/ArmySizeGraph"/>
 			<Shortcut val="#Toggle Player Intro - Hotkey 2"/>
+			<Enabled val="false"/>
 			
 			<StateGroup name="PlayerNameFromModState">
 				<DefaultState val="UseMod"/>
 				<State name="NoLogosModData">
 					<When type="Property" frame="$this" enabled="true"/>
+					<When type="AnimationState" frame="$GameUI" operator="NotEqual" VersusMode="None"/>
 					<When type="Property" frame="PlayerIntroPlayerFrame/PortraitCutout/LogoImage" texture=""/>
 					<When type="Property" frame="PlayerIntroPlayerFrame/Flag/LogoImage" texture=""/>
 					<When type="Property" frame="PlayerIntroPlayerFrame/PlayerName/LogoLabel" text=""/>
@@ -782,13 +789,61 @@
 					<When type="Property" frame="PlayerIntroPlayerFrame/FlavorText/LogoLabel" text=""/>
 					<When type="Property" frame="PlayerIntroPlayerFrame/RankValue/LogoLabel" text=""/>
 					<When type="Property" frame="PlayerIntroPlayerFrame/ScoreValue/LogoLabel" text=""/>
-					<Action type="SetProperty" frame="$this" undo="false" enabled="false"/>
-					<Action type="SetProperty" frame="$this" undo="false" visible="false"/>
+					<Action type="SetProperty" frame="$this" undo="true" enabled="false"/>
+					<Action type="SetProperty" frame="$this" undo="true" visible="false"/>
 				</State>
 				<State name="noPlayerSlotNone">
 					<When type="AnimationState" frame="$GameUI" VersusMode="None"/>
-					<Action type="SetProperty" frame="$this" undo="false" enabled="false"/>
-					<Action type="SetProperty" frame="$this" undo="false" visible="false"/>
+					<Action type="SetProperty" frame="$this" undo="true" enabled="false"/>
+					<Action type="SetProperty" frame="$this" undo="true" visible="false"/>
+				</State>
+				<State name="UseMod">
+				</State>
+			</StateGroup>
+		</Frame>
+		<Frame type="ToggleControl" name="PlayerIntro2_R" template="_PlayerIntroPanel/PlayerIntroPanelTemplate_R">
+			<LinkedModalFrame val="$parent/PlayerIntro1"/>
+			<LinkedModalFrame val="$parent/PlayerIntro2_L"/>
+			<LinkedModalFrame val="$parent/PlayerIntro3"/>
+			<LinkedModalFrame val="$parent/PlayerIntro4"/>
+			<LinkedModalFrame val="$parent/FullscreenUpperContainer/PlayerStatPanel/StatResourcesFrame"/>
+			<LinkedModalFrame val="$parent/FullscreenUpperContainer/PlayerStatPanel/StatResourcesGasFrame"/>
+			<LinkedModalFrame val="$parent/FullscreenUpperContainer/PlayerStatPanel/StatArmySupplyFrame"/>
+			<LinkedModalFrame val="$parent/FullscreenUpperContainer/PlayerStatPanel/StatWorkerSupplyFrame"/>
+			<LinkedModalFrame val="$parent/FullscreenUpperContainer/PlayerStatPanel/StatArmyLostFrame"/>
+			<LinkedModalFrame val="$parent/FullscreenUpperContainer/PlayerStatPanel/StatWorkerLostFrame"/>
+			<LinkedModalFrame val="$parent/FullscreenUpperContainer/PlayerStatPanel/StatAPMFrame"/>
+			<LinkedModalFrame val="$parent/FullscreenUpperContainer/PlayerStatPanel/StatCPMFrame"/>
+			<LinkedModalFrame val="$parent/FullscreenUpperContainer/PlayerStatPanel/TopStatContainer"/>
+			<LinkedModalFrame val="$parent/FullscreenUpperContainer/PlayerStatPanel/BottomStatContainer"/>
+			<LinkedModalFrame val="$parent/FullscreenUpperContainer/UnitsLostPanel/UnitsLostToggleControl"/>
+            <LinkedModalFrame val="$parent/FullscreenUpperContainer/GraphContainer/IncomeGraph"/>
+            <LinkedModalFrame val="$parent/FullscreenUpperContainer/GraphContainer/ArmySizeGraph"/>
+			<Shortcut val="#Toggle Player Intro - Hotkey 2"/>
+			<Enabled val="false"/>
+			
+			<StateGroup name="PlayerNameFromModState">
+				<DefaultState val="UseMod"/>
+				<State name="NoLogosModData">
+					<When type="Property" frame="$this" enabled="true"/>
+					<When type="AnimationState" frame="$GameUI" operator="NotEqual" VersusMode="None"/>
+					<When type="Property" frame="PlayerIntroPlayerFrame/PortraitCutout/LogoImage" texture=""/>
+					<When type="Property" frame="PlayerIntroPlayerFrame/Flag/LogoImage" texture=""/>
+					<When type="Property" frame="PlayerIntroPlayerFrame/PlayerName/LogoLabel" text=""/>
+					<When type="Property" frame="PlayerIntroPlayerFrame/PlayerRealName/LogoLabel" text=""/>
+					<When type="Property" frame="PlayerIntroPlayerFrame/TeamTextLogo/LogoImage" texture=""/>
+					<When type="Property" frame="PlayerIntroPlayerFrame/Trophies/LogoImage" texture=""/>
+					<When type="Property" frame="PlayerIntroPlayerFrame/Sponsors/LogoImage" texture=""/>
+					<When type="Property" frame="PlayerIntroPlayerFrame/FlavorText/LogoLabel" text=""/>
+					<When type="Property" frame="PlayerIntroPlayerFrame/RankValue/LogoLabel" text=""/>
+					<When type="Property" frame="PlayerIntroPlayerFrame/ScoreValue/LogoLabel" text=""/>
+					<Action type="SetProperty" frame="$this" undo="true" enabled="false"/>
+					<Action type="SetProperty" frame="$this" undo="true" visible="false"/>
+				</State>
+				<State name="noPlayerSlotNone">
+					<When type="AnimationState" frame="$GameUI" VersusMode="None"/>
+					<Action type="SetProperty" frame="$this" undo="true" enabled="false"/>
+					<Action type="SetProperty" frame="$this" undo="true" visible="false"/>
 				</State>
 				<State name="UseMod">
 				</State>
@@ -798,7 +853,8 @@
 		<!-- Apply Template for player -->
 		<Frame type="ToggleControl" name="PlayerIntro3" template="_PlayerIntroPanel/PlayerIntroPanelTemplate_R">
 			<LinkedModalFrame val="$parent/PlayerIntro1"/>
-			<LinkedModalFrame val="$parent/PlayerIntro2"/>
+			<LinkedModalFrame val="$parent/PlayerIntro2_L"/>
+			<LinkedModalFrame val="$parent/PlayerIntro2_R"/>
 			<LinkedModalFrame val="$parent/PlayerIntro4"/>
 			<LinkedModalFrame val="$parent/FullscreenUpperContainer/PlayerStatPanel/StatResourcesFrame"/>
 			<LinkedModalFrame val="$parent/FullscreenUpperContainer/PlayerStatPanel/StatResourcesGasFrame"/>
@@ -819,6 +875,10 @@
 				<DefaultState val="UseMod"/>
 				<State name="NoLogosModData">
 					<When type="Property" frame="$this" enabled="true"/>
+					<When type="AnimationState" frame="$GameUI" operator="NotEqual" VersusMode="None"/>
+					<When type="AnimationState" frame="$GameUI" operator="NotEqual" VersusMode="1v1"/>
+					<When type="AnimationState" frame="$GameUI" operator="NotEqual" VersusMode="3v3"/>
+					<When type="AnimationState" frame="$GameUI" operator="NotEqual" VersusMode="4v4"/>
 					<When type="Property" frame="PlayerIntroPlayerFrame/PortraitCutout/LogoImage" texture=""/>
 					<When type="Property" frame="PlayerIntroPlayerFrame/Flag/LogoImage" texture=""/>
 					<When type="Property" frame="PlayerIntroPlayerFrame/PlayerName/LogoLabel" text=""/>
@@ -829,28 +889,28 @@
 					<When type="Property" frame="PlayerIntroPlayerFrame/FlavorText/LogoLabel" text=""/>
 					<When type="Property" frame="PlayerIntroPlayerFrame/RankValue/LogoLabel" text=""/>
 					<When type="Property" frame="PlayerIntroPlayerFrame/ScoreValue/LogoLabel" text=""/>
-					<Action type="SetProperty" frame="$this" undo="false" enabled="false"/>
-					<Action type="SetProperty" frame="$this" undo="false" visible="false"/>
+					<Action type="SetProperty" frame="$this" undo="true" enabled="false"/>
+					<Action type="SetProperty" frame="$this" undo="true" visible="false"/>
 				</State>
 				<State name="noPlayerSlot1v1">
 					<When type="AnimationState" frame="$GameUI" VersusMode="1v1"/>
-					<Action type="SetProperty" frame="$this" undo="false" enabled="false"/>
-					<Action type="SetProperty" frame="$this" undo="false" visible="false"/>
+					<Action type="SetProperty" frame="$this" undo="true" enabled="false"/>
+					<Action type="SetProperty" frame="$this" undo="true" visible="false"/>
 				</State>
 				<State name="noPlayerSlot3v3">
 					<When type="AnimationState" frame="$GameUI" VersusMode="3v3"/>
-					<Action type="SetProperty" frame="$this" undo="false" enabled="false"/>
-					<Action type="SetProperty" frame="$this" undo="false" visible="false"/>
+					<Action type="SetProperty" frame="$this" undo="true" enabled="false"/>
+					<Action type="SetProperty" frame="$this" undo="true" visible="false"/>
 				</State>
 				<State name="noPlayerSlot4v4">
 					<When type="AnimationState" frame="$GameUI" VersusMode="4v4"/>
-					<Action type="SetProperty" frame="$this" undo="false" enabled="false"/>
-					<Action type="SetProperty" frame="$this" undo="false" visible="false"/>
+					<Action type="SetProperty" frame="$this" undo="true" enabled="false"/>
+					<Action type="SetProperty" frame="$this" undo="true" visible="false"/>
 				</State>
 				<State name="noPlayerSlotNone">
 					<When type="AnimationState" frame="$GameUI" VersusMode="None"/>
-					<Action type="SetProperty" frame="$this" undo="false" enabled="false"/>
-					<Action type="SetProperty" frame="$this" undo="false" visible="false"/>
+					<Action type="SetProperty" frame="$this" undo="true" enabled="false"/>
+					<Action type="SetProperty" frame="$this" undo="true" visible="false"/>
 				</State>
 				<State name="UseMod">
 				</State>
@@ -860,7 +920,8 @@
 		<!-- Apply Template for player -->
 		<Frame type="ToggleControl" name="PlayerIntro4" template="_PlayerIntroPanel/PlayerIntroPanelTemplate_R">
 			<LinkedModalFrame val="$parent/PlayerIntro1"/>
-			<LinkedModalFrame val="$parent/PlayerIntro2"/>
+			<LinkedModalFrame val="$parent/PlayerIntro2_L"/>
+			<LinkedModalFrame val="$parent/PlayerIntro2_R"/>
 			<LinkedModalFrame val="$parent/PlayerIntro3"/>
 			<LinkedModalFrame val="$parent/FullscreenUpperContainer/PlayerStatPanel/StatResourcesFrame"/>
 			<LinkedModalFrame val="$parent/FullscreenUpperContainer/PlayerStatPanel/StatResourcesGasFrame"/>
@@ -881,6 +942,10 @@
 				<DefaultState val="UseMod"/>
 				<State name="NoLogosModData">
 					<When type="Property" frame="$this" enabled="true"/>
+					<When type="AnimationState" frame="$GameUI" operator="NotEqual" VersusMode="None"/>
+					<When type="AnimationState" frame="$GameUI" operator="NotEqual" VersusMode="1v1"/>
+					<When type="AnimationState" frame="$GameUI" operator="NotEqual" VersusMode="3v3"/>
+					<When type="AnimationState" frame="$GameUI" operator="NotEqual" VersusMode="4v4"/>
 					<When type="Property" frame="PlayerIntroPlayerFrame/PortraitCutout/LogoImage" texture=""/>
 					<When type="Property" frame="PlayerIntroPlayerFrame/Flag/LogoImage" texture=""/>
 					<When type="Property" frame="PlayerIntroPlayerFrame/PlayerName/LogoLabel" text=""/>
@@ -891,28 +956,28 @@
 					<When type="Property" frame="PlayerIntroPlayerFrame/FlavorText/LogoLabel" text=""/>
 					<When type="Property" frame="PlayerIntroPlayerFrame/RankValue/LogoLabel" text=""/>
 					<When type="Property" frame="PlayerIntroPlayerFrame/ScoreValue/LogoLabel" text=""/>
-					<Action type="SetProperty" frame="$this" undo="false" enabled="false"/>
-					<Action type="SetProperty" frame="$this" undo="false" visible="false"/>
+					<Action type="SetProperty" frame="$this" undo="true" enabled="false"/>
+					<Action type="SetProperty" frame="$this" undo="true" visible="false"/>
 				</State>
 				<State name="noPlayerSlot1v1">
 					<When type="AnimationState" frame="$GameUI" VersusMode="1v1"/>
-					<Action type="SetProperty" frame="$this" undo="false" enabled="false"/>
-					<Action type="SetProperty" frame="$this" undo="false" visible="false"/>
+					<Action type="SetProperty" frame="$this" undo="true" enabled="false"/>
+					<Action type="SetProperty" frame="$this" undo="true" visible="false"/>
 				</State>
 				<State name="noPlayerSlot3v3">
 					<When type="AnimationState" frame="$GameUI" VersusMode="3v3"/>
-					<Action type="SetProperty" frame="$this" undo="false" enabled="false"/>
-					<Action type="SetProperty" frame="$this" undo="false" visible="false"/>
+					<Action type="SetProperty" frame="$this" undo="true" enabled="false"/>
+					<Action type="SetProperty" frame="$this" undo="true" visible="false"/>
 				</State>
 				<State name="noPlayerSlot4v4">
 					<When type="AnimationState" frame="$GameUI" VersusMode="4v4"/>
-					<Action type="SetProperty" frame="$this" undo="false" enabled="false"/>
-					<Action type="SetProperty" frame="$this" undo="false" visible="false"/>
+					<Action type="SetProperty" frame="$this" undo="true" enabled="false"/>
+					<Action type="SetProperty" frame="$this" undo="true" visible="false"/>
 				</State>
 				<State name="noPlayerSlotNone">
 					<When type="AnimationState" frame="$GameUI" VersusMode="None"/>
-					<Action type="SetProperty" frame="$this" undo="false" enabled="false"/>
-					<Action type="SetProperty" frame="$this" undo="false" visible="false"/>
+					<Action type="SetProperty" frame="$this" undo="true" enabled="false"/>
+					<Action type="SetProperty" frame="$this" undo="true" visible="false"/>
 				</State>
 				<State name="UseMod">
 				</State>
