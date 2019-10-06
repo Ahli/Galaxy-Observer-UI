@@ -797,10 +797,10 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				final var targetKeyValList = attrTarget.getKeyValues();
 				for (int i = 0; i < targetKeyValList.size(); i += 2) {
 					final String key = targetKeyValList.get(i);
-					if (key.equals()) {
-						edited = true;
-						break targetloop;
-					}
+//					if (key.equals()) {
+//						edited = true;
+//						break targetloop;
+//					}
 				}
 			}
 		}

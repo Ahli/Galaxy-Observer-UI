@@ -307,33 +307,38 @@ public class InterfaceBuilderApp extends Application {
 	 * 		app's main stage
 	 */
 	private void startReplayOrQuitOrShowError(final Stage primaryStage, final CommandLineParams params) {
-		if (params.isWasStartedWithParameters() && !anyErrorTrackerEncounteredError()) {
-			// start game, launch replay
-			attemptToRunGameWithReplay(params);
-			
-			// app started with params => potentially close itself
-			if (!params.isParamsOriginateFromExternalSource()) {
-				if (!params.isHasParamCompilePath()) {
-					Platform.runLater(() -> {
-						try {
-							// close after 5 seconds, if compiled all and no errors
-							final PauseTransition delay = new PauseTransition(Duration.seconds(5));
-							delay.setOnFinished(event -> primaryStage.close());
-							delay.play();
-						} catch (final Exception e) {
-							logger.fatal(FATAL_ERROR, e);
-						}
-					});
-				} else {
-					// close instantly, if only run or something else
-					Platform.runLater(() -> {
-						try {
-							primaryStage.close();
-						} catch (final Exception e) {
-							logger.fatal(FATAL_ERROR, e);
-						}
-					});
+		if (params.isWasStartedWithParameters()) {
+			if (!anyErrorTrackerEncounteredError()) {
+				// start game, launch replay
+				attemptToRunGameWithReplay(params);
+				
+				// app started with params => potentially close itself
+				if (!params.isParamsOriginateFromExternalSource()) {
+					if (!params.isHasParamCompilePath()) {
+						Platform.runLater(() -> {
+							try {
+								// close after 5 seconds, if compiled all and no errors
+								final PauseTransition delay = new PauseTransition(Duration.seconds(5));
+								delay.setOnFinished(event -> primaryStage.close());
+								delay.play();
+							} catch (final Exception e) {
+								logger.fatal(FATAL_ERROR, e);
+							}
+						});
+					} else {
+						// close instantly, if only run or something else
+						Platform.runLater(() -> {
+							try {
+								primaryStage.close();
+							} catch (final Exception e) {
+								logger.fatal(FATAL_ERROR, e);
+							}
+						});
+					}
 				}
+			} else {
+				// clear errors
+				clearErrorTrackers();
 			}
 		}
 		// allow client to exit
@@ -405,6 +410,17 @@ public class InterfaceBuilderApp extends Application {
 			logger.error("Failed to find any replay.");
 		}
 		printInfoLogMessageToGeneral("The game starts with a replay now...");
+	}
+	
+	/**
+	 * Clears the errors, so future build attempts can run.
+	 */
+	private void clearErrorTrackers() {
+		for (final ErrorTabController ctrl : errorTabControllers) {
+			if (ctrl.hasEncounteredError() && !ctrl.isErrorsDoNotPreventExit()) {
+				ctrl.clearError();
+			}
+		}
 	}
 	
 	/**
