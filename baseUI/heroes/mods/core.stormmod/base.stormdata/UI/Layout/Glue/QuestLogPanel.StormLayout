@@ -1,404 +1,406 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Desc>
-    <DescFlags val="Locked"/>
-
-    <Frame type="QuestLogPanel" name="QuestLogPanelTemplate">
-        <Anchor side="Top" relative="TopPadding" pos="Min" offset="0"/>
-        <Anchor side="Bottom" relative="$parent" pos="Max" offset="10"/>
-        <Width val="471"/>
-
-        <Frame type="Frame" name="TopPadding">
-            <Anchor side="Bottom" relative="$parent/SpecialEventsContainer" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="6"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-6"/>
-            <Height val="7"/>
-        </Frame>
-
-        <Frame type="Frame" name="SpecialEventsContainer">
-            <Anchor side="Top" relative="TitleFrame" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/QuestContainer" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="6"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-6"/>
-            <CollapseLayout val="True"/>
-            <Visible val="False"/>
-
-            <StateGroup name="SpecialEventState">
-                <DefaultState val="NoSpecialQuests"/>
-                <State name="HasSpecialQuests">
-                    <When type="Property" frame="QuestTileList" operator="NotEqual" DataCount="0"/>
-                    <Action type="SetProperty" frame="$this" visible="True"/>
-                    <Action type="SetProperty" frame="QuestTileList" visible="true"/>
-                    <Action type="SetProperty" frame="EventDialogOpener" visible="false"/>
-                </State>
-                <State name="ToyEventActive_NoQuestInProgress">
-                    <When type="Property" frame="QuestTileList" operator="Equal" DataCount="0"/>
-                    <When type="Property" frame="$QuestUI" CanOpenEventDialog="True"/>
-                    <When type="Property" frame="$QuestUI" ActiveSpecialEvent="ToyEvent"/>
-                    <Action type="SetProperty" frame="$this" visible="True"/>
-                    <Action type="SetProperty" frame="EventDialogOpener" visible="True"/>
-                    <Action type="SetProperty" frame="EventDialogOpener" height="116"/>
-                    <Action type="SetProperty" frame="EventDialogOpener/ToyFrame" visible="True"/>
-                    <Action type="SetProperty" frame="QuestTileList" visible="false"/>
-                </State>
-                <State name="MechaEventActive_NoQuestInProgress">
-                    <When type="Property" frame="QuestTileList" operator="Equal" DataCount="0"/>
-                    <When type="Property" frame="$QuestUI" ActiveSpecialEvent="MechaEvent"/>
-                    <When type="Property" frame="$QuestUI" CanOpenEventDialog="True"/>
-                    <When type="Property" frame="$QuestUI" IsQuestSelectable="True"/>
-                    <Action type="SetProperty" frame="$this" visible="True"/>
-                    <Action type="SetProperty" frame="EventDialogOpener" visible="True"/>
-                    <Action type="SetProperty" frame="EventDialogOpener" height="169"/>
-                    <Action type="SetProperty" frame="EventDialogOpener/MechaFrame" visible="True"/>
-                    <Action type="SetProperty" frame="QuestTileList" visible="false"/>
-                </State>
-
-                <State name="NoSpecialQuests">
-                    <Action type="SetProperty" frame="$this" visible="False"/>
-                </State>
-            </StateGroup>
-
-            <Frame type="Frame" name="TitleFrame">
-                <Height val="40"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                <Anchor side="Bottom" relative="$parent/EventDialogOpener" pos="Min" offset="0"/>
-
-                <Frame type="Label" name="TitleLabel">
-                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-                    <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
-
-                    <Style val="PopUpHeaderSmallGold"/>
-                    <Text val="@UI/QuestLogPanel/SpecialEventsSubHeader"/>
-                </Frame>
-            </Frame>
-
-            <Frame type="Frame" name="EventDialogOpener">
-                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                <Anchor side="Bottom" relative="$parent/QuestTileList" pos="Min" offset="0"/>
-                <Height val="0"/>
-                <CollapseLayout val="True"/>
-
-                <Frame type="Frame" name="ToyFrame">
-                    <Anchor relative="$parent"/>
-                    <Visible val="False"/>                    
-
-                    <Frame type="Image" name="BackgroundImage">
-                        <Anchor relative="$parent"/>
-                        <Texture val="@UI/storm_ui_quest_event_toy_questlog_bg_small"/>
-                    </Frame>
-
-                    <Frame type="Label" name="EventDialogText">
-                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                        <Anchor side="Top" relative="$parent" pos="Min" offset="15"/>
-                        <Style val="ToyEvent_QuestLogEmptyText"/>
-                        <Text val="@UI/QuestLine/Event/Toys/QuestLogEmptyText"/>
-                    </Frame>
-
-                    <Frame type="Button" name="OpenButton" template="StandardTemplates/OpenToyEventPopupButtonTemplate">
-                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                        <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Max" offset="-15"/>
-
-                        <Text val="@UI/QuestLine/Event/Toys/QuestLogButton"/>
-
-                        <Animation name="OpenEventPopup">
-                            <Event event="OnClick" action="Restart,Play"/>
-                            <Controller type="Event" frame="$QuestUI" end="Pause">
-                                <Key type="Event" time="0" event="OpenActiveEventDialog"/>
-                            </Controller>
-                        </Animation>
-                    </Frame>
-                </Frame>
-
-                <Frame type="Frame" name="MechaFrame">
-                    <Anchor relative="$parent"/>
-                    <Visible val="False"/>
-
-                    <Frame type="Image" name="BackgroundImage">
-                        <Anchor side="Top" relative="$parent" pos="Min" offset="-14"/>
-                        <Anchor side="Left" relative="$parent" pos="Min" offset="-15"/>
-                        <Anchor side="Right" relative="$parent" pos="Max" offset="13"/>
-                        <ScaleHeightToTexture val="True"/>
-                        <Texture val="@UI/Storm_UI_Quest_Event_Mecha_Questlog_BG"/>
-                    </Frame>
-
-                    <Frame type="Image" name="GridShimmer">
-                        <Anchor side="Top" relative="$parent/BackgroundImage" pos=".097" offset="0"/>
-                        <Anchor side="Bottom" relative="$parent/BackgroundImage" pos=".903" offset="0"/>
-                        <Anchor side="Left" relative="$parent/BackgroundImage" pos=".033" offset="0"/>
-                        <Anchor side="Right" relative="$parent/BackgroundImage" pos=".970" offset="0"/>
-                        <Alpha val="90"/>
-                        <BlendMode val="Add"/>
-
-                        <LayerCount val="2"/>
-
-                        <Texture val="@UI/Storm_UI_Quest_Event_Mecha_Questlog_BG_grid" layer="0"/>
-                        <AlphaLayer val="True" layer="0"/>
-                        <TextureType val="Normal" layer="0"/>
-
-                        <Texture val="@UI/Storm_UI_Quest_Event_Mecha_Questlog_BG_shimmer" layer="1"/>
-                        <TextureCoords top="0" left="0" bottom="1" right="1" layer="1"/>
-
-                        <Animation name="ExampleAnimation">
-                            <Event event="OnShown" action="Reset,Play" frame="$parent"/>
-
-                            <Controller type="LayerUV" layer="1" side="Top" relative="False" sidelock="True" end="Loop" >
-                                <Key type="Curve" time="0" value="1" inout="Linear"/>
-                                <Key type="Curve" time="5" value="-1" inout="Linear"/>
-                            </Controller>
-
-                        </Animation>
-                    </Frame>
-
-                    <Frame type="Label" name="EventDialogText">
-                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                        <Anchor side="Top" relative="$parent" pos="Min" offset="15"/>
-                        <Style val="MechaEvent_QuestLogNotification"/>
-                        <Text val="@UI/QuestLine/Event/Mecha/QuestLogEmptyText"/>
-                    </Frame>
-
-                    <Frame type="Button" name="OpenButton" template="StandardTemplates/MechaEventPopupButtonTemplate">
-                        <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                        <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Max" offset="-34"/>
-
-                        <Text val="@UI/QuestLine/Event/Mecha/QuestLogButton"/>
-
-                        <Animation name="OpenEventPopup">
-                            <Event event="OnClick" action="Restart,Play"/>
-                            <Controller type="Event" frame="$QuestUI" end="Pause">
-                                <Key type="Event" time="0" event="OpenActiveEventDialog"/>
-                            </Controller>
-                        </Animation>
-                    </Frame>
-                </Frame>
-            </Frame>
-
-            <Frame type="TileList" name="QuestTileList">
-                <Anchor side="Top" relative="Item0" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                <Anchor side="Bottom" relative="$parent/RemainingTimeLabel" pos="Max" offset="0"/>
-
-                <Frame type="QuestLineTileListItem" name="Item0" template="QuestLineTileListItem/QuestLineTileListItemTemplate">
-                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                    <Anchor side="Bottom" relative="$parent/Item1" pos="Min" offset="0"/>
-                    <CollapseLayout val="True"/>
-                </Frame>
-
-                <Frame type="QuestLineTileListItem" name="Item1" template="QuestLineTileListItem/QuestLineTileListItemTemplate">
-                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                    <Anchor side="Bottom" relative="$parent/Item2" pos="Min" offset="0"/>
-                    <CollapseLayout val="True"/>
-                </Frame>
-
-                <Frame type="QuestLineTileListItem" name="Item2" template="QuestLineTileListItem/QuestLineTileListItemTemplate">
-                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-                    <CollapseLayout val="True"/>
-                </Frame>
-            </Frame>
-                
-            <Frame type="Label" name="RemainingTimeLabel">
-                <Anchor side="Bottom" relative="$parent/BorderImage2" pos="Min" offset="-4"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
-                
-                <CollapseLayout val="True"/>
-                <Style val="SpecialQuestPlayerRewardLabel"/>
-                <Text val="{$QuestUI/@RemainingTime}"/>
-
-                <StateGroup name="SpecialEvent">
-                    <State name="NoEvent">
-                        <When type="Property" frame="$QuestUI" ActiveSpecialEvent=""/>
-                        <Action type="SetProperty" Visible="false"/>
-                    </State>
-                    <State name="EchoesOfAlterac">
-                        <When type="Property" frame="$QuestUI" ActiveSpecialEvent="EchoesOfAlterac"/>
-                        <Action type="SetProperty" style="AlteracEventQuestLogItemTimeRemaining"/>
-                    </State>
-                    <State name="FallofKingsCrest">
-                        <When type="Property" frame="$QuestUI" ActiveSpecialEvent="FallofKingsCrest"/>
-                        <Action type="SetProperty" style="SpookyQuestLogItemTimeRemaining"/>
-                    </State>
-                    <State name="ToyEvent">
-                        <When type="Property" frame="$QuestUI" ActiveSpecialEvent="ToyEvent"/>
-                        <Action type="SetProperty" style="ToyEvent_QuestLogItemTimeRemaining"/>
-                    </State>
-                    <State name="MechaEvent">
-                        <When type="Property" frame="$QuestUI" ActiveSpecialEvent="MechaEvent"/>
-                        <Action type="SetProperty" style="MechaEvent_QuestLogItemTimeRemaining"/>
-                    </State>
-                    <State name="MobsterEvent">
-                        <When type="Property" frame="$QuestUI" ActiveSpecialEvent="MobsterEvent"/>
-                        <Action type="SetProperty" style="MobsterEvent_QuestDesc"/>
-                    </State>
-                </StateGroup>
-            </Frame>
-
-            <Frame type="Image" name="BorderImage2" template="StandardTemplates/HBorderImageTemplate">
-                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-            </Frame>
-        </Frame>
-
-        <Frame type="Frame" name="QuestContainer">
-            <Anchor side="Top" relative="TitleFrame" pos="Min" offset="0"/>
-            <Anchor side="Bottom" relative="$parent/QuestContainerShim" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="6"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-6"/>
-
-            <Frame type="Frame" name="TitleFrame">
-                <Height val="40"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                <Anchor side="Bottom" relative="$parent/QuestLockedFrame" pos="Min" offset="0"/>
-
-                <Frame type="Label" name="TitleLabel">
-                    <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-                    <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
-                    <Anchor side="Left" relative="$parent" pos="Min" offset="15"/>
-
-                    <Style val="PopUpHeaderSmall"/>
-                    <Text val="@UI/QuestLogPanel/QuestSubHeader"/>
-                </Frame>
-            </Frame>
-
-            <Animation name="QuestLockedVisibility">
-                <Event event="QuestsUnavailable" action="DirectionReverse,Play" frame="QuestTileList"/>
-                <Event event="QuestsAvailable" action="DirectionForward,Play" frame="QuestTileList"/>
-                <Controller type="Visibility" end="Pause" frame="QuestTileList">
-                    <Key type="Bool" time="0" value="false"/>
-                    <Key type="Bool" time="0.01" value="true"/>
-                </Controller>
-                <Controller type="Visibility" end="Pause" frame="QuestLockedFrame">
-                    <Key type="Bool" time="0" value="true"/>
-                    <Key type="Bool" time="0.01" value="false"/>
-                </Controller>
-            </Animation>
-
-            <Frame type="Label" name="QuestLockedFrame">
-                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                <Anchor side="Bottom" relative="$parent/QuestTileList" pos="Min" offset="0"/>
-                <Anchor side="Top" relative="QuestLockedLabel" pos="Min" offset="-22"/>
-                <CollapseLayout val="True"/>
-
-                <Frame type="Image" name="BorderImage1" template="StandardTemplates/HBorderImageTemplate">
-                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
-                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                </Frame>
-
-                <Frame type="Label" name="QuestLockedLabel">
-                    <Anchor side="Left" relative="$parent" pos="Min" offset="23"/>
-                    <Anchor side="Right" relative="$parent" pos="Max" offset="-23"/>
-                    <Anchor side="Bottom" relative="$parent/$parent" pos="Max" offset="-20"/>
-                    <Style val="QuestProgressDescription"/>
-                </Frame>
-            </Frame>
-
-            <Frame type="TileList" name="QuestTileList">
-                <Anchor side="Top" relative="Item0" pos="Min" offset="0"/>
-                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-                <CollapseLayout val="True"/>
-
-                <Frame type="QuestTileListItem" name="Item0" template="QuestTileListItem/QuestTileListItemTemplate">
-                    <Anchor side="Bottom" relative="$parent/Item1" pos="Min" offset="0"/>
-                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-
-                    <Frame type="Frame" name="NewQuestIntro">
-                        <Animation name="NewQuest">
-                            <Event event="NewQuest" action="Play" frame="$parent"/>
-                            <Controller type="Event" end="Stop" frame="$parent">
-                                <Key type="Event" time="0" event="Intro"/>
-                            </Controller>
-                        </Animation>
-                    </Frame>
-                </Frame>
-
-                <Frame type="QuestTileListItem" name="Item1" template="QuestTileListItem/QuestTileListItemTemplate">
-                    <Anchor side="Bottom" relative="$parent/Item2" pos="Min" offset="0"/>
-                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-
-                    <Frame type="Frame" name="NewQuestIntro">
-                        <Animation name="NewQuest">
-                            <Event event="NewQuest" action="Play" frame="$parent"/>
-                            <Controller type="Event" end="Stop" frame="$parent">
-                                <Key type="Event" time="0.1" event="Intro"/>
-                            </Controller>
-                        </Animation>
-                    </Frame>
-                </Frame>
-
-                <Frame type="QuestTileListItem" name="Item2" template="QuestTileListItem/QuestTileListItemTemplate">
-                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-                    <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-                    <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-
-                    <Frame type="Frame" name="NewQuestIntro">
-                        <Animation name="NewQuest">
-                            <Event event="NewQuest" action="Play" frame="$parent"/>
-                            <Controller type="Event" end="Stop" frame="$parent">
-                                <Key type="Event" time="0.2" event="Intro"/>
-                            </Controller>
-                        </Animation>
-                    </Frame>
-
-                </Frame>
-            </Frame>
-        </Frame>
-
-        <Frame type="Frame" name="QuestContainerShim">
-            <Anchor side="Bottom" relative="$parent/RewardMapFrame" pos="Min" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-            <Height val="10"/>
-            <CollapseLayout val="true"/>
-            <Visible val="false"/>
-        </Frame>
-
-        <StateGroup name="PlayerProgressionState">
-            <State name="ShowRewardMap">
-                <When type="Property" PlayerProgressionState="ShowRewardMap"/>
-            </State>
-            <State name="Hide">
-                <When type="Property" PlayerProgressionState="Hide"/>
-                <Action type="SetProperty" frame="QuestContainerShim" visible="true"/>
-            </State>
-        </StateGroup>
-
-        <Frame type="RewardMapFrame" name="RewardMapFrame" template="RewardMapFrame/RewardMapFrameTemplate">
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
-            <Anchor side="Left" relative="$parent" pos="Min" offset="4"/>
-            <Anchor side="Right" relative="$parent" pos="Max" offset="-4"/>
-            <CollapseLayout val="true"/>
-            <Visible val="false"/>
-        </Frame>
-
-        <Frame type="Image" name="TailImageFrame">
-            <Anchor side="Left" relative="$parent" pos="Mid" offset="52"/>
-            <Anchor side="Right" relative="$parent" pos="Mid" offset="52"/>
-            <Anchor side="Bottom" relative="$parent" pos="Max" offset="20"/>
-            <Texture val="@UI/Storm_UI_Generic_SmallPanelArrow_Small"/>
-            <Unclipped val="True"/>
-        </Frame>
-
-        <StateGroup name="ToggleRewardMap">
-            <State name="ShowRewardMap">
-                <When type="StateGroup" PlayerProgressionState="ShowRewardMap"/>
-                <Action type="SetProperty" frame="RewardMapFrame" visible="true"/>
-            </State>
-        </StateGroup>
+  <DescFlags val="Locked" />
+  <Frame type="QuestLogPanel" name="QuestLogPanelTemplate">
+    <Anchor side="Top" relative="TopPadding" pos="Min" offset="0" />
+    <Anchor side="Bottom" relative="$parent" pos="Max" offset="10" />
+    <Width val="471" />
+    <Frame type="Frame" name="TopPadding">
+      <Anchor side="Bottom" relative="$parent/SpecialEventsContainer" pos="Min" offset="0" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="6" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="-6" />
+      <Height val="7" />
     </Frame>
+    <Frame type="Frame" name="SpecialEventsContainer">
+      <Anchor side="Top" relative="TitleFrame" pos="Min" offset="0" />
+      <Anchor side="Bottom" relative="$parent/QuestContainer" pos="Min" offset="0" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="6" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="-6" />
+      <CollapseLayout val="True" />
+      <Visible val="False" />
+      <StateGroup name="SpecialEventState">
+        <DefaultState val="NoSpecialQuests" />
+        <State name="HasSpecialQuests">
+          <When type="Property" frame="QuestTileList" operator="NotEqual" DataCount="0" />
+          <Action type="SetProperty" frame="$this" visible="True" />
+          <Action type="SetProperty" frame="QuestTileList" visible="true" />
+          <Action type="SetProperty" frame="EventDialogOpener" visible="false" />
+        </State>
+        <State name="ToyEventActive_NoQuestInProgress">
+          <When type="Property" frame="QuestTileList" operator="Equal" DataCount="0" />
+          <When type="Property" frame="$QuestUI" CanOpenEventDialog="True" />
+          <When type="Property" frame="$QuestUI" ActiveSpecialEvent="ToyEvent" />
+          <Action type="SetProperty" frame="$this" visible="True" />
+          <Action type="SetProperty" frame="EventDialogOpener" visible="True" />
+          <Action type="SetProperty" frame="EventDialogOpener" height="116" />
+          <Action type="SetProperty" frame="EventDialogOpener/ToyFrame" visible="True" />
+          <Action type="SetProperty" frame="QuestTileList" visible="false" />
+        </State>
+        <State name="MechaEventActive_NoQuestInProgress">
+          <When type="Property" frame="QuestTileList" operator="Equal" DataCount="0" />
+          <When type="Property" frame="$QuestUI" ActiveSpecialEvent="MechaEvent" />
+          <When type="Property" frame="$QuestUI" CanOpenEventDialog="True" />
+          <When type="Property" frame="$QuestUI" IsQuestSelectable="True" />
+          <Action type="SetProperty" frame="$this" visible="True" />
+          <Action type="SetProperty" frame="EventDialogOpener" visible="True" />
+          <Action type="SetProperty" frame="EventDialogOpener" height="169" />
+          <Action type="SetProperty" frame="EventDialogOpener/MechaFrame" visible="True" />
+          <Action type="SetProperty" frame="QuestTileList" visible="false" />
+        </State>
+        <State name="MobsterEventActive_NoQuestInProgress">
+          <When type="Property" frame="QuestTileList" operator="Equal" DataCount="0" />
+          <When type="Property" frame="$QuestUI" ActiveSpecialEvent="MobsterEvent" />
+          <When type="Property" frame="$QuestUI" CanOpenEventDialog="True" />
+          <Action type="SetProperty" frame="$this" visible="True" />
+          <Action type="SetProperty" frame="EventDialogOpener" visible="True" />
+          <Action type="SetProperty" frame="EventDialogOpener" height="148" />
+          <Action type="SetProperty" frame="EventDialogOpener/MobsterFrame" visible="True" />
+          <Action type="SetProperty" frame="QuestTileList" visible="false" />
+        </State>
+        <State name="NoSpecialQuests">
+          <Action type="SetProperty" frame="$this" visible="False" />
+        </State>
+      </StateGroup>
+      <Frame type="Frame" name="TitleFrame">
+        <Height val="40" />
+        <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+        <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+        <Anchor side="Bottom" relative="$parent/EventDialogOpener" pos="Min" offset="0" />
+        <Frame type="Label" name="TitleLabel">
+          <Anchor side="Top" relative="$parent" pos="Mid" offset="0" />
+          <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0" />
+          <Anchor side="Left" relative="$parent" pos="Min" offset="15" />
+          <Style val="PopUpHeaderSmallGold" />
+          <Text val="@UI/QuestLogPanel/SpecialEventsSubHeader" />
+        </Frame>
+      </Frame>
+      <Frame type="Frame" name="EventDialogOpener">
+        <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+        <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+        <Anchor side="Bottom" relative="$parent/QuestTileList" pos="Min" offset="0" />
+        <Height val="0" />
+        <CollapseLayout val="True" />
+        <Frame type="Frame" name="ToyFrame">
+          <Anchor relative="$parent" />
+          <Visible val="False" />
+          <Frame type="Image" name="BackgroundImage">
+            <Anchor relative="$parent" />
+            <Texture val="@UI/storm_ui_quest_event_toy_questlog_bg_small" />
+          </Frame>
+          <Frame type="Label" name="EventDialogText">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+            <Anchor side="Top" relative="$parent" pos="Min" offset="15" />
+            <Style val="ToyEvent_QuestLogEmptyText" />
+            <Text val="@UI/QuestLine/Event/Toys/QuestLogEmptyText" />
+          </Frame>
+          <Frame type="Button" name="OpenButton" template="StandardTemplates/OpenToyEventPopupButtonTemplate">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+            <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Max" offset="-15" />
+            <Text val="@UI/QuestLine/Event/Toys/QuestLogButton" />
+            <Animation name="OpenEventPopup">
+              <Event event="OnClick" action="Restart,Play" />
+              <Controller type="Event" frame="$QuestUI" end="Pause">
+                <Key type="Event" time="0" event="OpenActiveEventDialog" />
+              </Controller>
+            </Animation>
+          </Frame>
+        </Frame>
+        <Frame type="Frame" name="MechaFrame">
+          <Anchor relative="$parent" />
+          <Visible val="False" />
+          <Frame type="Image" name="BackgroundImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="-14" />
+            <Anchor side="Left" relative="$parent" pos="Min" offset="-15" />
+            <Anchor side="Right" relative="$parent" pos="Max" offset="13" />
+            <ScaleHeightToTexture val="True" />
+            <Texture val="@UI/Storm_UI_Quest_Event_Mecha_Questlog_BG" />
+          </Frame>
+          <Frame type="Image" name="GridShimmer">
+            <Anchor side="Top" relative="$parent/BackgroundImage" pos=".097" offset="0" />
+            <Anchor side="Bottom" relative="$parent/BackgroundImage" pos=".903" offset="0" />
+            <Anchor side="Left" relative="$parent/BackgroundImage" pos=".033" offset="0" />
+            <Anchor side="Right" relative="$parent/BackgroundImage" pos=".970" offset="0" />
+            <Alpha val="90" />
+            <BlendMode val="Add" />
+            <LayerCount val="2" />
+            <Texture val="@UI/Storm_UI_Quest_Event_Mecha_Questlog_BG_grid" layer="0" />
+            <AlphaLayer val="True" layer="0" />
+            <TextureType val="Normal" layer="0" />
+            <Texture val="@UI/Storm_UI_Quest_Event_Mecha_Questlog_BG_shimmer" layer="1" />
+            <TextureCoords top="0" left="0" bottom="1" right="1" layer="1" />
+            <Animation name="ExampleAnimation">
+              <Event event="OnShown" action="Reset,Play" frame="$parent" />
+              <Controller type="LayerUV" layer="1" side="Top" relative="False" sidelock="True" end="Loop">
+                <Key type="Curve" time="0" value="1" inout="Linear" />
+                <Key type="Curve" time="5" value="-1" inout="Linear" />
+              </Controller>
+            </Animation>
+          </Frame>
+          <Frame type="Label" name="EventDialogText">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+            <Anchor side="Top" relative="$parent" pos="Min" offset="15" />
+            <Style val="MechaEvent_QuestLogNotification" />
+            <Text val="@UI/QuestLine/Event/Mecha/QuestLogEmptyText" />
+          </Frame>
+          <Frame type="Button" name="OpenButton" template="StandardTemplates/MechaEventPopupButtonTemplate">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+            <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Max" offset="-34" />
+            <Text val="@UI/QuestLine/Event/Mecha/QuestLogButton" />
+            <Animation name="OpenEventPopup">
+              <Event event="OnClick" action="Restart,Play" />
+              <Controller type="Event" frame="$QuestUI" end="Pause">
+                <Key type="Event" time="0" event="OpenActiveEventDialog" />
+              </Controller>
+            </Animation>
+          </Frame>
+        </Frame>
+        <Frame type="Frame" name="MobsterFrame">
+          <Anchor relative="$parent" />
+          <Visible val="False" />
+          <Frame type="Image" name="BackgroundImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+            <ScaleHeightToTexture val="True" />
+            <Unclipped val="True" />
+            <Texture val="@UI/Storm_UI_Quest_Event_Mobster19_None_BG" />
+          </Frame>
+          <Frame type="Label" name="CooldownNotificationLabel">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="20" />
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-54" />
+            <Anchor side="Left" relative="$parent" pos="Min" offset="40" />
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-40" />
+            <Style val="MobsterEvent_CooldownNotification" />
+            <Visible val="False" />
+          </Frame>
+          <Frame type="Button" name="OpenButton" template="MobsterEventQuestTemplates/MobsterEventPopupOpenButton">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+            <Anchor side="Top" relative="$parent" pos="Min" offset="58" />
+            <Anchor side="Bottom" relative="$parent" pos="Min" offset="58" />
+            <Text val="{$QuestUI/@DialogButtonText}" />
+            <Tooltip val="{$QuestUI/@QuestSelectTooltip}" />
+            <Animation name="OpenEventPopup">
+              <Event event="OnClick" action="Restart,Play" />
+              <Controller type="Event" frame="$QuestUI" end="Pause">
+                <Key type="Event" time="0" event="OpenActiveEventDialog" />
+              </Controller>
+            </Animation>
+          </Frame>
+          <Frame type="Image" name="OverlayImage">
+            <Anchor relative="$parent" />
+            <Unclipped val="True" />
+            <Texture val="@UI/Storm_UI_Quest_Event_Mobster19_None_Vintage_Overlay" />
+          </Frame>
+          <StateGroup name="IsQuestSelectableStates">
+            <State name="NotSelectable">
+              <When type="Property" frame="$QuestUI" IsQuestSelectable="False" />
+              <Action type="SetProperty" frame="OpenButton" Visible="false" />
+              <Action type="SetProperty" frame="CooldownNotificationLabel" Visible="true" />
+              <Action type="SetProperty" frame="CooldownNotificationLabel" Text="{$EventPopupOpenButton/@Tooltip}" />
+            </State>
+            <DefaultState val="Selectable" />
+            <State name="Selectable" />
+          </StateGroup>
+        </Frame>
+      </Frame>
+      <Frame type="TileList" name="QuestTileList">
+        <Anchor side="Top" relative="Item0" pos="Min" offset="0" />
+        <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+        <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+        <Anchor side="Bottom" relative="$parent/RemainingTimeLabel" pos="Max" offset="0" />
+        <Frame type="QuestLineTileListItem" name="Item0" template="QuestLineTileListItem/QuestLineTileListItemTemplate">
+          <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+          <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+          <Anchor side="Bottom" relative="$parent/Item1" pos="Min" offset="0" />
+          <CollapseLayout val="True" />
+        </Frame>
+        <Frame type="QuestLineTileListItem" name="Item1" template="QuestLineTileListItem/QuestLineTileListItemTemplate">
+          <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+          <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+          <Anchor side="Bottom" relative="$parent/Item2" pos="Min" offset="0" />
+          <CollapseLayout val="True" />
+        </Frame>
+        <Frame type="QuestLineTileListItem" name="Item2" template="QuestLineTileListItem/QuestLineTileListItemTemplate">
+          <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+          <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+          <Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
+          <CollapseLayout val="True" />
+        </Frame>
+      </Frame>
+      <Frame type="Label" name="RemainingTimeLabel">
+        <Anchor side="Bottom" relative="$parent/BorderImage2" pos="Min" offset="-4" />
+        <Anchor side="Right" relative="$parent" pos="Max" offset="-10" />
+        <CollapseLayout val="True" />
+        <Style val="SpecialQuestPlayerRewardLabel" />
+        <Text val="{$QuestUI/@RemainingTime}" />
+        <StateGroup name="SpecialEvent">
+          <State name="NoEvent">
+            <When type="Property" frame="$QuestUI" ActiveSpecialEvent="" />
+            <Action type="SetProperty" Visible="false" />
+          </State>
+          <State name="EchoesOfAlterac">
+            <When type="Property" frame="$QuestUI" ActiveSpecialEvent="EchoesOfAlterac" />
+            <Action type="SetProperty" style="AlteracEventQuestLogItemTimeRemaining" />
+          </State>
+          <State name="FallofKingsCrest">
+            <When type="Property" frame="$QuestUI" ActiveSpecialEvent="FallofKingsCrest" />
+            <Action type="SetProperty" style="SpookyQuestLogItemTimeRemaining" />
+          </State>
+          <State name="ToyEvent">
+            <When type="Property" frame="$QuestUI" ActiveSpecialEvent="ToyEvent" />
+            <Action type="SetProperty" style="ToyEvent_QuestLogItemTimeRemaining" />
+          </State>
+          <State name="MechaEvent">
+            <When type="Property" frame="$QuestUI" ActiveSpecialEvent="MechaEvent" />
+            <Action type="SetProperty" style="MechaEvent_QuestLogItemTimeRemaining" />
+          </State>
+          <State name="MobsterEvent">
+            <When type="Property" frame="$QuestUI" ActiveSpecialEvent="MobsterEvent" />
+            <Action type="SetProperty" style="MobsterEvent_QuestDesc" />
+          </State>
+        </StateGroup>
+      </Frame>
+      <Frame type="Image" name="BorderImage2" template="StandardTemplates/HBorderImageTemplate">
+        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
+        <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+        <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+      </Frame>
+    </Frame>
+    <Frame type="Frame" name="QuestContainer">
+      <Anchor side="Top" relative="TitleFrame" pos="Min" offset="0" />
+      <Anchor side="Bottom" relative="$parent/QuestContainerShim" pos="Min" offset="0" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="6" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="-6" />
+      <Frame type="Frame" name="TitleFrame">
+        <Height val="40" />
+        <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+        <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+        <Anchor side="Bottom" relative="$parent/QuestLockedFrame" pos="Min" offset="0" />
+        <Frame type="Label" name="TitleLabel">
+          <Anchor side="Top" relative="$parent" pos="Mid" offset="0" />
+          <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0" />
+          <Anchor side="Left" relative="$parent" pos="Min" offset="15" />
+          <Style val="PopUpHeaderSmall" />
+          <Text val="@UI/QuestLogPanel/QuestSubHeader" />
+        </Frame>
+      </Frame>
+      <Animation name="QuestLockedVisibility">
+        <Event event="QuestsUnavailable" action="DirectionReverse,Play" frame="QuestTileList" />
+        <Event event="QuestsAvailable" action="DirectionForward,Play" frame="QuestTileList" />
+        <Controller type="Visibility" end="Pause" frame="QuestTileList">
+          <Key type="Bool" time="0" value="false" />
+          <Key type="Bool" time="0.01" value="true" />
+        </Controller>
+        <Controller type="Visibility" end="Pause" frame="QuestLockedFrame">
+          <Key type="Bool" time="0" value="true" />
+          <Key type="Bool" time="0.01" value="false" />
+        </Controller>
+      </Animation>
+      <Frame type="Label" name="QuestLockedFrame">
+        <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+        <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+        <Anchor side="Bottom" relative="$parent/QuestTileList" pos="Min" offset="0" />
+        <Anchor side="Top" relative="QuestLockedLabel" pos="Min" offset="-22" />
+        <CollapseLayout val="True" />
+        <Frame type="Image" name="BorderImage1" template="StandardTemplates/HBorderImageTemplate">
+          <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
+          <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+          <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+        </Frame>
+        <Frame type="Label" name="QuestLockedLabel">
+          <Anchor side="Left" relative="$parent" pos="Min" offset="23" />
+          <Anchor side="Right" relative="$parent" pos="Max" offset="-23" />
+          <Anchor side="Bottom" relative="$parent/$parent" pos="Max" offset="-20" />
+          <Style val="QuestProgressDescription" />
+        </Frame>
+      </Frame>
+      <Frame type="TileList" name="QuestTileList">
+        <Anchor side="Top" relative="Item0" pos="Min" offset="0" />
+        <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+        <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
+        <CollapseLayout val="True" />
+        <Frame type="QuestTileListItem" name="Item0" template="QuestTileListItem/QuestTileListItemTemplate">
+          <Anchor side="Bottom" relative="$parent/Item1" pos="Min" offset="0" />
+          <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+          <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+          <Frame type="Frame" name="NewQuestIntro">
+            <Animation name="NewQuest">
+              <Event event="NewQuest" action="Play" frame="$parent" />
+              <Controller type="Event" end="Stop" frame="$parent">
+                <Key type="Event" time="0" event="Intro" />
+              </Controller>
+            </Animation>
+          </Frame>
+        </Frame>
+        <Frame type="QuestTileListItem" name="Item1" template="QuestTileListItem/QuestTileListItemTemplate">
+          <Anchor side="Bottom" relative="$parent/Item2" pos="Min" offset="0" />
+          <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+          <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+          <Frame type="Frame" name="NewQuestIntro">
+            <Animation name="NewQuest">
+              <Event event="NewQuest" action="Play" frame="$parent" />
+              <Controller type="Event" end="Stop" frame="$parent">
+                <Key type="Event" time="0.1" event="Intro" />
+              </Controller>
+            </Animation>
+          </Frame>
+        </Frame>
+        <Frame type="QuestTileListItem" name="Item2" template="QuestTileListItem/QuestTileListItemTemplate">
+          <Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
+          <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+          <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+          <Frame type="Frame" name="NewQuestIntro">
+            <Animation name="NewQuest">
+              <Event event="NewQuest" action="Play" frame="$parent" />
+              <Controller type="Event" end="Stop" frame="$parent">
+                <Key type="Event" time="0.2" event="Intro" />
+              </Controller>
+            </Animation>
+          </Frame>
+        </Frame>
+      </Frame>
+    </Frame>
+    <Frame type="Frame" name="QuestContainerShim">
+      <Anchor side="Bottom" relative="$parent/RewardMapFrame" pos="Min" offset="0" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+      <Height val="10" />
+      <CollapseLayout val="true" />
+      <Visible val="false" />
+    </Frame>
+    <StateGroup name="PlayerProgressionState">
+      <State name="ShowRewardMap">
+        <When type="Property" PlayerProgressionState="ShowRewardMap" />
+      </State>
+      <State name="Hide">
+        <When type="Property" PlayerProgressionState="Hide" />
+        <Action type="SetProperty" frame="QuestContainerShim" visible="true" />
+      </State>
+    </StateGroup>
+    <Frame type="RewardMapFrame" name="RewardMapFrame" template="RewardMapFrame/RewardMapFrameTemplate">
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="4" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="-4" />
+      <CollapseLayout val="true" />
+      <Visible val="false" />
+    </Frame>
+    <Frame type="Image" name="TailImageFrame">
+      <Anchor side="Left" relative="$parent" pos="Mid" offset="52" />
+      <Anchor side="Right" relative="$parent" pos="Mid" offset="52" />
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="20" />
+      <Texture val="@UI/Storm_UI_Generic_SmallPanelArrow_Small" />
+      <Unclipped val="True" />
+    </Frame>
+    <StateGroup name="ToggleRewardMap">
+      <State name="ShowRewardMap">
+        <When type="StateGroup" PlayerProgressionState="ShowRewardMap" />
+        <Action type="SetProperty" frame="RewardMapFrame" visible="true" />
+      </State>
+    </StateGroup>
+  </Frame>
 </Desc>
