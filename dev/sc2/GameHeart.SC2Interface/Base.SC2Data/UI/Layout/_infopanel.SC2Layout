@@ -5,102 +5,252 @@
 	<Constant name="StatLabelTopOffset" val="9"/>
     <!-- created by Ahli (twitter: @AhliSC2) -->
 
+
+
+	<Frame type="UnitButton" name="UnitButtonTemplate">
+		<TooltipFrame val="ForcedTooltipUpdate"/>
+		
+		<!-- has problems with pages, can cause infinite anim loops -->
+		<StateGroup name="Vis">
+			<DefaultState val="No"/>
+			<State name="Yes">
+				<!-- unit button becomes visible -->
+				<When type="Property" visible="true"/>
+				<When type="Property" operator="NotEqual" unitTag="0#0"/>
+				<!--<When type="Property" frame="UnitStatusFrame0/ForceUpdateCommand" enabled="true"/> causes slots to increment by 1 each update -->
+				<!-- page frame is visible -->
+				<When type="Property" frame="$parent" visible="true"/>
+				<Action type="SendEvent" frame="$parent/$parent" event="FixBug"/>
+			</State>
+			<State name="No"/>
+		</StateGroup>
+		
+		<!-- has problems with pages, too 
+		<StateGroup name="AdditionalSelectionDetector">
+			<DefaultState val="No"/>
+			<State name="Yes">
+				<When type="Property" operator="NotEqual" unitTag="0#0"/>
+				<Action type="SendEvent" frame="$parent" event="FixBug"/>
+			</State>
+			<State name="No"/>
+		</StateGroup>-->
+		
+		<Frame type="UnitStatusFrame" name="UnitStatusFrame0">
+			<Anchor relative="$parent"/>
+			<UnitTag val="{$parent/@UnitTag}"/>
+			
+			<Frame type="DataRefFrame" name="PlayerColor">
+				<Anchor relative="$parent"/>
+				<Argument name="GameValue" val="PlayerColor"/>
+				<PlayerId val="{$parent/@ControlPlayerId}"/>
+			</Frame>
+			<!-- debug labels
+			<Frame type="Label" name="Label">
+				<Anchor relative="$parent"/>
+				<Text val="{$parent/$parent/@UnitTag}"/>
+				<Options val="ScaleToPreventTruncation"/>
+			</Frame>
+			<Frame type="Label" name="Label2">
+				<Anchor side="Top" relative="$parent" pos="33%" offset="0"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+				<Text val="{$parent/@UnitTag}"/>
+				<Options val="ScaleToPreventTruncation"/>
+			</Frame>
+			<Frame type="Label" name="Label3">
+				<Anchor side="Top" relative="$parent" pos="66%" offset="0"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+				<Text val="{$parent/@ControlPlayerId}"/>
+				<Options val="ScaleToPreventTruncation"/>
+			</Frame>
+			-->
+			<Frame type="Frame" name="ForceUpdateCommand">
+				<Anchor relative="$parent"/>
+				<Visible val="false"/>
+				<Enabled val="false"/>
+			</Frame>
+			<Animation name="Ahlimation">
+				<Event event="FixBug" action="Reset,Play" frame="$parent/$parent/$parent"/>
+				
+				<Controller type="Enabled" frame="ForceUpdateCommand" end="Pause">
+					<!-- time:
+						0 = freeze
+						0.001 = fine
+					-->
+					<Key type="Bool" time="0.001" value="true"/>
+					<Key type="Bool" time="0.001" value="false"/>
+				</Controller>
+			</Animation>
+			
+			<StateGroup name="SetUnitTagToForceUpdate">
+				<DefaultState val="other"/>
+				<State name="ForcingUpdate">
+					<When type="Property" frame="ForceUpdateCommand" enabled="true"/>
+					 <!-- forces update of UnitButton which updates bindings which updates ControlPlayerId, wtf?! -->
+					<Action type="SetProperty" frame="$parent" unitTag="0#0"/>
+				</State>
+				<State name="other"/>
+			</StateGroup>
+		</Frame>
+		
+		<Frame type="Image" name="CustomBorder">
+			<Anchor relative="$parent"/>
+			<RenderPriority val="402"/>
+			<Texture val="_Assets\Textures\bottompanel\btn-border-queue-trainingslot01.dds"/>
+			
+			<StateGroup name="Color">
+				<DefaultState val="other"/>
+				<State name="Red">
+					<When type="Property" frame="$parent/UnitStatusFrame0/PlayerColor" stringValue="255,180,20,30"/>
+					<Action type="SetProperty" color="#Red"/>
+				</State>
+				<State name="Blue">
+					<When type="Property" frame="$parent/UnitStatusFrame0/PlayerColor" stringValue="255,0,66,255"/>
+					<Action type="SetProperty" color="#Blue"/>
+				</State>
+				<State name="Teal">
+					<When type="Property" frame="$parent/UnitStatusFrame0/PlayerColor" stringValue="255,28,167,234"/>
+					<Action type="SetProperty" color="#Teal"/>
+				</State>
+				<State name="Purple">
+					<When type="Property" frame="$parent/UnitStatusFrame0/PlayerColor" stringValue="255,84,0,129"/>
+					<Action type="SetProperty" color="#Purple"/>
+				</State>
+				<State name="Yellow">
+					<When type="Property" frame="$parent/UnitStatusFrame0/PlayerColor" stringValue="255,235,225,41"/>
+					<Action type="SetProperty" color="#Yellow"/>
+				</State>
+				<State name="Orange">
+					<When type="Property" frame="$parent/UnitStatusFrame0/PlayerColor" stringValue="255,254,138,14"/>
+					<Action type="SetProperty" color="#Orange"/>
+				</State>
+				<State name="Green">
+					<When type="Property" frame="$parent/UnitStatusFrame0/PlayerColor" stringValue="255,22,128,0"/>
+					<Action type="SetProperty" color="#Green"/>
+				</State>
+				<State name="LightPink">
+					<When type="Property" frame="$parent/UnitStatusFrame0/PlayerColor" stringValue="255,204,166,252"/>
+					<Action type="SetProperty" color="#LightPink"/>
+				</State>
+				<State name="Violet">
+					<When type="Property" frame="$parent/UnitStatusFrame0/PlayerColor" stringValue="255,31,1,201"/>
+					<Action type="SetProperty" color="#Violet"/>
+				</State>
+				<State name="LightGrey">
+					<When type="Property" frame="$parent/UnitStatusFrame0/PlayerColor" stringValue="255,82,84,148"/>
+					<Action type="SetProperty" color="#LightGrey"/>
+				</State>
+				<State name="DarkGreen">
+					<When type="Property" frame="$parent/UnitStatusFrame0/PlayerColor" stringValue="255,16,98,70"/>
+					<Action type="SetProperty" color="#DarkGreen"/>
+				</State>
+				<State name="Brown">
+					<When type="Property" frame="$parent/UnitStatusFrame0/PlayerColor" stringValue="255,78,42,4"/>
+					<Action type="SetProperty" color="#Brown"/>
+				</State>
+				<State name="LightGreen">
+					<When type="Property" frame="$parent/UnitStatusFrame0/PlayerColor" stringValue="255,150,255,145"/>
+					<Action type="SetProperty" color="#LightGreen"/>
+				</State>
+				<State name="DarkGrey">
+					<When type="Property" frame="$parent/UnitStatusFrame0/PlayerColor" stringValue="255,35,35,35"/>
+					<Action type="SetProperty" color="#DarkGrey"/>
+				</State>
+				<State name="Pink">
+					<When type="Property" frame="$parent/UnitStatusFrame0/PlayerColor" stringValue="255,229,91,176"/>
+					<Action type="SetProperty" color="#Pink"/>
+				</State>
+				<State name="other">
+				</State>
+			</StateGroup>
+		</Frame>
+		<!-- Image0:
+			non-shielded unit:
+			- Image0/@Texture[3]: white32 or thin square
+			- Image0/@Texture[2]: white32 or thin square
+			- Image0/@Texture[1]: wireframe
+			- Image0/@Texture[0]: border
+			Shielded unit:
+			- Image0/@Texture[3]: ?
+			- Image0/@Texture[2]: wireframe
+			- Image0/@Texture[1]: thin square
+			- Image0/@Texture[0]: border
+		-->
+		
+
+	</Frame>
+
     <Frame type="Frame" name="PageFrameTemplate">
 
-        <Frame type="UnitButton" name="GroupUnitButton0">
-            <TooltipFrame val="ForcedTooltipUpdate"/>
+        <Frame type="UnitButton" name="GroupUnitButton0" template="_infoPanel/UnitButtonTemplate">
         </Frame>
 
-        <Frame type="UnitButton" name="GroupUnitButton1">
-            <TooltipFrame val="ForcedTooltipUpdate"/>
+        <Frame type="UnitButton" name="GroupUnitButton1" template="_infoPanel/UnitButtonTemplate">
         </Frame>
 
-        <Frame type="UnitButton" name="GroupUnitButton2">
-            <TooltipFrame val="ForcedTooltipUpdate"/>
+        <Frame type="UnitButton" name="GroupUnitButton2" template="_infoPanel/UnitButtonTemplate">
         </Frame>
 
-        <Frame type="UnitButton" name="GroupUnitButton3">
-            <TooltipFrame val="ForcedTooltipUpdate"/>
+        <Frame type="UnitButton" name="GroupUnitButton3" template="_infoPanel/UnitButtonTemplate">
         </Frame>
 
-        <Frame type="UnitButton" name="GroupUnitButton4">
-            <TooltipFrame val="ForcedTooltipUpdate"/>
+        <Frame type="UnitButton" name="GroupUnitButton4" template="_infoPanel/UnitButtonTemplate">
         </Frame>
 
-        <Frame type="UnitButton" name="GroupUnitButton5">
-            <TooltipFrame val="ForcedTooltipUpdate"/>
+        <Frame type="UnitButton" name="GroupUnitButton5" template="_infoPanel/UnitButtonTemplate">
         </Frame>
 
-        <Frame type="UnitButton" name="GroupUnitButton6">
-            <TooltipFrame val="ForcedTooltipUpdate"/>
+        <Frame type="UnitButton" name="GroupUnitButton6" template="_infoPanel/UnitButtonTemplate">
         </Frame>
 
-        <Frame type="UnitButton" name="GroupUnitButton7">
-            <TooltipFrame val="ForcedTooltipUpdate"/>
+        <Frame type="UnitButton" name="GroupUnitButton7" template="_infoPanel/UnitButtonTemplate">
         </Frame>
 
-        <Frame type="UnitButton" name="GroupUnitButton8">
-            <TooltipFrame val="ForcedTooltipUpdate"/>
+        <Frame type="UnitButton" name="GroupUnitButton8" template="_infoPanel/UnitButtonTemplate">
         </Frame>
 
-        <Frame type="UnitButton" name="GroupUnitButton9">
-            <TooltipFrame val="ForcedTooltipUpdate"/>
+        <Frame type="UnitButton" name="GroupUnitButton9" template="_infoPanel/UnitButtonTemplate">
         </Frame>
 
-        <Frame type="UnitButton" name="GroupUnitButton10">
-            <TooltipFrame val="ForcedTooltipUpdate"/>
+        <Frame type="UnitButton" name="GroupUnitButton10" template="_infoPanel/UnitButtonTemplate">
         </Frame>
 
-        <Frame type="UnitButton" name="GroupUnitButton11">
-            <TooltipFrame val="ForcedTooltipUpdate"/>
+        <Frame type="UnitButton" name="GroupUnitButton11" template="_infoPanel/UnitButtonTemplate">
         </Frame>
 
-        <Frame type="UnitButton" name="GroupUnitButton12">
-            <TooltipFrame val="ForcedTooltipUpdate"/>
+        <Frame type="UnitButton" name="GroupUnitButton12" template="_infoPanel/UnitButtonTemplate">
         </Frame>
 
-        <Frame type="UnitButton" name="GroupUnitButton13">
-            <TooltipFrame val="ForcedTooltipUpdate"/>
+        <Frame type="UnitButton" name="GroupUnitButton13" template="_infoPanel/UnitButtonTemplate">
         </Frame>
 
-        <Frame type="UnitButton" name="GroupUnitButton14">
-            <TooltipFrame val="ForcedTooltipUpdate"/>
+        <Frame type="UnitButton" name="GroupUnitButton14" template="_infoPanel/UnitButtonTemplate">
         </Frame>
 
-        <Frame type="UnitButton" name="GroupUnitButton15">
-            <TooltipFrame val="ForcedTooltipUpdate"/>
+        <Frame type="UnitButton" name="GroupUnitButton15" template="_infoPanel/UnitButtonTemplate">
         </Frame>
 
-        <Frame type="UnitButton" name="GroupUnitButton16">
-            <TooltipFrame val="ForcedTooltipUpdate"/>
+        <Frame type="UnitButton" name="GroupUnitButton16" template="_infoPanel/UnitButtonTemplate">
         </Frame>
 
-        <Frame type="UnitButton" name="GroupUnitButton17">
-            <TooltipFrame val="ForcedTooltipUpdate"/>
+        <Frame type="UnitButton" name="GroupUnitButton17" template="_infoPanel/UnitButtonTemplate">
         </Frame>
 
-        <Frame type="UnitButton" name="GroupUnitButton18">
-            <TooltipFrame val="ForcedTooltipUpdate"/>
+        <Frame type="UnitButton" name="GroupUnitButton18" template="_infoPanel/UnitButtonTemplate">
         </Frame>
 
-        <Frame type="UnitButton" name="GroupUnitButton19">
-            <TooltipFrame val="ForcedTooltipUpdate"/>
+        <Frame type="UnitButton" name="GroupUnitButton19" template="_infoPanel/UnitButtonTemplate">
         </Frame>
 
-        <Frame type="UnitButton" name="GroupUnitButton20">
-            <TooltipFrame val="ForcedTooltipUpdate"/>
+        <Frame type="UnitButton" name="GroupUnitButton20" template="_infoPanel/UnitButtonTemplate">
         </Frame>
 
-        <Frame type="UnitButton" name="GroupUnitButton21">
-            <TooltipFrame val="ForcedTooltipUpdate"/>
+        <Frame type="UnitButton" name="GroupUnitButton21" template="_infoPanel/UnitButtonTemplate">
         </Frame>
 
-        <Frame type="UnitButton" name="GroupUnitButton22">
-            <TooltipFrame val="ForcedTooltipUpdate"/>
+        <Frame type="UnitButton" name="GroupUnitButton22" template="_infoPanel/UnitButtonTemplate">
         </Frame>
 
-        <Frame type="UnitButton" name="GroupUnitButton23">
-            <TooltipFrame val="ForcedTooltipUpdate"/>
+        <Frame type="UnitButton" name="GroupUnitButton23" template="_infoPanel/UnitButtonTemplate">
         </Frame>
     </Frame>
 
