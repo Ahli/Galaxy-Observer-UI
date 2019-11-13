@@ -18,7 +18,7 @@ import interfacebuilder.integration.FileService;
 import interfacebuilder.integration.kryo.KryoGameInfo;
 import interfacebuilder.integration.kryo.KryoService;
 import interfacebuilder.projects.enums.Game;
-import interfacebuilder.ui.progress.Appender;
+import interfacebuilder.ui.progress.appender.Appender;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOCase;
 import org.apache.commons.io.IOUtils;

@@ -64,7 +64,7 @@ public class StylizedTextAreaAppenderThreadPoolExecutor extends ThreadPoolExecut
 	@Override
 	protected void afterExecute(final Runnable r, final Throwable t) {
 		super.afterExecute(r, t);
-		StylizedTextAreaAppender.finishedWork(Thread.currentThread().getName());
+		StylizedTextAreaAppender.finishedWork(Thread.currentThread().getName(), true);
 		
 		if (cleanUpTask != null && r != cleanUpTask) {
 			final int count = getActiveCount() - 1; // subtract this task

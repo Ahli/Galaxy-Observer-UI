@@ -23,9 +23,9 @@ import interfacebuilder.projects.ProjectService;
 import interfacebuilder.projects.enums.Game;
 import interfacebuilder.ui.Alerts;
 import interfacebuilder.ui.FXMLSpringLoader;
-import interfacebuilder.ui.progress.BaseUiExctractionController;
+import interfacebuilder.ui.Updateable;
+import interfacebuilder.ui.progress.BaseUiExtractionController;
 import interfacebuilder.ui.progress.ErrorTabController;
-import interfacebuilder.ui.settings.Updateable;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -182,7 +182,7 @@ public class BrowseController implements Updateable {
 	}
 	
 	private String buildBaseUiDetailsString(final Game game, final boolean isPtr) {
-		final StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder(25); // big enough for default case
 		final int[] version = baseUiService.getVersion(gameService.getNewGameDef(game), isPtr);
 		for (final int v : version) {
 			sb.append(v).append('.');
@@ -217,48 +217,85 @@ public class BrowseController implements Updateable {
 	
 	private void extractBaseUi(final Game game, final boolean usePtr) throws IOException {
 		final ObservableList<Tab> tabs = InterfaceBuilderApp.getInstance().getTabPane().getTabs();
-		final Tab newTab = new Tab();
+		final String tabName = "Extract " + game.name();
+		Tab newTab = null;
+		BaseUiExtractionController extractionController = null;
 		
-		final TextFlow newTxtArea = new TextFlow();
-		newTxtArea.getStyleClass().add("styled-text-area");
-		final ErrorTabController errorTabCtrl = new ErrorTabController(newTab, newTxtArea, true, false, true);
-		errorTabCtrl.setRunning(true);
-		
-		newTab.setText("Extract " + game.name());
-		tabs.add(newTab);
-		
-		final ScrollPane scrollPane = new ScrollPane(newTxtArea);
-		scrollPane.getStyleClass().add("virtualized-scroll-pane");
-		
-		// context menu with close option
-		final ContextMenu contextMenu = new ContextMenu();
-		final MenuItem closeItem = new MenuItem(Messages.getString("contextmenu.close"));
-		closeItem.setOnAction(event -> InterfaceBuilderApp.getInstance().getTabPane().getTabs().remove(newTab));
-		contextMenu.getItems().addAll(closeItem);
-		newTab.setContextMenu(contextMenu);
-		
-		final FXMLSpringLoader loader = new FXMLSpringLoader(appContext);
-		final var rootNode = loader.<AnchorPane>load("classpath:view/ProgressTab_ExtractBaseUi.fxml");
-		newTab.setContent(rootNode);
-		final BaseUiExctractionController extractionController = loader.getController();
-		controllers.add(extractionController);
-		extractionController.start(game, usePtr);
-		
-		for (final String threadName : extractionController.getThreadNames()) {
-			StylizedTextAreaAppender.setWorkerTaskController(errorTabCtrl, threadName);
+		// re-use existing tab with that name
+		for (final Tab tab : tabs) {
+			if (tab.getText().equals(tabName)) {
+				newTab = tab;
+				break;
+			}
+		}
+		if (newTab == null) {
+			// CASE: new tab
+			newTab = new Tab(tabName);
+			
+			final TextFlow newTxtArea = new TextFlow();
+			newTxtArea.getStyleClass().add("styled-text-area");
+			
+			final ScrollPane scrollPane = new ScrollPane(newTxtArea);
+			scrollPane.getStyleClass().add("virtualized-scroll-pane");
+			
+			// context menu with close option
+			final ContextMenu contextMenu = new ContextMenu();
+			final MenuItem closeItem = new MenuItem(Messages.getString("contextmenu.close"));
+			final Tab newTabFinal = newTab;
+			closeItem
+					.setOnAction(event -> InterfaceBuilderApp.getInstance().getTabPane().getTabs().remove(newTabFinal));
+			contextMenu.getItems().addAll(closeItem);
+			newTab.setContextMenu(contextMenu);
+			
+			final FXMLSpringLoader loader = new FXMLSpringLoader(appContext);
+			final var rootNode = loader.<AnchorPane>load("classpath:view/ProgressTab_ExtractBaseUi.fxml");
+			
+			newTab.setContent(rootNode);
+			
+			extractionController = loader.getController();
+			final ErrorTabController errorTabCtrl = new ErrorTabController(newTab, newTxtArea, true, false, true);
+			extractionController.setErrorTabControl(errorTabCtrl);
+			controllers.add(extractionController);
+			tabs.add(newTab);
+			
+			for (final String threadName : extractionController.getThreadNames()) {
+				StylizedTextAreaAppender.setWorkerTaskController(errorTabCtrl, threadName);
+			}
+			
+			
+			// runlater needs to appear below the edits above, else it might be added before
+			// which results in UI edits not in UI thread -> error
+			final BaseUiExtractionController extractionControllerFinal = extractionController;
+			Platform.runLater(() -> {
+				try {
+					extractionControllerFinal.loggingArea.getChildren().add(scrollPane);
+					InterfaceBuilderApp.getInstance().getTabPane().getTabs().add(newTabFinal);
+				} catch (final Exception e) {
+					logger.fatal(FATAL_ERROR, e);
+				}
+			});
+		} else {
+			// CASE: recycled Tab -> only do the workload
+			for (final var controller : controllers) {
+				if (controller instanceof BaseUiExtractionController) {
+					final BaseUiExtractionController extractCtrl = (BaseUiExtractionController) controller;
+					final ErrorTabController errorTabCtrl = extractCtrl.getErrorTabController();
+					if (errorTabCtrl != null) {
+						final Tab tab = errorTabCtrl.getTab();
+						if (tab != null && tabName.equals(tab.getText())) {
+							// found the correct one
+							extractionController = extractCtrl;
+							break;
+						}
+					}
+				}
+			}
+			if (extractionController == null) {
+				throw new IOException("The desired BaseUiExtractionController was not found while recycling a Tab.");
+			}
 		}
 		
-		// runlater needs to appear below the edits above, else it might be added before
-		// which results in UI edits not in UI thread -> error
-		Platform.runLater(() -> {
-			try {
-				extractionController.loggingArea.getChildren().add(scrollPane);
-				InterfaceBuilderApp.getInstance().getTabPane().getTabs().add(newTab);
-			} catch (final Exception e) {
-				logger.fatal(FATAL_ERROR, e);
-			}
-		});
-		
+		extractionController.start(game, usePtr);
 	}
 	
 	public void extractBaseUiHeroes() {

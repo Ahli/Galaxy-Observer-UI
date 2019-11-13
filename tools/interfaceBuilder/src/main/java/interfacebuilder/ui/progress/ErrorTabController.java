@@ -17,11 +17,12 @@ import javafx.scene.text.TextFlow;
 public final class ErrorTabController {
 	private static final String TAB_TEXT_COLOR_YELLOW = "-tab-text-color: yellow;";
 	private static final String TAB_TEXT_COLOR_RED = "-tab-text-color: red;";
+	private static final String TAB_TEXT_COLOR_WHITE = "-tab-text-color: white;";
 	private final boolean colorizeTitle;
 	private final boolean showResultIcon;
+	private final Tab tab;
+	private final TextFlow textArea;
 	private boolean encounteredError;
-	private Tab tab;
-	private TextFlow textArea;
 	private boolean running;
 	private boolean encounteredWarning;
 	private State state = State.NOT_STARTED;
@@ -58,8 +59,54 @@ public final class ErrorTabController {
 		return encounteredWarning;
 	}
 	
-	public void clearError() {
+	public void clearError(final boolean updateTabHeader) {
 		encounteredError = false;
+		if (updateTabHeader) {
+			updateIcon();
+			updateLabel();
+		}
+	}
+	
+	/**
+	 *
+	 */
+	private void updateIcon() {
+		if (running) {
+			setIconAppearance(State.RUNNING, FontAwesomeIcon.SPINNER, Color.GAINSBORO);
+		} else if (encounteredError) {
+			setIconAppearance(State.ERROR, FontAwesomeIcon.EXCLAMATION_TRIANGLE, Color.RED);
+		} else if (encounteredWarning) {
+			setIconAppearance(State.WARNING, FontAwesomeIcon.EXCLAMATION_TRIANGLE, Color.YELLOW);
+		} else {
+			setIconAppearance(State.GOOD, FontAwesomeIcon.CHECK, Color.LAWNGREEN);
+		}
+	}
+	
+	private void updateLabel() {
+		if (!encounteredError && !encounteredWarning) {
+			tab.setStyle(TAB_TEXT_COLOR_WHITE);
+		}
+	}
+	
+	private void setIconAppearance(final State newState, final FontAwesomeIcon icon, final Color color) {
+		if (state != newState) {
+			state = newState;
+			if (newState == State.RUNNING || newState == State.NOT_STARTED || showResultIcon) {
+				final FontAwesomeIconView iconView = new FontAwesomeIconView(icon);
+				iconView.setFill(color);
+				tab.setGraphic(iconView);
+			} else {
+				tab.setGraphic(null);
+			}
+		}
+	}
+	
+	public void clearWarning(final boolean updateTabHeader) {
+		encounteredWarning = false;
+		if (updateTabHeader) {
+			updateIcon();
+			updateLabel();
+		}
 	}
 	
 	/**
@@ -67,14 +114,6 @@ public final class ErrorTabController {
 	 */
 	public Tab getTab() {
 		return tab;
-	}
-	
-	/**
-	 * @param tab
-	 * 		the tab to set
-	 */
-	public void setTabPane(final Tab tab) {
-		this.tab = tab;
 	}
 	
 	/**
@@ -94,45 +133,10 @@ public final class ErrorTabController {
 	}
 	
 	/**
-	 *
-	 */
-	private void updateIcon() {
-		if (running) {
-			setIconAppearance(State.RUNNING, FontAwesomeIcon.SPINNER, Color.GAINSBORO);
-		} else if (encounteredError) {
-			setIconAppearance(State.ERROR, FontAwesomeIcon.EXCLAMATION_TRIANGLE, Color.RED);
-		} else if (encounteredWarning) {
-			setIconAppearance(State.WARNING, FontAwesomeIcon.EXCLAMATION_TRIANGLE, Color.YELLOW);
-		} else {
-			setIconAppearance(State.GOOD, FontAwesomeIcon.CHECK, Color.LAWNGREEN);
-		}
-	}
-	
-	private void setIconAppearance(final State newState, final FontAwesomeIcon icon, final Color color) {
-		if (state != newState) {
-			state = newState;
-			if (newState == State.RUNNING || newState == State.NOT_STARTED || showResultIcon) {
-				final FontAwesomeIconView iconView = new FontAwesomeIconView(icon);
-				iconView.setFill(color);
-				tab.setGraphic(iconView);
-			} else {
-				tab.setGraphic(null);
-			}
-		}
-	}
-	
-	/**
 	 * @return
 	 */
 	public TextFlow getTextArea() {
 		return textArea;
-	}
-	
-	/**
-	 * @param textArea
-	 */
-	public void setTextArea(final TextFlow textArea) {
-		this.textArea = textArea;
 	}
 	
 	/**

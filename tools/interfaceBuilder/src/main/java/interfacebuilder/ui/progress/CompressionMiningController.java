@@ -18,7 +18,7 @@ import interfacebuilder.i18n.Messages;
 import interfacebuilder.integration.FileService;
 import interfacebuilder.projects.Project;
 import interfacebuilder.projects.ProjectService;
-import interfacebuilder.ui.settings.Updateable;
+import interfacebuilder.ui.Updateable;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;

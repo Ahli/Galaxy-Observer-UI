@@ -13,7 +13,7 @@ import com.ahli.galaxy.ui.UIStateGroup;
 import com.ahli.galaxy.ui.UITemplate;
 import com.ahli.galaxy.ui.abstracts.UIElement;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
-import interfacebuilder.ui.settings.Updateable;
+import interfacebuilder.ui.Updateable;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;

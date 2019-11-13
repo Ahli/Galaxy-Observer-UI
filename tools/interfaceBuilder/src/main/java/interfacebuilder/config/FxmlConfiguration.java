@@ -12,7 +12,7 @@ import interfacebuilder.ui.home.NewProjectController;
 import interfacebuilder.ui.home.NewProjectDialogController;
 import interfacebuilder.ui.home.ViewRuleSetController;
 import interfacebuilder.ui.navigation.NavigationController;
-import interfacebuilder.ui.progress.BaseUiExctractionController;
+import interfacebuilder.ui.progress.BaseUiExtractionController;
 import interfacebuilder.ui.progress.CompressionMiningController;
 import interfacebuilder.ui.progress.TabPaneController;
 import interfacebuilder.ui.settings.SettingsCommandLineToolController;
@@ -122,7 +122,7 @@ public class FxmlConfiguration {
 	
 	@Bean
 	@Scope (ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-	protected BaseUiExctractionController baseUiExctractionController() {
-		return new BaseUiExctractionController();
+	protected BaseUiExtractionController baseUiExtractionController() {
+		return new BaseUiExtractionController();
 	}
 }

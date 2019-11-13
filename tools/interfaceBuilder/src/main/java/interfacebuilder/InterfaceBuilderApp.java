@@ -29,6 +29,7 @@ import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.application.Preloader;
+import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -418,7 +419,7 @@ public class InterfaceBuilderApp extends Application {
 	private void clearErrorTrackers() {
 		for (final ErrorTabController ctrl : errorTabControllers) {
 			if (ctrl.hasEncounteredError() && !ctrl.isErrorsDoNotPreventExit()) {
-				ctrl.clearError();
+				ctrl.clearError(false);
 			}
 		}
 	}
@@ -625,40 +626,76 @@ public class InterfaceBuilderApp extends Application {
 	 * Adds a Tab for the specified Thread ID containing its log messages.
 	 *
 	 * @param threadName
-	 * @param tabTitle
+	 * @param tabName
 	 */
-	public void addThreadLoggerTab(final String threadName, final String tabTitle,
+	public void addThreadLoggerTab(final String threadName, final String tabName,
 			final boolean errorsDoNotPreventExit) {
-		final Tab newTab = new Tab();
-		final TextFlow newTxtArea = new TextFlow();
-		newTxtArea.getStyleClass().add("styled-text-area");
-		final ErrorTabController errorTabCtrl =
-				new ErrorTabController(newTab, newTxtArea, true, false, errorsDoNotPreventExit);
-		errorTabCtrl.setRunning(true);
-		errorTabControllers.add(errorTabCtrl);
+		final ObservableList<Tab> tabs = getTabPane().getTabs();
+		Tab newTab = null;
 		
-		final ScrollPane scrollPane = new ScrollPane(newTxtArea);
-		scrollPane.getStyleClass().add("virtualized-scroll-pane");
-		newTab.setContent(scrollPane);
-		StylizedTextAreaAppender.setWorkerTaskController(errorTabCtrl, threadName);
-		newTab.setText(tabTitle);
-		
-		// context menu with close option
-		final ContextMenu contextMenu = new ContextMenu();
-		final MenuItem closeItem = new MenuItem(Messages.getString("contextmenu.close"));
-		closeItem.setOnAction(event -> getTabPane().getTabs().remove(newTab));
-		contextMenu.getItems().addAll(closeItem);
-		newTab.setContextMenu(contextMenu);
-		
-		// runlater needs to appear below the edits above, else it might be added before
-		// which results in UI edits not in UI thread -> error
-		Platform.runLater(() -> {
-			try {
-				getTabPane().getTabs().add(newTab);
-			} catch (final Exception e) {
-				logger.fatal(FATAL_ERROR, e);
+		// re-use existing tab with that name
+		for (final Tab tab : tabs) {
+			if (tab.getText().equals(tabName)) {
+				newTab = tab;
+				break;
 			}
-		});
+		}
+		if (newTab == null) {
+			// CASE: new tab
+			newTab = new Tab(tabName);
+			final TextFlow newTxtArea = new TextFlow();
+			newTxtArea.getStyleClass().add("styled-text-area");
+			final ErrorTabController errorTabCtrl =
+					new ErrorTabController(newTab, newTxtArea, true, false, errorsDoNotPreventExit);
+			errorTabCtrl.setRunning(true);
+			errorTabControllers.add(errorTabCtrl);
+			
+			final ScrollPane scrollPane = new ScrollPane(newTxtArea);
+			scrollPane.getStyleClass().add("virtualized-scroll-pane");
+			newTab.setContent(scrollPane);
+			StylizedTextAreaAppender.setWorkerTaskController(errorTabCtrl, threadName);
+			
+			// context menu with close option
+			final ContextMenu contextMenu = new ContextMenu();
+			final MenuItem closeItem = new MenuItem(Messages.getString("contextmenu.close"));
+			final Tab newTabFinal = newTab;
+			closeItem.setOnAction(event -> getTabPane().getTabs().remove(newTabFinal));
+			contextMenu.getItems().addAll(closeItem);
+			newTab.setContextMenu(contextMenu);
+			
+			// runlater needs to appear below the edits above, else it might be added before
+			// which results in UI edits not in UI thread -> error
+			Platform.runLater(() -> {
+				try {
+					getTabPane().getTabs().add(newTabFinal);
+				} catch (final Exception e) {
+					logger.fatal(FATAL_ERROR, e);
+				}
+			});
+		} else {
+			// CASE: recycle existing Tab
+			ErrorTabController errorTabCtrl = null;
+			for (final var ctrl : errorTabControllers) {
+				if (ctrl != null) {
+					final Tab tab = ctrl.getTab();
+					if (tab != null && tabName.equals(tab.getText())) {
+						// found the correct one
+						errorTabCtrl = ctrl;
+						break;
+					}
+				}
+			}
+			if (errorTabCtrl != null) {
+				StylizedTextAreaAppender.setWorkerTaskController(errorTabCtrl, threadName);
+				final ErrorTabController errorTabControllerFinal = errorTabCtrl;
+				Platform.runLater(() -> {
+					errorTabControllerFinal.setErrorsDoNotPreventExit(errorsDoNotPreventExit);
+					errorTabControllerFinal.clearError(false);
+					errorTabControllerFinal.clearWarning(false);
+					errorTabControllerFinal.setRunning(true);
+				});
+			}
+		}
 	}
 	
 	/**

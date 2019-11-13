@@ -101,9 +101,15 @@ public final class StylizedTextAreaAppender extends AbstractAppender {
 	/**
 	 * @param threadName
 	 */
-	public static void finishedWork(final String threadName) {
+	public static void finishedWork(final String threadName, final boolean unregister) {
 		final ErrorTabController ctrl = getWorkerTaskController(threadName);
-		Platform.runLater(() -> ctrl.setRunning(false));
+		if (ctrl != generalController) {
+			Platform.runLater(() -> ctrl.setRunning(false));
+		}
+		if (unregister) {
+			// TODO eventually this needs to be delayed and executed with low priority, so it appears after logs
+			workerTaskControllers.remove(threadName);
+		}
 	}
 	
 	/**

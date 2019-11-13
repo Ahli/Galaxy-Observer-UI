@@ -4,6 +4,7 @@
 package interfacebuilder.ui.settings;
 
 import interfacebuilder.ui.FXMLSpringLoader;
+import interfacebuilder.ui.Updateable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;

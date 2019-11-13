@@ -27,6 +27,7 @@ public final class Messages {
 	 * The Default Constructor.
 	 */
 	private Messages() {
+		// no instances alllowed
 	}
 	
 	/**

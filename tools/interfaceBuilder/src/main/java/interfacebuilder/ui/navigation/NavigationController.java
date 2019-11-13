@@ -6,7 +6,7 @@ package interfacebuilder.ui.navigation;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import interfacebuilder.ui.FXMLSpringLoader;
-import interfacebuilder.ui.settings.Updateable;
+import interfacebuilder.ui.Updateable;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;

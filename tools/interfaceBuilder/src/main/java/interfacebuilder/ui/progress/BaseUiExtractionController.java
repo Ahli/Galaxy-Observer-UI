@@ -9,14 +9,16 @@ import interfacebuilder.compress.GameService;
 import interfacebuilder.config.ConfigService;
 import interfacebuilder.integration.FileService;
 import interfacebuilder.projects.enums.Game;
-import interfacebuilder.ui.settings.Updateable;
+import interfacebuilder.ui.Updateable;
+import interfacebuilder.ui.progress.appender.Appender;
+import interfacebuilder.ui.progress.appender.TextFlowAppender;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextFlow;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class BaseUiExctractionController implements Updateable {
+public class BaseUiExtractionController implements Updateable {
 	
 	private static int threadCount;
 	private final String[] threadNames;
@@ -44,11 +46,9 @@ public class BaseUiExctractionController implements Updateable {
 	private BaseUiService baseUiService;
 	@Autowired
 	private GameService gameService;
+	private ErrorTabController errorTabController;
 	
-	private GameDef exportedGameDef;
-	
-	public BaseUiExctractionController() {
-		// nothing to do
+	public BaseUiExtractionController() {
 		threadNames = new String[3];
 		for (int i = 0; i < threadNames.length; ++i) {
 			threadNames[i] = "extractThread_" + ++threadCount;
@@ -68,17 +68,32 @@ public class BaseUiExctractionController implements Updateable {
 	}
 	
 	public void start(final Game game, final boolean usePtr) {
-		exportedGameDef = gameService.getNewGameDef(game);
+		errorTabController.setRunning(true);
+		final GameDef exportedGameDef = gameService.getNewGameDef(game);
 		final String ptrString = usePtr ? " PTR" : "";
 		titleLabel.setText(String.format("Extract %s's Base UI", exportedGameDef.getName() + ptrString));
+		txtArea1.getChildren().clear();
+		txtArea2.getChildren().clear();
+		txtArea3.getChildren().clear();
 		final Appender[] output = new Appender[3];
 		output[0] = new TextFlowAppender(txtArea1);
 		output[1] = new TextFlowAppender(txtArea2);
 		output[2] = new TextFlowAppender(txtArea3);
 		baseUiService.extract(game, usePtr, output);
+		
+		// TODO setRunning(false) after extraction was done -> integrate completableFuture into TaskExecutor
+		// errorTabController.setRunning(false);
 	}
 	
 	public String[] getThreadNames() {
 		return threadNames;
+	}
+	
+	public void setErrorTabControl(final ErrorTabController errorTabCtrl) {
+		errorTabController = errorTabCtrl;
+	}
+	
+	public ErrorTabController getErrorTabController() {
+		return errorTabController;
 	}
 }

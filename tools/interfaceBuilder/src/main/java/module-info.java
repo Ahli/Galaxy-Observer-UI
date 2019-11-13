@@ -39,6 +39,7 @@ module interfacex.builder {
 	requires com.fasterxml.classmate;
 	requires net.bytebuddy;
 	requires java.sql;
+	requires org.apache.commons.lang3;
 	
 	// own projects
 	requires CascExplorerConfigFileEdit;
@@ -69,6 +70,7 @@ module interfacex.builder {
 	exports interfacebuilder.integration.log4j to org.apache.logging.log4j.core;
 	exports interfacebuilder.integration;
 	exports interfacebuilder.ui.navigation;
+	exports interfacebuilder.ui.progress.appender;
 	
 	// for public API only
 	exports interfacebuilder.ui.progress;

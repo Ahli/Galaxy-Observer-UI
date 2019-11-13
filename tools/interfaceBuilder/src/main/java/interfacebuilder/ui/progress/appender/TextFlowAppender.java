@@ -1,4 +1,4 @@
-package interfacebuilder.ui.progress;
+package interfacebuilder.ui.progress.appender;
 
 import javafx.application.Platform;
 import javafx.collections.ObservableList;

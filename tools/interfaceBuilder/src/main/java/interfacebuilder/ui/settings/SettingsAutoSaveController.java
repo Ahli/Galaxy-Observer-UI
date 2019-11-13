@@ -6,6 +6,7 @@ package interfacebuilder.ui.settings;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import interfacebuilder.config.ConfigService;
+import interfacebuilder.ui.Updateable;
 import javafx.animation.FadeTransition;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;

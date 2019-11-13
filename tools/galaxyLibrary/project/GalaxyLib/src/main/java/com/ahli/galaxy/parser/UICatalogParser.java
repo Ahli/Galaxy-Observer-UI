@@ -309,8 +309,10 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				final String parentName = name.substring(0, j);
 				if (curTemplate == null) {
 					logger.error("CurTemplate is null, but there is a path in the name {}", name);
+					curElement = null;
+				} else {
+					curElement = curTemplate.receiveFrameFromPath(parentName);
 				}
-				curElement = curTemplate.receiveFrameFromPath(parentName);
 			} else {
 				// newElem has no parent, it is the template's root
 				curElement = null;
@@ -789,7 +791,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	
 	private void copyAttributes(final List<UIAttribute> attributesSource, final List<UIAttribute> attributesTarget) {
 		for (final UIAttribute attrSource : attributesSource) {
-			boolean edited = false;
+			final boolean edited = false;
 			
 			// TODO modify existing attributes
 			targetloop:
@@ -797,10 +799,10 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				final var targetKeyValList = attrTarget.getKeyValues();
 				for (int i = 0; i < targetKeyValList.size(); i += 2) {
 					final String key = targetKeyValList.get(i);
-//					if (key.equals()) {
-//						edited = true;
-//						break targetloop;
-//					}
+					//					if (key.equals()) {
+					//						edited = true;
+					//						break targetloop;
+					//					}
 				}
 			}
 		}
