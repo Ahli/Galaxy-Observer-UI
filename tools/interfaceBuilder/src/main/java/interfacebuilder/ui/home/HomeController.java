@@ -330,30 +330,50 @@ public class HomeController implements Updateable {
 			// init UI as Tab in Progress
 			final FXMLSpringLoader loader = new FXMLSpringLoader(appContext);
 			final Parent content = loader.load("classpath:view/ProgressTab_CompressionMining.fxml");
-			final Tab newTab = new Tab();
-			newTab.setContent(content);
-			newTab.setText(String.format("%s Compression Mining", project.getName()));
+			final String tabName = String.format("%s Compression Mining", project.getName());
+			
 			final TabPane tabPane = TabPaneController.getInstance().getTabPane();
-			final CompressionMiningController controller = loader.getController();
+			final ObservableList<Tab> tabs = tabPane.getTabs();
+			Tab newTab = null;
 			
-			// context menu with close option
-			final ContextMenu contextMenu = new ContextMenu();
-			final MenuItem closeItem = new MenuItem(Messages.getString("contextmenu.close"));
-			closeItem.setOnAction(event -> {
-				TabPaneController.getInstance().getTabPane().getTabs().remove(newTab);
-				logger.trace("close tab");
-				controller.stopMining();
-			});
-			contextMenu.getItems().addAll(closeItem);
-			newTab.setContextMenu(contextMenu);
-			
-			tabPane.getTabs().add(newTab);
-			controller.setProject(project);
-			// switch to progress and the new tab
-			NavigationController.getInstance().clickProgress();
-			tabPane.getSelectionModel().select(newTab);
-			// start mining
-			controller.startMining();
+			// re-use existing tab with that name
+			for (final Tab tab : tabs) {
+				if (tab.getText().equals(tabName)) {
+					newTab = tab;
+					break;
+				}
+			}
+			if (newTab == null) {
+				// CASE: new tab
+				newTab = new Tab(tabName, content);
+				final CompressionMiningController controller = loader.getController();
+				
+				// context menu with close option
+				final ContextMenu contextMenu = new ContextMenu();
+				final MenuItem closeItem = new MenuItem(Messages.getString("contextmenu.close"));
+				final Tab newTabFinal = newTab;
+				closeItem.setOnAction(event -> {
+					logger.trace("close tab");
+					TabPaneController.getInstance().getTabPane().getTabs().remove(newTabFinal);
+					controller.stopMining();
+				});
+				contextMenu.getItems().addAll(closeItem);
+				newTab.setContextMenu(contextMenu);
+				
+				tabs.add(newTab);
+				controller.setProject(project);
+				// switch to progress and the new tab
+				NavigationController.getInstance().clickProgress();
+				tabPane.getSelectionModel().select(newTab);
+				// start mining
+				controller.startMining();
+			} else {
+				// CASE: recycle existing Tab
+				
+				// switch to progress and the new tab
+				NavigationController.getInstance().clickProgress();
+				tabPane.getSelectionModel().select(newTab);
+			}
 		}
 	}
 }

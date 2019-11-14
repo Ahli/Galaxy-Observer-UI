@@ -24,6 +24,7 @@ import interfacebuilder.projects.enums.Game;
 import interfacebuilder.ui.Alerts;
 import interfacebuilder.ui.FXMLSpringLoader;
 import interfacebuilder.ui.Updateable;
+import interfacebuilder.ui.navigation.NavigationController;
 import interfacebuilder.ui.progress.BaseUiExtractionController;
 import interfacebuilder.ui.progress.ErrorTabController;
 import javafx.application.Platform;
@@ -281,8 +282,8 @@ public class BrowseController implements Updateable {
 					final BaseUiExtractionController extractCtrl = (BaseUiExtractionController) controller;
 					final ErrorTabController errorTabCtrl = extractCtrl.getErrorTabController();
 					if (errorTabCtrl != null) {
-						final Tab tab = errorTabCtrl.getTab();
-						if (tab != null && tabName.equals(tab.getText())) {
+						newTab = errorTabCtrl.getTab();
+						if (newTab != null && tabName.equals(newTab.getText())) {
 							// found the correct one
 							extractionController = extractCtrl;
 							break;
@@ -294,6 +295,9 @@ public class BrowseController implements Updateable {
 				throw new IOException("The desired BaseUiExtractionController was not found while recycling a Tab.");
 			}
 		}
+		// select progress & tab
+		InterfaceBuilderApp.getInstance().getTabPane().getSelectionModel().select(newTab);
+		NavigationController.getInstance().clickProgress();
 		
 		extractionController.start(game, usePtr);
 	}
@@ -350,6 +354,8 @@ public class BrowseController implements Updateable {
 			});
 			contextMenu.getItems().addAll(closeItem);
 			newTab.setContextMenu(contextMenu);
+			
+			tabPane.getSelectionModel().select(newTab);
 			
 		} catch (final IOException e) {
 			logger.error("failed to load BrowseTab FXML", e);

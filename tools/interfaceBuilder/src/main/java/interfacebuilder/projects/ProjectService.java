@@ -7,6 +7,7 @@ import com.ahli.galaxy.game.GameData;
 import interfacebuilder.build.MpqBuilderService;
 import interfacebuilder.compress.RuleSet;
 import interfacebuilder.projects.enums.Game;
+import interfacebuilder.ui.navigation.NavigationController;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOCase;
 import org.apache.commons.io.filefilter.IOFileFilter;
@@ -98,8 +99,14 @@ public class ProjectService {
 	 * @param useCmdLineSettings
 	 */
 	public void build(final Iterable<Project> projects, final boolean useCmdLineSettings) {
+		boolean building = false;
 		for (final Project project : projects) {
+			building = true;
 			mpqBuilderService.build(project, useCmdLineSettings);
+		}
+		if (building) {
+			// switch to progress
+			NavigationController.getInstance().clickProgress();
 		}
 	}
 	

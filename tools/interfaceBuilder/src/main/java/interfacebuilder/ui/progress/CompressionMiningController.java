@@ -181,8 +181,6 @@ public class CompressionMiningController implements Updateable {
 			try {
 				long bestSize;
 				{
-					final RuleSet bestCompressionRuleSet = projectService.fetchBestCompressionRuleSet(project);
-					
 					final ModData mod = gameService.getModData(project.getGame());
 					final GameDef gameDef = mod.getGameData().getGameDef();
 					final File projectSource = new File(project.getProjectPath());
@@ -192,6 +190,7 @@ public class CompressionMiningController implements Updateable {
 					mod.setTargetFile(modTargetFile);
 					mod.setSourceDirectory(projectSource);
 					
+					final RuleSet bestCompressionRuleSet = projectService.fetchBestCompressionRuleSet(project);
 					final MpqEditorCompressionRule[] prevBestCompressionRules =
 							(bestCompressionRuleSet != null) ? bestCompressionRuleSet.getCompressionRules() : null;
 					

@@ -6,8 +6,6 @@ package interfacebuilder.ui.progress;
 import com.ahli.galaxy.game.def.abstracts.GameDef;
 import interfacebuilder.base_ui.BaseUiService;
 import interfacebuilder.compress.GameService;
-import interfacebuilder.config.ConfigService;
-import interfacebuilder.integration.FileService;
 import interfacebuilder.projects.enums.Game;
 import interfacebuilder.ui.Updateable;
 import interfacebuilder.ui.progress.appender.Appender;
@@ -38,10 +36,6 @@ public class BaseUiExtractionController implements Updateable {
 	private TextFlow txtArea3;
 	@FXML
 	private Label areaLabel3;
-	@Autowired
-	private ConfigService configService;
-	@Autowired
-	private FileService fileService;
 	@Autowired
 	private BaseUiService baseUiService;
 	@Autowired

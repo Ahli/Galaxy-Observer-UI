@@ -659,7 +659,10 @@ public class InterfaceBuilderApp extends Application {
 			final ContextMenu contextMenu = new ContextMenu();
 			final MenuItem closeItem = new MenuItem(Messages.getString("contextmenu.close"));
 			final Tab newTabFinal = newTab;
-			closeItem.setOnAction(event -> getTabPane().getTabs().remove(newTabFinal));
+			closeItem.setOnAction(event -> {
+				getTabPane().getTabs().remove(newTabFinal);
+				errorTabControllers.remove(errorTabCtrl);
+			});
 			contextMenu.getItems().addAll(closeItem);
 			newTab.setContextMenu(contextMenu);
 			
@@ -674,17 +677,7 @@ public class InterfaceBuilderApp extends Application {
 			});
 		} else {
 			// CASE: recycle existing Tab
-			ErrorTabController errorTabCtrl = null;
-			for (final var ctrl : errorTabControllers) {
-				if (ctrl != null) {
-					final Tab tab = ctrl.getTab();
-					if (tab != null && tabName.equals(tab.getText())) {
-						// found the correct one
-						errorTabCtrl = ctrl;
-						break;
-					}
-				}
-			}
+			final ErrorTabController errorTabCtrl = getErrorTabController(tabName);
 			if (errorTabCtrl != null) {
 				StylizedTextAreaAppender.setWorkerTaskController(errorTabCtrl, threadName);
 				final ErrorTabController errorTabControllerFinal = errorTabCtrl;
@@ -703,6 +696,23 @@ public class InterfaceBuilderApp extends Application {
 	 */
 	public TabPane getTabPane() {
 		return TabPaneController.getInstance().getTabPane();
+	}
+	
+	/**
+	 * @param tabName
+	 * @return
+	 */
+	public ErrorTabController getErrorTabController(final String tabName) {
+		for (final var ctrl : errorTabControllers) {
+			if (ctrl != null) {
+				final Tab tab = ctrl.getTab();
+				if (tab != null && tabName.equals(tab.getText())) {
+					// found the correct one
+					return ctrl;
+				}
+			}
+		}
+		return null;
 	}
 	
 	/**
