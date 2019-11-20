@@ -13,10 +13,17 @@
 		<!-- detect additional selections via buttons becoming visible -->
 		<StateGroup name="Vis">
 			<DefaultState val="No"/>
-			<State name="Yes">
+			<State name="YesEatingClicks">
 				<!-- unit button becomes visible -->
 				<When type="Property" visible="true"/>
-				<Action type="SendEvent" frame="$parent/$parent" event="FixBug"/>
+				<When type="Property" frame="UnitStatusFrame0/ForceUpdateCommand" alpha="255"/>
+				<Action type="SendEvent" frame="$parent/$parent" undo="false" event="FixBug"/>
+			</State>
+			<State name="YesNotUpdating">
+				<!-- unit button becomes visible -->
+				<When type="Property" visible="true"/>
+				<When type="Property" operator="NotEqual" frame="UnitStatusFrame0/ForceUpdateCommand" alpha="255"/>
+				<Action type="SendEvent" frame="$this" undo="false" event="doNothing"/>
 			</State>
 			<State name="No"/>
 		</StateGroup>
@@ -53,8 +60,10 @@
 				<Anchor relative="$parent"/>
 				<Visible val="false"/>
 				<Enabled val="false"/>
+				<Alpha val="255"/>
 			</Frame>
-			<Animation name="Ahlimation">
+			
+			<Animation name="FixBug">
 				<Event event="FixBug" action="Reset,Play" frame="$parent/$parent/$parent"/>
 				
 				<Controller type="Enabled" frame="ForceUpdateCommand" end="Pause">
@@ -74,8 +83,41 @@
 					 <!-- forces update of UnitButton which updates bindings which updates ControlPlayerId, wtf?!
 						 This interacts with the game's hardcoded blackbox logic of the parent GameButton which sets the unitTag to the correct unit again.
 						 For some reason, ControlPlayerId is updated then.
+						 
+						 Undo cannot be disabled as that breaks it. The undoing seems to be the deciding factor.
 					 -->
-					<Action type="SetProperty" frame="$parent" unitTag="0#0"/>
+					<Action type="SetProperty" frame="$parent" unitTag="0#0" undo="true"/>
+					<!-- Enable a cooldown for the update mechanic. -->
+					<Action type="SetProperty" frame="ForceUpdateCommand" alpha="1" undo="false"/>
+					<Action type="SendEvent" frame="$this" undo="false" event="FixBugReset"/>
+				</State>
+				<State name="other"/>
+			</StateGroup>
+			
+			
+			<Frame type="Frame" name="ResetCommand">
+				<Anchor relative="$parent"/>
+				<Visible val="false"/>
+				<Enabled val="false"/>
+			</Frame>
+			
+			<Animation name="FixBugReset">
+				<Event event="FixBugReset" action="Reset,Play" frame="$this"/>
+				
+				<Controller type="Enabled" frame="ResetCommand" end="Pause">
+					<!-- This decides how long the update cooldown is. If this is set to <= 0.001, then this is basically instant.
+						Warning: This causes button clicks to be ignored.
+					-->
+					<Key type="Bool" time="1.0" value="true"/>
+					<!--<Key type="Bool" time="1.0" value="false"/>-->
+				</Controller>
+			</Animation>
+			
+			<StateGroup name="FixBugResetState">
+				<DefaultState val="other"/>
+				<State name="Resetting">
+					<When type="Property" frame="ResetCommand" enabled="true"/>
+					<Action type="SetProperty" frame="ForceUpdateCommand" alpha="255" undo="false"/>
 				</State>
 				<State name="other"/>
 			</StateGroup>
