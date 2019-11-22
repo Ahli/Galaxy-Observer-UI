@@ -3,6 +3,9 @@
 
 package com.ahli.mpq.mpqeditor;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 public class MpqEditorCompressionRuleSize extends MpqEditorCompressionRule {
 	private int minSize;
 	private int maxSize;
@@ -64,5 +67,41 @@ public class MpqEditorCompressionRuleSize extends MpqEditorCompressionRule {
 	@Override
 	public Object deepCopy() {
 		return new MpqEditorCompressionRuleSize(this);
+	}
+	
+	@Override
+	public boolean equals(final Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		if (obj == this) {
+			return true;
+		}
+		final Object[] signatureFields = getSignatureFields();
+		final Object[] thatSignatureFields = ((MpqEditorCompressionRuleSize) obj).getSignatureFields();
+		for (int i = 0; i < signatureFields.length; i++) {
+			if (!(signatureFields[i] instanceof Object[])) {
+				if (!Objects.equals(signatureFields[i], thatSignatureFields[i])) {
+					return false;
+				}
+			} else {
+				if (!Arrays.deepEquals((Object[]) signatureFields[i], (Object[]) thatSignatureFields[i])) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+	
+	private Object[] getSignatureFields() {
+		return new Object[] { maxSize, minSize, getCompressionMethod(), getAttributeString() };
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(getSignatureFields());
 	}
 }

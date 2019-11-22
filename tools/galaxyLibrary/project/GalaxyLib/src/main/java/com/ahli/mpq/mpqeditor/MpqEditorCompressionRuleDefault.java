@@ -3,6 +3,9 @@
 
 package com.ahli.mpq.mpqeditor;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 public class MpqEditorCompressionRuleDefault extends MpqEditorCompressionRule {
 	
 	public MpqEditorCompressionRuleDefault() {
@@ -26,5 +29,41 @@ public class MpqEditorCompressionRuleDefault extends MpqEditorCompressionRule {
 	@Override
 	public Object deepCopy() {
 		return new MpqEditorCompressionRuleDefault(this);
+	}
+	
+	@Override
+	public boolean equals(final Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		if (obj == this) {
+			return true;
+		}
+		final Object[] signatureFields = getSignatureFields();
+		final Object[] thatSignatureFields = ((MpqEditorCompressionRuleDefault) obj).getSignatureFields();
+		for (int i = 0; i < signatureFields.length; i++) {
+			if (!(signatureFields[i] instanceof Object[])) {
+				if (!Objects.equals(signatureFields[i], thatSignatureFields[i])) {
+					return false;
+				}
+			} else {
+				if (!Arrays.deepEquals((Object[]) signatureFields[i], (Object[]) thatSignatureFields[i])) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+	
+	private Object[] getSignatureFields() {
+		return new Object[] { getCompressionMethod(), getAttributeString() };
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(getSignatureFields());
 	}
 }

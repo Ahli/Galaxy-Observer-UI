@@ -789,21 +789,24 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		}
 	}
 	
+	@SuppressWarnings ("squid:S4973")
 	private void copyAttributes(final List<UIAttribute> attributesSource, final List<UIAttribute> attributesTarget) {
 		for (final UIAttribute attrSource : attributesSource) {
-			final boolean edited = false;
-			
-			// TODO modify existing attributes
-			targetloop:
+			boolean edited = false;
+			final String sourceName = attrSource.getName();
+			// override attribute => remove existing one with same tag
 			for (final UIAttribute attrTarget : attributesTarget) {
-				final var targetKeyValList = attrTarget.getKeyValues();
-				for (int i = 0; i < targetKeyValList.size(); i += 2) {
-					final String key = targetKeyValList.get(i);
-					//					if (key.equals()) {
-					//						edited = true;
-					//						break targetloop;
-					//					}
+				final String targetName = attrTarget.getName();
+				// both null or equal
+				if (targetName == sourceName || targetName.equals(sourceName)) {
+					attrTarget.setKeyValues(attrSource.getKeyValues());
+					edited = true;
+					break;
 				}
+			}
+			if (!edited) {
+				// no matching existing attribute -> add
+				attributesTarget.add((UIAttribute) attrSource.deepCopy());
 			}
 		}
 	}

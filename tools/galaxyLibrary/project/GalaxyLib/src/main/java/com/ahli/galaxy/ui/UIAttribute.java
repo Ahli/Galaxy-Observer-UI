@@ -20,6 +20,9 @@ import java.util.Objects;
 public class UIAttribute extends UIElement {
 	private final List<String> keyValueList;
 	
+	/**
+	 * Constructor for deserialization
+	 */
 	public UIAttribute() {
 		super(null);
 		keyValueList = new ArrayList<>(0);
@@ -104,6 +107,16 @@ public class UIAttribute extends UIElement {
 	 */
 	public List<String> getKeyValues() {
 		return keyValueList;
+	}
+	
+	/**
+	 * Clears all existing key-value-pairs and adds all entries from the list.
+	 *
+	 * @param keyValues
+	 */
+	public void setKeyValues(final List<String> keyValues) {
+		keyValueList.clear();
+		keyValueList.addAll(keyValues);
 	}
 	
 	@Override

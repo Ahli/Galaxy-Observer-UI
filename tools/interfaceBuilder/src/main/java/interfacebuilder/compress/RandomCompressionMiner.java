@@ -14,6 +14,7 @@ import com.ahli.mpq.mpqeditor.MpqEditorCompressionRuleSize;
 import interfacebuilder.integration.FileService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.collections.impl.map.mutable.primitive.ObjectLongHashMap;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,7 +43,8 @@ public class RandomCompressionMiner {
 	private final ModData mod;
 	private final MpqEditorInterface mpqInterface;
 	private final Random random = new Random();
-	//	private final MpqEditorCompressionRuleMethod[] compressionSetting = MpqEditorCompressionRuleMethod.values();
+	private final MpqEditorCompressionRuleMethod[] compressionSetting = MpqEditorCompressionRuleMethod.values();
+	private ObjectLongHashMap<String> fileSizeMap;
 	private MpqEditorCompressionRule[] rules;
 	private long bestSize;
 	private MpqEditorCompressionRule[] bestRuleSet;
@@ -81,22 +83,24 @@ public class RandomCompressionMiner {
 			throws IOException, MpqException, InterruptedException {
 		this.mod = mod;
 		mpqInterface = new MpqEditorInterface(mpqCachePath + Thread.currentThread().getId(), mpqEditorPath);
-		final File cache = new File(mpqInterface.getMpqCachePath());
-		mod.setMpqCacheDirectory(cache);
+		final File cacheDir = new File(mpqInterface.getMpqCachePath());
+		mod.setMpqCacheDirectory(cacheDir);
 		mpqInterface.clearCacheExtractedMpq();
-		fileService.copyFileOrDirectory(mod.getSourceDirectory(), cache);
+		fileService.copyFileOrDirectory(mod.getSourceDirectory(), cacheDir);
 		
 		// use old ruleset if one was specified and test it
 		if (oldBestRuleset != null) {
 			// check for file coverage holes
-			final List<File> untrackedFiles = getUntrackedFiles(oldBestRuleset, cache.toPath());
+			final List<File> untrackedFiles = getUntrackedFiles(oldBestRuleset, cacheDir.toPath());
 			if (!untrackedFiles.isEmpty()) {
-				rules = addRulesForFiles(oldBestRuleset, untrackedFiles, cache);
+				rules = addRulesForFiles(oldBestRuleset, untrackedFiles, cacheDir);
 				oldRulesetHadMissingFiles = true;
 			} else {
 				rules = oldBestRuleset;
 			}
-			rules = removeUnusedMaskEnries(rules, cache);
+			rules = removeUnusedMaskEnries(rules, cacheDir);
+			fillFileSizeMap(rules, cacheDir);
+			replaceForbiddenRulesets(rules);
 			
 			bestRuleSet = deepCopy(rules);
 			bestSize = build(rules, true);
@@ -106,7 +110,7 @@ public class RandomCompressionMiner {
 		}
 		
 		// compare with usual, initial ruleset and use the better one
-		final MpqEditorCompressionRule[] initRules = createInitialRuleset(cache.toPath());
+		final MpqEditorCompressionRule[] initRules = createInitialRuleset(cacheDir.toPath());
 		final long initRuleSetSize = build(initRules, true);
 		if (initRuleSetSize < bestSize) {
 			bestSize = initRuleSetSize;
@@ -194,6 +198,42 @@ public class RandomCompressionMiner {
 	}
 	
 	/**
+	 * @param rules
+	 * @param cache
+	 */
+	private void fillFileSizeMap(final MpqEditorCompressionRule[] rules, final File cache) {
+		fileSizeMap = new ObjectLongHashMap<>();
+		final Path cachePath = cache.toPath();
+		for (final MpqEditorCompressionRule rule : rules) {
+			if (rule instanceof MpqEditorCompressionRuleMask) {
+				final String mask = ((MpqEditorCompressionRuleMask) rule).getMask();
+				fileSizeMap.put(mask, getFileSize(mask, cachePath));
+			}
+		}
+	}
+	
+	/**
+	 * @param rules
+	 */
+	private static void replaceForbiddenRulesets(final MpqEditorCompressionRule[] rules) {
+		for (final MpqEditorCompressionRule rule : rules) {
+			if (rule instanceof MpqEditorCompressionRuleMask) {
+				if (hasInvalidCompressionRuleset(rule.getCompressionMethod())) {
+					rule.setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2);
+				}
+			} else {
+				// Size-rule 0-0 is forced to use compression NONE
+				if (rule instanceof MpqEditorCompressionRuleSize &&
+						((MpqEditorCompressionRuleSize) rule).getMaxSize() == 0 &&
+						!rule.getCompressionMethod().equals(MpqEditorCompressionRuleMethod.NONE)) {
+					((MpqEditorCompressionRuleSize) rule).setMinSize(0);
+					rule.setCompressionMethod(MpqEditorCompressionRuleMethod.NONE);
+				}
+			}
+		}
+	}
+	
+	/**
 	 * Creates a deep copy of the specified list of rules.
 	 *
 	 * @param rules
@@ -237,12 +277,22 @@ public class RandomCompressionMiner {
 		final List<MpqEditorCompressionRule> initRules = new ArrayList<>();
 		initRules.add(new MpqEditorCompressionRuleSize(0, 0).setSingleUnit(true));
 		final File sourceDir = mod.getMpqCacheDirectory();
+		fileSizeMap = new ObjectLongHashMap<>();
 		try (final Stream<Path> ps = Files.walk(cacheModDirectory)) {
-			ps.filter(Files::isRegularFile).forEach(p -> initRules.add(getDefaultRule(p, sourceDir)));
+			ps.filter(Files::isRegularFile).forEach(p -> {
+				final var compressionRule = getDefaultRule(p, sourceDir);
+				initRules.add(compressionRule);
+				fileSizeMap.put(compressionRule.getMask(), getFileSize(compressionRule.getMask(), cacheModDirectory));
+			});
 		}
 		return initRules.toArray(new MpqEditorCompressionRule[0]);
 	}
 	
+	/**
+	 * @param rules
+	 * @param p
+	 * @return
+	 */
 	private static boolean containsFile(final MpqEditorCompressionRule[] rules, final Path p) {
 		for (final MpqEditorCompressionRule rule : rules) {
 			if (rule instanceof MpqEditorCompressionRuleMask) {
@@ -284,7 +334,37 @@ public class RandomCompressionMiner {
 		return referencedFile.exists() && referencedFile.isFile();
 	}
 	
-	private static MpqEditorCompressionRule getDefaultRule(final Path path, final File sourceDir) {
+	/**
+	 * @param mask
+	 * @return
+	 */
+	private long getFileSize(final String mask, final Path cache) {
+		final Path path = Path.of(cache.toString(), mask);
+		if (Files.exists(path) && Files.isRegularFile(path)) {
+			try {
+				return Files.size(path);
+			} catch (final IOException e) {
+				return 0;
+			}
+		}
+		return 0;
+	}
+	
+	/**
+	 * @param method
+	 * @return
+	 */
+	private static boolean hasInvalidCompressionRuleset(final MpqEditorCompressionRuleMethod method) {
+		return method == MpqEditorCompressionRuleMethod.LZMA || method == MpqEditorCompressionRuleMethod.PKWARE ||
+				method == MpqEditorCompressionRuleMethod.SPARSE;
+	}
+	
+	/**
+	 * @param path
+	 * @param sourceDir
+	 * @return
+	 */
+	private static MpqEditorCompressionRuleMask getDefaultRule(final Path path, final File sourceDir) {
 		final var rule = new MpqEditorCompressionRuleMask(getFileMask(path, sourceDir));
 		rule.setSingleUnit(true).setCompress(true);
 		if (path.endsWith(OGG) || path.endsWith(OGV) || path.endsWith(WAV) || path.endsWith(TXT) ||
@@ -321,7 +401,7 @@ public class RandomCompressionMiner {
 		// not fine: LZMA (crash during load)
 		for (final MpqEditorCompressionRule rule : rules) {
 			if (rule instanceof MpqEditorCompressionRuleMask) {
-				rule.setCompressionMethod(getRandomCompressionMethod());
+				rule.setCompressionMethod(getRandomCompressionMethod(((MpqEditorCompressionRuleMask) rule).getMask()));
 				rule.setSingleUnit(random.nextBoolean());
 			}
 		}
@@ -332,21 +412,22 @@ public class RandomCompressionMiner {
 	 *
 	 * @return
 	 */
-	private MpqEditorCompressionRuleMethod getRandomCompressionMethod() {
-		// exclude LZMA
-		final MpqEditorCompressionRuleMethod method;
-		//		final int max = compressionSetting.length;
-		//		do {
-		//			method = compressionSetting[random.nextInt(max)];
-		//		} while (method == MpqEditorCompressionRuleMethod.LZMA || method == MpqEditorCompressionRuleMethod.NONE ||
-		//				method == MpqEditorCompressionRuleMethod.PKWARE || method == MpqEditorCompressionRuleMethod.SPARSE ||
-		//				method == MpqEditorCompressionRuleMethod.SPARSE_BZIP2 ||
-		//				method == MpqEditorCompressionRuleMethod.SPARSE_ZLIB);
-		method = random.nextBoolean() ? MpqEditorCompressionRuleMethod.ZLIB : MpqEditorCompressionRuleMethod.BZIP2;
+	private MpqEditorCompressionRuleMethod getRandomCompressionMethod(final String mask) {
+		// exclude LZMA -> crash
+		MpqEditorCompressionRuleMethod method;
+		if (fileSizeMap.get(mask) > 0) {
+			method = random.nextBoolean() ? MpqEditorCompressionRuleMethod.ZLIB : MpqEditorCompressionRuleMethod.BZIP2;
+		} else {
+			final int max = compressionSetting.length;
+			do {
+				method = compressionSetting[random.nextInt(max)];
+			} while (hasInvalidCompressionRuleset(method));
+		}
+		//		method = random.nextBoolean() ? MpqEditorCompressionRuleMethod.ZLIB : MpqEditorCompressionRuleMethod.BZIP2;
 		return method;
 	}
 	
-	public MpqEditorCompressionRule[] getBestRuleSet() {
+	public MpqEditorCompressionRule[] getBestCompressionRules() {
 		return bestRuleSet;
 	}
 	
