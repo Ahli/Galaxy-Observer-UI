@@ -57,6 +57,16 @@
           <Action type="SetProperty" frame="EventDialogOpener/MobsterFrame" visible="True" />
           <Action type="SetProperty" frame="QuestTileList" visible="false" />
         </State>
+        <State name="Toy2019EventActive_NoQuestInProgress">
+          <When type="Property" frame="QuestTileList" operator="Equal" DataCount="0" />
+          <When type="Property" frame="$QuestUI" CanOpenEventDialog="True" />
+          <When type="Property" frame="$QuestUI" ActiveSpecialEvent="Toy2019" />
+          <Action type="SetProperty" frame="$this" visible="True" />
+          <Action type="SetProperty" frame="EventDialogOpener" visible="True" />
+          <Action type="SetProperty" frame="EventDialogOpener" height="116" />
+          <Action type="SetProperty" frame="EventDialogOpener/Toy2019Frame" visible="True" />
+          <Action type="SetProperty" frame="QuestTileList" visible="false" />
+        </State>
         <State name="NoSpecialQuests">
           <Action type="SetProperty" frame="$this" visible="False" />
         </State>
@@ -207,12 +217,38 @@
             <State name="Selectable" />
           </StateGroup>
         </Frame>
+        <Frame type="Frame" name="Toy2019Frame">
+          <Anchor relative="$parent" />
+          <Visible val="False" />
+          <Frame type="Image" name="BackgroundImage">
+            <Anchor relative="$parent" />
+            <Texture val="@UI/Storm_UI_Quest_Event_Toy2019_QuestLog_BG_Small" />
+          </Frame>
+          <Frame type="Label" name="EventDialogText">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+            <Anchor side="Top" relative="$parent" pos="Min" offset="20" />
+            <Style val="ToyEvent_QuestLogEmptyText" />
+            <Text val="@UI/QuestLine/Event/Toys2019/QuestLogEmptyText" />
+          </Frame>
+          <Frame type="Button" name="OpenButton" template="Toy2019EventQuestPopupPanel/OpenToy2019EventPopupButtonTemplate">
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+            <Anchor side="Bottom" relative="$parent/BackgroundImage" pos="Max" offset="-15" />
+            <Animation name="OpenEventPopup">
+              <Event event="OnClick" action="Restart,Play" />
+              <Controller type="Event" frame="$QuestUI" end="Pause">
+                <Key type="Event" time="0" event="OpenActiveEventDialog" />
+              </Controller>
+            </Animation>
+          </Frame>
+        </Frame>
       </Frame>
       <Frame type="TileList" name="QuestTileList">
         <Anchor side="Top" relative="Item0" pos="Min" offset="0" />
         <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
         <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
-        <Anchor side="Bottom" relative="$parent/RemainingTimeLabel" pos="Max" offset="0" />
+        <Anchor side="Bottom" relative="$parent/RemainingTimeLabel" pos="Min" offset="0" />
         <Frame type="QuestLineTileListItem" name="Item0" template="QuestLineTileListItem/QuestLineTileListItemTemplate">
           <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
           <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
@@ -233,10 +269,11 @@
         </Frame>
       </Frame>
       <Frame type="Label" name="RemainingTimeLabel">
-        <Anchor side="Bottom" relative="$parent/BorderImage2" pos="Min" offset="-4" />
+        <Anchor side="Bottom" relative="$parent/BorderImage2" pos="Min" offset="0" />
         <Anchor side="Right" relative="$parent" pos="Max" offset="-10" />
+        <Height val="38" />
         <CollapseLayout val="True" />
-        <Style val="SpecialQuestPlayerRewardLabel" />
+        <Style val="SpecialQuestTimeRemaining" />
         <Text val="{$QuestUI/@RemainingTime}" />
         <StateGroup name="SpecialEvent">
           <State name="NoEvent">
@@ -262,6 +299,10 @@
           <State name="MobsterEvent">
             <When type="Property" frame="$QuestUI" ActiveSpecialEvent="MobsterEvent" />
             <Action type="SetProperty" style="MobsterEvent_QuestDesc" />
+          </State>
+          <State name="Toy2019Event">
+            <When type="Property" frame="$QuestUI" ActiveSpecialEvent="Toy2019" />
+            <Action type="SetProperty" style="ToyEvent_QuestLogItemTimeRemaining" />
           </State>
         </StateGroup>
       </Frame>
