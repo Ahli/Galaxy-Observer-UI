@@ -100,11 +100,54 @@
     </Frame>
 
     <Frame type="CoopCampaignMapSelectionPanel" name="CoopCampaignMapSelectionPanelTemplate">
-    
+        <Frame type="Button" name="RetryMapButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
+            <!--"Fake" map button to replace the real one while retry is selected.-->
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Width val="260"/>
+            <StateGroup name="VisibleState">
+                <DefaultState val="Hide"/>
+                <State name="ValidRetry">
+                    <When type="Property" frame="$CoopStandardGlue_CommanderSelectionPanel/DifficultyContainer/DifficultyTileList" RetryIsSelected="True"/>
+                    <When type="Property" frame="$CoopStandardGlue_CommanderSelectionPanel/DifficultyContainer/DifficultyTileList" RetryIsAvailable="True"/>
+                    <Action type="SetProperty" Text="{$parent/MapButton/@Text}"/>
+                    <Action type="SetProperty" Visible="True"/>
+                </State>
+              
+                <State name="InvalidRetry">
+                    <When type="Property" frame="$CoopStandardGlue_CommanderSelectionPanel/DifficultyContainer/DifficultyTileList" RetryIsSelected="True"/>
+                    <When type="Property" frame="$CoopStandardGlue_CommanderSelectionPanel/DifficultyContainer/DifficultyTileList" RetryIsAvailable="False"/>
+                    <Action type="SetProperty" Text="@UI/FilePanelDateUnavailable"/>
+                    <Action type="SetProperty" Visible="True"/>
+                </State>
+
+                <State name="Hide">
+                    <Action type="SetProperty" Visible="False"/>
+                </State>
+            </StateGroup>
+        </Frame>
         <Frame type="Button" name="MapButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
             <Width val="260"/>
+            <!-- Hide the standard button when the retry button is showing. -->
+            <StateGroup name="VisibleState">
+                <State name="ValidRetry">
+                    <When type="Property" frame="$CoopStandardGlue_CommanderSelectionPanel/DifficultyContainer/DifficultyTileList" RetryIsSelected="True"/>
+                    <When type="Property" frame="$CoopStandardGlue_CommanderSelectionPanel/DifficultyContainer/DifficultyTileList" RetryIsAvailable="True"/>
+                    <Action type="SetProperty" Visible="False"/>
+                </State>
+              
+                <State name="InvalidRetry">
+                    <When type="Property" frame="$CoopStandardGlue_CommanderSelectionPanel/DifficultyContainer/DifficultyTileList" RetryIsSelected="True"/>
+                    <When type="Property" frame="$CoopStandardGlue_CommanderSelectionPanel/DifficultyContainer/DifficultyTileList" RetryIsAvailable="False"/>
+                    <Action type="SetProperty" Visible="False"/>
+                </State>
+              
+                <State name="Show">
+                    <Action type="SetProperty" Visible="True"/>
+                </State>
+            </StateGroup>
         </Frame>
         
         <Frame type="Label" name="SelectMapLabel">
@@ -120,7 +163,19 @@
             <Anchor side="Top" relative="$parent/MapButton" pos="Max" offset="-2"/>
             <Anchor side="Left" relative="$parent/MapButton" pos="Min" offset="2"/>
             <Anchor side="Right" relative="$parent/MapButton" pos="Max" offset="2"/>
+            <!-- Hide the map bonus label for retry. Retry does not support the random map bonus. -->
             <Style val="Coop_MapDifficultyLabel"/>
+          
+            <StateGroup name="HideForRetry">
+                <State name="RetrySelected">
+                    <When type="Property" frame="$CoopStandardGlue_CommanderSelectionPanel/DifficultyContainer/DifficultyTileList" RetryIsSelected="True"/>
+                    <Action type="SetProperty" Visible="False"/>
+                </State>
+                
+                <State name="Show">
+                    <Action type="SetProperty" Visible="True"/>
+                </State>
+            </StateGroup>
         </Frame>
 
         <Frame type="Frame" name="SelectionContainer">

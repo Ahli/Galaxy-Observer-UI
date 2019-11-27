@@ -169,10 +169,76 @@
             <Text val="@UI/ScreenCoopCampaign/ScorePanel/Close"/>
             <Shortcut val="@UI/ScreenNavigationBack_Hotkey"/>
         </Frame>
-
-        <Frame type="PartyInviteButton" name="PartyInviteButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
+      
+        <Frame type="Button" name="RetryButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
+            <!-- This is the button to request Retry Brutal+ -->
             <Anchor side="Bottom" relative="$parent/CloseButton" pos="Max" offset="0"/>
             <Anchor side="Left" relative="$parent/CloseButton" pos="Max" offset="5"/>
+            <Text val="@CommanderDifficultyLevel/ShortName/Retry"/>
+            <CollapseLayout val="True"/>
+            <StateGroup name="RetryState">
+                <State name="GameIncomplete">
+                    <When type="Property" frame="$parent" IsGameOver="False"/>
+                    <Action type="SetProperty" Visible="True"/>
+                    <Action type="SetProperty" Enabled="False"/>
+                    <Action type="SetProperty" Tooltip="@UI/ScoreScreenLadder/MatchInProgress"/> <!-- FIXME create a better string for this tooltip.-->
+                    <!--UI/ScoreScreenLadder/MatchInProgress=Match In Progress-->
+                </State>
+                <State name="NotBrutalPlus">
+                    <!-- The IsBrutalPlus property is invalid until the game is completed.-->
+                    <When type="Property" frame="$parent" IsGameOver="True"/>
+                    <When type="Property" frame="$parent" IsBrutalPlus="False"/>
+                    <Action type="SetProperty" Visible="False"/>
+                    <Action type="SetProperty" Enabled="False"/>
+                    <Action type="SetProperty" Tooltip=""/>
+                </State>
+                <State name="GameEndedVictory">
+                    <When type="Property" frame="$parent" IsGameOver="True"/>
+                    <When type="Property" frame="$parent" IsBrutalPlus="True"/>
+                    <When type="Property" frame="$parent" IsGameVictory="True"/>
+                    <Action type="SetProperty" Visible="False"/>
+                    <Action type="SetProperty" Enabled="False"/>
+                    <Action type="SetProperty" Tooltip=""/>
+                </State>
+                <State name="GameEndedNoParty">
+                    <When type="Property" frame="$parent" IsGameOver="True"/>
+                    <When type="Property" frame="$parent" IsBrutalPlus="True"/>
+                    <When type="Property" frame="$parent" IsGameVictory="False"/>
+                    <When type="Property" frame="$parent" IsInParty="False"/>
+                    <Action type="SetProperty" Visible="True"/>
+                    <Action type="SetProperty" Enabled="False"/>
+                    <Action type="SetProperty" Tooltip="@UI/ScreenMatchmaking/QueueTeamTooSmallTooltip"/> <!-- FIXME create a better string for this tooltip. -->
+                    <!--@UI/ScreenMatchmaking/QueueTeamTooSmallTooltip=Not enough players in your party for this play mode.-->
+                </State>
+                <State name="GameEndedPartyLeader">
+                    <When type="Property" frame="$parent" IsGameOver="True"/>
+                    <When type="Property" frame="$parent" IsBrutalPlus="True"/>
+                    <When type="Property" frame="$parent" IsGameVictory="False"/>
+                    <When type="Property" frame="$parent" IsInParty="True"/>
+                    <When type="Property" frame="$parent" IsPartyLeader="True"/>
+                    <Action type="SetProperty" Visible="True"/>
+                    <Action type="SetProperty" Enabled="True"/>
+                    <Action type="SetProperty" Tooltip=""/>
+                </State>
+                <State name="GameEndedPartyFollower">
+                    <When type="Property" frame="$parent" IsGameOver="True"/>
+                    <When type="Property" frame="$parent" IsBrutalPlus="True"/>
+                    <When type="Property" frame="$parent" IsGameVictory="False"/>
+                    <When type="Property" frame="$parent" IsInParty="True"/>
+                    <When type="Property" frame="$parent" IsPartyLeader="False"/>
+                    <Action type="SetProperty" Visible="True"/>
+                    <Action type="SetProperty" Enabled="False"/>
+                    <Action type="SetProperty" Tooltip="@UI/ScreenMatchmaking/QueueNotPartyLeaderTooltip"/>
+                </State>
+                <State name="Invalid">
+                    <Action type="SetProperty" Visible="False"/>
+                </State>
+            </StateGroup>
+        </Frame>
+
+        <Frame type="PartyInviteButton" name="PartyInviteButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
+            <Anchor side="Bottom" relative="$parent/RetryButton" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent/RetryButton" pos="Max" offset="5"/>
             <Text val="@UI/ScreenCoopCampaign/ScorePanel/PartyInvite"/>
         </Frame>
 

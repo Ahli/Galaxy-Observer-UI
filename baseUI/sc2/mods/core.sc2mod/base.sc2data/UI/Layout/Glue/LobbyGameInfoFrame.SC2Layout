@@ -127,6 +127,48 @@
             <Height val="30"/>
         </Frame>
         
+        <Frame type="Label" name="MapNameLabel">
+            <Anchor side="Top" relative="$parent/ScreenshotTileList" pos="Max" offset="10"/>
+            <Anchor side="Left" relative="$parent/ScreenshotTileList" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/ScreenshotTileList" pos="Max" offset="0"/>
+            <Height val="30"/>
+            <AcceptsMouse val="True"/>
+            <Options val="Ellipsis | TooltipIfTruncated"/>
+            <Style val="@Lobby_MapInfoPreview_Title"/>
+            <Text val="{$parent/BattleMapFrame/@Name}"/>
+        </Frame>
+        
+        <Frame type="Label" name="AuthorLabel">
+            <Anchor side="Top" relative="$parent/MapNameLabel" pos="Max" offset="3"/>
+            <Anchor side="Left" relative="$parent/MapNameLabel" pos="Min" offset="0"/>
+            <Style val="@Lobby_MapInfoPreview_Author"/>
+            <Visible val="False"/>
+        </Frame>
+        
+        <Frame type="Image" name="BlizzardIcon">
+            <Anchor side="Top" relative="$parent/MapNameLabel" pos="Max" offset="5"/>
+            <Anchor side="Left" relative="$parent/AuthorLabel" pos="Min" offset="0"/>
+            <Width val="40"/>
+            <ScaleHeightToTexture val="True"/>
+            <Texture val="@UI/Glues_Icons_BlizzardAuthored_Normal"/>
+            
+            <StateGroup name="VisibleState">
+                <DefaultState val="NotVisible"/>
+                
+                <State name="Visible">
+                    <When type="AnimationState" frame="$parent" GameInfo="Loaded"/>
+                    <When type="Property" frame="$parent/BattleMapFrame" IsBlizzardMap="True"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                    <Action type="SetProperty" frame="$parent/AuthorLabel" Alpha="0"/>
+                </State>
+
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                    <Action type="SetProperty" frame="$parent/AuthorLabel" Alpha="255"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
         <Frame type="Frame" name="DetailsAnchor">
             <Anchor side="Top" relative="$parent/ScreenshotTileList" pos="Min" offset="0"/>
             <Anchor side="Bottom" relative="$parent" pos="Max" offset="-24"/>
@@ -134,24 +176,48 @@
             <Width val="375"/>
         </Frame>
         
-        <Frame type="Label" name="NameLabelDetails">
+        <Frame type="Label" name="MapNameLabelDetails">
             <Anchor side="Top" relative="$parent/DetailsAnchor" pos="Min" offset="0"/>
             <Anchor side="Left" relative="$parent/DetailsAnchor" pos="Min" offset="2"/>
-            <Style val="@Arcade_GameInfo_Title"/>
+            <Style val="@Lobby_MapInfoPreview_Title"/>
             <Visible val="True"/>
-            <Text val="{$parent/NameLabel/@Text}"/>
+            <Text val="{$parent/MapNameLabel/@Text}"/>
             <Width val="300"/>
         </Frame>
         
         <Frame type="Label" name="AuthorLabelDetails">
-            <Anchor side="Top" relative="$parent/NameLabelDetails" pos="Max" offset="3"/>
-            <Anchor side="Left" relative="$parent/NameLabelDetails" pos="Min" offset="0"/>
-            <Style val="@Arcade_GameInfo_Author"/>
+            <Anchor side="Top" relative="$parent/MapNameLabelDetails" pos="Max" offset="3"/>
+            <Anchor side="Left" relative="$parent/MapNameLabelDetails" pos="Min" offset="0"/>
+            <Style val="@Lobby_MapInfoPreview_Author"/>
             <Visible val="True"/>
             <AcceptsMouse val="true"/>
             <ContextMenu val="$parent/UserContextMenu"/>
             <ContextMenuButtons val="Left|Right"/>
             <Text val="{$parent/AuthorLabel/@Text}"/>
+        </Frame>
+        
+        <Frame type="Image" name="BlizzardIconDetails">
+            <Anchor side="Top" relative="$parent/MapNameLabelDetails" pos="Max" offset="5"/>
+            <Anchor side="Left" relative="$parent/AuthorLabelDetails" pos="Min" offset="0"/>
+            <Width val="40"/>
+            <ScaleHeightToTexture val="True"/>
+            <Texture val="@UI/Glues_Icons_BlizzardAuthored_Normal"/>
+            
+            <StateGroup name="VisibleState">
+                <DefaultState val="NotVisible"/>
+                
+                <State name="Visible">
+                    <When type="AnimationState" frame="$parent" GameInfo="Loaded"/>
+                    <When type="Property" frame="$parent/BattleMapFrame" IsBlizzardMap="True"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                    <Action type="SetProperty" frame="$parent/AuthorLabelDetails" Alpha="0"/>
+                </State>
+
+                <State name="NotVisible">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                    <Action type="SetProperty" frame="$parent/AuthorLabelDetails" Alpha="255"/>
+                </State>
+            </StateGroup>
         </Frame>
         
         <Frame type="ProgressBar" name="RatingProgressBar">
@@ -172,40 +238,74 @@
             <Anchor side="Left" relative="$parent/RatingProgressBar" pos="Max" offset="5"/>
             <Anchor side="Bottom" relative="$parent/RatingProgressBar" pos="Mid" offset="2"/>
             <Anchor side="Right" relative="$parent/PlayerLabel" pos="Max" offset="0"/>
-            <Style val="@Arcade_GameInfo_Author_RightAligned"/>
+            <Style val="@Lobby_MapInfoPreview_DescriptionRight"/>
             <Visible val="False"/>
         </Frame>
 
         <Frame type="Label" name="GenreLabel">
-            <Anchor side="Top" relative="$parent/RatingProgressBar" pos="Max" offset="5"/>
+            <Anchor side="Top" relative="$parent/RatingProgressBar" pos="Max" offset="12"/>
             <Anchor side="Left" relative="$parent/AuthorLabelDetails" pos="Min" offset="0"/>
             <Anchor side="Right" relative="$parent/PlayerLabel" pos="Max" offset="0"/>
-            <Style val="@Arcade_GameInfo_Author"/>
+            <Style val="@Lobby_MapInfoPreview_Description"/>
             <Options val="Ellipsis | TooltipIfTruncated"/>
             <AcceptsMouse val="True"/>
             <Visible val="False"/>
+            <CollapseLayout val="True"/>
         </Frame>
 
         <Frame type="Label" name="ModeLabel">
             <Anchor side="Top" relative="$parent/RatingProgressBar" pos="Mid" offset="2"/>
             <Anchor side="Bottom" relative="$parent/RatingProgressBar" pos="Mid" offset="2"/>
             <Anchor side="Right" relative="$parent/PlayerLabel" pos="Max" offset="0"/>
-            <Style val="@Arcade_GameInfo_Author"/>
+            <Style val="@Lobby_MapInfoPreview_Description"/>
             <Visible val="False"/>
         </Frame>
 
         <Frame type="Label" name="PlayerLabel">
             <Anchor side="Bottom" relative="$parent/AuthorLabelDetails" pos="Max" offset="0"/>
             <Anchor side="Right" relative="$parent/DetailsAnchor" pos="Max" offset="-2"/>
-            <Style val="@Arcade_GameInfo_Author"/>
+            <Style val="@Lobby_MapInfoPreview_DescriptionRight"/>
             <Visible val="False"/>
+        </Frame>
+ 
+        <Frame type="TextFormatFrame" name="FormattedInfoText">
+            <Anchor relative="$parent"/>
+            <Replacement index="0" val="{$parent/PlayerLabel/@Text}"/>
+            <Replacement index="1" val="{$parent/BattleMapFrame/@Genre}"/>
+            <FormatText val="%0% | %1%"/>
+        </Frame>
+
+        <Frame type="Label" name="InfoLabel">
+            <Anchor side="Top" relative="$parent/AuthorLabelDetails" pos="Max" offset="2"/>
+            <Anchor side="Left" relative="$parent/AuthorLabelDetails" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/VersionLabel" pos="Min" offset="-50"/>
+            <AcceptsMouseTooltip val="True"/>
+            <Options val="Ellipsis | TooltipIfTruncated | NoWrapping"/>
+            <Style val="@Lobby_MapInfoPreview_Description"/>
+            <Text val="Sample Info Text"/>
+            <Text val="{$parent/FormattedInfoText/@Text}"/>
+        </Frame>
+
+        <Frame type="Label" name="VersionLabel">
+            <Anchor side="Top" relative="$parent/InfoLabel" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/DetailsAnchor" pos="Max" offset="-2"/>
+            <Style val="@Lobby_MapInfoPreview_DescriptionRight"/>
+            <Text val="{$parent/FormattedVersionText/@Text}"/>
+        </Frame>
+ 
+        <Frame type="TextFormatFrame" name="FormattedVersionText">
+            <Anchor relative="$parent"/>
+            <Replacement index="0" val="{$parent/BattleMapFrame/@MajorVersionNum}"/>
+            <Replacement index="1" val="{$parent/BattleMapFrame/@MinorVersionNum}"/>
+            <FormatText val="@UI/ScreenCustomGames/VersionNumFormatText"/>
         </Frame>
 
         <Frame type="Label" name="DescriptionLabel">
             <Anchor side="Top" relative="$parent/GenreLabel" pos="Max" offset="10"/>
+            <Anchor side="Bottom" relative="$parent/ScreenshotsButton" pos="Min" offset="-5"/>
             <Anchor side="Left" relative="$parent/AuthorLabelDetails" pos="Min" offset="0"/>
             <Anchor side="Right" relative="$parent/PlayerLabel" pos="Max" offset="0"/>
-            <Style val="@Arcade_GameInfo_Description_Top"/>
+            <Style val="@Lobby_MapInfoPreview_Description"/>
             <AutoSizeClamps maxHeight="150"/>
             <Options val="Ellipsis | TooltipIfTruncated"/>
             <AcceptsMouse val="True"/>
@@ -366,6 +466,7 @@
                 <Action type="SetProperty" frame="ScreenshotTileList" visible="false"/>
                 <Action type="SetProperty" frame="ScreenshotBorder" visible="false"/>
                 <Action type="SetProperty" frame="NameLabel" visible="false"/>
+                <Action type="SetProperty" frame="MapNameLabel" visible="false"/>
                 <Action type="SetProperty" frame="AuthorLabel" visible="false"/>
                 <Action type="SetProperty" frame="RatingProgressBar" visible="false"/>
                 <Action type="SetProperty" frame="RatingsCountLabel" visible="false"/>
@@ -373,6 +474,8 @@
                 <Action type="SetProperty" frame="PlayerLabel" visible="false"/>
                 <Action type="SetProperty" frame="DescriptionLabel" visible="false"/>
                 <Action type="SetProperty" frame="WebsiteLabel" visible="false"/>
+                <Action type="SetProperty" frame="InfoLabel" visible="false"/>
+                <Action type="SetProperty" frame="VersionLabel" visible="false"/>
                 <Action type="SetProperty" frame="InfoEmpty" visible="false"/>
                 <Action type="SetProperty" frame="InfoDownloading" visible="true"/>
             </State>
@@ -381,14 +484,18 @@
                 <When type="AnimationState" frame="$this" GameInfo="Loaded"/>
                 <Action type="SetProperty" frame="ScreenshotTileList" visible="true"/>
                 <Action type="SetProperty" frame="ScreenshotBorder" visible="true"/>
-                <Action type="SetProperty" frame="NameLabel" visible="true"/>
+                <Action type="SetProperty" frame="NameLabel" visible="false"/>
+                <Action type="SetProperty" frame="MapNameLabel" visible="true"/>
                 <Action type="SetProperty" frame="AuthorLabel" visible="true"/>
-                <Action type="SetProperty" frame="RatingProgressBar" visible="true"/>
-                <Action type="SetProperty" frame="RatingsCountLabel" visible="true"/>
-                <Action type="SetProperty" frame="GenreLabel" visible="true"/>
-                <Action type="SetProperty" frame="PlayerLabel" visible="true"/>
+                <Action type="SetProperty" frame="RatingProgressBar" visible="false"/>
+                <Action type="SetProperty" frame="RatingsCountLabel" visible="false"/>
+                <Action type="SetProperty" frame="GenreLabel" visible="false"/>
+                <Action type="SetProperty" frame="PlayerLabel" visible="false"/>
                 <Action type="SetProperty" frame="DescriptionLabel" visible="true"/>
                 <Action type="SetProperty" frame="WebsiteLabel" visible="true"/>
+                <Action type="SetProperty" frame="InfoLabel" visible="true"/>
+                <Action type="SetProperty" frame="VersionLabel" visible="true"/>
+                <Action type="SetProperty" frame="DescriptionLabel" visible="true"/>
                 <Action type="SetProperty" frame="InfoEmpty" visible="false"/>
                 <Action type="SetProperty" frame="InfoDownloading" visible="false"/>
             </State>
@@ -398,6 +505,7 @@
                 <Action type="SetProperty" frame="ScreenshotTileList" visible="false"/>
                 <Action type="SetProperty" frame="ScreenshotBorder" visible="false"/>
                 <Action type="SetProperty" frame="NameLabel" visible="false"/>
+                <Action type="SetProperty" frame="MapNameLabel" visible="false"/>
                 <Action type="SetProperty" frame="AuthorLabel" visible="false"/>
                 <Action type="SetProperty" frame="RatingProgressBar" visible="false"/>
                 <Action type="SetProperty" frame="RatingsCountLabel" visible="false"/>
@@ -405,6 +513,8 @@
                 <Action type="SetProperty" frame="PlayerLabel" visible="false"/>
                 <Action type="SetProperty" frame="DescriptionLabel" visible="false"/>
                 <Action type="SetProperty" frame="WebsiteLabel" visible="false"/>
+                <Action type="SetProperty" frame="InfoLabel" visible="false"/>
+                <Action type="SetProperty" frame="VersionLabel" visible="false"/>
                 <Action type="SetProperty" frame="InfoEmpty" visible="true"/>
                 <Action type="SetProperty" frame="InfoDownloading" visible="false"/>
             </State>
