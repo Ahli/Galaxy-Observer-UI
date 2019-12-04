@@ -8,16 +8,17 @@
 	<Constant name="ManaColor_Console" val="26bdf8"/>
 	<Constant name="ManaColorRegen_Console" val="0072ff"/>
 	
-	<Constant name="SonyaFuryColor" val="ea9a1f"/>
-	<Constant name="ChenBrewColor" val="fed210"/>
-	<Constant name="AurielStoredManaColor" val="fed210"/>
-	<Constant name="ValeeraEnergyColor" val="fed210"/>
-	<Constant name="TracerAmmoColor" val="3fddf6"/>
+	<Constant name="SonyaFuryColor" val="ea9a1f"/> <!-- 234,154,31 -->
+	<Constant name="ChenBrewColor" val="ebe24c"/> <!-- 235,226,76 -->
+	<Constant name="AurielStoredManaColor" val="ebe24c"/>
+	<Constant name="ValeeraEnergyColor" val="ebe24c"/>
+	<Constant name="TracerAmmoColor" val="3fddf6"/> <!-- 63,221,246 -->
 	<Constant name="ZaryaEnergyColor" val="ff69b4"/>
-	<Constant name="DVaEnergyColor" val="ff69b4"/>
-	<Constant name="MoralesEnergyColor" val="fed210"/>
+	<Constant name="DVaEnergyColor" val="ff69b4"/> <!-- 255,105,180 -->
+	<Constant name="MoralesEnergyColor" val="ebe24c"/>
 	<Constant name="VolskayaRobotEnergyColor" val="ff69b4"/>
 	<Constant name="JunkratAmmoColor" val="ea9a1f"/>
+	<Constant name="DeathwingBreathColor" val="f72613"/> <!-- 247,38,19 -->
 	
 	<Frame type="UnitStatusEnergyType" name="EnergyBarMagicWidthTemplate">
 		<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
@@ -155,7 +156,7 @@
 		<OwnerColor val="#VolskayaRobotEnergyColor" index="1"/>
 		<AllyColor val="#VolskayaRobotEnergyColor" index="1"/>
 		<EnemyColor val="#VolskayaRobotEnergyColor" index="1"/>
-		<Segmented val="true" index="1"/>
+		<Segmented val="true" index="0"/>
 		<SegmentValue val="1"/>
 		<ColorStyle val="DivaEnergy" />
 	</Frame>
@@ -166,9 +167,18 @@
 		<OwnerColor val="#JunkratAmmoColor" index="1"/>
 		<AllyColor val="#JunkratAmmoColor" index="1"/>
 		<EnemyColor val="#JunkratAmmoColor" index="1"/>
-		<Segmented val="true" index="1"/>
+		<Segmented val="true" index="0"/>
 		<SegmentValue val="1"/>
 		<ColorStyle val="FuryEnergy" />
+	</Frame>
+	<Frame type="UnitStatusEnergyBar" name="DeathwingBreathConsoleTemplate" template="_ColoredManaBars/BaseEnergyConsoleTemplate">
+		<OwnerColor val="#DeathwingBreathColor" index="0"/>
+		<AllyColor val="#DeathwingBreathColor" index="0"/>
+		<EnemyColor val="#DeathwingBreathColor" index="0"/>
+		<OwnerColor val="#DeathwingBreathColor" index="1"/>
+		<AllyColor val="#DeathwingBreathColor" index="1"/>
+		<EnemyColor val="#DeathwingBreathColor" index="1"/>
+		<ColorStyle val="DeathwingEnergy"/>
 	</Frame>
 	<!-- Observer templates -->
 	<Frame type="UnitStatusEnergyBar" name="ManaBarObserverOverviewTemplate">
@@ -271,9 +281,19 @@
 		<OwnerColor val="#JunkratAmmoColor" index="1"/>
 		<AllyColor val="#JunkratAmmoColor" index="1"/>
 		<EnemyColor val="#JunkratAmmoColor" index="1"/>
-		<Segmented val="true" index="1"/>
+		<Segmented val="true" index="0"/>
 		<SegmentValue val="1"/>
 		<ColorStyle val="FuryEnergy" />
+	</Frame>
+	<Frame type="UnitStatusEnergyBar" name="DeathwingBreathObserverOverviewTemplate">
+		<OwnerColor val="#DeathwingBreathColor" index="0"/>
+		<AllyColor val="#DeathwingBreathColor" index="0"/>
+		<EnemyColor val="#DeathwingBreathColor" index="0"/>
+		<OwnerColor val="#DeathwingBreathColor" index="1"/>
+		<AllyColor val="#DeathwingBreathColor" index="1"/>
+		<EnemyColor val="#DeathwingBreathColor" index="1"/>
+		<Segmented val="false" index="0"/>
+		<ColorStyle val="DeathwingEnergy"/>
 	</Frame>
 
 	<!-- Mana Bars non-generic... -->
@@ -285,8 +305,6 @@
 	<Frame type="Frame" name="ConsoleManaBarSwitchTemplate">
 		<Width val="232"/>
 		<Height val="15"/>
-		
-		<!-- TODO: implement all of this with 1 mana bar and apply-template-stategroups to remove unnecessary frames -->
 		
 		<!-- blue mana bar for other heroes, no mana bar for structures (detected via empty mana type label) -->
 		<Frame type="Frame" name="MagicAnchorWithAntiLabel">
@@ -496,6 +514,15 @@
 			<Frame type="UnitStatusFrame" name="UnitStatusFrame0">
 				<Anchor relative="$parent"/>
 				<Frame type="UnitStatusEnergyBar" name="ManaBar" template="_ColoredManaBars/JunkratAmmoConsoleTemplate">
+				</Frame>
+			</Frame>
+		</Frame>
+		<Frame type="SelectionUnitStatusPanel" name="DeathwingBreath">
+			<Anchor relative="$parent"/>
+			<SpecificUnit val="HeroDeathwing"/>
+			<Frame type="UnitStatusFrame" name="UnitStatusFrame0">
+				<Anchor relative="$parent"/>
+				<Frame type="UnitStatusEnergyBar" name="ManaBar" template="_ColoredManaBars/DeathwingBreathConsoleTemplate">
 				</Frame>
 			</Frame>
 		</Frame>
@@ -746,6 +773,25 @@
 				</Controller>
 			</Animation>
 		</Frame>
+		<Frame type="UnitStatusBehaviorAnim" name="DeathwingAdamantineArmorPlate1">
+			<Anchor relative="$parent"/>
+			<Behavior val="DeathwingAdamantineArmorPlate1"/>
+			
+			<Frame type="Frame" name="DeathwingAdamantineArmorPlate1State">
+				<Anchor relative="$parent"/>
+				<Visible val="false"/>
+			</Frame>
+			
+			<Animation name="BehaviorControlAnim">
+				<Event event="BehaviorCreate" action="Reset,DirectionForward,Play"/>
+				<Event event="BehaviorDestroy" action="DirectionReverse,Play"/>
+
+				<Controller type="Visibility" end="Pause" frame="DeathwingAdamantineArmorPlate1State">
+					<Key type="Bool" time="0" value="false"/>
+					<Key type="Bool" time="0" value="true"/>
+				</Controller>
+			</Animation>
+		</Frame>
 		
 		<!-- switch colors -->
 		<StateGroup name="ManaBarColorSwitcher">
@@ -757,6 +803,8 @@
 			<State name="Brew">
 				<When type="Property" frame="BrewUsers_NotManaUserDummy/NotManaUserState" visible="true"/>
 				<When type="Property" frame="BrewUsers_HeroGenericIsFat/HeroGenericIsFatState" visible="true"/>
+				<!-- Deathwing is fat and NotManaUser, too -->
+				<When type="Property" frame="DeathwingAdamantineArmorPlate1/DeathwingAdamantineArmorPlate1State" visible="false"/>
 				<Action type="ApplyTemplate" frame="ManaBar" template="_ColoredManaBars/BrewBarObserverOverviewTemplate"/>
 			</State>
 			<State name="TracerAmmo">
@@ -790,6 +838,10 @@
 			<State name="JunkratAmmo">
 				<When type="Property" frame="JunkratTotalMayhem/JunkratTotalMayhemState" visible="true"/>
 				<Action type="ApplyTemplate" frame="ManaBar" template="_ColoredManaBars/JunkratAmmoObserverOverviewTemplate"/>
+			</State>
+			<State name="DeathwingBreath">
+				<When type="Property" frame="DeathwingAdamantineArmorPlate1/DeathwingAdamantineArmorPlate1State" visible="true"/>
+				<Action type="ApplyTemplate" frame="ManaBar" template="_ColoredManaBars/DeathwingBreathObserverOverviewTemplate"/>
 			</State>
 			<State name="BlueMana">
 				<Action type="ApplyTemplate" frame="ManaBar" template="_ColoredManaBars/ManaBarObserverOverviewTemplate"/>
