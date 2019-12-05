@@ -265,7 +265,13 @@ public class InterfaceBuilderApp extends Application {
 					Thread.currentThread().setName("Supervisor");
 					Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
 					final ThreadPoolExecutor executorTmp = getExecutor();
-					Platform.runLater(() -> navigationController.lockNavToProgress());
+					Platform.runLater(() -> {
+						try {
+							navigationController.lockNavToProgress();
+						} catch (final Exception e) {
+							logger.fatal(FATAL_ERROR, e);
+						}
+					});
 					
 					mpqBuilderService.build(params.getParamCompilePath());
 					
@@ -273,7 +279,13 @@ public class InterfaceBuilderApp extends Application {
 						Thread.sleep(50);
 					}
 					startReplayOrQuitOrShowError(stage, params);
-					Platform.runLater(() -> navigationController.unlockNav());
+					Platform.runLater(() -> {
+						try {
+							navigationController.unlockNav();
+						} catch (final Exception e) {
+							logger.fatal(FATAL_ERROR, e);
+						}
+					});
 				} catch (final InterruptedException e) {
 					Thread.currentThread().interrupt();
 				} catch (final Exception e) {
@@ -682,10 +694,14 @@ public class InterfaceBuilderApp extends Application {
 				StylizedTextAreaAppender.setWorkerTaskController(errorTabCtrl, threadName);
 				final ErrorTabController errorTabControllerFinal = errorTabCtrl;
 				Platform.runLater(() -> {
-					errorTabControllerFinal.setErrorsDoNotPreventExit(errorsDoNotPreventExit);
-					errorTabControllerFinal.clearError(false);
-					errorTabControllerFinal.clearWarning(false);
-					errorTabControllerFinal.setRunning(true);
+					try {
+						errorTabControllerFinal.setErrorsDoNotPreventExit(errorsDoNotPreventExit);
+						errorTabControllerFinal.clearError(false);
+						errorTabControllerFinal.clearWarning(false);
+						errorTabControllerFinal.setRunning(true);
+					} catch (final Exception e) {
+						logger.fatal(FATAL_ERROR, e);
+					}
 				});
 			}
 		}

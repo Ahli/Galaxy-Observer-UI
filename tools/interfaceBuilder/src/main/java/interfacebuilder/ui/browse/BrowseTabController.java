@@ -44,6 +44,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import static interfacebuilder.InterfaceBuilderApp.FATAL_ERROR;
+
 public class BrowseTabController implements Updateable {
 	private static final String PATH_SEPARATOR = " > ";
 	private static final String ANCHOR_RIGHT = "Anchor-Right";
@@ -140,16 +142,24 @@ public class BrowseTabController implements Updateable {
 		// dropdowns
 		templateMap = new UnifiedMap<>();
 		fileDropdown.setOnAction(actionEvent -> Platform.runLater(() -> {
-			final String selectedFile = fileDropdown.getSelectionModel().getSelectedItem();
-			updateTemplateDropdown(selectedFile);
+			try {
+				final String selectedFile = fileDropdown.getSelectionModel().getSelectedItem();
+				updateTemplateDropdown(selectedFile);
+			} catch (final Exception e) {
+				logger.fatal(FATAL_ERROR, e);
+			}
 		}));
 		templateDropdown.setOnAction(actionEvent -> Platform.runLater(() -> {
-			final String selectedTemplateRootElem = templateDropdown.getSelectionModel().getSelectedItem();
-			final UITemplate template = templateMap.get(selectedTemplateRootElem);
-			final long start = System.currentTimeMillis();
-			framesTotal = 0;
-			createTree(template);
-			logger.info("Tree creation: {}ms , {} frames", (System.currentTimeMillis() - start), framesTotal);
+			try {
+				final String selectedTemplateRootElem = templateDropdown.getSelectionModel().getSelectedItem();
+				final UITemplate template = templateMap.get(selectedTemplateRootElem);
+				final long start = System.currentTimeMillis();
+				framesTotal = 0;
+				createTree(template);
+				logger.info("Tree creation: {}ms , {} frames", (System.currentTimeMillis() - start), framesTotal);
+			} catch (final Exception e) {
+				logger.fatal(FATAL_ERROR, e);
+			}
 		}));
 		
 		// table
@@ -195,17 +205,21 @@ public class BrowseTabController implements Updateable {
 					}
 					final String strFinal = str;
 					Platform.runLater(() -> {
-						frameTree.setRoot(root);
-						frameTree.getSelectionModel().select(selectedItem);
-						tableView.setPlaceholder(tableViewPlaceholderText);
-						final int selectedIndex = frameTree.getSelectionModel().getSelectedIndex();
-						// scroll to slightly above the selected item
-						frameTree.scrollTo(Math.max(selectedIndex - 4, 0));
-						// clear tableview & path if the selected item is not visible OR re-show it when visible
-						showInTableView(selectedIndex < 0 ? null : selectedItem);
-						queryRunning = false;
-						if (!queryRunning && !queriedFilter.equals(strFinal)) {
-							logger.error("Query set, but Filter Thread is dead. -> does this happen?");
+						try {
+							frameTree.setRoot(root);
+							frameTree.getSelectionModel().select(selectedItem);
+							tableView.setPlaceholder(tableViewPlaceholderText);
+							final int selectedIndex = frameTree.getSelectionModel().getSelectedIndex();
+							// scroll to slightly above the selected item
+							frameTree.scrollTo(Math.max(selectedIndex - 4, 0));
+							// clear tableview & path if the selected item is not visible OR re-show it when visible
+							showInTableView(selectedIndex < 0 ? null : selectedItem);
+							queryRunning = false;
+							if (!queryRunning && !queriedFilter.equals(strFinal)) {
+								logger.error("Query set, but Filter Thread is dead. -> does this happen?");
+							}
+						} catch (final Exception e) {
+							logger.fatal(FATAL_ERROR, e);
 						}
 					});
 				}, "BrowseFilter").start();
@@ -379,7 +393,13 @@ public class BrowseTabController implements Updateable {
 			fileNames.sort(null);
 			fileDropdown.setItems(fileNames);
 			final String firstSelection = fileNamesSet.contains(GAME_UI) ? GAME_UI : fileNames.get(0);
-			Platform.runLater(() -> fileDropdown.setValue(firstSelection));
+			Platform.runLater(() -> {
+				try {
+					fileDropdown.setValue(firstSelection);
+				} catch (final Exception e) {
+					logger.fatal(FATAL_ERROR, e);
+				}
+			});
 		}
 	}
 	

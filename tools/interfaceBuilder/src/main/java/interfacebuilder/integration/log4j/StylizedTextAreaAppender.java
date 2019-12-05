@@ -104,7 +104,13 @@ public final class StylizedTextAreaAppender extends AbstractAppender {
 	public static void finishedWork(final String threadName, final boolean unregister) {
 		final ErrorTabController ctrl = getWorkerTaskController(threadName);
 		if (ctrl != generalController) {
-			Platform.runLater(() -> ctrl.setRunning(false));
+			Platform.runLater(() -> {
+				try {
+					ctrl.setRunning(false);
+				} catch (final Exception e) {
+					System.err.println("Error while cleaning up: " + e.getMessage());
+				}
+			});
 		}
 		if (unregister) {
 			// TODO eventually this needs to be delayed and executed with low priority, so it appears after logs

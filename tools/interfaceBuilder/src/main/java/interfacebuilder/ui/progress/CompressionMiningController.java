@@ -37,6 +37,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.File;
 import java.io.IOException;
 
+import static interfacebuilder.InterfaceBuilderApp.FATAL_ERROR;
+
 public class CompressionMiningController implements Updateable {
 	private static final Logger logger = LogManager.getLogger(CompressionMiningController.class);
 	
@@ -261,8 +263,12 @@ public class CompressionMiningController implements Updateable {
 	 */
 	private void updateUiRules(final MpqEditorCompressionRule... rules) {
 		Platform.runLater(() -> {
-			ruleSetObservableItems.setAll(rules);
-			ruleSetTable.setItems(ruleSetObservableItems);
+			try {
+				ruleSetObservableItems.setAll(rules);
+				ruleSetTable.setItems(ruleSetObservableItems);
+			} catch (final Exception e) {
+				logger.fatal(FATAL_ERROR, e);
+			}
 		});
 	}
 	
@@ -272,7 +278,13 @@ public class CompressionMiningController implements Updateable {
 	 * @param bestSize
 	 */
 	private void updateUiSizeToBeat(final long bestSize) {
-		Platform.runLater(() -> sizeToBeatLabel.setText(bestSize / 1024 + " kb"));
+		Platform.runLater(() -> {
+			try {
+				sizeToBeatLabel.setText(bestSize / 1024 + " kb");
+			} catch (final Exception e) {
+				logger.fatal(FATAL_ERROR, e);
+			}
+		});
 	}
 	
 	/**
@@ -283,8 +295,12 @@ public class CompressionMiningController implements Updateable {
 	 */
 	private void updateUiAttemptSize(final long lastSize, final int attempts) {
 		Platform.runLater(() -> {
-			lastSizeLabel.setText(lastSize / 1024 + " kb");
-			attemptCounterLabel.setText(String.valueOf(attempts));
+			try {
+				lastSizeLabel.setText(lastSize / 1024 + " kb");
+				attemptCounterLabel.setText(String.valueOf(attempts));
+			} catch (final Exception e) {
+				logger.fatal(FATAL_ERROR, e);
+			}
 		});
 	}
 }

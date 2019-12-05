@@ -44,6 +44,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -442,6 +443,11 @@ public class BaseUiService {
 	 */
 	public boolean cacheIsUpToDate(final Path cacheFile, final File metaFileDir) throws IOException {
 		final KryoGameInfo baseUiInfo = readMetaFile(metaFileDir);
+		
+		// no cache -> not up to date
+		if (!Files.exists(cacheFile)) {
+			return false;
+		}
 		final KryoGameInfo cacheInfo = discCacheService.getCachedBaseUiInfo(cacheFile);
 		
 		final int[] versionCache = cacheInfo.getVersion();

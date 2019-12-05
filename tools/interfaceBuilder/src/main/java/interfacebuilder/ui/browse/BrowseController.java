@@ -257,12 +257,10 @@ public class BrowseController implements Updateable {
 			final ErrorTabController errorTabCtrl = new ErrorTabController(newTab, newTxtArea, true, false, true);
 			extractionController.setErrorTabControl(errorTabCtrl);
 			controllers.add(extractionController);
-			tabs.add(newTab);
 			
 			for (final String threadName : extractionController.getThreadNames()) {
 				StylizedTextAreaAppender.setWorkerTaskController(errorTabCtrl, threadName);
 			}
-			
 			
 			// runlater needs to appear below the edits above, else it might be added before
 			// which results in UI edits not in UI thread -> error

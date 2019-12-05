@@ -6,9 +6,14 @@ import javafx.scene.Node;
 import javafx.scene.text.FontSmoothingType;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import static interfacebuilder.InterfaceBuilderApp.FATAL_ERROR;
 
 public class TextFlowAppender implements Appender {
 	private static final String STYLE = "INFO";
+	private static final Logger logger = LogManager.getLogger(TextFlowAppender.class);
 	private final TextFlow textFlow;
 	
 	public TextFlowAppender(final TextFlow textFlow) {
@@ -21,7 +26,13 @@ public class TextFlowAppender implements Appender {
 		text.setFontSmoothingType(FontSmoothingType.LCD);
 		text.getStyleClass().add(STYLE);
 		final ObservableList<Node> children = textFlow.getChildren();
-		Platform.runLater(() -> children.add(text));
+		Platform.runLater(() -> {
+			try {
+				children.add(text);
+			} catch (final Exception e) {
+				logger.fatal(FATAL_ERROR, e);
+			}
+		});
 	}
 	
 }

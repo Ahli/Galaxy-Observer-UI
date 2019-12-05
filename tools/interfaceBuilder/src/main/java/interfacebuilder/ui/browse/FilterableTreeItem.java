@@ -54,6 +54,8 @@ public class FilterableTreeItem <T> extends TreeItem<T> {
 	private void setHiddenFieldChildrenPrivate(final ObservableList<TreeItem<T>> list) {
 		final Field children = ReflectionUtils.findField(getClass(), "children");
 		if (children != null) {
+			/* TODO requires "--add-opens=javafx.controls/javafx.scene.control=interfacex.builder" in VM options in
+			    IntelliJ to start/debug in IntelliJ. The JAR created by Maven does not need this. */
 			children.setAccessible(true);
 			ReflectionUtils.setField(children, this, list);
 		}
