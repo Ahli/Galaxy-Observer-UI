@@ -38,7 +38,7 @@ import java.util.List;
  * ProjectService manages Observer Interface project related tasks.
  */
 public class ProjectService {
-	public static final String DIRECTORY_SYMBOL = "/";
+	private static final String DIRECTORY_SYMBOL = "/";
 	private static final Logger logger = LogManager.getLogger(ProjectService.class);
 	@Autowired
 	private ProjectJpaRepository projectRepo;
@@ -82,13 +82,14 @@ public class ProjectService {
 	 *
 	 * @param project
 	 * @return updated instance
+	 * @throws DataAccessException
 	 */
 	public Project saveProject(final Project project) {
 		try {
 			return projectRepo.save(project);
 		} catch (final DataAccessException e) {
 			logger.error(e);
-			return project;
+			throw e;
 		}
 	}
 	
