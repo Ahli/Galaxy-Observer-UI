@@ -692,13 +692,12 @@ public class InterfaceBuilderApp extends Application {
 			final ErrorTabController errorTabCtrl = getErrorTabController(tabName);
 			if (errorTabCtrl != null) {
 				StylizedTextAreaAppender.setWorkerTaskController(errorTabCtrl, threadName);
-				final ErrorTabController errorTabControllerFinal = errorTabCtrl;
 				Platform.runLater(() -> {
 					try {
-						errorTabControllerFinal.setErrorsDoNotPreventExit(errorsDoNotPreventExit);
-						errorTabControllerFinal.clearError(false);
-						errorTabControllerFinal.clearWarning(false);
-						errorTabControllerFinal.setRunning(true);
+						errorTabCtrl.setErrorsDoNotPreventExit(errorsDoNotPreventExit);
+						errorTabCtrl.clearError(false);
+						errorTabCtrl.clearWarning(false);
+						errorTabCtrl.setRunning(true);
 					} catch (final Exception e) {
 						logger.fatal(FATAL_ERROR, e);
 					}
