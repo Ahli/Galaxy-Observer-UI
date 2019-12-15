@@ -83,6 +83,7 @@ public class CompressionMiningController implements Updateable {
 	private Project project;
 	private ObservableList<MpqEditorCompressionRule> ruleSetObservableItems;
 	private Runnable task;
+	private boolean stopTaskNow = false;
 	private RandomCompressionMiner expCompMiner;
 	
 	public CompressionMiningController() {
@@ -175,10 +176,14 @@ public class CompressionMiningController implements Updateable {
 		}
 	}
 	
+	/**
+	 *
+	 */
 	public void startMining() {
 		if (task != null) {
 			return;
 		}
+		stopTaskNow = false;
 		task = () -> {
 			try {
 				long bestSize;
@@ -212,7 +217,7 @@ public class CompressionMiningController implements Updateable {
 				updateUiSizeToBeat(bestSize);
 				long lastSize;
 				final RandomCompressionMiner comprMiner = expCompMiner;
-				for (int attempts = 1; attempts < Integer.MAX_VALUE; attempts++) {
+				for (int attempts = 1; !stopTaskNow && attempts < Integer.MAX_VALUE; attempts++) {
 					comprMiner.randomizeRules();
 					lastSize = comprMiner.build();
 					updateUiAttemptSize(lastSize, attempts);
@@ -242,11 +247,15 @@ public class CompressionMiningController implements Updateable {
 		miningButton.setText(Messages.getString("progress.compressionMining.stopMining"));
 	}
 	
+	/**
+	 *
+	 */
 	public void stopMining() {
 		if (task == null) {
 			return;
 		}
-		InterfaceBuilderApp.getInstance().getExecutor().remove(task);
+		//		InterfaceBuilderApp.getInstance().getExecutor().remove(task);
+		stopTaskNow = true;
 		task = null;
 		if (expCompMiner != null) {
 			final long newBest = expCompMiner.getBestSize();

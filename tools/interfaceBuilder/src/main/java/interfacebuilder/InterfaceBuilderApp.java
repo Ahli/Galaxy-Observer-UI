@@ -4,7 +4,6 @@
 package interfacebuilder;
 
 import com.ahli.galaxy.game.def.abstracts.GameDef;
-import com.ahli.util.StringInterner;
 import interfacebuilder.base_ui.BaseUiService;
 import interfacebuilder.build.MpqBuilderService;
 import interfacebuilder.compress.GameService;
@@ -22,7 +21,6 @@ import interfacebuilder.ui.FXMLSpringLoader;
 import interfacebuilder.ui.navigation.NavigationController;
 import interfacebuilder.ui.navigation.Notification;
 import interfacebuilder.ui.progress.ErrorTabController;
-import interfacebuilder.ui.progress.StylizedTextAreaAppenderThreadPoolExecutor;
 import interfacebuilder.ui.progress.TabPaneController;
 import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
@@ -63,7 +61,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -104,7 +102,9 @@ public class InterfaceBuilderApp extends Application {
 	@Autowired
 	private MpqBuilderService mpqBuilderService;
 	@Autowired
-	private StylizedTextAreaAppenderThreadPoolExecutor executor;
+	//	private StylizedTextAreaAppenderThreadPoolExecutor executor;
+	private ForkJoinPool executor;
+	
 	@Autowired
 	private ConfigService configService;
 	@Autowired
@@ -264,7 +264,7 @@ public class InterfaceBuilderApp extends Application {
 				try {
 					Thread.currentThread().setName("Supervisor");
 					Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-					final ThreadPoolExecutor executorTmp = getExecutor();
+					final var executorTmp = getExecutor();
 					Platform.runLater(() -> {
 						try {
 							navigationController.lockNavToProgress();
@@ -275,7 +275,8 @@ public class InterfaceBuilderApp extends Application {
 					
 					mpqBuilderService.build(params.getParamCompilePath());
 					
-					while (!executorTmp.getQueue().isEmpty() || executorTmp.getActiveCount() > 0) {
+					while (executorTmp.getQueuedSubmissionCount() > 0 || executorTmp.getActiveThreadCount() > 0 ||
+							executorTmp.getRunningThreadCount() > 0) {
 						Thread.sleep(50);
 					}
 					startReplayOrQuitOrShowError(stage, params);
@@ -309,7 +310,7 @@ public class InterfaceBuilderApp extends Application {
 	/**
 	 * @return the executor
 	 */
-	public ThreadPoolExecutor getExecutor() {
+	public ForkJoinPool getExecutor() {
 		return executor;
 	}
 	
@@ -467,27 +468,28 @@ public class InterfaceBuilderApp extends Application {
 		autowireCapableBeanFactory.autowireBean(this);
 		autowireCapableBeanFactory.initializeBean(this, getClass().getName());
 		
-		executor.setCleanUpTask(() -> {
-			// free space of baseUI
-			if (executor.getQueue().isEmpty() && executor.getActiveCount() <= 1) {
-				logger.info("Freeing up resources");
-				mpqBuilderService.getGameData(Game.SC2).setUiCatalog(null);
-				mpqBuilderService.getGameData(Game.HEROES).setUiCatalog(null);
-				// GC1 is the default GC and can now release RAM -> actually good to do after a task because we use a
-				// lot of RAM for the UIs
-				// Weak References survive 3 garbage collections by default
-				for (int i = 0; i < 3; ++i) {
-					System.gc();
-				}
-				try {
-					Thread.sleep(200);
-					// clean up StringInterner's weak references that the GC removed
-					StringInterner.cleanUpGarbage();
-				} catch (final InterruptedException e) {
-					Thread.currentThread().interrupt();
-				}
-			}
-		});
+		// TODO clean up garbage after tasks
+		//		executor.setCleanUpTask(() -> {
+		//			// free space of baseUI
+		//			if (executor.getQueue().isEmpty() && executor.getActiveCount() <= 1) {
+		//				logger.info("Freeing up resources");
+		//				mpqBuilderService.getGameData(Game.SC2).setUiCatalog(null);
+		//				mpqBuilderService.getGameData(Game.HEROES).setUiCatalog(null);
+		//				// GC1 is the default GC and can now release RAM -> actually good to do after a task because we use a
+		//				// lot of RAM for the UIs
+		//				// Weak References survive 3 garbage collections by default
+		//				for (int i = 0; i < 3; ++i) {
+		//					System.gc();
+		//				}
+		//				try {
+		//					Thread.sleep(200);
+		//					// clean up StringInterner's weak references that the GC removed
+		//					StringInterner.cleanUpGarbage();
+		//				} catch (final InterruptedException e) {
+		//					Thread.currentThread().interrupt();
+		//				}
+		//			}
+		//		});
 	}
 	
 	/**

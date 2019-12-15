@@ -53,7 +53,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.ThreadPoolExecutor;
 
 public class BaseUiService {
 	private static final String UNKNOWN_GAME_EXCEPTION = "Unknown Game";
@@ -165,7 +164,7 @@ public class BaseUiService {
 		logger.info("Extracting baseUI for {}", game);
 		prepareCascExplorerConfig(game, usePtr);
 		
-		final ThreadPoolExecutor executor = InterfaceBuilderApp.getInstance().getExecutor();
+		final var executor = InterfaceBuilderApp.getInstance().getExecutor();
 		final GameDef gameDef = gameService.getNewGameDef(game);
 		final File destination = new File(configService.getBaseUiPath(gameDef));
 		

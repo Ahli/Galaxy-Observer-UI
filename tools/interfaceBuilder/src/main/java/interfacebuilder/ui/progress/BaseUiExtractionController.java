@@ -77,6 +77,7 @@ public class BaseUiExtractionController implements Updateable {
 		
 		// TODO setRunning(false) after extraction was done -> integrate completableFuture into TaskExecutor
 		// errorTabController.setRunning(false);
+		
 	}
 	
 	public String[] getThreadNames() {
