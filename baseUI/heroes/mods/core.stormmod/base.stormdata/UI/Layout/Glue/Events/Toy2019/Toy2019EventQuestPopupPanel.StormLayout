@@ -3,6 +3,8 @@
   <DescFlags val="Locked" />
   <Constant name="Toy2019_QuestCardWidth" val="266" />
   <Constant name="Toy2019_QuestCardHeight" val="385" />
+  <Constant name="Toy2019_WriteoutDelay" val="1.1" />
+  <Constant name="Toy2019_WriteOutTextDuration" val="2200" />
   <Frame type="Button" name="ToyEventCustomButtonTemplate">
     <ClickSound val="@UI_BNet_Generic_01" />
     <Width val="321" />
@@ -81,7 +83,7 @@
       <Anchor side="Left" relative="$parent/BackgroundContainerFrame/BackgroundImage" pos="Min" offset="40" />
       <Anchor side="Right" relative="$parent/BackgroundContainerFrame/BackgroundImage" pos="Max" offset="-40 " />
       <Anchor side="Bottom" relative="$parent/BackgroundContainerFrame/BackgroundImage" pos="Max" offset="-20" />
-      <Style val="ToyEvent_ErrorDialogText" />
+      <Style val="Toy2019Event_ErrorDialogText" />
       <Text val="@UI/QuestLine/Event/Toys/ErrorText" />
     </Frame>
     <Frame type="Button" name="CloseButton" template="Toy2019EventQuestPopupPanel/ToyEventCustomButtonTemplate">
@@ -229,14 +231,14 @@
       <Event event="TurnOn" action="Reset,Play" />
       <Controller type="Fade" end="Pause">
         <Key type="Curve" time="0" value="0" inout="Step" />
-        <Key type="Curve" time="1.4" value="255" inout="Step,Slow" />
-        <Key type="Curve" time="1.9" value="255" inout="Slow" />
+        <Key type="Curve" time="2.5" value="255" inout="Step,Slow" />
+        <Key type="Curve" time="3.0" value="255" inout="Slow" />
       </Controller>
     </Animation>
     <Animation name="DelayedOff">
       <Event event="ShowLoot" frame="$parent" action="Reset,Play" />
       <Controller type="Event" frame="$parent" end="Stop">
-        <Key type="Event" time="2" event="TurnOff" />
+        <Key type="Event" time="3.6" event="TurnOff" />
       </Controller>
     </Animation>
     <Animation name="TurnOff">
@@ -498,9 +500,10 @@
     </Frame>
     <Frame type="Frame" name="EmceePortraitFrame">
       <Anchor side="Left" relative="$parent" pos="Min" offset="15" />
-      <Anchor side="Bottom" relative="$parent/EmceeBorder" pos="Max" offset="-40" />
+      <Anchor side="Bottom" relative="$parent/EmceeBorder" pos="Max" offset="-38" />
       <Width val="350" />
       <Height val="350" />
+      <RenderPriority val="513" />
       <Frame type="Image" name="CharacterPortrait">
         <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
         <Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
@@ -548,7 +551,7 @@
     </Frame>
     <Frame type="Label" name="NameLabel">
       <Anchor side="Top" relative="$parent/BackgroundContainerFrame/BackgroundImage" pos="Min" offset="40" />
-      <Anchor side="Left" relative="$parent/EmceePortraitFrame" pos="Max" offset="0" />
+      <Anchor side="Left" relative="$parent/EmceePortraitFrame" pos="Max" offset="10" />
       <Anchor side="Right" relative="$parent/BackgroundContainerFrame/BackgroundImage" pos="Max" offset="-40 " />
       <Visible val="{$parent/EmceePortraitFrame/@Visible}" />
       <Alpha val="{$parent/EmceePortraitFrame/@Alpha}" />
@@ -557,8 +560,8 @@
       <Text val="@UI/QuestLine/Event/Toys2019/Emcee/Name" />
     </Frame>
     <Frame type="Label" name="PopupLabel">
-      <Anchor side="Top" relative="$parent/NameLabel" pos="Max" offset="10" />
-      <Anchor side="Left" relative="$parent/EmceePortraitFrame" pos="Max" offset="0" />
+      <Anchor side="Top" relative="$parent/NameLabel" pos="Max" offset="0" />
+      <Anchor side="Left" relative="$parent/EmceePortraitFrame" pos="Max" offset="10" />
       <Anchor side="Right" relative="$parent/BackgroundContainerFrame/BackgroundImage" pos="Max" offset="-40 " />
       <Anchor side="Bottom" relative="$parent/CloseButton" pos="Min" offset="0" />
       <Visible val="{$parent/EmceePortraitFrame/@Visible}" />
@@ -566,7 +569,7 @@
       <Style val="Toy2019Event_EmceeText" />
       <Options val="ScaleToPreventTruncation" />
       <WriteOutText val="true" />
-      <WriteOutTextDuration val="7500" />
+      <WriteOutTextDuration val="#Toy2019_WriteOutTextDuration" />
       <SubpixelRendering val="True" />
     </Frame>
     <Frame type="Button" name="CloseButton" template="Toy2019EventQuestPopupPanel/ToyEventCustomButtonTemplate">
@@ -642,13 +645,10 @@
         <Key type="Bool" time="0.5" value="True" />
       </Controller>
       <Controller type="Text" end="Pause" frame="PopupLabel">
-        <Key type="Text" time="1.5" text="@UI/QuestLine/Event/Toys2019/Emcee/Intro" />
+        <Key type="Text" time="2.0" text="@UI/QuestLine/Event/Toys2019/Emcee/Intro" />
       </Controller>
-      <Controller type="Sound" end="Stop">
-        <Key type="Sound" time="1.5" sound="*@UI_Mecha19_Quest_Text_Scroll_Valla_Sound" />
-      </Controller>
-      <Controller type="State" stateGroup="EmceeTextDuration" end="Pause">
-        <Key type="Identifier" time="0" value="EmceeIntro" />
+      <Controller type="Event" end="Stop">
+        <Key type="Event" time="1.72" event="PlayWriteoutSound" />
       </Controller>
     </Animation>
     <Animation name="EventBoardFirstOpen">
@@ -657,14 +657,11 @@
       <Controller type="Visibility" end="Pause">
         <Key type="Bool" time="0" value="true" />
       </Controller>
-      <Controller type="Sound" end="Stop">
-        <Key type="Sound" time="1.5" sound="*@UI_Mecha19_Quest_Text_Scroll_Valla_Sound" />
+      <Controller type="Event" end="Stop">
+        <Key type="Event" time="#Toy2019_WriteoutDelay" event="PlayWriteoutSound" />
       </Controller>
       <Controller type="Text" end="Pause" frame="PopupLabel">
         <Key type="Text" time="0" text="@UI/QuestLine/Event/Toys2019/Emcee/GameStart" />
-      </Controller>
-      <Controller type="State" stateGroup="EmceeTextDuration" end="Pause">
-        <Key type="Identifier" time="0" value="EmceeFirstOpenBoard" />
       </Controller>
     </Animation>
     <Animation name="EventFirstRepeatableStart">
@@ -672,14 +669,11 @@
       <Controller type="Visibility" end="Pause">
         <Key type="Bool" time="0" value="true" />
       </Controller>
-      <Controller type="Sound" end="Stop">
-        <Key type="Sound" time="1.5" sound="*@UI_Mecha19_Quest_Text_Scroll_Valla_Sound" />
+      <Controller type="Event" end="Stop">
+        <Key type="Event" time="#Toy2019_WriteoutDelay" event="PlayWriteoutSound" />
       </Controller>
       <Controller type="Text" end="Pause" frame="PopupLabel">
         <Key type="Text" time="0" text="@UI/QuestLine/Event/Toys2019/Emcee/FirstRepeatableStart" />
-      </Controller>
-      <Controller type="State" stateGroup="EmceeTextDuration" end="Pause">
-        <Key type="Identifier" time="0" value="EmceeFirstRepeatStart" />
       </Controller>
     </Animation>
     <Animation name="EventFirstRepeatableEnd">
@@ -687,14 +681,11 @@
       <Controller type="Visibility" end="Pause">
         <Key type="Bool" time="0" value="true" />
       </Controller>
-      <Controller type="Sound" end="Stop">
-        <Key type="Sound" time="1.5" sound="*@UI_Mecha19_Quest_Text_Scroll_Valla_Sound" />
+      <Controller type="Event" end="Stop">
+        <Key type="Event" time="#Toy2019_WriteoutDelay" event="PlayWriteoutSound" />
       </Controller>
       <Controller type="Text" end="Pause" frame="PopupLabel">
         <Key type="Text" time="0" text="@UI/QuestLine/Event/Toys2019/Emcee/FirstRepeatableComplete" />
-      </Controller>
-      <Controller type="State" stateGroup="EmceeTextDuration" end="Pause">
-        <Key type="Identifier" time="0" value="EmceeFirstRepeatEnd" />
       </Controller>
     </Animation>
     <Animation name="EventDehakaQuestStart">
@@ -702,14 +693,11 @@
       <Controller type="Visibility" end="Pause">
         <Key type="Bool" time="0" value="true" />
       </Controller>
-      <Controller type="Sound" end="Stop">
-        <Key type="Sound" time="1.5" sound="*@UI_Mecha19_Quest_Text_Scroll_Valla_Sound" />
+      <Controller type="Event" end="Stop">
+        <Key type="Event" time="#Toy2019_WriteoutDelay" event="PlayWriteoutSound" />
       </Controller>
       <Controller type="Text" end="Pause" frame="PopupLabel">
         <Key type="Text" time="0" text="@UI/QuestLine/Event/Toys2019/Emcee/QuestUnique1Start" />
-      </Controller>
-      <Controller type="State" stateGroup="EmceeTextDuration" end="Pause">
-        <Key type="Identifier" time="0" value="EmceeDehakaStart" />
       </Controller>
     </Animation>
     <Animation name="EventDehakaQuestEnd">
@@ -717,14 +705,11 @@
       <Controller type="Visibility" end="Pause">
         <Key type="Bool" time="0" value="true" />
       </Controller>
-      <Controller type="Sound" end="Stop">
-        <Key type="Sound" time="1.5" sound="*@UI_Mecha19_Quest_Text_Scroll_Valla_Sound" />
+      <Controller type="Event" end="Stop">
+        <Key type="Event" time="#Toy2019_WriteoutDelay" event="PlayWriteoutSound" />
       </Controller>
       <Controller type="Text" end="Pause" frame="PopupLabel">
         <Key type="Text" time="0" text="@UI/QuestLine/Event/Toys2019/Emcee/QuestUnique1Complete" />
-      </Controller>
-      <Controller type="State" stateGroup="EmceeTextDuration" end="Pause">
-        <Key type="Identifier" time="0" value="EmceeDehakaEnd" />
       </Controller>
     </Animation>
     <Animation name="EventUnicornQuestStart">
@@ -732,14 +717,11 @@
       <Controller type="Visibility" end="Pause">
         <Key type="Bool" time="0" value="true" />
       </Controller>
-      <Controller type="Sound" end="Stop">
-        <Key type="Sound" time="1.5" sound="*@UI_Mecha19_Quest_Text_Scroll_Valla_Sound" />
+      <Controller type="Event" end="Stop">
+        <Key type="Event" time="#Toy2019_WriteoutDelay" event="PlayWriteoutSound" />
       </Controller>
       <Controller type="Text" end="Pause" frame="PopupLabel">
         <Key type="Text" time="0" text="@UI/QuestLine/Event/Toys2019/Emcee/QuestUnique2Start" />
-      </Controller>
-      <Controller type="State" stateGroup="EmceeTextDuration" end="Pause">
-        <Key type="Identifier" time="0" value="EmceeUnicornStart" />
       </Controller>
     </Animation>
     <Animation name="EventUnicornQuestEnd">
@@ -747,14 +729,11 @@
       <Controller type="Visibility" end="Pause">
         <Key type="Bool" time="0" value="true" />
       </Controller>
-      <Controller type="Sound" end="Stop">
-        <Key type="Sound" time="1.5" sound="*@UI_Mecha19_Quest_Text_Scroll_Valla_Sound" />
+      <Controller type="Event" end="Stop">
+        <Key type="Event" time="#Toy2019_WriteoutDelay" event="PlayWriteoutSound" />
       </Controller>
       <Controller type="Text" end="Pause" frame="PopupLabel">
         <Key type="Text" time="0" text="@UI/QuestLine/Event/Toys2019/Emcee/QuestUnique2Complete" />
-      </Controller>
-      <Controller type="State" stateGroup="EmceeTextDuration" end="Pause">
-        <Key type="Identifier" time="0" value="EmceeUnicornEnd" />
       </Controller>
     </Animation>
     <Animation name="EventValeeraQuestStart">
@@ -762,14 +741,11 @@
       <Controller type="Visibility" end="Pause">
         <Key type="Bool" time="0" value="true" />
       </Controller>
-      <Controller type="Sound" end="Stop">
-        <Key type="Sound" time="1.5" sound="*@UI_Mecha19_Quest_Text_Scroll_Valla_Sound" />
+      <Controller type="Event" end="Stop">
+        <Key type="Event" time="#Toy2019_WriteoutDelay" event="PlayWriteoutSound" />
       </Controller>
       <Controller type="Text" end="Pause" frame="PopupLabel">
         <Key type="Text" time="0" text="@UI/QuestLine/Event/Toys2019/Emcee/QuestUnique3Start" />
-      </Controller>
-      <Controller type="State" stateGroup="EmceeTextDuration" end="Pause">
-        <Key type="Identifier" time="0" value="EmceeValeeraStart" />
       </Controller>
     </Animation>
     <Animation name="EventValeeraQuestEnd">
@@ -777,14 +753,11 @@
       <Controller type="Visibility" end="Pause">
         <Key type="Bool" time="0" value="true" />
       </Controller>
-      <Controller type="Sound" end="Stop">
-        <Key type="Sound" time="1.5" sound="*@UI_Mecha19_Quest_Text_Scroll_Valla_Sound" />
+      <Controller type="Event" end="Stop">
+        <Key type="Event" time="#Toy2019_WriteoutDelay" event="PlayWriteoutSound" />
       </Controller>
       <Controller type="Text" end="Pause" frame="PopupLabel">
         <Key type="Text" time="0" text="@UI/QuestLine/Event/Toys2019/Emcee/QuestUnique3Complete" />
-      </Controller>
-      <Controller type="State" stateGroup="EmceeTextDuration" end="Pause">
-        <Key type="Identifier" time="0" value="EmceeValeeraEnd" />
       </Controller>
     </Animation>
     <Animation name="EventLionQuestStart">
@@ -792,14 +765,11 @@
       <Controller type="Visibility" end="Pause">
         <Key type="Bool" time="0" value="true" />
       </Controller>
-      <Controller type="Sound" end="Stop">
-        <Key type="Sound" time="1.5" sound="*@UI_Mecha19_Quest_Text_Scroll_Valla_Sound" />
+      <Controller type="Event" end="Stop">
+        <Key type="Event" time="#Toy2019_WriteoutDelay" event="PlayWriteoutSound" />
       </Controller>
       <Controller type="Text" end="Pause" frame="PopupLabel">
         <Key type="Text" time="0" text="@UI/QuestLine/Event/Toys2019/Emcee/QuestUnique4Start" />
-      </Controller>
-      <Controller type="State" stateGroup="EmceeTextDuration" end="Pause">
-        <Key type="Identifier" time="0" value="EmceeLionStart" />
       </Controller>
     </Animation>
     <Animation name="EventLionQuestEnd">
@@ -807,14 +777,11 @@
       <Controller type="Visibility" end="Pause">
         <Key type="Bool" time="0" value="true" />
       </Controller>
-      <Controller type="Sound" end="Stop">
-        <Key type="Sound" time="1.5" sound="*@UI_Mecha19_Quest_Text_Scroll_Valla_Sound" />
+      <Controller type="Event" end="Stop">
+        <Key type="Event" time="#Toy2019_WriteoutDelay" event="PlayWriteoutSound" />
       </Controller>
       <Controller type="Text" end="Pause" frame="PopupLabel">
         <Key type="Text" time="0" text="@UI/QuestLine/Event/Toys2019/Emcee/QuestUnique4Complete" />
-      </Controller>
-      <Controller type="State" stateGroup="EmceeTextDuration" end="Pause">
-        <Key type="Identifier" time="0" value="EmceeLionEnd" />
       </Controller>
     </Animation>
     <Animation name="EventStitchesQuestStart">
@@ -822,14 +789,11 @@
       <Controller type="Visibility" end="Pause">
         <Key type="Bool" time="0" value="true" />
       </Controller>
-      <Controller type="Sound" end="Stop">
-        <Key type="Sound" time="1.5" sound="*@UI_Mecha19_Quest_Text_Scroll_Valla_Sound" />
+      <Controller type="Event" end="Stop">
+        <Key type="Event" time="#Toy2019_WriteoutDelay" event="PlayWriteoutSound" />
       </Controller>
       <Controller type="Text" end="Pause" frame="PopupLabel">
         <Key type="Text" time="0" text="@UI/QuestLine/Event/Toys2019/Emcee/QuestUnique5Start" />
-      </Controller>
-      <Controller type="State" stateGroup="EmceeTextDuration" end="Pause">
-        <Key type="Identifier" time="0" value="EmceeStitchesStart" />
       </Controller>
     </Animation>
     <Animation name="EventStitchesQuestEnd">
@@ -837,14 +801,11 @@
       <Controller type="Visibility" end="Pause">
         <Key type="Bool" time="0" value="true" />
       </Controller>
-      <Controller type="Sound" end="Stop">
-        <Key type="Sound" time="1.5" sound="*@UI_Mecha19_Quest_Text_Scroll_Valla_Sound" />
+      <Controller type="Event" end="Stop">
+        <Key type="Event" time="#Toy2019_WriteoutDelay" event="PlayWriteoutSound" />
       </Controller>
       <Controller type="Text" end="Pause" frame="PopupLabel">
         <Key type="Text" time="0" text="@UI/QuestLine/Event/Toys2019/Emcee/QuestUnique5Complete" />
-      </Controller>
-      <Controller type="State" stateGroup="EmceeTextDuration" end="Pause">
-        <Key type="Identifier" time="0" value="EmceeStitchesEnd" />
       </Controller>
     </Animation>
     <Animation name="EventBoardGameEnd">
@@ -852,14 +813,11 @@
       <Controller type="Visibility" end="Pause">
         <Key type="Bool" time="0" value="true" />
       </Controller>
-      <Controller type="Sound" end="Stop">
-        <Key type="Sound" time="1.5" sound="*@UI_Mecha19_Quest_Text_Scroll_Valla_Sound" />
+      <Controller type="Event" end="Stop">
+        <Key type="Event" time="#Toy2019_WriteoutDelay" event="PlayWriteoutSound" />
       </Controller>
       <Controller type="Text" end="Pause" frame="PopupLabel">
         <Key type="Text" time="0" text="@UI/QuestLine/Event/Toys2019/Emcee/GameComplete" />
-      </Controller>
-      <Controller type="State" stateGroup="EmceeTextDuration" end="Pause">
-        <Key type="Identifier" time="0" value="EmceeGameEnd" />
       </Controller>
     </Animation>
     <Animation name="EventRepeatableEmcee1">
@@ -867,14 +825,11 @@
       <Controller type="Visibility" end="Pause">
         <Key type="Bool" time="0" value="true" />
       </Controller>
-      <Controller type="Sound" end="Stop">
-        <Key type="Sound" time="1.5" sound="*@UI_Mecha19_Quest_Text_Scroll_Valla_Sound" />
+      <Controller type="Event" end="Stop">
+        <Key type="Event" time="#Toy2019_WriteoutDelay" event="PlayWriteoutSound" />
       </Controller>
       <Controller type="Text" end="Pause" frame="PopupLabel">
         <Key type="Text" time="0" text="@UI/QuestLine/Event/Toys2019/Emcee/RepeatableEmcee/1" />
-      </Controller>
-      <Controller type="State" stateGroup="EmceeTextDuration" end="Pause">
-        <Key type="Identifier" time="0" value="Emcee1" />
       </Controller>
     </Animation>
     <Animation name="EventRepeatableEmcee2">
@@ -882,14 +837,11 @@
       <Controller type="Visibility" end="Pause">
         <Key type="Bool" time="0" value="true" />
       </Controller>
-      <Controller type="Sound" end="Stop">
-        <Key type="Sound" time="1.5" sound="*@UI_Mecha19_Quest_Text_Scroll_Valla_Sound" />
+      <Controller type="Event" end="Stop">
+        <Key type="Event" time="#Toy2019_WriteoutDelay" event="PlayWriteoutSound" />
       </Controller>
       <Controller type="Text" end="Pause" frame="PopupLabel">
         <Key type="Text" time="0" text="@UI/QuestLine/Event/Toys2019/Emcee/RepeatableEmcee/2" />
-      </Controller>
-      <Controller type="State" stateGroup="EmceeTextDuration" end="Pause">
-        <Key type="Identifier" time="0" value="Emcee2" />
       </Controller>
     </Animation>
     <Animation name="EventRepeatableEmcee3">
@@ -897,14 +849,11 @@
       <Controller type="Visibility" end="Pause">
         <Key type="Bool" time="0" value="true" />
       </Controller>
-      <Controller type="Sound" end="Stop">
-        <Key type="Sound" time="1.5" sound="*@UI_Mecha19_Quest_Text_Scroll_Valla_Sound" />
+      <Controller type="Event" end="Stop">
+        <Key type="Event" time="#Toy2019_WriteoutDelay" event="PlayWriteoutSound" />
       </Controller>
       <Controller type="Text" end="Pause" frame="PopupLabel">
         <Key type="Text" time="0" text="@UI/QuestLine/Event/Toys2019/Emcee/RepeatableEmcee/3" />
-      </Controller>
-      <Controller type="State" stateGroup="EmceeTextDuration" end="Pause">
-        <Key type="Identifier" time="0" value="Emcee3" />
       </Controller>
     </Animation>
     <Animation name="EventRepeatableEmcee4">
@@ -912,14 +861,11 @@
       <Controller type="Visibility" end="Pause">
         <Key type="Bool" time="0" value="true" />
       </Controller>
-      <Controller type="Sound" end="Stop">
-        <Key type="Sound" time="1.5" sound="*@UI_Mecha19_Quest_Text_Scroll_Valla_Sound" />
+      <Controller type="Event" end="Stop">
+        <Key type="Event" time="#Toy2019_WriteoutDelay" event="PlayWriteoutSound" />
       </Controller>
       <Controller type="Text" end="Pause" frame="PopupLabel">
         <Key type="Text" time="0" text="@UI/QuestLine/Event/Toys2019/Emcee/RepeatableEmcee/4" />
-      </Controller>
-      <Controller type="State" stateGroup="EmceeTextDuration" end="Pause">
-        <Key type="Identifier" time="0" value="Emcee4" />
       </Controller>
     </Animation>
     <Animation name="EventRepeatableEmcee5">
@@ -927,14 +873,11 @@
       <Controller type="Visibility" end="Pause">
         <Key type="Bool" time="0" value="true" />
       </Controller>
-      <Controller type="Sound" end="Stop">
-        <Key type="Sound" time="1.5" sound="*@UI_Mecha19_Quest_Text_Scroll_Valla_Sound" />
+      <Controller type="Event" end="Stop">
+        <Key type="Event" time="#Toy2019_WriteoutDelay" event="PlayWriteoutSound" />
       </Controller>
       <Controller type="Text" end="Pause" frame="PopupLabel">
         <Key type="Text" time="0" text="@UI/QuestLine/Event/Toys2019/Emcee/RepeatableEmcee/5" />
-      </Controller>
-      <Controller type="State" stateGroup="EmceeTextDuration" end="Pause">
-        <Key type="Identifier" time="0" value="Emcee5" />
       </Controller>
     </Animation>
     <Animation name="EventRepeatableEmcee6">
@@ -942,14 +885,11 @@
       <Controller type="Visibility" end="Pause">
         <Key type="Bool" time="0" value="true" />
       </Controller>
-      <Controller type="Sound" end="Stop">
-        <Key type="Sound" time="1.5" sound="*@UI_Mecha19_Quest_Text_Scroll_Valla_Sound" />
+      <Controller type="Event" end="Stop">
+        <Key type="Event" time="#Toy2019_WriteoutDelay" event="PlayWriteoutSound" />
       </Controller>
       <Controller type="Text" end="Pause" frame="PopupLabel">
         <Key type="Text" time="0" text="@UI/QuestLine/Event/Toys2019/Emcee/RepeatableEmcee/6" />
-      </Controller>
-      <Controller type="State" stateGroup="EmceeTextDuration" end="Pause">
-        <Key type="Identifier" time="0" value="Emcee6" />
       </Controller>
     </Animation>
     <Animation name="EventRepeatableEmcee7">
@@ -957,14 +897,11 @@
       <Controller type="Visibility" end="Pause">
         <Key type="Bool" time="0" value="true" />
       </Controller>
-      <Controller type="Sound" end="Stop">
-        <Key type="Sound" time="1.5" sound="*@UI_Mecha19_Quest_Text_Scroll_Valla_Sound" />
+      <Controller type="Event" end="Stop">
+        <Key type="Event" time="#Toy2019_WriteoutDelay" event="PlayWriteoutSound" />
       </Controller>
       <Controller type="Text" end="Pause" frame="PopupLabel">
         <Key type="Text" time="0" text="@UI/QuestLine/Event/Toys2019/Emcee/RepeatableEmcee/7" />
-      </Controller>
-      <Controller type="State" stateGroup="EmceeTextDuration" end="Pause">
-        <Key type="Identifier" time="0" value="Emcee7" />
       </Controller>
     </Animation>
     <Animation name="EventRepeatableEmcee8">
@@ -972,14 +909,11 @@
       <Controller type="Visibility" end="Pause">
         <Key type="Bool" time="0" value="true" />
       </Controller>
-      <Controller type="Sound" end="Stop">
-        <Key type="Sound" time="1.5" sound="*@UI_Mecha19_Quest_Text_Scroll_Valla_Sound" />
+      <Controller type="Event" end="Stop">
+        <Key type="Event" time="#Toy2019_WriteoutDelay" event="PlayWriteoutSound" />
       </Controller>
       <Controller type="Text" end="Pause" frame="PopupLabel">
         <Key type="Text" time="0" text="@UI/QuestLine/Event/Toys2019/Emcee/RepeatableEmcee/8" />
-      </Controller>
-      <Controller type="State" stateGroup="EmceeTextDuration" end="Pause">
-        <Key type="Identifier" time="0" value="Emcee8" />
       </Controller>
     </Animation>
     <Animation name="EventRepeatableEmcee9">
@@ -987,14 +921,11 @@
       <Controller type="Visibility" end="Pause">
         <Key type="Bool" time="0" value="true" />
       </Controller>
-      <Controller type="Sound" end="Stop">
-        <Key type="Sound" time="1.5" sound="*@UI_Mecha19_Quest_Text_Scroll_Valla_Sound" />
+      <Controller type="Event" end="Stop">
+        <Key type="Event" time="#Toy2019_WriteoutDelay" event="PlayWriteoutSound" />
       </Controller>
       <Controller type="Text" end="Pause" frame="PopupLabel">
         <Key type="Text" time="0" text="@UI/QuestLine/Event/Toys2019/Emcee/RepeatableEmcee/9" />
-      </Controller>
-      <Controller type="State" stateGroup="EmceeTextDuration" end="Pause">
-        <Key type="Identifier" time="0" value="Emcee9" />
       </Controller>
     </Animation>
     <Animation name="EventRepeatableEmcee10">
@@ -1002,93 +933,19 @@
       <Controller type="Visibility" end="Pause">
         <Key type="Bool" time="0" value="true" />
       </Controller>
-      <Controller type="Sound" end="Stop">
-        <Key type="Sound" time="1.5" sound="*@UI_Mecha19_Quest_Text_Scroll_Valla_Sound" />
+      <Controller type="Event" end="Stop">
+        <Key type="Event" time="#Toy2019_WriteoutDelay" event="PlayWriteoutSound" />
       </Controller>
       <Controller type="Text" end="Pause" frame="PopupLabel">
         <Key type="Text" time="0" text="@UI/QuestLine/Event/Toys2019/Emcee/RepeatableEmcee/10" />
       </Controller>
-      <Controller type="State" stateGroup="EmceeTextDuration" end="Pause">
-        <Key type="Identifier" time="0" value="Emcee10" />
+    </Animation>
+    <Animation name="PlayWriteoutSound">
+      <Event event="PlayWriteoutSound" action="Reset, Play" />
+      <Controller type="Sound" end="Stop">
+        <Key type="Sound" time="0" sound="*@UI_Mecha19_Quest_Text_Scroll_Sound" />
       </Controller>
     </Animation>
-    <StateGroup name="EmceeTextDuration">
-      <State name="Emcee1">
-        <Action type="SetProperty" frame="PopupLabel" WriteOutTextDuration="6500" />
-      </State>
-      <State name="Emcee2">
-        <Action type="SetProperty" frame="PopupLabel" WriteOutTextDuration="8900" />
-      </State>
-      <State name="Emcee3">
-        <Action type="SetProperty" frame="PopupLabel" WriteOutTextDuration="5000" />
-      </State>
-      <State name="Emcee4">
-        <Action type="SetProperty" frame="PopupLabel" WriteOutTextDuration="9100" />
-      </State>
-      <State name="Emcee5">
-        <Action type="SetProperty" frame="PopupLabel" WriteOutTextDuration="3300" />
-      </State>
-      <State name="Emcee6">
-        <Action type="SetProperty" frame="PopupLabel" WriteOutTextDuration="7700" />
-      </State>
-      <State name="Emcee7">
-        <Action type="SetProperty" frame="PopupLabel" WriteOutTextDuration="6500" />
-      </State>
-      <State name="Emcee8">
-        <Action type="SetProperty" frame="PopupLabel" WriteOutTextDuration="10500" />
-      </State>
-      <State name="Emcee9">
-        <Action type="SetProperty" frame="PopupLabel" WriteOutTextDuration="5000" />
-      </State>
-      <State name="Emcee10">
-        <Action type="SetProperty" frame="PopupLabel" WriteOutTextDuration="4500" />
-      </State>
-      <State name="EmceeGameEnd">
-        <Action type="SetProperty" frame="PopupLabel" WriteOutTextDuration="8700" />
-      </State>
-      <State name="EmceeStitchesEnd">
-        <Action type="SetProperty" frame="PopupLabel" WriteOutTextDuration="6000" />
-      </State>
-      <State name="EmceeStitchesStart">
-        <Action type="SetProperty" frame="PopupLabel" WriteOutTextDuration="14500" />
-      </State>
-      <State name="EmceeLionEnd">
-        <Action type="SetProperty" frame="PopupLabel" WriteOutTextDuration="7100" />
-      </State>
-      <State name="EmceeLionStart">
-        <Action type="SetProperty" frame="PopupLabel" WriteOutTextDuration="14000" />
-      </State>
-      <State name="EmceeValeeraEnd">
-        <Action type="SetProperty" frame="PopupLabel" WriteOutTextDuration="8500" />
-      </State>
-      <State name="EmceeValeeraStart">
-        <Action type="SetProperty" frame="PopupLabel" WriteOutTextDuration="14000" />
-      </State>
-      <State name="EmceeUnicornEnd">
-        <Action type="SetProperty" frame="PopupLabel" WriteOutTextDuration="8500" />
-      </State>
-      <State name="EmceeUnicornStart">
-        <Action type="SetProperty" frame="PopupLabel" WriteOutTextDuration="12000" />
-      </State>
-      <State name="EmceeDehakaEnd">
-        <Action type="SetProperty" frame="PopupLabel" WriteOutTextDuration="9500" />
-      </State>
-      <State name="EmceeDehakaStart">
-        <Action type="SetProperty" frame="PopupLabel" WriteOutTextDuration="12500" />
-      </State>
-      <State name="EmceeFirstRepeatEnd">
-        <Action type="SetProperty" frame="PopupLabel" WriteOutTextDuration="9500" />
-      </State>
-      <State name="EmceeFirstRepeatStart">
-        <Action type="SetProperty" frame="PopupLabel" WriteOutTextDuration="5000" />
-      </State>
-      <State name="EmceeFirstOpenBoard">
-        <Action type="SetProperty" frame="PopupLabel" WriteOutTextDuration="13500" />
-      </State>
-      <State name="EmceeIntro">
-        <Action type="SetProperty" frame="PopupLabel" WriteOutTextDuration="7500" />
-      </State>
-    </StateGroup>
     <StateGroup name="EventIntroStates">
       <State name="IsEventIntro">
         <When type="Property" frame="$parent/$parent" HasSeenEventIntro="false" />
@@ -1562,7 +1419,7 @@
     <Frame type="Frame" name="Initial_StartSquareTooltip" template="Toy2019EventQuestPopupPanel/QuestRewardBoardTooltip">
       <Anchor side="Right" relative="$parent/StartSquareTooltipHitArea" pos="Min" offset="15" />
       <Anchor side="Top" relative="$parent/StartSquareTooltipHitArea" pos="Mid" offset="-100" />
-      <Anchor side="Bottom" relative="RewardLabel2" pos="Max" offset="31" />
+      <Anchor side="Bottom" relative="RewardLabel3" pos="Max" offset="31" />
       <Alpha val="0" />
       <RenderPriority val="801" />
       <Frame type="Label" name="HeaderLabel">
@@ -1579,10 +1436,27 @@
         <Text val="@EmoticonPack/Name/EmojiToysPack2" />
       </Frame>
       <Frame type="Image" name="RewardLabelIcon2">
-        <Texture val="@UI/Storm_UI_ToyEvent_Icon_Loot" />
+        <Texture val="@UI/Storm_UI_ToyEvent_Icon_Sticker" />
         <Visible val="True" />
       </Frame>
       <Frame type="Label" name="RewardLabel2">
+        <Text val="@Mount/Name/MountHorseToys19" />
+      </Frame>
+      <Frame type="Image" name="RewardLabelIcon3">
+        <Anchor side="Top" relative="$parent/RewardLabel3" pos="Mid" offset="0" />
+        <Anchor side="Bottom" relative="$parent/RewardLabel3" pos="Mid" offset="0" />
+        <Anchor side="Left" relative="$parent/RewardImage" pos="Min" offset="3" />
+        <Width val="30" />
+        <ScaleHeightToTexture val="True" />
+        <Visible val="{$parent/RewardLabel3/@Visible}" />
+        <Texture val="@UI/Storm_UI_ToyEvent_Icon_Loot" />
+      </Frame>
+      <Frame type="Label" name="RewardLabel3">
+        <Anchor side="Top" relative="$parent/RewardLabel2" pos="Max" offset="2" />
+        <Anchor side="Left" relative="$parent/RewardLabelIcon3" pos="Max" offset="0" />
+        <Anchor side="Right" relative="$parent/RewardImage" pos="Max" offset="-5" />
+        <Style val="Toy2019EventQuestCardTooltipText" />
+        <CollapseLayout val="True" />
         <Text val="@LootChest/Name/LootChestChristmas2019Rare" />
       </Frame>
     </Frame>
@@ -1747,43 +1621,75 @@
         </State>
       </StateGroup>
     </Frame>
-    <StateGroup name="StickerStates">
-      <State name="StickerNone_Idle" debug="False">
-        <When type="Property" frame="$parent" StickerCount="0" />
-      </State>
-      <State name="StickerOne_Reveal" debug="False">
+    <StateGroup name="CoinsStates">
+      <State name="One_Reveal">
         <When type="Property" frame="$parent" LastSeenStickerCount="0" />
         <When type="Property" frame="$parent" StickerCount="1" />
+        <When type="StateGroup" RepeatableCardStates="Dismissing" />
         <Action type="SetProperty" frame="CoinBox/Led1" Visible="True" />
         <Action type="SendEvent" frame="CoinBox/Led1" event="TurnOn" />
         <Action type="SendEvent" frame="CoinBox" event="DropCoin" />
+        <Action type="SetState" group="CoinsDroppedStates" state="Dropped" />
       </State>
-      <State name="StickerOne_Idle" debug="False">
+      <State name="One_PreReveal">
+        <When type="Property" frame="$parent" LastSeenStickerCount="0" />
+        <When type="Property" frame="$parent" StickerCount="1" />
+        <When type="StateGroup" CoinsDroppedStates="Default" />
+      </State>
+      <State name="One_Idle">
         <When type="Property" frame="$parent" StickerCount="1" />
         <Action type="SetProperty" frame="CoinBox/Led1" Visible="True" />
       </State>
-      <State name="StickerTwo_Reveal">
+      <State name="Two_Reveal">
         <When type="Property" frame="$parent" LastSeenStickerCount="1" />
         <When type="Property" frame="$parent" StickerCount="2" />
+        <When type="StateGroup" RepeatableCardStates="Dismissing" />
         <Action type="SetProperty" frame="CoinBox/Led1" Visible="True" />
         <Action type="SetProperty" frame="CoinBox/Led2" Visible="True" />
         <Action type="SendEvent" frame="CoinBox/Led2" event="TurnOn" />
         <Action type="SendEvent" frame="CoinBox" event="DropCoin" />
+        <Action type="SetState" group="CoinsDroppedStates" state="Dropped" />
       </State>
-      <State name="StickerTwo_Idle">
+      <State name="Two_PreReveal">
+        <When type="Property" frame="$parent" LastSeenStickerCount="1" />
+        <When type="Property" frame="$parent" StickerCount="2" />
+        <When type="StateGroup" CoinsDroppedStates="Default" />
+        <Action type="SetProperty" frame="CoinBox/Led1" Visible="True" />
+      </State>
+      <State name="Two_Idle">
         <When type="Property" frame="$parent" StickerCount="2" />
         <Action type="SetProperty" frame="CoinBox/Led1" Visible="True" />
         <Action type="SetProperty" frame="CoinBox/Led2" Visible="True" />
       </State>
-      <State name="StickerThree_Reveal">
+      <State name="Three_Reveal">
         <When type="Property" frame="$parent" StickerCount="3" />
+        <When type="StateGroup" RepeatableCardStates="Dismissing" />
         <Action type="SetProperty" frame="CoinBox/Led1" Visible="True" />
         <Action type="SetProperty" frame="CoinBox/Led2" Visible="True" />
         <Action type="SetProperty" frame="CoinBox/Led3" Visible="True" />
         <Action type="SendEvent" frame="CoinBox/Led3" event="TurnOn" />
         <Action type="SendEvent" frame="CoinBox" event="DropCoin" />
+        <Action type="SetState" group="CoinsDroppedStates" state="Dropped" />
         <Action type="SendEvent" frame="CoinBox" event="ShowLoot" />
       </State>
+      <State name="Three_PreReveal">
+        <When type="Property" frame="$parent" StickerCount="3" />
+        <When type="StateGroup" CoinsDroppedStates="Default" />
+        <Action type="SetProperty" frame="CoinBox/Led1" Visible="True" />
+        <Action type="SetProperty" frame="CoinBox/Led2" Visible="True" />
+      </State>
+      <DefaultState val="None" />
+      <State name="None" />
+    </StateGroup>
+    <Animation name="ResetCoinsDroppedStates">
+      <Event event="OnShown" action="Reset,Play" />
+      <Controller type="State" stateGroup="CoinsDroppedStates" end="Pause">
+        <Key type="Identifier" time="0" value="Default" />
+      </Controller>
+    </Animation>
+    <StateGroup name="CoinsDroppedStates">
+      <State name="Default" />
+      <State name="Dropped" />
     </StateGroup>
     <Frame type="Frame" name="CoinBox">
       <Anchor side="Left" relative="$parent" pos="Mid" offset="80" />
@@ -1793,10 +1699,10 @@
       <Width val="300" />
       <Height val="300" />
       <Frame type="Image" name="BoxShadow">
-        <Anchor side="Left" relative="$parent" pos="Mid" offset="95" />
-        <Anchor side="Right" relative="$parent" pos="Mid" offset="95" />
-        <Anchor side="Top" relative="$parent" pos="Mid" offset="-17" />
-        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="-17" />
+        <Anchor side="Left" relative="$parent" pos="Mid" offset="99" />
+        <Anchor side="Right" relative="$parent" pos="Mid" offset="99" />
+        <Anchor side="Top" relative="$parent" pos="Mid" offset="-14" />
+        <Anchor side="Bottom" relative="$parent" pos="Mid" offset="-14" />
         <Texture val="@UI/Storm_UI_Toy2019Event_GameBoard_CoinSlot_Shadow" />
         <Unclipped val="True" />
         <Alpha val="180" />
@@ -1815,6 +1721,13 @@
         <Anchor side="Bottom" relative="$parent" pos="Mid" offset="30" />
         <Texture val="@UI/Storm_UI_Toy2019Event_GameBoard_CoinSlot_Coin" />
         <Unclipped val="True" />
+        <Frame type="Image" name="Glow">
+          <Anchor relative="$parent" />
+          <BlendMode val="Add" />
+          <Color val="f0f000" />
+          <Alpha val="0" />
+          <Texture val="{$parent/@Texture}" />
+        </Frame>
       </Frame>
       <Frame type="Image" name="BoxFront">
         <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
@@ -1848,19 +1761,29 @@
         <Event event="DropCoin" action="Reset,Play" />
         <Controller type="Fade" frame="Coin" end="Stop">
           <Key type="Curve" time="0" value="0" inout="Slow" />
-          <Key type="Curve" time="0.8" value="255" inout="Slow,Linear" />
-          <Key type="Curve" time="1.4" value="255" inout="Linear" />
-          <Key type="Curve" time="1.4" value="0" inout="Linear" />
+          <Key type="Curve" time="0.7" value="255" inout="Slow,Linear" />
+          <Key type="Curve" time="2.4" value="255" inout="Linear" />
+          <Key type="Curve" time="2.4" value="0" inout="Linear" />
+        </Controller>
+        <Controller type="Fade" frame="Coin/Glow" end="Pause">
+          <Key type="Curve" time="0" value="0" inout="Step" />
+          <Key type="Curve" time="0.7" value="0" inout="Step,Slow" />
+          <Key type="Curve" time="1.0" value="255" inout="Fast" />
+          <Key type="Curve" time="1.5" value="0" inout="Slow" />
         </Controller>
         <Controller type="Anchor" frame="Coin" end="Stop" side="Top" relative="true">
           <Key type="Curve" time="0" value="-350" inout="Step" />
-          <Key type="Curve" time="1.0" value="-350" inout="Step,Slow" />
-          <Key type="Curve" time="1.4" value="0" inout="Fast" />
+          <Key type="Curve" time="2.0" value="-350" inout="Step,Slow" />
+          <Key type="Curve" time="2.4" value="0" inout="Fast" />
         </Controller>
         <Controller type="Anchor" frame="Coin" end="Stop" side="Bottom" relative="true">
           <Key type="Curve" time="0" value="-350" inout="Step" />
-          <Key type="Curve" time="1.0" value="-350" inout="Step,Slow" />
-          <Key type="Curve" time="1.4" value="0" inout="Fast" />
+          <Key type="Curve" time="2.0" value="-350" inout="Step,Slow" />
+          <Key type="Curve" time="2.4" value="0" inout="Fast" />
+        </Controller>
+        <Controller type="Sound" end="Stop">
+          <Key type="Sound" time="0.7" sound="*@UI_Toys18_Quest_Button_Hover_Sound" />
+          <Key type="Sound" time="2.4" sound="@Event_TreasureGoblin_Coin_Swipe" />
         </Controller>
       </Animation>
     </Frame>
@@ -2183,39 +2106,51 @@
       <Height val="217" />
       <DisplayType val="ImageLayer" />
       <ClickSound val="*@UI_Toys18_Quest_Button_Press_Sound" />
-      <TooltipFrame val="ToyEventTooltip" />
-      <Frame type="StandardTooltip" name="ToyEventTooltip" template="Toy2019EventQuestPopupPanel/ToyEventTooltipTemplate" />
+      <Frame type="StandardTooltip" name="RollButtonTooltip" template="Toy2019EventQuestPopupPanel/ToyEventTooltipTemplate" />
+      <Frame type="StandardTooltip" name="RollButtonTooltipReady" template="Toy2019EventQuestPopupPanel/ToyEventTooltipTemplate">
+        <Frame type="Label" name="Label">
+          <Height val="55" />
+          <Style val="Toy2019EventQuestCardTooltipText_Centered" />
+        </Frame>
+      </Frame>
       <StateGroup name="TooltipShow">
         <State name="HideTooltip">
           <When type="Property" frame="$ancestor[@name=ToyEventDialog]" operator="NotEqual" CurrentBoardState="ReadyToRoll" />
           <When type="Property" frame="$ancestor[@name=ToyEventDialog]" operator="NotEqual" CurrentBoardState="UnableToRoll" />
           <Action type="SetProperty" AcceptsMouse="False" />
+          <Action type="SetProperty" TooltipFrame="RollButtonTooltip" undo="False" />
         </State>
         <State name="ReadyToRoll">
           <When type="Property" frame="$ancestor[@name=ToyEventDialog]" CurrentBoardState="ReadyToRoll" />
           <Action type="SetProperty" Tooltip="@UI/QuestLine/Event/Toys/Tooltip/RollButtonReady" />
+          <Action type="SetProperty" TooltipFrame="RollButtonTooltipReady" undo="False" />
         </State>
         <State name="LapsLimitReached">
           <When type="Property" frame="$parent/$parent" LapCount10s="5" />
           <When type="Property" frame="$parent/$parent" LapCount1s="0" />
           <Action type="SetProperty" Tooltip="@UI/QuestLine/Event/Toys/Tooltip/LapsLimitReached" />
+          <Action type="SetProperty" TooltipFrame="RollButtonTooltip" undo="False" />
         </State>
         <State name="ShowTooltip2Quests">
           <When type="Property" frame="$parent/CardDeckRepeatableTopCard" QuestState="Active" />
           <When type="Property" frame="$parent/CardDeckUniqueTopCard" QuestState="Active" />
           <Action type="SetProperty" Tooltip="@UI/QuestLine/Event/Toys/Tooltip/RollButton2Quests" />
+          <Action type="SetProperty" TooltipFrame="RollButtonTooltip" undo="False" />
         </State>
         <State name="ShowTooltip1QuestRep">
           <When type="Property" frame="$parent/CardDeckRepeatableTopCard" QuestState="Active" />
           <Action type="SetProperty" Tooltip="@UI/QuestLine/Event/Toys/Tooltip/RollButton1Quest" />
+          <Action type="SetProperty" TooltipFrame="RollButtonTooltip" undo="False" />
         </State>
         <State name="ShowTooltip1QuestUnq">
           <When type="Property" frame="$parent/CardDeckUniqueTopCard" QuestState="Active" />
           <Action type="SetProperty" Tooltip="@UI/QuestLine/Event/Toys/Tooltip/RollButton1Quest" />
+          <Action type="SetProperty" TooltipFrame="RollButtonTooltip" undo="False" />
         </State>
         <State name="InQueueOrDraft">
           <When type="Property" enabled="False" />
           <Action type="SetProperty" Tooltip="@UI/QuestLine/Event/Toys/Tooltip/InQueueOrDraft" />
+          <Action type="SetProperty" TooltipFrame="RollButtonTooltip" undo="False" />
         </State>
       </StateGroup>
       <Animation name="OnButtonDisable">
@@ -2328,6 +2263,10 @@
           <Key type="Curve" time="0.6" value="255" inout="Linear" />
           <Key type="Curve" time="1.1" value="0" inout="Linear" />
         </Controller>
+        <Controller type="Property" property="AcceptsMouse" end="Stop">
+          <Key type="Property" time="0" value="True" />
+          <Key type="Property" time="1.1" value="False" />
+        </Controller>
       </Animation>
     </Frame>
     <Frame type="Image" name="ToyEventFrame">
@@ -2405,6 +2344,7 @@
     </Frame>
   </Frame>
   <Frame type="Button" name="OpenToy2019EventPopupButtonTemplate" template="StandardTemplates/OpenToyEventPopupButtonTemplate">
+    <Enabled val="{$QuestUI/@IsQuestSelectable}" />
     <Frame type="Image" name="NormalImage">
       <Texture val="@UI/Storm_UI_Toy2019Event_SpecialEvent_Button_Normal" />
     </Frame>
@@ -2415,6 +2355,14 @@
       <Style val="ToyEvent_CustomButtonLabelSmall" />
       <Text val="@UI/QuestLine/Event/Toys2019/QuestLogButton" />
     </Frame>
+    <StateGroup name="Tooltip">
+      <State name="Disabled">
+        <When type="Property" enabled="False" />
+        <Action type="SetProperty" tooltip="@UI/QuestLine/Event/QuestButtonTooltip/UnavailableReasonInQueue" />
+      </State>
+      <DefaultState val="Enabled" />
+      <State name="Enabled" />
+    </StateGroup>
     <Animation name="OpenPopup">
       <Event event="OnClick" action="Restart,Play" />
       <Controller type="Event" frame="$QuestUI" end="Pause">
