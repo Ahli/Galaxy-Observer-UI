@@ -20,6 +20,7 @@ import interfacebuilder.integration.ReplayFinder;
 import interfacebuilder.integration.SettingsIniInterface;
 import interfacebuilder.integration.kryo.KryoService;
 import interfacebuilder.projects.ProjectService;
+import interfacebuilder.threads.SpringForkJoinWorkerThreadFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -155,8 +156,8 @@ public class AppConfiguration {
 	@Bean
 	protected ForkJoinPool forkJoinPool() {
 		final int maxThreads = Math.max(1, Runtime.getRuntime().availableProcessors() / 2);
-		return new ForkJoinPool(maxThreads, ForkJoinPool.defaultForkJoinWorkerThreadFactory, null, true, maxThreads,
-				256, 1, null, 5_000L, TimeUnit.MILLISECONDS);
+		return new ForkJoinPool(maxThreads, new SpringForkJoinWorkerThreadFactory(), null, true, maxThreads, 256, 1,
+				null, 5_000L, TimeUnit.MILLISECONDS);
 	}
 	
 	@Bean
