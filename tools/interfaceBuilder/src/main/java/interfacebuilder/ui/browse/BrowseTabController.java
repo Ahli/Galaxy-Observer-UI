@@ -216,7 +216,9 @@ public class BrowseTabController implements Updateable {
 							showInTableView(selectedIndex < 0 ? null : selectedItem);
 							queryRunning = false;
 							if (!queryRunning && !queriedFilter.equals(strFinal)) {
-								logger.error("Query set, but Filter Thread is dead. -> does this happen?");
+								//Query set, but Filter Thread is dead. -> try again
+								logger.error("Query set, but Filter Thread is dead. -> try again. Does this work?");
+								filterTree(filter);
 							}
 						} catch (final Exception e) {
 							logger.fatal(FATAL_ERROR, e);
