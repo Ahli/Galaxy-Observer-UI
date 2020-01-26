@@ -22,6 +22,7 @@ import com.esotericsoftware.kryo.util.ListReferenceResolver;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileAttribute;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.DeflaterOutputStream;
@@ -102,6 +103,7 @@ public class KryoService {
 	}
 	
 	public void put(final Path path, final Iterable<Object> payload, final Kryo kryo) throws IOException {
+		Files.createDirectories(path.getParent());
 		try (final DeflaterOutputStream out = new DeflaterOutputStream(Files.newOutputStream(path))) {
 			try (final Output output = new Output(out)) {
 				for (final var obj : payload) {
