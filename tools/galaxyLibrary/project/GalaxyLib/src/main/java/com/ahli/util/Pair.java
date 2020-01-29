@@ -8,7 +8,7 @@ import java.util.Objects;
 /**
  * <p> A convenience class to represent name-value pairs. </p>
  */
-public class Pair <K, V> {
+public class Pair<K, V> {
 	
 	/**
 	 * Key of this <code>Pair</code>.

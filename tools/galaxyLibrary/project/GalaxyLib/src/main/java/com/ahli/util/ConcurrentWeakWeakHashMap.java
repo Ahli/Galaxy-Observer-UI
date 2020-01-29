@@ -36,7 +36,7 @@ import java.util.concurrent.ConcurrentMap;
  *
  * @author Alex Snaps, modified by Ahli
  */
-public class ConcurrentWeakWeakHashMap <K> implements ConcurrentMap<K, K> {
+public class ConcurrentWeakWeakHashMap<K> implements ConcurrentMap<K, K> {
 	
 	private final ConcurrentMap<WeakReferenceWithHash<K>, WeakReferenceWithHash<K>> map;
 	private final ReferenceQueue<K> queue = new ReferenceQueue<>();
@@ -220,7 +220,7 @@ public class ConcurrentWeakWeakHashMap <K> implements ConcurrentMap<K, K> {
 		};
 	}
 	
-	private static final class WeakReferenceWithHash <T> extends java.lang.ref.WeakReference<T> {
+	private static final class WeakReferenceWithHash<T> extends java.lang.ref.WeakReference<T> {
 		
 		private final int hashCode;
 		
@@ -243,7 +243,7 @@ public class ConcurrentWeakWeakHashMap <K> implements ConcurrentMap<K, K> {
 		}
 	}
 	
-	private abstract static class WeakSafeIterator <T, U> implements Iterator<T> {
+	private abstract static class WeakSafeIterator<T, U> implements Iterator<T> {
 		
 		private final Iterator<U> weakIterator;
 		protected T strongNext;

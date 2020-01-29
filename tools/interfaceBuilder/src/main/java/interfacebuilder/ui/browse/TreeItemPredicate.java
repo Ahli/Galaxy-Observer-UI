@@ -8,7 +8,7 @@ import javafx.scene.control.TreeItem;
 import java.util.function.Predicate;
 
 @FunctionalInterface
-public interface TreeItemPredicate <T> {
+public interface TreeItemPredicate<T> {
 	/**
 	 * Utility method to create a TreeItemPredicate from a given {@link Predicate}
 	 */

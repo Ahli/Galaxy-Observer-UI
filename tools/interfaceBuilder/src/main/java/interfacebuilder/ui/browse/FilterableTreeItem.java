@@ -15,7 +15,7 @@ import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
 
-public class FilterableTreeItem <T> extends TreeItem<T> {
+public class FilterableTreeItem<T> extends TreeItem<T> {
 	private final ObservableList<TreeItem<T>> sourceList;
 	
 	private final ObjectProperty<TreeItemPredicate<T>> predicate = new SimpleObjectProperty<>();

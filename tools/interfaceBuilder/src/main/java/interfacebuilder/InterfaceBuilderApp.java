@@ -86,7 +86,7 @@ import java.util.concurrent.TimeUnit;
 		"org.springframework.boot.autoconfigure.task.TaskSchedulingAutoConfiguration",
 		//"org.springframework.boot.autoconfigure.transaction.TransactionAutoConfiguration", // req
 		"org.springframework.boot.autoconfigure.transaction.jta.JtaAutoConfiguration" })
-@Import ( { AppConfiguration.class, FxmlConfiguration.class })
+@Import ({ AppConfiguration.class, FxmlConfiguration.class })
 public class InterfaceBuilderApp extends Application {
 	public static final String FATAL_ERROR = "FATAL ERROR: ";
 	private static final Logger logger = LogManager.getLogger(InterfaceBuilderApp.class);

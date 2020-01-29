@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 public class UICatalogParser implements ParsedXmlConsumer {
@@ -377,7 +378,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				} else {
 					// add to parent
 					if (curElement instanceof UIStateGroup) {
-						((UIStateGroup) curElement).getStates().add((UIState) newElem);
+						((UIStateGroup) curElement).getStates().add(newElem);
 						
 						// set flags to override on edit after parsing children
 						statesToClose.add((UIState) newElem);
@@ -393,7 +394,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				// add to parent
 				if (curElement != null) {
 					if (curElement instanceof UIAnimation) {
-						((UIAnimation) curElement).getControllers().add((UIController) newElem);
+						((UIAnimation) curElement).getControllers().add(newElem);
 						final var newElemUiController = (UIController) newElem;
 						for (int j = 0, len = attrValues.size(); j < len; j++) {
 							newElemUiController.addValue(attrTypes.get(j), attrValues.get(j));
@@ -425,7 +426,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				// add to parent
 				if (curElement != null) {
 					if (curElement instanceof UIFrame) {
-						((UIFrame) curElement).getChildren().add(newElem);
+						(curElement).getChildren().add(newElem);
 					} else {
 						logger.error("StateGroup appearing in unexpected parent element: {}", curElement);
 					}
@@ -798,7 +799,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			for (final UIAttribute attrTarget : attributesTarget) {
 				final String targetName = attrTarget.getName();
 				// both null or equal
-				if (targetName == sourceName || targetName.equals(sourceName)) {
+				if (Objects.equals(targetName, sourceName)) {
 					attrTarget.setKeyValues(attrSource.getKeyValues());
 					edited = true;
 					break;
