@@ -20,6 +20,7 @@ import interfacebuilder.integration.ReplayFinder;
 import interfacebuilder.integration.SettingsIniInterface;
 import interfacebuilder.integration.kryo.KryoService;
 import interfacebuilder.projects.ProjectService;
+import interfacebuilder.threads.CleaningForkJoinPool;
 import interfacebuilder.threads.SpringForkJoinWorkerThreadFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -143,21 +144,11 @@ public class AppConfiguration {
 		return new ReplayFinder();
 	}
 	
-	//	@Bean
-	//	protected StylizedTextAreaAppenderThreadPoolExecutor threadPoolExecutor() {
-	//		final int maxThreads = Math.max(1, Runtime.getRuntime().availableProcessors() / 2);
-	//		final StylizedTextAreaAppenderThreadPoolExecutor executor =
-	//				new StylizedTextAreaAppenderThreadPoolExecutor(maxThreads, maxThreads, 5000L, TimeUnit.MILLISECONDS,
-	//						new LinkedBlockingQueue<>(), Executors.defaultThreadFactory(), null);
-	//		executor.allowCoreThreadTimeOut(true);
-	//		return executor;
-	//	}
-	
 	@Bean
 	protected ForkJoinPool forkJoinPool() {
 		final int maxThreads = Math.max(1, Runtime.getRuntime().availableProcessors() / 2);
-		return new ForkJoinPool(maxThreads, new SpringForkJoinWorkerThreadFactory(), null, true, maxThreads, 256, 1,
-				null, 5_000L, TimeUnit.MILLISECONDS);
+		return new CleaningForkJoinPool(maxThreads, new SpringForkJoinWorkerThreadFactory(), null, true, maxThreads,
+				256, 1, null, 5_000L, TimeUnit.MILLISECONDS);
 	}
 	
 	@Bean

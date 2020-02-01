@@ -18,7 +18,7 @@ public class SpringForkJoinWorkerThreadFactory implements ForkJoinPool.ForkJoinW
 		
 		private MyForkJoinWorkerThread(final ForkJoinPool pool) {
 			super(pool);
-			// set the correct classloader
+			// set the correct classloader to work with Spring
 			setContextClassLoader(Thread.currentThread().getContextClassLoader());
 		}
 	}

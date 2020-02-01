@@ -6,6 +6,10 @@ package interfacebuilder;
 public class Main {
 	/**
 	 * Entry point of the App.
+	 * <p>
+	 * Required VM Options: --add-opens=javafx.controls/javafx.scene.control=interfacex.builder
+	 * <p>
+	 * Required for filtering items in a TreeView.
 	 *
 	 * @param args
 	 * 		command line arguments

@@ -63,6 +63,7 @@ public class ConcurrentWeakWeakHashMap<K> implements ConcurrentMap<K, K> {
 	public void purgeKeys() {
 		Reference<? extends K> reference;
 		while ((reference = queue.poll()) != null) {
+			//noinspection SuspiciousMethodCalls
 			map.remove(reference);
 		}
 	}
@@ -111,6 +112,7 @@ public class ConcurrentWeakWeakHashMap<K> implements ConcurrentMap<K, K> {
 	}
 	
 	private WeakReferenceWithHash<?> newKeyByObj(final Object obj) {
+		//noinspection rawtypes
 		return new WeakReferenceWithHash(obj, queue);
 	}
 	

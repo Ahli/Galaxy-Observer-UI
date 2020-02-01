@@ -4,6 +4,7 @@
 package interfacebuilder;
 
 import com.ahli.galaxy.game.def.abstracts.GameDef;
+import com.ahli.util.StringInterner;
 import interfacebuilder.base_ui.BaseUiService;
 import interfacebuilder.build.MpqBuilderService;
 import interfacebuilder.compress.GameService;
@@ -264,7 +265,7 @@ public class InterfaceBuilderApp extends Application {
 				try {
 					Thread.currentThread().setName("Supervisor");
 					Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-					final var executorTmp = getExecutor();
+					
 					Platform.runLater(() -> {
 						try {
 							navigationController.lockNavToProgress();
@@ -273,8 +274,11 @@ public class InterfaceBuilderApp extends Application {
 						}
 					});
 					
+					// TODO replace with CleaningForkJoinTask and add to executor?
+					
 					mpqBuilderService.build(params.getParamCompilePath());
 					
+					final var executorTmp = getExecutor();
 					while (executorTmp.getQueuedSubmissionCount() > 0 || executorTmp.getActiveThreadCount() > 0 ||
 							executorTmp.getRunningThreadCount() > 0) {
 						Thread.sleep(50);
@@ -453,6 +457,36 @@ public class InterfaceBuilderApp extends Application {
 		});
 	}
 	
+	/**
+	 * After a short delay, the app attempts to clean up its resources,
+	 */
+	public static void tryCleanUp() {
+		// new delayed thread is required, else the ForkJoinPool is not finished
+		Platform.runLater(() -> {
+			final InterfaceBuilderApp instance = InterfaceBuilderApp.getInstance();
+			// free space of baseUI
+			if (instance != null && instance.executor != null && instance.mpqBuilderService != null &&
+					instance.executor.isQuiescent()) {
+				logger.info("Freeing up resources");
+				instance.mpqBuilderService.getGameData(Game.SC2).setUiCatalog(null);
+				instance.mpqBuilderService.getGameData(Game.HEROES).setUiCatalog(null);
+				// GC1 is the default GC and can now release RAM -> actually good to do after a task because we use a
+				// lot of RAM for the UIs
+				// Weak References survive 3 garbage collections by default
+				for (int i = 0; i < 3; ++i) {
+					System.gc();
+				}
+				try {
+					Thread.sleep(200);
+					// clean up StringInterner's weak references that the GC removed
+					StringInterner.cleanUpGarbage();
+				} catch (final InterruptedException e) {
+					Thread.currentThread().interrupt();
+				}
+			}
+		});
+	}
+	
 	@Override
 	public void init() {
 		// initialize Spring
@@ -467,29 +501,6 @@ public class InterfaceBuilderApp extends Application {
 		final AutowireCapableBeanFactory autowireCapableBeanFactory = appContext.getAutowireCapableBeanFactory();
 		autowireCapableBeanFactory.autowireBean(this);
 		autowireCapableBeanFactory.initializeBean(this, getClass().getName());
-		
-		// TODO clean up garbage after tasks
-		//		executor.setCleanUpTask(() -> {
-		//			// free space of baseUI
-		//			if (executor.getQueue().isEmpty() && executor.getActiveCount() <= 1) {
-		//				logger.info("Freeing up resources");
-		//				mpqBuilderService.getGameData(Game.SC2).setUiCatalog(null);
-		//				mpqBuilderService.getGameData(Game.HEROES).setUiCatalog(null);
-		//				// GC1 is the default GC and can now release RAM -> actually good to do after a task because we use a
-		//				// lot of RAM for the UIs
-		//				// Weak References survive 3 garbage collections by default
-		//				for (int i = 0; i < 3; ++i) {
-		//					System.gc();
-		//				}
-		//				try {
-		//					Thread.sleep(200);
-		//					// clean up StringInterner's weak references that the GC removed
-		//					StringInterner.cleanUpGarbage();
-		//				} catch (final InterruptedException e) {
-		//					Thread.currentThread().interrupt();
-		//				}
-		//			}
-		//		});
 	}
 	
 	/**
