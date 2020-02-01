@@ -7,11 +7,11 @@ import com.ahli.galaxy.ModData;
 import com.ahli.galaxy.archive.ComponentsListReaderDom;
 import com.ahli.galaxy.archive.DescIndexData;
 import com.ahli.galaxy.game.GameData;
-import com.ahli.galaxy.ui.interfaces.UICatalog;
 import com.ahli.mpq.MpqEditorInterface;
 import interfacebuilder.InterfaceBuilderApp;
 import interfacebuilder.base_ui.BaseUiService;
 import interfacebuilder.build.MpqBuilderService;
+import interfacebuilder.compile.BrowseCompileTask;
 import interfacebuilder.compile.CompileService;
 import interfacebuilder.compress.GameService;
 import interfacebuilder.config.ConfigService;
@@ -320,8 +320,9 @@ public class BrowseController implements Updateable {
 		final GameData gameData = mpqBuilderService.getGameData(game);
 		final Updateable controller = createTab(gameData.getGameDef().getName());
 		if (controller != null) {
-			final Runnable followupTask = () -> ((BrowseTabController) controller).setData(gameData.getUiCatalog());
-			baseUiService.parseBaseUI(gameData, followupTask);
+			final BrowseLoadBaseUiTask task =
+					new BrowseLoadBaseUiTask(gameData, (BrowseTabController) controller, baseUiService);
+			InterfaceBuilderApp.getInstance().getExecutor().execute(task);
 		}
 	}
 	
@@ -412,20 +413,10 @@ public class BrowseController implements Updateable {
 					continue;
 				}
 				
-				final Runnable followupTask = () -> {
-					try {
-						// TODO cache compiled uicatalogs
-						final UICatalog uiCatalog = compileService
-								.compile(mod, configService.getRaceId(), false, true, true,
-										configService.getConsoleSkinId());
-						mod.setUi(uiCatalog);
-					} catch (final InterruptedException e) {
-						Thread.currentThread().interrupt();
-						return;
-					}
-					((BrowseTabController) controller).setData(mod.getUi());
-				};
-				baseUiService.parseBaseUI(mod.getGameData(), followupTask);
+				final BrowseCompileTask task =
+						new BrowseCompileTask(mod, (BrowseTabController) controller, compileService, baseUiService,
+								configService);
+				InterfaceBuilderApp.getInstance().getExecutor().execute(task);
 			}
 		}
 	}

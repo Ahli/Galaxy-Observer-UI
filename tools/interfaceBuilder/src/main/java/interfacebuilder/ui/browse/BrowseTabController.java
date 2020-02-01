@@ -156,7 +156,9 @@ public class BrowseTabController implements Updateable {
 				final long start = System.currentTimeMillis();
 				framesTotal = 0;
 				createTree(template);
-				logger.info("Tree creation: {}ms , {} frames", (System.currentTimeMillis() - start), framesTotal);
+				if (logger.isTraceEnabled()) {
+					logger.trace("Tree creation: {}ms , {} frames", (System.currentTimeMillis() - start), framesTotal);
+				}
 			} catch (final Exception e) {
 				logger.fatal(FATAL_ERROR, e);
 			}
@@ -201,7 +203,9 @@ public class BrowseTabController implements Updateable {
 						str = queriedFilter;
 						flowFactory.setHighlight(str);
 						queryString.set(str.toUpperCase());
-						logger.info("filter apply: {}ms - {}", (System.currentTimeMillis() - startTime), str);
+						if (logger.isTraceEnabled()) {
+							logger.trace("filter apply: {}ms - {}", (System.currentTimeMillis() - startTime), str);
+						}
 					}
 					final String strFinal = str;
 					Platform.runLater(() -> {

@@ -113,7 +113,6 @@ public final class StylizedTextAreaAppender extends AbstractAppender {
 			});
 		}
 		if (unregister) {
-			// eventually this needs to be delayed and executed with low priority, so it appears after logs
 			workerTaskControllers.remove(threadName);
 		}
 	}

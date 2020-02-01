@@ -15,8 +15,10 @@ import interfacebuilder.InterfaceBuilderApp;
 import interfacebuilder.compress.GameService;
 import interfacebuilder.config.ConfigService;
 import interfacebuilder.integration.FileService;
+import interfacebuilder.integration.SettingsIniInterface;
 import interfacebuilder.integration.kryo.KryoGameInfo;
 import interfacebuilder.integration.kryo.KryoService;
+import interfacebuilder.integration.log4j.StylizedTextAreaAppender;
 import interfacebuilder.projects.enums.Game;
 import interfacebuilder.ui.progress.appender.Appender;
 import org.apache.commons.io.FileUtils;
@@ -53,6 +55,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.ForkJoinTask;
+import java.util.concurrent.RecursiveAction;
 
 public class BaseUiService {
 	private static final String UNKNOWN_GAME_EXCEPTION = "Unknown Game";
@@ -159,8 +163,10 @@ public class BaseUiService {
 	 *
 	 * @param game
 	 * @param usePtr
+	 * @param outputs
+	 * @return list of executable tasks
 	 */
-	public void extract(final Game game, final boolean usePtr, final Appender[] outputs) {
+	public List<ForkJoinTask<Void>> extract(final Game game, final boolean usePtr, final Appender[] outputs) {
 		logger.info("Extracting baseUI for {}", game);
 		prepareCascExplorerConfig(game, usePtr);
 		
@@ -171,45 +177,57 @@ public class BaseUiService {
 		try {
 			if (!destination.exists() && !destination.mkdirs()) {
 				logger.error("Directory {} could not be created.", destination);
-				return;
+				return null;
 			}
 			fileService.cleanDirectory(destination);
 			discCacheService.remove(gameDef.getName(), usePtr);
 		} catch (final IOException e) {
 			logger.error(String.format("Directory %s could not be cleaned.", destination), e);
-			return;
+			return null;
 		}
 		
+		final List<ForkJoinTask<Void>> tasks = new ArrayList<>(4);
 		final File extractorExe = configService.getCascExtractorConsoleExeFile();
 		final String[] queryMasks = getQueryMasks(game);
 		int i = 0;
 		for (final String mask : queryMasks) {
 			final Appender out = outputs[i];
 			i++;
-			final Runnable task = () -> {
-				try {
-					if (extract(extractorExe, mask, destination, out)) {
-						Thread.sleep(50);
+			final ForkJoinTask<Void> task = new RecursiveAction() {
+				@Override
+				protected void compute() {
+					try {
 						if (extract(extractorExe, mask, destination, out)) {
-							logger.warn(
-									"Extraction failed due to a file access. Try closing the Battle.net App, if it is running and this fails to extract all files.");
+							Thread.sleep(50);
+							if (extract(extractorExe, mask, destination, out)) {
+								logger.warn(
+										"Extraction failed due to a file access. Try closing the Battle.net App, if it is running and this fails to extract all files.");
+							}
 						}
+					} catch (final IOException e) {
+						logger.error("Extracting files from CASC via CascExtractor failed.", e);
+					} catch (final InterruptedException e) {
+						Thread.currentThread().interrupt();
 					}
-				} catch (final IOException e) {
-					logger.error("Extracting files from CASC via CascExtractor failed.", e);
-				} catch (final InterruptedException e) {
-					Thread.currentThread().interrupt();
 				}
 			};
-			executor.execute(task);
+			tasks.add(task);
 		}
 		
-		final int[] version = getVersion(gameDef, usePtr);
-		try {
-			writeToMetaFile(destination, gameDef.getName(), version, usePtr);
-		} catch (final IOException e) {
-			logger.error("Failed to write metafile: ", e);
-		}
+		final ForkJoinTask<Void> task = new RecursiveAction() {
+			@Override
+			protected void compute() {
+				final int[] version = getVersion(gameDef, usePtr);
+				try {
+					writeToMetaFile(destination, gameDef.getName(), version, usePtr);
+				} catch (final IOException e) {
+					logger.error("Failed to write metafile: ", e);
+				}
+			}
+		};
+		tasks.add(task);
+		
+		return tasks;
 	}
 	
 	/**
@@ -302,105 +320,122 @@ public class BaseUiService {
 	}
 	
 	/**
-	 * Parses the baseUI of the specified game in its own thread. Afterwards, a specified followupTask is executed. The
-	 * parsing of the baseUI is synchronized.
+	 * Parses the baseUI of the GameData, if that is required for the settings.
 	 *
-	 * @param game
-	 * 		game whose default UI is parsed
-	 * @param followupTask
+	 * @param gameData
+	 * @param useCmdLineSettings
 	 */
-	public void parseBaseUI(final GameData game, final Runnable followupTask) {
-		// create tasks for the worker pool
-		InterfaceBuilderApp.getInstance().getExecutor().execute(() -> {
-			// lock per game
-			synchronized (game.getGameDef().getName()) {
-				UICatalog uiCatalog = game.getUiCatalog();
-				final String gameName = game.getGameDef().getName();
-				if (uiCatalog != null) {
-					if (logger.isTraceEnabled()) {
-						logger.trace("Aborting parsing baseUI for '{}' as was already parsed.", gameName);
+	public void parseBaseUiIfNecessary(final GameData gameData, final boolean useCmdLineSettings) {
+		final boolean verifyLayout;
+		final SettingsIniInterface settings = configService.getIniSettings();
+		if (useCmdLineSettings) {
+			verifyLayout = settings.isCmdLineVerifyLayout();
+		} else {
+			verifyLayout = settings.isGuiVerifyLayout();
+		}
+		if (gameData.getUiCatalog() == null && verifyLayout) {
+			parseBaseUI(gameData);
+		}
+	}
+	
+	/**
+	 * Parses the baseUI of the specified game. The parsing of the baseUI is synchronized.
+	 *
+	 * @param gameData
+	 * 		game whose default UI is parsed
+	 */
+	public void parseBaseUI(final GameData gameData) {
+		// lock per game
+		synchronized (gameData.getGameDef().getName()) {
+			UICatalog uiCatalog = gameData.getUiCatalog();
+			final String gameName = gameData.getGameDef().getName();
+			if (uiCatalog != null) {
+				if (logger.isTraceEnabled()) {
+					logger.trace("Aborting parsing baseUI for '{}' as was already parsed.", gameName);
+				}
+			} else {
+				final long startTime = System.currentTimeMillis();
+				logger.info("Loading baseUI for {}", gameName);
+				boolean needToParseAgain = true;
+				
+				/*!(game.getNewGameDef() instanceof SC2GameDef) &&*/
+				final String baseUiPath = configService.getBaseUiPath(gameData.getGameDef());
+				boolean isPtr = false;
+				try {
+					isPtr = isPtr(new File(baseUiPath));
+				} catch (final IOException e) {
+					// do nothing
+					logger.trace("Ignoring error in isPtr() check on baseUiPath.", e);
+				}
+				try {
+					if (cacheIsUpToDateCheckException(gameData.getGameDef(), isPtr)) {
+						// load from cache
+						uiCatalog = discCacheService.getCachedBaseUi(gameName, isPtr);
+						gameData.setUiCatalog(uiCatalog);
+						needToParseAgain = false;
+						if (logger.isTraceEnabled()) {
+							logger.trace("Loaded baseUI for '{}' from cache", gameName);
+						}
 					}
-				} else {
-					final long startTime = System.currentTimeMillis();
-					logger.info("Loading baseUI for {}", gameName);
-					boolean needToParseAgain = true;
-					
-					/*!(game.getNewGameDef() instanceof SC2GameDef) &&*/
-					final String baseUiPath = configService.getBaseUiPath(game.getGameDef());
-					boolean isPtr = false;
+				} catch (final IOException e) {
+					logger.warn("ERROR: loading cached base UI failed.", e);
+				}
+				if (needToParseAgain) {
+					// parse baseUI
+					uiCatalog = new UICatalogImpl();
+					uiCatalog.setParser(new UICatalogParser(uiCatalog, new XmlParserVtd(), true));
+					final var app = InterfaceBuilderApp.getInstance();
+					app.printInfoLogMessageToGeneral("Starting to parse base " + gameName + " UI.");
+					app.addThreadLoggerTab(Thread.currentThread().getName(),
+							gameData.getGameDef().getNameHandle() + "UI", true);
+					final String gameDir = configService.getBaseUiPath(gameData.getGameDef()) + File.separator +
+							gameData.getGameDef().getModsSubDirectory();
 					try {
-						isPtr = isPtr(new File(baseUiPath));
-					} catch (final IOException e) {
-						// do nothing
-						logger.trace("Ignoring error in isPtr() check on baseUiPath.", e);
-					}
-					try {
-						if (cacheIsUpToDateCheckException(game.getGameDef(), isPtr)) {
-							// load from cache
-							uiCatalog = discCacheService.getCachedBaseUi(gameName, isPtr);
-							game.setUiCatalog(uiCatalog);
-							needToParseAgain = false;
-							if (logger.isTraceEnabled()) {
-								logger.trace("Loaded baseUI for '{}' from cache", gameName);
+						final WildcardFileFilter fileFilter =
+								new WildcardFileFilter("descindex.*layout", IOCase.INSENSITIVE);
+						for (final String modOrDir : gameData.getGameDef().getCoreModsOrDirectories()) {
+							
+							final File directory = new File(gameDir + File.separator + modOrDir);
+							if (!directory.exists() || !directory.isDirectory()) {
+								throw new IOException("BaseUI out of date.");
+							}
+							
+							final Collection<File> descIndexFiles =
+									FileUtils.listFiles(directory, fileFilter, TrueFileFilter.INSTANCE);
+							logger.info("number of descIndexFiles found: {}", descIndexFiles.size());
+							
+							for (final File descIndexFile : descIndexFiles) {
+								logger.info("parsing descIndexFile '{}'", descIndexFile.getPath());
+								uiCatalog.processDescIndex(descIndexFile, gameData.getGameDef().getDefaultRaceId(),
+										gameData.getGameDef().getDefaultConsoleSkinId());
 							}
 						}
+						uiCatalog.postProcessParsing();
+						gameData.setUiCatalog(uiCatalog);
+					} catch (final SAXException | IOException | ParserConfigurationException e) {
+						logger.error("ERROR parsing base UI catalog for '" + gameName + "'.", e);
+					} catch (final InterruptedException e) {
+						Thread.currentThread().interrupt();
+					} finally {
+						uiCatalog.setParser(null);
+					}
+					final String msg = "Finished parsing base UI for " + gameName + ".";
+					logger.info(msg);
+					app.printInfoLogMessageToGeneral(msg);
+					try {
+						discCacheService.put(uiCatalog, gameName, isPtr, getVersion(gameData.getGameDef(), isPtr));
 					} catch (final IOException e) {
-						logger.warn("ERROR: loading cached base UI failed.", e);
+						logger.error("ERROR when creating cache file of UI", e);
 					}
-					if (needToParseAgain) {
-						// parse baseUI
-						uiCatalog = new UICatalogImpl();
-						uiCatalog.setParser(new UICatalogParser(uiCatalog, new XmlParserVtd(), true));
-						final var app = InterfaceBuilderApp.getInstance();
-						app.printInfoLogMessageToGeneral("Starting to parse base " + gameName + " UI.");
-						app.addThreadLoggerTab(Thread.currentThread().getName(),
-								game.getGameDef().getNameHandle() + "UI", true);
-						final String gameDir = configService.getBaseUiPath(game.getGameDef()) + File.separator +
-								game.getGameDef().getModsSubDirectory();
-						try {
-							final WildcardFileFilter fileFilter =
-									new WildcardFileFilter("descindex.*layout", IOCase.INSENSITIVE);
-							for (final String modOrDir : game.getGameDef().getCoreModsOrDirectories()) {
-								
-								final File directory = new File(gameDir + File.separator + modOrDir);
-								if (!directory.exists() || !directory.isDirectory()) {
-									throw new IOException("BaseUI out of date.");
-								}
-								
-								final Collection<File> descIndexFiles =
-										FileUtils.listFiles(directory, fileFilter, TrueFileFilter.INSTANCE);
-								logger.info("number of descIndexFiles found: {}", descIndexFiles.size());
-								
-								for (final File descIndexFile : descIndexFiles) {
-									logger.info("parsing descIndexFile '{}'", descIndexFile.getPath());
-									uiCatalog.processDescIndex(descIndexFile, game.getGameDef().getDefaultRaceId(),
-											game.getGameDef().getDefaultConsoleSkinId());
-								}
-							}
-							uiCatalog.postProcessParsing();
-							game.setUiCatalog(uiCatalog);
-						} catch (final SAXException | IOException | ParserConfigurationException e) {
-							logger.error("ERROR parsing base UI catalog for '" + gameName + "'.", e);
-						} catch (final InterruptedException e) {
-							Thread.currentThread().interrupt();
-						} finally {
-							uiCatalog.setParser(null);
-						}
-						final String msg = "Finished parsing base UI for " + gameName + ".";
-						logger.info(msg);
-						app.printInfoLogMessageToGeneral(msg);
-						try {
-							discCacheService.put(uiCatalog, gameName, isPtr, getVersion(game.getGameDef(), isPtr));
-						} catch (final IOException e) {
-							logger.error("ERROR when creating cache file of UI", e);
-						}
-					}
-					final long executionTime = (System.currentTimeMillis() - startTime);
-					logger.info("Loading BaseUI for '{}' took {}ms.", gameName, executionTime);
+				}
+				final long executionTime = (System.currentTimeMillis() - startTime);
+				logger.info("Loading BaseUI for '{}' took {}ms.", gameName, executionTime);
+				if (needToParseAgain) {
+					// set result in UI
+					StylizedTextAreaAppender.finishedWork(Thread.currentThread().getName(), true);
 				}
 			}
-			addTaskToExecutor(followupTask);
-		});
+		}
 	}
 	
 	public boolean isPtr(final File baseUiDirectory) throws IOException {
@@ -416,17 +451,6 @@ public class BaseUiService {
 			logger.info("Failed to check cache status of " + gameDef.getName() + ":", e);
 		}
 		return false;
-	}
-	
-	/**
-	 * Adds a task to the executor.
-	 *
-	 * @param followupTask
-	 */
-	private static void addTaskToExecutor(final Runnable followupTask) {
-		if (followupTask != null) {
-			InterfaceBuilderApp.getInstance().getExecutor().execute(followupTask);
-		}
 	}
 	
 	public boolean cacheIsUpToDate(final GameDef gameDef, final boolean usePtr) throws IOException {

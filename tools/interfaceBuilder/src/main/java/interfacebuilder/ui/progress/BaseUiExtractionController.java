@@ -4,7 +4,9 @@
 package interfacebuilder.ui.progress;
 
 import com.ahli.galaxy.game.def.abstracts.GameDef;
+import interfacebuilder.InterfaceBuilderApp;
 import interfacebuilder.base_ui.BaseUiService;
+import interfacebuilder.base_ui.ExtractBaseUiTask;
 import interfacebuilder.compress.GameService;
 import interfacebuilder.projects.enums.Game;
 import interfacebuilder.ui.Updateable;
@@ -73,11 +75,9 @@ public class BaseUiExtractionController implements Updateable {
 		output[0] = new TextFlowAppender(txtArea1);
 		output[1] = new TextFlowAppender(txtArea2);
 		output[2] = new TextFlowAppender(txtArea3);
-		baseUiService.extract(game, usePtr, output);
 		
-		// TODO setRunning(false) after extraction was done -> integrate completableFuture into TaskExecutor
-		// errorTabController.setRunning(false);
-		
+		final ExtractBaseUiTask task = new ExtractBaseUiTask(baseUiService, game, usePtr, output, errorTabController);
+		InterfaceBuilderApp.getInstance().getExecutor().execute(task);
 	}
 	
 	public String[] getThreadNames() {

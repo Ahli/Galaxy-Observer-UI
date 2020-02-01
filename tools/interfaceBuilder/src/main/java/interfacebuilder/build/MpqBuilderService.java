@@ -40,25 +40,31 @@ public class MpqBuilderService {
 	
 	@Autowired
 	private ConfigService configService;
-	
 	@Autowired
 	private CompileService compileService;
-	
 	@Autowired
 	private FileService fileService;
-	
-	@Autowired
-	@Qualifier ("sc2BaseGameData")
-	private GameData sc2BaseGameData;
-	
-	@Autowired
-	@Qualifier ("heroesBaseGameData")
-	private GameData heroesBaseGameData;
-	
 	@Autowired
 	private ProjectService projectService;
 	@Autowired
 	private BaseUiService baseUiService;
+	@Autowired
+	@Qualifier ("sc2BaseGameData")
+	private GameData sc2BaseGameData;
+	@Autowired
+	@Qualifier ("heroesBaseGameData")
+	private GameData heroesBaseGameData;
+	
+	/**
+	 * Adds a task to the executor.
+	 *
+	 * @param followupTask
+	 */
+	private static void addTaskToExecutor(final Runnable followupTask) {
+		if (followupTask != null) {
+			InterfaceBuilderApp.getInstance().getExecutor().execute(followupTask);
+		}
+	}
 	
 	/**
 	 * Finds and builds a project based on the specified path.
@@ -93,14 +99,8 @@ public class MpqBuilderService {
 	 * @param project
 	 */
 	public void build(final Project project, final boolean useCmdLineSettings) {
-		// 1. parse base UI (is skipped if not necessary)
-		// 2. then build
-		final GameData gameData = getGameData(project.getGame());
-		final Runnable followupTask = () -> {
-			final File interfaceDirectory = new File(project.getProjectPath());
-			buildSpecificUI(interfaceDirectory, gameData, useCmdLineSettings, project);
-		};
-		parseBaseUiIfNecessary(gameData, useCmdLineSettings, followupTask);
+		final BuildTask task = new BuildTask(project, useCmdLineSettings, this, baseUiService);
+		InterfaceBuilderApp.getInstance().getExecutor().execute(task);
 	}
 	
 	/**
@@ -132,7 +132,7 @@ public class MpqBuilderService {
 	 * @param game
 	 * @param useCmdLineSettings
 	 */
-	private void buildSpecificUI(final File interfaceDirectory, final GameData game, final boolean useCmdLineSettings,
+	void buildSpecificUI(final File interfaceDirectory, final GameData game, final boolean useCmdLineSettings,
 			final Project project) {
 		if (InterfaceBuilderApp.getInstance().getExecutor().isShutdown()) {
 			logger.error("ERROR: Executor shut down. Skipping building a UI...");
@@ -156,77 +156,51 @@ public class MpqBuilderService {
 		}
 		
 		// create tasks for the worker pool
-		InterfaceBuilderApp.getInstance().getExecutor().execute(() -> {
-			try {
-				InterfaceBuilderApp.getInstance()
-						.addThreadLoggerTab(Thread.currentThread().getName(), interfaceDirectory.getName(), false);
-				// create unique cache path
-				final MpqEditorInterface threadsMpqInterface =
-						new MpqEditorInterface(configService.getMpqCachePath() + Thread.currentThread().getId(),
-								configService.getMpqEditorPath());
-				
-				// work
-				final boolean compressXml;
-				final int compressMpqSetting;
-				final boolean buildUnprotectedToo;
-				final boolean repairLayoutOrder;
-				final boolean verifyXml;
-				if (useCmdLineSettings) {
-					compressXml = settings.isCmdLineCompressXml();
-					compressMpqSetting = settings.getCmdLineCompressMpq();
-					buildUnprotectedToo = settings.isCmdLineBuildUnprotectedToo();
-					repairLayoutOrder = settings.isCmdLineRepairLayoutOrder();
-					verifyXml = settings.isCmdLineVerifyXml();
-				} else {
-					compressXml = settings.isGuiCompressXml();
-					compressMpqSetting = settings.getGuiCompressMpq();
-					buildUnprotectedToo = settings.isGuiBuildUnprotectedToo();
-					repairLayoutOrder = settings.isGuiRepairLayoutOrder();
-					verifyXml = settings.isGuiVerifyXml();
-				}
-				
-				// load best compression ruleset
-				if (compressXml && compressMpqSetting == 2) {
-					final RuleSet ruleSet = projectService.fetchBestCompressionRuleSet(project);
-					if (ruleSet != null) {
-						threadsMpqInterface.setCustomCompressionRules(ruleSet.getCompressionRules());
-					}
-				}
-				threadsMpqInterface.clearCacheExtractedMpq();
-				buildFile(interfaceDirectory, game, threadsMpqInterface, compressXml, compressMpqSetting,
-						buildUnprotectedToo, repairLayoutOrder, verifyLayout, verifyXml, project);
-				threadsMpqInterface.clearCacheExtractedMpq();
-			} catch (final InterruptedException e) {
-				Thread.currentThread().interrupt();
-			} catch (final IOException e) {
-				logger.error("ERROR: Exception while building UIs.", e);
-			} catch (final Exception e) {
-				logger.fatal("FATAL ERROR: ", e);
+		try {
+			InterfaceBuilderApp.getInstance()
+					.addThreadLoggerTab(Thread.currentThread().getName(), interfaceDirectory.getName(), false);
+			// create unique cache path
+			final MpqEditorInterface threadsMpqInterface =
+					new MpqEditorInterface(configService.getMpqCachePath() + Thread.currentThread().getId(),
+							configService.getMpqEditorPath());
+			
+			// work
+			final boolean compressXml;
+			final int compressMpqSetting;
+			final boolean buildUnprotectedToo;
+			final boolean repairLayoutOrder;
+			final boolean verifyXml;
+			if (useCmdLineSettings) {
+				compressXml = settings.isCmdLineCompressXml();
+				compressMpqSetting = settings.getCmdLineCompressMpq();
+				buildUnprotectedToo = settings.isCmdLineBuildUnprotectedToo();
+				repairLayoutOrder = settings.isCmdLineRepairLayoutOrder();
+				verifyXml = settings.isCmdLineVerifyXml();
+			} else {
+				compressXml = settings.isGuiCompressXml();
+				compressMpqSetting = settings.getGuiCompressMpq();
+				buildUnprotectedToo = settings.isGuiBuildUnprotectedToo();
+				repairLayoutOrder = settings.isGuiRepairLayoutOrder();
+				verifyXml = settings.isGuiVerifyXml();
 			}
-		});
-	}
-	
-	/**
-	 * Parses the baseUI of the GameData, if that is required for the settings. Afterwards, another task is added (e.g.
-	 * a build task that might require the baseUI).
-	 *
-	 * @param gameData
-	 * @param useCmdLineSettings
-	 * @param followupTask
-	 */
-	private void parseBaseUiIfNecessary(final GameData gameData, final boolean useCmdLineSettings,
-			final Runnable followupTask) {
-		final boolean verifyLayout;
-		final SettingsIniInterface settings = configService.getIniSettings();
-		if (useCmdLineSettings) {
-			verifyLayout = settings.isCmdLineVerifyLayout();
-		} else {
-			verifyLayout = settings.isGuiVerifyLayout();
-		}
-		if (gameData.getUiCatalog() == null && verifyLayout) {
-			baseUiService.parseBaseUI(gameData, followupTask);
-		} else {
-			addTaskToExecutor(followupTask);
+			
+			// load best compression ruleset
+			if (compressXml && compressMpqSetting == 2) {
+				final RuleSet ruleSet = projectService.fetchBestCompressionRuleSet(project);
+				if (ruleSet != null) {
+					threadsMpqInterface.setCustomCompressionRules(ruleSet.getCompressionRules());
+				}
+			}
+			threadsMpqInterface.clearCacheExtractedMpq();
+			buildFile(interfaceDirectory, game, threadsMpqInterface, compressXml, compressMpqSetting,
+					buildUnprotectedToo, repairLayoutOrder, verifyLayout, verifyXml, project);
+			threadsMpqInterface.clearCacheExtractedMpq();
+		} catch (final InterruptedException e) {
+			Thread.currentThread().interrupt();
+		} catch (final IOException e) {
+			logger.error("ERROR: Exception while building UIs.", e);
+		} catch (final Exception e) {
+			logger.fatal("FATAL ERROR: ", e);
 		}
 	}
 	
@@ -365,17 +339,6 @@ public class MpqBuilderService {
 			logger.error("ERROR: unable to construct final Interface file.", e);
 			InterfaceBuilderApp.getInstance()
 					.printErrorLogMessageToGeneral(sourceFile.getName() + " could not be created.");
-		}
-	}
-	
-	/**
-	 * Adds a task to the executor.
-	 *
-	 * @param followupTask
-	 */
-	private static void addTaskToExecutor(final Runnable followupTask) {
-		if (followupTask != null) {
-			InterfaceBuilderApp.getInstance().getExecutor().execute(followupTask);
 		}
 	}
 	

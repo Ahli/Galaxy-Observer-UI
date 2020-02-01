@@ -103,7 +103,6 @@ public class InterfaceBuilderApp extends Application {
 	@Autowired
 	private MpqBuilderService mpqBuilderService;
 	@Autowired
-	//	private StylizedTextAreaAppenderThreadPoolExecutor executor;
 	private ForkJoinPool executor;
 	
 	@Autowired

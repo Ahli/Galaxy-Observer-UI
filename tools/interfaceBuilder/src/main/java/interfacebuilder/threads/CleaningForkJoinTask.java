@@ -1,6 +1,9 @@
 package interfacebuilder.threads;
 
 import interfacebuilder.InterfaceBuilderApp;
+import interfacebuilder.integration.log4j.StylizedTextAreaAppender;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.ForkJoinTask;
 
@@ -13,6 +16,8 @@ import java.util.concurrent.ForkJoinTask;
  * @param <V>
  */
 public abstract class CleaningForkJoinTask<V> extends ForkJoinTask<V> {
+	private static final Logger logger = LogManager.getLogger(CleaningForkJoinTask.class);
+	
 	// TODO maybe make this more generic, so this can be re-used -> define interface & call member of that to clean up
 	
 	@Override
@@ -33,7 +38,11 @@ public abstract class CleaningForkJoinTask<V> extends ForkJoinTask<V> {
 	protected boolean exec() {
 		try {
 			return work();
+		} catch (final Exception e) {
+			logger.error("Error in Task:", e);
+			return false;
 		} finally {
+			StylizedTextAreaAppender.finishedWork(Thread.currentThread().getName(), true);
 			InterfaceBuilderApp.tryCleanUp();
 		}
 	}
