@@ -4,30 +4,28 @@
 package interfacebuilder.ui.navigation;
 
 /**
- * Class for Notifications used by the NavigationController.
+ * Notifications used by the NavigationController.
  */
 public class Notification {
-	private String text;
-	private int navPageIndex;
+	private final String id;
+	private final String text;
+	private final int navPageIndex;
 	
-	public Notification(final String text, final int navPageIndex) {
+	public Notification(final String text, final int navPageIndex, final String id) {
 		this.text = text;
 		this.navPageIndex = navPageIndex;
+		this.id = id;
+	}
+	
+	public String getId() {
+		return id;
 	}
 	
 	public String getText() {
 		return text;
 	}
 	
-	public void setText(final String text) {
-		this.text = text;
-	}
-	
 	public int getNavPageIndex() {
 		return navPageIndex;
-	}
-	
-	public void setNavPageIndex(final int navPageIndex) {
-		this.navPageIndex = navPageIndex;
 	}
 }

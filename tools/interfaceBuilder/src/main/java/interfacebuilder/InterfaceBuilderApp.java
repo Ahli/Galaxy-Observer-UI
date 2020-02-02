@@ -204,7 +204,7 @@ public class InterfaceBuilderApp extends Application {
 	public void start(final Stage primaryStage) throws Exception {
 		if (instance == null) {
 			instance = this;
-			logger.trace("Application singleton successfull.");
+			logger.trace("Application singleton successful.");
 		} else {
 			logger.error("Application cannot be started multiple times.");
 			throw new ExceptionInInitializerError("Application cannot be started multiple times.");
@@ -348,7 +348,7 @@ public class InterfaceBuilderApp extends Application {
 			if (baseUiService.isOutdated(Game.SC2, false)) {
 				navigationController.appendNotification(
 						new Notification(Messages.getString("browse.notification.sc2OutOfDate"),
-								NavigationController.BROWSE_TAB));
+								NavigationController.BROWSE_TAB, "sc2OutOfDate"));
 			}
 		} catch (final IOException e) {
 			logger.error("Error during SC2 baseUI update check.", e);
@@ -357,7 +357,7 @@ public class InterfaceBuilderApp extends Application {
 			if (baseUiService.isOutdated(Game.HEROES, false)) {
 				navigationController.appendNotification(
 						new Notification(Messages.getString("browse.notification.heroesOutOfDate"),
-								NavigationController.BROWSE_TAB));
+								NavigationController.BROWSE_TAB, "heroesOutOfDate"));
 			}
 		} catch (final IOException e) {
 			logger.error("Error during Heroes baseUI update check.", e);
@@ -366,7 +366,7 @@ public class InterfaceBuilderApp extends Application {
 			if (baseUiService.isOutdated(Game.HEROES, true)) {
 				navigationController.appendNotification(
 						new Notification(Messages.getString("browse.notification.heroesPtrOutOfDate"),
-								NavigationController.BROWSE_TAB));
+								NavigationController.BROWSE_TAB, "heroesPtrOutOfDate"));
 			}
 		} catch (final IOException e) {
 			logger.error("Error during Heroes PTR baseUI update check.", e);

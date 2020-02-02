@@ -1,5 +1,6 @@
 package interfacebuilder.base_ui;
 
+import interfacebuilder.InterfaceBuilderApp;
 import interfacebuilder.projects.enums.Game;
 import interfacebuilder.threads.CleaningForkJoinTask;
 import interfacebuilder.ui.progress.ErrorTabController;
@@ -29,6 +30,20 @@ public class ExtractBaseUiTask extends CleaningForkJoinTask {
 	@Override
 	protected boolean work() {
 		final List<ForkJoinTask<Void>> tasks = baseUiService.extract(game, usePtr, output);
+		
+		Platform.runLater(() -> {
+			final String notificationId;
+			if (game == Game.SC2) {
+				notificationId = "sc2OutOfDate";
+			} else if (usePtr && game == Game.HEROES) {
+				notificationId = "heroesPtrOutOfDate";
+			} else if (game == Game.HEROES) {
+				notificationId = "heroesOutOfDate";
+			} else {
+				return;
+			}
+			InterfaceBuilderApp.getInstance().getNavigationController().closeNotification(notificationId);
+		});
 		
 		for (final var task : tasks) {
 			task.fork();

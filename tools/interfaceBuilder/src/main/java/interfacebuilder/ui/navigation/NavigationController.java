@@ -221,10 +221,34 @@ public class NavigationController {
 		showFirstNotification();
 	}
 	
+	/**
+	 * Shows the first notification. Ensure that the notification-list is not empty!
+	 */
 	private void showFirstNotification() {
 		notificationBar.setVisible(true);
 		final Notification notification = notifications.get(0);
 		notificationLabel.setText(notification.getText());
+	}
+	
+	/**
+	 * Closes a notification of the specified id, if one exists.
+	 *
+	 * @param id
+	 */
+	public void closeNotification(final String id) {
+		int i = 0;
+		for (final var notification : notifications) {
+			if (id.equals(notification.getId())) {
+				notifications.remove(i);
+				if (notifications.isEmpty()) {
+					notificationBar.setVisible(false);
+				} else if (i == 0) {
+					showFirstNotification();
+				}
+				return;
+			}
+			++i;
+		}
 	}
 	
 	@FXML
