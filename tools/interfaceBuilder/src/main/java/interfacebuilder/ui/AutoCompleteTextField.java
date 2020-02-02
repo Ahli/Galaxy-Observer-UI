@@ -81,12 +81,9 @@ public class AutoCompleteTextField extends TextField {
 			final String result = searchResult.get(i);
 			final Label entryLabel = new Label(result);
 			final CustomMenuItem item = new CustomMenuItem(entryLabel, true);
-			item.setOnAction(new EventHandler<>() {
-				@Override
-				public void handle(final ActionEvent actionEvent) {
-					setText(result);
-					entriesPopup.hide();
-				}
+			item.setOnAction(event -> {
+				setText(result);
+				entriesPopup.hide();
 			});
 			menuItems.add(item);
 		}

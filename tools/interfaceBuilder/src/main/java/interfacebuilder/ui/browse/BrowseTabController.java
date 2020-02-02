@@ -13,6 +13,7 @@ import com.ahli.galaxy.ui.UIStateGroup;
 import com.ahli.galaxy.ui.UITemplate;
 import com.ahli.galaxy.ui.abstracts.UIElement;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
+import com.ahli.util.StringInterner;
 import interfacebuilder.ui.Updateable;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -141,23 +142,28 @@ public class BrowseTabController implements Updateable {
 		
 		// dropdowns
 		templateMap = new UnifiedMap<>();
-		fileDropdown.setOnAction(actionEvent -> Platform.runLater(() -> {
+		fileDropdown.setOnAction(event -> Platform.runLater(() -> {
 			try {
-				final String selectedFile = fileDropdown.getSelectionModel().getSelectedItem();
-				updateTemplateDropdown(selectedFile);
+				if (fileDropdown != null) {
+					final String selectedFile = fileDropdown.getSelectionModel().getSelectedItem();
+					updateTemplateDropdown(selectedFile);
+				}
 			} catch (final Exception e) {
 				logger.fatal(FATAL_ERROR, e);
 			}
 		}));
-		templateDropdown.setOnAction(actionEvent -> Platform.runLater(() -> {
+		templateDropdown.setOnAction(event -> Platform.runLater(() -> {
 			try {
-				final String selectedTemplateRootElem = templateDropdown.getSelectionModel().getSelectedItem();
-				final UITemplate template = templateMap.get(selectedTemplateRootElem);
-				final long start = System.currentTimeMillis();
-				framesTotal = 0;
-				createTree(template);
-				if (logger.isTraceEnabled()) {
-					logger.trace("Tree creation: {}ms , {} frames", (System.currentTimeMillis() - start), framesTotal);
+				if (templateDropdown != null && templateMap != null) {
+					final String selectedTemplateRootElem = templateDropdown.getSelectionModel().getSelectedItem();
+					final UITemplate template = templateMap.get(selectedTemplateRootElem);
+					final long start = System.currentTimeMillis();
+					framesTotal = 0;
+					createTree(template);
+					if (logger.isTraceEnabled()) {
+						logger.trace("Tree creation: {}ms , {} frames", (System.currentTimeMillis() - start),
+								framesTotal);
+					}
 				}
 			} catch (final Exception e) {
 				logger.fatal(FATAL_ERROR, e);
@@ -443,4 +449,45 @@ public class BrowseTabController implements Updateable {
 		}
 	}
 	
+	/**
+	 * TODO This only exists because this controller is not garbage collected.
+	 */
+	public void dispose() {
+		treeFilter.clear();
+		treeFilter = null;
+		frameTree.setRoot(null);
+		frameTree = null;
+		fileDropdown.getItems().clear();
+		fileDropdown = null;
+		templateDropdown.getItems().clear();
+		templateDropdown = null;
+		templateMap.clear();
+		templateMap = null;
+		uiCatalog.getTemplates().clear();
+		uiCatalog.getDevLayouts().clear();
+		uiCatalog.getConstants().clear();
+		uiCatalog.getBlizzOnlyConstants().clear();
+		uiCatalog.getBlizzOnlyTemplates().clear();
+		uiCatalog = null;
+		pathTextFlow = null;
+		tableView = null;
+		columnAttributes = null;
+		columnValues = null;
+		
+		new Thread(() -> {
+			// GC1 is the default GC and can now release RAM -> actually good to do after a task because we use a
+			// lot of RAM for the UIs
+			// Weak References survive 3 garbage collections by default
+			for (int i = 0; i < 3; ++i) {
+				System.gc();
+			}
+			try {
+				Thread.sleep(200);
+				// clean up StringInterner's weak references that the GC removed
+				StringInterner.cleanUpGarbage();
+			} catch (final InterruptedException e) {
+				Thread.currentThread().interrupt();
+			}
+		}).start();
+	}
 }

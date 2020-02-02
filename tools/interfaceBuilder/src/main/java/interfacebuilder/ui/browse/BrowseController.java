@@ -350,6 +350,8 @@ public class BrowseController implements Updateable {
 			closeItem.setOnAction(event -> {
 				tabPane.getTabs().remove(newTab);
 				controllers.remove(controllerRef);
+				// TODO remove because in theory unnecessary, but the BrowseTabController is currently leaked
+				((BrowseTabController) controllerRef).dispose();
 			});
 			contextMenu.getItems().addAll(closeItem);
 			newTab.setContextMenu(contextMenu);
