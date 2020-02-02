@@ -28,12 +28,10 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
-import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
@@ -131,17 +129,15 @@ public class BrowseTabController implements Updateable {
 	public void initialize() {
 		// tree
 		flowFactory = new TextFlowFactory();
+		
+		// must be strong EventHandler reference
 		frameTree.getSelectionModel().selectedItemProperty()
 				.addListener((observable, oldValue, newValue) -> showInTableView(newValue));
-		frameTree.setCellFactory(new Callback<>() {
-			@Override
-			public TreeCell<UIElement> call(final TreeView<UIElement> treeView) {
-				return new CustomTreeCell(flowFactory);
-			}
-		});
+		frameTree.setCellFactory(treeView -> new CustomTreeCell(flowFactory));
 		
 		// dropdowns
 		templateMap = new UnifiedMap<>();
+		// must be strong EventHandler reference
 		fileDropdown.setOnAction(event -> Platform.runLater(() -> {
 			try {
 				if (fileDropdown != null) {
@@ -152,6 +148,7 @@ public class BrowseTabController implements Updateable {
 				logger.fatal(FATAL_ERROR, e);
 			}
 		}));
+		// must be strong EventHandler reference
 		templateDropdown.setOnAction(event -> Platform.runLater(() -> {
 			try {
 				if (templateDropdown != null && templateMap != null) {
@@ -178,8 +175,9 @@ public class BrowseTabController implements Updateable {
 		columnAttributes.sortTypeProperty().set(TableColumn.SortType.ASCENDING);
 		tableView.getSortOrder().add(columnAttributes);
 		
-		// filter
-		treeFilter.textProperty().addListener((observable, oldValue, newValue) -> filterTree(newValue));
+		// filter (must be strong reference)
+		treeFilter.textProperty()
+				.addListener((observable, oldValue, newValue) -> filterTree(newValue));
 		
 		// Path header
 		final ObservableList<Node> children = pathTextFlow.getChildren();
@@ -216,19 +214,21 @@ public class BrowseTabController implements Updateable {
 					final String strFinal = str;
 					Platform.runLater(() -> {
 						try {
-							frameTree.setRoot(root);
-							frameTree.getSelectionModel().select(selectedItem);
-							tableView.setPlaceholder(tableViewPlaceholderText);
-							final int selectedIndex = frameTree.getSelectionModel().getSelectedIndex();
-							// scroll to slightly above the selected item
-							frameTree.scrollTo(Math.max(selectedIndex - 4, 0));
-							// clear tableview & path if the selected item is not visible OR re-show it when visible
-							showInTableView(selectedIndex < 0 ? null : selectedItem);
-							queryRunning = false;
-							if (!queryRunning && !queriedFilter.equals(strFinal)) {
-								//Query set, but Filter Thread is dead. -> try again
-								logger.error("Query set, but Filter Thread is dead. -> try again. Does this work?");
-								filterTree(filter);
+							if (frameTree != null && queriedFilter != null) {
+								frameTree.setRoot(root);
+								frameTree.getSelectionModel().select(selectedItem);
+								tableView.setPlaceholder(tableViewPlaceholderText);
+								final int selectedIndex = frameTree.getSelectionModel().getSelectedIndex();
+								// scroll to slightly above the selected item
+								frameTree.scrollTo(Math.max(selectedIndex - 4, 0));
+								// clear tableview & path if the selected item is not visible OR re-show it when visible
+								showInTableView(selectedIndex < 0 ? null : selectedItem);
+								queryRunning = false;
+								if (!queryRunning && !queriedFilter.equals(strFinal)) {
+									//Query set, but Filter Thread is dead. -> try again
+									logger.error("Query set, but Filter Thread is dead. -> try again. Does this work?");
+									filterTree(filter);
+								}
 							}
 						} catch (final Exception e) {
 							logger.fatal(FATAL_ERROR, e);
