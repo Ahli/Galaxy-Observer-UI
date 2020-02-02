@@ -56,18 +56,7 @@ public class MpqBuilderService {
 	private GameData heroesBaseGameData;
 	
 	/**
-	 * Adds a task to the executor.
-	 *
-	 * @param followupTask
-	 */
-	private static void addTaskToExecutor(final Runnable followupTask) {
-		if (followupTask != null) {
-			InterfaceBuilderApp.getInstance().getExecutor().execute(followupTask);
-		}
-	}
-	
-	/**
-	 * Finds and builds a project based on the specified path.
+	 * Schedules a task to find and build a project based on the specified path.
 	 *
 	 * @param path
 	 */
@@ -94,7 +83,7 @@ public class MpqBuilderService {
 	}
 	
 	/**
-	 * Builds the mpq archive file for a project.
+	 * Schedules a task to build the mpq archive file for a project.
 	 *
 	 * @param project
 	 */

@@ -12,21 +12,19 @@ import java.util.concurrent.ForkJoinTask;
  * instead of the usual exec().
  * <p>
  * exec() should still be overridden with the actual workload.
- *
- * @param <V>
  */
-public abstract class CleaningForkJoinTask<V> extends ForkJoinTask<V> {
+public abstract class CleaningForkJoinTask extends ForkJoinTask<Void> {
 	private static final Logger logger = LogManager.getLogger(CleaningForkJoinTask.class);
 	
 	// TODO maybe make this more generic, so this can be re-used -> define interface & call member of that to clean up
 	
 	@Override
-	public V getRawResult() {
+	public Void getRawResult() {
 		return null;
 	}
 	
 	@Override
-	protected void setRawResult(final V value) {
+	protected void setRawResult(final Void value) {
 	}
 	
 	/**
@@ -50,7 +48,7 @@ public abstract class CleaningForkJoinTask<V> extends ForkJoinTask<V> {
 	/**
 	 * CleaningForkJoinTask's workload that is executed.
 	 *
-	 * @return
+	 * @return true, if the task finished normally
 	 */
 	protected abstract boolean work();
 }

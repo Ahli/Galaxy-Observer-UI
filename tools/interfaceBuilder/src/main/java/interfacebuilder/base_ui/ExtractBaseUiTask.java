@@ -9,7 +9,7 @@ import javafx.application.Platform;
 import java.util.List;
 import java.util.concurrent.ForkJoinTask;
 
-public class ExtractBaseUiTask extends CleaningForkJoinTask<Object> {
+public class ExtractBaseUiTask extends CleaningForkJoinTask {
 	
 	private final Game game;
 	private final boolean usePtr;

@@ -7,7 +7,7 @@ import interfacebuilder.threads.CleaningForkJoinTask;
 
 import java.io.File;
 
-public class BuildTask extends CleaningForkJoinTask<Object> {
+public class BuildTask extends CleaningForkJoinTask {
 	
 	private final Project project;
 	private final boolean useCmdLineSettings;

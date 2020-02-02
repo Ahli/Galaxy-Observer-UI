@@ -3,9 +3,8 @@ package interfacebuilder.ui.browse;
 import com.ahli.galaxy.game.GameData;
 import interfacebuilder.base_ui.BaseUiService;
 import interfacebuilder.threads.CleaningForkJoinTask;
-import interfacebuilder.ui.browse.BrowseTabController;
 
-public class BrowseLoadBaseUiTask extends CleaningForkJoinTask<Object> {
+public class BrowseLoadBaseUiTask extends CleaningForkJoinTask {
 	
 	private final GameData gameData;
 	private final BrowseTabController controller;

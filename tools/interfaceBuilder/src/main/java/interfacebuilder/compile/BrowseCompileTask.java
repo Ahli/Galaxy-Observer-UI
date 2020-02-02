@@ -7,7 +7,7 @@ import interfacebuilder.config.ConfigService;
 import interfacebuilder.threads.CleaningForkJoinTask;
 import interfacebuilder.ui.browse.BrowseTabController;
 
-public class BrowseCompileTask extends CleaningForkJoinTask<Object> {
+public class BrowseCompileTask extends CleaningForkJoinTask {
 	
 	private final ModData mod;
 	private final BrowseTabController controller;
