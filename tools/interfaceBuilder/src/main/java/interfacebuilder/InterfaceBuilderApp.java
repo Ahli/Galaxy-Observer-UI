@@ -52,6 +52,7 @@ import org.springframework.context.annotation.Import;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -559,10 +560,17 @@ public class InterfaceBuilderApp extends Application {
 			// context menu with close option
 			final ContextMenu contextMenu = new ContextMenu();
 			final MenuItem closeItem = new MenuItem(Messages.getString("contextmenu.close"));
-			final Tab newTabFinal = newTab;
+			final WeakReference<ErrorTabController> controllerRef = new WeakReference<>(errorTabCtrl);
+			final WeakReference<Tab> newTabFinal = new WeakReference<>(newTab);
 			closeItem.setOnAction(event -> {
-				getTabPane().getTabs().remove(newTabFinal);
-				errorTabControllers.remove(errorTabCtrl);
+				final Tab t = newTabFinal.get();
+				if (t != null) {
+					getTabPane().getTabs().remove(t);
+				}
+				final ErrorTabController c = controllerRef.get();
+				if (c != null) {
+					errorTabControllers.remove(c);
+				}
 			});
 			contextMenu.getItems().addAll(closeItem);
 			newTab.setContextMenu(contextMenu);
@@ -571,7 +579,10 @@ public class InterfaceBuilderApp extends Application {
 			// which results in UI edits not in UI thread -> error
 			Platform.runLater(() -> {
 				try {
-					getTabPane().getTabs().add(newTabFinal);
+					final Tab t = newTabFinal.get();
+					if (t != null) {
+						getTabPane().getTabs().add(t);
+					}
 				} catch (final Exception e) {
 					logger.fatal(FATAL_ERROR, e);
 				}

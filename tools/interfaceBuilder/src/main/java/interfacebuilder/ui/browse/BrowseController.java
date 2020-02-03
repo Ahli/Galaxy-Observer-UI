@@ -55,6 +55,7 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -239,15 +240,6 @@ public class BrowseController implements Updateable {
 			final ScrollPane scrollPane = new ScrollPane(newTxtArea);
 			scrollPane.getStyleClass().add("virtualized-scroll-pane");
 			
-			// context menu with close option
-			final ContextMenu contextMenu = new ContextMenu();
-			final MenuItem closeItem = new MenuItem(Messages.getString("contextmenu.close"));
-			final Tab newTabFinal = newTab;
-			closeItem
-					.setOnAction(event -> InterfaceBuilderApp.getInstance().getTabPane().getTabs().remove(newTabFinal));
-			contextMenu.getItems().addAll(closeItem);
-			newTab.setContextMenu(contextMenu);
-			
 			final FXMLSpringLoader loader = new FXMLSpringLoader(appContext);
 			final var rootNode = loader.<AnchorPane>load("classpath:view/ProgressTab_ExtractBaseUi.fxml");
 			
@@ -262,13 +254,38 @@ public class BrowseController implements Updateable {
 				StylizedTextAreaAppender.setWorkerTaskController(errorTabCtrl, threadName);
 			}
 			
+			// context menu with close option
+			final ContextMenu contextMenu = new ContextMenu();
+			final MenuItem closeItem = new MenuItem(Messages.getString("contextmenu.close"));
+			final WeakReference<BaseUiExtractionController> newControllerFinal =
+					new WeakReference<>(extractionController);
+			final WeakReference<Tab> newTabFinal = new WeakReference<>(newTab);
+			closeItem.setOnAction(event -> {
+				final Tab t = newTabFinal.get();
+				if (t != null) {
+					InterfaceBuilderApp.getInstance().getTabPane().getTabs().remove(t);
+				}
+				final BaseUiExtractionController c = newControllerFinal.get();
+				if (c != null) {
+					controllers.remove(c);
+					StylizedTextAreaAppender.unregister(c.getErrorTabController());
+				}
+			});
+			contextMenu.getItems().addAll(closeItem);
+			newTab.setContextMenu(contextMenu);
+			
 			// runlater needs to appear below the edits above, else it might be added before
 			// which results in UI edits not in UI thread -> error
-			final BaseUiExtractionController extractionControllerFinal = extractionController;
 			Platform.runLater(() -> {
 				try {
-					extractionControllerFinal.loggingArea.getChildren().add(scrollPane);
-					InterfaceBuilderApp.getInstance().getTabPane().getTabs().add(newTabFinal);
+					final BaseUiExtractionController c = newControllerFinal.get();
+					if (c != null) {
+						c.loggingArea.getChildren().add(scrollPane);
+					}
+					final Tab t = newTabFinal.get();
+					if (t != null) {
+						InterfaceBuilderApp.getInstance().getTabPane().getTabs().add(t);
+					}
 				} catch (final Exception e) {
 					logger.fatal(FATAL_ERROR, e);
 				}
@@ -346,12 +363,19 @@ public class BrowseController implements Updateable {
 			// context menu with close option
 			final ContextMenu contextMenu = new ContextMenu();
 			final MenuItem closeItem = new MenuItem(Messages.getString("contextmenu.close"));
-			final Updateable controllerRef = controller;
+			final WeakReference<Updateable> controllerRef = new WeakReference<>(controller);
+			final WeakReference<Tab> newTabFinal = new WeakReference<>(newTab);
 			closeItem.setOnAction(event -> {
-				tabPane.getTabs().remove(newTab);
-				controllers.remove(controllerRef);
-				// TODO remove because in theory unnecessary, but the BrowseTabController is currently leaked
-				((BrowseTabController) controllerRef).dispose();
+				final Tab t = newTabFinal.get();
+				if (t != null) {
+					tabPane.getTabs().remove(t);
+				}
+				final Updateable c = controllerRef.get();
+				if (c != null) {
+					controllers.remove(c);
+					// TODO remove because in theory unnecessary, but the BrowseTabController is currently leaked
+					((BrowseTabController) c).dispose();
+				}
 			});
 			contextMenu.getItems().addAll(closeItem);
 			newTab.setContextMenu(contextMenu);

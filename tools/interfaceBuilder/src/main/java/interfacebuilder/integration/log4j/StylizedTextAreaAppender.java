@@ -99,7 +99,10 @@ public final class StylizedTextAreaAppender extends AbstractAppender {
 	}
 	
 	/**
+	 * Sets the thread's ErrorTabController to finished and unregisters it.
+	 *
 	 * @param threadName
+	 * @param unregister
 	 */
 	public static void finishedWork(final String threadName, final boolean unregister) {
 		final ErrorTabController ctrl = getWorkerTaskController(threadName);
@@ -123,6 +126,19 @@ public final class StylizedTextAreaAppender extends AbstractAppender {
 	 */
 	private static ErrorTabController getWorkerTaskController(final String threadName) {
 		return workerTaskControllers.getOrDefault(threadName, generalController);
+	}
+	
+	/**
+	 * Unregisters a specified ErrorTabController.
+	 */
+	public static void unregister(final ErrorTabController controller) {
+		final var keys = workerTaskControllers.keySet().toArray(new String[0]);
+		for (final String key : keys) {
+			final ErrorTabController curController = workerTaskControllers.get(key);
+			if (curController == controller) {
+				workerTaskControllers.remove(key);
+			}
+		}
 	}
 	
 	/**
