@@ -156,7 +156,9 @@ public class InterfaceBuilderApp extends Application {
 				try {
 					Thread.sleep(200);
 					// clean up StringInterner's weak references that the GC removed
+					logger.trace("string interner size before cleaning: {}", StringInterner::size);
 					StringInterner.cleanUpGarbage();
+					logger.trace("string interner size after cleaning: {}", StringInterner::size);
 				} catch (final InterruptedException e) {
 					Thread.currentThread().interrupt();
 				}

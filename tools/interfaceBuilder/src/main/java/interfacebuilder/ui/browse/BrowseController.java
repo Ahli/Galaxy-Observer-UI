@@ -373,8 +373,6 @@ public class BrowseController implements Updateable {
 				final Updateable c = controllerRef.get();
 				if (c != null) {
 					controllers.remove(c);
-					// TODO remove because in theory unnecessary, but the BrowseTabController is currently leaked
-					((BrowseTabController) c).dispose();
 				}
 			});
 			contextMenu.getItems().addAll(closeItem);

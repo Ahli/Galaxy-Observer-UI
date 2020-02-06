@@ -126,5 +126,7 @@ public class ViewRuleSetController {
 		}
 		ruleSetTable.setItems(ruleSetObservableItems);
 		ruleSetTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+		
+		// columns are properly resized for content, if no prefWidth was defined!
 	}
 }

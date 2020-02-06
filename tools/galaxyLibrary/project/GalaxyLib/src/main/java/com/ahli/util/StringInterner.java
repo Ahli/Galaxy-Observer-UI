@@ -24,4 +24,13 @@ public final class StringInterner {
 	public static void cleanUpGarbage() {
 		map.purgeKeys();
 	}
+	
+	/**
+	 * Returns the number of interned strings stored.
+	 *
+	 * @return the number of stored strings
+	 */
+	public static int size() {
+		return map.size();
+	}
 }

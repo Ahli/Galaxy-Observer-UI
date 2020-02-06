@@ -160,6 +160,8 @@ public class CompressionMiningController implements Updateable {
 		}
 		ruleSetTable.setItems(ruleSetObservableItems);
 		ruleSetTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+		
+		// columns are properly resized for content, if no prefWidth was defined!
 	}
 	
 	@Override
