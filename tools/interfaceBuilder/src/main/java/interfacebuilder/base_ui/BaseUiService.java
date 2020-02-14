@@ -429,7 +429,7 @@ public class BaseUiService {
 					}
 				}
 				final long executionTime = (System.currentTimeMillis() - startTime);
-				logger.info("Loading BaseUI for '{}' took {}ms.", gameName, executionTime);
+				logger.info("Loading BaseUI for {} took {}ms.", gameName, executionTime);
 				if (needToParseAgain) {
 					// set result in UI
 					StylizedTextAreaAppender.finishedWork(Thread.currentThread().getName(), true);

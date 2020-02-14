@@ -295,6 +295,8 @@ public class BrowseTabController implements Updateable {
 					i++;
 					map.put(KEY_PREFIX + i, prettyPrint(attr));
 				}
+				// TODO keyValueList
+				
 			} else if (el instanceof UIState) {
 				final UIState elem = (UIState) el;
 				int i = 0;

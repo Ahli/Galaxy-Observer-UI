@@ -762,19 +762,48 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		} else if (templateElem instanceof UIStateGroup) {
 			final UIStateGroup stateGroup = (UIStateGroup) templateElem;
 			templateChildren = stateGroup.getChildrenRaw();
-			// TODO
+			if (targetElem instanceof UIStateGroup) {
+				final UIStateGroup target = (UIStateGroup) targetElem;
+				target.setDefaultState(stateGroup.getDefaultState());
+				// states are the children
+			} else {
+				logger.error("Attempting to apply a template of type {} to a different type.", "StateGroup");
+			}
 		} else if (templateElem instanceof UIController) {
-			final UIController stateGroup = (UIController) templateElem;
-			templateChildren = stateGroup.getChildrenRaw();
-			// TODO
+			final UIController uiController = (UIController) templateElem;
+			templateChildren = uiController.getChildrenRaw();
+			if (targetElem instanceof UIController) {
+				final UIController target = (UIController) targetElem;
+				copyAttributes(uiController.getKeys(), target.getKeys());
+				// TODO attributesKeyValueList
+				// TODO isNameImplicit?
+				// TODO next edit overrides?
+			} else {
+				logger.error("Attempting to apply a template of type {} to a different type.", "UIController");
+			}
 		} else if (templateElem instanceof UIAnimation) {
-			final UIAnimation stateGroup = (UIAnimation) templateElem;
-			templateChildren = stateGroup.getChildrenRaw();
-			// TODO
+			final UIAnimation uiAnimation = (UIAnimation) templateElem;
+			templateChildren = uiAnimation.getChildrenRaw();
+			if (targetElem instanceof UIAnimation) {
+				final UIAnimation target = (UIAnimation) targetElem;
+				// TODO events
+				// TODO controller
+				// TODO driver
+			} else {
+				logger.error("Attempting to apply a template of type {} to a different type.", "UIAnimation");
+			}
 		} else if (templateElem instanceof UIState) {
-			final UIState stateGroup = (UIState) templateElem;
-			templateChildren = stateGroup.getChildrenRaw();
-			// TODO
+			final UIState uiState = (UIState) templateElem;
+			templateChildren = uiState.getChildrenRaw();
+			if (targetElem instanceof UIState) {
+				final UIState target = (UIState) targetElem;
+				// TODO nextAdditionShouldOverrideActions
+				copyAttributes(uiState.getActions(), target.getActions());
+				// TODO nextAdditionShouldOverrideWhens
+				copyAttributes(uiState.getWhens(), target.getWhens());
+			} else {
+				logger.error("Attempting to apply a template of type {} to a different type.", "UIState");
+			}
 		} else {
 			templateChildren = null;
 		}
