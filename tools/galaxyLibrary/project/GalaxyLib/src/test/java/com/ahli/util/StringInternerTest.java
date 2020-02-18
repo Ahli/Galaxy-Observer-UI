@@ -52,7 +52,8 @@ final class StringInternerTest {
 		secondInterned = null;
 		
 		int i = 0;
-		final int maxAttempts = 100;
+		// 100 can rarely fail, I wish Java had a method for GC with the goal to minimize RAM usage
+		final int maxAttempts = 200;
 		while (referenceQueue.poll() == null && i < maxAttempts) {
 			++i;
 			System.gc();

@@ -4,8 +4,6 @@
 package com.ahli.hotkey_ui.application.ui;
 
 import com.ahli.hotkey_ui.application.model.ValueDef;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableCell;
 import org.apache.logging.log4j.LogManager;
