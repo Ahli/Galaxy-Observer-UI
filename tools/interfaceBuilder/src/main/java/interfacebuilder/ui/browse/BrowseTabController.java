@@ -23,12 +23,12 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import org.apache.logging.log4j.LogManager;
@@ -63,6 +63,8 @@ public class BrowseTabController implements Updateable {
 	private static final String GAME_UI = "GameUI";
 	private static final String SPACE_HIVEN_SPACE = " - ";
 	private final StringProperty queryString;
+	private final AutoCompleteComboBox fileSelector;
+	private final AutoCompleteComboBox templateSelector;
 	@FXML
 	private TextFlow pathTextFlow;
 	@FXML
@@ -76,9 +78,7 @@ public class BrowseTabController implements Updateable {
 	@FXML
 	private TreeView<UIElement> frameTree;
 	@FXML
-	private ComboBox<String> fileDropdown;
-	@FXML
-	private ComboBox<String> templateDropdown;
+	private AnchorPane anchorPane;
 	private Map<String, UITemplate> templateMap;
 	private int framesTotal;
 	private UICatalog uiCatalog;
@@ -96,6 +96,14 @@ public class BrowseTabController implements Updateable {
 	
 	public BrowseTabController() {
 		queryString = new SimpleStringProperty("");
+		
+		fileSelector = new AutoCompleteComboBox();
+		fileSelector.setPrefHeight(25);
+		fileSelector.setPrefWidth(218);
+		
+		templateSelector = new AutoCompleteComboBox();
+		templateSelector.setPrefHeight(25);
+		templateSelector.setPrefWidth(218);
 	}
 	
 	private static String prettyPrintAttributeStringList(final List<String> attributes) {
@@ -126,6 +134,18 @@ public class BrowseTabController implements Updateable {
 	 * Automatically called by FxmlLoader
 	 */
 	public void initialize() {
+		AnchorPane.setTopAnchor(fileSelector, 5d);
+		AnchorPane.setLeftAnchor(fileSelector, 5d);
+		AnchorPane.setRightAnchor(fileSelector, 5d);
+		
+		AnchorPane.setTopAnchor(templateSelector, 35d);
+		AnchorPane.setLeftAnchor(templateSelector, 5d);
+		AnchorPane.setRightAnchor(templateSelector, 5d);
+		
+		anchorPane.getChildren().add(fileSelector);
+		anchorPane.getChildren().add(templateSelector);
+		
+		
 		// tree
 		flowFactory = new TextFlowFactory();
 		
@@ -137,21 +157,20 @@ public class BrowseTabController implements Updateable {
 		// dropdowns
 		templateMap = new UnifiedMap<>();
 		// must be strong EventHandler reference
-		fileDropdown.setOnAction(event -> Platform.runLater(() -> {
+		fileSelector.setOnAction(event -> Platform.runLater(() -> {
 			try {
-				if (fileDropdown != null) {
-					final String selectedFile = fileDropdown.getSelectionModel().getSelectedItem();
-					updateTemplateDropdown(selectedFile);
-				}
+				final String selectedFile = fileSelector.getSelectionModel().getSelectedItem();
+				updateTemplateDropdown(selectedFile);
 			} catch (final Exception e) {
 				logger.fatal(FATAL_ERROR, e);
 			}
 		}));
+		
 		// must be strong EventHandler reference
-		templateDropdown.setOnAction(event -> Platform.runLater(() -> {
+		templateSelector.setOnAction(event -> Platform.runLater(() -> {
 			try {
-				if (templateDropdown != null && templateMap != null) {
-					final String selectedTemplateRootElem = templateDropdown.getSelectionModel().getSelectedItem();
+				if (templateMap != null) {
+					final String selectedTemplateRootElem = templateSelector.getSelectionModel().getSelectedItem();
 					final UITemplate template = templateMap.get(selectedTemplateRootElem);
 					final long start = System.currentTimeMillis();
 					framesTotal = 0;
@@ -295,7 +314,7 @@ public class BrowseTabController implements Updateable {
 					i++;
 					map.put(KEY_PREFIX + i, prettyPrint(attr));
 				}
-				// TODO keyValueList
+				// TODO keyValueList, e.g. in a new panel where it would show template, file and type, too?
 				
 			} else if (el instanceof UIState) {
 				final UIState elem = (UIState) el;
@@ -348,9 +367,11 @@ public class BrowseTabController implements Updateable {
 							/* I could not get this code any faster than this form (caching toUpperCase() was not
 							faster) */
 							return queryString.getValue().isEmpty() || (element.getName() != null &&
-									element.getName().toUpperCase().contains(queryString.getValue())) ||
-									(element instanceof UIFrame && ((UIFrame) element).getType().toUpperCase()
-											.contains(queryString.getValue()));
+									AutoCompleteComboBox
+											.containsIgnoreCase(element.getName(), queryString.getValue())) ||
+									(element instanceof UIFrame &&
+											AutoCompleteComboBox.containsIgnoreCase(((UIFrame) element).getType(),
+													queryString.getValue()));
 						}
 					}), queryString));
 			
@@ -404,11 +425,11 @@ public class BrowseTabController implements Updateable {
 			}
 			final ObservableList<String> fileNames = FXCollections.observableList(new ArrayList<>(fileNamesSet));
 			fileNames.sort(null);
-			fileDropdown.setItems(fileNames);
+			fileSelector.setItems(fileNames);
 			final String firstSelection = fileNamesSet.contains(GAME_UI) ? GAME_UI : fileNames.get(0);
 			Platform.runLater(() -> {
 				try {
-					fileDropdown.setValue(firstSelection);
+					fileSelector.setValue(firstSelection);
 				} catch (final Exception e) {
 					logger.fatal(FATAL_ERROR, e);
 				}
@@ -441,11 +462,11 @@ public class BrowseTabController implements Updateable {
 				}
 			}
 			final ObservableList<String> elementNames = FXCollections.observableList(new ArrayList<>(templatesOfFile));
-			templateDropdown.setItems(elementNames);
+			templateSelector.setItems(elementNames);
 			if (firstSelection != null) {
-				templateDropdown.setValue(firstSelection);
+				templateSelector.setValue(firstSelection);
 			} else {
-				templateDropdown.selectionModelProperty().get().selectFirst();
+				templateSelector.selectionModelProperty().get().selectFirst();
 			}
 		}
 	}
