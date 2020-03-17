@@ -103,8 +103,9 @@ public final class StylizedTextAreaAppender extends AbstractAppender {
 	 *
 	 * @param threadName
 	 * @param unregister
+	 * @param delayInMs
 	 */
-	public static void finishedWork(final String threadName, final boolean unregister) {
+	public static void finishedWork(final String threadName, final boolean unregister, final long delayInMs) {
 		final ErrorTabController ctrl = getWorkerTaskController(threadName);
 		if (ctrl != generalController) {
 			Platform.runLater(() -> {
@@ -116,7 +117,22 @@ public final class StylizedTextAreaAppender extends AbstractAppender {
 			});
 		}
 		if (unregister) {
-			workerTaskControllers.remove(threadName);
+			if (delayInMs > 0) {
+				final var ctrlToRemove = workerTaskControllers.get(threadName);
+				Platform.runLater(() -> {
+					try {
+						Thread.sleep(delayInMs);
+					} catch (InterruptedException e) {
+						Thread.currentThread().interrupt();
+					}
+					// ensure that the correct one is removed
+					if(ctrlToRemove == workerTaskControllers.get(threadName)){
+						workerTaskControllers.remove(threadName);
+					}
+				});
+			} else {
+				workerTaskControllers.remove(threadName);
+			}
 		}
 	}
 	

@@ -40,7 +40,7 @@ public abstract class CleaningForkJoinTask extends ForkJoinTask<Void> {
 			logger.error("Error in Task:", e);
 			return false;
 		} finally {
-			StylizedTextAreaAppender.finishedWork(Thread.currentThread().getName(), true);
+			StylizedTextAreaAppender.finishedWork(Thread.currentThread().getName(), true, 50);
 			InterfaceBuilderApp.tryCleanUp();
 		}
 	}

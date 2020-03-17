@@ -432,7 +432,7 @@ public class BaseUiService {
 				logger.info("Loading BaseUI for {} took {}ms.", gameName, executionTime);
 				if (needToParseAgain) {
 					// set result in UI
-					StylizedTextAreaAppender.finishedWork(Thread.currentThread().getName(), true);
+					StylizedTextAreaAppender.finishedWork(Thread.currentThread().getName(), true, 50);
 				}
 			}
 		}
