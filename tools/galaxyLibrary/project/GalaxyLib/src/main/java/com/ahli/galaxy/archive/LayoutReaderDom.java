@@ -95,7 +95,7 @@ public final class LayoutReaderDom {
 							firstIndex = Math.min(firstIndex, firstIndex2);
 							final String layoutName = dependency.substring(0, firstIndex);
 							if (!layoutName.equalsIgnoreCase(nameWOfileEnding) &&
-									!doesNameAppearInList(layoutName, list)) {
+									doesNotAppearInList(layoutName, list)) {
 								if (logger.isTraceEnabled()) {
 									logger.trace("{} has dependency to {}", nameWOfileEnding, layoutName);
 								}
@@ -145,8 +145,8 @@ public final class LayoutReaderDom {
 				final String attrValue = attribute.getNodeValue();
 				
 				// attribute name
-				if (attrName.startsWith(CONSTANT_MARKER) && !doesNameAppearInList(attrName, usedConstants) &&
-						!doesConstantNameAppearInList(attrName, ownConstants)) {
+				if (attrName.startsWith(CONSTANT_MARKER) && doesNotAppearInList(attrName, usedConstants) &&
+						doesConstantNotAppearInList(attrName, ownConstants)) {
 					if (logger.isTraceEnabled()) {
 						logger.trace("{} uses undefined constant {}", nameWOfileEnding, attrName);
 					}
@@ -154,8 +154,8 @@ public final class LayoutReaderDom {
 					list.add(attrName);
 				}
 				// attribute value
-				if (attrValue.startsWith(CONSTANT_MARKER) && !doesNameAppearInList(attrValue, usedConstants) &&
-						!doesConstantNameAppearInList(attrValue, ownConstants)) {
+				if (attrValue.startsWith(CONSTANT_MARKER) && doesNotAppearInList(attrValue, usedConstants) &&
+						doesConstantNotAppearInList(attrValue, ownConstants)) {
 					if (logger.isTraceEnabled()) {
 						logger.trace("{} uses undefined constant {}", nameWOfileEnding, attrValue);
 					}
@@ -188,17 +188,17 @@ public final class LayoutReaderDom {
 	/**
 	 * Checks if a name appears in the list.
 	 *
-	 * @param name
+	 * @param query
 	 * @param list
 	 * @return
 	 */
-	private static boolean doesNameAppearInList(final String name, final List<String> list) {
+	private static boolean doesNotAppearInList(final String query, final List<String> list) {
 		for (final String n : list) {
-			if (n.equalsIgnoreCase(name)) {
-				return true;
+			if (n.equalsIgnoreCase(query)) {
+				return false;
 			}
 		}
-		return false;
+		return true;
 	}
 	
 	/**
@@ -237,7 +237,7 @@ public final class LayoutReaderDom {
 	 * @param list
 	 * @return
 	 */
-	private static boolean doesConstantNameAppearInList(final String constUsage, final List<String> list) {
+	private static boolean doesConstantNotAppearInList(final String constUsage, final List<String> list) {
 		
 		String name = constUsage;
 		
@@ -252,11 +252,11 @@ public final class LayoutReaderDom {
 		for (final String n : list) {
 			if (n.equalsIgnoreCase(name)) {
 				// System.out.println("check - true - "+constUsage);
-				return true;
+				return false;
 			}
 		}
 		// System.out.println("check - false - "+constUsage+" - "+name);
-		return false;
+		return true;
 	}
 	
 	/**

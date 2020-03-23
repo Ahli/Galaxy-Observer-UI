@@ -287,7 +287,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	 */
 	public void newMpq(final String mpqPath, final int maxFileCount)
 			throws InterruptedException, IOException, MpqException {
-		if (!verifyMpqEditor()) {
+		if (notVerifyMpqEditor()) {
 			throw new MpqException(
 					String.format(Messages.getString(MPQ_INTERFACE_MPQ_EDITOR_NOT_FOUND), mpqEditorPath));
 		}
@@ -313,7 +313,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	 */
 	public void addToMpq(final String mpqPath, final String sourceFilePath, final String targetName)
 			throws InterruptedException, IOException, MpqException {
-		if (!verifyMpqEditor()) {
+		if (notVerifyMpqEditor()) {
 			throw new MpqException(
 					String.format(Messages.getString(MPQ_INTERFACE_MPQ_EDITOR_NOT_FOUND), mpqEditorPath));
 		}
@@ -334,7 +334,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	 * @throws MpqException
 	 */
 	public void compactMpq(final String mpqPath) throws InterruptedException, IOException, MpqException {
-		if (!verifyMpqEditor()) {
+		if (notVerifyMpqEditor()) {
 			throw new MpqException(
 					String.format(Messages.getString(MPQ_INTERFACE_MPQ_EDITOR_NOT_FOUND), mpqEditorPath));
 		}
@@ -419,7 +419,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	 */
 	public void extractFromMpq(final String mpqPath, final String fileName, final String targetPath,
 			final boolean inclSubFolders) throws InterruptedException, IOException, MpqException {
-		if (!verifyMpqEditor()) {
+		if (notVerifyMpqEditor()) {
 			throw new MpqException(
 					String.format(Messages.getString(MPQ_INTERFACE_MPQ_EDITOR_NOT_FOUND), mpqEditorPath));
 		}
@@ -452,7 +452,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	 */
 	public void scriptMpq(final String mpqPath, final String scriptPath)
 			throws InterruptedException, IOException, MpqException {
-		if (!verifyMpqEditor()) {
+		if (notVerifyMpqEditor()) {
 			throw new MpqException(
 					String.format(Messages.getString(MPQ_INTERFACE_MPQ_EDITOR_NOT_FOUND), mpqEditorPath));
 		}
@@ -471,9 +471,9 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	 *
 	 * @return
 	 */
-	private boolean verifyMpqEditor() {
+	private boolean notVerifyMpqEditor() {
 		final File f = new File(mpqEditorPath);
-		return f.exists() && f.isFile();
+		return !f.exists() || !f.isFile();
 	}
 	
 	/**
@@ -485,7 +485,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	 */
 	public void deleteFileInMpq(final String mpqPath, final String filePath)
 			throws InterruptedException, IOException, MpqException {
-		if (!verifyMpqEditor()) {
+		if (notVerifyMpqEditor()) {
 			throw new MpqException(
 					String.format(Messages.getString(MPQ_INTERFACE_MPQ_EDITOR_NOT_FOUND), mpqEditorPath));
 		}
@@ -509,7 +509,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	 */
 	public void renameFileInMpq(final String mpqPath, final String oldfilePath, final String newFilePath)
 			throws InterruptedException, IOException, MpqException {
-		if (!verifyMpqEditor()) {
+		if (notVerifyMpqEditor()) {
 			throw new MpqException(
 					String.format(Messages.getString(MPQ_INTERFACE_MPQ_EDITOR_NOT_FOUND), mpqEditorPath));
 		}
