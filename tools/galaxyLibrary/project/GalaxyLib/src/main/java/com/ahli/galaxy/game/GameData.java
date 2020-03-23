@@ -13,7 +13,7 @@ import com.ahli.galaxy.ui.interfaces.UICatalog;
  */
 public class GameData {
 	
-	private GameDef gameDef;
+	private final GameDef gameDef;
 	private UICatalog uiCatalog;
 	
 	/**
@@ -47,14 +47,6 @@ public class GameData {
 	 */
 	public GameDef getGameDef() {
 		return gameDef;
-	}
-	
-	/**
-	 * @param gameDef
-	 * 		the gameDef to set
-	 */
-	public void setGameDef(final GameDef gameDef) {
-		this.gameDef = gameDef;
 	}
 	
 }
