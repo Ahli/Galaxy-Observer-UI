@@ -14,20 +14,8 @@ public class SC2GameDef extends GameDef {
 	 *
 	 */
 	public SC2GameDef() {
-		super();
-		name = "StarCraft II";
-		nameHandle = "sc2";
-		modFileEnding = "SC2Mod";
-		coreModsOrDirectories = new String[] { "core.sc2mod" };
-		defaultRaceId = "Terr";
-		defaultConsoleSkinId = "ClassicTerran";
-		documentsGameDirectoryName = "StarCraft II";
-		layoutFileEnding = "SC2Layout";
-		baseDataFolderName = "base.sc2data";
-		rootExeName = "StarCraft II.exe";
-		switcherExeNameX32 = "SC2Switcher.exe";
-		switcherExeNameX64 = "SC2Switcher_x64.exe";
-		supportDirectoryX32 = "Support";
-		supportDirectoryX64 = "Support64";
+		super("StarCraft II", "sc2", "SC2Mod", new String[] { "core.sc2mod" }, "Terr", "ClassicTerran", "StarCraft II",
+				"SC2Layout", "base.sc2data", "StarCraft II.exe", "SC2Switcher.exe", "SC2Switcher_x64.exe", "Support",
+				"Support64", "Interfaces", "mods", "StarCraft II Public Test.exe");
 	}
 }

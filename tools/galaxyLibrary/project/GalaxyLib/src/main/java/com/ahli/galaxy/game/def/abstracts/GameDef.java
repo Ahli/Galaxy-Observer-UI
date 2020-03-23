@@ -9,26 +9,48 @@ import java.util.Arrays;
  * @author Ahli
  */
 public abstract class GameDef {
-	protected String[] coreModsOrDirectories;
-	protected String defaultRaceId = "Terr";
-	protected String defaultConsoleSkinId = "ClassicTerran";
-	protected String documentsGameDirectoryName = "StarCraft II";
-	protected String documentsInterfaceSubdirectoryName = "Interfaces";
-	protected String modFileEnding = ".sc2mod";
-	protected String modsSubDirectory = "mods";
-	protected String name = "StarCraft II";
-	protected String nameHandle = "sc2";
-	protected String layoutFileEnding = ".SC2Layout";
-	protected String baseDataFolderName = "base.sc2data";
-	protected String rootExeName = "StarCraft II.exe";
-	protected String ptrRootExeName = "StarCraft II Public Test.exe";
-	protected String switcherExeNameX32 = "SC2Switcher.exe";
-	protected String switcherExeNameX64 = "SC2Switcher_x64.exe";
-	protected String supportDirectoryX32 = "Support";
-	protected String supportDirectoryX64 = "Support64";
+	protected final String[] coreModsOrDirectories;
+	protected final String defaultRaceId;
+	protected final String defaultConsoleSkinId;
+	protected final String documentsGameDirectoryName;
+	protected final String documentsInterfaceSubdirectoryName;
+	protected final String modFileEnding;
+	protected final String modsSubDirectory;
+	protected final String name;
+	protected final String nameHandle;
+	protected final String layoutFileEnding;
+	protected final String baseDataFolderName;
+	protected final String rootExeName;
+	protected final String ptrRootExeName;
+	protected final String switcherExeNameX32;
+	protected final String switcherExeNameX64;
+	protected final String supportDirectoryX32;
+	protected final String supportDirectoryX64;
 	
-	public GameDef() {
-		// nothing to do
+	public GameDef(final String name, final String nameHandle, final String modFileEnding,
+			final String[] coreModsOrDirectories, final String defaultRaceId, final String defaultConsoleSkinId,
+			final String documentsGameDirectoryName, final String layoutFileEnding, final String baseDataFolderName,
+			final String rootExeName, final String switcherExeNameX32, final String switcherExeNameX64,
+			final String supportDirectoryX32, final String supportDirectoryX64,
+			final String documentsInterfaceSubdirectoryName, final String modsSubDirectory,
+			final String ptrRootExeName) {
+		this.name = name;
+		this.nameHandle = nameHandle;
+		this.modFileEnding = modFileEnding;
+		this.coreModsOrDirectories = coreModsOrDirectories;
+		this.defaultRaceId = defaultRaceId;
+		this.defaultConsoleSkinId = defaultConsoleSkinId;
+		this.documentsGameDirectoryName = documentsGameDirectoryName;
+		this.layoutFileEnding = layoutFileEnding;
+		this.baseDataFolderName = baseDataFolderName;
+		this.rootExeName = rootExeName;
+		this.switcherExeNameX32 = switcherExeNameX32;
+		this.switcherExeNameX64 = switcherExeNameX64;
+		this.supportDirectoryX32 = supportDirectoryX32;
+		this.supportDirectoryX64 = supportDirectoryX64;
+		this.documentsInterfaceSubdirectoryName = documentsInterfaceSubdirectoryName;
+		this.modsSubDirectory = modsSubDirectory;
+		this.ptrRootExeName = ptrRootExeName;
 	}
 	
 	/**
@@ -39,28 +61,10 @@ public abstract class GameDef {
 	}
 	
 	/**
-	 * @param layoutFileEnding
-	 * 		the layoutFileEnding to set
-	 */
-	public void setLayoutFileEnding(final String layoutFileEnding) {
-		this.layoutFileEnding = layoutFileEnding;
-	}
-	
-	/**
 	 * @return the coreModsOrDirectories
 	 */
 	public String[] getCoreModsOrDirectories() {
 		return Arrays.copyOf(coreModsOrDirectories, coreModsOrDirectories.length);
-	}
-	
-	/**
-	 * Saves a copy of the specified array.
-	 *
-	 * @param coreModsOrDirectories
-	 * 		the coreModsOrDirectories to set
-	 */
-	public void setCoreModsOrDirectories(final String... coreModsOrDirectories) {
-		this.coreModsOrDirectories = Arrays.copyOf(coreModsOrDirectories, coreModsOrDirectories.length);
 	}
 	
 	/**
@@ -71,26 +75,10 @@ public abstract class GameDef {
 	}
 	
 	/**
-	 * @param defaultRaceId
-	 * 		the defaultRaceId to set
-	 */
-	public void setDefaultRaceId(final String defaultRaceId) {
-		this.defaultRaceId = defaultRaceId;
-	}
-	
-	/**
 	 * @return
 	 */
 	public String getDocumentsGameDirectoryName() {
 		return documentsGameDirectoryName;
-	}
-	
-	/**
-	 * @param documentsGameDirectoryName
-	 * 		the documentsGameDirectoryName to set
-	 */
-	public void setDocumentsGameDirectoryName(final String documentsGameDirectoryName) {
-		this.documentsGameDirectoryName = documentsGameDirectoryName;
 	}
 	
 	/**
@@ -101,26 +89,10 @@ public abstract class GameDef {
 	}
 	
 	/**
-	 * @param documentsInterfaceSubdirectoryName
-	 * 		the documentsInterfaceSubdirectoryName to set
-	 */
-	public void setDocumentsInterfaceSubdirectoryName(final String documentsInterfaceSubdirectoryName) {
-		this.documentsInterfaceSubdirectoryName = documentsInterfaceSubdirectoryName;
-	}
-	
-	/**
 	 * @return the modFileEnding
 	 */
 	public String getModFileEnding() {
 		return modFileEnding;
-	}
-	
-	/**
-	 * @param modFileEnding
-	 * 		the modFileEnding to set
-	 */
-	public void setModFileEnding(final String modFileEnding) {
-		this.modFileEnding = modFileEnding;
 	}
 	
 	/**
@@ -131,26 +103,10 @@ public abstract class GameDef {
 	}
 	
 	/**
-	 * @param modsSubDirectory
-	 * 		the modsSubDirectory to set
-	 */
-	public void setModsSubDirectory(final String modsSubDirectory) {
-		this.modsSubDirectory = modsSubDirectory;
-	}
-	
-	/**
 	 * @return the name
 	 */
 	public String getName() {
 		return name;
-	}
-	
-	/**
-	 * @param name
-	 * 		the name to set
-	 */
-	public void setName(final String name) {
-		this.name = name;
 	}
 	
 	/**
@@ -161,26 +117,10 @@ public abstract class GameDef {
 	}
 	
 	/**
-	 * @param nameHandle
-	 * 		the nameHandle to set
-	 */
-	public void setNameHandle(final String nameHandle) {
-		this.nameHandle = nameHandle;
-	}
-	
-	/**
 	 * @return
 	 */
 	public String getBaseDataFolderName() {
 		return baseDataFolderName;
-	}
-	
-	/**
-	 * @param baseDataFolderName
-	 * 		the baseDataFolderName to set
-	 */
-	public void setBaseDataFolderName(final String baseDataFolderName) {
-		this.baseDataFolderName = baseDataFolderName;
 	}
 	
 	/**
@@ -192,66 +132,28 @@ public abstract class GameDef {
 		return rootExeName;
 	}
 	
-	/**
-	 * Set the name of the game's rootExecutable.
-	 *
-	 * @param rootExeName
-	 */
-	public void setRootExeName(final String rootExeName) {
-		this.rootExeName = rootExeName;
-	}
-	
 	public String getPtrRootExeName() {
 		return ptrRootExeName;
-	}
-	
-	/**
-	 * Set the name of the game's rootExecutable of the PTR client.
-	 *
-	 * @param ptrRootExeName
-	 */
-	public void setPtrRootExeName(final String ptrRootExeName) {
-		this.ptrRootExeName = ptrRootExeName;
 	}
 	
 	public String getSwitcherExeNameX32() {
 		return switcherExeNameX32;
 	}
 	
-	public void setSwitcherExeNameX32(final String switcherExeNameX32) {
-		this.switcherExeNameX32 = switcherExeNameX32;
-	}
-	
 	public String getSwitcherExeNameX64() {
 		return switcherExeNameX64;
-	}
-	
-	public void setSwitcherExeNameX64(final String switcherExeNameX64) {
-		this.switcherExeNameX64 = switcherExeNameX64;
 	}
 	
 	public String getSupportDirectoryX32() {
 		return supportDirectoryX32;
 	}
 	
-	public void setSupportDirectoryX32(final String supportDirectoryX32) {
-		this.supportDirectoryX32 = supportDirectoryX32;
-	}
-	
 	public String getSupportDirectoryX64() {
 		return supportDirectoryX64;
 	}
 	
-	public void setSupportDirectoryX64(final String supportDirectoryX64) {
-		this.supportDirectoryX64 = supportDirectoryX64;
-	}
-	
 	public String getDefaultConsoleSkinId() {
 		return defaultConsoleSkinId;
-	}
-	
-	public void setDefaultConsoleSkinId(final String defaultConsoleSkinId) {
-		this.defaultConsoleSkinId = defaultConsoleSkinId;
 	}
 	
 }

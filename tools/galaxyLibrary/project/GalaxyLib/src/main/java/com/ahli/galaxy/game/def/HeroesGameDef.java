@@ -14,22 +14,11 @@ public class HeroesGameDef extends GameDef {
 	 *
 	 */
 	public HeroesGameDef() {
-		super();
-		name = "Heroes of the Storm";
-		nameHandle = "heroes";
-		modFileEnding = "stormmod";
-		coreModsOrDirectories = new String[] { "core.stormmod", "heroesdata.stormmod", "heromods" };
-		defaultRaceId = "Terr";
-		defaultConsoleSkinId = "ClassicTerran";
-		documentsGameDirectoryName = "Heroes of the Storm";
-		layoutFileEnding = "stormlayout";
-		baseDataFolderName = "base.stormdata";
-		rootExeName = "Heroes of the Storm.exe";
-		ptrRootExeName = "Heroes of the Storm Public Test.exe";
-		switcherExeNameX32 = "HeroesSwitcher.exe";
-		switcherExeNameX64 = "HeroesSwitcher_x64.exe";
-		supportDirectoryX32 = "Support";
-		supportDirectoryX64 = "Support64";
+		super("Heroes of the Storm", "heroes", "stormmod",
+				new String[] { "core.stormmod", "heroesdata.stormmod", "heromods" }, "Terr", "ClassicTerran",
+				"Heroes of the Storm", "stormlayout", "Heroes of the Storm", "base.stormdata",
+				"Heroes of the Storm.exe", "HeroesSwitcher.exe", "HeroesSwitcher_x64.exe", "Support", "Support64",
+				"mods", "Heroes of the Storm Public Test.exe");
 	}
 	
 }
