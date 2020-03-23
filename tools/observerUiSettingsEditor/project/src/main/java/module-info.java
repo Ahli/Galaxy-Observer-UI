@@ -14,6 +14,7 @@ module ObserverUiSettingsEditor {
 	requires GalaxyLib;
 	exports com.ahli.hotkey_ui.application to javafx.graphics;
 	exports com.ahli.hotkey_ui.application.controller to javafx.fxml;
+	exports com.ahli.hotkey_ui.application.model to javafx.fxml; // for the TabsController
 	opens com.ahli.hotkey_ui.application.controller to javafx.fxml;
 	opens com.ahli.hotkey_ui.application.model to javafx.base;
 	opens res;
