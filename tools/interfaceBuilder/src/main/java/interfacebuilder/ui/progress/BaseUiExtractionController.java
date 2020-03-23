@@ -76,6 +76,11 @@ public class BaseUiExtractionController implements Updateable {
 		output[1] = new TextFlowAppender(txtArea2);
 		output[2] = new TextFlowAppender(txtArea3);
 		
+		final String[] queryMasks = BaseUiService.getQueryMasks(game);
+		areaLabel1.setText(String.format("Extracting %s files", queryMasks[0]));
+		areaLabel2.setText(String.format("Extracting %s files", queryMasks[1]));
+		areaLabel3.setText(String.format("Extracting %s files", queryMasks[2]));
+		
 		final ExtractBaseUiTask task = new ExtractBaseUiTask(baseUiService, game, usePtr, output, errorTabController);
 		InterfaceBuilderApp.getInstance().getExecutor().execute(task);
 	}
