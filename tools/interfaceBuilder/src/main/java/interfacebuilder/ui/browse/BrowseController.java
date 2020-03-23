@@ -213,7 +213,7 @@ public class BrowseController implements Updateable {
 			extractBaseUi(Game.SC2, false);
 		} catch (final IOException e) {
 			logger.error("Error extracting Heroes Base UI.", e);
-			Alerts.buildExceptionAlert(InterfaceBuilderApp.getInstance().getPrimaryStage(), e);
+			Alerts.buildExceptionAlert(InterfaceBuilderApp.getInstance().getPrimaryStage(), e).showAndWait();
 		}
 	}
 	
@@ -324,7 +324,7 @@ public class BrowseController implements Updateable {
 			updatePtrStatusLabel(usePtr);
 		} catch (final IOException e) {
 			logger.error("Error extracting Heroes Base UI.", e);
-			Alerts.buildExceptionAlert(InterfaceBuilderApp.getInstance().getPrimaryStage(), e);
+			Alerts.buildExceptionAlert(InterfaceBuilderApp.getInstance().getPrimaryStage(), e).showAndWait();
 		}
 	}
 	
