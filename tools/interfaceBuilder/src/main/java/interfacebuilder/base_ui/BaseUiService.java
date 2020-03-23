@@ -243,33 +243,32 @@ public class BaseUiService {
 		final String product;
 		final String locale = "enUS";
 		switch (game) {
-			case SC2:
+			case SC2 -> {
 				storagePath = configService.getIniSettings().getSc2Path();
 				product = "sc2";
-				break;
-			case HEROES:
+			}
+			case HEROES -> {
 				if (usePtr) {
 					storagePath = configService.getIniSettings().getHeroesPtrPath();
 				} else {
 					storagePath = configService.getIniSettings().getHeroesPath();
 				}
 				product = "heroes";
-				break;
-			default:
-				throw new InvalidParameterException(UNKNOWN_GAME_EXCEPTION);
+			}
+			default -> throw new InvalidParameterException(UNKNOWN_GAME_EXCEPTION);
 		}
 		CascExplorerConfigFileEditor.write(configFile, storagePath, onlineMode, product, locale);
 	}
 	
-	private static String[] getQueryMasks(final Game game) {
-		switch (game) {
-			case SC2:
-				return new String[] { "*.SC2Layout", "*Assets.txt", "*.SC2Style" };
-			case HEROES:
-				return new String[] { "*.StormLayout", "*Assets.txt", "*.StormStyle" };
-			default:
-				throw new InvalidParameterException(UNKNOWN_GAME_EXCEPTION);
-		}
+	/**
+	 * @param game
+	 * @return
+	 */
+	public static String[] getQueryMasks(final Game game) {
+		return switch (game) {
+			case SC2 -> new String[] { "*.SC2Layout", "*Assets.txt", "*.SC2Style" };
+			case HEROES -> new String[] { "*.StormLayout", "*Assets.txt", "*.StormStyle" };
+		};
 	}
 	
 	/**

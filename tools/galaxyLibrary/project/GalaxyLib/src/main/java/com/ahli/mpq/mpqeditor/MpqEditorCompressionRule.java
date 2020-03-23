@@ -155,24 +155,16 @@ public abstract class MpqEditorCompressionRule implements DeepCopyable {
 	 * @return
 	 */
 	public String getCompressionMethodString() {
-		switch (compressionMethod) {
-			case ZLIB:
-				return "0x00000002";
-			case PKWARE:
-				return "0x00000008";
-			case BZIP2:
-				return "0x00000010";
-			case LZMA:
-				return "0x00000012";
-			case SPARSE:
-				return "0x00000020";
-			case SPARSE_ZLIB:
-				return "0x00000022";
-			case SPARSE_BZIP2:
-				return "0x00000030";
-			default:
-				return "0x00000000";
-		}
+		return switch (compressionMethod) {
+			case ZLIB -> "0x00000002";
+			case PKWARE -> "0x00000008";
+			case BZIP2 -> "0x00000010";
+			case LZMA -> "0x00000012";
+			case SPARSE -> "0x00000020";
+			case SPARSE_ZLIB -> "0x00000022";
+			case SPARSE_BZIP2 -> "0x00000030";
+			default -> "0x00000000";
+		};
 	}
 	
 	public MpqEditorCompressionRuleMethod getCompressionMethod() {

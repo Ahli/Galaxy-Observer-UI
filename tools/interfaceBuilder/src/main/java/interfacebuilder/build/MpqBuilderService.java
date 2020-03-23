@@ -99,18 +99,10 @@ public class MpqBuilderService {
 	 * @return
 	 */
 	public GameData getGameData(final Game game) {
-		final GameData baseGame;
-		switch (game) {
-			case SC2:
-				baseGame = sc2BaseGameData;
-				break;
-			case HEROES:
-				baseGame = heroesBaseGameData;
-				break;
-			default:
-				throw new IllegalArgumentException("Unhandled game enum " + game.toString() + ".");
-		}
-		return baseGame;
+		return switch (game) {
+			case SC2 -> sc2BaseGameData;
+			case HEROES -> heroesBaseGameData;
+		};
 	}
 	
 	/**
@@ -336,17 +328,12 @@ public class MpqBuilderService {
 	 * @return
 	 */
 	private static MpqEditorCompression getCompressionModeOfSetting(final int compressMpqSetting) {
-		switch (compressMpqSetting) {
-			case 0:
-				return MpqEditorCompression.NONE;
-			case 1:
-				return MpqEditorCompression.BLIZZARD_SC2_HEROES;
-			case 2:
-				return MpqEditorCompression.CUSTOM;
-			case 3:
-				return MpqEditorCompression.SYSTEM_DEFAULT;
-			default:
-				throw new IllegalArgumentException("Unsupported mpq compression mode.");
-		}
+		return switch (compressMpqSetting) {
+			case 0 -> MpqEditorCompression.NONE;
+			case 1 -> MpqEditorCompression.BLIZZARD_SC2_HEROES;
+			case 2 -> MpqEditorCompression.CUSTOM;
+			case 3 -> MpqEditorCompression.SYSTEM_DEFAULT;
+			default -> throw new IllegalArgumentException("Unsupported mpq compression mode.");
+		};
 	}
 }

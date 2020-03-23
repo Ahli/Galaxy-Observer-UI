@@ -61,29 +61,30 @@ public class SettingsCommandLineToolController extends SettingsAutoSaveControlle
 	 */
 	private void initCompressMpq(final int val) {
 		switch (val) {
-			case 1:
+			case 1 -> {
 				compressMpqNone.setSelected(false);
 				compressMpqBlizz.setSelected(true);
 				compressMpqExperimentalBest.setSelected(false);
 				compressMpqSystemDefault.setSelected(false);
-				return;
-			case 2:
+			}
+			case 2 -> {
 				compressMpqNone.setSelected(false);
 				compressMpqBlizz.setSelected(false);
 				compressMpqExperimentalBest.setSelected(true);
 				compressMpqSystemDefault.setSelected(false);
-				return;
-			case 3:
+			}
+			case 3 -> {
 				compressMpqNone.setSelected(false);
 				compressMpqBlizz.setSelected(false);
 				compressMpqExperimentalBest.setSelected(false);
 				compressMpqSystemDefault.setSelected(true);
-				return;
-			default:
+			}
+			default -> {
 				compressMpqNone.setSelected(true);
 				compressMpqBlizz.setSelected(false);
 				compressMpqExperimentalBest.setSelected(false);
 				compressMpqSystemDefault.setSelected(false);
+			}
 		}
 	}
 	

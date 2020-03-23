@@ -224,15 +224,10 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 	 * @return
 	 */
 	private static int getGameIdPropertyValue(final MpqEditorCompression compression) {
-		switch (compression) {
-			case BLIZZARD_SC2_HEROES:
-				return 11;
-			case NONE:
-			case CUSTOM:
-			case SYSTEM_DEFAULT:
-			default:
-				return 13;
+		if (compression == MpqEditorCompression.BLIZZARD_SC2_HEROES) {
+			return 11;
 		}
+		return 13;
 	}
 	
 	/**

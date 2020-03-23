@@ -35,18 +35,10 @@ public class GameService {
 	 * @return
 	 */
 	public GameDef getNewGameDef(final Game game) {
-		final GameDef gameDef;
-		switch (game) {
-			case SC2:
-				gameDef = new SC2GameDef();
-				break;
-			case HEROES:
-				gameDef = new HeroesGameDef();
-				break;
-			default:
-				throw new IllegalArgumentException("Unknown game value " + game);
-		}
-		return gameDef;
+		return switch (game) {
+			case SC2 -> new SC2GameDef();
+			case HEROES -> new HeroesGameDef();
+		};
 	}
 	
 	
@@ -57,14 +49,10 @@ public class GameService {
 	 * @return
 	 */
 	public String getGameItemPath(final Game game) {
-		switch (game) {
-			case SC2:
-				return "classpath:res/sc2.png";
-			case HEROES:
-				return "classpath:res/heroes.png";
-			default:
-				return "classpath:res/ahli.png";
-		}
+		return switch (game) {
+			case SC2 -> "classpath:res/sc2.png";
+			case HEROES -> "classpath:res/heroes.png";
+		};
 	}
 	
 	/**
