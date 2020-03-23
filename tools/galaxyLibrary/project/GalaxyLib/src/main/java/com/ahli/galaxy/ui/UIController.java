@@ -98,7 +98,7 @@ public class UIController extends UIElement {
 	 * @param key
 	 * @param value
 	 */
-	public String addValue(final String key, final String value) {
+	public void addValue(final String key, final String value) {
 		int i = 0;
 		final int len = attributesKeyValueList.size();
 		for (; i < len; i += 2) {
@@ -110,9 +110,8 @@ public class UIController extends UIElement {
 			// not found
 			attributesKeyValueList.add(StringInterner.intern(key));
 			attributesKeyValueList.add(StringInterner.intern(value));
-			return null;
 		} else {
-			return attributesKeyValueList.set(i, StringInterner.intern(value));
+			attributesKeyValueList.set(i, StringInterner.intern(value));
 		}
 	}
 	

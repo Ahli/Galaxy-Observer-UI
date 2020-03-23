@@ -155,19 +155,19 @@ public class UIFrame extends UIElement {
 	/**
 	 * @param value
 	 */
-	public UIAttribute addAttribute(final UIAttribute value) {
+	public void addAttribute(final UIAttribute value) {
 		final String key = value.getName();
 		if (attributes != null) {
 			for (int i = 0, len = attributes.size(); i < len; i++) {
 				if (attributes.get(i).getName().equalsIgnoreCase(key)) {
-					return attributes.set(i, value);
+					attributes.set(i, value);
+					return;
 				}
 			}
 		} else {
 			attributes = new ArrayList<>(1);
 		}
 		attributes.add(value);
-		return null;
 	}
 	
 	/**

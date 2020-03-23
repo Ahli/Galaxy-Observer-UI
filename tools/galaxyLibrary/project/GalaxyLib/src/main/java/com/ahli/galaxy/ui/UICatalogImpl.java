@@ -271,7 +271,7 @@ public class UICatalogImpl implements UICatalog {
 	 * @throws UIException
 	 */
 	@Override
-	public UITemplate addTemplate(final String fileName, final UIElement thisElem, final boolean isDevLayout)
+	public void addTemplate(final String fileName, final UIElement thisElem, final boolean isDevLayout)
 			throws UIException {
 		if (thisElem == null) {
 			throw new UIException("Cannot create Template definition for a 'null' UIElement.");
@@ -280,7 +280,6 @@ public class UICatalogImpl implements UICatalog {
 		final List<UITemplate> list = isDevLayout ? blizzOnlyTemplates : templates;
 		final UITemplate template = new UITemplate(fileName, thisElem);
 		list.add(template);
-		return template;
 	}
 	
 	/**

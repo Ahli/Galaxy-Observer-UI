@@ -372,22 +372,22 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	
 	/**
 	 * Removes the "(listfile)" file from the cache.
-	 *
-	 * @return whether the cache's list file was deleted
 	 */
-	private boolean clearCacheListFile() {
+	private void clearCacheListFile() {
 		final File f = new File(mpqCachePath + File.separator + "(listfile)");
-		return !f.exists() || f.isDirectory() || f.delete();
+		if (f.exists() && !f.isDirectory()) {
+			f.delete();
+		}
 	}
 	
 	/**
 	 * Removes the "(attributes)" file from the cache.
-	 *
-	 * @return whether the cache's attribute file was deleted
 	 */
-	private boolean clearCacheAttributesFile() {
+	private void clearCacheAttributesFile() {
 		final File f = new File(mpqCachePath + File.separator + "(attributes)");
-		return !f.exists() || f.isDirectory() || f.delete();
+		if (f.exists() && !f.isDirectory()) {
+			f.delete();
+		}
 	}
 	
 	/**

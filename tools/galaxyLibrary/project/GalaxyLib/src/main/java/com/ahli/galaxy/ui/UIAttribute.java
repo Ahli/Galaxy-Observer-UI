@@ -68,7 +68,7 @@ public class UIAttribute extends UIElement {
 	 * @param key
 	 * @param value
 	 */
-	public String addValue(final String key, final String value) {
+	public void addValue(final String key, final String value) {
 		int i = 0;
 		final int len = keyValueList.size();
 		for (; i < len; i += 2) {
@@ -80,9 +80,8 @@ public class UIAttribute extends UIElement {
 			// not found
 			keyValueList.add(StringInterner.intern(key));
 			keyValueList.add(StringInterner.intern(value));
-			return null;
 		} else {
-			return keyValueList.set(i, StringInterner.intern(value));
+			keyValueList.set(i, StringInterner.intern(value));
 		}
 	}
 	

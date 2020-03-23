@@ -147,9 +147,8 @@ public class SettingsGamesPathsController extends SettingsAutoSaveController {
 	 * 		name of the Switcher.exe file found in the "Support" folder
 	 * @param invalidLabel
 	 * 		label set visible if invalid, can be null
-	 * @return whether the path belongs to that game directory or not
 	 */
-	private static boolean validatePath(final String path, final String switcher, final Label invalidLabel) {
+	private static void validatePath(final String path, final String switcher, final Label invalidLabel) {
 		boolean valid = false;
 		if (path != null) {
 			valid = switcherExists(path, switcher, false) ||
@@ -158,7 +157,6 @@ public class SettingsGamesPathsController extends SettingsAutoSaveController {
 		if (invalidLabel != null) {
 			invalidLabel.setVisible(!valid);
 		}
-		return valid;
 	}
 	
 	/**
