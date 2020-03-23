@@ -126,7 +126,7 @@ public final class StylizedTextAreaAppender extends AbstractAppender {
 						Thread.currentThread().interrupt();
 					}
 					// ensure that the correct one is removed
-					if(ctrlToRemove == workerTaskControllers.get(threadName)){
+					if (ctrlToRemove == workerTaskControllers.get(threadName)) {
 						workerTaskControllers.remove(threadName);
 					}
 				});

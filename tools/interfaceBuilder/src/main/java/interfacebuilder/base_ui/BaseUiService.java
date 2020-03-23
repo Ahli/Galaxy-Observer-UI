@@ -170,7 +170,6 @@ public class BaseUiService {
 		logger.info("Extracting baseUI for {}", game);
 		prepareCascExplorerConfig(game, usePtr);
 		
-		final var executor = InterfaceBuilderApp.getInstance().getExecutor();
 		final GameDef gameDef = gameService.getNewGameDef(game);
 		final File destination = new File(configService.getBaseUiPath(gameDef));
 		
