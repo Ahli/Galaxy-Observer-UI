@@ -16,6 +16,6 @@ public class SC2GameDef extends GameDef {
 	public SC2GameDef() {
 		super("StarCraft II", "sc2", "SC2Mod", new String[] { "core.sc2mod" }, "Terr", "ClassicTerran", "StarCraft II",
 				"SC2Layout", "base.sc2data", "StarCraft II.exe", "SC2Switcher.exe", "SC2Switcher_x64.exe", "Support",
-				"Support64", "Interfaces", "mods", "StarCraft II Public Test.exe");
+				"Support64", "Interfaces", "mods", null);
 	}
 }

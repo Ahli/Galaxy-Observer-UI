@@ -16,9 +16,9 @@ public class HeroesGameDef extends GameDef {
 	public HeroesGameDef() {
 		super("Heroes of the Storm", "heroes", "stormmod",
 				new String[] { "core.stormmod", "heroesdata.stormmod", "heromods" }, "Terr", "ClassicTerran",
-				"Heroes of the Storm", "stormlayout", "Heroes of the Storm", "base.stormdata",
-				"Heroes of the Storm.exe", "HeroesSwitcher.exe", "HeroesSwitcher_x64.exe", "Support", "Support64",
-				"mods", "Heroes of the Storm Public Test.exe");
+				"Heroes of the Storm", "stormlayout", "base.stormdata",
+				"Heroes of the Storm.exe", null, "HeroesSwitcher_x64.exe", null, "Support64",
+				"Heroes of the Storm", "mods", "Heroes of the Storm Public Test.exe");
 	}
 	
 }
