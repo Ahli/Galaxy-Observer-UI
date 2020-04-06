@@ -70,6 +70,35 @@
     </Frame>
   </Frame>
   <Frame type="HeroTalentTierButton" name="InGameHeroTalentTierButtonTemplate" template="StandardTemplates/HeroTalentTierButtonTemplate">
+    <Frame type="Image" name="PrepickIndicator" template="TalentPicker/InGamePrepickIndicatorTierTemplate">
+      <Anchor side="Top" relative="$parent" pos="Min" offset="-1" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="10" />
+      <Visible val="false" />
+      <StateGroup name="TalentPrepickState">
+        <State name="Show">
+          <When type="Property" frame="$parent" TierHasPrepick="true" />
+          <When type="Property" frame="$parent/TalentIcon/IconImage" visible="false" />
+          <Action type="SetProperty" frame="$this" Visible="true" />
+        </State>
+      </StateGroup>
+      <StateGroup name="TalentTierState">
+        <DefaultState val="Normal" />
+        <State name="Disabled">
+          <When type="Property" frame="$parent" Visible="false" />
+        </State>
+        <State name="CurrentTier">
+          <When type="Property" frame="$parent" Toggled="true" />
+          <Action type="SetState" group="State" state="Current" />
+        </State>
+        <State name="HoveredTier">
+          <When type="Property" frame="$parent" Hovering="true" />
+          <Action type="SetState" group="State" state="Hovered" />
+        </State>
+        <State name="Normal">
+          <Action type="SetState" group="State" state="Normal" />
+        </State>
+      </StateGroup>
+    </Frame>
     <Frame type="UnitStatusTalentIcon" name="TalentIcon">
       <Frame type="Image" name="QuestingIcon">
         <Anchor side="Bottom" relative="$parent/$parent" pos="Max" offset="-1" />
@@ -155,21 +184,31 @@
       <TextureType val="Normal" layer="3" />
       <DesaturateOnDisable val="false" />
     </Frame>
-    <Frame type="Image" name="HoverAnimationImage">
+    <Frame type="Frame" name="TalentSelectHoverEffect">
       <Anchor relative="$parent/NormalImage" />
-      <Texture val="@UI/Storm_UI_InGame_TalentPanel_TalentDown" />
-      <BlendMode val="Add" />
-      <Alpha val="0" />
-      <RenderPriority val="513" />
-      <Animation name="Hover">
-        <Event event="OnMouseEnter" action="DirectionForward,Play" frame="$parent" />
-        <Event event="OnMouseExit" action="DirectionReverse,Play" frame="$parent" />
-        <Event event="OnDisabled" action="Stop" frame="$parent" />
-        <Controller type="Fade" end="Pause">
-          <Key type="Curve" time="0" value="0" inout="Linear" />
-          <Key type="Curve" time=".2" value="110" inout="Slow,Linear" />
-        </Controller>
-      </Animation>
+      <Frame type="Image" name="HoverAnimationImage">
+        <Anchor relative="$parent" />
+        <Texture val="@UI/Storm_UI_InGame_TalentPanel_TalentDown" />
+        <BlendMode val="Add" />
+        <Alpha val="110" />
+        <RenderPriority val="513" />
+        <Visible val="{$ancestor[@type=HeroTalentTreeButton]/@Hovering}" />
+      </Frame>
+      <Visible val="false" />
+    </Frame>
+    <Frame type="Frame" name="PrepickBorder" template="TalentPicker/PrepickBorderTemplate">
+      <Anchor side="Top" relative="$parent" pos="Min" offset="11" />
+      <Anchor side="Bottom" relative="$parent" pos="Max" offset="-11" />
+      <Anchor side="Left" relative="$parent" pos="Min" offset="11" />
+      <Anchor side="Right" relative="$parent" pos="Max" offset="-11" />
+      <Visible val="true" />
+      <RenderPriority val="517" />
+      <Frame type="Image" name="PrepickedBorder">
+        <RenderPriority val="517" />
+      </Frame>
+      <Frame type="Image" name="PrepickedBorder">
+        <RenderPriority val="517" />
+      </Frame>
     </Frame>
     <Frame type="Image" name="IconBackground">
       <Anchor relative="$parent/IconImage" />
@@ -228,6 +267,90 @@
       <Anchor side="Right" relative="$parent" pos="Max" offset="-7" />
       <ShowAbbreviatedHotkey val="True" />
       <RenderPriority val="550" />
+    </Frame>
+    <Frame type="TalentPrepickFrame" name="TalentPrepick">
+      <Anchor relative="$parent" />
+      <TalentLink val="{$ancestor[@type=HeroTalentTreeButton]/@TalentLink}" />
+      <TalentTier val="{$ancestor[@type=HeroTalentTreeButton]/@TalentTier}" />
+      <StateGroup name="PrepickMode">
+        <DefaultState val="FavoriteSelect" />
+        <State name="TalentLocked">
+          <When type="Property" frame="$ancestor[@type=HeroTalentTreePanel]" CanSelectTalentTier="false" />
+          <When type="Property" frame="$ancestor[@type=HeroTalentTreePanel]" IsCurrentTierTalentSelected="true" />
+          <Action type="SetProperty" frame="$parent/TalentSelectHoverEffect" Visible="false" />
+          <Action type="SetProperty" frame="$parent/PrepickBorder" Visible="false" />
+          <Action type="SetProperty" frame="$parent/PrepickIndicator" Visible="true" />
+          <Action type="SetProperty" frame="$parent/NormalImage" Texture="@UI/Storm_UI_InGame_TalentPanel_TalentDown" index="1" />
+        </State>
+        <State name="TalentSelect">
+          <When type="Property" frame="$ancestor[@type=HeroTalentTreePanel]" CanSelectTalentTier="true" />
+          <When type="Property" frame="$ancestor[@type=HeroTalentTreePanel]" IsCurrentTierTalentSelected="false" />
+          <Action type="SetProperty" frame="$parent/TalentSelectHoverEffect" Visible="true" />
+          <Action type="SetProperty" frame="$parent/PrepickIndicator" Visible="true" />
+          <Action type="SetProperty" frame="$parent/PrepickBorder" Visible="false" />
+          <Action type="SetProperty" frame="$parent/NormalImage" Texture="@UI/Storm_UI_InGame_TalentPanel_TalentDown" index="1" />
+        </State>
+        <State name="FavoriteSelect">
+          <When type="Property" frame="$ancestor[@type=HeroTalentTreePanel]" IsCurrentTierTalentSelected="false" />
+          <When type="Property" frame="$ancestor[@type=HeroTalentTreePanel]" CanSelectTalentTier="false" />
+          <Action type="SetProperty" frame="$parent/PrepickIndicator" Visible="true" />
+          <Action type="SetProperty" frame="$parent/PrepickBorder" Visible="true" />
+          <Action type="SetProperty" frame="$parent/NormalImage" Texture="@UI/Storm_UI_InGame_TalentPanel_TalentAvailable" index="1" />
+        </State>
+      </StateGroup>
+      <StateGroup name="PrepickedState">
+        <DefaultState val="None" />
+        <State name="LockedPrepicked">
+          <When type="Property" frame="$ancestor[@type=HeroTalentTreePanel]" IsCurrentTierTalentSelected="true" />
+          <When type="Property" frame="$this" IsPrepicked="true" />
+          <Action type="SetState" frame="$parent/PrepickBorder" group="State" state="Hovered" />
+          <Action type="SetState" frame="$parent/PrepickIndicator" group="State" state="Hovered" />
+        </State>
+        <State name="LockedNotPrepicked">
+          <When type="Property" frame="$ancestor[@type=HeroTalentTreePanel]" IsCurrentTierTalentSelected="true" />
+          <When type="Property" frame="$this" IsPrepicked="false" />
+          <Action type="SetState" frame="$parent/PrepickBorder" group="State" state="None" />
+          <Action type="SetState" frame="$parent/PrepickIndicator" group="State" state="None" />
+        </State>
+        <State name="Prepicked">
+          <When type="Property" frame="$this" IsPrepicked="true" />
+          <When type="Property" frame="$parent" Hovering="false" />
+          <Action type="SetState" frame="$parent/PrepickBorder" group="State" state="Prepicked" />
+          <Action type="SetState" frame="$parent/PrepickIndicator" group="State" state="Prepicked" />
+        </State>
+        <State name="PrepickedHovered">
+          <When type="Property" frame="$this" IsPrepicked="true" />
+          <When type="Property" frame="$parent" Hovering="true" />
+          <Action type="SetState" frame="$parent/PrepickBorder" group="State" state="PrepickedHovered" />
+          <Action type="SetState" frame="$parent/PrepickIndicator" group="State" state="PrepickedHovered" />
+        </State>
+        <State name="Hovered">
+          <When type="Property" frame="$ancestor[@type=HeroTalentTreePanel]" CanSelectTalentTier="false" />
+          <When type="Property" frame="$this" IsPrepicked="false" />
+          <When type="Property" frame="$parent" Hovering="true" />
+          <Action type="SetState" frame="$parent/PrepickBorder" group="State" state="Hovered" />
+          <Action type="SetState" frame="$parent/PrepickIndicator" group="State" state="Hovered" />
+        </State>
+        <State name="None">
+          <Action type="SetState" frame="$parent/PrepickBorder" group="State" state="None" />
+          <Action type="SetState" frame="$parent/PrepickIndicator" group="State" state="None" />
+        </State>
+      </StateGroup>
+    </Frame>
+    <Frame type="Frame" name="PrepickIndicator" template="TalentPicker/PrepickIconTemplate">
+      <Anchor side="Top" relative="$parent/IconFrameImage" pos="Min" offset="-10" />
+      <Anchor side="Left" relative="$parent/IconFrameImage" pos="Min" offset="-10" />
+      <Visible val="true" />
+      <RenderPriority val="550" />
+      <Frame type="Image" name="PrepickedIcon">
+        <RenderPriority val="550" />
+      </Frame>
+      <Frame type="Image" name="PrepickedHoveredIcon">
+        <RenderPriority val="550" />
+      </Frame>
+      <Frame type="Image" name="PrepickPreviewIcon">
+        <RenderPriority val="550" />
+      </Frame>
     </Frame>
     <Frame type="Image" name="RecommendedTalentImage">
       <Anchor side="Top" relative="$parent" pos="Mid" offset="0" />
@@ -298,61 +421,67 @@
         <RenderType val="HDR" />
         <Visible val="#IngameBlur" />
       </Frame>
+      <Frame type="TalentBuildSelectionFrame" name="TalentBuildSelection" template="TalentPicker/InGameTalentBuildSelectionTemplate">
+        <Anchor side="Bottom" relative="$parent/TalentTreeButton0" pos="Min" offset="#TalentTreeItemSpacing" />
+        <Anchor side="Left" relative="$parent" pos="Min" offset="38" />
+        <Anchor side="Right" relative="$parent" pos="Max" offset="-4" />
+        <Height val="40" />
+      </Frame>
       <Frame type="HeroTalentTreeButton" name="TalentTreeButton0" template="HeroTalentTreeSelectionPanel/InGameHeroTalentTreeButtonTemplate">
-        <Anchor side="Bottom" relative="$parent\TalentTreeButton1" pos="Min" offset="#TalentTreeItemSpacing" />
-        <Anchor side="Left" relative="$parent\TalentTreeButton4" pos="Min" offset="0" />
+        <Anchor side="Bottom" relative="$parent/TalentTreeButton1" pos="Min" offset="#TalentTreeItemSpacing" />
+        <Anchor side="Left" relative="$parent/TalentTreeButton4" pos="Min" offset="0" />
         <CollapseLayout val="true" />
       </Frame>
       <Frame type="HeroTalentTreeButton" name="TalentTreeButton1" template="HeroTalentTreeSelectionPanel/InGameHeroTalentTreeButtonTemplate">
-        <Anchor side="Bottom" relative="$parent\TalentTreeButton2" pos="Min" offset="#TalentTreeItemSpacing" />
-        <Anchor side="Left" relative="$parent\TalentTreeButton4" pos="Min" offset="0" />
+        <Anchor side="Bottom" relative="$parent/TalentTreeButton2" pos="Min" offset="#TalentTreeItemSpacing" />
+        <Anchor side="Left" relative="$parent/TalentTreeButton4" pos="Min" offset="0" />
         <CollapseLayout val="true" />
       </Frame>
       <Frame type="HeroTalentTreeButton" name="TalentTreeButton2" template="HeroTalentTreeSelectionPanel/InGameHeroTalentTreeButtonTemplate">
-        <Anchor side="Bottom" relative="$parent\TalentTreeButton3" pos="Min" offset="#TalentTreeItemSpacing" />
-        <Anchor side="Left" relative="$parent\TalentTreeButton4" pos="Min" offset="0" />
+        <Anchor side="Bottom" relative="$parent/TalentTreeButton3" pos="Min" offset="#TalentTreeItemSpacing" />
+        <Anchor side="Left" relative="$parent/TalentTreeButton4" pos="Min" offset="0" />
         <CollapseLayout val="true" />
       </Frame>
       <Frame type="HeroTalentTreeButton" name="TalentTreeButton3" template="HeroTalentTreeSelectionPanel/InGameHeroTalentTreeButtonTemplate">
-        <Anchor side="Bottom" relative="$parent\TalentTreeButton4" pos="Min" offset="#TalentTreeItemSpacing" />
-        <Anchor side="Left" relative="$parent\TalentTreeButton4" pos="Min" offset="0" />
+        <Anchor side="Bottom" relative="$parent/TalentTreeButton4" pos="Min" offset="#TalentTreeItemSpacing" />
+        <Anchor side="Left" relative="$parent/TalentTreeButton4" pos="Min" offset="0" />
         <CollapseLayout val="true" />
       </Frame>
       <Frame type="HeroTalentTreeButton" name="TalentTreeButton4" template="HeroTalentTreeSelectionPanel/InGameHeroTalentTreeButtonTemplate">
-        <Anchor side="Bottom" relative="$parent\$parent\BorderImage" pos="Min" offset="7" />
+        <Anchor side="Bottom" relative="$parent/$parent/BorderImage" pos="Min" offset="7" />
         <Anchor side="Left" relative="$parent" pos="Min" offset="34" />
         <CollapseLayout val="true" />
       </Frame>
       <Frame type="HeroTalentTierButton" name="TalentTierButton0" template="HeroTalentTreeSelectionPanel/InGameHeroTalentTierButtonTemplate">
-        <Anchor relative="$parent\TalentTierButton1" />
+        <Anchor relative="$parent/TalentTierButton1" />
       </Frame>
       <Frame type="HeroTalentTierButton" name="TalentTierButton1" template="HeroTalentTreeSelectionPanel/InGameHeroTalentTierButtonTemplate">
-        <Anchor side="Top" relative="$parent\$parent\BorderImage" pos="Min" offset="4" />
-        <Anchor side="Left" relative="$parent\$parent\BorderImage" pos="Min" offset="26" />
+        <Anchor side="Top" relative="$parent/$parent/BorderImage" pos="Min" offset="4" />
+        <Anchor side="Left" relative="$parent/$parent/BorderImage" pos="Min" offset="26" />
       </Frame>
       <Frame type="HeroTalentTierButton" name="TalentTierButton2" template="HeroTalentTreeSelectionPanel/InGameHeroTalentTierButtonTemplate">
-        <Anchor side="Top" relative="$parent\TalentTierButton1" pos="Min" offset="0" />
-        <Anchor side="Left" relative="$parent\TalentTierButton1" pos="Max" offset="#TalentTierButtonSpacing" />
+        <Anchor side="Top" relative="$parent/TalentTierButton1" pos="Min" offset="0" />
+        <Anchor side="Left" relative="$parent/TalentTierButton1" pos="Max" offset="#TalentTierButtonSpacing" />
       </Frame>
       <Frame type="HeroTalentTierButton" name="TalentTierButton3" template="HeroTalentTreeSelectionPanel/InGameHeroTalentTierButtonTemplate">
-        <Anchor side="Top" relative="$parent\TalentTierButton2" pos="Min" offset="0" />
-        <Anchor side="Left" relative="$parent\TalentTierButton2" pos="Max" offset="#TalentTierButtonSpacing" />
+        <Anchor side="Top" relative="$parent/TalentTierButton2" pos="Min" offset="0" />
+        <Anchor side="Left" relative="$parent/TalentTierButton2" pos="Max" offset="#TalentTierButtonSpacing" />
       </Frame>
       <Frame type="HeroTalentTierButton" name="TalentTierButton4" template="HeroTalentTreeSelectionPanel/InGameHeroTalentTierButtonTemplate">
-        <Anchor side="Top" relative="$parent\TalentTierButton3" pos="Min" offset="0" />
-        <Anchor side="Left" relative="$parent\TalentTierButton3" pos="Max" offset="#TalentTierButtonSpacing" />
+        <Anchor side="Top" relative="$parent/TalentTierButton3" pos="Min" offset="0" />
+        <Anchor side="Left" relative="$parent/TalentTierButton3" pos="Max" offset="#TalentTierButtonSpacing" />
       </Frame>
       <Frame type="HeroTalentTierButton" name="TalentTierButton5" template="HeroTalentTreeSelectionPanel/InGameHeroTalentTierButtonTemplate">
-        <Anchor side="Top" relative="$parent\TalentTierButton4" pos="Min" offset="0" />
-        <Anchor side="Left" relative="$parent\TalentTierButton4" pos="Max" offset="#TalentTierButtonSpacing" />
+        <Anchor side="Top" relative="$parent/TalentTierButton4" pos="Min" offset="0" />
+        <Anchor side="Left" relative="$parent/TalentTierButton4" pos="Max" offset="#TalentTierButtonSpacing" />
       </Frame>
       <Frame type="HeroTalentTierButton" name="TalentTierButton6" template="HeroTalentTreeSelectionPanel/InGameHeroTalentTierButtonTemplate">
-        <Anchor side="Top" relative="$parent\TalentTierButton5" pos="Min" offset="0" />
-        <Anchor side="Left" relative="$parent\TalentTierButton5" pos="Max" offset="#TalentTierButtonSpacing" />
+        <Anchor side="Top" relative="$parent/TalentTierButton5" pos="Min" offset="0" />
+        <Anchor side="Left" relative="$parent/TalentTierButton5" pos="Max" offset="#TalentTierButtonSpacing" />
       </Frame>
       <Frame type="HeroTalentTierButton" name="TalentTierButton7" template="HeroTalentTreeSelectionPanel/InGameHeroTalentTierButtonTemplate">
-        <Anchor side="Top" relative="$parent\TalentTierButton6" pos="Min" offset="0" />
-        <Anchor side="Left" relative="$parent\TalentTierButton6" pos="Max" offset="#TalentTierButtonSpacing" />
+        <Anchor side="Top" relative="$parent/TalentTierButton6" pos="Min" offset="0" />
+        <Anchor side="Left" relative="$parent/TalentTierButton6" pos="Max" offset="#TalentTierButtonSpacing" />
       </Frame>
       <Frame type="Frame" name="TutorialTalentHighlight">
         <Anchor side="Top" relative="$parent/TalentTreeButton0" pos="Min" offset="-46" />
