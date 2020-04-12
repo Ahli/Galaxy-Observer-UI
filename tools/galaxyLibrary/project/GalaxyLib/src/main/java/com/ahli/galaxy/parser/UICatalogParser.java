@@ -348,7 +348,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				String type = ((i = attrTypes.indexOf(TYPE)) != -1) ?
 						catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout, consoleSkinId) : null;
 				if (type == null) {
-					logger.error("Unknown type defined in child element of: {}", curElement);
+					logger.error("Unknown or no type defined in child element of: {}", curElement);
 					type = FRAME;
 				}
 				final var newElemUiFrame = (UIFrame) newElem;

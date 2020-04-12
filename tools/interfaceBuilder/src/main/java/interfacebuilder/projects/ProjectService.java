@@ -16,6 +16,7 @@ import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Hibernate;
+import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -152,7 +153,11 @@ public class ProjectService {
 		if (!Hibernate.isInitialized(project.getBestCompressionRuleSet())) {
 			// grab from DB wire compression rules to old instance
 			final Project project2 = projectRepo.getOne(project.getId());
-			Hibernate.initialize(project2.getBestCompressionRuleSet());
+			try {
+				Hibernate.initialize(project2.getBestCompressionRuleSet());
+			} catch (final HibernateException e) {
+				logger.error("Error while fetching compression rule set from DB.", e);
+			}
 			project.setBestCompressionRuleSet(project2.getBestCompressionRuleSet());
 		}
 		return project.getBestCompressionRuleSet();

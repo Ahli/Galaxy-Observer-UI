@@ -6,6 +6,7 @@ module interfacex.builder {
 	// javafx
 	requires java.desktop;
 	requires java.persistence;
+	//requires jakarta.persistence;
 	requires java.xml;
 	requires javafx.base;
 	requires javafx.controls;
@@ -26,7 +27,7 @@ module interfacex.builder {
 	
 	// spring
 	requires jakarta.activation;
-	requires java.xml.bind; // provices javax/xml/jaxbexception
+	requires java.xml.bind; // provides javax/xml/jaxbexception
 	requires org.hibernate.orm.core;
 	requires spring.beans;
 	requires spring.boot.autoconfigure;
@@ -90,4 +91,5 @@ module interfacex.builder {
 	//	requires spring.boot.actuator;
 	//	requires spring.boot.actuator.autoconfigure;
 	//	requires spring.boot.starter.actuator;
+	
 }

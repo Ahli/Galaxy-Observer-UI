@@ -3,6 +3,9 @@
 
 package interfacebuilder.compress;
 
+//import jakarta.persistence.AttributeConverter;
+//import jakarta.persistence.Converter;
+
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 import java.util.ArrayList;

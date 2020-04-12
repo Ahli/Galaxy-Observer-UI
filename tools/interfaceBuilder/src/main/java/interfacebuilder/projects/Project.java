@@ -19,30 +19,42 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
 
+//import jakarta.persistence.CascadeType;
+//import jakarta.persistence.Column;
+//import jakarta.persistence.Entity;
+//import jakarta.persistence.EnumType;
+//import jakarta.persistence.Enumerated;
+//import jakarta.persistence.FetchType;
+//import jakarta.persistence.GeneratedValue;
+//import jakarta.persistence.GenerationType;
+//import jakarta.persistence.Id;
+//import jakarta.persistence.OneToOne;
+//import jakarta.persistence.Table;
+
 @Entity
-@Table (name = "project")
+@Table(name = "project")
 public class Project {
 	@Id
-	@GeneratedValue (strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;
 	
-	@Column (/*unique = false,*/ nullable = false, length = 30)
+	@Column(/*unique = false,*/ nullable = false, length = 30)
 	private String name;
 	
-	@Column (unique = true, nullable = false/*, length = 255*/)
+	@Column(unique = true, nullable = false/*, length = 255*/)
 	private String projectPath;
 	
-	@Enumerated (EnumType.STRING)
-	@Column (nullable = false, length = 8)
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false, length = 8)
 	private Game game;
 	
-	@Column (name = "lastBuildDate")
+	@Column(name = "lastBuildDate")
 	private LocalDateTime lastBuildDateTime;
 	
 	@Column
 	private Long lastBuildSize;
 	
-	@OneToOne (cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
 	private RuleSet bestCompressionRuleSet;
 	
 	public Project() {

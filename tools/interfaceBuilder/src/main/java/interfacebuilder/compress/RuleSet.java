@@ -18,17 +18,25 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+//import jakarta.persistence.ElementCollection;
+//import jakarta.persistence.Entity;
+//import jakarta.persistence.FetchType;
+//import jakarta.persistence.GeneratedValue;
+//import jakarta.persistence.GenerationType;
+//import jakarta.persistence.Id;
+//import jakarta.persistence.Transient;
+
 @Entity
 public class RuleSet {
 	
 	@Id
-	@GeneratedValue (strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	
 	@Transient
 	private MpqEditorCompressionRule[] compressionRules;
 	
-	@ElementCollection (fetch = FetchType.EAGER)
+	@ElementCollection(fetch = FetchType.EAGER)
 	private List<String> compressionRulesString;
 	
 	public RuleSet() {
