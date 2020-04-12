@@ -1,0 +1,752 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+	<!-- created by Ahli (twitter: @AhliSC2) -->
+	
+	<!-- Templates to not repeat yourself -->
+	<!-- Self-hiding Vespene Label if Value is 0 -->
+	<Frame type="ResourceFrame" name="ResourceFrameTemplate">
+		<!-- hide Vespene resource amount, if 0 -->
+		<Frame type="CountdownLabel" name="ResourceLabel1">
+			<StateGroup name="Visibility">
+				<DefaultState val="Dflt"/>
+				<State name="Hidden">
+					<When type="Property" CurrentValue="0"/>
+					<!-- Setting Visibility does not work here -->
+					<!-- => Hide icon, background and label via making the width 0 -->
+					<Action type="SetAnchor" side="Left" relative="$parent/ResourceIcon2" pos="Min" offset="0" undo="true"/>
+					<Action type="SetAnchor" side="Right" relative="$parent/ResourceIcon2" pos="Min" offset="0" undo="true"/>
+					<Action type="SetAnchor" frame="$parent/ResourceIconBackground1" side="Left" relative="$parent/ResourceLabel1" pos="Min" offset="0" undo="true"/>
+					<Action type="SetAnchor" frame="$parent/ResourceIconBackground1" side="Right" relative="$parent/ResourceLabel1" pos="Min" offset="0" undo="true"/>
+					<Action type="SetAnchor" frame="$parent/ResourceIcon1" side="Left" relative="$parent/ResourceIconBackground1" pos="Min" offset="5" undo="true"/>
+					<Action type="SetAnchor" frame="$parent/ResourceIcon1" side="Right" relative="$parent/ResourceIconBackground1" pos="Min" offset="5" undo="true"/>
+					<!-- reduce alpha to 0 to make sure nothing is visible -->
+					<Action type="SetProperty" Alpha="0" undo="true"/>
+					<Action type="SetProperty" frame="$parent/ResourceIconBackground1" Alpha="0" undo="true"/>
+					<Action type="SetProperty" frame="$parent/ResourceIcon1" Alpha="0" undo="true"/>
+				</State>
+				<State name="Dflt"/>
+			</StateGroup>
+		</Frame>
+	</Frame>
+	
+	<!-- Info Panel's Unit Group wireframes per page, so 3x8 => 5x5 -->
+	<Frame type="Frame" name="PageFrameTemplate">
+		<Frame type="UnitButton" name="GroupUnitButton0">
+			<Anchor side="Top" relative="$parent" pos="Min" offset="8"/>
+			<Anchor side="Left" relative="$parent" pos="Min" offset="38"/>
+		</Frame>
+		<Frame type="UnitButton" name="GroupUnitButton5">
+			<Anchor side="Top" relative="$parent/GroupUnitButton0" pos="Max" offset="0"/>
+			<Anchor side="Left" relative="$parent/GroupUnitButton0" pos="Min" offset="0"/>
+		</Frame>
+		<Frame type="UnitButton" name="GroupUnitButton8">
+			<Anchor side="Top" relative="$parent/GroupUnitButton7" pos="Min" offset="0"/>
+			<Anchor side="Left" relative="$parent/GroupUnitButton7" pos="Max" offset="0"/>
+		</Frame>
+		<Frame type="UnitButton" name="GroupUnitButton10">
+			<Anchor side="Top" relative="$parent/GroupUnitButton5" pos="Max" offset="0"/>
+			<Anchor side="Left" relative="$parent/GroupUnitButton5" pos="Min" offset="0"/>
+		</Frame>
+		<Frame type="UnitButton" name="GroupUnitButton15">
+			<Anchor side="Top" relative="$parent/GroupUnitButton10" pos="Max" offset="0"/>
+			<Anchor side="Left" relative="$parent/GroupUnitButton10" pos="Min" offset="0"/>
+		</Frame>
+		<Frame type="UnitButton" name="GroupUnitButton16">
+			<Anchor side="Top" relative="$parent/GroupUnitButton15" pos="Min" offset="0"/>
+			<Anchor side="Left" relative="$parent/GroupUnitButton15" pos="Max" offset="0"/>
+		</Frame>
+		<Frame type="UnitButton" name="GroupUnitButton20">
+			<Anchor side="Top" relative="$parent/GroupUnitButton15" pos="Max" offset="0"/>
+			<Anchor side="Left" relative="$parent/GroupUnitButton15" pos="Min" offset="0"/>
+		</Frame>
+		<!-- add new button, does not work :(
+		<Frame type="UnitButton" name="GroupUnitButton24" template="InfoPaneGroup/GroupUnitButtonTemplate">
+			<Anchor side="Top" relative="$parent/GroupUnitButton23" pos="Min" offset="0"/>
+			<Anchor side="Left" relative="$parent/GroupUnitButton23" pos="Max" offset="0"/>
+		</Frame> -->
+	</Frame>
+	
+	<!-- Rotate Page Buttons of Info Panel's Unit Group wireframes -->
+	<Frame type="PageButton" name="PageButtonTemplate">
+		<Height val="58"/>
+		<Width val="58"/>
+		<HitTestFrame val="HitTestFrame"/>
+		
+		<Frame type="Image" name="NormalImage">
+			<Anchor side="Top" relative="$parent" pos="Mid" offset="-16"/>
+			<Anchor side="Bottom" relative="$parent" pos="Mid" offset="16"/>
+			<Anchor side="Left" relative="$parent" pos="Mid" offset="-29"/>
+			<Anchor side="Right" relative="$parent" pos="Mid" offset="29"/>
+			<Rotation val="270"/>
+			<Unclipped val="true"/>
+		</Frame>
+		
+		<Frame type="Image" name="HoverImage">
+			<Anchor side="Top" relative="$parent" pos="Mid" offset="-16"/>
+			<Anchor side="Bottom" relative="$parent" pos="Mid" offset="16"/>
+			<Anchor side="Left" relative="$parent" pos="Mid" offset="-29"/>
+			<Anchor side="Right" relative="$parent" pos="Mid" offset="29"/>
+			<Rotation val="270"/>
+			<Unclipped val="true"/>
+		</Frame>
+		
+		<Frame type="Frame" name="HitTestFrame">
+			<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+			<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+			<Anchor side="Left" relative="$parent" pos="Mid" offset="-16"/>
+			<Anchor side="Right" relative="$parent" pos="Mid" offset="16"/>
+			<DescFlags val="Internal"/>
+		</Frame>
+		
+		<Frame type="Label" name="PageLabel">
+			<Anchor side="Top" relative="$parent" pos="Min" offset="5"/>
+			<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+			<Anchor side="Right" relative="$parent" pos="Max" offset="-19"/>
+		</Frame>
+	</Frame>
+	
+	<!-- UI Tree modification -->
+	<Frame type="GameUI" name="GameUI" file="GameUI">
+		<ConsoleWorldBottomOffset val="0"/>
+		
+		<Frame type="Frame" name="UIContainer">
+			
+			<Frame type="Frame" name="FullscreenUpperContainer">
+				
+				<Frame type="ResourcePanel" name="ResourcePanel">
+					<Frame type="ResourceFrame" name="ResourceFrame" template="_bottomPanel/ResourceFrameTemplate">
+					</Frame>
+					<Frame type="ResourceFrame" name="ResourceFrameSecond" template="_bottomPanel/ResourceFrameTemplate">
+					</Frame>
+				</Frame>
+				
+				<!-- Move Hero Panel to bottom left -->
+				<Frame type="HeroPanel" name="HeroPanel">
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="-8"/>
+					<Anchor side="Left" relative="$parent" pos="Min" offset="8"/>
+					<Anchor side="Right" relative="$parent" pos="Min" offset="688"/>
+					<Anchor side="Top" relative="$this" pos="Min" offset="0"/>
+					<Width val="0"/>
+					<Height val="0"/>
+					<Handle val="HeroPanel"/>
+					
+					<!-- reverse order => left to right -->
+					<Frame type="HeroFrame" name="HeroFrame00">
+						<Anchor side="Right" relative="$this" pos="Max" offset="0"/>
+						<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+						<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+						<Visible val="false"/>
+					</Frame>
+					<Frame type="HeroFrame" name="HeroFrame01">
+						<Anchor side="Right" relative="$this" pos="Max" offset="0"/>
+						<Anchor side="Left" relative="$parent/HeroFrame00" pos="Max" offset="5"/>
+						<Anchor side="Bottom" relative="$parent/HeroFrame00" pos="Max" offset="0"/>
+					</Frame>
+					<Frame type="HeroFrame" name="HeroFrame02">
+						<Anchor side="Right" relative="$this" pos="Max" offset="0"/>
+						<Anchor side="Left" relative="$parent/HeroFrame01" pos="Max" offset="5"/>
+						<Anchor side="Bottom" relative="$parent/HeroFrame01" pos="Max" offset="0"/>
+					</Frame>
+					<Frame type="HeroFrame" name="HeroFrame03">
+						<Anchor side="Right" relative="$this" pos="Max" offset="0"/>
+						<Anchor side="Left" relative="$parent/HeroFrame02" pos="Max" offset="5"/>
+						<Anchor side="Bottom" relative="$parent/HeroFrame02" pos="Max" offset="0"/>
+					</Frame>
+					<Frame type="HeroFrame" name="HeroFrame04">
+						<Anchor side="Right" relative="$this" pos="Max" offset="0"/>
+						<Anchor side="Left" relative="$parent/HeroFrame03" pos="Max" offset="5"/>
+						<Anchor side="Bottom" relative="$parent/HeroFrame03" pos="Max" offset="0"/>
+					</Frame>
+					<Frame type="HeroFrame" name="HeroFrame05">
+						<Anchor side="Right" relative="$this" pos="Max" offset="0"/>
+						<Anchor side="Left" relative="$parent/HeroFrame04" pos="Max" offset="5"/>
+						<Anchor side="Bottom" relative="$parent/HeroFrame04" pos="Max" offset="0"/>
+					</Frame>
+					<Frame type="HeroFrame" name="HeroFrame06">
+						<Anchor side="Right" relative="$this" pos="Max" offset="0"/>
+						<Anchor side="Left" relative="$parent/HeroFrame05" pos="Max" offset="5"/>
+						<Anchor side="Bottom" relative="$parent/HeroFrame05" pos="Max" offset="0"/>
+					</Frame>
+					<Frame type="HeroFrame" name="HeroFrame07">
+						<Anchor side="Right" relative="$this" pos="Max" offset="0"/>
+						<Anchor side="Left" relative="$parent/HeroFrame06" pos="Max" offset="5"/>
+						<Anchor side="Bottom" relative="$parent/HeroFrame06" pos="Max" offset="0"/>
+					</Frame>
+					
+					
+					<!-- Dynamic 2nd row based on aspect ration -->
+					<Frame type="AspectRatioFrame" name="AspectRatioListener_Slot7">
+						<MinVisibleAspectRatio val="0"/>
+						<MaxVisibleAspectRatio val="1.5780"/>
+					</Frame>
+					<Frame type="AspectRatioFrame" name="AspectRatioListener_Slot6">
+						<MinVisibleAspectRatio val="0"/>
+						<MaxVisibleAspectRatio val="1.5062"/>
+					</Frame>
+					<Frame type="AspectRatioFrame" name="AspectRatioListener_Slot5">
+						<MinVisibleAspectRatio val="0"/>
+						<MaxVisibleAspectRatio val="1.4353"/>
+					</Frame>
+					<Frame type="AspectRatioFrame" name="AspectRatioListener_Slot4">
+						<MinVisibleAspectRatio val="0"/>
+						<MaxVisibleAspectRatio val="1.3604"/>
+					</Frame>
+					
+					<StateGroup name="SlotPositionAspectRatioMover">
+						<DefaultState val="Dflt"/>
+						<State name="7">
+							<When type="Property" frame="HeroFrame07" Visible="True"/>
+							<When type="Property" frame="AspectRatioListener_Slot7" Visible="True"/>
+							<When type="Property" frame="AspectRatioListener_Slot6" Visible="false"/>
+							<When type="Property" frame="AspectRatioListener_Slot5" Visible="false"/>
+							<When type="Property" frame="AspectRatioListener_Slot4" Visible="false"/>
+							<Action type="SetAnchor" frame="HeroFrame07" side="Left" relative="$parent/HeroFrame00" pos="Min" offset="0" undo="true"/>
+							<Action type="SetAnchor" frame="HeroFrame07" side="Bottom" relative="$parent/HeroFrame00" pos="Min" offset="-5" undo="true"/>
+							<Action type="SetAnchor" frame="$this" side="Top" relative="$this" pos="Max" offset="-229" undo="true"/>
+						</State>
+						<State name="6">
+							<When type="Property" frame="HeroFrame06" Visible="True"/>
+							<When type="Property" frame="AspectRatioListener_Slot6" Visible="True"/>
+							<When type="Property" frame="AspectRatioListener_Slot5" Visible="false"/>
+							<When type="Property" frame="AspectRatioListener_Slot4" Visible="false"/>
+							<Action type="SetAnchor" frame="HeroFrame06" side="Left" relative="$parent/HeroFrame00" pos="Min" offset="0" undo="true"/>
+							<Action type="SetAnchor" frame="HeroFrame06" side="Bottom" relative="$parent/HeroFrame00" pos="Min" offset="-5" undo="true"/>
+							<Action type="SetAnchor" frame="$this" side="Top" relative="$this" pos="Max" offset="-229" undo="true"/>
+						</State>
+						<State name="5">
+							<When type="Property" frame="HeroFrame05" Visible="True"/>
+							<When type="Property" frame="AspectRatioListener_Slot5" Visible="True"/>
+							<When type="Property" frame="AspectRatioListener_Slot4" Visible="false"/>
+							<Action type="SetAnchor" frame="HeroFrame05" side="Left" relative="$parent/HeroFrame00" pos="Min" offset="0" undo="true"/>
+							<Action type="SetAnchor" frame="HeroFrame05" side="Bottom" relative="$parent/HeroFrame00" pos="Min" offset="-5" undo="true"/>
+							<Action type="SetAnchor" frame="$this" side="Top" relative="$this" pos="Max" offset="-229" undo="true"/>
+						</State>
+						<State name="4">
+							<When type="Property" frame="HeroFrame04" Visible="True"/>
+							<When type="Property" frame="AspectRatioListener_Slot4" Visible="True"/>
+							<Action type="SetAnchor" frame="HeroFrame04" side="Left" relative="$parent/HeroFrame00" pos="Min" offset="0" undo="true"/>
+							<Action type="SetAnchor" frame="HeroFrame04" side="Bottom" relative="$parent/HeroFrame00" pos="Min" offset="-5" undo="true"/>
+							<Action type="SetAnchor" frame="$this" side="Top" relative="$this" pos="Max" offset="-229" undo="true"/>
+						</State>
+						<State name="Dflt"/>
+					</StateGroup>
+					
+					<!-- adjust panel's right anchor to reflect max width depending on aspect ration -->
+					<StateGroup name="HeroPanelRightAnchorAspectRatio">
+						<DefaultState val="Dflt"/>
+						<State name="7">
+							<When type="Property" frame="AspectRatioListener_Slot7" Visible="True"/>
+							<When type="Property" frame="AspectRatioListener_Slot6" Visible="false"/>
+							<When type="Property" frame="AspectRatioListener_Slot5" Visible="false"/>
+							<When type="Property" frame="AspectRatioListener_Slot4" Visible="false"/>
+							<Action type="SetAnchor" frame="$this" side="Right" relative="$this" pos="Min" offset="595" undo="true"/>
+						</State>
+						<State name="6">
+							<When type="Property" frame="AspectRatioListener_Slot6" Visible="True"/>
+							<When type="Property" frame="AspectRatioListener_Slot5" Visible="false"/>
+							<When type="Property" frame="AspectRatioListener_Slot4" Visible="false"/>
+							<Action type="SetAnchor" frame="$this" side="Right" relative="$this" pos="Min" offset="510" undo="true"/>
+						</State>
+						<State name="5">
+							<When type="Property" frame="AspectRatioListener_Slot5" Visible="True"/>
+							<When type="Property" frame="AspectRatioListener_Slot4" Visible="false"/>
+							<Action type="SetAnchor" frame="$this" side="Right" relative="$this" pos="Min" offset="425" undo="true"/>
+						</State>
+						<State name="4">
+							<When type="Property" frame="AspectRatioListener_Slot4" Visible="True"/>
+							<Action type="SetAnchor" frame="$this" side="Right" relative="$this" pos="Min" offset="340" undo="true"/>
+						</State>
+						<State name="Dflt"/>
+					</StateGroup>
+				</Frame>
+				
+				<!-- Move Alert Panel to the bottom left -->
+				<Frame type="AlertPanel" name="AlertPanel">
+					<Anchor side="Left" relative="$parent" pos="Min" offset="5"/>
+					<Anchor side="Top" relative="$this" pos="Min" offset="0"/>
+					<Anchor side="Bottom" relative="$parent/HeroPanel" pos="Min" offset="-10"/>
+					<Width val="550"/>
+					<Height val="312"/>
+					<Inverted val="true"/>
+				</Frame>
+				<Frame type="GameMessageDisplay" name="ErrorDisplay">
+					<Anchor side="Top" relative="$this" pos="Min" offset="0"/>
+					<Anchor side="Bottom" relative="$parent/AlertPanel" pos="Min" offset="0"/>
+				</Frame>
+				
+				<!--  -->
+				<Frame type="ObjectivePanel" name="ObjectivePanel">
+					<Anchor side="Top" relative="$parent" pos="Min" offset="103"/>
+					<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+					<Width val="650"/>
+					<Height val="500"/>
+				</Frame>
+				
+				<!-- Move Observer Panel to the left side of the CommandPanel -->
+				<Frame type="Frame" name="ObserverPanelStartFrame">
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="-64"/>
+					<Anchor side="Right" relative="$parent" pos="Max" offset="-450"/>
+					<Width val="800"/>
+					<Height val="850"/>
+				</Frame>
+				<Frame type="Frame" name="ObserverPanelEndFrame">
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="-55"/>
+					<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+					<Width val="800"/>
+					<Height val="850"/>
+				</Frame>
+				<Frame type="MovingFrame" name="ObserverPanelMovingContainer">
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="-64"/>
+					<Anchor side="Right" relative="$parent" pos="Max" offset="-450"/>
+					<Width val="800"/>
+					<Height val="850"/>
+				</Frame>
+				
+				<!-- Fix other panel positions -->
+				<Frame type="ResourceRequestAlertPanel" name="ResourceRequestAlertPanel">
+					<Anchor side="Right" relative="$MinimapPanel" pos="Max" offset="-10"/>
+				</Frame>
+				<Frame type="TipAlertMovingFrame" name="TipAlertMovingFrame">
+					<Anchor side="Right" relative="$MinimapPanel" pos="Max" offset="0"/>
+				</Frame>
+				<Frame type="Frame" name="TipAlertPanelNormalAnchor">
+					<Anchor side="Right" relative="$MinimapPanel" pos="Max" offset="35"/>
+				</Frame>
+				<Frame type="WarningTimerPanel" name="WarningTimerPanel">
+					<Anchor side="Right" relative="$MinimapPanel" pos="Max" offset="-50"/>
+					<Width val="350"/>
+					<Height val="120"/>
+				</Frame>
+				<Frame type="TournamentMatchStartingFrame" name="TournamentMatchStartingFrame">
+					<Anchor side="Right" relative="$MinimapPanel" pos="Max" offset="-15"/>
+				</Frame>
+				<Frame type="TournamentPortalClosingFrame" name="TournamentPortalClosingFrame">
+					<Anchor side="Right" relative="$MinimapPanel" pos="Max" offset="-15"/>
+				</Frame>
+			</Frame>
+			
+			<Frame type="Frame" name="ConsoleUIContainer">
+				
+				<!-- Move Minimap to the top right below resources -->
+				<Frame type="MinimapPanel" name="MinimapPanel">
+					<Anchor side="Top" relative="$parent/$parent/FullscreenUpperContainer/ResourcePanel" pos="Max" offset="0"/>
+					<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+					<Anchor side="Left" relative="$this" pos="Min" offset="0"/>
+					<Anchor side="Bottom" relative="$this" pos="Max" offset="0"/>
+					<Width val="395"/>
+					<Height val="327"/>
+					<Handle val="MinimapPanel"/>
+				</Frame>
+				
+				<!-- Move InfoPanel below the Minimap -->
+				<Frame type="InfoPanel" name="InfoPanel">
+					<Anchor side="Left" relative="$this" pos="Min" offset="0"/>
+					<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+					<Anchor side="Top" relative="$parent/MinimapPanel" pos="Max" offset="40"/>
+					<Anchor side="Bottom" relative="$GameUI_CommandPanel" pos="Min" offset="0"/>
+					<Height val="0"/>
+					<Width val="395"/>
+					<Handle val="InfoPanel"/>
+					<!-- batch needs to be disabled to cut off nydus cargo slots -->
+					<Batch val="false"/>
+					
+					<!-- Move Wireframe, behaviors, labels to the center -->
+					<Frame type="Frame" name="UnitPanel">
+						<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+						<Anchor side="Left" relative="$parent" pos="Mid" offset="-102"/>
+						<Anchor side="Right" relative="$parent" pos="Mid" offset="102"/>
+						<Anchor side="Bottom" relative="$this" pos="Max" offset="0"/>
+						<!-- Behavior Bar 32 + Wireframe 140 + 32 for symmetry -->
+						<Width val="0"/>
+						<!-- Height of Wireframe 140 + Labels -->
+						<Height val="195"/>
+						<!-- give more space to other elements, if hidden -->
+						<CollapseLayout val="true"/>
+					</Frame>
+					
+					<!-- Put other Info below the Wireframe -->
+					<Frame type="InfoPaneUnit" name="InfoPaneUnit">
+						<Anchor side="Top" relative="$parent/UnitPanel" pos="Max" offset="0"/>
+						
+						<Frame type="Label" name="NameLabel">
+							<Anchor side="Left" relative="$parent" pos="Mid" offset="-160"/>
+							<Anchor side="Right" relative="$parent" pos="Mid" offset="160"/>
+						</Frame>
+						<Frame type="Label" name="SubtitleLabel">
+							<Anchor side="Left" relative="$parent" pos="Mid" offset="-160"/>
+							<Anchor side="Right" relative="$parent" pos="Mid" offset="160"/>
+							<Options val="ScaleToPreventTruncation|TooltipIfTruncated"/>
+						</Frame>
+						<Frame type="Label" name="InfoLabel">
+							<Anchor side="Left" relative="$parent" pos="Mid" offset="-160"/>
+							<Anchor side="Right" relative="$parent" pos="Mid" offset="160"/>
+							<Options val="ScaleToPreventTruncation|TooltipIfTruncated"/>
+						</Frame>
+						<Frame type="Label" name="TypeLabel">
+							<Anchor side="Left" relative="$parent" pos="Mid" offset="-160"/>
+							<Anchor side="Right" relative="$parent" pos="Mid" offset="160"/>
+						</Frame>
+					</Frame>
+					<Frame type="InfoPaneHero" name="InfoPaneHero">
+						<Anchor side="Top" relative="$parent/UnitPanel" pos="Max" offset="0"/>
+						
+						<Frame type="Label" name="NameLabel">
+							<Anchor side="Left" relative="$parent" pos="Mid" offset="-160"/>
+							<Anchor side="Right" relative="$parent" pos="Mid" offset="160"/>
+						</Frame>
+						<Frame type="Label" name="ExperienceLabel">
+							<Anchor side="Left" relative="$parent" pos="Mid" offset="-160"/>
+							<Anchor side="Right" relative="$parent" pos="Mid" offset="160"/>
+							<Options val="NoWrapping|ScaleToPreventTruncation|TooltipIfTruncated"/>
+						</Frame>
+						<Frame type="Label" name="TypeLabel">
+							<Anchor side="Left" relative="$parent" pos="Mid" offset="-160"/>
+							<Anchor side="Right" relative="$parent" pos="Mid" offset="160"/>
+							<Options val="NoWrapping|ScaleToPreventTruncation|TooltipIfTruncated"/>
+						</Frame>
+					</Frame>
+					<Frame type="InfoPaneQueue" name="InfoPaneQueue">
+						<Anchor side="Top" relative="$parent/UnitPanel" pos="Max" offset="0"/>
+						
+						<Frame type="Label" name="NameLabel">
+							<Anchor side="Left" relative="$parent" pos="Mid" offset="-160"/>
+							<Anchor side="Right" relative="$parent" pos="Mid" offset="160"/>
+						</Frame>
+						
+						<!-- Altering the frames with the usual code does not work.
+							 Altering the templates does not work.
+							=> Stategroup modification are working :)
+						-->
+						<StateGroup name="ReactorUi">
+							<DefaultState val="Dflt"/>
+							<State name="Active">
+								<When type="Property" frame="$this/QueuePanel/ActiveQueuePanel01" Visible="true"/>
+								<Action type="SetAnchor" frame="$this/QueuePanel/ActiveQueuePanel00" side="Left" relative="$parent" pos="Min" offset="42" undo="true"/>
+								<Action type="SetAnchor" frame="$this/QueuePanel/ActiveQueuePanel00" side="Right" relative="$parent" pos="Min" offset="198" undo="true"/>
+								<Action type="SetAnchor" frame="$this/QueuePanel/ActiveQueuePanel00/ProgressBar" side="Left" relative="$parent/QueueButton" pos="Max" offset="0" undo="true"/>
+								<Action type="SetAnchor" frame="$this/QueuePanel/ActiveQueuePanel00/ProgressBar" side="Right" relative="$parent/QueueButton" pos="Max" offset="94" undo="true"/>
+								<Action type="SetAnchor" frame="$this/QueuePanel/ActiveQueuePanel01/ProgressBar" side="Left" relative="$parent/QueueButton" pos="Max" offset="0" undo="true"/>
+								<Action type="SetAnchor" frame="$this/QueuePanel/ActiveQueuePanel01/ProgressBar" side="Right" relative="$parent/QueueButton" pos="Max" offset="94" undo="true"/>
+								<Action type="SetAnchor" frame="$this/QueuePanel/QueueButton00" side="Left" relative="$parent/ActiveQueuePanel00/QueueButton" pos="Min" offset="8" undo="true"/>
+								<Action type="SetAnchor" frame="$this/QueuePanel/QueueButton00" side="Right" relative="$parent/ActiveQueuePanel00/QueueButton" pos="Min" offset="58" undo="true"/>
+								<Action type="SetAnchor" frame="$this/QueuePanel/QueueButton01" side="Left" relative="$parent/ActiveQueuePanel00/QueueButton" pos="Min" offset="58" undo="true"/>
+								<Action type="SetAnchor" frame="$this/QueuePanel/QueueButton01" side="Right" relative="$parent/ActiveQueuePanel00/QueueButton" pos="Min" offset="108" undo="true"/>
+								<Action type="SetAnchor" frame="$this/QueuePanel/QueueButton02" side="Left" relative="$parent/ActiveQueuePanel00/QueueButton" pos="Min" offset="108" undo="true"/>
+								<Action type="SetAnchor" frame="$this/QueuePanel/QueueButton02" side="Right" relative="$parent/ActiveQueuePanel00/QueueButton" pos="Min" offset="158" undo="true"/>
+								<Action type="SetAnchor" frame="$this/QueuePanel/QueueButton03" side="Left" relative="$parent/ActiveQueuePanel00/QueueButton" pos="Min" offset="158" undo="true"/>
+								<Action type="SetAnchor" frame="$this/QueuePanel/QueueButton03" side="Right" relative="$parent/ActiveQueuePanel00/QueueButton" pos="Min" offset="208" undo="true"/>
+								<Action type="SetAnchor" frame="$this/QueuePanel/QueueButton04" side="Left" relative="$parent/ActiveQueuePanel00/QueueButton" pos="Min" offset="208" undo="true"/>
+								<Action type="SetAnchor" frame="$this/QueuePanel/QueueButton04" side="Right" relative="$parent/ActiveQueuePanel00/QueueButton" pos="Min" offset="258" undo="true"/>
+								<Action type="SetAnchor" frame="$this/QueuePanel/QueueButton05" side="Left" relative="$parent/ActiveQueuePanel00/QueueButton" pos="Min" offset="258" undo="true"/>
+								<Action type="SetAnchor" frame="$this/QueuePanel/QueueButton05" side="Right" relative="$parent/ActiveQueuePanel00/QueueButton" pos="Min" offset="308" undo="true"/>
+								<Action type="SetAnchor" frame="$this/QueuePanel/QueueButton00" side="Bottom" relative="$parent/ActiveQueuePanel00" pos="Max" offset="52" undo="true"/>
+								<Action type="SetAnchor" frame="$this/QueuePanel/QueueButton01" side="Bottom" relative="$parent/ActiveQueuePanel00" pos="Max" offset="52" undo="true"/>
+								<Action type="SetAnchor" frame="$this/QueuePanel/QueueButton02" side="Bottom" relative="$parent/ActiveQueuePanel00" pos="Max" offset="52" undo="true"/>
+								<Action type="SetAnchor" frame="$this/QueuePanel/QueueButton03" side="Bottom" relative="$parent/ActiveQueuePanel00" pos="Max" offset="52" undo="true"/>
+								<Action type="SetAnchor" frame="$this/QueuePanel/QueueButton04" side="Bottom" relative="$parent/ActiveQueuePanel00" pos="Max" offset="52" undo="true"/>
+								<Action type="SetAnchor" frame="$this/QueuePanel/QueueButton05" side="Bottom" relative="$parent/ActiveQueuePanel00" pos="Max" offset="52" undo="true"/>
+							</State>
+							<State name="Dflt"/>
+						</StateGroup>
+						
+					</Frame>
+					<Frame type="InfoPaneProgress" name="InfoPaneProgress">
+						<Anchor side="Top" relative="$parent/UnitPanel" pos="Max" offset="0"/>
+						
+						<Frame type="Label" name="NameLabel">
+							<Anchor side="Left" relative="$parent" pos="Mid" offset="-160"/>
+							<Anchor side="Right" relative="$parent" pos="Mid" offset="160"/>
+						</Frame>
+					</Frame>
+					<Frame type="InfoPaneCargo" name="InfoPaneCargo">
+						<Anchor side="Top" relative="$parent/UnitPanel" pos="Max" offset="0"/>
+						<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+						<!-- reduce width by the same value as right anchor offset times 2: 402-(2x70)=262 -->
+						<!--<Width val="262"/>-->
+						
+						<!-- Hide original NameLabel, add a new one that is not modified by the Animation -->
+						<Frame type="Label" name="NameLabel">
+							<Alpha val="0"/>
+						</Frame>
+						<Frame type="Label" name="NameLabel2">
+							<Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
+							<Anchor side="Left" relative="$parent/$parent" pos="Mid" offset="-160"/>
+							<Anchor side="Right" relative="$parent/$parent" pos="Mid" offset="160"/>
+							<Style val="@@@InfoPaneUnitName"/>
+							<Options val="NoWrapping|ScaleToPreventTruncation"/>
+							<Text val="{$parent/NameLabel/@Text}"/>
+							<Unclipped val="true"/>
+						</Frame>
+						
+						<Frame type="PageButton" name="PageButton0" template="_bottomPanel/PageButtonTemplate">
+							<Anchor side="Top" relative="$parent" pos="Min" offset="330"/>
+							<Anchor side="Right" relative="$this" pos="Max" offset="0"/>
+							<Anchor side="Left" relative="$parent/$parent" pos="Min" offset="54"/>
+						</Frame>
+						<Frame type="PageButton" name="PageButton1" template="_bottomPanel/PageButtonTemplate">
+							<Anchor side="Top" relative="$parent/PageButton0" pos="Min" offset="0"/>
+							<Anchor side="Left" relative="$parent/PageButton0" pos="Max" offset="-26"/>
+						</Frame>
+						<Frame type="PageButton" name="PageButton2" template="_bottomPanel/PageButtonTemplate">
+							<Anchor side="Top" relative="$parent/PageButton1" pos="Min" offset="0"/>
+							<Anchor side="Left" relative="$parent/PageButton1" pos="Max" offset="-26"/>
+						</Frame>
+						<Frame type="PageButton" name="PageButton3" template="_bottomPanel/PageButtonTemplate">
+							<Anchor side="Top" relative="$parent/PageButton2" pos="Min" offset="0"/>
+							<Anchor side="Left" relative="$parent/PageButton2" pos="Max" offset="-26"/>
+						</Frame>
+						
+						<!-- 2nd InfoPanel for 2nd half of Nydus Cargo -->
+						<Frame type="Frame" name="CustomInfoPanelHoleCutter">
+							<Anchor side="Top" relative="$parent" pos="Min" offset="192"/>
+							<Anchor side="Left" relative="$parent" pos="Min" offset="324"/>
+							<Height val="134"/>
+							<Width val="262"/>
+							
+							<Frame type="Frame" name="CustomInfoPanel" template="InfoPanel/InfoPanelTemplate">
+								<Anchor side="Top" relative="$parent/$parent" pos="Min" offset="140"/>
+								<Anchor side="Left" relative="$parent/$parent" pos="Min" offset="0"/>
+								<Anchor side="Bottom" relative="$parent/$parent" pos="Max" offset="0"/>
+								<Anchor side="Right" relative="$parent/$parent" pos="Max" offset="4"/>
+								
+								<Frame type="Frame" name="UnitPanel">
+									<Visible val="false"/>
+								</Frame>
+								<Frame type="Frame" name="InfoPaneCoopAI">
+									<Visible val="false"/>
+								</Frame>
+								<Frame type="Frame" name="InfoPaneHero">
+									<Visible val="false"/>
+								</Frame>
+								<Frame type="Frame" name="InfoPaneQueue">
+									<Visible val="false"/>
+								</Frame>
+								<Frame type="Frame" name="InfoPaneProgress">
+									<Visible val="false"/>
+								</Frame>
+								<Frame type="Frame" name="InfoPaneUnit">
+									<Visible val="false"/>
+								</Frame>
+								<Frame type="Frame" name="InfoPaneGroup">
+									<Visible val="false"/>
+								</Frame>
+							</Frame>
+						</Frame>
+						
+						<StateGroup name="NydusUI">
+							<DefaultState val="Dflt"/>
+							<State name="Active">
+								<!-- When Nydus Cargo is visible, move Container to good left anchor -->
+								<When type="AnimationState" InfoPaneCargoState="HighCapacity"/>
+								<Action type="SetAnchor" frame="$this/CargoContainer" side="Left" relative="$parent/$parent" pos="0.825" offset="0" undo="true"/>
+								<Action type="SetAnchor" frame="$this/CargoContainer" side="Right" relative="$parent/$parent" pos="0.825" offset="0" undo="true"/>
+								<Action type="SetProperty" frame="$this/CustomInfoPanelHoleCutter" Visible="true" undo="true"/>
+								<Action type="SetAnchor" frame="$this/NameLabel2" side="Top" relative="$parent" pos="Min" offset="15" undo="true"/>
+								<Action type="SetAnchor" frame="$this" side="Right" relative="$parent" pos="Max" offset="-70" undo="true"/>
+							</State>
+							<State name="Dflt"/>
+						</StateGroup>
+						
+					</Frame>
+					
+					<!-- show 5x5 wireframe slots per page -->
+					<Frame type="InfoPaneGroup" name="InfoPaneGroup">
+						
+						<Frame type="Frame" name="PageFrame0" template="_bottomPanel/PageFrameTemplate">
+						</Frame>
+						<Frame type="Frame" name="PageFrame1" template="_bottomPanel/PageFrameTemplate">
+						</Frame>
+						<Frame type="Frame" name="PageFrame2" template="_bottomPanel/PageFrameTemplate">
+						</Frame>
+						<Frame type="Frame" name="PageFrame3" template="_bottomPanel/PageFrameTemplate">
+						</Frame>
+						<Frame type="Frame" name="PageFrame4" template="_bottomPanel/PageFrameTemplate">
+						</Frame>
+						<Frame type="Frame" name="PageFrame5" template="_bottomPanel/PageFrameTemplate">
+						</Frame>
+						
+						<Frame type="PageButton" name="PageButton0" template="_bottomPanel/PageButtonTemplate">
+							<Anchor side="Top" relative="$parent" pos="Min" offset="330"/>
+							<Anchor side="Left" relative="$parent" pos="Min" offset="54"/>
+						</Frame>
+						<Frame type="PageButton" name="PageButton1" template="_bottomPanel/PageButtonTemplate">
+							<Anchor side="Top" relative="$parent/PageButton0" pos="Min" offset="0"/>
+							<Anchor side="Left" relative="$parent/PageButton0" pos="Max" offset="-26"/>
+						</Frame>
+						<Frame type="PageButton" name="PageButton2" template="_bottomPanel/PageButtonTemplate">
+							<Anchor side="Top" relative="$parent/PageButton1" pos="Min" offset="0"/>
+							<Anchor side="Left" relative="$parent/PageButton1" pos="Max" offset="-26"/>
+						</Frame>
+						<Frame type="PageButton" name="PageButton3" template="_bottomPanel/PageButtonTemplate">
+							<Anchor side="Top" relative="$parent/PageButton2" pos="Min" offset="0"/>
+							<Anchor side="Left" relative="$parent/PageButton2" pos="Max" offset="-26"/>
+						</Frame>
+						<Frame type="PageButton" name="PageButton4" template="_bottomPanel/PageButtonTemplate">
+							<Anchor side="Top" relative="$parent/PageButton3" pos="Min" offset="0"/>
+							<Anchor side="Left" relative="$parent/PageButton3" pos="Max" offset="-26"/>
+						</Frame>
+						<Frame type="PageButton" name="PageButton5" template="_bottomPanel/PageButtonTemplate">
+							<Anchor side="Top" relative="$parent/PageButton4" pos="Min" offset="0"/>
+							<Anchor side="Left" relative="$parent/PageButton4" pos="Max" offset="-26"/>
+						</Frame>
+						
+						<StateGroup name="HideUselessPage1Button">
+							<DefaultState val="Dflt"/>
+							<State name="Hidden">
+								<When type="Property" frame="$this/PageButton1" Visible="false"/>
+								<Action type="SetAnchor" frame="$this/PageButton0" side="Top" relative="$parent" pos="Min" offset="9999" undo="true"/>
+							</State>
+							<State name="Dflt"/>
+						</StateGroup>
+					</Frame>
+				</Frame>
+				
+				<!-- Marks the center between HeroPanel and CommandPanel -->
+				<Frame type="Frame" name="ControlGroupCenteredAnchor">
+					<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+					<Anchor side="Right" relative="$GameUI_CommandPanel" pos="Min" offset="-28"/>
+					<Anchor side="Left" relative="$HeroPanel" pos="Max" offset="0"/>
+				</Frame>
+				<Frame type="ControlGroupPanel" name="ControlGroupPanel">
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+					<Anchor side="Left" relative="$parent/ControlGroupAnchor" pos="Mid" offset="-383"/>
+					
+					<!-- Repurpose the aspect ration checker for UIs -->
+					<Frame type="AspectRatioFrame" name="AspectRatioListener_16x10">
+						<MinVisibleAspectRatio val="0"/>
+						<MaxVisibleAspectRatio val="1.5890"/>
+					</Frame>
+					
+					<!-- Override StateGroup  actions -->
+					<StateGroup name="AlignmentRatioCheck">
+						<!-- overridden, do not alter name -->
+						<State name="LeftAligned">
+							<When type="Property" frame="AspectRatioListener_16x10" Visible="True"/>
+							<!-- prevents the control panel from overlapping the command panel based on aspect ration -->
+							<Action type="SetAnchor" side="Left" relative="$GameUI_CommandPanel" pos="Min" offset="-792" undo="false"/>
+						</State>
+						<!-- overridden, do not alter name -->
+						<State name="CenterAligned">
+							<!--<Action type="SetAnchor" side="Left" relative="$parent" pos="Mid" offset="-383" undo="false"/>-->
+							<!-- pos=mid: centered between right side of hero panel and left side of command panel -->
+							<!-- pos=min: aligned to the hero panel's maximum right side depending on aspect ration -->
+							<Action type="SetAnchor" side="Left" relative="$parent/ControlGroupCenteredAnchor" pos="Mid" offset="-396" undo="false"/>
+						</State>
+					</StateGroup>
+				</Frame>
+				
+				<!-- Move Mission Time Panel to menu bar -->
+				<Frame type="MissionTimePanel" name="MissionTimePanel">
+					<Anchor side="Bottom" relative="$GameUI_MenuBar" pos="Max" offset="-5"/>
+					<Anchor side="Left" relative="$this" pos="Min" offset="0"/>
+					<Anchor side="Right" relative="$GameUI_MenuBar" pos="Min" offset="0"/>
+					<Width val="200"/>
+					
+					<!-- make label and image right aligned -->
+					<Frame type="Label" name="TimeLabel">
+						<Anchor side="Left" relative="$this" pos="Min" offset="0"/>
+						<Anchor side="Right" relative="$parent" pos="Max" offset="-15"/>
+					</Frame>
+					<Frame type="Image" name="BackgroundImage">
+						<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+						<Anchor side="Left" relative="$parent/TimeLabel" pos="Min" offset="-15"/>
+					</Frame>
+				</Frame>
+				
+				<!-- Move Army and Idle Buttons -->
+				<Frame type="IdleButton" name="IdleButton">
+					<Anchor side="Bottom" relative="$parent/MissionTimePanel" pos="Max" offset="5"/>
+					<Anchor side="Left" relative="$parent/MissionTimePanel" pos="Min" offset="-200"/>
+				</Frame>
+				<Frame type="ArmyButton" name="ArmyButton">
+					<Anchor side="Bottom" relative="$parent/IdleButton" pos="Max" offset="0"/>
+					<Anchor side="Left" relative="$parent/IdleButton" pos="Max" offset="-5"/>
+				</Frame>
+				
+				<!-- Background Images -->
+				<Frame type="Image" name="MinimapPanelBackground">
+					<Anchor side="Bottom" relative="$MinimapPanel" pos="Max" offset="0"/>
+					<Anchor side="Left" relative="$MinimapPanel" pos="Min" offset="0"/>
+					<Texture val="Assets\Textures\minimapPanelBackground.dds"/>
+					<Width val="410"/>
+					<Height val="424"/>
+					<Unclipped val="true"/>
+					<RenderPriority val="300"/>
+				</Frame>
+				<Frame type="Frame" name="InfoPanelBackground" template="StandardTemplates/StandardMediumPanelTemplate">
+					<Anchor side="Top" relative="$InfoPanel" pos="Min" offset="-75"/>
+					<Anchor side="Left" relative="$InfoPanel" pos="Min" offset="-40"/>
+					<Anchor side="Bottom" relative="$InfoPanel" pos="Max" offset="-10"/>
+					<Anchor side="Right" relative="$InfoPanel" pos="Max" offset="40"/>
+					<RenderPriority val="300"/>
+				</Frame>
+				<Frame type="Image" name="CommandPanelBackground">
+					<Anchor side="Bottom" relative="$GameUI_CommandPanel" pos="Max" offset="18"/>
+					<Anchor side="Right" relative="$GameUI_CommandPanel" pos="Max" offset="21"/>
+					<Texture val="Assets\Textures\commandPanelBackground.dds"/>
+					<Width val="488"/>
+					<Height val="366"/>
+					<Unclipped val="true"/>
+					<RenderPriority val="300"/>
+				</Frame>
+				
+			</Frame>
+			
+			<!-- Hide console model and portrait -->
+			<Frame type="ConsolePanel" name="ConsolePanel">
+				<UseApm val="False"/>
+				
+				<Frame type="Model" name="InfopanelModel">
+					<Visible val="False"/>
+				</Frame>
+				<Frame type="Model" name="MinimapModel">
+					<Visible val="False"/>
+				</Frame>
+				<Frame type="PortraitPanel" name="PortraitPanel">
+					<Visible val="False"/>
+					<Width val="0"/>
+					<Height val="0"/>
+					
+					<Animation name="KeepHidden">
+						<Event event="OnShown" action="Reset,Play"/>
+						<Controller type="Visibility" end="Pause">
+							<Key type="Bool" time="0" value="false"/>
+						</Controller>
+					</Animation>
+				</Frame>
+				<Frame type="Model" name="CommandPanelModel">
+					<Visible val="False"/>
+				</Frame>
+				<Frame type="Frame" name="MinimapStub">
+					<Anchor side="Left" relative="$MinimapPanel" pos="Min" offset="0"/>
+					<Anchor side="Bottom" relative="$MinimapPanel" pos="Max" offset="0"/>
+					<Anchor side="Top" relative="$MinimapPanel" pos="Min" offset="0"/>
+					<Anchor side="Right" relative="$MinimapPanel" pos="Max" offset="0"/>
+					<Width val="0"/>
+					<Height val="0"/>
+				</Frame>
+				<Frame type="Frame" name="InfoStub">
+					<Anchor side="Left" relative="$InfoPanel" pos="Min" offset="0"/>
+					<Anchor side="Bottom" relative="$InfoPanel" pos="Max" offset="0"/>
+					<Anchor side="Right" relative="$InfoPanel" pos="Max" offset="0"/>
+					<Anchor side="Top" relative="$InfoPanel" pos="Min" offset="0"/>
+					<Width val="0"/>
+					<Height val="0"/>
+				</Frame>
+				<Frame type="Frame" name="CommandStub">
+					<Anchor side="Top" relative="$GameUI_CommandPanel" pos="Min" offset="-20"/>
+					<Anchor side="Left" relative="$GameUI_CommandPanel" pos="Min" offset="-20"/>
+					<Anchor side="Bottom" relative="$GameUI_CommandPanel" pos="Max" offset="18"/>
+					<Anchor side="Right" relative="$GameUI_CommandPanel" pos="Max" offset="21"/>
+					<Width val="0"/>
+					<Height val="0"/>
+				</Frame>
+			</Frame>
+			
+		</Frame>
+		
+	</Frame>
+
+
+</Desc>
