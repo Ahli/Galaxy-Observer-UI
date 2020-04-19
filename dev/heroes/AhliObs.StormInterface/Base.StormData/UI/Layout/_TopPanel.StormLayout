@@ -147,6 +147,7 @@
 							</Frame>
 						</Frame>
 						
+						<!-- top panel is altered when Varian is in this slot to show the cooldown -->
 						<Frame type="UnitStatusTalentIcon" name="TalentTreeIcon2" template="_TopPanel/TalentTreeIconTemplate">
 							<Anchor side="Top" relative="$parent" pos="Min" offset="-9999"/>
 							<!--<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>-->
@@ -592,7 +593,6 @@
 							</Controller>
 						</Animation>
 					</Frame>
-					
 					<StateGroup name="StateControl">
 						<DefaultState val="Dflt"/>
 						<State name="Varian">
@@ -602,6 +602,89 @@
 						<State name="Dflt">
 						</State>
 					</StateGroup>
+					
+					<!-- Deathwing pre-10 and R2 icon for cataclysmn -->
+					<Frame type="UnitStatusAbilIcon" name="DeathwingCataclysmIconAndCooldown">
+						<Anchor side="Top" relative="$parent/HeroSelectedTalentTreeFrame/TalentTreeIcon4/IconImage" pos="Min" offset="-8"/>
+						<Anchor side="Left" relative="$parent/HeroSelectedTalentTreeFrame/TalentTreeIcon4/IconImage" pos="Min" offset="-2"/>
+						<Anchor side="Right" relative="$parent/HeroSelectedTalentTreeFrame/TalentTreeIcon4/IconImage" pos="Max" offset="2"/>
+						<Anchor side="Bottom" relative="$parent/HeroSelectedTalentTreeFrame/TalentTreeIcon4/IconImage" pos="Max" offset="8"/>
+						<RenderPriority val="600"/>
+						<AbilityLink val="DeathwingCataclysm"/>
+						<Visible val="false"/>
+						
+						<Frame type="AbilIcon" name="AbilIcon">
+							<Anchor relative="$parent" />
+							
+							<Frame type="Image" name="IconImage">
+								<Anchor side="Top" relative="$parent" pos="Min" offset="0" />
+								<Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+								<Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+								<Anchor side="Bottom" relative="$parent" pos="Max" offset="0" />
+								<ImageMaskTexture val="@UI/obs_alphaMask_mini_talents"/>
+							</Frame>
+							
+							<Frame type="Label" name="CooldownLabel">
+								<Anchor relative="$parent" />
+								<Style val="AhliHeroicCooldown"/>
+								<Unclipped val="true"/>
+								<RenderPriority val="650"/>
+								
+								<Animation name="DarkenIcon">
+									<Event event="OnShown" action="DirectionForward, Play"/>
+									<Event event="OnHidden" action="DirectionReverse, Play"/>
+									
+									<Controller type="Color" end="Pause" frame="$parent/IconImage">
+										<Key type="Curve" time="0.0" value="255,255,255" inout="Step"/>
+										<Key type="Curve" time="0.01" value="64,64,64" inout="Step"/>
+									</Controller>
+								</Animation>
+							</Frame>
+							<Frame type="ProgressBar" name="CooldownBar">
+								<Anchor relative="$parent/IconImage" />
+								<Visible val="false"/>
+								<Alpha val="0"/>
+							</Frame>
+							
+							<Frame type="UnitStatusBehaviorAnim" name="Detector">
+								<Anchor relative="$parent"/>
+								<Behavior val="DeathwingFormSwitchAbility"/>
+								
+								<Animation name="CataclysmnOn">
+									<Event event="BehaviorCreate" action="Reset,Play"/>
+									
+									<Controller type="Event" end="Stop" frame="$ancestor[@type=HeroTalentsPanelPlayerFrame]">
+										<Key type="Event" time="0" event="ShowHeroic"/>
+									</Controller>
+									<Controller type="Visibility" end="Pause" frame="$parent">
+										<Key type="Bool" time="0" value="True"/>
+									</Controller>
+									<Controller type="Fade" end="Pause" frame="$parent/$parent/$parent/UnitStatusAbil/AbilIcon/CooldownLabel">
+										<Key type="Curve" time="0" value="0"/>
+									</Controller>
+									<Controller type="Fade" end="Pause" frame="$parent/$parent/$parent/HeroSelectedTalentTreeFrame/TalentTreeIcon4/IconImage">
+										<Key type="Curve" time="0" value="0"/>
+									</Controller>
+								</Animation>
+								<Animation name="CataclysmnOff">
+									<Event event="BehaviorDestroy" action="Reset,Play"/>
+									
+									<Controller type="Event" end="Stop" frame="$ancestor[@type=HeroTalentsPanelPlayerFrame]">
+										<Key type="Event" time="0" event="HideHeroic"/>
+									</Controller>
+									<Controller type="Visibility" end="Pause" frame="$parent">
+										<Key type="Bool" time="0" value="False"/>
+									</Controller>
+									<Controller type="Fade" end="Pause" frame="$parent/$parent/$parent/UnitStatusAbil/AbilIcon/CooldownLabel">
+										<Key type="Curve" time="0" value="255"/>
+									</Controller>
+									<Controller type="Fade" end="Pause" frame="$parent/$parent/$parent/HeroSelectedTalentTreeFrame/TalentTreeIcon4/IconImage">
+										<Key type="Curve" time="0" value="255"/>
+									</Controller>
+								</Animation>
+							</Frame>
+						</Frame>
+					</Frame>
 					
 				</Frame>
 			</Frame>
@@ -662,6 +745,13 @@
 						</Frame>
 						<Frame type="Frame" name="TracerAbilityImage">
 							<Frame type="Image" name="Image">
+								<ImageMaskTexture val="@UI/obs_alphaMask_mini_talents_mirrored"/>
+							</Frame>
+						</Frame>
+					</Frame>
+					<Frame type="UnitStatusAbilIcon" name="DeathwingCataclysmIconAndCooldown">
+						<Frame type="AbilIcon" name="AbilIcon">
+							<Frame type="Image" name="IconImage">
 								<ImageMaskTexture val="@UI/obs_alphaMask_mini_talents_mirrored"/>
 							</Frame>
 						</Frame>
