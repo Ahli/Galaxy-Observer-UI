@@ -27,9 +27,9 @@ public class UIFrame extends UIElement {
 	private static final String[] DFLT_OFFSET = { ZERO, ZERO, ZERO, ZERO };
 	private static final String[] DFLT_RELATIVE = { THIS, THIS, THIS, THIS };
 	
-	private String[] pos = new String[4];
-	private String[] offset = new String[4];
-	private String[] relative = new String[4];
+	private String[] pos;
+	private String[] offset;
+	private String[] relative;
 	
 	private List<UIAttribute> attributes;
 	private String type;
@@ -106,12 +106,15 @@ public class UIFrame extends UIElement {
 			}
 		}
 		if (relative != DFLT_RELATIVE) {
+			clone.relative = new String[4];
 			System.arraycopy(relative, 0, clone.relative, 0, 4);
 		}
 		if (offset != DFLT_OFFSET) {
+			clone.offset = new String[4];
 			System.arraycopy(offset, 0, clone.offset, 0, 4);
 		}
 		if (pos != DFLT_POS) {
+			clone.pos = new String[4];
 			System.arraycopy(pos, 0, clone.pos, 0, 4);
 		}
 		return clone;
@@ -230,7 +233,7 @@ public class UIFrame extends UIElement {
 			this.relative = DFLT_RELATIVE;
 		} else {
 			if (this.relative == DFLT_RELATIVE) {
-				this.relative = new String[] { THIS, THIS, THIS, THIS };
+				this.relative = new String[4];
 			}
 			this.relative[0] = StringInterner.intern(relative);
 			this.relative[1] = this.relative[0];
@@ -241,7 +244,7 @@ public class UIFrame extends UIElement {
 			this.offset = DFLT_OFFSET;
 		} else {
 			if (this.offset == DFLT_OFFSET) {
-				this.offset = new String[] { ZERO, ZERO, ZERO, ZERO };
+				this.offset = new String[4];
 			}
 			this.offset[0] = StringInterner.intern(offset);
 			this.offset[1] = this.offset[0];
@@ -291,8 +294,11 @@ public class UIFrame extends UIElement {
 			}
 			this.pos = new String[] { MIN, MIN, MAX, MAX };
 		}
-		this.pos[side.ordinal()] =
-				MAX.equalsIgnoreCase(pos) ? MAX : (MIN.equalsIgnoreCase(pos) ? MIN : StringInterner.intern(pos));
+		if (MAX.equalsIgnoreCase(pos)) {
+			this.pos[side.ordinal()] = MAX;
+		} else {
+			this.pos[side.ordinal()] = MIN.equalsIgnoreCase(pos) ? MIN : StringInterner.intern(pos);
+		}
 		if (MIN.equals(this.pos[0]) && MIN.equals(this.pos[1]) && MAX.equals(this.pos[2]) && MAX.equals(this.pos[3])) {
 			this.pos = DFLT_POS;
 		}

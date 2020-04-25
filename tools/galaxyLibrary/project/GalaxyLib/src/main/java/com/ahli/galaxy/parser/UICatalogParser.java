@@ -538,7 +538,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		if (level == 2) {
 			if (newElem != null) {
 				if (logger.isTraceEnabled()) {
-					logger.trace("adding new template: {} with {}", curFileName, newElem.getName());
+					logger.trace("adding new template: '{}' added to '{}'", newElem.getName(), curFileName);
 				}
 				// curTemplate =
 				catalog.addTemplate(curFileName, newElem, curIsDevLayout);

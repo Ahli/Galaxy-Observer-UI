@@ -3,8 +3,6 @@
 package com.ahli.util;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
@@ -14,13 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@ExtendWith (MockitoExtension.class)
 final class StringInternerTest {
-	
-	//	@BeforeEach
-	//	public void initMocks() {
-	//		MockitoAnnotations.initMocks(this);
-	//	}
 	
 	@Test
 	public void testWeakRefStringInterner() {
@@ -53,7 +45,7 @@ final class StringInternerTest {
 		
 		int i = 0;
 		// 100 can rarely fail, I wish Java had a method for GC with the goal to minimize RAM usage
-		final int maxAttempts = 200;
+		final int maxAttempts = 1000;
 		while (referenceQueue.poll() == null && i < maxAttempts) {
 			++i;
 			System.gc();
