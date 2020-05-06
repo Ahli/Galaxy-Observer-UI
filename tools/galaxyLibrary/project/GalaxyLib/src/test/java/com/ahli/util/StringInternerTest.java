@@ -45,10 +45,11 @@ final class StringInternerTest {
 		
 		int i = 0;
 		// 100 can rarely fail, I wish Java had a method for GC with the goal to minimize RAM usage
-		final int maxAttempts = 1000;
+		final int maxAttempts = 3;
 		while (referenceQueue.poll() == null && i < maxAttempts) {
 			++i;
 			System.gc();
+			System.runFinalization();
 		}
 		// fails on J9 JDK
 		assertTrue(i < maxAttempts, "GC did not remove the WeakReference within " + maxAttempts + " attempts");

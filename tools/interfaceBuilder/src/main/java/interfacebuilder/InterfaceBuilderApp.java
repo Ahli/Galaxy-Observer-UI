@@ -152,6 +152,7 @@ public class InterfaceBuilderApp extends Application {
 				// Weak References survive 3 garbage collections by default
 				for (int i = 0; i < 3; ++i) {
 					System.gc();
+					System.runFinalization();
 				}
 				try {
 					Thread.sleep(200);

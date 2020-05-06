@@ -82,7 +82,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	private String raceId;
 	private String consoleSkinId;
 	private UITemplate curTemplate;
-	private boolean editingMode;
+	//private boolean editingMode;
 	private String curFileName;
 	private Deque<Object> toDeduplicate;
 	private int postProcessDeduplications;
@@ -236,7 +236,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			curLevel = level;
 			curElement = null; // no parent frame
 			// default editing mode unless the parsed aspect defines another one
-			editingMode = false;
+			//editingMode = false;
 			if (logger.isTraceEnabled()) {
 				logger.trace("resetting path to root");
 			}
@@ -277,8 +277,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			if (level != 2) {
 				logger.warn("WARNING: Unexpected attribute 'file=' found in {}", curElement);
 			}
-			// TODO enable to test modification of existing templates, feature is incomplete
-			editingMode = true;
+			//editingMode = true;
 			potentiallyEditedTemplates = catalog.getTemplatesOfPath(attrValues.get(i));
 		}
 		String name = ((i = attrTypes.indexOf(NAME)) != -1) ?
@@ -819,7 +818,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		}
 	}
 	
-	@SuppressWarnings ("squid:S4973")
+	@SuppressWarnings("squid:S4973")
 	private void copyAttributes(final List<UIAttribute> attributesSource, final List<UIAttribute> attributesTarget) {
 		for (final UIAttribute attrSource : attributesSource) {
 			boolean edited = false;
