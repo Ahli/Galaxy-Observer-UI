@@ -152,8 +152,8 @@ public class InterfaceBuilderApp extends Application {
 				// Weak References survive 3 garbage collections by default
 				for (int i = 0; i < 3; ++i) {
 					System.gc();
-					System.runFinalization();
 				}
+				System.runFinalization();
 				try {
 					Thread.sleep(200);
 					// clean up StringInterner's weak references that the GC removed
