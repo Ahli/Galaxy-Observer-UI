@@ -3,12 +3,10 @@
 
 package interfacebuilder.integration;
 
-import interfacebuilder.InterfaceBuilderApp;
 import interfacebuilder.projects.ProjectJpaRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -16,9 +14,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@ExtendWith (MockitoExtension.class)
-@SpringBootTest (classes = InterfaceBuilderApp.class)
-public class CommandLineParametersTest {
+@ExtendWith(MockitoExtension.class)
+final class CommandLineParametersTest {
 	
 	@MockBean
 	private ProjectJpaRepository projectRepoMock;

@@ -9,17 +9,25 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.autoconfigure.SpringBootDependencyInjectionTestExecutionListener;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestExecutionListeners;
 
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-@ExtendWith (MockitoExtension.class)
-@SpringBootTest (classes = InterfaceBuilderApp.class)
-public class ProjectServiceTest {
+@ExtendWith(MockitoExtension.class)
+@SpringBootTest(classes = InterfaceBuilderApp.class)
+@ContextConfiguration
+@TestExecutionListeners(
+		listeners = { MockitoTestExecutionListener.class, SpringBootDependencyInjectionTestExecutionListener.class },
+		mergeMode = TestExecutionListeners.MergeMode.REPLACE_DEFAULTS)
+final class ProjectServiceTest {
 	
 	@MockBean
 	private ProjectJpaRepository projectRepoMock;

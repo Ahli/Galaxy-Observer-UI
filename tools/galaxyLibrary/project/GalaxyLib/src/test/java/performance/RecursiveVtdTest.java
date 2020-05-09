@@ -16,7 +16,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RecursiveVtdTest {
+final class RecursiveVtdTest {
 	private static final List<Object> list = new ArrayList<>();
 	private static final String TAG = "*";
 	

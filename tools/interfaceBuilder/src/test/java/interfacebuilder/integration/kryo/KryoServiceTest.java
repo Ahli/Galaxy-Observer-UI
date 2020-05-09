@@ -14,8 +14,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.SpringBootDependencyInjectionTestExecutionListener;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestExecutionListeners;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,9 +30,13 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@ExtendWith (MockitoExtension.class)
-@SpringBootTest (classes = InterfaceBuilderApp.class)
-public class KryoServiceTest {
+@ExtendWith(MockitoExtension.class)
+@SpringBootTest(classes = InterfaceBuilderApp.class)
+@ContextConfiguration
+@TestExecutionListeners(
+		listeners = { MockitoTestExecutionListener.class, SpringBootDependencyInjectionTestExecutionListener.class },
+		mergeMode = TestExecutionListeners.MergeMode.REPLACE_DEFAULTS)
+final class KryoServiceTest {
 	
 	@MockBean
 	private ProjectJpaRepository projectRepoMock;
@@ -50,7 +58,7 @@ public class KryoServiceTest {
 		
 		kryoService.put(path, payload, kryo);
 		
-		final List<Class<? extends Object>> payloadClasses = new ArrayList<>();
+		final List<Class<?>> payloadClasses = new ArrayList<>();
 		payloadClasses.add(KryoGameInfo.class);
 		
 		final KryoGameInfo kryoGameInfoB = (KryoGameInfo) kryoService.get(path, payloadClasses, kryo).get(0);
@@ -78,7 +86,7 @@ public class KryoServiceTest {
 		kryoService.put(path, payload, kryo);
 		
 		final Kryo kryo2 = kryoService.getKryoForUICatalog();
-		final List<Class<? extends Object>> payloadClasses = new ArrayList<>();
+		final List<Class<?>> payloadClasses = new ArrayList<>();
 		payloadClasses.add(UICatalogImpl.class);
 		payloadClasses.add(KryoGameInfo.class);
 		
