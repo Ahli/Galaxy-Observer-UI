@@ -49,10 +49,10 @@ public class MpqBuilderService {
 	@Autowired
 	private BaseUiService baseUiService;
 	@Autowired
-	@Qualifier ("sc2BaseGameData")
+	@Qualifier("sc2BaseGameData")
 	private GameData sc2BaseGameData;
 	@Autowired
-	@Qualifier ("heroesBaseGameData")
+	@Qualifier("heroesBaseGameData")
 	private GameData heroesBaseGameData;
 	
 	/**

@@ -97,7 +97,7 @@ public class BrowseController implements Updateable {
 	private FileService fileService;
 	
 	// prevent GC of controllers
-	@SuppressWarnings ("MismatchedQueryAndUpdateOfCollection")
+	@SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
 	private List<Updateable> controllers;
 	
 	public BrowseController() {

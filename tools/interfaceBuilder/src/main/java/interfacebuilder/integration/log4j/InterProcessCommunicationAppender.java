@@ -28,8 +28,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 /**
  * If this Appender does not work, then the Log4j2Plugins.dat might not have been created.
  */
-@Plugin (name = "InterProcessCommunicationAppender", category = Core.CATEGORY_NAME, elementType = Appender.ELEMENT_TYPE,
-         printObject = true)
+@Plugin(name = "InterProcessCommunicationAppender", category = Core.CATEGORY_NAME, elementType = Appender.ELEMENT_TYPE,
+        printObject = true)
 public final class InterProcessCommunicationAppender extends AbstractAppender {
 	private static PrintWriter printWriter;
 	private static InterProcessCommunicationAppender instance;
@@ -65,9 +65,9 @@ public final class InterProcessCommunicationAppender extends AbstractAppender {
 	 * @return The TextAreaAppender
 	 */
 	@PluginFactory
-	public static InterProcessCommunicationAppender createAppender(@PluginAttribute ("name") final String name,
-			@PluginElement ("Layout") final Layout<? extends Serializable> layout,
-			@PluginElement ("Filter") final Filter filter) {
+	public static InterProcessCommunicationAppender createAppender(@PluginAttribute("name") final String name,
+			@PluginElement("Layout") final Layout<? extends Serializable> layout,
+			@PluginElement("Filter") final Filter filter) {
 		if (name == null) {
 			LOGGER.error("No name provided for InterProcessCommunicationAppender");
 			return null;

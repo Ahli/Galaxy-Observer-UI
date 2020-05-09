@@ -91,7 +91,7 @@ public class BrowseTabController implements Updateable {
 	 * Value used for the next Query executed. This needs to be on the controller instance's scope, so it can be
 	 * overridden to skip unnecessary searches.
 	 */
-	@SuppressWarnings ("squid:S1450") // no, it cannot be made local.
+	@SuppressWarnings("squid:S1450") // no, it cannot be made local.
 	private volatile String queriedFilter;
 	
 	public BrowseTabController() {
@@ -350,7 +350,7 @@ public class BrowseTabController implements Updateable {
 	/**
 	 * @param template
 	 */
-	@SuppressWarnings ("squid:S1604") // replace anonymous class with lambda suggestion
+	@SuppressWarnings("squid:S1604") // replace anonymous class with lambda suggestion
 	private void createTree(final UITemplate template) {
 		if (template != null) {
 			final UIElement rootElement = template.getElement();
@@ -361,7 +361,7 @@ public class BrowseTabController implements Updateable {
 					.bind(Bindings.createObjectBinding(() -> TreeItemPredicate.create(new Predicate<>() {
 						/* do not turn the Predicate into a lambda -> for some reason it becomes 2-3x slower except
 						for first usage */
-						@SuppressWarnings ("squid:S1067") // reduce number of conditional operators
+						@SuppressWarnings("squid:S1067") // reduce number of conditional operators
 						@Override
 						public boolean test(final UIElement element) {
 							/* I could not get this code any faster than this form (caching toUpperCase() was not

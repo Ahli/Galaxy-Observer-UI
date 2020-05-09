@@ -273,7 +273,7 @@ public class ConcurrentWeakWeakHashMap<K> implements ConcurrentMap<K, K> {
 		}
 		
 		@Override
-		@SuppressWarnings ("squid:S2272") // does not throw NoSuchElementException
+		@SuppressWarnings("squid:S2272") // does not throw NoSuchElementException
 		public final T next() {
 			final T next = strongNext;
 			advance();

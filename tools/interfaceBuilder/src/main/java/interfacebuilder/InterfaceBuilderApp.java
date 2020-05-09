@@ -65,7 +65,7 @@ import java.util.concurrent.TimeUnit;
  * @author Ahli
  */
 
-@EnableAutoConfiguration (excludeName = { // exclude based on beans in context on runtime
+@EnableAutoConfiguration(excludeName = { // exclude based on beans in context on runtime
 		"org.springframework.boot.autoconfigure.aop.AopAutoConfiguration", // not required
 		//"org.springframework.boot.autoconfigure.context.ConfigurationPropertiesAutoConfiguration", // required for Resources
 		//"org.springframework.boot.autoconfigure.context.MessageSourceAutoConfiguration", // req for Resources
@@ -81,7 +81,7 @@ import java.util.concurrent.TimeUnit;
 		"org.springframework.boot.autoconfigure.task.TaskSchedulingAutoConfiguration",
 		//"org.springframework.boot.autoconfigure.transaction.TransactionAutoConfiguration", // req
 		"org.springframework.boot.autoconfigure.transaction.jta.JtaAutoConfiguration" })
-@Import ({ AppConfiguration.class, FxmlConfiguration.class })
+@Import({ AppConfiguration.class, FxmlConfiguration.class })
 public class InterfaceBuilderApp extends Application {
 	public static final String FATAL_ERROR = "FATAL ERROR: ";
 	public static final int INTER_PROCESS_COMMUNICATION_PORT = 12317;

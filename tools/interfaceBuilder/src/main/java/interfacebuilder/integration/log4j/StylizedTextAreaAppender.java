@@ -38,8 +38,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * <p>
  * If this Appender does not work, then the Log4j2Plugins.dat might not have been created.
  */
-@Plugin (name = "StylizedTextAreaAppender", category = Core.CATEGORY_NAME, elementType = Appender.ELEMENT_TYPE,
-         printObject = true)
+@Plugin(name = "StylizedTextAreaAppender", category = Core.CATEGORY_NAME, elementType = Appender.ELEMENT_TYPE,
+        printObject = true)
 public final class StylizedTextAreaAppender extends AbstractAppender {
 	/* THashMap is more memory efficient than Java's one */
 	private static final Map<String, ErrorTabController> workerTaskControllers = new UnifiedMap<>(4);
@@ -71,9 +71,9 @@ public final class StylizedTextAreaAppender extends AbstractAppender {
 	 * @return The TextAreaAppender
 	 */
 	@PluginFactory
-	public static StylizedTextAreaAppender createAppender(@PluginAttribute ("name") final String name,
-			@PluginElement ("Layout") final Layout<? extends Serializable> layout,
-			@PluginElement ("Filter") final Filter filter) {
+	public static StylizedTextAreaAppender createAppender(@PluginAttribute("name") final String name,
+			@PluginElement("Layout") final Layout<? extends Serializable> layout,
+			@PluginElement("Filter") final Filter filter) {
 		if (name == null) {
 			LOGGER.error("No name provided for StylizedTextAreaAppender");
 			return null;

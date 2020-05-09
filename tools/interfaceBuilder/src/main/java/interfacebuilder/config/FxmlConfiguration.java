@@ -33,7 +33,7 @@ public class FxmlConfiguration {
 	// If it is not a prototype, the bean will not be garbage collected when not used anymore.
 	
 	@Bean
-	@Scope (ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 	protected ViewRuleSetController viewRuleSetController() {
 		return new ViewRuleSetController();
 	}
@@ -44,31 +44,31 @@ public class FxmlConfiguration {
 	}
 	
 	@Bean
-	@Scope (ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 	protected HomeController homeController() {
 		return new HomeController();
 	}
 	
 	@Bean
-	@Scope (ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 	protected SettingsCommandLineToolController settingsCommandLineToolController() {
 		return new SettingsCommandLineToolController();
 	}
 	
 	@Bean
-	@Scope (ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 	protected SettingsController settingsController() {
 		return new SettingsController();
 	}
 	
 	@Bean
-	@Scope (ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 	protected SettingsGamesPathsController settingsGamesPathsController() {
 		return new SettingsGamesPathsController();
 	}
 	
 	@Bean
-	@Scope (ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 	protected SettingsGuiToolController settingsGuiToolController() {
 		return new SettingsGuiToolController();
 	}
@@ -79,49 +79,49 @@ public class FxmlConfiguration {
 	}
 	
 	@Bean
-	@Scope (ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 	protected NewProjectController newProjectController() {
 		return new NewProjectController();
 	}
 	
 	@Bean
-	@Scope (ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 	protected NewProjectDialogController newProjectDialogController() {
 		return new NewProjectDialogController();
 	}
 	
 	@Bean
-	@Scope (ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 	protected AddProjectController addProjectController() {
 		return new AddProjectController();
 	}
 	
 	@Bean
-	@Scope (ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 	protected AddProjectDialogController addProjectDialogController() {
 		return new AddProjectDialogController();
 	}
 	
 	@Bean
-	@Scope (ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 	protected CompressionMiningController compressionMiningController() {
 		return new CompressionMiningController();
 	}
 	
 	@Bean
-	@Scope (ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 	protected BrowseController browseController() {
 		return new BrowseController();
 	}
 	
 	@Bean
-	@Scope (ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 	protected BrowseTabController browseTabController() {
 		return new BrowseTabController();
 	}
 	
 	@Bean
-	@Scope (ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 	protected BaseUiExtractionController baseUiExtractionController() {
 		return new BaseUiExtractionController();
 	}

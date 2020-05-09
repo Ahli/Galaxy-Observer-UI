@@ -13,46 +13,46 @@ import java.io.File;
 public class ConfigService {
 	
 	@Autowired
-	@Qualifier ("mpqCachePath")
+	@Qualifier("mpqCachePath")
 	private String mpqCachePath;
 	
 	@Autowired
-	@Qualifier ("basePath")
+	@Qualifier("basePath")
 	private File basePath;
 	
 	@Autowired
-	@Qualifier ("documentsPath")
+	@Qualifier("documentsPath")
 	private String documentsPath;
 	
 	@Autowired
-	@Qualifier ("mpqEditorPath")
+	@Qualifier("mpqEditorPath")
 	private String mpqEditorPath;
 	
 	@Autowired
 	private SettingsIniInterface iniSettings;
 	
 	@Autowired
-	@Qualifier ("raceId")
+	@Qualifier("raceId")
 	private String raceId;
 	
 	@Autowired
-	@Qualifier ("consoleSkinId")
+	@Qualifier("consoleSkinId")
 	private String consoleSkinId;
 	
 	@Autowired
-	@Qualifier ("baseUiPath")
+	@Qualifier("baseUiPath")
 	private String baseUiPath;
 	
 	@Autowired
-	@Qualifier ("cascExtractorConfigFile")
+	@Qualifier("cascExtractorConfigFile")
 	private File cascExtractorConfigFile;
 	
 	@Autowired
-	@Qualifier ("cascExtractorConsoleExeFile")
+	@Qualifier("cascExtractorConsoleExeFile")
 	private File cascExtractorConsoleExeFile;
 	
 	@Autowired
-	@Qualifier ("cachePath")
+	@Qualifier("cachePath")
 	private String cachePath;
 	
 	public String getMpqEditorPath() {
