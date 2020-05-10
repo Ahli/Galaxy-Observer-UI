@@ -53,9 +53,7 @@ public class ExtractBaseUiTask extends CleaningForkJoinTask {
 			task.join();
 		}
 		
-		Platform.runLater(() -> {
-			errorTabController.setRunning(false);
-		});
+		Platform.runLater(() -> errorTabController.setRunning(false));
 		return true;
 	}
 }

@@ -41,7 +41,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 @Plugin(name = "StylizedTextAreaAppender", category = Core.CATEGORY_NAME, elementType = Appender.ELEMENT_TYPE,
         printObject = true)
 public final class StylizedTextAreaAppender extends AbstractAppender {
-	/* THashMap is more memory efficient than Java's one */
 	private static final Map<String, ErrorTabController> workerTaskControllers = new UnifiedMap<>(4);
 	private static ErrorTabController generalController;
 	private final ReadWriteLock rwLock = new ReentrantReadWriteLock();
@@ -122,7 +121,7 @@ public final class StylizedTextAreaAppender extends AbstractAppender {
 				Platform.runLater(() -> {
 					try {
 						Thread.sleep(delayInMs);
-					} catch (InterruptedException e) {
+					} catch (final InterruptedException e) {
 						Thread.currentThread().interrupt();
 					}
 					// ensure that the correct one is removed
