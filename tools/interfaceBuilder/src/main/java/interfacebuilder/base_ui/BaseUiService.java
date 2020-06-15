@@ -93,6 +93,9 @@ public class BaseUiService {
 		final KryoGameInfo baseUiInfo;
 		try {
 			baseUiInfo = readMetaFile(baseUiMetaFileDir);
+			if (baseUiInfo == null) {
+				return true;
+			}
 		} catch (final IOException e) {
 			final String msg = "Failed to read Game Info from extracted base UI.";
 			logger.warn(msg);
@@ -116,10 +119,13 @@ public class BaseUiService {
 	
 	private KryoGameInfo readMetaFile(final File directory) throws IOException {
 		final Path path = Paths.get(directory.getAbsolutePath(), META_FILE_NAME);
-		final Kryo kryo = kryoService.getKryoForBaseUiMetaFile();
-		final List<Class<? extends Object>> payloadClasses = new ArrayList<>();
-		payloadClasses.add(KryoGameInfo.class);
-		return (KryoGameInfo) kryoService.get(path, payloadClasses, kryo).get(0);
+		if (Files.exists(path)) {
+			final Kryo kryo = kryoService.getKryoForBaseUiMetaFile();
+			final List<Class<? extends Object>> payloadClasses = new ArrayList<>();
+			payloadClasses.add(KryoGameInfo.class);
+			return (KryoGameInfo) kryoService.get(path, payloadClasses, kryo).get(0);
+		}
+		return null;
 	}
 	
 	public int[] getVersion(final GameDef gameDef, final boolean isPtr) {
@@ -436,8 +442,16 @@ public class BaseUiService {
 		}
 	}
 	
+	/**
+	 * Checks if the baseUiDirectory is PTR.
+	 *
+	 * @param baseUiDirectory
+	 * @return true if PTR; false if not or no file is existing
+	 * @throws IOException
+	 */
 	public boolean isPtr(final File baseUiDirectory) throws IOException {
-		return readMetaFile(baseUiDirectory).isPtr();
+		final KryoGameInfo kryoGameInfo = readMetaFile(baseUiDirectory);
+		return kryoGameInfo != null && kryoGameInfo.isPtr();
 	}
 	
 	public boolean cacheIsUpToDateCheckException(final GameDef gameDef, final boolean usePtr) {
@@ -463,15 +477,18 @@ public class BaseUiService {
 	 * @return
 	 */
 	public boolean cacheIsUpToDate(final Path cacheFile, final File metaFileDir) throws IOException {
-		final KryoGameInfo baseUiInfo = readMetaFile(metaFileDir);
-		
 		// no cache -> not up to date
 		if (!Files.exists(cacheFile)) {
 			return false;
 		}
-		final KryoGameInfo cacheInfo = discCacheService.getCachedBaseUiInfo(cacheFile);
 		
+		final KryoGameInfo cacheInfo = discCacheService.getCachedBaseUiInfo(cacheFile);
 		final int[] versionCache = cacheInfo.getVersion();
+		
+		final KryoGameInfo baseUiInfo = readMetaFile(metaFileDir);
+		if (baseUiInfo == null) {
+			return false;
+		}
 		final int[] versionBaseUi = baseUiInfo.getVersion();
 		
 		boolean isUpToDate = true;
@@ -488,7 +505,9 @@ public class BaseUiService {
 		final File baseUiMetaFileDir = new File(configService.getBaseUiPath(gameService.getNewGameDef(Game.HEROES)));
 		try {
 			final KryoGameInfo baseUiInfo = readMetaFile(baseUiMetaFileDir);
-			return baseUiInfo.isPtr();
+			if (baseUiInfo != null) {
+				return baseUiInfo.isPtr();
+			}
 		} catch (final IOException e) {
 			logger.error("ERROR while checking if ptr is active via baseUI cache file", e);
 		}
