@@ -20,14 +20,14 @@ module interfacex.builder {
 	requires org.apache.logging.log4j;
 	requires org.apache.logging.log4j.core;
 	requires com.esotericsoftware.kryo;
-	requires com.esotericsoftware.minlog;
+	//requires com.esotericsoftware.minlog;
 	requires pecoff4j;
-	requires org.eclipse.collections.api;
+	//requires org.eclipse.collections.api;
 	requires org.eclipse.collections.impl;
 	
 	// spring
-	requires jakarta.activation;
-	requires java.xml.bind; // provides javax/xml/jaxbexception
+	//requires jakarta.activation;
+	//requires java.xml.bind; // provides javax/xml/jaxbexception
 	requires org.hibernate.orm.core;
 	requires spring.beans;
 	requires spring.boot.autoconfigure;
@@ -37,9 +37,9 @@ module interfacex.builder {
 	requires spring.data.commons;
 	requires spring.data.jpa;
 	requires spring.tx;
-	requires com.fasterxml.classmate;
-	requires net.bytebuddy;
-	requires java.sql;
+	//requires com.fasterxml.classmate;
+	//requires net.bytebuddy;
+	//requires java.sql;
 	requires org.apache.commons.lang3;
 	
 	// own projects

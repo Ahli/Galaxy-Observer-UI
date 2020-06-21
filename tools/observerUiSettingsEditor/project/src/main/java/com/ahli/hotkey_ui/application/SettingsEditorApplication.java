@@ -626,7 +626,7 @@ public class SettingsEditorApplication extends Application {
 				compile();
 				final File parentFile = f.getParentFile();
 				if (parentFile == null) {
-					throw new IOException(String.format("Parent of File %s is null.", parentFile));
+					throw new IOException(String.format("Parent of File %s is null.", f));
 				}
 				mpqi.buildMpq(parentFile.getAbsolutePath(), f.getName(), false,
 						MpqEditorCompression.BLIZZARD_SC2_HEROES, false);

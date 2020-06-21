@@ -64,7 +64,7 @@ public class KryoService {
 		return kryo;
 	}
 	
-	public List<Object> get(final Path path, final Iterable<Class<? extends Object>> payloadClasses, final Kryo kryo)
+	public List<Object> get(final Path path, final Iterable<Class<?>> payloadClasses, final Kryo kryo)
 			throws IOException {
 		try (final InflaterInputStream in = new InflaterInputStream(Files.newInputStream(path))) {
 			try (final Input input = new Input(in)) {
@@ -80,7 +80,7 @@ public class KryoService {
 		}
 	}
 	
-	public List<Object> get(final Path path, final Iterable<Class<? extends Object>> payloadClasses, final Kryo kryo,
+	public List<Object> get(final Path path, final Iterable<Class<?>> payloadClasses, final Kryo kryo,
 			final int stopAfterIndex) throws IOException {
 		try (final InflaterInputStream in = new InflaterInputStream(Files.newInputStream(path))) {
 			try (final Input input = new Input(in)) {

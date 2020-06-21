@@ -72,7 +72,7 @@ public class DiscCacheService {
 	
 	public UICatalog getCachedBaseUi(final Path path) throws IOException {
 		final Kryo kryo = kryoService.getKryoForUICatalog();
-		final List<Class<? extends Object>> payloadClasses = new ArrayList<>();
+		final List<Class<?>> payloadClasses = new ArrayList<>();
 		payloadClasses.add(KryoGameInfo.class);
 		payloadClasses.add(UICatalogImpl.class);
 		return (UICatalog) kryoService.get(path, payloadClasses, kryo).get(1);
@@ -80,7 +80,7 @@ public class DiscCacheService {
 	
 	public KryoGameInfo getCachedBaseUiInfo(final Path path) throws IOException {
 		final Kryo kryo = kryoService.getKryoForUICatalog();
-		final List<Class<? extends Object>> payloadClasses = new ArrayList<>();
+		final List<Class<?>> payloadClasses = new ArrayList<>();
 		payloadClasses.add(KryoGameInfo.class);
 		payloadClasses.add(UICatalogImpl.class);
 		return (KryoGameInfo) kryoService.get(path, payloadClasses, kryo, 0).get(0);

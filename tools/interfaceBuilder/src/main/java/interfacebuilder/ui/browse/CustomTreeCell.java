@@ -18,10 +18,9 @@ public class CustomTreeCell extends TreeCell<UIElement> {
 		
 		if (empty) {
 			setGraphic(null);
-			setText(null);
 		} else {
 			setGraphic(flowFactory.getFlow(item));
-			setText(null);
 		}
+		setText(null);
 	}
 }

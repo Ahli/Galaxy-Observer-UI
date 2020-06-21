@@ -121,7 +121,7 @@ public class BaseUiService {
 		final Path path = Paths.get(directory.getAbsolutePath(), META_FILE_NAME);
 		if (Files.exists(path)) {
 			final Kryo kryo = kryoService.getKryoForBaseUiMetaFile();
-			final List<Class<? extends Object>> payloadClasses = new ArrayList<>();
+			final List<Class<?>> payloadClasses = new ArrayList<>();
 			payloadClasses.add(KryoGameInfo.class);
 			return (KryoGameInfo) kryoService.get(path, payloadClasses, kryo).get(0);
 		}
@@ -369,7 +369,9 @@ public class BaseUiService {
 					isPtr = isPtr(new File(baseUiPath));
 				} catch (final IOException e) {
 					// do nothing
-					logger.trace("Ignoring error in isPtr() check on baseUiPath.", e);
+					if (logger.isTraceEnabled()) {
+						logger.trace("Ignoring error in isPtr() check on baseUiPath.", e);
+					}
 				}
 				try {
 					if (cacheIsUpToDateCheckException(gameData.getGameDef(), isPtr)) {

@@ -125,7 +125,7 @@ public class CompileService {
 	 * @return clone of the CatalogUI
 	 */
 	private static UICatalog getClonedUICatalog(final UICatalog uiCatalog) {
-		return (UICatalog) uiCatalog.deepCopy();
+		return uiCatalog != null ? (UICatalog) uiCatalog.deepCopy() : null;
 	}
 	
 	/**

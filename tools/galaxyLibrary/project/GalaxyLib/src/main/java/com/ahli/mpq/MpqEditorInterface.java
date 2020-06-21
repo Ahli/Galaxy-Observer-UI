@@ -239,16 +239,14 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 				logger.error(ExceptionUtils.getStackTrace(e));
 			}
 			
-			buildMpqWithCompression(compressMpq, absolutePath, fileCount);
-			
 		} else {
 			// NO CONTENT COMPRESSION/PROTECTION OPTIONS
 			
 			// make way for file
 			deleteFile(absolutePath);
 			
-			buildMpqWithCompression(compressMpq, absolutePath, fileCount);
 		}
+		buildMpqWithCompression(compressMpq, absolutePath, fileCount);
 	}
 	
 	/**
