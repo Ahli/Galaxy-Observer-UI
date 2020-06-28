@@ -142,8 +142,8 @@ public class InterfaceBuilderApp extends Application {
 		Platform.runLater(() -> {
 			final InterfaceBuilderApp instance = InterfaceBuilderApp.getInstance();
 			// free space of baseUI
-			if (instance != null && instance.executor != null && instance.mpqBuilderService != null &&
-					instance.executor.isQuiescent()) {
+			if (instance != null && instance.executor != null && instance.executor.isQuiescent() &&
+					instance.mpqBuilderService != null) {
 				logger.info("Freeing up resources");
 				instance.mpqBuilderService.getGameData(Game.SC2).setUiCatalog(null);
 				instance.mpqBuilderService.getGameData(Game.HEROES).setUiCatalog(null);

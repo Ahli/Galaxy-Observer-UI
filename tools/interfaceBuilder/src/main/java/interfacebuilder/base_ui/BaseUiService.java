@@ -403,7 +403,7 @@ public class BaseUiService {
 							
 							final File directory = new File(gameDir + File.separator + modOrDir);
 							if (!directory.exists() || !directory.isDirectory()) {
-								throw new IOException("BaseUI out of date.");
+								throw new IOException("BaseUI does not exist.");
 							}
 							
 							final Collection<File> descIndexFiles =
@@ -418,6 +418,9 @@ public class BaseUiService {
 						}
 						uiCatalog.postProcessParsing();
 						gameData.setUiCatalog(uiCatalog);
+						if (logger.isTraceEnabled()) {
+							logger.trace("Parsed BaseUI for {}", gameName);
+						}
 					} catch (final SAXException | IOException | ParserConfigurationException e) {
 						logger.error("ERROR parsing base UI catalog for '" + gameName + "'.", e);
 					} catch (final InterruptedException e) {
