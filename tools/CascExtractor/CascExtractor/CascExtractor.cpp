@@ -36,9 +36,9 @@ int main(int argc, char* argv[])
 	mask = argv[1];
 	targetPath = argv[2];
 #else
-	path = L"E:\\Spiele\\Heroes of the Storm\\";
+	path = L"C:\\Spiele\\Heroes of the Storm\\";
 	mask = "*Assets.txt";
-	targetPath = "D:\\GalaxyObsUI\\tools\\CascExtractor\\CascExtractor\\Debug\\out";
+	targetPath = "Debug\\out";
 #endif
 
 	HANDLE hStorage;
