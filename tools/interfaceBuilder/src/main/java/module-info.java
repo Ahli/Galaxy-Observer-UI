@@ -43,7 +43,6 @@ module interfacex.builder {
 	requires org.apache.commons.lang3;
 	
 	// own projects
-	requires CascExplorerConfigFileEdit;
 	requires GalaxyLib;
 	
 	// log4j export is a test to fix stylized text area appender

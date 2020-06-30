@@ -44,12 +44,8 @@ public class ConfigService {
 	private String baseUiPath;
 	
 	@Autowired
-	@Qualifier("cascExtractorConfigFile")
-	private File cascExtractorConfigFile;
-	
-	@Autowired
-	@Qualifier("cascExtractorConsoleExeFile")
-	private File cascExtractorConsoleExeFile;
+	@Qualifier("cascExtractorExeFile")
+	private File cascExtractorExeFile;
 	
 	@Autowired
 	@Qualifier("cachePath")
@@ -83,12 +79,8 @@ public class ConfigService {
 		return baseUiPath + File.separator + gameDef.getNameHandle();
 	}
 	
-	public File getCascExtractorConfigFile() {
-		return cascExtractorConfigFile;
-	}
-	
-	public File getCascExtractorConsoleExeFile() {
-		return cascExtractorConsoleExeFile;
+	public File getCascExtractorExeFile() {
+		return cascExtractorExeFile;
 	}
 	
 	public String getCachePath() {

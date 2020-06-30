@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public class FileService {
@@ -91,30 +90,29 @@ public class FileService {
 	}
 	
 	/**
-	 * Compares the files within a specified directory to a compareDate.
-	 *
-	 * @param compareDate
-	 * @param directory
-	 * @return true, if the compareDate is newer than the compare date
-	 * @throws IOException
-	 */
-	public boolean directoryFilesAreUpToDate(final long compareDate, final File directory) throws IOException {
-		try (final Stream<Path> ps = Files.walk(directory.toPath())) {
-			
-			final Predicate<Path> predicateIsYoungerThanCompareDate =
-					path -> path.toFile().lastModified() > compareDate;
-			return ps.filter(Files::isRegularFile).allMatch(predicateIsYoungerThanCompareDate);
-		}
-	}
-	
-	/**
 	 * Cleans a directory without deleting it.
 	 *
 	 * @param directory
 	 * @throws IOException
 	 */
 	public void cleanDirectory(final File directory) throws IOException {
-		FileUtils.cleanDirectory(directory);
+		for (int i = 500; i > 0; --i) {
+			try {
+				FileUtils.cleanDirectory(directory);
+				return;
+			} catch (final IOException e) {
+				if (i <= 1) {
+					throw e;
+				} else {
+					try {
+						Thread.sleep(5);
+					} catch (final InterruptedException e1) {
+						e1.printStackTrace();
+						Thread.currentThread().interrupt();
+					}
+				}
+			}
+		}
 	}
 	
 	/**

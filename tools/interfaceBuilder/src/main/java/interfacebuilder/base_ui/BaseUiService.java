@@ -3,7 +3,6 @@
 
 package interfacebuilder.base_ui;
 
-import cascexplorerconfigedit.editor.CascExplorerConfigFileEditor;
 import com.ahli.galaxy.game.GameData;
 import com.ahli.galaxy.game.def.abstracts.GameDef;
 import com.ahli.galaxy.parser.UICatalogParser;
@@ -50,7 +49,6 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -174,7 +172,6 @@ public class BaseUiService {
 	 */
 	public List<ForkJoinTask<Void>> extract(final Game game, final boolean usePtr, final Appender[] outputs) {
 		logger.info("Extracting baseUI for {}", game);
-		prepareCascExplorerConfig(game, usePtr);
 		
 		final GameDef gameDef = gameService.getNewGameDef(game);
 		final File destination = new File(configService.getBaseUiPath(gameDef));
@@ -192,19 +189,20 @@ public class BaseUiService {
 		}
 		
 		final List<ForkJoinTask<Void>> tasks = new ArrayList<>(4);
-		final File extractorExe = configService.getCascExtractorConsoleExeFile();
+		final File extractorExe = configService.getCascExtractorExeFile();
+		final String gamePath = gameService.getGameDirPath(gameDef, usePtr);
 		final String[] queryMasks = getQueryMasks(game);
 		int i = 0;
 		for (final String mask : queryMasks) {
-			final Appender out = outputs[i];
+			final Appender outputAppender = outputs[i];
 			i++;
 			final ForkJoinTask<Void> task = new RecursiveAction() {
 				@Override
 				protected void compute() {
 					try {
-						if (extract(extractorExe, mask, destination, out)) {
+						if (extract(extractorExe, gamePath, mask, destination, outputAppender)) {
 							Thread.sleep(50);
-							if (extract(extractorExe, mask, destination, out)) {
+							if (extract(extractorExe, gamePath, mask, destination, outputAppender)) {
 								logger.warn(
 										"Extraction failed due to a file access. Try closing the Battle.net App, if it is running and this fails to extract all files.");
 							}
@@ -236,36 +234,6 @@ public class BaseUiService {
 	}
 	
 	/**
-	 * Edits the config file of the CASCexplorer.
-	 *
-	 * @param game
-	 * @param usePtr
-	 */
-	private void prepareCascExplorerConfig(final Game game, final boolean usePtr) {
-		final File configFile = configService.getCascExtractorConfigFile();
-		final String storagePath;
-		final String onlineMode = "False";
-		final String product;
-		final String locale = "enUS";
-		switch (game) {
-			case SC2 -> {
-				storagePath = configService.getIniSettings().getSc2Path();
-				product = "sc2";
-			}
-			case HEROES -> {
-				if (usePtr) {
-					storagePath = configService.getIniSettings().getHeroesPtrPath();
-				} else {
-					storagePath = configService.getIniSettings().getHeroesPath();
-				}
-				product = "heroes";
-			}
-			default -> throw new InvalidParameterException(UNKNOWN_GAME_EXCEPTION);
-		}
-		CascExplorerConfigFileEditor.write(configFile, storagePath, onlineMode, product, locale);
-	}
-	
-	/**
 	 * @param game
 	 * @return
 	 */
@@ -278,6 +246,7 @@ public class BaseUiService {
 	
 	/**
 	 * @param extractorExe
+	 * @param gamePath
 	 * @param mask
 	 * @param destination
 	 * @param out
@@ -285,10 +254,12 @@ public class BaseUiService {
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	private static boolean extract(final File extractorExe, final String mask, final File destination,
+	private static boolean extract(final File extractorExe, final String gamePath, final String mask,
+			final File destination,
 			final Appender out) throws IOException, InterruptedException {
 		final ProcessBuilder pb =
-				new ProcessBuilder(extractorExe.getAbsolutePath(), mask, destination + File.separator, "enUS", "None");
+				new ProcessBuilder(extractorExe.getAbsolutePath(), gamePath + File.separator, mask,
+						destination + File.separator);
 		// put error and normal output into the same stream
 		pb.redirectErrorStream(true);
 		

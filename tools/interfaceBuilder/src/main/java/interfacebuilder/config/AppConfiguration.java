@@ -91,17 +91,10 @@ public class AppConfiguration {
 	}
 	
 	@Bean
-	protected File cascExtractorConfigFile() {
+	protected File cascExtractorExeFile() {
 		return new File(
 				basePath().getParent() + File.separator + "tools" + File.separator + "plugins" + File.separator +
-						"casc" + File.separator + "CASCConsole.exe.config");
-	}
-	
-	@Bean
-	protected File cascExtractorConsoleExeFile() {
-		return new File(
-				basePath().getParent() + File.separator + "tools" + File.separator + "plugins" + File.separator +
-						"casc" + File.separator + "CASCConsole.exe");
+						"casc" + File.separator + "CascExtractor.exe");
 	}
 	
 	@Bean
