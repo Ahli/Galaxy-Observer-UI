@@ -1,3 +1,6 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
+
 #include <iostream>
 #include <filesystem>
 #include <atlbase.h>
@@ -77,13 +80,12 @@ int main(int argc, char* argv[])
 	}
 	FILE* pOutFile;
 	do {
-		++results;
 		std::cout << pFindData->szFileName << std::endl;
-		std::string targetFilePath = std::string(targetPath).append("\\").append(pFindData->szFileName).c_str();
+		std::string targetFilePath = std::string(targetPath).append("\\").append(pFindData->szFileName);
 
 		// get the path from file
 		std::string targetDirPath;
-		std::size_t pos = targetFilePath.find_last_of("\\");
+		std::size_t pos = targetFilePath.find_last_of('\\');
 		if (pos != std::string::npos) {
 			targetDirPath = targetFilePath.substr(0, pos);
 			//std::cout << "creating directory: " << targetDirPath.c_str() << std::endl;
@@ -108,7 +110,7 @@ int main(int argc, char* argv[])
 					std::vector<fs::path> directories;
 					for (auto& p : fs::recursive_directory_iterator(top)) {
 						if (fs::is_directory(p)) {
-							directories.push_back(fs::canonical(p));
+							directories.emplace_back(fs::canonical(p));
 						}
 					}
 					const auto itend = directories.rend();
@@ -118,10 +120,13 @@ int main(int argc, char* argv[])
 						}
 					}
 				}
+				else {
+					++results;
+				}
 			}
 		}
 		else {
-			std::cerr << "ERROR: Unexpected file path: " << targetFilePath << std::endl;
+			std::cerr << "   ERROR: Unexpected file path: " << targetFilePath << std::endl;
 		}
 	} while (CascFindNextFile(hFind, pFindData));
 	pOutFile = nullptr;
@@ -184,9 +189,7 @@ template <typename T> T* CASC_ALLOC(size_t nCount)
 
 template <typename T> void CASC_FREE(T*& ptr)
 {
-	if (ptr) {
-		free(ptr);
-	}
+	free(ptr);
 	ptr = nullptr;
 }
 
@@ -256,7 +259,7 @@ static bool ExtractFile(HANDLE hStorage, CASC_FIND_DATA& findData, FILE* outFile
 				pbFileSpan = CASC_ALLOC<BYTE>(cbFileSpan);
 				if (pbFileSpan == NULL)
 				{
-					std::cerr << "ERROR: Not enough memory to allocate " << cbFileSpan << " bytes" << std::endl;
+					std::cerr << "   ERROR: Not enough memory to allocate " << cbFileSpan << " bytes" << std::endl;
 					dwErrCode = ERROR_NOT_ENOUGH_MEMORY;
 					break;
 				}
@@ -273,10 +276,10 @@ static bool ExtractFile(HANDLE hStorage, CASC_FIND_DATA& findData, FILE* outFile
 					case ERROR_SUCCESS: {
 					} break;
 					case ERROR_FILE_ENCRYPTED: {
-						std::cout << "Warning: File is encrypted, file: " << szOpenName << std::endl;
+						std::cout << "   WARNING: File is encrypted: " << szOpenName << std::endl;
 					} break;
 					default: {
-						std::cout << "Warning: Could not read file: " << szOpenName << std::endl;
+						std::cout << "   WARNING: Could not read file: " << szOpenName << std::endl;
 					}break;
 					}
 				}
@@ -294,7 +297,7 @@ static bool ExtractFile(HANDLE hStorage, CASC_FIND_DATA& findData, FILE* outFile
 			// Check whether the total size matches
 			if (dwErrCode == ERROR_SUCCESS && totalWritten != fileInfo.ContentSize)
 			{
-				std::cout << "Warning: corruption detected, file: " << szOpenName << std::endl;
+				std::cout << "   WARNING: exported file is corrupted: " << szOpenName << std::endl;
 				dwErrCode = ERROR_FILE_CORRUPT;
 			}
 
@@ -307,7 +310,7 @@ static bool ExtractFile(HANDLE hStorage, CASC_FIND_DATA& findData, FILE* outFile
 	}
 	else
 	{
-		std::cout << "Warning: could not open file: " << szOpenName << std::endl;
+		std::cout << "   WARNING: could not open file: " << szOpenName << std::endl;
 		dwErrCode = GetLastError();
 	}
 
