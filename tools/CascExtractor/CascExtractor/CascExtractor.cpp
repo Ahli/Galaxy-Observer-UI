@@ -6,7 +6,7 @@
 #include <atlbase.h>
 #include "CascLib.h"
 
-static bool ExtractFile(HANDLE hStorage, const CASC_FIND_DATA& findData, FILE* outFile, ULONGLONG& totalWritten);
+static bool ExtractFile(HANDLE hStorage, const CASC_FIND_DATA& findData, const char* targetDirPath, const char* targetFilePath);
 static int  CleanUp(int exitCode, HANDLE hStorage, HANDLE hFind) noexcept;
 static bool CleanUpStorage(HANDLE hStorage) noexcept;
 static bool CleanUpFind(HANDLE hFind) noexcept;
@@ -18,7 +18,7 @@ static FILE* OpenExtractedFile(const char* filePath);
 /// <param name="argc"></param>
 /// <param name="argv"></param>
 /// <returns></returns>
-int main(const int argc, const char* argv[])
+int main(const int argc, const char* const argv[])
 {
 	try {
 		LPCTSTR path = nullptr;
@@ -42,7 +42,7 @@ int main(const int argc, const char* argv[])
 
 #else
 		path = L"C:\\Spiele\\StarCraft II\\";
-		mask = "*.SC2Layout";
+		mask = "*.sc2style";
 		targetPath = "Debug\\out";
 #endif
 		std::wcout << "casc path: " << path << std::endl;
@@ -60,8 +60,8 @@ int main(const int argc, const char* argv[])
 
 		std::cout << "Finding files with mask: " << mask << std::endl;
 
-		PCASC_FIND_DATA pFindData = &CASC_FIND_DATA();
-		LPCTSTR listFile = NULL;
+		const LPCTSTR listFile = NULL;
+		const PCASC_FIND_DATA pFindData = &CASC_FIND_DATA();
 		HANDLE hFind = CascFindFirstFile(hStorage, mask, pFindData, listFile);
 		if (hFind == INVALID_HANDLE_VALUE) {
 			if (GetLastError() == ERROR_SUCCESS) {
@@ -78,10 +78,8 @@ int main(const int argc, const char* argv[])
 			}
 		}
 
-		namespace fs = std::filesystem;
 
 		int results = 0;
-		FILE* pOutFile = nullptr;
 		do {
 			std::cout << pFindData->szFileName << std::endl;
 			std::string targetFilePath = std::string(targetPath).append("\\").append(pFindData->szFileName);
@@ -91,47 +89,15 @@ int main(const int argc, const char* argv[])
 			const std::size_t pos = targetFilePath.find_last_of('\\');
 			if (pos != std::string::npos) {
 				targetDirPath = targetFilePath.substr(0, pos);
-				//std::cout << "creating directory: " << targetDirPath.c_str() << std::endl;
 
-				fs::create_directories(targetDirPath.c_str());
-
-				// create filestream
-				pOutFile = OpenExtractedFile(targetFilePath.c_str());
-				if (pOutFile) {
-					ULONGLONG totalWritten = 0;
-					ExtractFile(hStorage, *pFindData, pOutFile, totalWritten);
-					fclose(pOutFile);
-
-					// remove empty file
-					if (totalWritten == 0) {
-						remove(targetFilePath.c_str());
-						//std::cout << "removed empty file: " << targetFilePath.c_str() << std::endl;
-					}
-					else {
-						++results;
-					}
+				if (ExtractFile(hStorage, *pFindData, targetDirPath.c_str(), targetFilePath.c_str()) == ERROR_SUCCESS) {
+					++results;
 				}
 			}
 			else {
 				std::cerr << "   ERROR: Unexpected file path: " << targetFilePath << std::endl;
 			}
 		} while (CascFindNextFile(hFind, pFindData));
-		pOutFile = nullptr;
-
-		// remove empty directories recursively
-		fs::path top = fs::path(targetPath);
-		std::vector<fs::path> directories;
-		for (auto& p : fs::recursive_directory_iterator(top)) {
-			if (fs::is_directory(p)) {
-				directories.emplace_back(fs::canonical(p));
-			}
-		}
-		const auto itend = directories.rend();
-		for (std::vector<fs::path>::reverse_iterator rit = directories.rbegin(); rit != itend; ++rit) {
-			if (fs::is_empty(*rit)) {
-				fs::remove(*rit);
-			}
-		}
 
 		std::cout << "Extracted " << results << " file" << (results == 1 ? "" : "s") << " for mask: " << mask << std::endl;
 
@@ -235,30 +201,32 @@ static PCASC_FILE_SPAN_INFO GetFileInfo(HANDLE hFile, CASC_FILE_FULL_INFO& FileI
 	return pSpans;
 }
 
-// removed unnecessary steps/counters
-static bool ExtractFile(HANDLE hStorage, const CASC_FIND_DATA& findData, FILE* outFile, ULONGLONG& totalWritten) {
+static bool ExtractFile(HANDLE hStorage, const CASC_FIND_DATA& findData, const char* targetDirPath, const char* targetFilePath) {
+	namespace fs = std::filesystem;
+
 	PCASC_FILE_SPAN_INFO pSpans = nullptr;
 	CASC_FILE_FULL_INFO fileInfo{};
 	LPCSTR szOpenName = findData.szFileName;
 	DWORD dwErrCode = ERROR_SUCCESS;
 	HANDLE hFile = NULL;
-	totalWritten = 0;
 
-	if (CascOpenFile(hStorage, szOpenName, NULL, CASC_STRICT_DATA_CHECK, &hFile))
+	if (CascOpenFile(hStorage, szOpenName, NULL /*dwLocaleFlags*/, CASC_STRICT_DATA_CHECK, &hFile))
 	{
 		// Retrieve the information about file spans.
-		if ((pSpans = GetFileInfo(hFile, fileInfo)) != NULL)
+		if ((pSpans = GetFileInfo(hFile, fileInfo)) != nullptr && fileInfo.ContentSize > 0)
 		{
 			DWORD dwBytesRead = 0;
+			ULONGLONG totalWritten = 0;
+			FILE* pOutFile = nullptr;
 
 			// Load the entire file, one read request per span.
 			// Using span-aligned reads will cause CascReadFile not to do any caching,
 			// and the amount of memcpys will be almost zero
 			for (DWORD i = 0; i < fileInfo.SpanCount && dwErrCode == ERROR_SUCCESS; i++)
 			{
-				const PCASC_FILE_SPAN_INFO pFileSpan = pSpans + i;
+				const PCASC_FILE_SPAN_INFO const pFileSpan = pSpans + i;
 				LPBYTE pbFileSpan = nullptr;
-				DWORD cbFileSpan = (DWORD)(pFileSpan->EndOffset - pFileSpan->StartOffset);
+				const DWORD cbFileSpan = (DWORD)(pFileSpan->EndOffset - pFileSpan->StartOffset);
 
 				// Do not read empty spans.
 				if (cbFileSpan == 0)
@@ -293,24 +261,55 @@ static bool ExtractFile(HANDLE hStorage, const CASC_FIND_DATA& findData, FILE* o
 					}
 				}
 
-				// If required, write the file data to the output file
-				if (outFile)
-					fwrite(pbFileSpan, 1, dwBytesRead, outFile);
+				if (dwBytesRead > 0) {
+					// prepare file stream
+					if (!pOutFile) {
 
-				totalWritten += dwBytesRead;
+						if (fs::exists(targetDirPath) || fs::create_directories(targetDirPath)) {
+
+							// create filestream and empty file
+							if ((pOutFile = OpenExtractedFile(targetFilePath)) == nullptr) {
+								std::cerr << "   ERROR: Could not create file: " << targetFilePath << std::endl;
+							}
+						}
+						else {
+							std::cerr << "   ERROR: Could not create directories: " << targetDirPath << std::endl;
+						}
+					}
+
+					// write span's content to the file
+					if (pOutFile) {
+						//std::cout << "   bytes read: " << dwBytesRead << std::endl;
+						fwrite(pbFileSpan, 1, dwBytesRead, pOutFile);
+					}
+
+					totalWritten += dwBytesRead;
+				}
 
 				// Free the memory occupied by the file span
 				CASC_FREE(pbFileSpan);
 			}
 
+			if (pOutFile) {
+				fclose(pOutFile);
+			}
+
 			// Check whether the total size matches
 			if (dwErrCode == ERROR_SUCCESS && totalWritten != fileInfo.ContentSize)
 			{
-				std::cout << "   WARNING: exported file is corrupted: " << szOpenName << std::endl;
+				std::cerr << "   WARNING: exported file is corrupted: " << szOpenName << std::endl;
 				dwErrCode = ERROR_FILE_CORRUPT;
 			}
 
-			// Free the span array
+			//std::cout << "totalWritten: " << totalWritten << std::endl;
+		}
+		else if (dwErrCode == ERROR_SUCCESS) {
+			std::cerr << "   WARNING: file had no content: " << szOpenName << std::endl;
+			dwErrCode = ERROR_NO_DATA;
+		}
+
+		// Free the span array
+		if (pSpans) {
 			CASC_FREE(pSpans);
 		}
 
@@ -323,6 +322,7 @@ static bool ExtractFile(HANDLE hStorage, const CASC_FIND_DATA& findData, FILE* o
 		dwErrCode = GetLastError();
 	}
 
+	//std::cout << "   returning error code: " << dwErrCode << std::endl;
 	return dwErrCode;
 }
 
