@@ -6,10 +6,10 @@
 #include <atlbase.h>
 #include "CascLib.h"
 
-static bool ExtractFile(HANDLE hStorage, CASC_FIND_DATA& findData, FILE* outFile, ULONGLONG& totalWritten);
-static int  CleanUp(int exitCode, HANDLE hStorage, HANDLE hFind);
-static bool CleanUpStorage(HANDLE hStorage);
-static bool CleanUpFind(HANDLE hFind);
+static bool ExtractFile(HANDLE hStorage, const CASC_FIND_DATA& findData, FILE* outFile, ULONGLONG& totalWritten);
+static int  CleanUp(int exitCode, HANDLE hStorage, HANDLE hFind) noexcept;
+static bool CleanUpStorage(HANDLE hStorage) noexcept;
+static bool CleanUpFind(HANDLE hFind) noexcept;
 static FILE* OpenExtractedFile(const char* filePath);
 
 /// <summary>
@@ -18,125 +18,134 @@ static FILE* OpenExtractedFile(const char* filePath);
 /// <param name="argc"></param>
 /// <param name="argv"></param>
 /// <returns></returns>
-int main(int argc, char* argv[])
+int main(const int argc, const char* argv[])
 {
-	LPCTSTR path;
-	LPCSTR mask;
-	LPCSTR targetPath;
+	try {
+		LPCTSTR path = nullptr;
+		LPCSTR mask = nullptr;
+		LPCSTR targetPath = nullptr;
 #ifndef _DEBUG
-	if (argc != 4) {
-		std::cout << "ERROR: Please provide 3 arguments: CascExtractor.exe [\"Path\\to\\the\\CASC storage\"] [\"*mask.txt\"] [\"Path\to\\the\\output\\Directory\"]." << std::endl;
-		return EXIT_FAILURE;
-	}
-
-	std::string str = argv[1];
-	std::replace(str.begin(), str.end(), '/', '\\');
-	path = CA2CT(str.c_str());
-
-	mask = argv[2];
-
-	str = argv[3];
-	std::replace(str.begin(), str.end(), '/', '\\');
-	targetPath = str.c_str();
-
-#else
-	path = L"C:\\Spiele\\StarCraft II\\";
-	mask = "*.sc2style";
-	targetPath = "Debug\\out";
-#endif
-	std::wcout << "casc path: " << path << std::endl;
-	std::cout << "mask: " << mask << std::endl;
-	std::cout << "target path: " << targetPath << std::endl;
-
-	HANDLE hStorage;
-
-	std::wcout << "Opening CASC Storage: " << path << std::endl;
-
-	if (!CascOpenStorage(path, 0, &hStorage)) {
-		std::cerr << "ERROR: opening storage: " << GetLastError() << std::endl;
-		return EXIT_FAILURE;
-	}
-
-	std::cout << "Finding files with mask: " << mask << std::endl;
-
-	int results = 0;
-
-	PCASC_FIND_DATA pFindData = &CASC_FIND_DATA();
-	LPCTSTR listFile = NULL;
-	HANDLE hFind = CascFindFirstFile(hStorage, mask, pFindData, listFile);
-	if (hFind == INVALID_HANDLE_VALUE) {
-		if (GetLastError() == ERROR_SUCCESS) {
-			std::cout << "Found 0 files for mask: " << mask << std::endl;
-			CascFindClose(hFind);
-			CleanUpStorage(hStorage);
-			return EXIT_SUCCESS;
-		}
-		else {
-			std::cerr << "ERROR: Unknown error, mask: " << mask << std::endl;
-			CascFindClose(hFind);
-			CleanUpStorage(hStorage);
+		if (argc != 4) {
+			std::cout << "ERROR: Please provide 3 arguments: CascExtractor.exe [\"Path\\to\\the\\CASC storage\"] [\"*mask.txt\"] [\"Path\\to\\the\\output Directory\"]." << std::endl;
 			return EXIT_FAILURE;
 		}
-	}
-	FILE* pOutFile;
-	do {
-		std::cout << pFindData->szFileName << std::endl;
-		std::string targetFilePath = std::string(targetPath).append("\\").append(pFindData->szFileName);
 
-		// get the path from file
-		std::string targetDirPath;
-		std::size_t pos = targetFilePath.find_last_of('\\');
-		if (pos != std::string::npos) {
-			targetDirPath = targetFilePath.substr(0, pos);
-			//std::cout << "creating directory: " << targetDirPath.c_str() << std::endl;
+		std::string str = argv[1];
+		std::replace(str.begin(), str.end(), '/', '\\');
+		path = CA2CT(str.c_str());
 
-			namespace fs = std::filesystem;
+		mask = argv[2];
 
-			fs::create_directories(targetDirPath.c_str());
+		str = argv[3];
+		std::replace(str.begin(), str.end(), '/', '\\');
+		targetPath = str.c_str();
 
-			// create filestream
-			pOutFile = OpenExtractedFile(targetFilePath.c_str());
-			if (pOutFile) {
-				ULONGLONG totalWritten = 0;
-				ExtractFile(hStorage, *pFindData, pOutFile, totalWritten);
-				fclose(pOutFile);
+#else
+		path = L"C:\\Spiele\\StarCraft II\\";
+		mask = "*.SC2Layout";
+		targetPath = "Debug\\out";
+#endif
+		std::wcout << "casc path: " << path << std::endl;
+		std::cout << "mask: " << mask << std::endl;
+		std::cout << "target path: " << targetPath << std::endl;
 
-				// remove empty file
-				if (totalWritten == 0) {
-					remove(targetFilePath.c_str());
+		std::wcout << "Opening CASC Storage: " << path << std::endl;
 
-					// remove empty directories recursively
-					fs::path top = fs::path(targetPath);
-					std::vector<fs::path> directories;
-					for (auto& p : fs::recursive_directory_iterator(top)) {
-						if (fs::is_directory(p)) {
-							directories.emplace_back(fs::canonical(p));
-						}
-					}
-					const auto itend = directories.rend();
-					for (std::vector<fs::path>::reverse_iterator rit = directories.rbegin(); rit != itend; ++rit) {
-						if (fs::is_empty(*rit)) {
-							fs::remove(*rit);
-						}
-					}
-				}
-				else {
-					++results;
-				}
+		HANDLE hStorage;
+
+		if (!CascOpenStorage(path, 0, &hStorage)) {
+			std::cerr << "ERROR: opening storage: " << GetLastError() << std::endl;
+			return EXIT_FAILURE;
+		}
+
+		std::cout << "Finding files with mask: " << mask << std::endl;
+
+		PCASC_FIND_DATA pFindData = &CASC_FIND_DATA();
+		LPCTSTR listFile = NULL;
+		HANDLE hFind = CascFindFirstFile(hStorage, mask, pFindData, listFile);
+		if (hFind == INVALID_HANDLE_VALUE) {
+			if (GetLastError() == ERROR_SUCCESS) {
+				std::cout << "Found 0 files for mask: " << mask << std::endl;
+				CascFindClose(hFind);
+				CleanUpStorage(hStorage);
+				return EXIT_SUCCESS;
+			}
+			else {
+				std::cerr << "ERROR: Unknown error, mask: " << mask << std::endl;
+				CascFindClose(hFind);
+				CleanUpStorage(hStorage);
+				return EXIT_FAILURE;
 			}
 		}
-		else {
-			std::cerr << "   ERROR: Unexpected file path: " << targetFilePath << std::endl;
+
+		namespace fs = std::filesystem;
+
+		int results = 0;
+		FILE* pOutFile = nullptr;
+		do {
+			std::cout << pFindData->szFileName << std::endl;
+			std::string targetFilePath = std::string(targetPath).append("\\").append(pFindData->szFileName);
+
+			// get the path from file
+			std::string targetDirPath;
+			const std::size_t pos = targetFilePath.find_last_of('\\');
+			if (pos != std::string::npos) {
+				targetDirPath = targetFilePath.substr(0, pos);
+				//std::cout << "creating directory: " << targetDirPath.c_str() << std::endl;
+
+				fs::create_directories(targetDirPath.c_str());
+
+				// create filestream
+				pOutFile = OpenExtractedFile(targetFilePath.c_str());
+				if (pOutFile) {
+					ULONGLONG totalWritten = 0;
+					ExtractFile(hStorage, *pFindData, pOutFile, totalWritten);
+					fclose(pOutFile);
+
+					// remove empty file
+					if (totalWritten == 0) {
+						remove(targetFilePath.c_str());
+						//std::cout << "removed empty file: " << targetFilePath.c_str() << std::endl;
+					}
+					else {
+						++results;
+					}
+				}
+			}
+			else {
+				std::cerr << "   ERROR: Unexpected file path: " << targetFilePath << std::endl;
+			}
+		} while (CascFindNextFile(hFind, pFindData));
+		pOutFile = nullptr;
+
+		// remove empty directories recursively
+		fs::path top = fs::path(targetPath);
+		std::vector<fs::path> directories;
+		for (auto& p : fs::recursive_directory_iterator(top)) {
+			if (fs::is_directory(p)) {
+				directories.emplace_back(fs::canonical(p));
+			}
 		}
-	} while (CascFindNextFile(hFind, pFindData));
-	pOutFile = nullptr;
+		const auto itend = directories.rend();
+		for (std::vector<fs::path>::reverse_iterator rit = directories.rbegin(); rit != itend; ++rit) {
+			if (fs::is_empty(*rit)) {
+				fs::remove(*rit);
+			}
+		}
 
-	std::cout << "Found " << results << " file" << (results == 1 ? "" : "s") << " for mask: " << mask << std::endl;
+		std::cout << "Extracted " << results << " file" << (results == 1 ? "" : "s") << " for mask: " << mask << std::endl;
 
-	// clean up
-	bool findFailed = (GetLastError() != ERROR_NO_MORE_FILES && GetLastError() != ERROR_SUCCESS);
-	int exitCode = findFailed ? EXIT_FAILURE : EXIT_SUCCESS;
-	return CleanUp(exitCode, hStorage, hFind);
+		// clean up
+		const bool findFailed = (GetLastError() != ERROR_NO_MORE_FILES && GetLastError() != ERROR_SUCCESS);
+		const int exitCode = findFailed ? EXIT_FAILURE : EXIT_SUCCESS;
+		return CleanUp(exitCode, hStorage, hFind);
+	}
+	catch (std::exception e) {
+		std::cout << "ERROR: " << e.what() << std::endl;
+	}
+	catch (...) {
+		std::cout << "An unknown fatal error occurred." << std::endl;
+	}
 }
 
 /// <summary>
@@ -146,7 +155,7 @@ int main(int argc, char* argv[])
 /// <param name="hStorage">HANDLE of the Storage</param>
 /// <param name="hFind">HANDLE of the Find</param>
 /// <returns>EXIT_FAILURE code when cleaning up encountered a problem. Else the specified exitCode is returned.</returns>
-static int CleanUp(int exitCode, HANDLE hStorage, HANDLE hFind) {
+static int CleanUp(int exitCode, HANDLE hStorage, HANDLE hFind) noexcept {
 	bool result = CleanUpFind(hFind);
 	result = CleanUpStorage(hStorage) || result;
 	return !result ? EXIT_FAILURE : exitCode;
@@ -156,7 +165,7 @@ static int CleanUp(int exitCode, HANDLE hStorage, HANDLE hFind) {
 /// 
 /// </summary>
 /// <param name="hStorage">HANDLE of the Storage</param>
-static bool CleanUpStorage(HANDLE hStorage) {
+static bool CleanUpStorage(HANDLE hStorage) noexcept {
 	if (hStorage) {
 		return CascCloseStorage(hStorage);
 	}
@@ -167,7 +176,7 @@ static bool CleanUpStorage(HANDLE hStorage) {
 /// 
 /// </summary>
 /// <param name="hFind">HANDLE of the Find</param>
-static bool CleanUpFind(HANDLE hFind) {
+static bool CleanUpFind(HANDLE hFind) noexcept {
 	if (hFind) {
 		return CascFindClose(hFind);
 	}
@@ -182,12 +191,12 @@ static bool CleanUpFind(HANDLE hFind) {
 // BASED ON THE CODE FROM CASCLIB's TEST PROJECT
 // -----------------------------------------------
 
-template <typename T> T* CASC_ALLOC(size_t nCount)
+template <typename T> T* CASC_ALLOC(size_t nCount) noexcept
 {
 	return (T*)malloc(nCount * sizeof(T));
 }
 
-template <typename T> void CASC_FREE(T*& ptr)
+template <typename T> void CASC_FREE(T*& ptr) noexcept
 {
 	free(ptr);
 	ptr = nullptr;
@@ -208,7 +217,7 @@ template <typename XCHAR> const XCHAR* GetPlainFileName(const XCHAR* szFileName)
 	return szPlainName;
 }
 
-static PCASC_FILE_SPAN_INFO GetFileInfo(HANDLE hFile, CASC_FILE_FULL_INFO& FileInfo)
+static PCASC_FILE_SPAN_INFO GetFileInfo(HANDLE hFile, CASC_FILE_FULL_INFO& FileInfo) noexcept
 {
 	PCASC_FILE_SPAN_INFO pSpans = nullptr;
 	// Retrieve the full file info
@@ -227,9 +236,9 @@ static PCASC_FILE_SPAN_INFO GetFileInfo(HANDLE hFile, CASC_FILE_FULL_INFO& FileI
 }
 
 // removed unnecessary steps/counters
-static bool ExtractFile(HANDLE hStorage, CASC_FIND_DATA& findData, FILE* outFile, ULONGLONG& totalWritten) {
-	PCASC_FILE_SPAN_INFO pSpans;
-	CASC_FILE_FULL_INFO fileInfo;
+static bool ExtractFile(HANDLE hStorage, const CASC_FIND_DATA& findData, FILE* outFile, ULONGLONG& totalWritten) {
+	PCASC_FILE_SPAN_INFO pSpans = nullptr;
+	CASC_FILE_FULL_INFO fileInfo{};
 	LPCSTR szOpenName = findData.szFileName;
 	DWORD dwErrCode = ERROR_SUCCESS;
 	HANDLE hFile = NULL;
@@ -247,8 +256,8 @@ static bool ExtractFile(HANDLE hStorage, CASC_FIND_DATA& findData, FILE* outFile
 			// and the amount of memcpys will be almost zero
 			for (DWORD i = 0; i < fileInfo.SpanCount && dwErrCode == ERROR_SUCCESS; i++)
 			{
-				PCASC_FILE_SPAN_INFO pFileSpan = pSpans + i;
-				LPBYTE pbFileSpan;
+				const PCASC_FILE_SPAN_INFO pFileSpan = pSpans + i;
+				LPBYTE pbFileSpan = nullptr;
 				DWORD cbFileSpan = (DWORD)(pFileSpan->EndOffset - pFileSpan->StartOffset);
 
 				// Do not read empty spans.
