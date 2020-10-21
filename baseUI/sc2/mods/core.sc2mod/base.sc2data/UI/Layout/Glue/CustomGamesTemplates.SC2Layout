@@ -216,6 +216,66 @@
                 </State>
             </StateGroup>
         </Frame>
+        
+        
+        <Frame type="EditBox" name="MapNameEditBox" template="StandardSmallButtonTemplates/StandardSmallEditBoxTemplate">
+            <Text val="{$parent/BattleMapFrame/@Name}"/>
+            <Visible val="False"/>
+        
+            <Frame type="Frame" name="AnchorFrame">
+                <Anchor side="Top" relative="$parent/$parent" pos="Min" offset="0"/>
+                <Anchor side="Left" relative="$parent/$parent" pos="Min" offset="15"/>
+                <Anchor side="Right" relative="$parent/$parent" pos="Max" offset="-15"/>
+            </Frame>
+
+            <Frame type="Frame" name="LabelContainerFrame">
+                <Frame type="Label" name="Label">
+                
+                    <StateGroup name="StyleState">
+                        <DefaultState val="Normal"/>
+                    
+                        <State name="Disabled">
+                            <When type="StateGroup" frame="$parent/$parent" DisabledState="Disabled"/>
+                            <Action type="SetProperty" frame="$this" Style="StandardSmallEditBoxItem_Selected"/>
+                            <Action type="SetProperty" frame="$this" Alpha="255"/>
+                        </State>
+                        
+                        <State name="Selected">
+                            <When type="StateGroup" frame="$parent/$parent" PressedState="Pressed"/>
+                            <Action type="SetProperty" frame="$this" Style="StandardSmallEditBoxItem_Selected"/>
+                            <Action type="SetProperty" frame="$this" Alpha="255"/>
+                        </State>
+                        
+                        <State name="Hover">
+                            <When type="StateGroup" frame="$parent/$parent" HoveredState="Hovered"/>
+                            <Action type="SetProperty" frame="$this" Style="StandardSmallEditBoxItem_Selected"/>
+                            <Action type="SetProperty" frame="$this" Alpha="255"/>
+                        </State>
+
+                        <State name="Normal">
+                            <Action type="SetProperty" frame="$this" Style="StandardSmallEditBoxItem_Selected"/>
+                            <Action type="SetProperty" frame="$this" Alpha="255"/>
+                        </State>
+                    </StateGroup>
+                </Frame>
+            </Frame>
+            
+            <StateGroup name="ModerationState">
+                <DefaultState val="NoModeration"/>
+                
+                <State name="PublishModeration">
+                    <When type="Property" frame="$BattleUI" IsModerationRegion="True"/>
+                    <When type="Property" frame="$BattleUI" IsMapModerator="True"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                    <Action type="SetProperty" frame="$parent/MapNameLabel" Alpha="0"/>
+                </State>
+
+                <State name="NoModeration">
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                    <Action type="SetProperty" frame="$parent/MapNameLabel" Alpha="255"/>
+                </State>
+            </StateGroup>
+        </Frame>
 		
 		<Frame type="Frame" name="PremiumIconAnchor">
             <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
@@ -412,6 +472,31 @@
                     <Action type="SetProperty" frame="$this" Visible="False"/>
                 </State>
             </StateGroup>
+            
+            <StateGroup name="ModerationState">
+                <DefaultState val="NoModeration"/>
+                
+                <State name="PublishModeration">
+                    <When type="Property" frame="$BattleUI" IsModerationRegion="True"/>
+                    <When type="Property" frame="$BattleUI" IsMapModerator="False"/>
+                    <When type="Property" frame="$parent/BattleMapFrame" IsBlizzardMap="False"/>
+                    <When type="Property" frame="$parent/BattleMapFrame" IsMapMyPublished="False"/>
+                    <When type="Property" frame="$parent/BattleMapFrame" IsMapInPublishModeration="True"/>
+                    <Action type="SetProperty" frame="$this" Text="@UI/ScreenCustomGames/MapAudit/UnderReviewUpdate"/>
+                </State>
+                
+                <State name="UpdateModeration">
+                    <When type="Property" frame="$BattleUI" IsModerationRegion="True"/>
+                    <When type="Property" frame="$BattleUI" IsMapModerator="False"/>
+                    <When type="Property" frame="$parent/BattleMapFrame" IsBlizzardMap="False"/>
+                    <When type="Property" frame="$parent/BattleMapFrame" IsMapMyPublished="False"/>
+                    <When type="Property" frame="$parent/BattleMapFrame" IsMapInUpdateModeration="True"/>
+                    <Action type="SetProperty" frame="$this" Text="@UI/ScreenCustomGames/MapAudit/UnderReviewUpdate"/>
+                </State>
+
+                <State name="NoModeration">
+                </State>
+            </StateGroup>
         </Frame>
 
         <Frame type="Label" name="WebsiteLabel">
@@ -433,6 +518,31 @@
                 
                 <State name="NotVisible">
                     <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            </StateGroup>
+            
+            <StateGroup name="ModerationState">
+                <DefaultState val="NoModeration"/>
+                
+                <State name="PublishModeration">
+                    <When type="Property" frame="$BattleUI" IsModerationRegion="True"/>
+                    <When type="Property" frame="$BattleUI" IsMapModerator="False"/>
+                    <When type="Property" frame="$parent/BattleMapFrame" IsBlizzardMap="False"/>
+                    <When type="Property" frame="$parent/BattleMapFrame" IsMapMyPublished="False"/>
+                    <When type="Property" frame="$parent/BattleMapFrame" IsMapInPublishModeration="True"/>
+                    <Action type="SetAnchor" frame="$this" side="Bottom" relative="$parent" pos="Max" offset="5000"/>
+                </State>
+                
+                <State name="UpdateModeration">
+                    <When type="Property" frame="$BattleUI" IsModerationRegion="True"/>
+                    <When type="Property" frame="$BattleUI" IsMapModerator="False"/>
+                    <When type="Property" frame="$parent/BattleMapFrame" IsBlizzardMap="False"/>
+                    <When type="Property" frame="$parent/BattleMapFrame" IsMapMyPublished="False"/>
+                    <When type="Property" frame="$parent/BattleMapFrame" IsMapInUpdateModeration="True"/>
+                    <Action type="SetAnchor" frame="$this" side="Bottom" relative="$parent" pos="Max" offset="5000"/>
+                </State>
+
+                <State name="NoModeration">
                 </State>
             </StateGroup>
         </Frame>
@@ -572,6 +682,37 @@
                 </State>
             </StateGroup>
         </Frame>
+            
+        <Frame type="Image" name="UnderReviewImageBg">
+            <Anchor relative="$parent/BattleMapInfoBg"/>
+            <Visible val="False"/>
+            <Texture val="Assets/Textures/UI_Battlenet_Glues_Arcade_MapIcon_Default_Large.dds"/>
+            
+            <StateGroup name="ModerationState">
+                <DefaultState val="NoModeration"/>
+                
+                <State name="PublishModeration">
+                    <When type="Property" frame="$BattleUI" IsModerationRegion="True"/>
+                    <When type="Property" frame="$BattleUI" IsMapModerator="False"/>
+                    <When type="Property" frame="$parent/Item0/BattleMapFrame" IsBlizzardMap="False"/>
+                    <When type="Property" frame="$parent/Item0/BattleMapFrame" IsMapMyPublished="False"/>
+                    <When type="Property" frame="$parent/Item0/BattleMapFrame" IsMapInPublishModeration="True"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+                
+                <State name="UpdateModeration">
+                    <When type="Property" frame="$BattleUI" IsModerationRegion="True"/>
+                    <When type="Property" frame="$BattleUI" IsMapModerator="False"/>
+                    <When type="Property" frame="$parent/Item0/BattleMapFrame" IsBlizzardMap="False"/>
+                    <When type="Property" frame="$parent/Item0/BattleMapFrame" IsMapMyPublished="False"/>
+                    <When type="Property" frame="$parent/Item0/BattleMapFrame" IsMapInUpdateModeration="True"/>
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+
+                <State name="NoModeration">
+                </State>
+            </StateGroup>
+        </Frame>
 
         <Frame type="BattleMapScreenshotTileListItem" name="Item0">
             <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
@@ -580,9 +721,15 @@
             <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
             <Width val="466"/>
             <Height val="350"/>
+
+            <Frame type="BattleMapFrame" name="BattleMapFrame">
+                <Anchor relative="$parent"/>
+                <MapHandle val="{$parent/$parent/@MapHandle}"/>
+            </Frame>
             
             <Frame type="Image" name="ScreenshotImage">
                 <Anchor relative="$parent"/>
+                <Visible val="True"/>
             </Frame>
 
             <Frame type="Label" name="CaptionLabel">
@@ -591,6 +738,12 @@
                 <Anchor side="Right" relative="$parent" pos="Max" offset="-5"/>
                 <Style val="@GlueLabel"/>
                 <Visible val="False"/>
+            </Frame>
+            
+            <Frame type="Image" name="UnderReviewImage">
+                <Anchor relative="$parent"/>
+                <Visible val="False"/>
+                <Texture val="Assets/Textures/UI_Battlenet_Glues_Arcade_MapIcon_Default_Large.dds"/>
             </Frame>
                 
             <Animation name="FadeIn">
@@ -613,6 +766,33 @@
                 
                 <State name="NotVisible">
                     <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+            </StateGroup>
+            
+            <StateGroup name="ModerationState">
+                <DefaultState val="NoModeration"/>
+                
+                <State name="PublishModeration">
+                    <When type="Property" frame="$BattleUI" IsModerationRegion="True"/>
+                    <When type="Property" frame="$BattleUI" IsMapModerator="False"/>
+                    <When type="Property" frame="$this/BattleMapFrame" IsBlizzardMap="False"/>
+                    <When type="Property" frame="$this/BattleMapFrame" IsMapMyPublished="False"/>
+                    <When type="Property" frame="$this/BattleMapFrame" IsMapInPublishModeration="True"/>
+                    <Action type="SetProperty" frame="$this/ScreenshotImage" Visible="False"/>
+                    <Action type="SetProperty" frame="$this/UnderReviewImage" Visible="True"/>
+                </State>
+                
+                <State name="UpdateModeration">
+                    <When type="Property" frame="$BattleUI" IsModerationRegion="True"/>
+                    <When type="Property" frame="$BattleUI" IsMapModerator="False"/>
+                    <When type="Property" frame="$this/BattleMapFrame" IsBlizzardMap="False"/>
+                    <When type="Property" frame="$this/BattleMapFrame" IsMapMyPublished="False"/>
+                    <When type="Property" frame="$this/BattleMapFrame" IsMapInUpdateModeration="True"/>
+                    <Action type="SetProperty" frame="$this/ScreenshotImage" Visible="False"/>
+                    <Action type="SetProperty" frame="$this/UnderReviewImage" Visible="True"/>
+                </State>
+
+                <State name="NoModeration">
                 </State>
             </StateGroup>
         </Frame>
@@ -1120,6 +1300,43 @@
                 <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
                 <ScaleWidthToTexture val="True"/>
             </Frame>
+
+            <Frame type="Image" name="ModerationImage">
+                <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <ScaleWidthToTexture val="True"/>
+                <Texture val="Assets/Textures/UI_Battlenet_Glues_Arcade_MapIcon_Default.dds"/>
+                <Visible val="False"/>
+            </Frame>
+            
+            <StateGroup name="ModerationState">
+                <DefaultState val="NoModeration"/>
+                
+                <State name="PublishModeration">
+                    <When type="Property" frame="$BattleUI" IsModerationRegion="True"/>
+                    <When type="Property" frame="$BattleUI" IsMapModerator="False"/>
+                    <When type="Property" frame="$parent/BattleMapFrame" IsBlizzardMap="False"/>
+                    <When type="Property" frame="$parent/BattleMapFrame" IsMapMyPublished="False"/>
+                    <When type="Property" frame="$parent/BattleMapFrame" IsMapInPublishModeration="True"/>
+                    <Action type="SetProperty" frame="$this/Image" Visible="False"/>
+                    <Action type="SetProperty" frame="$this/ModerationImage" Visible="True"/>
+                </State>
+                
+                <State name="UpdateModeration">
+                    <When type="Property" frame="$BattleUI" IsModerationRegion="True"/>
+                    <When type="Property" frame="$BattleUI" IsMapModerator="False"/>
+                    <When type="Property" frame="$parent/BattleMapFrame" IsBlizzardMap="False"/>
+                    <When type="Property" frame="$parent/BattleMapFrame" IsMapMyPublished="False"/>
+                    <When type="Property" frame="$parent/BattleMapFrame" IsMapInUpdateModeration="True"/>
+                    <Action type="SetProperty" frame="$this/Image" Visible="False"/>
+                    <Action type="SetProperty" frame="$this/ModerationImage" Visible="True"/>
+                </State>
+
+                <State name="NoModeration">
+                </State>
+            </StateGroup>
             
             <StateGroup name="VisibleState">
                 <DefaultState val="NotVisible"/>
@@ -1742,6 +1959,11 @@
             <MapHandle val="{$parent/@MapHandle}"/>
         </Frame>
 
+        <Frame type="BattleMapFrame" name="BattleMapFrame">
+            <Anchor relative="$parent"/>
+            <MapHandle val="{$parent/@MapHandle}"/>
+        </Frame>
+
         <Frame type="BattleMapIcon" name="BattleMapIcon">
             <Anchor relative="$parent"/>
             <MapHandle val="{$parent/@MapHandle}"/>
@@ -1777,6 +1999,60 @@
                     <Action type="SetProperty" frame="$this" Visible="False"/>
                 </State>
             </StateGroup>
+        </Frame>
+        
+        <Frame type="Image" name="ModerationIcon">
+            <Anchor relative="$parent/Icon"/>
+            <Texture val="Assets/Textures/UI_Battlenet_Glues_Arcade_MapIcon_Default.dds"/>
+        </Frame>
+        
+        <Frame type="Image" name="ModerationUpdateIndicator">
+            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="-4"/>
+            <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="4"/>
+            <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="-4"/>
+            <Height val="6"/>
+            <Color val="255,255,0"/>
+            <Visible val="False"/>
+            <RenderPriority val="600"/>
+        </Frame>
+        
+        <Frame type="Image" name="ModerationNewIndicator">
+            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="-4"/>
+            <Anchor side="Left" relative="$parent/AnchorFrame" pos="Min" offset="4"/>
+            <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="-4"/>
+            <Height val="6"/>
+            <Color val="255,0,0"/>
+            <Visible val="False"/>
+            <RenderPriority val="600"/>
+        </Frame>
+        
+        <Frame type="Frame" name="ModerationMapTypeContainer">
+            <Anchor side="Bottom" relative="$parent/AnchorFrame" pos="Max" offset="-10"/>
+            <Anchor side="Right" relative="$parent/AnchorFrame" pos="Max" offset="-10"/>
+            <Width val="16"/>
+            <Height val="16"/>
+            <Visible val="False"/>
+            <RenderPriority val="600"/>
+        
+            <Frame type="Image" name="MeleeIcon">
+                <Anchor relative="$parent"/>
+                <Texture val="Assets/Textures/ui-editoricon-triggercategories_melee.dds"/>
+                <Visible val="False"/>
+            
+                <StateGroup name="MeleeState">
+                    <DefaultState val="NotMelee"/>
+                    
+                    <State name="IsMelee">
+                        <When type="Property" frame="$parent/$parent/BattleMapFrame" IsArcade="False"/>
+                        <When type="Property" frame="$parent/$parent/BattleMapFrame" IsExtensionMod="False"/>
+                        <Action type="SetProperty" frame="$this" Visible="True"/>
+                    </State>
+
+                    <State name="NotMelee">
+                        <Action type="SetProperty" frame="$this" Visible="False"/>
+                    </State>
+                </StateGroup>
+            </Frame>
         </Frame>
         
         <Frame type="UnlockableFrame" name="UnlockableFrame">
@@ -2004,6 +2280,65 @@
                 <When type="AnimationState" frame="$this" BookmarkedState="Bookmarked"/>
             </State>
             <State name="NotEquipped">
+            </State>
+        </StateGroup>
+            
+        <StateGroup name="ModerationState">
+            <DefaultState val="NoModeration"/>
+            
+            <State name="PublishModerationNotModerator">
+                <When type="Property" frame="$BattleUI" IsModerationRegion="True"/>
+                <When type="Property" frame="$BattleUI" IsMapModerator="False"/>
+                <When type="Property" frame="$this/BattleMapFrame" IsBlizzardMap="False"/>
+                <When type="Property" frame="$this/BattleMapFrame" IsMapMyPublished="False"/>
+                <When type="Property" frame="$this/BattleMapFrame" IsMapInPublishModeration="True"/>
+                <Action type="SetProperty" frame="$this/ModerationIcon" Visible="True"/>
+                <Action type="SetProperty" frame="$this/ModerationMapTypeContainer" Visible="False"/>
+                <Action type="SetProperty" frame="$this/ModerationNewIndicator" Visible="False"/>
+                <Action type="SetProperty" frame="$this/ModerationUpdateIndicator" Visible="False"/>
+            </State>
+            
+            <State name="UpdateModerationNotModerator">
+                <When type="Property" frame="$BattleUI" IsModerationRegion="True"/>
+                <When type="Property" frame="$BattleUI" IsMapModerator="False"/>
+                <When type="Property" frame="$this/BattleMapFrame" IsBlizzardMap="False"/>
+                <When type="Property" frame="$this/BattleMapFrame" IsMapMyPublished="False"/>
+                <When type="Property" frame="$this/BattleMapFrame" IsMapInUpdateModeration="True"/>
+                <Action type="SetProperty" frame="$this/ModerationIcon" Visible="True"/>
+                <Action type="SetProperty" frame="$this/ModerationMapTypeContainer" Visible="False"/>
+                <Action type="SetProperty" frame="$this/ModerationNewIndicator" Visible="False"/>
+                <Action type="SetProperty" frame="$this/ModerationUpdateIndicator" Visible="False"/>
+            </State>
+            
+            <State name="PublishModerationModerator">
+                <When type="Property" frame="$BattleUI" IsModerationRegion="True"/>
+                <When type="Property" frame="$BattleUI" IsMapModerator="True"/>
+                <When type="Property" frame="$this/BattleMapFrame" IsBlizzardMap="False"/>
+                <When type="Property" frame="$this/BattleMapFrame" IsMapMyPublished="False"/>
+                <When type="Property" frame="$this/BattleMapFrame" IsMapInPublishModeration="True"/>
+                <Action type="SetProperty" frame="$this/ModerationIcon" Visible="False"/>
+                <Action type="SetProperty" frame="$this/ModerationMapTypeContainer" Visible="True"/>
+                <Action type="SetProperty" frame="$this/ModerationNewIndicator" Visible="True"/>
+                <Action type="SetProperty" frame="$this/ModerationUpdateIndicator" Visible="False"/>
+            </State>
+            
+            <State name="UpdateModerationModerator">
+                <When type="Property" frame="$BattleUI" IsModerationRegion="True"/>
+                <When type="Property" frame="$BattleUI" IsMapModerator="True"/>
+                <When type="Property" frame="$this/BattleMapFrame" IsBlizzardMap="False"/>
+                <When type="Property" frame="$this/BattleMapFrame" IsMapMyPublished="False"/>
+                <When type="Property" frame="$this/BattleMapFrame" IsMapInUpdateModeration="True"/>
+                <Action type="SetProperty" frame="$this/ModerationIcon" Visible="False"/>
+                <Action type="SetProperty" frame="$this/ModerationMapTypeContainer" Visible="True"/>
+                <Action type="SetProperty" frame="$this/ModerationNewIndicator" Visible="False"/>
+                <Action type="SetProperty" frame="$this/ModerationUpdateIndicator" Visible="True"/>
+            </State>
+
+            <State name="NoModeration">
+                <Action type="SetProperty" frame="$this/ModerationIcon" Visible="False"/>
+                <Action type="SetProperty" frame="$this/ModerationMapTypeContainer" Visible="False"/>
+                <Action type="SetProperty" frame="$this/ModerationNewIndicator" Visible="False"/>
+                <Action type="SetProperty" frame="$this/ModerationUpdateIndicator" Visible="False"/>
             </State>
         </StateGroup>
     </Frame>

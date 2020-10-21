@@ -179,11 +179,11 @@
             <TabListItem val="SubnavContainer/SubnavButton0"/>
             <TabListItem val="SubnavContainer/SubnavButton1"/>
             <TabListItem val="SubnavContainer/SubnavButton2"/>
-            <!-- <TabListItem val="SubnavContainer/SubnavButton3"/> -->
+            <TabListItem val="SubnavContainer/SubnavButton3"/>
             <PanelListItem val="CustomGamesLobbies"/>
             <PanelListItem val="CustomGamesMelee"/>
             <PanelListItem val="CustomGamesArcade"/>
-            <!-- <PanelListItem val="CustomGamesSingleplayer"/> -->
+            <PanelListItem val="CustomGamesCustomCampaigns"/>
 
             <!-- This is explicitly broken out into a state group to avoid reloading issues. The Undo="false" exists
             on each Action to prevent a Red Text error caused by this State Group and the SelectedTabIndex property
@@ -201,7 +201,7 @@
                     <When type="Property" frame="$parent" SelectedIndex="2"/>
                     <Action type="SetProperty" frame="$this" SelectedIndex="2" Undo="false"/>
                 </State>
-                <!-- <State name="ScreenCustomIndex_Singleplayer">
+                <State name="ScreenCustomIndex_CustomCampaigns">
                     <When type="Property" frame="$parent" SelectedTabIndex="#CollectionIndex_Emoticons"/>
                     <Action type="SetProperty" frame="$this" SelectedIndex="#CollectionIndex_Emoticons" Undo="false"/>
                 </State> -->
@@ -222,7 +222,7 @@
             <Frame type="LobbyListFrame" name="CustomGamesLobbies" template="CustomGamesLobbies/CustomGamesLobbies"/>
             <Frame type="CustomGameListPanel" name="CustomGamesMelee" template="CustomGamesMelee/CustomGamesMelee"/>
             <Frame type="ArcadeBrowseListPanel" name="CustomGamesArcade" template="CustomGamesArcade/CustomGamesArcade"/>
-            <!-- <Frame type="Frame" name="CustomGamesSingleplayer" template="CustomGamesSingleplayer/CustomGamesSingleplayer"/> -->
+            <Frame type="CustomGamesBrowseListPanel" name="CustomGamesCustomCampaigns" template="CustomGamesCustomCampaigns/CustomGamesCustomCampaigns"/> -->
             
             <Frame type="BlurFrame" name="BlurEffect">
                 <Anchor relative="$parent/Background"/>
@@ -301,8 +301,14 @@
                     <Text val="@UI/ScreenCustomGames/ArcadeButton"/>
                     <Visible val="True"/>
                 </Frame>
+              
+                <!-- CUSTOM CAMPAIGN BUTTON -->
+                <Frame type="Button" name="SubnavButton3">
+                    <Text val="@UI/ScreenCustomGames/CustomCampaignButton"/>
+                    <Visible val="True"/>
+                </Frame>
 
-                <Frame type="Image" name="SubnavButtonDivider2">
+                <Frame type="Image" name="SubnavButtonDivider3">
                     
                     <StateGroup name="VisibilityState">
                         <DefaultState val="NotVisible"/>
@@ -325,6 +331,97 @@
                     </StateGroup>
                 </Frame>
                 
+                <Frame type="VersionNotificationFrame" name="CustomCampaignsNewContentIndicator">
+                    <Anchor side="Bottom" relative="$parent/SubnavButton3" pos="Max" offset="11"/>
+                    <Anchor side="Right" relative="$parent/SubnavButton3/Label" pos="Max" offset="21"/>
+                    <Width val="36"/>
+                    <Height val="36"/>
+                    <Visible val="False"/>
+                    <Version val="1"/>
+                    <SettingName val="CustomCampaignsButton"/>
+                    <Unclipped val="True"/>
+                    
+                    <Animation name="VersionState">
+                        <Event event="NewVersion" action="Reset,Play"/>
+                        <Event event="OldVersion" action="Reset,Stop"/>
+                        <Event event="InvalidVersion" action="Reset,Stop"/>
+                        <Controller type="Visibility" end="Pause">
+                            <Key type="Bool" time="0" value="True"/>
+                        </Controller>
+                        <Controller type="Tooltip" end="Pause" frame="$parent/SubnavButton3">
+                            <Key type="Text" time="0" text="@UI/ScreenNavigation/NewCustomCampaigns"/>
+                        </Controller>
+                    </Animation>
+                 
+                    <!-- The name of this animation must be "ClearNotification" -->
+                    <!-- When played, it will update the version of this notification  -->
+                    <Animation name="ClearNotification">
+                        <Event event="OnClick" action="Reset,Play" frame="$parent/SubnavButton3"/>
+                        <Event event="Toggled" action="Reset,Play" frame="$parent/SubnavButton3"/>
+                 
+                        <Controller type="Event" end="Stop">
+                            <Key type="Event" time="0.0" event="NoOp"/>
+                            <Key type="Event" time="1.0" event="NoOp"/>
+                        </Controller>
+
+                        <Controller type="Tooltip" end="Pause" frame="$parent/SubnavButton3">
+                            <Key type="Text" time="0" text=""/>
+                        </Controller>
+                    </Animation>
+                        
+                    <Frame type="Image" name="NewContentFlagBg">
+                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                        <Texture val="@UI/Glues_Battlenet_TopNav_NewContentGlow"/>
+                        <Width val="36"/>
+                        <Height val="36"/>
+
+                        <Animation name="FlagGlow">
+                            <Event event="OnShown" action="Reset,Play" frame="$parent"/>
+                            <Event event="OnHidden" action="Stop" frame="$parent"/>
+
+                            <Controller type="Rotation" relative="False" end="Loop">
+                                <Key type="Curve" time="0" value="0" out="Linear"/>
+                                <Key type="Curve" time="5" value="360" in="Linear"/>
+                            </Controller>
+                        </Animation>
+                    </Frame>
+
+                    <Frame type="Image" name="NewContentFlag">
+                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                        <Texture val="@UI/Glues_Battlenet_TopNav_NewContent"/>
+                        <Width val="36"/>
+                        <Height val="36"/>
+                    </Frame>
+                    
+                    <Frame type="Image" name="NewContentFlagGlow">
+                        <Anchor side="Bottom" relative="$parent/NewContentFlag" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent/NewContentFlag" pos="Mid" offset="0"/>
+                        <Anchor side="Right" relative="$parent/NewContentFlag" pos="Mid" offset="0"/>
+                        <Texture val="@UI/Glues_Battlenet_TopNav_NewContentBg"/>
+                        <Width val="36"/>
+                        <Height val="36"/>
+                        <Alpha val="0"/>
+                        
+                        <Animation name="FlagGlow">
+                            <Event event="OnShown" action="Reset,Play" frame="$parent"/>
+                            <Event event="OnHidden" action="Stop" frame="$parent"/>
+
+                            <Controller type="Rotation" relative="False" end="Loop">
+                                <Key type="Curve" time="0" value="0" out="Linear"/>
+                                <Key type="Curve" time="5" value="360" in="Linear"/>
+                            </Controller>
+
+                            <Controller type="Fade" end="Loop">
+                                <Key type="Curve" time="0" value="255" out="Fast"/>
+                                <Key type="Curve" time="2" value="0" in="Slow"/>
+                                <Key type="Curve" time="4" value="255" out="Fast"/>
+                            </Controller>
+                        </Animation>
+                    </Frame>
+                </Frame>
+                
                 <!-- FEATURED PIN -->
                 <Frame type="Button" name="FeaturedPinButton" template="StandardNavigationTemplates/SpecialSubnavExtendedButtonTemplate">
                     <CollapseLayout val="True"/>
@@ -333,7 +430,7 @@
                     <Frame type="Frame" name="AnchorFrame">
                         <Anchor side="Top" relative="$parent/$parent/SubnavButton0" pos="Mid" offset="-4"/>
                         <Anchor side="Bottom" relative="$parent/$parent/SubnavButton0" pos="Mid" offset="-4"/>
-                        <Anchor side="Left" relative="$parent/$parent/SubnavButton2" pos="Max" offset="-29"/>
+                        <Anchor side="Left" relative="$parent/$parent/SubnavButton3" pos="Max" offset="-29"/>
                         <CollapseLayout val="True"/>
                     </Frame>
                     

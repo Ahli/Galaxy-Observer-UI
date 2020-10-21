@@ -48,6 +48,7 @@
 
     <Frame type="CommanderSelectionPanel" name="CommanderSelectionPanelTemplate">
         <Handle val="CoopStandardGlue_CommanderSelectionPanel"/>
+        <HookupAlias original="MasterySelectionPanel" alias="CustomizationSelectionPanel/MasterySelectionPanel"/>
     
         <!-- 
         ===========================
@@ -701,7 +702,7 @@
             <Anchor side="Left" relative="$parent/MasteryLevelFrame" pos="Mid" offset="-5"/>
             <Anchor side="Right" relative="$parent/DetailsContainer/DetailsBackground/CommanderDetailsBackground" pos="Max" offset="-6"/>
             <Height val="56"/>
-            <Text val="@Commander/Name/Mastery"/>
+            <Text val="@Commander/Name/Customize"/>
             <HoverSound val="@UI_HoverTick"/>
             <ClickSound val="@UI_PopUpWindowEnters"/>
             
@@ -734,11 +735,24 @@
                 <TextureType val="NineSlice"/>
                 <Alpha val="0"/>
                 <RenderPriority val="500"/>
+            
+                <StateGroup name="VisibleState">
+                    <DefaultState val="NotVisible"/>
+                    
+                    <State name="Visible">
+                        <When type="Property" frame="$CoopStandardGlue_CommanderSelectionPanel" Level="15"/>
+                        <Action type="SetProperty" frame="$this" Visible="True"/>
+                    </State>
+                    
+                    <State name="NotVisible">
+                        <Action type="SetProperty" frame="$this" Visible="False"/>
+                    </State>
+                </StateGroup>
                 
                 <Animation name="FlashMasteryButton">
                     <Event event="ShowMasteryNotification" action="Reset,Play"/>
-                    <Event event="Unspent" action="Reset,Play" frame="$parent/$parent/MasterySelectionPanel/"/>
-                    <Event event="AllSpent" action="Reset,Stop" frame="$parent/$parent/MasterySelectionPanel"/>
+                    <Event event="Unspent" action="Reset,Play" frame="$MasterySelectionPanel"/>
+                    <Event event="AllSpent" action="Reset,Stop" frame="$MasterySelectionPanel"/>
 
                     <Controller type="Fade" end="Loop">
                         <Key type="Curve" time="0" value="0" out="Slow"/>
@@ -766,8 +780,8 @@
             </Frame>
 
             <Animation name="UnspentRanksAnimation">
-                <Event event="Unspent" action="Reset,Play" frame="$parent/MasterySelectionPanel/"/>
-                <Event event="AllSpent" action="Reset,Stop" frame="$parent/MasterySelectionPanel"/>
+                <Event event="Unspent" action="Reset,Play" frame="$MasterySelectionPanel"/>
+                <Event event="AllSpent" action="Reset,Stop" frame="$MasterySelectionPanel"/>
 
                 <Controller type="Fade" end="PingPong">
                     <Key type="Curve" time="0" value="255" out="Auto"/>
@@ -873,7 +887,7 @@
                 </State>
 
                 <State name="MasteryInactiveState">
-                    <Action type="SetProperty" Visible="false"/>
+                    <Action type="SetProperty" Visible="true"/>
                 </State>
             </StateGroup>
         </Frame>
@@ -950,8 +964,38 @@
                 </Controller>
             </Animation>
         </Frame>
+        
+        <!-- Commander Mastery Selection Panel-->
+        
+        <!-- <Frame type="CommanderMasterySelectionPanel" name="MasterySelectionPanel" template="CommanderMasterySelectionPanel/CommanderMasterySelectionPanelTemplate"> -->
+            <!-- <Anchor relative="$parent"/> -->
+            <!-- <Handle val="MasterySelectionPanel"/> -->
+            <!-- <Visible val="false"/> -->
+            <!-- <Alpha val="0"/> -->
+            <!-- <RenderPriority val="800"/> -->
 
-        <Frame type="CommanderMasterySelectionPanel" name="MasterySelectionPanel" template="CommanderMasterySelectionPanel/CommanderMasterySelectionPanelTemplate">
+            <!-- <Animation name="Show"> -->
+                <!-- <Event event="OnClick" action="Reset,Play" frame="$parent/MasteryButton"/> -->
+                <!-- <Event event="OnClick" action="DirectionReverse,Play" frame="$this/AcceptButton"/> -->
+                <!-- <Event event="OnClick" action="DirectionReverse,Play" frame="$this/CancelButton"/> -->
+                <!-- <Event event="Hide" action="Reset,Stop" frame="$parent/$parent"/> -->
+
+                <!-- <Controller type="Fade" end="Pause"> -->
+                    <!-- <Key type="Curve" time="0" value="0" out="Auto"/> -->
+                    <!-- <Key type="Curve" time="0.2" value="255" in="Auto"/> -->
+                <!-- </Controller> -->
+
+                <!-- <Controller type="Visibility" end="Pause"> -->
+                    <!-- <Key type="Bool" time="0.00" value="false"/> -->
+                    <!-- <Key type="Bool" time="0.01" value="true"/> -->
+                    <!-- <Key type="Bool" time="0.20" value="true"/> -->
+                <!-- </Controller> -->
+            <!-- </Animation> -->
+        <!-- </Frame> -->
+        
+        <!-- Commander Mastery Selection Panel-->
+        
+        <Frame type="Frame" name="CustomizationSelectionPanel" template="CommanderCustomizationSelectionPanel/CommanderCustomizationSelectionPanelTemplate">
             <Anchor relative="$parent"/>
             <Visible val="false"/>
             <Alpha val="0"/>
@@ -959,8 +1003,8 @@
 
             <Animation name="Show">
                 <Event event="OnClick" action="Reset,Play" frame="$parent/MasteryButton"/>
-                <Event event="OnClick" action="DirectionReverse,Play" frame="$this/AcceptButton"/>
-                <Event event="OnClick" action="DirectionReverse,Play" frame="$this/CancelButton"/>
+                <Event event="OnClick" action="DirectionReverse,Play" frame="$MasterySelectionPanel/AcceptButton"/>
+                <Event event="OnClick" action="DirectionReverse,Play" frame="$MasterySelectionPanel/CancelButton"/>
                 <Event event="Hide" action="Reset,Stop" frame="$parent/$parent"/>
 
                 <Controller type="Fade" end="Pause">

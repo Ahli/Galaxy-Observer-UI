@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+  
+    <Frame type="CustomGamesBrowseListPanel" name="CustomGamesCustomCampaigns" template="CustomGamesTemplates/CustomGamesBaseTemplate">
+        <Anchor relative="$parent"/>
+        <HookupAlias original="FilterPulldown" alias="ContentContainer/HeaderPanel/FilterPulldown"/>
+        <HookupAlias original="GenrePulldown" alias="ContentContainer/HeaderPanel/GenrePulldown"/>
+        <HookupAlias original="GamesTileList" alias="ContentContainer/PrimaryPanel/GamesTileList"/>
+        <HookupAlias original="GamesTileList/ScrollBar" alias="ContentContainer/PrimaryPanel/GamesTileList/ScrollBar"/>
+        <SearchText val="{$this/ContentContainer/HeaderPanel/SearchEditBox/@Text}"/>
+        
+        <Frame type="Label" name="TitleLabel">
+            <Text val="@UI/ScreenCustomGames/CustomCampaigns/Title"/>
+        </Frame>
+        
+        <Frame type="Label" name="SubtitleLabel">
+            <Text val="@UI/ScreenCustomGames/CustomCampaigns/Subtitle"/>
+        </Frame>
+
+      <Frame type="Frame" name="ContentContainer">
+        <Frame type="Frame" name="HeaderPanel">
+
+          <Frame type="EditBox" name="SearchEditBox" template="CustomGamesTemplates/SearchEditBoxTemplate">
+            <Tooltip val="@UI/ScreenCustomGames/SearchTooltip"/>
+            <MaxCharacters val="80"/>
+
+            <Animation name="RequestSearch">
+              <Event event="OnEnterPressed" frame="$this" action="Reset,Play"/>
+
+              <Controller type="Event" end="Pause" frame="$ancestor[@type=CustomGamesBrowseListPanel]">
+                <Key type="Event" time="0.0" event="RequestEditBoxSearch"/>
+              </Controller>
+            </Animation>
+
+            <Frame type="Label" name="SearchTextLabel">
+              <Text val="@UI/ScreenCustomGames/CustomCampaigns/SearchText"/>
+            </Frame>
+
+            <Frame type="Frame" name="AnchorFrame">
+              <Anchor side="Right" relative="$parent/$parent/FilterPulldown/AnchorFrame" pos="Min" offset="-14"/>
+            </Frame>
+
+            <Frame type="Button" name="ClearTextButton">
+              <Animation name="ClearLobbyList">
+                <Event event="OnClick" frame="$this" action="Reset,Play"/>
+
+                <Controller type="Event" end="Pause" frame="$ancestor[@type=CustomGamesBrowseListPanel]">
+                  <Key type="Event" time="0.1" event="RequestEditBoxSearch"/>
+                </Controller>
+              </Animation>
+            </Frame>
+          </Frame>
+
+          <Frame type="Pulldown" name="FilterPulldown" template="StandardSmallButtonTemplates/StandardSmallPulldownTemplate">
+            <Frame type="Frame" name="AnchorFrame">
+              <Anchor side="Top" relative="$parent/$parent" pos="Mid" offset="0"/>
+              <Anchor side="Bottom" relative="$parent/$parent" pos="Mid" offset="0"/>
+              <Anchor side="Right" relative="$parent/$parent" pos="Max" offset="-15"/>
+            </Frame>
+          </Frame>
+
+          <Frame type="Pulldown" name="GenrePulldown" template="StandardSmallButtonTemplates/StandardSmallPulldownTemplate">
+            <Frame type="Frame" name="AnchorFrame">
+              <Anchor side="Top" relative="$parent/$parent" pos="Mid" offset="0"/>
+              <Anchor side="Bottom" relative="$parent/$parent" pos="Mid" offset="0"/>
+              <Anchor side="Right" relative="$parent/$parent/FilterPulldown/AnchorFrame" pos="Min" offset="-14"/>
+            </Frame>
+            <Enabled val="false"/>
+            <Visible val="false"/>
+          </Frame>
+        </Frame>
+
+        <Frame type="Frame" name="PrimaryPanel">
+          <Frame type="TileList" name="GamesTileList" template="CustomGamesArcade/ArcadeGamesListTemplate"/>
+        </Frame>
+
+        <Frame type="Frame" name="SecondaryPanel">
+
+          <Frame type="Frame" name="DetailsPanel" template="CustomGamesArcade/DetailsPanelTemplate">
+
+            <Frame type="TabControl" name="InfoPanel">
+              <Frame type="Frame" name="TabsContainer">
+                <Visible val="True"/>
+              </Frame>
+
+              <Frame type="Frame" name="Panel2">
+                <Frame type="BattleMapInfoPanel" name="BattleMapInfoPanel">
+                  <MapHandle val="0,0"/>
+
+                  <StateGroup name="ExtensionModState">
+                    <DefaultState val="ExtensionMod"/>
+                  </StateGroup>
+
+                  <StateGroup name="ErrorState">
+                    <DefaultState val="NoSelection"/>
+
+                    <State name="ArcadeExtensionMod">
+                      <When type="Property" frame="$parent/$parent/Panel1/BattleMapInfoPanel/BattleMapFrame" IsArcade="True"/>
+                      <Action type="SetProperty" frame="$this/ErrorLabel" Text="@UI/ScreenCustomGames/InfoTabs/Error/ArcadeMod"/>
+                    </State>
+
+                    <State name="MeleeNoExtensionMod">
+                      <When type="Property" frame="$this/BattleMapFrame" MapHandle="0,0"/>
+                      <Action type="SetProperty" frame="$this/ErrorLabel" Text="@UI/ScreenCustomGames/InfoTabs/Error/NoMod"/>
+                    </State>
+
+                    <State name="NoSelection">
+                      <Action type="SetProperty" frame="$this/ErrorLabel" Text=""/>
+                    </State>
+                  </StateGroup>
+                </Frame>
+              </Frame>
+            </Frame>
+
+            <Frame type="BattleMapFrame" name="BattleMapFrame">
+              <MapHandle val="{$ancestor[@type=CustomGamesBrowseListPanel]/@SelectedMapHandle}"/>
+            </Frame>
+
+            <Frame type="BattleMapFrame" name="BattleModFrame">
+              <MapHandle val="0,0"/>
+            </Frame>
+          </Frame>
+        </Frame>
+      </Frame>
+
+      <Frame type="CustomGamePlayButton" name="CreateButton" template="StandardBattlenetTemplates/BattlenetAlternateButtonTemplate">
+        <Anchor side="Bottom" relative="$Anchor_ActionButton" pos="Min" offset="0"/>
+        <Anchor side="Left" relative="$Anchor_ActionButton" pos="Max" offset="0"/>
+        <Width val="260"/>
+        <Text val="@UI/ScreenCustomGames/CreateButton"/>
+        <MapHandle val="{$parent/@SelectedMapHandle}"/>
+        <UseDefaultVariant val="False"/>
+        <VariantIndex val="{$parent/VariantPulldown/@VariantIndex}"/>
+        <CollapseLayout val="True"/>
+
+        <Animation name="ItemDoubleClicked">
+          <Event event="OnItemDoubleClicked" action="Reset,Play" frame="$parent/ContentContainer/PrimaryPanel/GamesTileList"/>
+
+          <Controller type="Event" end="Pause">
+            <Key type="Event" time="0" event="ControlClickRequest"/>
+          </Controller>
+        </Animation>
+
+        <StateGroup name="VisibleState">
+          <DefaultState val="Visible"/>
+
+          <State name="NotVisible">
+            <When type="Property" frame="$CustomGamesArcadePremiumMapCache" HasPremium="True"/>
+            <When type="Property" frame="$CustomGamesArcadePremiumMapCache" PayToPlay="True"/>
+            <When type="Property" frame="$CustomGamesArcadePremiumMapCache" Owned="False"/>
+            <Action type="SetProperty" frame="$this" Visible="false"/>
+          </State>
+
+          <State name="Visible">
+            <Action type="SetProperty" frame="$this" Visible="True"/>
+          </State>
+        </StateGroup>
+      </Frame>
+
+      <Frame type="BattleMapVariantPulldown" name="VariantPulldown" template="StandardBattlenetTemplates/BattlenetLargePulldownTemplate">
+        <Anchor side="Bottom" relative="$Anchor_ActionButton" pos="Min" offset="-4"/>
+        <Anchor side="Left" relative="$parent/CreateButton" pos="Max" offset="8"/>
+        <Width val="260"/>
+        <MapHandle val="{$parent/@SelectedMapHandle}"/>
+        <CollapseLayout val="True"/>
+
+        <StateGroup name="EnabledState">
+          <DefaultState val="Disabled"/>
+
+          <State name="Disabled">
+            <Action type="SetProperty" frame="$this" Enabled="False"/>
+          </State>
+        </StateGroup>
+
+        <StateGroup name="VisibleState">
+          <DefaultState val="Visible"/>
+
+          <State name="NotVisible">
+            <When type="Property" frame="$CustomGamesArcadePremiumMapCache" HasPremium="True"/>
+            <When type="Property" frame="$CustomGamesArcadePremiumMapCache" PayToPlay="True"/>
+            <When type="Property" frame="$CustomGamesArcadePremiumMapCache" Owned="False"/>
+            <Action type="SetProperty" frame="$this" Visible="false"/>
+          </State>
+
+          <State name="Visible">
+            <Action type="SetProperty" frame="$this" Visible="True"/>
+          </State>
+        </StateGroup>
+      </Frame>
+
+      <Frame type="ViewMapProfileButton" name="GameInfoButton" template="StandardBattlenetTemplates/BattlenetStandardButtonTemplate">
+        <Anchor side="Bottom" relative="$Anchor_ActionButton" pos="Min" offset="0"/>
+        <Anchor side="Left" relative="$parent/VariantPulldown" pos="Max" offset="8"/>
+        <Width val="260"/>
+        <Text val="@UI/ScreenCustomGames/MapInfoButton"/>
+        <HoverSound val="@UI_HoverTick"/>
+        <MapHandle val="{$parent/@SelectedMapHandle}"/>
+        <UseHyperLink val="True"/>
+        <HyperLinkIndex val="0"/>
+        <CollapseLayout val="True"/>
+
+        <StateGroup name="GameInfoButtonState">
+          <State name="MapHandleInvalid">
+            <When type="Property" frame="$parent" SelectedMapHandle="0,0"/>
+            <Action type="SetProperty" frame="$this" Enabled="false"/>
+          </State>
+          <State name="MapHandleValid">
+            <Action type="SetProperty" frame="$this" Enabled="true"/>
+          </State>
+        </StateGroup>
+
+        <StateGroup name="LinkState">
+          <DefaultState val="Overview"/>
+
+          <State name="Premium">
+            <When type="Property" frame="$CustomGamesArcadePremiumMapCache" HasPremium="True"/>
+            <When type="Property" frame="$CustomGamesArcadePremiumMapCache" PayToPlay="True"/>
+            <When type="Property" frame="$CustomGamesArcadePremiumMapCache" Owned="False"/>
+            <Action type="SetProperty" frame="$this" HyperLinkIndex="1"/>
+            <Action type="SetProperty" frame="$this" Text="@UI/ScreenCustomGames/PremiumInfoButton"/>
+          </State>
+
+          <State name="Overview">
+            <Action type="SetProperty" frame="$this" HyperLinkIndex="0"/>
+            <Action type="SetProperty" frame="$this" Text="@UI/ScreenCustomGames/MapInfoButton"/>
+          </State>
+        </StateGroup>
+      </Frame>
+
+      <Frame type="BattleMapContextMenu" name="ItemContextMenu" template="StandardTemplates/StandardContextMenuTemplate">
+        <Anchor side="Top" relative="$parent" pos="Max" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+        <ShowMapInfo val="true"/>
+        <ShowCreateOffline val="false"/>
+        <MapHandle val="{$parent/@SelectedMapHandle}"/>
+      </Frame>
+
+      <StateGroup name="SearchingStateGroup">
+        <DefaultState val="NotSearchingState"/>
+
+        <State name="SearchingState">
+          <When type="AnimationState" frame="$this" SearchState="Searching"/>
+          <Action type="SetProperty" frame="ContentContainer/HeaderPanel/FilterPulldown" Enabled="false"/>
+        </State>
+
+        <State name="NotSearchingState">
+          <Action type="SetProperty" frame="ContentContainer/HeaderPanel/FilterPulldown" Enabled="true"/>
+        </State>
+      </StateGroup>
+    </Frame>
+  </Desc>
+  

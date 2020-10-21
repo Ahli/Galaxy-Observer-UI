@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+    <Constant name="MapToMapIdleSpinnerVerticalOffset" val="500"/>
+
+    <Frame type="ScreenMapToMapTransition" name="ScreenMapToMapTransition">
+        <Anchor relative="$parent"/>
+        <DisplayBackgroundModel val="false"/>
+        <DisplayForegroundUI val="false"/>
+
+        <Frame type="Image" name="ScreenDim">
+            <Anchor relative="$parent"/>
+            <Texture val="@UI/PauseScreenDimImage"/>
+        </Frame>
+
+        <Frame type="Image" name="LoadingImage">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Texture val="@UI/MapToMapLoadingImage"/>
+            <TextureType val="Normal"/>
+            <ScaleWidthToTexture val="True"/>
+        </Frame>
+
+        <Frame type="Frame" name="HackedInSpinner">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="#MapToMapIdleSpinnerVerticalOffset"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="#MapToMapIdleSpinnerVerticalOffset"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="92"/>
+            <Height val="92"/>
+
+            <Frame type="Image" name="SpinnerBG">
+                <Anchor side="Top" relative="$parent" pos="-0.0435" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="1.0435" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="-0.0435" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="1.0435" offset="0"/>
+                <LayerCount val="2"/>
+                <Texture val="@UI/Glues_Generic_Mask_Circle_76x76_Buffer12pt" layer="0"/>
+                <AlphaLayer val="True" layer="0"/>
+                <Texture val="Assets/Textures/White.dds" layer="1"/>
+                <LayerColor val="0,50,100" layer="1"/>
+                <LayerAlpha val="0" layer="1"/>
+            </Frame>
+
+            <Frame type="Image" name="SpinnerGlow">
+                <Anchor side="Top" relative="$parent" pos="-0.0435" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="1.0435" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="-0.0435" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="1.0435" offset="0"/>
+                <LayerCount val="2"/>
+                <Texture val="@UI/Glues_Generic_Mask_Ring_76x76_Buffer12pt" layer="0"/>
+                <AlphaLayer val="True" layer="0"/>
+                <Texture val="@UI/Glues_Generic_Effect_AngleGradient_256x256" layer="1"/>
+                <LayerColor val="60,120,255" layer="1"/>
+                <LayerAlpha val="0" layer="1"/>
+                <Blur val="True"/>
+                <BlurAmount val="1"/>
+
+                <Animation name="Spin">
+                    <Event event="OnShown" action="Reset,Play"/>
+
+                    <Controller type="Property" property="TextureCoordRotation" curve="True" index="1"  end="Loop" frame="$this">
+                        <Key type="Property" time="0.000" value="0" inOut="Linear"/>
+                        <Key type="Property" time="3.000" value="360" inOut="Linear"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+
+            <Frame type="Image" name="Spinner">
+                <Anchor side="Top" relative="$parent" pos="-0.0435" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="1.0435" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="-0.0435" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="1.0435" offset="0"/>
+                <LayerCount val="3"/>
+                <Texture val="@UI/Glues_Generic_Mask_Circle_76x76_Buffer12pt" layer="0"/>
+                <AlphaLayer val="True" layer="0"/>
+                <Texture val="@UI/Glues_Generic_Mask_Circle_76x76_Buffer12pt" layer="1"/>
+                <AlphaLayer val="True" layer="1"/>
+                <AlphaChannel val="InverseAlpha" layer="1"/>
+                <TextureCoords top="-0.2" left="-0.2" bottom="1.2" right="1.2" layer="1"/>
+                <Texture val="@UI/Glues_Generic_Effect_AngleGradient_256x256" layer="2"/>
+                <LayerColor val="160,230,255" layer="2"/>
+                <LayerAlpha val="255" layer="2"/>
+
+                <Animation name="Spin">
+                    <Event event="OnShown" action="Reset,Play"/>
+
+                    <Controller type="Property" property="TextureCoordRotation" curve="True" index="2"  end="Loop" frame="$this">
+                        <Key type="Property" time="0.000" value="0" inOut="Linear"/>
+                        <Key type="Property" time="3.000" value="360" inOut="Linear"/>
+                    </Controller>
+                </Animation>
+            </Frame>
+        </Frame>
+
+        <Frame type="Label" name="MaptoMapLoadingStateLabel">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="300"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Style val="LoadingStartup"/>
+            <Text val="{$parent/@MapToMapTransitionState}"/>
+        </Frame>
+
+        <StateGroup name="MapToMapLoadingState">
+            <DefaultState val="Inactive"/>
+
+            <State name="Waiting">
+                <When type="Property" frame="$this" MapToMapTransitionState="Waiting"/>
+                <Action type="SetProperty" frame="MaptoMapLoadingStateLabel" Text="@UI/ScreenMapToMapTransition/TransitionStateWaiting"/>
+                <Action type="SetProperty" frame="MaptoMapLoadingStateLabel" Visible="True"/>
+                <Action type="SetProperty" frame="CloseButton" Enabled="True"/>
+            </State>
+          
+            <State name="Prework">
+                <When type="Property" frame="$this" MapToMapTransitionState="Prework"/>
+                <Action type="SetProperty" frame="MaptoMapLoadingStateLabel" Text="@UI/ScreenMapToMapTransition/TransitionStatePrework"/>
+                <Action type="SetProperty" frame="CloseButton" Enabled="True"/>
+            </State>
+
+            <State name="Downloading">
+                <When type="Property" frame="$this" MapToMapTransitionState="Downloading"/>
+                <Action type="SetProperty" frame="MaptoMapLoadingStateLabel" Text="@UI/ScreenMapToMapTransition/TransitionStateDownload"/>
+                <Action type="SetProperty" frame="MaptoMapLoadingStateLabel" Visible="True"/>
+                <Action type="SetProperty" frame="CloseButton" Enabled="True"/>
+            </State>
+    
+            <State name="WaitingForPlayers">
+                <When type="Property" frame="$this" MapToMapTransitionState="WaitingForPlayers"/>
+                <Action type="SetProperty" frame="MaptoMapLoadingStateLabel" Text="@UI/ScreenMapToMapTransition/TransitionStateWaitingForPlayers"/>
+                <Action type="SetProperty" frame="MaptoMapLoadingStateLabel" Visible="True"/>
+                <Action type="SetProperty" frame="CloseButton" Enabled="True"/>
+            </State>
+          
+            <State name="StartingGame">
+                <When type="Property" frame="$this" MapToMapTransitionState="StartingGame"/>
+                <Action type="SetProperty" frame="MaptoMapLoadingStateLabel" Text="@UI/ScreenMapToMapTransition/TransitionStateStartingGame"/>
+                <Action type="SetProperty" frame="MaptoMapLoadingStateLabel" Visible="True"/>
+                <Action type="SetProperty" frame="CloseButton" Enabled="False"/>
+            </State>
+        
+            <State name="Inactive">
+                <Action type="SetProperty" frame="MaptoMapLoadingStateLabel" Text="@UI/ScreenMapToMapTransition/TransitionStateInactive"/>
+                <Action type="SetProperty" frame="MaptoMapLoadingStateLabel" Visible="False"/>
+                <Action type="SetProperty" frame="CloseButton" Enabled="False"/>
+            </State>
+        </StateGroup>
+        
+        <Frame type="Button" name="CloseButton" template="StandardBattlenetTemplates/BattlenetMediumButtonTemplate">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-10"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-20"/>
+            <Text val="@UI/CreditsScreen/CloseButton"/>
+          
+        <Animation name="FadeIn">
+            <Event event="OnShown" action="Reset,Play"/>
+
+            <Controller name="FadeIn" type="Fade" end="Pause">
+              <Key type="Curve" time="0.0" value="0" in="Auto"/>
+              <Key type="Curve" time="1.0" value="0" in="Auto"/>
+              <Key type="Curve" time="1.3" value="255" in="Auto"/>
+            </Controller>
+          </Animation>
+        </Frame>
+    </Frame>
+</Desc>

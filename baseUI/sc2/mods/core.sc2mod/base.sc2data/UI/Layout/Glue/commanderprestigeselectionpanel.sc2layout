@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <DescFlags val="Locked"/>
+
+    <Frame type="CommanderPrestigeTileListItem" name="CommanderPrestigeTileListItemTemplate">
+        <Height val="113"/>
+        <Enabled val="{$this/CommanderPrestigeFrame/@IsPrestigeLevelUnlocked}"/>
+        <Tooltip val="{$this/CommanderPrestigeFrame/@PrestigeTooltip}"/>
+        <SelectedSound val="@UI_ActionButtonSelect"/>
+
+        <Frame type="CommanderPrestigeFrame" name="CommanderPrestigeFrame">
+            <Anchor relative="$parent"/>
+            <Visible val="false"/>
+            <Commander val="{$parent/@Commander}"/>
+            <PrestigeLevel val="{$parent/@PrestigeLevel}"/>
+            <MaxCommanderPrestigeLevelUnlocked val="{$parent/@MaxCommanderPrestigeLevelUnlocked}"/>
+        </Frame>
+        
+        <Frame type="Image" name="HoverGlow">
+            <Anchor relative="$parent"/>
+            <Color val="7,53,107"/>
+            <Alpha val="97"/>
+            <TextureCoords top="1" left="0" bottom="0" right="1"/>
+            <Texture val="Assets/Textures/SC2_UI_Global_GenericEffect_LinearGradient_1x256.dds"/>
+            <Visible val="False"/>
+        </Frame>
+        
+        <Frame type="Image" name="UnlockGlow">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            <Color val="7,53,107"/>
+            <Alpha val="0"/>
+            <TextureCoords top="0" left="0.3" bottom="1" right="1"/>
+            <Texture val="Assets/Textures/SC2_UI_Global_GenericEffect_RadialGradient_256x256.dds"/>
+            <Visible val="False"/>
+            
+            <Animation name="PrestigeUnlock">
+                <!-- PrestigeRecentlyUnlocked is sent to the new prestige tier after it becomes available -->
+                <Event event="PrestigeRecentlyUnlocked" frame="$parent" action="Reset,Play"/>
+                <Event event="PrestigeRecentlyUnlockedReset" frame="$parent" action="Reset,Stop"/>
+                <Event event="Selected" frame="$parent" action="Reset,Stop"/>
+                
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="False"/>
+                    <Key type="Bool" time="0.01" value="True"/>
+                </Controller>
+                
+                <Controller type="Sound" end="Stop">
+                    <Key type="Sound" time="0.2" sound="@AC_UI_PrestigeUnlock"/>
+                </Controller>
+                 
+                <Controller type="Fade" end="Loop">
+                    <Key type="Curve" time="0" value="0" out="Slow"/>
+                    <Key type="Curve" timeinc="0.6" value="255" in="Slow"/>
+                    <Key type="Curve" timeinc="0.6" value="0" out="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+        
+        <Frame type="Image" name="Indicator">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+            <Width val="118"/>
+            <Height val="107"/>
+            <Texture val="@UI/Glues_Battlenet_PageAssets_DifficultySelection_Radio_Normal"/>
+            <DesaturateOnDisable val="false"/>
+        </Frame>
+       
+        <Frame type="Label" name="PrestigeTitleLabel">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/Indicator" pos="Max" offset="0"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-20"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Text val="{$parent/CommanderPrestigeFrame/@PrestigeTitle}"/>
+            <Style val="DifficultySelectionButtonTitle"/>
+        </Frame>
+        
+        <Frame type="Image" name="UnlockSlide">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="-500"/>
+            <Width val="400"/>
+            <Height val="120"/>
+            <Rotation val="-45"/>
+            <Visible val="False"/>
+            <Texture val="Assets/Textures/White.dds"/>
+            <TextureCoords top="0" left="0.2" bottom="1" right="0.2"/>
+            <Color val="125,200,255"/>
+            
+            <Animation name="PrestigeUnlock">
+                <!-- PrestigeRecentlyUnlocked is sent to the new prestige tier after it becomes available -->
+                <Event event="PrestigeRecentlyUnlocked" frame="$parent" action="Reset,Play"/>
+                <Event event="PrestigeRecentlyUnlockedReset" frame="$parent" action="Reset,Stop"/>
+
+                <Controller type="Visibility" end="Pause">
+                    <Key type="Bool" time="0" value="False"/>
+                    <Key type="Bool" time="0.01" value="True"/>
+                </Controller>
+                
+                <Controller type="Anchor" end="Pause" side="Left" relative="true">
+                    <Key type="Curve" time="0.0" value="0" inout="Fast"/>
+                    <Key type="Curve" time="0.2" value="0" inout="Fast"/>
+                    <Key type="Curve" time="0.9" value="1300" inout="Slow"/>
+                </Controller>
+                 
+                <Controller type="Fade" end="Pause">
+                    <Key type="Curve" time="0.2" value="255" inout="Fast"/>
+                    <Key type="Curve" time="0.9" value="255" inout="Slow"/>
+                    <Key type="Curve" time="1.1" value="0" inout="Slow"/>
+                </Controller>
+            </Animation>
+        </Frame>
+
+        <StateGroup name="DisplayState">
+            <DefaultState val="Disabled"/>
+            
+            <State name="Selected">
+                <When type="Property" frame="$this" Selected="True"/>
+                <When type="Property" frame="$this" Enabled="True"/>
+                <Action type="SetProperty" frame="Indicator" Texture="@UI/Glues_Battlenet_PageAssets_DifficultySelection_Radio_Selected"/>
+                <Action type="SetProperty" frame="PrestigeTitleLabel" Style="Coop_Prestige_TalentSelection_Selected"/>
+                <Action type="SetProperty" frame="HoverGlow" Visible="False"/>
+            </State>
+            
+            <State name="Hover">
+                <When type="Property" frame="$this" Hovered="True"/>
+                <When type="Property" frame="$this" Enabled="True"/>
+                <Action type="SetProperty" frame="Indicator" Texture="@UI/Glues_Battlenet_PageAssets_DifficultySelection_Radio_Normal"/>
+                <Action type="SetProperty" frame="PrestigeTitleLabel" Style="Coop_Prestige_TalentSelection_Hover"/>
+                <Action type="SetProperty" frame="HoverGlow" Visible="True"/>
+            </State>
+            
+            <State name="Normal">
+                <When type="Property" frame="$this" Enabled="True"/>
+                <Action type="SetProperty" frame="Indicator" Texture="@UI/Glues_Battlenet_PageAssets_DifficultySelection_Radio_Normal"/>
+                <Action type="SetProperty" frame="PrestigeTitleLabel" Style="Coop_Prestige_TalentSelection_Normal"/>
+                <Action type="SetProperty" frame="HoverGlow" Visible="False"/>
+            </State>
+            
+            <State name="Disabled">
+                <Action type="SetProperty" frame="Indicator" Texture="@UI/Glues_Battlenet_PageAssets_DifficultySelection_Radio_Disabled"/>
+                <Action type="SetProperty" frame="PrestigeTitleLabel" Style="Coop_Prestige_TalentSelection_Disabled"/>
+                <Action type="SetProperty" frame="HoverGlow" Visible="False"/>
+            </State>
+        </StateGroup>
+    </Frame>
+
+    <Frame type="CommanderPrestigeSelectionPanel" name="CommanderPrestigeSelectionPanelTemplate">
+
+        <!-- <Frame type="Label" name="DescriptionLabel"> -->
+            <!-- <Anchor side="Top" relative="$parent/TitleLabel" pos="Max" offset="0"/> -->
+            <!-- <Anchor side="Left" relative="$parent/BackgroundImage" pos="Min" offset="30"/> -->
+            <!-- <Anchor side="Right" relative="$parent/BackgroundImage" pos="Max" offset="-30"/> -->
+            <!-- <Style val="@Coop_CommanderMasterySubtitle"/> -->
+            <!-- <Text val="@UI/CommanderPrestigeSelectionPanel/Description"/> -->
+        <!-- </Frame> -->
+
+        <Frame type="Button" name="ActivatePrestigeButton" template="StandardBattlenetTemplates/BattlenetSmallAlternateButtonTemplate">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="10"/>
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+            <Width val="300"/>
+            <Height val="48"/>
+            <Text val="@UI/CommanderPrestigeSelectionPanel/ActivatePrestige"/>
+            <Enabled val="{$parent/@CanPrestige}"/>
+
+            <StateGroup name="DisabledTooltipState">
+                <DefaultState val="Disabled"/>
+
+                <State name="Enabled">
+                    <When type="Property" frame="$this" Enabled="True"/>
+                    <Action type="SetProperty" frame="$this" Tooltip=""/>
+                </State>
+
+                <!-- Prestige Max Level is 3 -->
+                <State name="DisabledMax">
+                    <When type="Property" frame="$this" Enabled="False"/>
+                    <When type="Property" frame="$parent" MaxCommanderPrestigeLevelUnlocked="3"/>
+                    <Action type="SetProperty" frame="$this" Tooltip="@UI/CommanderPrestigeSelectionPanel/ActivationDisabledTooltipAlreadyMax"/>
+                </State>
+
+                <State name="DisabledNotMastery">
+                    <When type="Property" frame="$this" Enabled="False"/>
+                    <Action type="SetProperty" frame="$this" Tooltip="@UI/CommanderPrestigeSelectionPanel/ActivationDisabledTooltipRequireMastery"/>
+                </State>
+            </StateGroup>
+        </Frame>
+                
+        <Frame type="Image" name="PrestigeInfoIcon">
+            <Anchor side="Top" relative="$parent/ActivatePrestigeButton" pos="Mid" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/ActivatePrestigeButton" pos="Mid" offset="0"/>
+            <Anchor side="Left" relative="$parent/ActivatePrestigeButton" pos="Max" offset="5"/>
+            <Width val="32"/>
+            <Height val="32"/>
+            <Texture val="Assets/Textures/ui_glues_icons_infogeneric.dds"/>
+            <AcceptsMouse val="True"/>
+            <Tooltip val="@UI/CommanderPrestigeSelectionPanel/InfoTooltip"/>
+        </Frame>
+
+        <Frame type="Label" name="PrestigeLevelLabel">
+            <Anchor side="Bottom" relative="$parent/ListBackground" pos="Min" offset="-12"/>
+            <Anchor side="Left" relative="$parent/ListBackground" pos="Mid" offset="0"/>
+            <Anchor side="Right" relative="$parent/ListBackground" pos="Mid" offset="0"/>
+            <Style val="@Coop_CommanderMasteryInfoHeader"/>
+            <Text val="{$this/FormatFrame/@Text}"/>
+
+            <Frame type="TextFormatFrame" name="FormatFrame">
+                <Anchor relative="$parent"/>
+                <FormatText val="@UI/CommanderMasterySelectionPanel/PrestigeLevel"/>
+                <Replacement index="0" val="{$parent/$parent/@MaxCommanderPrestigeLevelUnlocked}"/>
+            </Frame>
+        </Frame>
+        
+        <Frame type="Image" name="ListBackground">
+            <Anchor side="Bottom" relative="$parent" pos="Max" offset="-18"/>
+            <Anchor side="Left" relative="$parent" pos="Min" offset="18"/>
+            <Anchor side="Right" relative="$parent" pos="Max" offset="-18"/>
+            <Height val="500"/>
+            <Texture val="@UI/Glues_Battlenet_PageAssets_ContainerBorder"/>
+            <TextureType val="NineSlice"/>
+        </Frame>
+
+        <Frame type="Image" name="ListHeader">
+            <Anchor side="Top" relative="$parent/ListBackground" pos="Min" offset="0"/>
+            <Anchor side="Left" relative="$parent/ListBackground" pos="Min" offset="0"/>
+            <Anchor side="Right" relative="$parent/ListBackground" pos="Max" offset="0"/>
+            <Texture val="@UI/Glues_Battlenet_PageAssets_ContainerHeader"/>
+            <TextureType val="NineSlice"/>
+            <Height val="40"/>
+        </Frame>
+
+        <Frame type="Label" name="HeaderTitle">
+            <Anchor side="Top" relative="$parent/ListHeader" pos="Mid" offset="1"/>
+            <Anchor side="Bottom" relative="$parent/ListHeader" pos="Mid" offset="1"/>
+            <Anchor side="Left" relative="$parent/ListHeader" pos="Min" offset="15"/>
+            <Style val="@Coop_CommanderMasteryInfoHeader"/>
+            <Text val="@UI/CommanderMasterySelectionPanel/HeaderTitlePrestige"/>
+        </Frame>
+
+        <Frame type="TileList" name="CommanderPrestigeTileList">
+            <Anchor side="Top" relative="$parent/ListHeader" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/ListBackground" pos="Max" offset="-2"/>
+            <Anchor side="Left" relative="$parent/ListBackground" pos="Min" offset="2"/>
+            <Anchor side="Right" relative="$parent/ListBackground" pos="Max" offset="-2"/>
+            <Handle val="CommanderPrestigeTileList"/>
+
+            <Frame type="CommanderPrestigeTileListItem" name="Item0" template="CommanderPrestigeSelectionPanel/CommanderPrestigeTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/$parent/ListHeader" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+            </Frame>
+        
+            <Frame type="Image" name="ListDivider0">
+                <Anchor side="Top" relative="$parent/Item0" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Height val="2"/>
+                <Color val="11,49,88"/>
+                <Alpha val="127"/>
+            </Frame>
+
+            <Frame type="CommanderPrestigeTileListItem" name="Item1" template="CommanderPrestigeSelectionPanel/CommanderPrestigeTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item0" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item0" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/Item0" pos="Max" offset="0"/>
+            </Frame>
+        
+            <Frame type="Image" name="ListDivider1">
+                <Anchor side="Top" relative="$parent/Item1" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Height val="2"/>
+                <Color val="11,49,88"/>
+                <Alpha val="127"/>
+            </Frame>
+
+            <Frame type="CommanderPrestigeTileListItem" name="Item2" template="CommanderPrestigeSelectionPanel/CommanderPrestigeTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item1" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item1" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/Item1" pos="Max" offset="0"/>
+            </Frame>
+        
+            <Frame type="Image" name="ListDivider2">
+                <Anchor side="Top" relative="$parent/Item2" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                <Height val="2"/>
+                <Color val="11,49,88"/>
+                <Alpha val="127"/>
+            </Frame>
+
+            <Frame type="CommanderPrestigeTileListItem" name="Item3" template="CommanderPrestigeSelectionPanel/CommanderPrestigeTileListItemTemplate">
+                <Anchor side="Top" relative="$parent/Item2" pos="Max" offset="0"/>
+                <Anchor side="Left" relative="$parent/Item2" pos="Min" offset="0"/>
+                <Anchor side="Right" relative="$parent/Item2" pos="Max" offset="0"/>
+            </Frame>
+            
+            <StateGroup name="VisibleState">
+                <DefaultState val="Visible"/>
+                
+                <State name="NotVisible">
+                    <When type="Property" frame="$parent" ActivationInProgress="True"/>
+                    <Action type="SetProperty" frame="$this" Visible="False"/>
+                </State>
+                
+                <State name="Visible">
+                    <Action type="SetProperty" frame="$this" Visible="True"/>
+                </State>
+            </StateGroup>
+        </Frame>
+        
+        <Frame type="Frame" name="ActivationPanel">
+            <Anchor side="Top" relative="$parent/ListHeader" pos="Max" offset="0"/>
+            <Anchor side="Bottom" relative="$parent/ListBackground" pos="Max" offset="-2"/>
+            <Anchor side="Left" relative="$parent/ListBackground" pos="Min" offset="2"/>
+            <Anchor side="Right" relative="$parent/ListBackground" pos="Max" offset="-2"/>
+            <Visible val="{$parent/@ActivationInProgress}"/>
+            
+            <Frame type="Label" name="ActivationLabel">
+                <Anchor side="Bottom" relative="$parent/WaitLabel" pos="Min" offset="-10"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Style val="Coop_Prestige_ActivationLabel"/>
+                <Text val="@UI/CommanderPrestigeSelectionPanel/ActivatingPrestige"/>
+            </Frame>
+            
+            <Frame type="Label" name="WaitLabel">
+                <Anchor side="Bottom" relative="$parent/IdleSpinner" pos="Min" offset="-50"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                <Style val="Coop_Prestige_ActivationLabel"/>
+                <Text val="@UI/CommanderPrestigeSelectionPanel/PleaseWait"/>
+            </Frame>
+            
+            <Frame type="Frame" name="IdleSpinner" template="StandardBattlenetTemplates/IdleSpinnerTemplate">
+                <Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+            </Frame>
+        </Frame>
+    </Frame>
+</Desc>

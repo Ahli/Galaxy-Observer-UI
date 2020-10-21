@@ -1,0 +1,644 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Desc>
+    <Constant name="ColorMenuButtonIcon_Alliance" val="#ColorConsoleStandard_White"/>
+    
+    <!-- Colors used to display high/mid/low health for unit group icons -->
+    <Constant name="UnitVitals_EnergyColor" val="159,202,255"/>
+    
+    <Frame type="Frame" name="InventorySlotAnchorTemplate">
+        <Width val="80"/>
+        <Height val="76"/>
+        <Frame type="Image" name="Filler">
+            <Anchor relative="$parent" offset="-10"/>
+            <Texture val="@@@UI/InventorySlotFiller"/>
+        </Frame>
+        <RenderPriority val="522"/>
+        <StateGroup name="VisibilityState">
+            <DefaultState val="Visible"/>
+            
+            <State name="NotVisible">
+                <Action type="SetProperty" frame="$this\Filler" Visible="False"/>
+            </State>
+            
+            <State name="Visible">
+                <Action type="SetProperty"  frame="$this\Filler" Visible="True"/>
+            </State>
+        </StateGroup>
+    </Frame>
+    
+    <Frame type="CommandButton" name="InventoryButtonTemplate" template="CommandButton/CommandButtonTemplate">
+        <Width val="0"/>
+        <Height val="0"/>
+        <TooltipFrame val="InventoryTooltip"/>
+        <RenderPriority val="1500"/>
+        <Handle val="InventoryBag0"/>
+        <Frame type="Image" name="NormalImage">
+            <Anchor relative="$parent"/>
+            <DescFlags val=""/>
+        </Frame>
+
+        <Frame type="Image" name="HoverImage">
+            <Anchor relative="$parent"/>
+            <DescFlags val=""/>
+        </Frame>
+    </Frame>
+    
+    <Frame type="Label" name="VitalsLabelTemplate">
+        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+        <Style val="@@@GameButtonCharge"/>
+        <Text val="{$this/VitalsFormatFrame/@Text}"/>
+        <RenderType val="LDR"/>
+        
+        <Frame type="MathFrame" name="CurrentVitalFrame">
+            <Anchor relative="$parent"/>
+            <Operator val="Add"/>
+            <A val="{$ancestor[@type=UnitFrame]/@CurrentEnergy}"/>
+            <B val=".5"/>
+        </Frame>
+        
+        <Frame type="MathFrame" name="MaxVitalFrame">
+            <Anchor relative="$parent"/>
+            <Operator val="Add"/>
+            <A val="{$ancestor[@type=UnitFrame]/@MaxEnergy}"/>
+            <B val=".5"/>
+        </Frame>
+        
+        <Frame type="TextFormatFrame" name="VitalsFormatFrame">
+            <Anchor relative="$parent"/>
+            <FormatText val="%0%/%1%"/>
+            <Replacement index="0" val="{$parent/CurrentVitalFrame/@ResultInt}"/>
+            <Replacement index="1" val="{$parent/MaxVitalFrame/@ResultInt}"/>
+        </Frame>
+    </Frame>
+    
+    <Frame type="Label" name="EnergyLabelTemplate" template="War3_GameUI/VitalsLabelTemplate">
+        <Anchor side="Bottom" relative="$parent" pos="Max" offset="-1"/>
+        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+        <Color val="#UnitVitals_EnergyColor"/>
+        <Style val="@@@GameButtonCharge"/>
+   
+        <StateGroup name="VisibilityState">
+            <DefaultState val="Visible"/>
+            
+            <State name="NotVisible">
+                <When type="Property" frame="$ancestor[@type=UnitFrame]" MaxEnergy="0"/>
+                <Action type="SetProperty" Visible="False"/>
+            </State>
+            
+            <State name="Visible">
+                <Action type="SetProperty" Visible="True"/>
+            </State>
+        </StateGroup>
+    </Frame>
+    
+    <Frame type="Label" name="LifeLabelTemplate" template="War3_GameUI/VitalsLabelTemplate">
+        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+        <Style val="@@@GameButtonCharge"/>
+        
+        <Frame type="MathFrame" name="CurrentVitalFrame">
+            <A val="{$ancestor[@type=UnitFrame]/@CurrentHealth}"/>
+        </Frame>
+        
+        <Frame type="MathFrame" name="MaxVitalFrame">
+            <A val="{$ancestor[@type=UnitFrame]/@MaxHealth}"/>
+        </Frame>
+        
+        <Frame type="MathFrame" name="LifePercentFrame">
+            <Anchor relative="$parent"/>
+            <Operator val="Divide"/>
+            <A val="{$ancestor[@type=UnitFrame]/@CurrentHealth}"/>
+            <B val="{$ancestor[@type=UnitFrame]/@MaxHealth}"/>
+        </Frame>
+   
+        <StateGroup name="HealthState">
+            <DefaultState val="HealthMax"/>
+            
+            <State name="HealthBelow25Percent">
+                <When type="Property" frame="LifePercentFrame" operator="LessThanOrEqual" Result=".25"/>
+                <Action type="SetProperty" Color="#UnitGroup_HealthColor_Low3"/>
+            </State>
+            
+            <State name="HealthBelow50Percent">
+                <When type="Property" frame="LifePercentFrame" operator="LessThanOrEqual" Result=".5"/>
+                <Action type="SetProperty" Color="#UnitGroup_HealthColor_Low2"/>
+            </State>
+            
+            <State name="HealthBelow75Percent">
+                <When type="Property" frame="LifePercentFrame" operator="LessThanOrEqual" Result=".75"/>
+                <Action type="SetProperty" Color="#UnitGroup_HealthColor_Low1"/>
+            </State>
+            
+            <State name="HealthMax">
+                <Action type="SetProperty" Color="#UnitGroup_HealthColor_Max"/>
+            </State>
+        </StateGroup>
+    </Frame>
+    
+    <Frame type="UnitFrame" name="LeaderVitalsFrameTemplate">
+        <Width val="152"/>
+        <UseSelectionLeader val="True"/>
+        <RenderType val="HDR"/>
+        
+        <Frame type="Label" name="LifeLabel" template="War3_GameUI/LifeLabelTemplate"/>
+        <Frame type="Label" name="EnergyLabel" template="War3_GameUI/EnergyLabelTemplate"/>
+   
+        <StateGroup name="VisibilityState">
+            <DefaultState val="Visible"/>
+            
+            <State name="NotVisible">
+                <When type="Property" UnitTag="0#0"/>
+                <Action type="SetProperty" Alpha="0"/>
+            </State>
+            
+            <State name="Visible">
+                <Action type="SetProperty" Alpha="255"/>
+            </State>
+        </StateGroup>
+    </Frame>
+    
+    <Frame type="HeroFrame" name="HeroFrameTemplate" template="HeroPanel/HeroFrameTemplate">
+        <Frame type="UnitStatusFrame" name="StatusFrame" template="War3_UnitInfoPropertyBars/HeroPanelStatusFrameTemplate"/>
+        <Frame type="Image" name="ShieldBar">
+            <Visible val="false"/>
+        </Frame>
+        <Frame type="Image" name="ShieldBarBackground">
+            <Visible val="false"/>
+        </Frame>
+        <Frame type="Image" name="HealthBar">
+            <Visible val="false"/>
+        </Frame>
+        <Frame type="Image" name="HealthBarBackground">
+            <Visible val="false"/>
+        </Frame>
+        <Frame type="Portrait" name="HeroFrameSkillPointPortrait">
+            <Anchor relative="$parent\Button" offset="50"/>
+            <AcceptsMouse val="false"/>
+            <BorderImage val="BorderImage"/>
+            <BackgroundImage val="BackgroundImage"/>
+            <UseTransition val="false"/>
+            <Visible val="true"/>
+            <ModelLink val="War3_SkillPointVFX"/>
+            <RenderType val="HDR"/>
+            <Unclipped val="true"/>
+            <Frame type="Image" name="BorderImage">
+                <Visible val="false"/>
+            </Frame>
+            <Frame type="Image" name="BackgroundImage">
+                <Visible val="false"/>
+            </Frame>
+            <Visible val="{$parent/Button/ChargeLabel/@Visible}"/>
+        </Frame>
+        <Frame type="HeroButton" name="Button">
+            <DisplayType val="ImageLayer"/>
+            
+            <Frame type="Image" name="NormalImage">
+                <Anchor relative="$parent"/>
+                <LayerCount val="2"/>
+                <StateCount val="1"/>
+                <TextureType val="Normal" layer="0"/>
+                <TextureType val="Normal" layer="1"/>
+                <Texture val="@@@UI/ButtonBorderNormal" layer="0"/>
+                <Texture val="@@@UI/ButtonBorderNormalActive" layer="1"/>
+                <RenderPriority val="500"/>
+                <DescFlags val=""/>
+            </Frame>
+
+            <Frame type="Image" name="HoverImage">
+                <Anchor relative="$parent"/>
+                <LayerCount val="2"/>
+                <StateCount val="1"/>
+                <TextureType val="Normal" layer="0"/>
+                <TextureType val="Normal" layer="1"/>
+                <Texture val="@@@UI/ButtonBorderNormal" layer="0"/>
+                <Texture val="@@@UI/ButtonBorderNormalActive" layer="1"/>
+                <RenderPriority val="500"/>
+                <DescFlags val=""/>
+            </Frame>
+            <Frame type="Label" name="ChargeLabel">
+                <Anchor side="Bottom" relative="$parent" pos="Max" offset="-8"/>
+                <Anchor side="Right" relative="$parent" pos="Max" offset="-8"/>
+                <Style val="GameButtonCharge"/>
+                <RenderPriority val="516"/>
+                <Text val="{$parent/$parent/@SkillPoint}"/>
+                <StateGroup name="VisibilityState">
+                    <DefaultState val="Visible"/>
+                    <State name="NotVisible">
+                        <When type="Property" frame="$parent/$parent" SkillPoint="0"/>
+                        <Action type="SetProperty" Visible="false"/>
+                    </State>
+                    
+                    <State name="Visible">
+                        <Action type="SetProperty" Visible="true"/>
+                    </State>
+                </StateGroup>
+            </Frame>
+        </Frame>
+    </Frame>
+    
+    <Frame type="EquipmentIcon" name="EquipmentIconTemplate" file="EquipmentIcon">        
+        <Frame type="Image" name="EquipmentIconBorder">
+            <Visible val="false"/>
+            <Alpha val="0"/>
+        </Frame>
+    </Frame>
+    
+    <Frame type="Frame" name="GameUI" file="GameUI" requiredtoload="Human|Orc|NightElf|Undead">
+
+        <!-- UI Container - for all ui elements above the world -->
+        <Frame type="Frame" name="UIContainer">
+        
+            <Frame type="Frame" name="FullscreenUpperContainer">
+                <Frame type="HeroPanel" name="HeroPanel">
+                    <Frame type="HeroFrame" name="HeroFrame07" template="War3_GameUI/HeroFrameTemplate"/>
+                    <Frame type="HeroFrame" name="HeroFrame06" template="War3_GameUI/HeroFrameTemplate"/>
+                    <Frame type="HeroFrame" name="HeroFrame05" template="War3_GameUI/HeroFrameTemplate"/>
+                    <Frame type="HeroFrame" name="HeroFrame04" template="War3_GameUI/HeroFrameTemplate"/>
+                    <Frame type="HeroFrame" name="HeroFrame03" template="War3_GameUI/HeroFrameTemplate"/>
+                    <Frame type="HeroFrame" name="HeroFrame02" template="War3_GameUI/HeroFrameTemplate"/>
+                    <Frame type="HeroFrame" name="HeroFrame01" template="War3_GameUI/HeroFrameTemplate"/>
+                    <Frame type="HeroFrame" name="HeroFrame00" template="War3_GameUI/HeroFrameTemplate"/>
+                </Frame>
+            </Frame>
+        
+            <Frame type="ConsolePanel" name="ConsolePanel">
+                <Frame type="PortraitPanel" name="PortraitPanel">
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="-60"/>
+                    <Anchor side="Left" relative="$parent" pos="Min" offset="400"/>
+                    <Anchor side="Right" relative="$this" pos="Min" offset="0"/>
+                    <Height val="165"/>
+                    <RenderPriority val="550"/>
+                </Frame>
+                <Frame type="UnitFrame" name="LeaderVitalsFrame" template="War3_GameUI/LeaderVitalsFrameTemplate">
+                    <Anchor side="Top" relative="$parent/PortraitPanel" pos="Max" offset="3"/>
+                    <Anchor side="Left" relative="$parent/PortraitPanel" pos="Min" offset="0"/>
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <RenderPriority val="550"/>
+                </Frame>
+            </Frame>
+            <Frame type="Frame" name="ConsoleUIContainer">
+                <Frame type="PortraitTimeOfDay" name="GameTODIndicator">
+                    <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                    <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                    <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                    <Width val="220"/>
+                    <Height val="170"/>
+                    <AcceptsMouse val="false"/>
+                    <BorderImage val="BorderImage"/>
+                    <BackgroundImage val="BackgroundImage"/>
+                    <UseTransition val="false"/>
+                    <ModelLink val="TimeIndicatorHuman"/>
+                    <ActorLink val="War3_ToDActor"/>
+                    <Frame type="Image" name="BorderImage">
+                        <Visible val="false"/>
+                        <Anchor relative="$parent"/>
+                    </Frame>
+
+                    <Frame type="Image" name="BackgroundImage">
+                        <Visible val="false"/>
+                        <Anchor relative="$parent"/>
+                    </Frame>
+                    
+                    <Frame type="Frame" name="TooltipAnchor">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                        <Width val="100"/>
+                        <Height val="90"/>
+                        <Tooltip val="@UI/TimeOfDayString"/>
+                        <AcceptsMouse val="true"/>
+                    </Frame>
+                </Frame>
+            
+            
+                <Frame type="InventoryPanel" name="InventoryPanel">
+                    <HideUnusedInventoryButtons val="false"/>
+                    <UseAlertIcon val="true"/>
+                    <Frame type="CommandTooltip" name="InventoryTooltip">
+                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="-330"/>
+                        <Anchor side="Right" relative="$parent" pos="Max" offset="-210"/>
+                    </Frame>
+
+                    <Frame type="InventoryContainer" name="InventoryButtons">
+                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                        <Anchor side="Right" relative="$parent/$parent/CommandPanel" pos="Min" offset="-20"/>
+                        <Height val="270"/>
+                        <Width val="165"/>
+                        <Anchor side="Left" relative="$this" pos="Max" offset="0"/>
+                        <CollapseLayout val="false"/>
+                        
+                        <Frame type="Image" name="BackgroundImage">
+                            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                            <!--Anchor side="Bottom" relative="$parent/Button00" pos="Min" offset="-3"/-->
+                            <Texture val="@@@UI/InventoryBackground"/>
+                            <!--ScaleHeightToTexture val="True"/-->
+                            <ScaleHeightToTexture val="True"/>
+                        </Frame>
+                        
+                        <Frame type="Frame" name="Anchor00" template="War3_GameUI/InventorySlotAnchorTemplate">
+                            <Anchor side="Bottom" relative="$parent/Anchor02" pos="Min" offset="0"/>
+                            <Anchor side="Left" relative="$parent/Anchor02" pos="Min" offset="0"/>
+                            <StateGroup name="VisibilityState">            
+                                <State name="NotVisible">
+                                    <When type="Property" frame="$parent/Button00" Visible="True"/>
+                                </State>
+                            </StateGroup>
+                        </Frame>
+                        <Frame type="Frame" name="Anchor01" template="War3_GameUI/InventorySlotAnchorTemplate">
+                            <Anchor side="Bottom" relative="$parent/Anchor00" pos="Max" offset="0"/>
+                            <Anchor side="Left" relative="$parent/Anchor00" pos="Max" offset="0"/>
+                            <StateGroup name="VisibilityState">            
+                                <State name="NotVisible">
+                                    <When type="Property" frame="$parent/Button01" Visible="True"/>
+                                </State>
+                            </StateGroup>
+                        </Frame>
+                        <Frame type="Frame" name="Anchor02" template="War3_GameUI/InventorySlotAnchorTemplate">
+                            <Anchor side="Bottom" relative="$parent/Anchor04" pos="Min" offset="0"/>
+                            <Anchor side="Left" relative="$parent/Anchor04" pos="Min" offset="0"/>
+                            <StateGroup name="VisibilityState">            
+                                <State name="NotVisible">
+                                    <When type="Property" frame="$parent/Button02" Visible="True"/>
+                                </State>
+                            </StateGroup>
+                        </Frame>
+                        <Frame type="Frame" name="Anchor03" template="War3_GameUI/InventorySlotAnchorTemplate">
+                            <Anchor side="Bottom" relative="$parent/Anchor02" pos="Max" offset="0"/>
+                            <Anchor side="Left" relative="$parent/Anchor02" pos="Max" offset="0"/>
+                            <StateGroup name="VisibilityState">            
+                                <State name="NotVisible">
+                                    <When type="Property" frame="$parent/Button03" Visible="True"/>
+                                </State>
+                            </StateGroup>
+                        </Frame>
+                        <Frame type="Frame" name="Anchor04" template="War3_GameUI/InventorySlotAnchorTemplate">
+                            <Anchor side="Bottom" relative="$parent/InnerSizeFrame" pos="Max" offset="0"/>
+                            <Anchor side="Left" relative="$parent/InnerSizeFrame" pos="Min" offset="0"/>
+                            <StateGroup name="VisibilityState">            
+                                <State name="NotVisible">
+                                    <When type="Property" frame="$parent/Button04" Visible="True"/>
+                                </State>
+                            </StateGroup>
+                        </Frame>
+                        <Frame type="Frame" name="Anchor05" template="War3_GameUI/InventorySlotAnchorTemplate">
+                            <Anchor side="Bottom" relative="$parent/Anchor04" pos="Max" offset="0"/>
+                            <Anchor side="Left" relative="$parent/Anchor04" pos="Max" offset="0"/>
+                            <StateGroup name="VisibilityState">            
+                                <State name="NotVisible">
+                                    <When type="Property" frame="$parent/Button05" Visible="True"/>
+                                </State>
+                            </StateGroup>
+                        </Frame>
+                        <Frame type="CommandButton" name="Button00" template="War3_GameUI/InventoryButtonTemplate">
+                            <Anchor relative="$parent/Anchor00" offset="-1"/>
+                            <Handle val="InventoryBag0"/>
+                        </Frame>
+                        <Frame type="CommandButton" name="Button01" template="War3_GameUI/InventoryButtonTemplate">
+                            <Anchor relative="$parent/Anchor01" offset="-1"/>
+                            <Handle val="InventoryBag1"/>
+                        </Frame>
+                        <Frame type="CommandButton" name="Button02" template="War3_GameUI/InventoryButtonTemplate">
+                            <Anchor relative="$parent/Anchor02" offset="-1"/>
+                            <Handle val="InventoryBag2"/>
+                        </Frame>			
+                        <Frame type="CommandButton" name="Button03" template="War3_GameUI/InventoryButtonTemplate">
+                            <Anchor relative="$parent/Anchor03" offset="-1"/>
+                            <Handle val="InventoryBag3"/>
+                        </Frame>
+                        <Frame type="CommandButton" name="Button04" template="War3_GameUI/InventoryButtonTemplate">
+                            <Anchor relative="$parent/Anchor04" offset="-1"/>
+                            <Handle val="InventoryBag4"/>
+                        </Frame>
+                        <Frame type="CommandButton" name="Button05" template="War3_GameUI/InventoryButtonTemplate">
+                            <Anchor relative="$parent/Anchor05" offset="-1"/>
+                            <Handle val="InventoryBag5"/>
+                        </Frame>
+                        <Frame type="Frame" name="InnerSizeFrame">
+                            <Anchor relative="$parent" offset="-2"/>
+                        </Frame>
+                        <Frame type="Frame" name="ContainerSizeFrame">
+                            <Anchor relative="$parent" offset="0"/>
+                        </Frame>
+                    </Frame>
+
+                    <Frame type="Image" name="Cursor">
+                        <Anchor side="Top" relative="$parent" pos="Min" offset="-32"/>
+                        <Anchor side="Left" relative="$parent" pos="Min" offset="-32"/>
+                        <Width val="76"/>
+                        <Height val="76"/>
+                        <RenderPriority val="2500"/>
+                        <LayerCount val="2"/>
+                        <TextureType val="Normal" layer="0"/>
+                        <Texture val="@@@UI/ButtonBorderNormal" layer="0"/>
+                    </Frame>                
+                </Frame>
+                <Frame type="InfoPanel" name="InfoPanel">
+                    <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                    <Height val="235"/>
+                    <Frame type="InfoPaneUnit" name="InfoPaneUnit">
+                        <Frame type="Frame" name="EquipmentPanel">
+                            <Anchor side="Top" relative="$parent" pos="Min" offset="88"/>
+                        </Frame>
+                        <Frame type="Label" name="InfoLabel">
+                            <Anchor side="Bottom" relative="$parent" pos="Min" offset="90"/>
+                        </Frame>
+                    </Frame>
+                    <Frame type="InfoPaneHero" name="InfoPaneHero">
+                        <Frame type="EquipmentIcon" name="WeaponIcon">
+                            <Anchor side="Top" relative="$parent/ExperienceBar" pos="Max" offset="12"/>
+                            <Width val="48"/>
+                            <Height val="48"/>
+                        </Frame>
+
+                        <Frame type="Label" name="WeaponLabel">
+                            <Anchor side="Top" relative="$parent/WeaponIcon" pos="Min" offset="-5"/>
+                        </Frame>
+
+                        <Frame type="EquipmentIcon" name="ArmorIcon">
+                            <Width val="48"/>
+                            <Height val="48"/>
+                            <Anchor side="Top" relative="$parent/WeaponIcon" pos="Max" offset="4"/>
+                        </Frame>
+
+                        <Frame type="Label" name="AttributeLabel1">
+                            <Anchor side="Top" relative="$parent/ExperienceBar" pos="Max" offset="10"/>
+                            <Anchor side="Left" relative="$this" pos="Max" offset="0"/>
+                            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                        </Frame>
+
+                        <Frame type="Label" name="AttributeLabel2">
+                            <Anchor side="Top" relative="$parent/AttributeLabel1" pos="Max" offset="4"/>
+                            <Anchor side="Left" relative="$this" pos="Max" offset="0"/>
+                            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                        </Frame>
+
+                        <Frame type="Label" name="AttributeLabel3">
+                            <Anchor side="Top" relative="$parent/AttributeLabel2" pos="Max" offset="4"/>
+                            <Anchor side="Left" relative="$this" pos="Max" offset="0"/>
+                            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                        </Frame>
+
+                        <Frame type="Label" name="AttributeLabel4">
+                            <Anchor side="Top" relative="$parent/AttributeLabel3" pos="Max" offset="4"/>
+                            <Anchor side="Left" relative="$this" pos="Max" offset="0"/>
+                            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                        </Frame>
+
+                        <Frame type="Label" name="AttributeLabel5">
+                            <Anchor side="Top" relative="$parent/AttributeLabel4" pos="Max" offset="4"/>
+                            <Anchor side="Left" relative="$this" pos="Max" offset="0"/>
+                            <Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+                        </Frame>
+                    </Frame>
+
+                    <Frame type="InfoPaneGroup" name="InfoPaneGroup">
+                        <Frame type="AspectRatioFrame" name="AspectRatioListener_Alternate">
+                            <Anchor side="Top" relative="$parent" pos="Max" offset="0"/>
+                            <Anchor side="Left" relative="$parent" pos="Max" offset="0"/>
+                            <Width val="1"/>
+                            <Height val="1"/>
+                            <MinVisibleAspectRatio val="1"/>
+                            <MaxVisibleAspectRatio val="1.6"/>
+                        </Frame>
+                        
+                        <Frame type="Frame" name="PageFrame0" template="War3_InfoPaneGroup/PageFrameTemplate">
+                            <Anchor relative="$parent"/>
+                        </Frame>
+
+                        <Frame type="Frame" name="PageFrame1" template="War3_InfoPaneGroup/PageFrameTemplate">
+                            <Anchor relative="$parent"/>
+                            <Visible val="false"/>
+                        </Frame>
+
+                        <Frame type="Frame" name="PageFrame2" template="War3_InfoPaneGroup/PageFrameTemplate">
+                            <Anchor relative="$parent"/>
+                            <Visible val="false"/>
+                        </Frame>
+
+                        <Frame type="Frame" name="PageFrame3" template="War3_InfoPaneGroup/PageFrameTemplate">
+                            <Anchor relative="$parent"/>
+                            <Visible val="false"/>
+                        </Frame>
+
+                        <Frame type="Frame" name="PageFrame4" template="War3_InfoPaneGroup/PageFrameTemplate">
+                            <Anchor relative="$parent"/>
+                            <Visible val="false"/>
+                        </Frame>
+
+                        <Frame type="Frame" name="PageFrame5" template="War3_InfoPaneGroup/PageFrameTemplate">
+                            <Anchor relative="$parent"/>
+                            <Visible val="false"/>
+                        </Frame>
+                    </Frame>
+
+                    <Frame type="InfoPaneCargo" name="InfoPaneCargo">
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                        <Frame type="CargoButton" name="CargoButton0">
+                            <Frame type="UnitStatusFrame" name="StatusFrame" template="War3_UnitInfoPropertyBars/CargoStatusFrameTemplate"/>
+                        </Frame>
+                        <Frame type="CargoButton" name="CargoButton1">
+                            <Frame type="UnitStatusFrame" name="StatusFrame" template="War3_UnitInfoPropertyBars/CargoStatusFrameTemplate"/>
+                        </Frame>
+                        <Frame type="CargoButton" name="CargoButton2">
+                            <Frame type="UnitStatusFrame" name="StatusFrame" template="War3_UnitInfoPropertyBars/CargoStatusFrameTemplate"/>
+                        </Frame>
+                        <Frame type="CargoButton" name="CargoButton3">
+                            <Frame type="UnitStatusFrame" name="StatusFrame" template="War3_UnitInfoPropertyBars/CargoStatusFrameTemplate"/>
+                        </Frame>
+                        <Frame type="CargoButton" name="CargoButton4">
+                            <Frame type="UnitStatusFrame" name="StatusFrame" template="War3_UnitInfoPropertyBars/CargoStatusFrameTemplate"/>
+                        </Frame>
+                        <Frame type="CargoButton" name="CargoButton5">
+                            <Frame type="UnitStatusFrame" name="StatusFrame" template="War3_UnitInfoPropertyBars/CargoStatusFrameTemplate"/>
+                        </Frame>
+                        <Frame type="CargoButton" name="CargoButton6">
+                            <Frame type="UnitStatusFrame" name="StatusFrame" template="War3_UnitInfoPropertyBars/CargoStatusFrameTemplate"/>
+                        </Frame>
+                        <Frame type="CargoButton" name="CargoButton7">
+                            <Frame type="UnitStatusFrame" name="StatusFrame" template="War3_UnitInfoPropertyBars/CargoStatusFrameTemplate"/>
+                        </Frame>
+                        <Frame type="CargoButton" name="CargoButton8">
+                            <Frame type="UnitStatusFrame" name="StatusFrame" template="War3_UnitInfoPropertyBars/CargoStatusFrameTemplate"/>
+                        </Frame>
+                        <Frame type="CargoButton" name="CargoButton9">
+                            <Frame type="UnitStatusFrame" name="StatusFrame" template="War3_UnitInfoPropertyBars/CargoStatusFrameTemplate"/>
+                        </Frame>
+                        <Frame type="CargoButton" name="CargoButton10">
+                            <Frame type="UnitStatusFrame" name="StatusFrame" template="War3_UnitInfoPropertyBars/CargoStatusFrameTemplate"/>
+                        </Frame>
+                        <Frame type="CargoButton" name="CargoButton11">
+                            <Frame type="UnitStatusFrame" name="StatusFrame" template="War3_UnitInfoPropertyBars/CargoStatusFrameTemplate"/>
+                        </Frame>
+                        <Frame type="CargoButton" name="CargoButton12">
+                            <Frame type="UnitStatusFrame" name="StatusFrame" template="War3_UnitInfoPropertyBars/CargoStatusFrameTemplate"/>
+                        </Frame>
+                        <Frame type="CargoButton" name="CargoButton13">
+                            <Frame type="UnitStatusFrame" name="StatusFrame" template="War3_UnitInfoPropertyBars/CargoStatusFrameTemplate"/>
+                        </Frame>
+                        <Frame type="CargoButton" name="CargoButton14">
+                            <Frame type="UnitStatusFrame" name="StatusFrame" template="War3_UnitInfoPropertyBars/CargoStatusFrameTemplate"/>
+                        </Frame>
+                        <Frame type="CargoButton" name="CargoButton15">
+                            <Frame type="UnitStatusFrame" name="StatusFrame" template="War3_UnitInfoPropertyBars/CargoStatusFrameTemplate"/>
+                        </Frame>
+                    </Frame>
+
+                    <Frame type="Frame" name="UnitPanel">
+                        <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                        <Anchor side="Left" relative="$parent" pos="Mid" offset="0"/>
+                        <Anchor side="Right" relative="$parent" pos="Mid" offset="0"/>
+                        <Width val="250"/>
+                        <Height val="200"/>
+                    
+                        <Frame type="UnitWireframe" name="UnitWireframe">
+                            <Anchor side="Top" relative="$parent" pos="Min" offset="52"/>
+                            <Anchor side="Left" relative="$parent" pos="Min" offset="10"/>
+                            <Visible val="false"/>
+                        </Frame>
+                        
+                        <Frame type="Label" name="ShieldLabel">
+                            <Alpha val="0"/>
+                        </Frame>	
+                        
+                        <Frame type="Label" name="LifeLabel">
+                            <Alpha val="0"/>
+                        </Frame>	
+                        
+                        <Frame type="Label" name="EnergyLabel">
+                            <Alpha val="0"/>
+                        </Frame>
+                        <Frame type="BehaviorBar" name="BehaviorBar">
+                            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                            <Anchor side="Left" relative="$parent" pos="Min" offset="-500"/>
+                            <Visible val="False"/>
+                        </Frame>
+                        
+                        <Frame type="BehaviorBar" name="War3_BuffBehaviorBar" template="War3_BehaviorBar/BuffBehaviorBarTemplate">
+                            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                            <Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+                            <RenderPriority val="520"/>
+                        </Frame>
+                        
+                        <Frame type="BehaviorBar" name="War3_DebuffBehaviorBar" template="War3_BehaviorBar/DebuffBehaviorBarTemplate">
+                            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                            <Anchor side="Left" relative="$parent/War3_BuffBehaviorBar" pos="Max" offset="0"/>
+                            <RenderPriority val="520"/>
+                        </Frame>
+                        
+                        <Frame type="BehaviorBar" name="War3_NeutralBehaviorBar" template="War3_BehaviorBar/NeutralBehaviorBarTemplate">
+                            <Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+                            <Anchor side="Left" relative="$parent/War3_DebuffBehaviorBar" pos="Max" offset="0"/>
+                            <RenderPriority val="520"/>
+                        </Frame>
+                    </Frame>
+                </Frame>
+            </Frame>
+        </Frame>
+    </Frame>
+</Desc>
