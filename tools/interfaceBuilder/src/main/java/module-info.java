@@ -19,7 +19,7 @@ module interfacex.builder {
 	requires org.apache.commons.io;
 	requires org.apache.logging.log4j;
 	requires org.apache.logging.log4j.core;
-	requires com.esotericsoftware.kryo;
+	requires kryo;
 	//requires com.esotericsoftware.minlog;
 	requires pecoff4j;
 	//requires org.eclipse.collections.api;
