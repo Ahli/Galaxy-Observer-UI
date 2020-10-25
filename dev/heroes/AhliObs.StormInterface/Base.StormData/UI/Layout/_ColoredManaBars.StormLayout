@@ -19,6 +19,7 @@
 	<Constant name="VolskayaRobotEnergyColor" val="ff69b4"/>
 	<Constant name="JunkratAmmoColor" val="ea9a1f"/>
 	<Constant name="DeathwingBreathColor" val="f72613"/> <!-- 247,38,19 -->
+	<Constant name="GazloweScrapColor" val="ea9a1f"/> <!-- 234,154,31 -->
 	
 	<Frame type="UnitStatusEnergyType" name="EnergyBarMagicWidthTemplate">
 		<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
@@ -180,6 +181,17 @@
 		<EnemyColor val="#DeathwingBreathColor" index="1"/>
 		<ColorStyle val="DeathwingEnergy"/>
 	</Frame>
+	<Frame type="UnitStatusEnergyBar" name="GazloweScrapConsoleTemplate" template="_ColoredManaBars/BaseEnergyConsoleTemplate">
+		<OwnerColor val="#GazloweScrapColor" index="0"/>
+		<AllyColor val="#GazloweScrapColor" index="0"/>
+		<EnemyColor val="#GazloweScrapColor" index="0"/>
+		<OwnerColor val="#GazloweScrapColor" index="1"/>
+		<AllyColor val="#GazloweScrapColor" index="1"/>
+		<EnemyColor val="#GazloweScrapColor" index="1"/>
+		<Segmented val="true" index="0"/>
+		<SegmentValue val="1"/>
+		<ColorStyle val="FuryEnergy" />
+	</Frame>
 	<!-- Observer templates -->
 	<Frame type="UnitStatusEnergyBar" name="ManaBarObserverOverviewTemplate">
 		<!-- unique colors -->
@@ -294,6 +306,17 @@
 		<EnemyColor val="#DeathwingBreathColor" index="1"/>
 		<Segmented val="false" index="0"/>
 		<ColorStyle val="DeathwingEnergy"/>
+	</Frame>
+	<Frame type="UnitStatusEnergyBar" name="GazloweScrapObserverOverviewTemplate">
+		<OwnerColor val="#GazloweScrapColor" index="0"/>
+		<AllyColor val="#GazloweScrapColor" index="0"/>
+		<EnemyColor val="#GazloweScrapColor" index="0"/>
+		<OwnerColor val="#GazloweScrapColor" index="1"/>
+		<AllyColor val="#GazloweScrapColor" index="1"/>
+		<EnemyColor val="#GazloweScrapColor" index="1"/>
+		<Segmented val="true" index="0"/>
+		<SegmentValue val="1"/>
+		<ColorStyle val="FuryEnergy" />
 	</Frame>
 
 	<!-- Mana Bars non-generic... -->
@@ -523,6 +546,15 @@
 			<Frame type="UnitStatusFrame" name="UnitStatusFrame0">
 				<Anchor relative="$parent"/>
 				<Frame type="UnitStatusEnergyBar" name="ManaBar" template="_ColoredManaBars/DeathwingBreathConsoleTemplate">
+				</Frame>
+			</Frame>
+		</Frame>
+		<Frame type="SelectionUnitStatusPanel" name="GazloweScrap">
+			<Anchor relative="$parent"/>
+			<SpecificUnit val="HeroTinker"/>
+			<Frame type="UnitStatusFrame" name="UnitStatusFrame0">
+				<Anchor relative="$parent"/>
+				<Frame type="UnitStatusEnergyBar" name="ManaBar" template="_ColoredManaBars/GazloweScrapConsoleTemplate">
 				</Frame>
 			</Frame>
 		</Frame>
@@ -792,6 +824,25 @@
 				</Controller>
 			</Animation>
 		</Frame>
+		<Frame type="UnitStatusBehaviorAnim" name="TinkerFocusTurrets">
+			<Anchor relative="$parent"/>
+			<Behavior val="TinkerFocusTurrets"/>
+			
+			<Frame type="Frame" name="TinkerFocusTurretsState">
+				<Anchor relative="$parent"/>
+				<Visible val="false"/>
+			</Frame>
+			
+			<Animation name="BehaviorControlAnim">
+				<Event event="BehaviorCreate" action="Reset,DirectionForward,Play"/>
+				<Event event="BehaviorDestroy" action="DirectionReverse,Play"/>
+
+				<Controller type="Visibility" end="Pause" frame="TinkerFocusTurretsState">
+					<Key type="Bool" time="0" value="false"/>
+					<Key type="Bool" time="0" value="true"/>
+				</Controller>
+			</Animation>
+		</Frame>
 		
 		<!-- switch colors -->
 		<StateGroup name="ManaBarColorSwitcher">
@@ -842,6 +893,10 @@
 			<State name="DeathwingBreath">
 				<When type="Property" frame="DeathwingFormSwitchAbility/DeathwingFormSwitchAbilityState" visible="true"/>
 				<Action type="ApplyTemplate" frame="ManaBar" template="_ColoredManaBars/DeathwingBreathObserverOverviewTemplate"/>
+			</State>
+			<State name="GazloweScrap">
+				<When type="Property" frame="TinkerFocusTurrets/TinkerFocusTurretsState" visible="true"/>
+				<Action type="ApplyTemplate" frame="ManaBar" template="_ColoredManaBars/GazloweScrapObserverOverviewTemplate"/>
 			</State>
 			<State name="BlueMana">
 				<Action type="ApplyTemplate" frame="ManaBar" template="_ColoredManaBars/ManaBarObserverOverviewTemplate"/>
