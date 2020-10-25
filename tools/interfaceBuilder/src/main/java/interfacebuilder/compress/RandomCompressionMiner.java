@@ -96,7 +96,8 @@ public class RandomCompressionMiner {
 				rules = addRulesForFiles(oldBestRuleset, untrackedFiles, cacheDir);
 				oldRulesetHadMissingFiles = true;
 			} else {
-				rules = oldBestRuleset;
+				// do not modify the original array
+				rules = oldBestRuleset.clone();
 			}
 			rules = removeUnusedMaskEnries(rules, cacheDir);
 			fillFileSizeMap(rules, cacheDir);
