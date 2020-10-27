@@ -33,6 +33,7 @@
 			<RenderPriority val="600"/>
 			
 			<Frame type="SelectionUnitStatusPanel" name="SelectionUnitStatusPanel">
+				<!-- The hero reference survives deaths -->
 				<Frame type="UnitStatusFrame" name="UnitStatusFrame0">
 					<Frame type="PlayerHeroSelectedTalentTreeFrame" name="HeroSelectedTalentTreeFrame">
 						<RenderPriority val="512"/>
@@ -725,6 +726,10 @@
 						</Frame>
 					</Frame>
 					
+					<Frame type="Frame" name="SpecialSingleCDPanel" template="_ActivateableTalentCD/SpecialSingleCDPanelTemplate_L">
+						<Anchor side="Top" relative="$parent" pos="Min" offset="19"/>
+						<Anchor side="Left" relative="$parent" pos="Min" offset="-21"/>
+					</Frame>
 				</Frame>
 			</Frame>
 			
@@ -794,6 +799,9 @@
 								<ImageMaskTexture val="@UI/obs_alphaMask_mini_talents_mirrored"/>
 							</Frame>
 						</Frame>
+					</Frame>
+					<Frame type="Frame" name="SpecialSingleCDPanel" template="_ActivateableTalentCD/SpecialSingleCDPanelTemplate_R">
+						<Anchor side="Left" relative="$parent" pos="Min" offset="24"/>
 					</Frame>
 				</Frame>
 			</Frame>
@@ -1052,15 +1060,6 @@
 					</Controller>
 				</Animation>
 			</Frame>
-
-			<!-- Special single Cooldown -->
-			<Frame type="Frame" name="SpecialSingleCDPanel" template="_ActivateableTalentCD/SpecialSingleCDPanelTemplate_L">
-				<Anchor side="Top" relative="$parent" pos="Min" offset="-60"/>
-				<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
-				<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-				<Height val="80"/>
-			</Frame>
-
 		</Frame>
 		
 		<Frame type="UnitTargetFrame" name="TargetHeroUnitFrame">
@@ -1462,24 +1461,6 @@
 		
 	</Frame>
 	<Frame type="Frame" name="HeroOverviewTemplateL" template="_TopPanel/HeroOverviewTemplate_Base">
-		<Frame type="UnitStatusFrame" name="HeroStatus">
-			<!-- Special single Cooldown -->
-			<Frame type="Frame" name="SpecialSingleCDPanel">
-				<Animation name="Ahlimation">
-					<Event event="HeroicShown" action="DirectionForward,Play" frame="$parent/HeroicPlaceholder"/>
-					<Event event="HeroicHidden" action="DirectionReverse,Play" frame="$parent/HeroicPlaceholder"/>
-					
-					<Controller type="Anchor" end="Pause" side="Top" relative="true">
-						<Key type="Curve" time="0" value="0" inout="Auto"/>
-						<Key type="Curve" time=".25" value="-16" inout="Auto"/>
-					</Controller>
-					<Controller type="Anchor" end="Pause" side="Left" relative="true">
-						<Key type="Curve" time="0" value="0" inout="Auto"/>
-						<Key type="Curve" time=".25" value="-10" inout="Auto"/>
-					</Controller>
-				</Animation>
-			</Frame>
-		</Frame>
 	</Frame>
 	<Frame type="Frame" name="HeroOverviewTemplateR" template="_TopPanel/HeroOverviewTemplate_Base">
 		
@@ -1523,23 +1504,6 @@
 			</Frame>
 			<Frame type="Image" name="EnergyBarBg">
 				<AlphaMaskTexture val="@UI/obs_bar_player_red"/>
-			</Frame>
-			
-			<!-- Special single Cooldown -->
-			<Frame type="Frame" name="SpecialSingleCDPanel" template="_ActivateableTalentCD/SpecialSingleCDPanelTemplate_R">
-				<Animation name="Ahlimation">
-					<Event event="HeroicShown" action="DirectionForward,Play" frame="$parent/HeroicPlaceholder"/>
-					<Event event="HeroicHidden" action="DirectionReverse,Play" frame="$parent/HeroicPlaceholder"/>
-					
-					<Controller type="Anchor" end="Pause" side="Top" relative="true">
-						<Key type="Curve" time="0" value="0" inout="Auto"/>
-						<Key type="Curve" time=".25" value="-16" inout="Auto"/>
-					</Controller>
-					<Controller type="Anchor" end="Pause" side="Left" relative="true">
-						<Key type="Curve" time="0" value="0" inout="Auto"/>
-						<Key type="Curve" time=".25" value="10" inout="Auto"/>
-					</Controller>
-				</Animation>
 			</Frame>
 		</Frame>
 
@@ -1760,6 +1724,18 @@
 				<Frame type="Label" name="HeroDeathTimeLabel_Baleog">
 					<Text val="{$PartyFramePanel/Team1HeroOverview/HeroOverview1/HeroDeathTimeVikingBaleogLabel/@Text}"/>
 					<Visible val="{$PartyFramePanel/Team1HeroOverview/HeroOverview1/HeroDeathTimeVikingBaleogLabel/@Visible}"/>
+					
+					<StateGroup name="OffsetState">
+						<DefaultState val="Dflt"/>
+						<State name="Offset">
+							<When type="Property" frame="$SpecialSingleCDPanel_L1/State" visible="true"/>
+							<Action type="SetAnchor" side="Top" relative="$parent" pos="Min" offset="4"/>
+							<Action type="SetAnchor" side="Bottom" relative="$this" pos="Min" offset="30"/>
+							<Action type="SetAnchor" side="Left" relative="$parent/HeroPortraitImage" pos="Min" offset="-36"/>
+							<Action type="SetAnchor" side="Right" relative="$parent/HeroPortraitImage" pos="Max" offset="-36"/>
+						</State>
+						<State name="Dflt"/>
+					</StateGroup>
 				</Frame>
 				<Frame type="Label" name="HeroDeathTimeLabel_Erik">
 					<Text val="{$PartyFramePanel/Team1HeroOverview/HeroOverview1/HeroDeathTimeVikingErikLabel/@Text}"/>
@@ -1778,6 +1754,18 @@
 				<Frame type="Label" name="HeroDeathTimeLabel_Baleog">
 					<Text val="{$PartyFramePanel/Team1HeroOverview/HeroOverview2/HeroDeathTimeVikingBaleogLabel/@Text}"/>
 					<Visible val="{$PartyFramePanel/Team1HeroOverview/HeroOverview2/HeroDeathTimeVikingBaleogLabel/@Visible}"/>
+					
+					<StateGroup name="OffsetState">
+						<DefaultState val="Dflt"/>
+						<State name="Offset">
+							<When type="Property" frame="$SpecialSingleCDPanel_L2/State" visible="true"/>
+							<Action type="SetAnchor" side="Top" relative="$parent" pos="Min" offset="4"/>
+							<Action type="SetAnchor" side="Bottom" relative="$this" pos="Min" offset="30"/>
+							<Action type="SetAnchor" side="Left" relative="$parent/HeroPortraitImage" pos="Min" offset="-36"/>
+							<Action type="SetAnchor" side="Right" relative="$parent/HeroPortraitImage" pos="Max" offset="-36"/>
+						</State>
+						<State name="Dflt"/>
+					</StateGroup>
 				</Frame>
 				<Frame type="Label" name="HeroDeathTimeLabel_Erik">
 					<Text val="{$PartyFramePanel/Team1HeroOverview/HeroOverview2/HeroDeathTimeVikingErikLabel/@Text}"/>
@@ -1796,6 +1784,18 @@
 				<Frame type="Label" name="HeroDeathTimeLabel_Baleog">
 					<Text val="{$PartyFramePanel/Team1HeroOverview/HeroOverview3/HeroDeathTimeVikingBaleogLabel/@Text}"/>
 					<Visible val="{$PartyFramePanel/Team1HeroOverview/HeroOverview3/HeroDeathTimeVikingBaleogLabel/@Visible}"/>
+					
+					<StateGroup name="OffsetState">
+						<DefaultState val="Dflt"/>
+						<State name="Offset">
+							<When type="Property" frame="$SpecialSingleCDPanel_L3/State" visible="true"/>
+							<Action type="SetAnchor" side="Top" relative="$parent" pos="Min" offset="4"/>
+							<Action type="SetAnchor" side="Bottom" relative="$this" pos="Min" offset="30"/>
+							<Action type="SetAnchor" side="Left" relative="$parent/HeroPortraitImage" pos="Min" offset="-36"/>
+							<Action type="SetAnchor" side="Right" relative="$parent/HeroPortraitImage" pos="Max" offset="-36"/>
+						</State>
+						<State name="Dflt"/>
+					</StateGroup>
 				</Frame>
 				<Frame type="Label" name="HeroDeathTimeLabel_Erik">
 					<Text val="{$PartyFramePanel/Team1HeroOverview/HeroOverview3/HeroDeathTimeVikingErikLabel/@Text}"/>
@@ -1810,6 +1810,18 @@
 				<Frame type="Label" name="HeroDeathTimeLabel_Olaf">
 					<Text val="{$PartyFramePanel/Team1HeroOverview/HeroOverview4/HeroDeathTimeVikingOlafLabel/@Text}"/>
 					<Visible val="{$PartyFramePanel/Team1HeroOverview/HeroOverview4/HeroDeathTimeVikingOlafLabel/@Visible}"/>
+					
+					<StateGroup name="OffsetState">
+						<DefaultState val="Dflt"/>
+						<State name="Offset">
+							<When type="Property" frame="$SpecialSingleCDPanel_L4/State" visible="true"/>
+							<Action type="SetAnchor" side="Top" relative="$parent" pos="Min" offset="4"/>
+							<Action type="SetAnchor" side="Bottom" relative="$this" pos="Min" offset="30"/>
+							<Action type="SetAnchor" side="Left" relative="$parent/HeroPortraitImage" pos="Min" offset="-36"/>
+							<Action type="SetAnchor" side="Right" relative="$parent/HeroPortraitImage" pos="Max" offset="-36"/>
+						</State>
+						<State name="Dflt"/>
+					</StateGroup>
 				</Frame>
 				<Frame type="Label" name="HeroDeathTimeLabel_Baleog">
 					<Text val="{$PartyFramePanel/Team1HeroOverview/HeroOverview4/HeroDeathTimeVikingBaleogLabel/@Text}"/>
@@ -1832,6 +1844,18 @@
 				<Frame type="Label" name="HeroDeathTimeLabel_Baleog">
 					<Text val="{$PartyFramePanel/Team1HeroOverview/HeroOverview5/HeroDeathTimeVikingBaleogLabel/@Text}"/>
 					<Visible val="{$PartyFramePanel/Team1HeroOverview/HeroOverview5/HeroDeathTimeVikingBaleogLabel/@Visible}"/>
+					
+					<StateGroup name="OffsetState">
+						<DefaultState val="Dflt"/>
+						<State name="Offset">
+							<When type="Property" frame="$SpecialSingleCDPanel_L5/State" visible="true"/>
+							<Action type="SetAnchor" side="Top" relative="$parent" pos="Min" offset="4"/>
+							<Action type="SetAnchor" side="Bottom" relative="$this" pos="Min" offset="30"/>
+							<Action type="SetAnchor" side="Left" relative="$parent/HeroPortraitImage" pos="Min" offset="-36"/>
+							<Action type="SetAnchor" side="Right" relative="$parent/HeroPortraitImage" pos="Max" offset="-36"/>
+						</State>
+						<State name="Dflt"/>
+					</StateGroup>
 				</Frame>
 				<Frame type="Label" name="HeroDeathTimeLabel_Erik">
 					<Text val="{$PartyFramePanel/Team1HeroOverview/HeroOverview5/HeroDeathTimeVikingErikLabel/@Text}"/>
@@ -2014,6 +2038,18 @@
 				<Frame type="Label" name="HeroDeathTimeLabel_Baleog">
 					<Text val="{$PartyFramePanel/Team2HeroOverview/HeroOverview1/HeroDeathTimeVikingBaleogLabel/@Text}"/>
 					<Visible val="{$PartyFramePanel/Team2HeroOverview/HeroOverview1/HeroDeathTimeVikingBaleogLabel/@Visible}"/>
+					
+					<StateGroup name="OffsetState">
+						<DefaultState val="Dflt"/>
+						<State name="Offset">
+							<When type="Property" frame="$SpecialSingleCDPanel_R1/State" visible="true"/>
+							<Action type="SetAnchor" side="Top" relative="$parent" pos="Min" offset="4"/>
+							<Action type="SetAnchor" side="Bottom" relative="$this" pos="Min" offset="30"/>
+							<Action type="SetAnchor" side="Left" relative="$parent/HeroPortraitImage" pos="Min" offset="-36"/>
+							<Action type="SetAnchor" side="Right" relative="$parent/HeroPortraitImage" pos="Max" offset="-36"/>
+						</State>
+						<State name="Dflt"/>
+					</StateGroup>
 				</Frame>
 				<Frame type="Label" name="HeroDeathTimeLabel_Erik">
 					<Text val="{$PartyFramePanel/Team2HeroOverview/HeroOverview1/HeroDeathTimeVikingErikLabel/@Text}"/>
@@ -2032,6 +2068,18 @@
 				<Frame type="Label" name="HeroDeathTimeLabel_Baleog">
 					<Text val="{$PartyFramePanel/Team2HeroOverview/HeroOverview2/HeroDeathTimeVikingBaleogLabel/@Text}"/>
 					<Visible val="{$PartyFramePanel/Team2HeroOverview/HeroOverview2/HeroDeathTimeVikingBaleogLabel/@Visible}"/>
+					
+					<StateGroup name="OffsetState">
+						<DefaultState val="Dflt"/>
+						<State name="Offset">
+							<When type="Property" frame="$SpecialSingleCDPanel_R2/State" visible="true"/>
+							<Action type="SetAnchor" side="Top" relative="$parent" pos="Min" offset="4"/>
+							<Action type="SetAnchor" side="Bottom" relative="$this" pos="Min" offset="30"/>
+							<Action type="SetAnchor" side="Left" relative="$parent/HeroPortraitImage" pos="Min" offset="-36"/>
+							<Action type="SetAnchor" side="Right" relative="$parent/HeroPortraitImage" pos="Max" offset="-36"/>
+						</State>
+						<State name="Dflt"/>
+					</StateGroup>
 				</Frame>
 				<Frame type="Label" name="HeroDeathTimeLabel_Erik">
 					<Text val="{$PartyFramePanel/Team2HeroOverview/HeroOverview2/HeroDeathTimeVikingErikLabel/@Text}"/>
@@ -2050,6 +2098,18 @@
 				<Frame type="Label" name="HeroDeathTimeLabel_Baleog">
 					<Text val="{$PartyFramePanel/Team2HeroOverview/HeroOverview3/HeroDeathTimeVikingBaleogLabel/@Text}"/>
 					<Visible val="{$PartyFramePanel/Team2HeroOverview/HeroOverview3/HeroDeathTimeVikingBaleogLabel/@Visible}"/>
+					
+					<StateGroup name="OffsetState">
+						<DefaultState val="Dflt"/>
+						<State name="Offset">
+							<When type="Property" frame="$SpecialSingleCDPanel_R3/State" visible="true"/>
+							<Action type="SetAnchor" side="Top" relative="$parent" pos="Min" offset="4"/>
+							<Action type="SetAnchor" side="Bottom" relative="$this" pos="Min" offset="30"/>
+							<Action type="SetAnchor" side="Left" relative="$parent/HeroPortraitImage" pos="Min" offset="-36"/>
+							<Action type="SetAnchor" side="Right" relative="$parent/HeroPortraitImage" pos="Max" offset="-36"/>
+						</State>
+						<State name="Dflt"/>
+					</StateGroup>
 				</Frame>
 				<Frame type="Label" name="HeroDeathTimeLabel_Erik">
 					<Text val="{$PartyFramePanel/Team2HeroOverview/HeroOverview3/HeroDeathTimeVikingErikLabel/@Text}"/>
@@ -2068,6 +2128,18 @@
 				<Frame type="Label" name="HeroDeathTimeLabel_Baleog">
 					<Text val="{$PartyFramePanel/Team2HeroOverview/HeroOverview4/HeroDeathTimeVikingBaleogLabel/@Text}"/>
 					<Visible val="{$PartyFramePanel/Team2HeroOverview/HeroOverview4/HeroDeathTimeVikingBaleogLabel/@Visible}"/>
+					
+					<StateGroup name="OffsetState">
+						<DefaultState val="Dflt"/>
+						<State name="Offset">
+							<When type="Property" frame="$SpecialSingleCDPanel_R4/State" visible="true"/>
+							<Action type="SetAnchor" side="Top" relative="$parent" pos="Min" offset="4"/>
+							<Action type="SetAnchor" side="Bottom" relative="$this" pos="Min" offset="30"/>
+							<Action type="SetAnchor" side="Left" relative="$parent/HeroPortraitImage" pos="Min" offset="-36"/>
+							<Action type="SetAnchor" side="Right" relative="$parent/HeroPortraitImage" pos="Max" offset="-36"/>
+						</State>
+						<State name="Dflt"/>
+					</StateGroup>
 				</Frame>
 				<Frame type="Label" name="HeroDeathTimeLabel_Erik">
 					<Text val="{$PartyFramePanel/Team2HeroOverview/HeroOverview4/HeroDeathTimeVikingErikLabel/@Text}"/>
@@ -2086,6 +2158,18 @@
 				<Frame type="Label" name="HeroDeathTimeLabel_Baleog">
 					<Text val="{$PartyFramePanel/Team2HeroOverview/HeroOverview5/HeroDeathTimeVikingBaleogLabel/@Text}"/>
 					<Visible val="{$PartyFramePanel/Team2HeroOverview/HeroOverview5/HeroDeathTimeVikingBaleogLabel/@Visible}"/>
+					
+					<StateGroup name="OffsetState">
+						<DefaultState val="Dflt"/>
+						<State name="Offset">
+							<When type="Property" frame="$SpecialSingleCDPanel_R5/State" visible="true"/>
+							<Action type="SetAnchor" side="Top" relative="$parent" pos="Min" offset="4"/>
+							<Action type="SetAnchor" side="Bottom" relative="$this" pos="Min" offset="30"/>
+							<Action type="SetAnchor" side="Left" relative="$parent/HeroPortraitImage" pos="Min" offset="-36"/>
+							<Action type="SetAnchor" side="Right" relative="$parent/HeroPortraitImage" pos="Max" offset="-36"/>
+						</State>
+						<State name="Dflt"/>
+					</StateGroup>
 				</Frame>
 				<Frame type="Label" name="HeroDeathTimeLabel_Erik">
 					<Text val="{$PartyFramePanel/Team2HeroOverview/HeroOverview5/HeroDeathTimeVikingErikLabel/@Text}"/>
@@ -3074,6 +3158,40 @@
 								<Key type="Event" time="0" event="HeroicHidden"/>
 							</Controller>
 						</Animation>
+						<Frame type="Frame" name="TalentsContainerFrame">
+							<Frame type="SelectionUnitStatusPanel" name="SelectionUnitStatusPanel">
+								<Frame type="UnitStatusFrame" name="UnitStatusFrame0">
+									<Frame type="Frame" name="SpecialSingleCDPanel">
+										<Handle val="SpecialSingleCDPanel_L1"/>
+										<Animation name="Ahlimation">
+											<Event event="HeroicShown" action="DirectionForward,Play" frame="$parent/$parent/$parent/$parent/$parent/$parent/$parent/$parent/Team1HeroOverview/HeroOverview1/HeroStatus/HeroicPlaceholder"/>
+											<Event event="HeroicHidden" action="DirectionReverse,Play" frame="$parent/$parent/$parent/$parent/$parent/$parent/$parent/$parent/Team1HeroOverview/HeroOverview1/HeroStatus/HeroicPlaceholder"/>
+											
+											<Controller type="Anchor" end="Pause" side="Top" relative="true">
+												<Key type="Curve" time="0" value="0" inout="Auto"/>
+												<Key type="Curve" time="0.25" value="-5" inout="Auto"/>
+											</Controller>
+											<Controller type="Anchor" end="Pause" side="Bottom" relative="true">
+												<Key type="Curve" time="0" value="0" inout="Auto"/>
+												<Key type="Curve" time="0.25" value="-18" inout="Auto"/>
+											</Controller>
+											<Controller type="Anchor" end="Pause" side="Left" relative="true">
+												<Key type="Curve" time="0" value="0" inout="Auto"/>
+												<Key type="Curve" time="0.25" value="-4" inout="Auto"/>
+											</Controller>
+											<Controller type="Anchor" end="Pause" side="Right" relative="true">
+												<Key type="Curve" time="0" value="0" inout="Auto"/>
+												<Key type="Curve" time="0.25" value="-12" inout="Auto"/>
+											</Controller>
+											<Controller type="Style" end="Pause" frame="State" style1="AhliHeroicCooldown" style2="AhliHeroicCooldownTiny">
+												<Key type="Curve" time="0" value="0" inout="Linear,Auto" />
+												<Key type="Curve" time=".25" value="1" inout="Auto,Linear" />
+											</Controller>
+										</Animation>
+									</Frame>
+								</Frame>
+							</Frame>
+						</Frame>
 					</Frame>
 					<Frame type="HeroTalentsPanelPlayerFrame" name="PlayerFrame1" template="_TopPanel/HeroicTalentPlayerFrameBlue">
 						<Animation name="HeroicShownAnimation">
@@ -3086,6 +3204,40 @@
 								<Key type="Event" time="0" event="HeroicHidden"/>
 							</Controller>
 						</Animation>
+						<Frame type="Frame" name="TalentsContainerFrame">
+							<Frame type="SelectionUnitStatusPanel" name="SelectionUnitStatusPanel">
+								<Frame type="UnitStatusFrame" name="UnitStatusFrame0">
+									<Frame type="Frame" name="SpecialSingleCDPanel">
+										<Handle val="SpecialSingleCDPanel_L2"/>
+										<Animation name="Ahlimation">
+											<Event event="HeroicShown" action="DirectionForward,Play" frame="$parent/$parent/$parent/$parent/$parent/$parent/$parent/$parent/Team1HeroOverview/HeroOverview2/HeroStatus/HeroicPlaceholder"/>
+											<Event event="HeroicHidden" action="DirectionReverse,Play" frame="$parent/$parent/$parent/$parent/$parent/$parent/$parent/$parent/Team1HeroOverview/HeroOverview2/HeroStatus/HeroicPlaceholder"/>
+											
+											<Controller type="Anchor" end="Pause" side="Top" relative="true">
+												<Key type="Curve" time="0" value="0" inout="Auto"/>
+												<Key type="Curve" time="0.25" value="-5" inout="Auto"/>
+											</Controller>
+											<Controller type="Anchor" end="Pause" side="Bottom" relative="true">
+												<Key type="Curve" time="0" value="0" inout="Auto"/>
+												<Key type="Curve" time="0.25" value="-18" inout="Auto"/>
+											</Controller>
+											<Controller type="Anchor" end="Pause" side="Left" relative="true">
+												<Key type="Curve" time="0" value="0" inout="Auto"/>
+												<Key type="Curve" time="0.25" value="-4" inout="Auto"/>
+											</Controller>
+											<Controller type="Anchor" end="Pause" side="Right" relative="true">
+												<Key type="Curve" time="0" value="0" inout="Auto"/>
+												<Key type="Curve" time="0.25" value="-12" inout="Auto"/>
+											</Controller>
+											<Controller type="Style" end="Pause" frame="State" style1="AhliHeroicCooldown" style2="AhliHeroicCooldownTiny">
+												<Key type="Curve" time="0" value="0" inout="Linear,Auto" />
+												<Key type="Curve" time=".25" value="1" inout="Auto,Linear" />
+											</Controller>
+										</Animation>
+									</Frame>
+								</Frame>
+							</Frame>
+						</Frame>
 					</Frame>
 					<Frame type="HeroTalentsPanelPlayerFrame" name="PlayerFrame2" template="_TopPanel/HeroicTalentPlayerFrameBlue">
 						<Animation name="HeroicShownAnimation">
@@ -3098,6 +3250,40 @@
 								<Key type="Event" time="0" event="HeroicHidden"/>
 							</Controller>
 						</Animation>
+						<Frame type="Frame" name="TalentsContainerFrame">
+							<Frame type="SelectionUnitStatusPanel" name="SelectionUnitStatusPanel">
+								<Frame type="UnitStatusFrame" name="UnitStatusFrame0">
+									<Frame type="Frame" name="SpecialSingleCDPanel">
+										<Handle val="SpecialSingleCDPanel_L3"/>
+										<Animation name="Ahlimation">
+											<Event event="HeroicShown" action="DirectionForward,Play" frame="$parent/$parent/$parent/$parent/$parent/$parent/$parent/$parent/Team1HeroOverview/HeroOverview3/HeroStatus/HeroicPlaceholder"/>
+											<Event event="HeroicHidden" action="DirectionReverse,Play" frame="$parent/$parent/$parent/$parent/$parent/$parent/$parent/$parent/Team1HeroOverview/HeroOverview3/HeroStatus/HeroicPlaceholder"/>
+											
+											<Controller type="Anchor" end="Pause" side="Top" relative="true">
+												<Key type="Curve" time="0" value="0" inout="Auto"/>
+												<Key type="Curve" time="0.25" value="-5" inout="Auto"/>
+											</Controller>
+											<Controller type="Anchor" end="Pause" side="Bottom" relative="true">
+												<Key type="Curve" time="0" value="0" inout="Auto"/>
+												<Key type="Curve" time="0.25" value="-18" inout="Auto"/>
+											</Controller>
+											<Controller type="Anchor" end="Pause" side="Left" relative="true">
+												<Key type="Curve" time="0" value="0" inout="Auto"/>
+												<Key type="Curve" time="0.25" value="-4" inout="Auto"/>
+											</Controller>
+											<Controller type="Anchor" end="Pause" side="Right" relative="true">
+												<Key type="Curve" time="0" value="0" inout="Auto"/>
+												<Key type="Curve" time="0.25" value="-12" inout="Auto"/>
+											</Controller>
+											<Controller type="Style" end="Pause" frame="State" style1="AhliHeroicCooldown" style2="AhliHeroicCooldownTiny">
+												<Key type="Curve" time="0" value="0" inout="Linear,Auto" />
+												<Key type="Curve" time=".25" value="1" inout="Auto,Linear" />
+											</Controller>
+										</Animation>
+									</Frame>
+								</Frame>
+							</Frame>
+						</Frame>
 					</Frame>
 					<Frame type="HeroTalentsPanelPlayerFrame" name="PlayerFrame3" template="_TopPanel/HeroicTalentPlayerFrameBlue">
 						<Animation name="HeroicShownAnimation">
@@ -3110,6 +3296,40 @@
 								<Key type="Event" time="0" event="HeroicHidden"/>
 							</Controller>
 						</Animation>
+						<Frame type="Frame" name="TalentsContainerFrame">
+							<Frame type="SelectionUnitStatusPanel" name="SelectionUnitStatusPanel">
+								<Frame type="UnitStatusFrame" name="UnitStatusFrame0">
+									<Frame type="Frame" name="SpecialSingleCDPanel">
+										<Handle val="SpecialSingleCDPanel_L4"/>
+										<Animation name="Ahlimation">
+											<Event event="HeroicShown" action="DirectionForward,Play" frame="$parent/$parent/$parent/$parent/$parent/$parent/$parent/$parent/Team1HeroOverview/HeroOverview4/HeroStatus/HeroicPlaceholder"/>
+											<Event event="HeroicHidden" action="DirectionReverse,Play" frame="$parent/$parent/$parent/$parent/$parent/$parent/$parent/$parent/Team1HeroOverview/HeroOverview4/HeroStatus/HeroicPlaceholder"/>
+											
+											<Controller type="Anchor" end="Pause" side="Top" relative="true">
+												<Key type="Curve" time="0" value="0" inout="Auto"/>
+												<Key type="Curve" time="0.25" value="-5" inout="Auto"/>
+											</Controller>
+											<Controller type="Anchor" end="Pause" side="Bottom" relative="true">
+												<Key type="Curve" time="0" value="0" inout="Auto"/>
+												<Key type="Curve" time="0.25" value="-18" inout="Auto"/>
+											</Controller>
+											<Controller type="Anchor" end="Pause" side="Left" relative="true">
+												<Key type="Curve" time="0" value="0" inout="Auto"/>
+												<Key type="Curve" time="0.25" value="-4" inout="Auto"/>
+											</Controller>
+											<Controller type="Anchor" end="Pause" side="Right" relative="true">
+												<Key type="Curve" time="0" value="0" inout="Auto"/>
+												<Key type="Curve" time="0.25" value="-12" inout="Auto"/>
+											</Controller>
+											<Controller type="Style" end="Pause" frame="State" style1="AhliHeroicCooldown" style2="AhliHeroicCooldownTiny">
+												<Key type="Curve" time="0" value="0" inout="Linear,Auto" />
+												<Key type="Curve" time=".25" value="1" inout="Auto,Linear" />
+											</Controller>
+										</Animation>
+									</Frame>
+								</Frame>
+							</Frame>
+						</Frame>
 					</Frame>
 					<Frame type="HeroTalentsPanelPlayerFrame" name="PlayerFrame4" template="_TopPanel/HeroicTalentPlayerFrameBlue">
 						<Animation name="HeroicShownAnimation">
@@ -3122,6 +3342,40 @@
 								<Key type="Event" time="0" event="HeroicHidden"/>
 							</Controller>
 						</Animation>
+						<Frame type="Frame" name="TalentsContainerFrame">
+							<Frame type="SelectionUnitStatusPanel" name="SelectionUnitStatusPanel">
+								<Frame type="UnitStatusFrame" name="UnitStatusFrame0">
+									<Frame type="Frame" name="SpecialSingleCDPanel">
+										<Handle val="SpecialSingleCDPanel_L5"/>
+										<Animation name="Ahlimation">
+											<Event event="HeroicShown" action="DirectionForward,Play" frame="$parent/$parent/$parent/$parent/$parent/$parent/$parent/$parent/Team1HeroOverview/HeroOverview5/HeroStatus/HeroicPlaceholder"/>
+											<Event event="HeroicHidden" action="DirectionReverse,Play" frame="$parent/$parent/$parent/$parent/$parent/$parent/$parent/$parent/Team1HeroOverview/HeroOverview5/HeroStatus/HeroicPlaceholder"/>
+											
+											<Controller type="Anchor" end="Pause" side="Top" relative="true">
+												<Key type="Curve" time="0" value="0" inout="Auto"/>
+												<Key type="Curve" time="0.25" value="-5" inout="Auto"/>
+											</Controller>
+											<Controller type="Anchor" end="Pause" side="Bottom" relative="true">
+												<Key type="Curve" time="0" value="0" inout="Auto"/>
+												<Key type="Curve" time="0.25" value="-18" inout="Auto"/>
+											</Controller>
+											<Controller type="Anchor" end="Pause" side="Left" relative="true">
+												<Key type="Curve" time="0" value="0" inout="Auto"/>
+												<Key type="Curve" time="0.25" value="-4" inout="Auto"/>
+											</Controller>
+											<Controller type="Anchor" end="Pause" side="Right" relative="true">
+												<Key type="Curve" time="0" value="0" inout="Auto"/>
+												<Key type="Curve" time="0.25" value="-12" inout="Auto"/>
+											</Controller>
+											<Controller type="Style" end="Pause" frame="State" style1="AhliHeroicCooldown" style2="AhliHeroicCooldownTiny">
+												<Key type="Curve" time="0" value="0" inout="Linear,Auto" />
+												<Key type="Curve" time=".25" value="1" inout="Auto,Linear" />
+											</Controller>
+										</Animation>
+									</Frame>
+								</Frame>
+							</Frame>
+						</Frame>
 					</Frame>
 					<Frame type="HeroTalentsPanelPlayerFrame" name="PlayerFrame5" template="_TopPanel/HeroicTalentPlayerFrameRed">
 						<Animation name="HeroicShownAnimation">
@@ -3134,6 +3388,48 @@
 								<Key type="Event" time="0" event="HeroicHidden"/>
 							</Controller>
 						</Animation>
+						<Frame type="Frame" name="TalentsContainerFrame">
+							<Frame type="SelectionUnitStatusPanel" name="SelectionUnitStatusPanel">
+								<Frame type="UnitStatusFrame" name="UnitStatusFrame0">
+									<Frame type="Frame" name="SpecialSingleCDPanel">
+										<Handle val="SpecialSingleCDPanel_R1"/>
+										<Animation name="Ahlimation">
+											<Event event="HeroicShown" action="DirectionForward,Play" frame="$parent/$parent/$parent/$parent/$parent/$parent/$parent/$parent/Team2HeroOverview/HeroOverview1/HeroStatus/HeroicPlaceholder"/>
+											<Event event="HeroicHidden" action="DirectionReverse,Play" frame="$parent/$parent/$parent/$parent/$parent/$parent/$parent/$parent/Team2HeroOverview/HeroOverview1/HeroStatus/HeroicPlaceholder"/>
+											
+<!--											<Controller type="Dimension" dimension="Height" percentage="false" end="Pause">
+												<Key type="Curve" time="0" value="52"/>
+												<Key type="Curve" time="0" value="39"/>
+											</Controller>
+											<Controller type="Dimension" dimension="Width" percentage="false" end="Pause">
+												<Key type="Curve" time="0" value="62"/>
+												<Key type="Curve" time="0" value="46"/>
+											</Controller>-->
+											<Controller type="Anchor" end="Pause" side="Top" relative="true">
+												<Key type="Curve" time="0" value="0" inout="Auto"/>
+												<Key type="Curve" time="0.25" value="-5" inout="Auto"/>
+											</Controller>
+											<Controller type="Anchor" end="Pause" side="Bottom" relative="true">
+												<Key type="Curve" time="0" value="0" inout="Auto"/>
+												<Key type="Curve" time="0.25" value="-18" inout="Auto"/>
+											</Controller>
+											<Controller type="Anchor" end="Pause" side="Left" relative="true">
+												<Key type="Curve" time="0" value="0" inout="Auto"/>
+												<Key type="Curve" time="0.25" value="5" inout="Auto"/>
+											</Controller>
+											<Controller type="Anchor" end="Pause" side="Right" relative="true">
+												<Key type="Curve" time="0" value="0" inout="Auto"/>
+												<Key type="Curve" time="0.25" value="-11" inout="Auto"/>
+											</Controller>
+											<Controller type="Style" end="Pause" frame="State" style1="AhliHeroicCooldown" style2="AhliHeroicCooldownTiny">
+												<Key type="Curve" time="0" value="0" inout="Linear,Auto" />
+												<Key type="Curve" time=".25" value="1" inout="Auto,Linear" />
+											</Controller>
+										</Animation>
+									</Frame>
+								</Frame>
+							</Frame>
+						</Frame>
 					</Frame>
 					<Frame type="HeroTalentsPanelPlayerFrame" name="PlayerFrame6" template="_TopPanel/HeroicTalentPlayerFrameRed">
 						<Animation name="HeroicShownAnimation">
@@ -3146,6 +3442,40 @@
 								<Key type="Event" time="0" event="HeroicHidden"/>
 							</Controller>
 						</Animation>
+						<Frame type="Frame" name="TalentsContainerFrame">
+							<Frame type="SelectionUnitStatusPanel" name="SelectionUnitStatusPanel">
+								<Frame type="UnitStatusFrame" name="UnitStatusFrame0">
+									<Frame type="Frame" name="SpecialSingleCDPanel">
+										<Handle val="SpecialSingleCDPanel_R2"/>
+										<Animation name="Ahlimation">
+											<Event event="HeroicShown" action="DirectionForward,Play" frame="$parent/$parent/$parent/$parent/$parent/$parent/$parent/$parent/Team2HeroOverview/HeroOverview2/HeroStatus/HeroicPlaceholder"/>
+											<Event event="HeroicHidden" action="DirectionReverse,Play" frame="$parent/$parent/$parent/$parent/$parent/$parent/$parent/$parent/Team2HeroOverview/HeroOverview2/HeroStatus/HeroicPlaceholder"/>
+											
+											<Controller type="Anchor" end="Pause" side="Top" relative="true">
+												<Key type="Curve" time="0" value="0" inout="Auto"/>
+												<Key type="Curve" time="0.25" value="-5" inout="Auto"/>
+											</Controller>
+											<Controller type="Anchor" end="Pause" side="Bottom" relative="true">
+												<Key type="Curve" time="0" value="0" inout="Auto"/>
+												<Key type="Curve" time="0.25" value="-18" inout="Auto"/>
+											</Controller>
+											<Controller type="Anchor" end="Pause" side="Left" relative="true">
+												<Key type="Curve" time="0" value="0" inout="Auto"/>
+												<Key type="Curve" time="0.25" value="5" inout="Auto"/>
+											</Controller>
+											<Controller type="Anchor" end="Pause" side="Right" relative="true">
+												<Key type="Curve" time="0" value="0" inout="Auto"/>
+												<Key type="Curve" time="0.25" value="-11" inout="Auto"/>
+											</Controller>
+											<Controller type="Style" end="Pause" frame="State" style1="AhliHeroicCooldown" style2="AhliHeroicCooldownTiny">
+												<Key type="Curve" time="0" value="0" inout="Linear,Auto" />
+												<Key type="Curve" time=".25" value="1" inout="Auto,Linear" />
+											</Controller>
+										</Animation>
+									</Frame>
+								</Frame>
+							</Frame>
+						</Frame>
 					</Frame>
 					<Frame type="HeroTalentsPanelPlayerFrame" name="PlayerFrame7" template="_TopPanel/HeroicTalentPlayerFrameRed">
 						<Animation name="HeroicShownAnimation">
@@ -3158,6 +3488,40 @@
 								<Key type="Event" time="0" event="HeroicHidden"/>
 							</Controller>
 						</Animation>
+						<Frame type="Frame" name="TalentsContainerFrame">
+							<Frame type="SelectionUnitStatusPanel" name="SelectionUnitStatusPanel">
+								<Frame type="UnitStatusFrame" name="UnitStatusFrame0">
+									<Frame type="Frame" name="SpecialSingleCDPanel">
+										<Handle val="SpecialSingleCDPanel_R3"/>
+										<Animation name="Ahlimation">
+											<Event event="HeroicShown" action="DirectionForward,Play" frame="$parent/$parent/$parent/$parent/$parent/$parent/$parent/$parent/Team2HeroOverview/HeroOverview3/HeroStatus/HeroicPlaceholder"/>
+											<Event event="HeroicHidden" action="DirectionReverse,Play" frame="$parent/$parent/$parent/$parent/$parent/$parent/$parent/$parent/Team2HeroOverview/HeroOverview3/HeroStatus/HeroicPlaceholder"/>
+											
+											<Controller type="Anchor" end="Pause" side="Top" relative="true">
+												<Key type="Curve" time="0" value="0" inout="Auto"/>
+												<Key type="Curve" time="0.25" value="-5" inout="Auto"/>
+											</Controller>
+											<Controller type="Anchor" end="Pause" side="Bottom" relative="true">
+												<Key type="Curve" time="0" value="0" inout="Auto"/>
+												<Key type="Curve" time="0.25" value="-18" inout="Auto"/>
+											</Controller>
+											<Controller type="Anchor" end="Pause" side="Left" relative="true">
+												<Key type="Curve" time="0" value="0" inout="Auto"/>
+												<Key type="Curve" time="0.25" value="5" inout="Auto"/>
+											</Controller>
+											<Controller type="Anchor" end="Pause" side="Right" relative="true">
+												<Key type="Curve" time="0" value="0" inout="Auto"/>
+												<Key type="Curve" time="0.25" value="-11" inout="Auto"/>
+											</Controller>
+											<Controller type="Style" end="Pause" frame="State" style1="AhliHeroicCooldown" style2="AhliHeroicCooldownTiny">
+												<Key type="Curve" time="0" value="0" inout="Linear,Auto" />
+												<Key type="Curve" time=".25" value="1" inout="Auto,Linear" />
+											</Controller>
+										</Animation>
+									</Frame>
+								</Frame>
+							</Frame>
+						</Frame>
 					</Frame>
 					<Frame type="HeroTalentsPanelPlayerFrame" name="PlayerFrame8" template="_TopPanel/HeroicTalentPlayerFrameRed">
 						<Animation name="HeroicShownAnimation">
@@ -3170,6 +3534,40 @@
 								<Key type="Event" time="0" event="HeroicHidden"/>
 							</Controller>
 						</Animation>
+						<Frame type="Frame" name="TalentsContainerFrame">
+							<Frame type="SelectionUnitStatusPanel" name="SelectionUnitStatusPanel">
+								<Frame type="UnitStatusFrame" name="UnitStatusFrame0">
+									<Frame type="Frame" name="SpecialSingleCDPanel">
+										<Handle val="SpecialSingleCDPanel_R4"/>
+										<Animation name="Ahlimation">
+											<Event event="HeroicShown" action="DirectionForward,Play" frame="$parent/$parent/$parent/$parent/$parent/$parent/$parent/$parent/Team2HeroOverview/HeroOverview4/HeroStatus/HeroicPlaceholder"/>
+											<Event event="HeroicHidden" action="DirectionReverse,Play" frame="$parent/$parent/$parent/$parent/$parent/$parent/$parent/$parent/Team2HeroOverview/HeroOverview4/HeroStatus/HeroicPlaceholder"/>
+											
+											<Controller type="Anchor" end="Pause" side="Top" relative="true">
+												<Key type="Curve" time="0" value="0" inout="Auto"/>
+												<Key type="Curve" time="0.25" value="-5" inout="Auto"/>
+											</Controller>
+											<Controller type="Anchor" end="Pause" side="Bottom" relative="true">
+												<Key type="Curve" time="0" value="0" inout="Auto"/>
+												<Key type="Curve" time="0.25" value="-18" inout="Auto"/>
+											</Controller>
+											<Controller type="Anchor" end="Pause" side="Left" relative="true">
+												<Key type="Curve" time="0" value="0" inout="Auto"/>
+												<Key type="Curve" time="0.25" value="5" inout="Auto"/>
+											</Controller>
+											<Controller type="Anchor" end="Pause" side="Right" relative="true">
+												<Key type="Curve" time="0" value="0" inout="Auto"/>
+												<Key type="Curve" time="0.25" value="-11" inout="Auto"/>
+											</Controller>
+											<Controller type="Style" end="Pause" frame="State" style1="AhliHeroicCooldown" style2="AhliHeroicCooldownTiny">
+												<Key type="Curve" time="0" value="0" inout="Linear,Auto" />
+												<Key type="Curve" time=".25" value="1" inout="Auto,Linear" />
+											</Controller>
+										</Animation>
+									</Frame>
+								</Frame>
+							</Frame>
+						</Frame>
 					</Frame>
 					<Frame type="HeroTalentsPanelPlayerFrame" name="PlayerFrame9" template="_TopPanel/HeroicTalentPlayerFrameRed">
 						<Animation name="HeroicShownAnimation">
@@ -3182,6 +3580,40 @@
 								<Key type="Event" time="0" event="HeroicHidden"/>
 							</Controller>
 						</Animation>
+						<Frame type="Frame" name="TalentsContainerFrame">
+							<Frame type="SelectionUnitStatusPanel" name="SelectionUnitStatusPanel">
+								<Frame type="UnitStatusFrame" name="UnitStatusFrame0">
+									<Frame type="Frame" name="SpecialSingleCDPanel">
+										<Handle val="SpecialSingleCDPanel_R5"/>
+										<Animation name="Ahlimation">
+											<Event event="HeroicShown" action="DirectionForward,Play" frame="$parent/$parent/$parent/$parent/$parent/$parent/$parent/$parent/Team2HeroOverview/HeroOverview5/HeroStatus/HeroicPlaceholder"/>
+											<Event event="HeroicHidden" action="DirectionReverse,Play" frame="$parent/$parent/$parent/$parent/$parent/$parent/$parent/$parent/Team2HeroOverview/HeroOverview5/HeroStatus/HeroicPlaceholder"/>
+											
+											<Controller type="Anchor" end="Pause" side="Top" relative="true">
+												<Key type="Curve" time="0" value="0" inout="Auto"/>
+												<Key type="Curve" time="0.25" value="-5" inout="Auto"/>
+											</Controller>
+											<Controller type="Anchor" end="Pause" side="Bottom" relative="true">
+												<Key type="Curve" time="0" value="0" inout="Auto"/>
+												<Key type="Curve" time="0.25" value="-18" inout="Auto"/>
+											</Controller>
+											<Controller type="Anchor" end="Pause" side="Left" relative="true">
+												<Key type="Curve" time="0" value="0" inout="Auto"/>
+												<Key type="Curve" time="0.25" value="5" inout="Auto"/>
+											</Controller>
+											<Controller type="Anchor" end="Pause" side="Right" relative="true">
+												<Key type="Curve" time="0" value="0" inout="Auto"/>
+												<Key type="Curve" time="0.25" value="-11" inout="Auto"/>
+											</Controller>
+											<Controller type="Style" end="Pause" frame="State" style1="AhliHeroicCooldown" style2="AhliHeroicCooldownTiny">
+												<Key type="Curve" time="0" value="0" inout="Linear,Auto" />
+												<Key type="Curve" time=".25" value="1" inout="Auto,Linear" />
+											</Controller>
+										</Animation>
+									</Frame>
+								</Frame>
+							</Frame>
+						</Frame>
 					</Frame>
 				</Frame>
 			</Frame>
