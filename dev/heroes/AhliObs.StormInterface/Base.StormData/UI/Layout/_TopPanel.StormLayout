@@ -843,45 +843,40 @@
 		</Frame>
 				
 		<!-- custom vehicle portrait -->
-		<Frame type="Frame" name="VehiclePortrait">
-			<Anchor relative="$parent/HeroPortraitImage"/>
+		<Frame type="Frame" name="IsUsingVehicle">
+			<Anchor relative="$parent"/>
 			<Visible val="false"/>
-			<RenderPriority val="511"/>
+		</Frame>
+		<Frame type="Frame" name="DragonShireDriverPortrait">
+			<Anchor relative="$DragonShirePilotIconPosition"/>
+			<Visible val="{$GameUI/UIContainer/ConsoleUIContainer/@Visible}"/>
 			
-			<Animation name="FadeLoop">
-				<Event event="OnShown" action="Reset,DirectionForward,Play"/>
-				<Event event="OnHidden" action="Stop"/>
-				
-				<Controller type="Fade" end="Loop">
-					<Key type="Curve" time="0" value="255"/>
-					<Key type="Curve" time="2.0" value="255"/>
-					<Key type="Curve" time="2.5" value="0"/>
-					<Key type="Curve" time="4.5" value="0"/>
-					<Key type="Curve" time="5.0" value="255"/>
-				</Controller>
-			</Animation>
-			
-			<Frame type="Image" name="DragonKnightIcon">
-				<Anchor relative="$parent"/>
+			<Frame type="Image" name="Portrait">
+				<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+				<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+				<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
 				<Unclipped val="true"/>
-				<!-- size: 184x164
-				<Texture val="Assets/Textures/ui_ingame_mapmechanic_loadscreen_dragonshire_icon3.dds"/> -->
-				<!-- size: 197x220
-				<Texture val="Assets/Textures/hud_minimap_dragon_dragonhud.dds"/> -->
-				<Texture val="Assets/Textures/ui_ingame_mapmechanic_loadscreen_dragonshire.dds"/>
-				<TextureCoords top="0.1574" left="0.4328" bottom="0.3241" right="0.6229"/>
+				<Texture val="{$parent/$parent/HeroPortraitImage/@Texture}"/>
 				<Visible val="false"/>
-				<AlphaMaskTexture val="@UI/obs_alphaMask_portrait"/>
+				<ScaleWidthToTexture val="True"/>
+			</Frame>
+			<Frame type="Label" name="DragonInfoLabel">
+				<Anchor relative="$DragonShirePilotIconPosition/$parent/DragonInfoLabel"/>
+				<Style val="{$DragonShirePilotIconPosition/$parent/DragonInfoLabel/@Style}"/>
+				<Text val="{$DragonShirePilotIconPosition/$parent/DragonInfoLabel/@Text}"/>
+				<Unclipped val="true"/>
+				<Visible val="false"/>
 			</Frame>
 			
-			<StateGroup name="MapMechanicState">
-				<DefaultState val="Nothing"/>
+			<StateGroup name="MapMechanicDriver">
+				<DefaultState val="No"/>
 				<State name="DragonShire">
-					<When type="Property" frame="$ancestor[@name=UIContainer]/ConsoleUIContainer/MapMechanicPanel/DragonShirePanel" visible="True"/>
-					<Action type="SetProperty" frame="DragonKnightIcon" visible="True"/>
+					<When type="Property" frame="$GameUI/UIContainer/ConsoleUIContainer/MapMechanicPanel/DragonShirePanel" visible="True"/>
+					<When type="Property" frame="$parent/IsUsingVehicle" visible="True"/>
+					<Action type="SetProperty" frame="$this/Portrait" visible="True"/>
+					<Action type="SetProperty" frame="$this/DragonInfoLabel" visible="True"/>
 				</State>
-				<State name="Nothing">
-				</State>
+				<State name="No"/>
 			</StateGroup>
 		</Frame>
 		
@@ -986,14 +981,14 @@
 				<Animation name="VehicleEntered">
 					<Event event="BehaviorCreate" action="Reset,Play"/>
 					
-					<Controller type="Visibility" end="Pause" frame="$parent/$parent/VehiclePortrait">
+					<Controller type="Visibility" end="Pause" frame="$parent/$parent/IsUsingVehicle">
 						<Key type="Bool" time="0" value="True"/>
 					</Controller>
 				</Animation>
 				<Animation name="VehicleLeft">
 					<Event event="BehaviorDestroy" action="Reset,Play"/>
 					
-					<Controller type="Visibility" end="Pause" frame="$parent/$parent/VehiclePortrait">
+					<Controller type="Visibility" end="Pause" frame="$parent/$parent/IsUsingVehicle">
 						<Key type="Bool" time="0" value="False"/>
 					</Controller>
 				</Animation>
@@ -1486,15 +1481,6 @@
 					<Action type="SetProperty" Texture="_Assets\Textures\storm_ui_ingame_obs_player_frame_orange.dds"/>
 				</State>
 			</StateGroup>
-		</Frame>
-		
-		<Frame type="Frame" name="VehiclePortrait">
-			<Frame type="Image" name="DragonKnightIcon">
-				<AlphaMaskTexture val="@UI/obs_alphaMask_portrait_mirrored"/>
-			</Frame>
-			<Frame type="Image" name="GardenTerrorIcon">
-				<AlphaMaskTexture val="@UI/obs_alphaMask_portrait_mirrored"/>
-			</Frame>
 		</Frame>
 		
 		<Frame type="UnitStatusFrame" name="HeroStatus">
