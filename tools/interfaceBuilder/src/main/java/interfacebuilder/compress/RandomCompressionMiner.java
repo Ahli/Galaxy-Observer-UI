@@ -87,6 +87,7 @@ public class RandomCompressionMiner {
 		mod.setMpqCacheDirectory(cacheDir);
 		mpqInterface.clearCacheExtractedMpq();
 		fileService.copyFileOrDirectory(mod.getSourceDirectory(), cacheDir);
+		boolean compressXml = true;
 		
 		// use old ruleset if one was specified and test it
 		if (oldBestRuleset != null) {
@@ -104,15 +105,16 @@ public class RandomCompressionMiner {
 			replaceForbiddenRulesets(rules);
 			
 			bestRuleSet = deepCopy(rules);
-			bestSize = build(rules, true);
-			
+			bestSize = build(rules, compressXml);
+			// only compress once
+			compressXml = false;
 		} else {
 			bestSize = Long.MAX_VALUE;
 		}
 		
 		// compare with usual, initial ruleset and use the better one
 		final MpqEditorCompressionRule[] initRules = createInitialRuleset(cacheDir.toPath());
-		final long initRuleSetSize = build(initRules, true);
+		final long initRuleSetSize = build(initRules, compressXml);
 		if (initRuleSetSize < bestSize) {
 			bestSize = initRuleSetSize;
 			rules = initRules;

@@ -4,7 +4,6 @@
 package interfacebuilder.ui.progress;
 
 import com.ahli.galaxy.ModData;
-import com.ahli.galaxy.game.def.abstracts.GameDef;
 import com.ahli.mpq.MpqException;
 import com.ahli.mpq.mpqeditor.MpqEditorCompressionRule;
 import com.ahli.mpq.mpqeditor.MpqEditorCompressionRuleMask;
@@ -36,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
 import static interfacebuilder.InterfaceBuilderApp.FATAL_ERROR;
 
@@ -187,15 +187,15 @@ public class CompressionMiningController implements Updateable {
 		}
 		stopTaskNow = false;
 		task = () -> {
+			File modTargetFile = null;
 			try {
 				long bestSize;
 				{
 					final ModData mod = gameService.getModData(project.getGame());
-					final GameDef gameDef = mod.getGameData().getGameDef();
 					final File projectSource = new File(project.getProjectPath());
-					final File modTargetFile = new File(configService.getDocumentsPath() + File.separator +
-							gameDef.getDocumentsGameDirectoryName() + File.separator +
-							gameDef.getDocumentsInterfaceSubdirectoryName() + File.separator + projectSource.getName());
+					
+					modTargetFile =
+							new File(configService.getMiningTempPath() + File.separator + projectSource.getName());
 					mod.setTargetFile(modTargetFile);
 					mod.setSourceDirectory(projectSource);
 					
@@ -242,6 +242,14 @@ public class CompressionMiningController implements Updateable {
 				logger.error("Experimental Compression Miner experienced a problem.", e);
 			} catch (final InterruptedException e) {
 				Thread.currentThread().interrupt();
+			} finally {
+				try {
+					if (modTargetFile != null) {
+						Files.deleteIfExists(modTargetFile.toPath());
+					}
+				} catch (final IOException e) {
+					logger.error("Experimental Compression Miner failed to clear the temporary target file", e);
+				}
 			}
 		};
 		attemptCounterLabel.setText("0");
@@ -256,7 +264,6 @@ public class CompressionMiningController implements Updateable {
 		if (task == null) {
 			return;
 		}
-		//		InterfaceBuilderApp.getInstance().getExecutor().remove(task);
 		stopTaskNow = true;
 		task = null;
 		if (expCompMiner != null) {

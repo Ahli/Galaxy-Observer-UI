@@ -91,6 +91,11 @@ public class AppConfiguration {
 	}
 	
 	@Bean
+	protected String miningTempPath() {
+		return tempDirectory() + "ObserverInterfaceBuilder" + File.separator + "_Mining";
+	}
+	
+	@Bean
 	protected File cascExtractorExeFile() {
 		return new File(
 				basePath().getParent() + File.separator + "tools" + File.separator + "plugins" + File.separator +
@@ -178,4 +183,5 @@ public class AppConfiguration {
 	protected KryoService kryoService() {
 		return new KryoService();
 	}
+	
 }

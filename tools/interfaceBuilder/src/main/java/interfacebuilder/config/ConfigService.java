@@ -51,6 +51,10 @@ public class ConfigService {
 	@Qualifier("cachePath")
 	private String cachePath;
 	
+	@Autowired
+	@Qualifier("miningTempPath")
+	private String miningTempPath;
+	
 	public String getMpqEditorPath() {
 		return mpqEditorPath;
 	}
@@ -89,5 +93,9 @@ public class ConfigService {
 	
 	public String getConsoleSkinId() {
 		return consoleSkinId;
+	}
+	
+	public String getMiningTempPath() {
+		return miningTempPath;
 	}
 }
