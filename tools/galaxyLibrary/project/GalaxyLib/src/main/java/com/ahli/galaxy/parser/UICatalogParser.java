@@ -105,7 +105,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	 * @return
 	 */
 	private static boolean checkFrameTypeCompatibility(final String typeTemplate, final String typeFrame) {
-		// TODO
+		// TODO frame type compatibility check
 		return true;
 	}
 	
@@ -202,7 +202,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				return name;
 			}
 			logger.trace("Implicit controller name existing: {}", () -> name);
-			i++;
+			++i;
 		}
 	}
 	
@@ -395,7 +395,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					if (curElement instanceof UIAnimation) {
 						((UIAnimation) curElement).getControllers().add(newElem);
 						final var newElemUiController = (UIController) newElem;
-						for (int j = 0, len = attrValues.size(); j < len; j++) {
+						for (int j = 0, len = attrValues.size(); j < len; ++j) {
 							newElemUiController.addValue(attrTypes.get(j), attrValues.get(j));
 						}
 						
@@ -448,7 +448,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					if (refToDuplicate != null) {
 						newElemUiConstant = (UIConstant) refToDuplicate;
 						deduplicatedElements.add(refToDuplicate);
-						constantDeduplications++;
+						++constantDeduplications;
 					} else {
 						addedFinalElements.put(newElem, newElem);
 					}
@@ -471,7 +471,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				newElem = new UIAttribute(tagName);
 				i = 0;
 				final var newElemUiAttr = (UIAttribute) newElem;
-				for (final int len = attrTypes.size(); i < len; i++) {
+				for (final int len = attrTypes.size(); i < len; ++i) {
 					newElemUiAttr.addValue(attrTypes.get(i),
 							catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout, consoleSkinId));
 				}
@@ -480,7 +480,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					if (refToDuplicate != null) {
 						newElem = refToDuplicate;
 						deduplicatedElements.add(refToDuplicate);
-						attributeDeduplications++;
+						++attributeDeduplications;
 					} else {
 						addedFinalElements.put(newElem, newElem);
 					}
@@ -942,7 +942,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					// replace in parent
 					childrenRaw.set(i, duplicate);
 					deduplicatedElements.add(duplicate);
-					postProcessDeduplications++;
+					++postProcessDeduplications;
 				} else {
 					toDeduplicate.add(child);
 				}
@@ -959,7 +959,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				// replace in parent
 				controllers.set(i, duplicate);
 				deduplicatedElements.add(duplicate);
-				postProcessDeduplications++;
+				++postProcessDeduplications;
 			}
 			// controllers cannot be deduplicated any further at this point (Attributes were already)
 		}
@@ -974,7 +974,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				// replace in parent
 				states.set(i, duplicate);
 				deduplicatedElements.add(duplicate);
-				postProcessDeduplications++;
+				++postProcessDeduplications;
 			}
 			// states cannot be deduplicated any further at this point (Attributes were already)
 		}
@@ -987,7 +987,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			// replace in parent
 			template.setElement(duplicate);
 			deduplicatedElements.add(duplicate);
-			postProcessDeduplications++;
+			++postProcessDeduplications;
 		} else {
 			toDeduplicate.add(elem);
 		}

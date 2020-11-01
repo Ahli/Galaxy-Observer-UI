@@ -19,7 +19,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -169,7 +168,7 @@ public class UICatalogImpl implements UICatalog {
 			}
 			if (lastIndex != -1) {
 				curBasePath = basePathTemp;
-				final Path layoutFilePath = Paths.get(basePathTemp + File.separator + intPath);
+				final Path layoutFilePath = Path.of(basePathTemp, intPath);
 				try {
 					processLayoutFile(layoutFilePath, raceId, isDevLayout, consoleSkinId, parser);
 				} catch (final IOException e) {
@@ -197,7 +196,7 @@ public class UICatalogImpl implements UICatalog {
 		}
 		
 		String basePathTemp = getCurBasePath();
-		while (!Files.exists(Paths.get(basePathTemp + File.separator + path))) {
+		while (!Files.exists(Path.of(basePathTemp, path))) {
 			final int lastIndex = basePathTemp.lastIndexOf(File.separatorChar);
 			if (lastIndex != -1) {
 				basePathTemp = basePathTemp.substring(0, lastIndex);
@@ -213,7 +212,7 @@ public class UICatalogImpl implements UICatalog {
 				return;
 			}
 		}
-		final Path filePath = Paths.get(basePathTemp, path);
+		final Path filePath = Path.of(basePathTemp, path);
 		final XmlParser xmlParser = new XmlParserVtd();
 		final UICatalogParser parserTemp = new UICatalogParser(this, xmlParser, true);
 		try {
@@ -313,7 +312,7 @@ public class UICatalogImpl implements UICatalog {
 	 */
 	private static boolean removeConstantFromList(final String name, final List<UIConstant> listOfConstants) {
 		boolean result = false;
-		for (int i = listOfConstants.size() - 1; i >= 0; i--) {
+		for (int i = listOfConstants.size() - 1; i >= 0; --i) {
 			final UIConstant curConst = listOfConstants.get(i);
 			if (curConst.getName().compareToIgnoreCase(name) == 0) {
 				listOfConstants.remove(i);

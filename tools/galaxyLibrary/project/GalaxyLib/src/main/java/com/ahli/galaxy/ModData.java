@@ -7,7 +7,7 @@ import com.ahli.galaxy.archive.DescIndexData;
 import com.ahli.galaxy.game.GameData;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
 
-import java.io.File;
+import java.nio.file.Path;
 
 /**
  * @author Ahli
@@ -15,11 +15,11 @@ import java.io.File;
 public class ModData {
 	
 	private GameData gameData;
-	private File sourceDirectory;
-	private File mpqCacheDirectory;
-	private File targetFile;
+	private Path sourceDirectory;
+	private Path mpqCacheDirectory;
+	private Path targetFile;
 	private DescIndexData descIndexData;
-	private File componentListFile;
+	private Path componentListFile;
 	private UICatalog uiCatalog;
 	
 	/**
@@ -65,7 +65,7 @@ public class ModData {
 	/**
 	 * @return the componentListFile
 	 */
-	public File getComponentListFile() {
+	public Path getComponentListFile() {
 		return componentListFile;
 	}
 	
@@ -73,14 +73,14 @@ public class ModData {
 	 * @param componentListFile
 	 * 		the componentListFile to set
 	 */
-	public void setComponentListFile(final File componentListFile) {
+	public void setComponentListFile(final Path componentListFile) {
 		this.componentListFile = componentListFile;
 	}
 	
 	/**
 	 * @return the sourceDirectory
 	 */
-	public File getSourceDirectory() {
+	public Path getSourceDirectory() {
 		return sourceDirectory;
 	}
 	
@@ -88,14 +88,14 @@ public class ModData {
 	 * @param sourceDirectory
 	 * 		the sourceDirectory to set
 	 */
-	public void setSourceDirectory(final File sourceDirectory) {
+	public void setSourceDirectory(final Path sourceDirectory) {
 		this.sourceDirectory = sourceDirectory;
 	}
 	
 	/**
 	 * @return the mpqCacheDirectory
 	 */
-	public File getMpqCacheDirectory() {
+	public Path getMpqCacheDirectory() {
 		return mpqCacheDirectory;
 	}
 	
@@ -103,14 +103,14 @@ public class ModData {
 	 * @param mpqCacheDirectory
 	 * 		the mpqCacheDirectory to set
 	 */
-	public void setMpqCacheDirectory(final File mpqCacheDirectory) {
+	public void setMpqCacheDirectory(final Path mpqCacheDirectory) {
 		this.mpqCacheDirectory = mpqCacheDirectory;
 	}
 	
 	/**
 	 * @return the targetFile
 	 */
-	public File getTargetFile() {
+	public Path getTargetFile() {
 		return targetFile;
 	}
 	
@@ -118,7 +118,7 @@ public class ModData {
 	 * @param targetFile
 	 * 		the targetFile to set
 	 */
-	public void setTargetFile(final File targetFile) {
+	public void setTargetFile(final Path targetFile) {
 		this.targetFile = targetFile;
 	}
 	

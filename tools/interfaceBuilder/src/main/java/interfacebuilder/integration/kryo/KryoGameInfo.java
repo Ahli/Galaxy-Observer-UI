@@ -61,7 +61,7 @@ public class KryoGameInfo {
 		}
 		final Object[] signatureFields = getSignatureFields();
 		final Object[] thatSignatureFields = ((KryoGameInfo) obj).getSignatureFields();
-		for (int i = 0; i < signatureFields.length; i++) {
+		for (int i = 0; i < signatureFields.length; ++i) {
 			final var thisObj = signatureFields[i];
 			final var thatObj = thatSignatureFields[i];
 			final boolean objectArray = thisObj instanceof Object[];

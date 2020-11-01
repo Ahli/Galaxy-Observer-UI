@@ -5,7 +5,7 @@ import interfacebuilder.base_ui.BaseUiService;
 import interfacebuilder.projects.Project;
 import interfacebuilder.threads.CleaningForkJoinTask;
 
-import java.io.File;
+import java.nio.file.Path;
 
 public class BuildTask extends CleaningForkJoinTask {
 	
@@ -27,7 +27,7 @@ public class BuildTask extends CleaningForkJoinTask {
 		final GameData gameData = mpqBuilderService.getGameData(project.getGame());
 		baseUiService.parseBaseUiIfNecessary(gameData, useCmdLineSettings);
 		
-		final File interfaceDirectory = new File(project.getProjectPath());
+		final Path interfaceDirectory = Path.of(project.getProjectPath());
 		mpqBuilderService.buildSpecificUI(interfaceDirectory, gameData, useCmdLineSettings, project);
 		
 		return true;

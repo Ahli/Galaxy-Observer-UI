@@ -38,9 +38,6 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOCase;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
-import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -51,6 +48,8 @@ import java.awt.SplashScreen;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -71,10 +70,10 @@ public class SettingsEditorApplication extends Application {
 	private BorderPane rootLayout;
 	private MenuBarController mbarCtrl;
 	private TabsController tabsCtrl;
-	private String openedDocPath;
+	private Path openedDocPath;
 	private MpqEditorInterface mpqi;
 	private DescIndexData descIndex;
-	private File basePath;
+	private Path basePath;
 	private boolean hasUnsavedFileChanges;
 	private LayoutExtensionReader layoutExtReader;
 	
@@ -282,12 +281,11 @@ public class SettingsEditorApplication extends Application {
 	 */
 	private void initMpqInterface() {
 		final String tempDirectory = System.getProperty("java.io.tmpdir");
-		final String cachePath = tempDirectory + "ObserverUiSettingsEditor" + File.separator + "_ExtractedMpq";
-		final String mpqEditorPath =
-				basePath + File.separator + "plugins" + File.separator + "mpq" + File.separator + "MPQEditor.exe";
+		final Path cachePath = Path.of(tempDirectory, "ObserverUiSettingsEditor", "_ExtractedMpq");
+		final Path mpqEditorPath =
+				basePath.resolve("plugins" + File.separator + "mpq" + File.separator + "MPQEditor.exe");
 		mpqi = new MpqEditorInterface(cachePath, mpqEditorPath);
-		final File f = new File(mpqEditorPath);
-		if (!f.exists() || !f.isFile()) {
+		if (!Files.isExecutable(mpqEditorPath)) {
 			logger.error("Could not find MPQEditor.exe within its expected path: {}", mpqEditorPath);
 			final String title = Messages.getString("Main.warningAlertTitle");
 			final String content = String.format(Messages.getString("Main.couldNotFindMpqEditor"), mpqEditorPath);
@@ -339,7 +337,7 @@ public class SettingsEditorApplication extends Application {
 			updateAppTitle();
 		} catch (final InterruptedException e) {
 			Thread.currentThread().interrupt();
-		} catch (final IOException | ParserConfigurationException | SAXException | MpqException e) {
+		} catch (final IOException | ParserConfigurationException | MpqException e) {
 			logger.error(ExceptionUtils.getStackTrace(e), e);
 			showErrorAlert(e);
 		}
@@ -360,7 +358,7 @@ public class SettingsEditorApplication extends Application {
 	 * @return
 	 */
 	public boolean isValidOpenedDocPath() {
-		return openedDocPath != null && !"".equals(openedDocPath);
+		return openedDocPath != null && !"".equals(openedDocPath.toString());
 	}
 	
 	/**
@@ -370,12 +368,8 @@ public class SettingsEditorApplication extends Application {
 	 * @throws SAXException
 	 * @throws ParserConfigurationException
 	 */
-	public void compile() throws ParserConfigurationException, SAXException {
-		final File cache = new File(mpqi.getMpqCachePath());
-		final String[] suffixes = new String[] { ".stormlayout", ".SC2Layout" };
-		final Collection<File> layoutFiles =
-				FileUtils.listFiles(cache, new SuffixFileFilter(suffixes, IOCase.INSENSITIVE), TrueFileFilter.INSTANCE);
-		layoutExtReader.updateLayoutFiles(layoutFiles);
+	public void compile() throws ParserConfigurationException {
+		layoutExtReader.updateLayoutFiles(mpqi.getCache());
 	}
 	
 	/**
@@ -385,7 +379,7 @@ public class SettingsEditorApplication extends Application {
 		Platform.runLater(() -> {
 			// Update UI here
 			final StringBuilder sb = new StringBuilder(Messages.getString("Main.observerUiSettingsEditorTitle"));
-			final String openedDocPathTmp = getOpenedDocPath();
+			final String openedDocPathTmp = getOpenedDocPath().toString();
 			if (openedDocPathTmp != null) {
 				sb.append("- [").append(openedDocPathTmp).append(']');
 			}
@@ -419,7 +413,7 @@ public class SettingsEditorApplication extends Application {
 	 *
 	 * @return
 	 */
-	public String getOpenedDocPath() {
+	public Path getOpenedDocPath() {
 		return openedDocPath;
 	}
 	
@@ -451,37 +445,37 @@ public class SettingsEditorApplication extends Application {
 		fileChooser.setSelectedExtensionFilter(genExtFilter);
 		final File f = fileChooser.showOpenDialog(primaryStage);
 		
-		openMpqFileThreaded(f);
+		openMpqFileThreaded(f.toPath());
 	}
 	
 	/**
 	 * Opens the specified MPQ file.
 	 *
-	 * @param f
+	 * @param file
 	 */
-	public void openMpqFileThreaded(final File f) {
+	public void openMpqFileThreaded(final Path file) {
 		new Thread() {
 			@Override
 			public void run() {
 				Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
 				setName(getName().replaceFirst("Thread", "Open"));
-				openMpqFile(f);
+				openMpqFile(file);
 			}
 		}.start();
 	}
 	
 	/**
-	 * @param f
+	 * @param file
 	 */
-	public void openMpqFile(final File f) {
+	public void openMpqFile(final Path file) {
 		final long time = System.nanoTime();
-		if (f != null) {
+		if (file != null) {
 			try {
-				mpqi.extractEntireMPQ(f.getAbsolutePath());
-				openedDocPath = f.getAbsolutePath();
+				mpqi.extractEntireMPQ(file.toString());
+				openedDocPath = file;
 				updateAppTitle();
 				
-				final File componentListFile = mpqi.getComponentListFile();
+				final Path componentListFile = mpqi.getComponentListFile();
 				if (componentListFile == null) {
 					throw new ShowToUserException(Messages.getString("Main.OpenedFileNoComponentList"));
 				}
@@ -498,7 +492,8 @@ public class SettingsEditorApplication extends Application {
 				tabsCtrl.clearData();
 				hasUnsavedFileChanges = false;
 				
-				final File cache = new File(mpqi.getMpqCachePath());
+				// TODO rewrite with nio stream
+				final File cache = mpqi.getCache().toFile();
 				final Collection<File> layoutFiles = FileUtils.listFiles(cache, null, true);
 				
 				layoutExtReader = new LayoutExtensionReader();
@@ -615,9 +610,9 @@ public class SettingsEditorApplication extends Application {
 								STORM_INTERFACE_FILE_FILTER));
 		fileChooser.setSelectedExtensionFilter(genExtFilter);
 		
-		final File loadedF = new File(getOpenedDocPath());
-		fileChooser.setInitialFileName(loadedF.getName());
-		fileChooser.setInitialDirectory(loadedF.getParentFile());
+		final Path loadedF = getOpenedDocPath();
+		fileChooser.setInitialFileName(loadedF.getFileName().toString());
+		fileChooser.setInitialDirectory(loadedF.getParent().toFile());
 		
 		final File f = fileChooser.showSaveDialog(primaryStage);
 		
@@ -628,14 +623,14 @@ public class SettingsEditorApplication extends Application {
 				if (parentFile == null) {
 					throw new IOException(String.format("Parent of File %s is null.", f));
 				}
-				mpqi.buildMpq(parentFile.getAbsolutePath(), f.getName(), false,
+				mpqi.buildMpq(parentFile.toPath(), f.getName(), false,
 						MpqEditorCompression.BLIZZARD_SC2_HEROES, false);
 				hasUnsavedFileChanges = false;
-				openedDocPath = f.getAbsolutePath();
+				openedDocPath = f.toPath();
 				updateAppTitle();
 			} catch (final InterruptedException e) {
 				Thread.currentThread().interrupt();
-			} catch (final IOException | ParserConfigurationException | SAXException | MpqException e) {
+			} catch (final IOException | ParserConfigurationException | MpqException e) {
 				logger.error(ExceptionUtils.getStackTrace(e), e);
 				showErrorAlert(e);
 			}

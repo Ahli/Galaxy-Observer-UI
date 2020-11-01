@@ -96,12 +96,12 @@ public class UIFrame extends UIElement {
 		final UIFrame clone = new UIFrame(getName(), attrSize, childrenSize);
 		clone.type = type;
 		if (childrenSize > 0) {
-			for (int i = 0; i < childrenSize; i++) {
+			for (int i = 0; i < childrenSize; ++i) {
 				clone.children.add((UIElement) children.get(i).deepCopy());
 			}
 		}
 		if (attrSize > 0) {
-			for (int i = 0; i < attrSize; i++) {
+			for (int i = 0; i < attrSize; ++i) {
 				clone.attributes.add((UIAttribute) attributes.get(i).deepCopy());
 			}
 		}
@@ -161,7 +161,7 @@ public class UIFrame extends UIElement {
 	public void addAttribute(final UIAttribute value) {
 		final String key = value.getName();
 		if (attributes != null) {
-			for (int i = 0, len = attributes.size(); i < len; i++) {
+			for (int i = 0, len = attributes.size(); i < len; ++i) {
 				if (attributes.get(i).getName().equalsIgnoreCase(key)) {
 					attributes.set(i, value);
 					return;
@@ -179,7 +179,7 @@ public class UIFrame extends UIElement {
 	 */
 	public UIAttribute getValue(final String key) {
 		if (attributes != null) {
-			for (int i = 0, len = attributes.size(); i < len; i++) {
+			for (int i = 0, len = attributes.size(); i < len; ++i) {
 				final UIAttribute a = attributes.get(i);
 				if (a.getName().equalsIgnoreCase(key)) {
 					return a;
@@ -366,7 +366,7 @@ public class UIFrame extends UIElement {
 		}
 		final Object[] signatureFields = getSignatureFields();
 		final Object[] thatSignatureFields = ((UIFrame) obj).getSignatureFields();
-		for (int i = 0; i < signatureFields.length; i++) {
+		for (int i = 0; i < signatureFields.length; ++i) {
 			if (!(signatureFields[i] instanceof Object[])) {
 				if (!Objects.equals(signatureFields[i], thatSignatureFields[i])) {
 					return false;

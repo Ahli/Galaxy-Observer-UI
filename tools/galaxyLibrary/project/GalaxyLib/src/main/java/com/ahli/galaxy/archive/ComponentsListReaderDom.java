@@ -17,6 +17,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 /**
  * Reads the Components List file within the MPQ Archive.
@@ -38,16 +39,16 @@ public final class ComponentsListReaderDom {
 	/**
 	 * Returns the internal path of DescIndex of the mpq file.
 	 *
-	 * @param f
+	 * @param compListFile
 	 * 		components list file
 	 * @return
 	 * @throws IOException
 	 * @throws SAXException
 	 * @throws ParserConfigurationException
 	 */
-	public static String getDescIndexPath(final File f, final GameDef game)
+	public static String getDescIndexPath(final Path compListFile, final GameDef game)
 			throws ParserConfigurationException, SAXException, IOException {
-		final String str = game.getBaseDataFolderName() + File.separator + getComponentsListValue(f, UIUI);
+		final String str = game.getBaseDataFolderName() + File.separator + getComponentsListValue(compListFile, UIUI);
 		logger.trace("DescIndexPath: {}", () -> str);
 		return str;
 	}
@@ -55,7 +56,7 @@ public final class ComponentsListReaderDom {
 	/**
 	 * Returns the path information of a given type value, e.g. "uiui" or "font". Locales are not supported here.
 	 *
-	 * @param f
+	 * @param compListFile
 	 * 		components list file
 	 * @param typeVal
 	 * 		value of the type, e.g. "uiui"
@@ -64,7 +65,7 @@ public final class ComponentsListReaderDom {
 	 * @throws IOException
 	 * @throws SAXException
 	 */
-	public static String getComponentsListValue(final File f, final String typeVal)
+	public static String getComponentsListValue(final Path compListFile, final String typeVal)
 			throws ParserConfigurationException, SAXException, IOException {
 		// find the type in the xml
 		final DocumentBuilderFactory dbFac = DocumentBuilderFactory.newInstance();
@@ -79,11 +80,11 @@ public final class ComponentsListReaderDom {
 		dbFac.setAttribute(XMLConstants.FEATURE_SECURE_PROCESSING, true);
 		dbFac.setIgnoringComments(true);
 		final DocumentBuilder dBuilder = dbFac.newDocumentBuilder();
-		final Document doc = dBuilder.parse(f);
+		final Document doc = dBuilder.parse(compListFile.toString());
 		
 		// must be in a DataComponent node
 		final NodeList nodeList = doc.getElementsByTagName(DATA_COMPONENT);
-		for (int i = 0, len = nodeList.getLength(); i < len; i++) {
+		for (int i = 0, len = nodeList.getLength(); i < len; ++i) {
 			final Node node = nodeList.item(i);
 			final Node attrZero = node.getAttributes().item(0);
 			// first attribute's name is Type & value must be as specified

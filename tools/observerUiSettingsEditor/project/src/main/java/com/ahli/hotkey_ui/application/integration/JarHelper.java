@@ -10,7 +10,6 @@ import java.io.File;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.CodeSource;
 import java.security.ProtectionDomain;
 
@@ -30,11 +29,11 @@ public final class JarHelper {
 	 * @param aclass
 	 * @return File at base path
 	 */
-	public static File getJarDir(final Class<?> aclass) {
+	public static Path getJarDir(final Class<?> aclass) {
 		final String modulePath = System.getProperty("jdk.module.path");
 		if (modulePath == null) {
 			// case: jlink VM
-			return new File(System.getProperty("user.dir"));
+			return Path.of(System.getProperty("user.dir"));
 		}
 		// case: IDE
 		final ProtectionDomain domain = aclass.getProtectionDomain();
@@ -48,9 +47,9 @@ public final class JarHelper {
 			final String check = path.substring(0, i);
 			logger.trace("target/classes location: {}", () -> check);
 			if (check.charAt(0) == '/') {
-				final Path p = Paths.get(check.substring(1)).getParent().getParent();
+				final Path p = Path.of(check.substring(1)).getParent().getParent();
 				if (Files.exists(p)) {
-					return p.toFile();
+					return p;
 				}
 			}
 		}

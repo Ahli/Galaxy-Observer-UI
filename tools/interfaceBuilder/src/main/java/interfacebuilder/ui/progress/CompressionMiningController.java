@@ -4,6 +4,7 @@
 package interfacebuilder.ui.progress;
 
 import com.ahli.galaxy.ModData;
+import com.ahli.mpq.MpqEditorInterface;
 import com.ahli.mpq.MpqException;
 import com.ahli.mpq.mpqeditor.MpqEditorCompressionRule;
 import com.ahli.mpq.mpqeditor.MpqEditorCompressionRuleMask;
@@ -36,6 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static interfacebuilder.InterfaceBuilderApp.FATAL_ERROR;
 
@@ -187,15 +189,14 @@ public class CompressionMiningController implements Updateable {
 		}
 		stopTaskNow = false;
 		task = () -> {
-			File modTargetFile = null;
+			Path modTargetFile = null;
 			try {
 				long bestSize;
+				final ModData mod = gameService.getModData(project.getGame());
 				{
-					final ModData mod = gameService.getModData(project.getGame());
-					final File projectSource = new File(project.getProjectPath());
+					final Path projectSource = Path.of(project.getProjectPath());
 					
-					modTargetFile =
-							new File(configService.getMiningTempPath() + File.separator + projectSource.getName());
+					modTargetFile = configService.getMiningTempPath().resolve(projectSource.getFileName());
 					mod.setTargetFile(modTargetFile);
 					mod.setSourceDirectory(projectSource);
 					
@@ -219,17 +220,21 @@ public class CompressionMiningController implements Updateable {
 				updateUiSizeToBeat(bestSize);
 				long lastSize;
 				final RandomCompressionMiner comprMiner = expCompMiner;
-				for (int attempts = 1; !stopTaskNow && attempts < Integer.MAX_VALUE; attempts++) {
+				for (int attempts = 1; !stopTaskNow && attempts < Integer.MAX_VALUE; ++attempts) {
 					comprMiner.randomizeRules();
 					lastSize = comprMiner.build();
 					updateUiAttemptSize(lastSize, attempts);
 					if (lastSize < bestSize) {
-						bestSize = lastSize;
-						logger.info("Mined better compression of size {} kb.", lastSize / 1024);
-						project.setBestCompressionRuleSet(new RuleSet(comprMiner.getBestCompressionRules()));
-						projectService.saveProject(project);
-						updateUiSizeToBeat(lastSize);
-						updateUiRules(comprMiner.getBestCompressionRules());
+						if (validateTargetFile(mod, expCompMiner.getMpqInterface())) {
+							bestSize = lastSize;
+							logger.info("Mined better compression of size {} kb.", lastSize / 1024);
+							project.setBestCompressionRuleSet(new RuleSet(comprMiner.getBestCompressionRules()));
+							projectService.saveProject(project);
+							updateUiSizeToBeat(lastSize);
+							updateUiRules(comprMiner.getBestCompressionRules());
+						} else {
+							logger.warn("Invalid file encountered: {} kb.", lastSize / 1024);
+						}
 					}
 					if (Thread.currentThread().isInterrupted() || task == null) {
 						logger.info("Stopping the mining task.");
@@ -243,12 +248,12 @@ public class CompressionMiningController implements Updateable {
 			} catch (final InterruptedException e) {
 				Thread.currentThread().interrupt();
 			} finally {
-				try {
-					if (modTargetFile != null) {
-						Files.deleteIfExists(modTargetFile.toPath());
+				if (modTargetFile != null) {
+					try {
+						Files.deleteIfExists(modTargetFile);
+					} catch (final IOException e) {
+						logger.error("Experimental Compression Miner failed to clear the temporary target file", e);
 					}
-				} catch (final IOException e) {
-					logger.error("Experimental Compression Miner failed to clear the temporary target file", e);
 				}
 			}
 		};
@@ -320,5 +325,20 @@ public class CompressionMiningController implements Updateable {
 				logger.fatal(FATAL_ERROR, e);
 			}
 		});
+	}
+	
+	/**
+	 * @param mod
+	 * @param mpqInterface
+	 * @return
+	 */
+	private boolean validateTargetFile(final ModData mod, final MpqEditorInterface mpqInterface) {
+		final Path targetFile = mod.getTargetFile();
+		if (targetFile == null) {
+			return false;
+		}
+		// TODO validate target mpq containing all files
+		
+		return true;
 	}
 }

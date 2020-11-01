@@ -32,6 +32,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystemException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -113,13 +115,13 @@ public class MpqBuilderService {
 	 * @param game
 	 * @param useCmdLineSettings
 	 */
-	void buildSpecificUI(final File interfaceDirectory, final GameData game, final boolean useCmdLineSettings,
+	void buildSpecificUI(final Path interfaceDirectory, final GameData game, final boolean useCmdLineSettings,
 			final Project project) {
 		if (InterfaceBuilderApp.getInstance().getExecutor().isShutdown()) {
 			logger.error("ERROR: Executor shut down. Skipping building a UI...");
 			return;
 		}
-		if (!interfaceDirectory.exists() || !interfaceDirectory.isDirectory()) {
+		if (!Files.exists(interfaceDirectory) || !Files.isDirectory(interfaceDirectory)) {
 			logger.error("ERROR: Can't build UI from file '{}', expected an existing directory.", interfaceDirectory);
 			return;
 		}
@@ -139,10 +141,12 @@ public class MpqBuilderService {
 		// create tasks for the worker pool
 		try {
 			InterfaceBuilderApp.getInstance()
-					.addThreadLoggerTab(Thread.currentThread().getName(), interfaceDirectory.getName(), false);
+					.addThreadLoggerTab(Thread.currentThread().getName(), interfaceDirectory.getFileName().toString(),
+							false);
 			// create unique cache path
 			final MpqEditorInterface threadsMpqInterface =
-					new MpqEditorInterface(configService.getMpqCachePath() + Thread.currentThread().getId(),
+					new MpqEditorInterface(
+							configService.getMpqCachePath().resolve(Long.toString(Thread.currentThread().getId())),
 							configService.getMpqEditorPath());
 			
 			// work
@@ -207,33 +211,31 @@ public class MpqBuilderService {
 	 * 		when something goes wrong
 	 * @throws InterruptedException
 	 */
-	private void buildFile(final File sourceFile, final GameData game, final MpqEditorInterface mpqi,
+	private void buildFile(final Path sourceFile, final GameData game, final MpqEditorInterface mpqi,
 			final boolean compressXml, final int compressMpq, final boolean buildUnprotectedToo,
 			final boolean repairLayoutOrder, final boolean verifyLayout, final boolean verifyXml, final Project project)
 			throws IOException, InterruptedException {
-		InterfaceBuilderApp.getInstance().printInfoLogMessageToGeneral(sourceFile.getName() + " started construction.");
+		InterfaceBuilderApp.getInstance()
+				.printInfoLogMessageToGeneral(sourceFile.getFileName() + " started construction.");
 		
 		final GameDef gameDef = game.getGameDef();
 		
-		final String targetPath =
-				configService.getDocumentsPath() + File.separator + gameDef.getDocumentsGameDirectoryName() +
-						File.separator + gameDef.getDocumentsInterfaceSubdirectoryName();
+		final Path targetFile =
+				Path.of(configService.getDocumentsPath() + File.separator + gameDef.getDocumentsGameDirectoryName() +
+						File.separator + gameDef.getDocumentsInterfaceSubdirectoryName());
 		
 		// init mod data
 		final ModData mod = new ModData(game);
 		mod.setSourceDirectory(sourceFile);
-		final File targetFile = new File(targetPath);
 		mod.setTargetFile(targetFile);
 		
 		// get and create cache
-		final File cache = new File(mpqi.getMpqCachePath());
-		if (!cache.exists() && !cache.mkdirs()) {
-			final String msg = "Unable to create cache directory.";
-			logger.error(msg);
-			throw new IOException(msg);
+		final Path cache = mpqi.getCache();
+		if (!Files.exists(cache)) {
+			Files.createDirectories(cache);
 		}
 		int cacheClearAttempts;
-		for (cacheClearAttempts = 0; cacheClearAttempts <= 100; cacheClearAttempts++) {
+		for (cacheClearAttempts = 0; cacheClearAttempts <= 100; ++cacheClearAttempts) {
 			if (!mpqi.clearCacheExtractedMpq()) {
 				// sleep and hope the file gets released soon
 				Thread.sleep(500);
@@ -250,7 +252,7 @@ public class MpqBuilderService {
 		mod.setMpqCacheDirectory(cache);
 		// put files into cache
 		int copyAttempts;
-		for (copyAttempts = 0; copyAttempts <= 100; copyAttempts++) {
+		for (copyAttempts = 0; copyAttempts <= 100; ++copyAttempts) {
 			try {
 				fileService.copyFileOrDirectory(sourceFile, cache);
 				break;
@@ -271,12 +273,17 @@ public class MpqBuilderService {
 		}
 		if (copyAttempts > 100) {
 			// copy keeps failing -> abort
-			final String msg = "Above code did not throw exception about copy attempt threshold reached.";
+			final String msg = "Failed to copy files to: " + cache;
 			logger.error(msg);
 			throw new IOException(msg);
 		}
 		
-		final File componentListFile = mpqi.getComponentListFile();
+		final Path componentListFile = mpqi.getComponentListFile();
+		if (componentListFile == null) {
+			final String msg = "ERROR: did not find the ComponentList file.";
+			logger.error(msg);
+			throw new IOException(msg);
+		}
 		mod.setComponentListFile(componentListFile);
 		
 		final DescIndexData descIndexData = new DescIndexData(mpqi);
@@ -298,29 +305,30 @@ public class MpqBuilderService {
 			logger.error("unable to read Layout paths", e);
 		}
 		
-		logger.info("Compiling... {}", sourceFile.getName());
+		logger.info("Compiling... {}", sourceFile.getFileName());
 		
 		// perform checks/improvements on code
 		compileService.compile(mod, configService.getRaceId(), repairLayoutOrder, verifyLayout, verifyXml,
 				configService.getConsoleSkinId());
 		
-		logger.info("Building... {}", sourceFile.getName());
+		logger.info("Building... {}", sourceFile.getFileName());
 		
+		final String sourceFileName = sourceFile.getFileName().toString();
 		try {
-			mpqi.buildMpq(targetPath, sourceFile.getName(), compressXml, getCompressionModeOfSetting(compressMpq),
+			mpqi.buildMpq(targetFile, sourceFileName, compressXml, getCompressionModeOfSetting(compressMpq),
 					buildUnprotectedToo);
 			
 			project.setLastBuildDateTime(LocalDateTime.now());
-			final long size = new File(targetPath + File.separator + sourceFile.getName()).length();
+			final long size = Files.size(targetFile.resolve(sourceFileName));
 			project.setLastBuildSize(size);
-			logger.info("Finished building... {}. Size: {}kb", sourceFile.getName(), size / 1024);
+			logger.info("Finished building... {}. Size: {}kb", sourceFileName, size / 1024);
 			projectService.saveProject(project);
 			InterfaceBuilderApp.getInstance()
-					.printInfoLogMessageToGeneral(sourceFile.getName() + " finished construction.");
+					.printInfoLogMessageToGeneral(sourceFileName + " finished construction.");
 		} catch (final IOException | MpqException e) {
 			logger.error("ERROR: unable to construct final Interface file.", e);
 			InterfaceBuilderApp.getInstance()
-					.printErrorLogMessageToGeneral(sourceFile.getName() + " could not be created.");
+					.printErrorLogMessageToGeneral(sourceFileName + " could not be created.");
 		}
 	}
 	

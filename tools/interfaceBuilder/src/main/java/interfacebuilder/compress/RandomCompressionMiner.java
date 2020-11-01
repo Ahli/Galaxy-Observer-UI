@@ -29,7 +29,7 @@ import java.util.stream.Stream;
  * This miner searches for a better compression via randomized rules.
  */
 public class RandomCompressionMiner {
-	private static final String STAR = "*";
+	private static final String WILDCARD = "*";
 	private static final String OGG = ".ogg";
 	private static final String OGV = ".ogv";
 	private static final String WAV = ".wav";
@@ -38,7 +38,6 @@ public class RandomCompressionMiner {
 	private static final String TTF = ".ttf";
 	private static final String OTF = ".otf";
 	private static final String M_3 = ".m3";
-	private static final String WILDCARD = STAR;
 	private static final Logger logger = LogManager.getLogger(RandomCompressionMiner.class);
 	private final ModData mod;
 	private final MpqEditorInterface mpqInterface;
@@ -61,7 +60,7 @@ public class RandomCompressionMiner {
 	 * @throws MpqException
 	 * @throws InterruptedException
 	 */
-	public RandomCompressionMiner(final ModData mod, final String mpqCachePath, final String mpqEditorPath,
+	public RandomCompressionMiner(final ModData mod, final Path mpqCachePath, final Path mpqEditorPath,
 			final FileService fileService) throws IOException, MpqException, InterruptedException {
 		this(mod, mpqCachePath, mpqEditorPath, new MpqEditorCompressionRule[0], fileService);
 	}
@@ -78,12 +77,13 @@ public class RandomCompressionMiner {
 	 * @throws MpqException
 	 * @throws InterruptedException
 	 */
-	public RandomCompressionMiner(final ModData mod, final String mpqCachePath, final String mpqEditorPath,
+	public RandomCompressionMiner(final ModData mod, final Path mpqCachePath, final Path mpqEditorPath,
 			final MpqEditorCompressionRule[] oldBestRuleset, final FileService fileService)
 			throws IOException, MpqException, InterruptedException {
 		this.mod = mod;
-		mpqInterface = new MpqEditorInterface(mpqCachePath + Thread.currentThread().getId(), mpqEditorPath);
-		final File cacheDir = new File(mpqInterface.getMpqCachePath());
+		final String id = Long.toString(Thread.currentThread().getId());
+		mpqInterface = new MpqEditorInterface(mpqCachePath.resolve(id), mpqEditorPath);
+		final Path cacheDir = mpqInterface.getCache();
 		mod.setMpqCacheDirectory(cacheDir);
 		mpqInterface.clearCacheExtractedMpq();
 		fileService.copyFileOrDirectory(mod.getSourceDirectory(), cacheDir);
@@ -92,7 +92,7 @@ public class RandomCompressionMiner {
 		// use old ruleset if one was specified and test it
 		if (oldBestRuleset != null) {
 			// check for file coverage holes
-			final List<File> untrackedFiles = getUntrackedFiles(oldBestRuleset, cacheDir.toPath());
+			final List<File> untrackedFiles = getUntrackedFiles(oldBestRuleset, cacheDir);
 			if (!untrackedFiles.isEmpty()) {
 				rules = addRulesForFiles(oldBestRuleset, untrackedFiles, cacheDir);
 				oldRulesetHadMissingFiles = true;
@@ -113,7 +113,7 @@ public class RandomCompressionMiner {
 		}
 		
 		// compare with usual, initial ruleset and use the better one
-		final MpqEditorCompressionRule[] initRules = createInitialRuleset(cacheDir.toPath());
+		final MpqEditorCompressionRule[] initRules = createInitialRuleset(cacheDir);
 		final long initRuleSetSize = build(initRules, compressXml);
 		if (initRuleSetSize < bestSize) {
 			bestSize = initRuleSetSize;
@@ -152,13 +152,13 @@ public class RandomCompressionMiner {
 	 * @return
 	 */
 	private static MpqEditorCompressionRule[] addRulesForFiles(final MpqEditorCompressionRule[] oldBestRuleset,
-			final List<File> untrackedFiles, final File cacheDir) {
+			final List<File> untrackedFiles, final Path cacheDir) {
 		final int oldRuleCount = oldBestRuleset.length;
 		final MpqEditorCompressionRule[] merged = new MpqEditorCompressionRule[oldRuleCount + untrackedFiles.size()];
 		// copy old
 		System.arraycopy(oldBestRuleset, 0, merged, 0, oldRuleCount);
 		// insert new untracked
-		for (int i = 0, len = untrackedFiles.size(); i < len; i++) {
+		for (int i = 0, len = untrackedFiles.size(); i < len; ++i) {
 			merged[oldRuleCount + i] =
 					new MpqEditorCompressionRuleMask(getFileMask(untrackedFiles.get(i).toPath(), cacheDir))
 							.setSingleUnit(true).setCompress(true)
@@ -174,7 +174,7 @@ public class RandomCompressionMiner {
 	 * @return
 	 */
 	private static MpqEditorCompressionRule[] removeUnusedMaskEnries(final MpqEditorCompressionRule[] dirty,
-			final File cacheDir) {
+			final Path cacheDir) {
 		final List<MpqEditorCompressionRule> clean = new ArrayList<>();
 		String mask;
 		for (final MpqEditorCompressionRule rule : dirty) {
@@ -204,13 +204,12 @@ public class RandomCompressionMiner {
 	 * @param rules
 	 * @param cache
 	 */
-	private void fillFileSizeMap(final MpqEditorCompressionRule[] rules, final File cache) {
+	private void fillFileSizeMap(final MpqEditorCompressionRule[] rules, final Path cache) {
 		fileSizeMap = new ObjectLongHashMap<>();
-		final Path cachePath = cache.toPath();
 		for (final MpqEditorCompressionRule rule : rules) {
 			if (rule instanceof MpqEditorCompressionRuleMask) {
 				final String mask = ((MpqEditorCompressionRuleMask) rule).getMask();
-				fileSizeMap.put(mask, getFileSize(mask, cachePath));
+				fileSizeMap.put(mask, getFileSize(mask, cache));
 			}
 		}
 	}
@@ -245,7 +244,7 @@ public class RandomCompressionMiner {
 	private static MpqEditorCompressionRule[] deepCopy(final MpqEditorCompressionRule... rules) {
 		final int len = rules.length;
 		final MpqEditorCompressionRule[] clone = new MpqEditorCompressionRule[len];
-		for (int i = 0; i < len; i++) {
+		for (int i = 0; i < len; ++i) {
 			clone[i] = ((MpqEditorCompressionRule) rules[i].deepCopy());
 		}
 		return clone;
@@ -264,9 +263,9 @@ public class RandomCompressionMiner {
 	private long build(final MpqEditorCompressionRule[] rules, final boolean compressXml)
 			throws InterruptedException, MpqException, IOException {
 		mpqInterface.setCustomCompressionRules(rules);
-		final File targetFile = mod.getTargetFile();
-		mpqInterface.buildMpq(targetFile.getAbsolutePath(), compressXml, MpqEditorCompression.CUSTOM, false);
-		return targetFile.length();
+		final Path targetFile = mod.getTargetFile();
+		mpqInterface.buildMpq(targetFile, compressXml, MpqEditorCompression.CUSTOM, false);
+		return Files.size(targetFile);
 	}
 	
 	/**
@@ -279,7 +278,7 @@ public class RandomCompressionMiner {
 	private MpqEditorCompressionRule[] createInitialRuleset(final Path cacheModDirectory) throws IOException {
 		final List<MpqEditorCompressionRule> initRules = new ArrayList<>();
 		initRules.add(new MpqEditorCompressionRuleSize(0, 0).setSingleUnit(true));
-		final File sourceDir = mod.getMpqCacheDirectory();
+		final Path sourceDir = mod.getMpqCacheDirectory();
 		fileSizeMap = new ObjectLongHashMap<>();
 		try (final Stream<Path> ps = Files.walk(cacheModDirectory)) {
 			ps.filter(Files::isRegularFile).forEach(p -> {
@@ -300,7 +299,7 @@ public class RandomCompressionMiner {
 		for (final MpqEditorCompressionRule rule : rules) {
 			if (rule instanceof MpqEditorCompressionRuleMask) {
 				final String cleanedMask =
-						File.separator + ((MpqEditorCompressionRuleMask) rule).getMask().replace(STAR, "");
+						File.separator + ((MpqEditorCompressionRuleMask) rule).getMask().replace(WILDCARD, "");
 				if (p.toString().endsWith(cleanedMask)) {
 					return true;
 				}
@@ -315,9 +314,9 @@ public class RandomCompressionMiner {
 	 * @param p
 	 * @return
 	 */
-	private static String getFileMask(final Path p, final File sourceDir) {
+	private static String getFileMask(final Path p, final Path sourceDir) {
 		final String name = p.normalize().toString();
-		return name.substring(sourceDir.getAbsolutePath().length() + 1);
+		return name.substring(sourceDir.toString().length() + 1);
 	}
 	
 	/**
@@ -329,12 +328,12 @@ public class RandomCompressionMiner {
 	 * 		cache directory containing the map
 	 * @return true if file exists within the cache and is not a directory
 	 */
-	private static boolean isValidFileSpecificMask(final String mask, final File cacheDir) {
+	private static boolean isValidFileSpecificMask(final String mask, final Path cacheDir) {
 		if (mask.contains(WILDCARD)) {
 			return false;
 		}
-		final File referencedFile = new File(cacheDir.getAbsolutePath() + File.separator + mask);
-		return referencedFile.exists() && referencedFile.isFile();
+		final Path referencedFile = Path.of(cacheDir.toString(), mask);
+		return Files.isRegularFile(referencedFile);
 	}
 	
 	/**
@@ -367,7 +366,7 @@ public class RandomCompressionMiner {
 	 * @param sourceDir
 	 * @return
 	 */
-	private static MpqEditorCompressionRuleMask getDefaultRule(final Path path, final File sourceDir) {
+	private static MpqEditorCompressionRuleMask getDefaultRule(final Path path, final Path sourceDir) {
 		final var rule = new MpqEditorCompressionRuleMask(getFileMask(path, sourceDir));
 		rule.setSingleUnit(true).setCompress(true);
 		if (path.endsWith(OGG) || path.endsWith(OGV) || path.endsWith(WAV) || path.endsWith(TXT) ||
@@ -419,14 +418,14 @@ public class RandomCompressionMiner {
 		// exclude LZMA -> crash
 		MpqEditorCompressionRuleMethod method;
 		if (fileSizeMap.get(mask) > 0) {
-			method = random.nextBoolean() ? MpqEditorCompressionRuleMethod.ZLIB : MpqEditorCompressionRuleMethod.BZIP2;
+			method = random.nextFloat() > 0.95f ? MpqEditorCompressionRuleMethod.ZLIB :
+					MpqEditorCompressionRuleMethod.BZIP2;
 		} else {
 			final int max = compressionSetting.length;
 			do {
 				method = compressionSetting[random.nextInt(max)];
 			} while (hasInvalidCompressionRuleset(method));
 		}
-		//		method = random.nextBoolean() ? MpqEditorCompressionRuleMethod.ZLIB : MpqEditorCompressionRuleMethod.BZIP2;
 		return method;
 	}
 	
@@ -447,5 +446,9 @@ public class RandomCompressionMiner {
 	 */
 	public void cleanUp() {
 		mpqInterface.clearCacheExtractedMpq();
+	}
+	
+	public MpqEditorInterface getMpqInterface() {
+		return mpqInterface;
 	}
 }

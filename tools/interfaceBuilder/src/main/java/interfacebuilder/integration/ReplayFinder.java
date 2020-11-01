@@ -13,7 +13,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.Collection;
 
 /**
@@ -33,7 +33,7 @@ public class ReplayFinder {
 	 * 		the documents path
 	 * @return the last or newest replay
 	 */
-	public File getLastUsedOrNewestReplay(final boolean isHeroes, final String documentsPath) {
+	public File getLastUsedOrNewestReplay(final boolean isHeroes, final Path documentsPath) {
 		File replay = null;
 		try {
 			replay = getLastUsedReplay(isHeroes, documentsPath);
@@ -59,16 +59,16 @@ public class ReplayFinder {
 	 * @throws IOException
 	 * 		Signals that an I/O exception has occurred.
 	 */
-	public File getLastUsedReplay(final boolean isHeroes, final String documentsPath) throws IOException {
-		String basePath = documentsPath + File.separator + (isHeroes ? "Heroes of the Storm" : "StarCraft II");
-		basePath += File.separator + "Variables.txt";
+	public File getLastUsedReplay(final boolean isHeroes, final Path documentsPath) throws IOException {
+		final Path basePath = documentsPath
+				.resolve((isHeroes ? "Heroes of the Storm" : "StarCraft II") + File.separator + "Variables.txt");
 		if (logger.isTraceEnabled()) {
 			logger.trace(basePath);
 		}
 		
 		String line;
 		String replayPath = null;
-		try (final BufferedReader br = Files.newBufferedReader(Paths.get(basePath))) {
+		try (final BufferedReader br = Files.newBufferedReader(basePath)) {
 			boolean found = false;
 			final String searchToken = "lastReplayFilePath=";
 			while ((line = br.readLine()) != null && !found) {
@@ -95,23 +95,23 @@ public class ReplayFinder {
 	 * 		the documents path
 	 * @return the newest replay
 	 */
-	public File getNewestReplay(final boolean isHeroes, final String documentsPath) {
-		String basePath = documentsPath + File.separator;
+	public File getNewestReplay(final boolean isHeroes, final Path documentsPath) {
+		final Path basePath;
 		final String[] extensions;
 		if (isHeroes) {
-			basePath += "Heroes of the Storm";
+			basePath = documentsPath.resolve("Heroes of the Storm" + File.separator + "Accounts");
 			extensions = new String[] { "StormReplay" };
 		} else {
-			basePath += "StarCraft II";
+			basePath = documentsPath.resolve("StarCraft II" + File.separator + "Accounts");
 			extensions = new String[] { "SC2Replay" };
 		}
-		basePath += File.separator + "Accounts";
 		if (logger.isTraceEnabled()) {
 			logger.trace(basePath);
 		}
 		
+		// TODO rewrite using nio
 		final Collection<File> allReplays =
-				FileUtils.listFiles(new File(basePath), TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
+				FileUtils.listFiles(basePath.toFile(), TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
 		
 		if (logger.isTraceEnabled()) {
 			logger.trace("# Replays found: {}", allReplays.size());

@@ -13,11 +13,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,9 +54,8 @@ public class DiscCacheService {
 	 * @return
 	 */
 	public Path getCacheFilePath(final String gameDefName, final boolean isPtr) {
-		return Paths.get(configService.getCachePath() + File.separator + gameDefName + (isPtr ? " PTR" : "") + ".kryo");
+		return configService.getCachePath().resolve(gameDefName + (isPtr ? " PTR" : "") + ".kryo");
 	}
-	
 	
 	/**
 	 * @param gameDefName

@@ -186,7 +186,7 @@ public class ProjectService {
 			logger.trace("extracting file {}", () -> uri);
 			final int i = uri.indexOf(jarIntPath);
 			final String intPath = uri.substring(i + jarIntPathLen);
-			final Path path = Path.of(projPath + File.separator + intPath);
+			final Path path = projPath.resolve(intPath);
 			logger.trace("writing file {}", () -> path);
 			if (!uri.endsWith(DIRECTORY_SYMBOL)) {
 				Files.createDirectories(path.getParent());

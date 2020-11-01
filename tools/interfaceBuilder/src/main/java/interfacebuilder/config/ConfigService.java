@@ -9,24 +9,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.io.File;
+import java.nio.file.Path;
 
 public class ConfigService {
 	
 	@Autowired
 	@Qualifier("mpqCachePath")
-	private String mpqCachePath;
+	private Path mpqCachePath;
 	
 	@Autowired
 	@Qualifier("basePath")
-	private File basePath;
+	private Path basePath;
 	
 	@Autowired
 	@Qualifier("documentsPath")
-	private String documentsPath;
+	private Path documentsPath;
 	
 	@Autowired
 	@Qualifier("mpqEditorPath")
-	private String mpqEditorPath;
+	private Path mpqEditorPath;
 	
 	@Autowired
 	private SettingsIniInterface iniSettings;
@@ -41,7 +42,7 @@ public class ConfigService {
 	
 	@Autowired
 	@Qualifier("baseUiPath")
-	private String baseUiPath;
+	private Path baseUiPath;
 	
 	@Autowired
 	@Qualifier("cascExtractorExeFile")
@@ -49,25 +50,25 @@ public class ConfigService {
 	
 	@Autowired
 	@Qualifier("cachePath")
-	private String cachePath;
+	private Path cachePath;
 	
 	@Autowired
 	@Qualifier("miningTempPath")
-	private String miningTempPath;
+	private Path miningTempPath;
 	
-	public String getMpqEditorPath() {
+	public Path getMpqEditorPath() {
 		return mpqEditorPath;
 	}
 	
-	public String getMpqCachePath() {
+	public Path getMpqCachePath() {
 		return mpqCachePath;
 	}
 	
-	public File getBasePath() {
+	public Path getBasePath() {
 		return basePath;
 	}
 	
-	public String getDocumentsPath() {
+	public Path getDocumentsPath() {
 		return documentsPath;
 	}
 	
@@ -79,15 +80,15 @@ public class ConfigService {
 		return raceId;
 	}
 	
-	public String getBaseUiPath(final GameDef gameDef) {
-		return baseUiPath + File.separator + gameDef.getNameHandle();
+	public Path getBaseUiPath(final GameDef gameDef) {
+		return baseUiPath.resolve(gameDef.getNameHandle());
 	}
 	
 	public File getCascExtractorExeFile() {
 		return cascExtractorExeFile;
 	}
 	
-	public String getCachePath() {
+	public Path getCachePath() {
 		return cachePath;
 	}
 	
@@ -95,7 +96,7 @@ public class ConfigService {
 		return consoleSkinId;
 	}
 	
-	public String getMiningTempPath() {
+	public Path getMiningTempPath() {
 		return miningTempPath;
 	}
 }

@@ -26,8 +26,16 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.FileVisitResult;
+import java.nio.file.FileVisitor;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -80,6 +88,78 @@ public class LayoutExtensionReader {
 			return null;
 		}
 		return part.substring(quoteStart + 1, quoteEnd);
+	}
+	
+	/**
+	 * Processes the Constants in the given Nodes.
+	 *
+	 * @param childNodes
+	 */
+	private static void readConstants(final NodeList childNodes, final List<ValueDef> hotkeys,
+			final List<ValueDef> settings) {
+		for (int i = 0, len = childNodes.getLength(); i < len; i++) {
+			final Node curNode = childNodes.item(i);
+			
+			if (curNode.getNodeType() == Node.ELEMENT_NODE) {
+				
+				final String nodeName = curNode.getNodeName().toLowerCase(Locale.ROOT);
+				if (nodeName.equals(CONSTANT)) {
+					processConstant(curNode, hotkeys, settings);
+				}
+				
+			} else {
+				readConstants(curNode.getChildNodes(), hotkeys, settings);
+			}
+		}
+	}
+	
+	/**
+	 * @param node
+	 */
+	private static void processConstant(final Node node, final List<ValueDef> hotkeys, final List<ValueDef> settings) {
+		final Node nameAttrNode = getNamedItemIgnoreCase(node.getAttributes(), NAME);
+		if (nameAttrNode != null) {
+			final String name = nameAttrNode.getNodeValue();
+			final Node valAttrNode = getNamedItemIgnoreCase(node.getAttributes(), VAL);
+			if (valAttrNode != null) {
+				final String val = valAttrNode.getNodeValue();
+				if (logger.isDebugEnabled()) {
+					logger.debug("Constant: name = {}, val = {}", name, val);
+				}
+				setValueDefCurValue(name, val, hotkeys, settings);
+			} else {
+				if (logger.isWarnEnabled()) {
+					logger.warn("Constant has no 'val' attribute defined.");
+				}
+			}
+		} else {
+			if (logger.isWarnEnabled()) {
+				logger.warn("Constant has no 'name' attribute defined.");
+			}
+		}
+	}
+	
+	/**
+	 * @param name
+	 * @param val
+	 */
+	private static void setValueDefCurValue(final String name, final String val, final List<ValueDef> hotkeys,
+			final List<ValueDef> settings) {
+		for (final ValueDef item : hotkeys) {
+			if (item.getId().equalsIgnoreCase(name)) {
+				item.setValue(val);
+				return;
+			}
+		}
+		for (final ValueDef item : settings) {
+			if (item.getId().equalsIgnoreCase(name)) {
+				item.setValue(val);
+				return;
+			}
+		}
+		if (logger.isDebugEnabled()) {
+			logger.debug("no ValueDef found with name: {}", name);
+		}
 	}
 	
 	/**
@@ -181,7 +261,7 @@ public class LayoutExtensionReader {
 			// read constants
 			final Element elem = doc.getDocumentElement();
 			final NodeList childNodes = elem.getChildNodes();
-			readConstants(childNodes);
+			readConstants(childNodes, hotkeys, settings);
 		}
 	}
 	
@@ -191,7 +271,7 @@ public class LayoutExtensionReader {
 	 * @param childNodes
 	 */
 	private void readComments(final NodeList childNodes) {
-		for (int i = 0; i < childNodes.getLength(); i++) {
+		for (int i = 0, len = childNodes.getLength(); i < len; i++) {
 			final Node curNode = childNodes.item(i);
 			
 			if (curNode.getNodeType() == Node.COMMENT_NODE) {
@@ -305,82 +385,12 @@ public class LayoutExtensionReader {
 	}
 	
 	/**
-	 * Processes the Constants in the given Nodes.
-	 *
-	 * @param childNodes
-	 */
-	private void readConstants(final NodeList childNodes) {
-		for (int i = 0; i < childNodes.getLength(); i++) {
-			final Node curNode = childNodes.item(i);
-			
-			if (curNode.getNodeType() == Node.ELEMENT_NODE) {
-				
-				final String nodeName = curNode.getNodeName().toLowerCase(Locale.ROOT);
-				if (nodeName.equals(CONSTANT)) {
-					processConstant(curNode);
-				}
-				
-			} else {
-				readConstants(curNode.getChildNodes());
-			}
-		}
-	}
-	
-	/**
-	 * @param node
-	 */
-	public void processConstant(final Node node) {
-		final Node nameAttrNode = getNamedItemIgnoreCase(node.getAttributes(), NAME);
-		if (nameAttrNode != null) {
-			final String name = nameAttrNode.getNodeValue();
-			final Node valAttrNode = getNamedItemIgnoreCase(node.getAttributes(), VAL);
-			if (valAttrNode != null) {
-				final String val = valAttrNode.getNodeValue();
-				if (logger.isDebugEnabled()) {
-					logger.debug("Constant: name = {}, val = {}", name, val);
-				}
-				setValueDefCurValue(name, val);
-			} else {
-				if (logger.isWarnEnabled()) {
-					logger.warn("Constant has no 'val' attribute defined.");
-				}
-			}
-		} else {
-			if (logger.isWarnEnabled()) {
-				logger.warn("Constant has no 'name' attribute defined.");
-			}
-		}
-	}
-	
-	/**
-	 * @param name
-	 * @param val
-	 */
-	private void setValueDefCurValue(final String name, final String val) {
-		for (final ValueDef item : hotkeys) {
-			if (item.getId().equalsIgnoreCase(name)) {
-				item.setValue(val);
-				return;
-			}
-		}
-		for (final ValueDef item : settings) {
-			if (item.getId().equalsIgnoreCase(name)) {
-				item.setValue(val);
-				return;
-			}
-		}
-		if (logger.isDebugEnabled()) {
-			logger.debug("no ValueDef found with name: {}", name);
-		}
-	}
-	
-	/**
-	 * @param layoutFiles
+	 * @param projectInCache
 	 * @throws ParserConfigurationException
 	 * @throws IOException
 	 * @throws SAXException
 	 */
-	public void updateLayoutFiles(final Iterable<File> layoutFiles) throws ParserConfigurationException, SAXException {
+	public void updateLayoutFiles(final Path projectInCache) throws ParserConfigurationException {
 		if (logger.isInfoEnabled()) {
 			logger.info("Scanning for XML file...");
 		}
@@ -398,100 +408,19 @@ public class LayoutExtensionReader {
 		// provide error handler that does not print incompatible files into console
 		dBuilder.setErrorHandler(new SilentXmlSaxErrorHandler());
 		
-		Document doc;
-		final Transformer transformer;
 		try {
 			final TransformerFactory factory = TransformerFactory.newInstance();
 			factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-			transformer = factory.newTransformer();
+			final Transformer transformer = factory.newTransformer();
 			
-			for (final File curFile : layoutFiles) {
-				try {
-					// parse XML file
-					doc = dBuilder.parse(curFile);
-				} catch (final SAXParseException | IOException e) {
-					if (logger.isTraceEnabled()) {
-						logger.trace(ERROR_PARSING_FILE, e);
-					}
-					continue;
-				}
-				
-				if (logger.isDebugEnabled()) {
-					logger.debug("processing file: {}", curFile.getPath());
-				}
-				
-				// process files
-				final Element elem = doc.getDocumentElement();
-				final NodeList childNodes = elem.getChildNodes();
-				modifyConstants(childNodes);
-				
-				// write DOM back to XML
-				try {
-					transformer.transform(new DOMSource(doc), new StreamResult(curFile));
-				} catch (final TransformerException e) {
-					logger.error("Transforming to generate XML file failed.", e);
-				}
-			}
-		} catch (final TransformerConfigurationException e) {
+			final String[] extensions = new String[] { "stormlayout", "SC2Layout" };
+			
+			final FileVisitor<Path> visitor =
+					new LayoutFileUpdater(dBuilder, transformer, extensions, hotkeys, settings);
+			
+			Files.walkFileTree(projectInCache, visitor);
+		} catch (final TransformerConfigurationException | IOException e) {
 			logger.error("Transforming to generate XML file failed.", e);
-		}
-	}
-	
-	private void modifyConstants(final NodeList childNodes) {
-		for (int i = 0; i < childNodes.getLength(); i++) {
-			final Node curNode = childNodes.item(i);
-			
-			if (curNode.getNodeType() == Node.ELEMENT_NODE) {
-				
-				final String nodeName = curNode.getNodeName().toLowerCase(Locale.ROOT);
-				if (nodeName.equals(CONSTANT)) {
-					modifyConstant(curNode);
-				}
-				
-			} else {
-				readConstants(curNode.getChildNodes());
-			}
-		}
-	}
-	
-	/**
-	 * Modify a Constant node from XML with data's current value.
-	 *
-	 * @param node
-	 */
-	private void modifyConstant(final Node node) {
-		final Node nameAttrNode = getNamedItemIgnoreCase(node.getAttributes(), NAME);
-		if (nameAttrNode != null) {
-			final String name = nameAttrNode.getNodeValue();
-			final Node valAttrNode = getNamedItemIgnoreCase(node.getAttributes(), VAL);
-			if (valAttrNode != null) {
-				final String val = valAttrNode.getNodeValue();
-				
-				for (final ValueDef item : hotkeys) {
-					if (item.getId().equalsIgnoreCase(name)) {
-						if (logger.isDebugEnabled()) {
-							logger.debug("updating hotkey constant: {}, with val: {}", name, val);
-						}
-						valAttrNode.setNodeValue(item.getValue());
-					}
-				}
-				for (final ValueDef item : settings) {
-					if (item.getId().equalsIgnoreCase(name)) {
-						if (logger.isDebugEnabled()) {
-							logger.debug("updating setting constant: {}, with val: {}", name, val);
-						}
-						valAttrNode.setNodeValue(item.getValue());
-					}
-				}
-			} else {
-				if (logger.isWarnEnabled()) {
-					logger.warn("Constant has no 'val' attribute defined.");
-				}
-			}
-		} else {
-			if (logger.isWarnEnabled()) {
-				logger.warn("Constant has no 'name' attribute defined.");
-			}
 		}
 	}
 	
@@ -502,4 +431,133 @@ public class LayoutExtensionReader {
 		hotkeys.clear();
 		settings.clear();
 	}
+	
+	private static final class LayoutFileUpdater extends SimpleFileVisitor<Path> {
+		private final DocumentBuilder dBuilder;
+		private final Transformer transformer;
+		private final String[] extensions;
+		private final List<ValueDef> hotkeys;
+		private final List<ValueDef> settings;
+		
+		public LayoutFileUpdater(final DocumentBuilder dBuilder, final Transformer transformer,
+				final String[] extensions, final List<ValueDef> hotkeys, final List<ValueDef> settings) {
+			super();
+			this.dBuilder = dBuilder;
+			this.transformer = transformer;
+			this.extensions = extensions;
+			this.hotkeys = hotkeys;
+			this.settings = settings;
+		}
+		
+		@Override
+		public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
+			final String fileName = file.getFileName().toString();
+			final int i = fileName.lastIndexOf('.');
+			if (i >= 0) {
+				final String curExt = fileName.substring(i + 1);
+				boolean found = false;
+				for (final String ext : extensions) {
+					if (ext.equalsIgnoreCase(curExt)) {
+						found = true;
+						break;
+					}
+				}
+				if (found) {
+					final Document doc;
+					try (final InputStream is = new BufferedInputStream(Files.newInputStream(file))) {
+						doc = dBuilder.parse(is);
+					} catch (final SAXException e) {
+						if (logger.isTraceEnabled()) {
+							logger.trace(ERROR_PARSING_FILE, e);
+						}
+						throw new IOException(ERROR_PARSING_FILE, e);
+					}
+					
+					if (logger.isDebugEnabled()) {
+						logger.debug("processing file: {}", file);
+					}
+					
+					// process files
+					final Element elem = doc.getDocumentElement();
+					final NodeList childNodes = elem.getChildNodes();
+					modifyConstants(childNodes, hotkeys, settings);
+					
+					// write DOM back to XML
+					try {
+						transformer.transform(new DOMSource(doc), new StreamResult(file.toFile()));
+					} catch (final TransformerException e) {
+						logger.error("Transforming to generate XML file failed.", e);
+					}
+				}
+			}
+			return FileVisitResult.CONTINUE;
+		}
+		
+		private static void modifyConstants(final NodeList childNodes, final List<ValueDef> hotkeys,
+				final List<ValueDef> settings) {
+			for (int i = 0, len = childNodes.getLength(); i < len; i++) {
+				final Node curNode = childNodes.item(i);
+				
+				if (curNode.getNodeType() == Node.ELEMENT_NODE) {
+					
+					final String nodeName = curNode.getNodeName().toLowerCase(Locale.ROOT);
+					if (nodeName.equals(CONSTANT)) {
+						modifyConstant(curNode, hotkeys, settings);
+					}
+					
+				} else {
+					readConstants(curNode.getChildNodes(), hotkeys, settings);
+				}
+			}
+		}
+		
+		/**
+		 * Modify a Constant node from XML with data's current value.
+		 *
+		 * @param node
+		 */
+		private static void modifyConstant(final Node node, final List<ValueDef> hotkeys,
+				final List<ValueDef> settings) {
+			final Node nameAttrNode = getNamedItemIgnoreCase(node.getAttributes(), NAME);
+			if (nameAttrNode != null) {
+				final String name = nameAttrNode.getNodeValue();
+				final Node valAttrNode = getNamedItemIgnoreCase(node.getAttributes(), VAL);
+				if (valAttrNode != null) {
+					final String val = valAttrNode.getNodeValue();
+					
+					for (final ValueDef item : hotkeys) {
+						if (item.getId().equalsIgnoreCase(name)) {
+							if (logger.isDebugEnabled()) {
+								logger.debug("updating hotkey constant: {}, with val: {}", name, val);
+							}
+							valAttrNode.setNodeValue(item.getValue());
+						}
+					}
+					for (final ValueDef item : settings) {
+						if (item.getId().equalsIgnoreCase(name)) {
+							if (logger.isDebugEnabled()) {
+								logger.debug("updating setting constant: {}, with val: {}", name, val);
+							}
+							valAttrNode.setNodeValue(item.getValue());
+						}
+					}
+				} else {
+					if (logger.isWarnEnabled()) {
+						logger.warn("Constant has no 'val' attribute defined.");
+					}
+				}
+			} else {
+				if (logger.isWarnEnabled()) {
+					logger.warn("Constant has no 'name' attribute defined.");
+				}
+			}
+		}
+		
+		@Override
+		public FileVisitResult visitFileFailed(final Path file, final IOException exc) throws IOException {
+			logger.error("Failed to access file: {}", file);
+			throw exc;
+		}
+	}
+	
 }

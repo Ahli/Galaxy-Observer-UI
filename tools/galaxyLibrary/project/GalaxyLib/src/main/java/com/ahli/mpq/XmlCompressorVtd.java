@@ -55,6 +55,7 @@ public final class XmlCompressorVtd {
 		logger.info("Compressing XML files...");
 		logger.trace("cachePath: {}", () -> cachePath);
 		
+		// TODO rewrite with nio walker
 		final Collection<File> filesOfCache = FileUtils.listFiles(new File(cachePath), null, true);
 		
 		final VTDGen vtd = new VTDGen();

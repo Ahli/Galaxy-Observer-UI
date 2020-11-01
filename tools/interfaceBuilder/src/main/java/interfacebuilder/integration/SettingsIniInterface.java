@@ -13,11 +13,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 
 /**
  * Interface Class for the Settings .ini file.
@@ -41,7 +40,7 @@ public class SettingsIniInterface {
 	private static final String COMPRESS_MPQ = "compressMPQ";
 	private static final String BUILD_UNPROTECTED_TOO = "buildUnprotectedToo";
 	private static final String UTF_8 = "UTF-8";
-	private String settingsFilePath;
+	private Path settingsFilePath;
 	private String sc2Path = "";
 	private String heroesPath = "";
 	private String heroesPtrPath = "";
@@ -66,7 +65,7 @@ public class SettingsIniInterface {
 	 *
 	 * @param settingsFilePath
 	 */
-	public SettingsIniInterface(final String settingsFilePath) {
+	public SettingsIniInterface(final Path settingsFilePath) {
 		this.settingsFilePath = settingsFilePath;
 		try {
 			readSettingsFromFilePrivate();
@@ -84,11 +83,11 @@ public class SettingsIniInterface {
 	 * 		when there is an error reading the file
 	 */
 	private void readSettingsFromFilePrivate() throws IOException {
-		final File f = new File(settingsFilePath);
-		if (f.exists()) {
+		if (Files.exists(settingsFilePath)) {
 			try {
 				logger.info("Loading settings from: {}", settingsFilePath);
-				final INIBuilderParameters params = new Parameters().ini().setFile(f).setEncoding(UTF_8);
+				final INIBuilderParameters params =
+						new Parameters().ini().setFile(settingsFilePath.toFile()).setEncoding(UTF_8);
 				final FileBasedConfigurationBuilder<INIConfiguration> b =
 						new FileBasedConfigurationBuilder<>(INIConfiguration.class).configure(params);
 				readValuesFromIni(b.getConfiguration());
@@ -137,7 +136,7 @@ public class SettingsIniInterface {
 		final Parameters params = new Parameters();
 		final FileBasedConfigurationBuilder<INIConfiguration> b =
 				new FileBasedConfigurationBuilder<>(INIConfiguration.class)
-						.configure(params.ini().setFile(new File(settingsFilePath)).setEncoding(UTF_8));
+						.configure(params.ini().setFile(settingsFilePath.toFile()).setEncoding(UTF_8));
 		INIConfiguration ini;
 		try {
 			// load current file
@@ -148,7 +147,7 @@ public class SettingsIniInterface {
 			ini = new INIConfiguration();
 		}
 		writeValuesToIni(ini);
-		try (final BufferedWriter bw = Files.newBufferedWriter(Paths.get(settingsFilePath))) {
+		try (final BufferedWriter bw = Files.newBufferedWriter(settingsFilePath)) {
 			ini.write(bw);
 		} catch (final ConfigurationException | NoSuchFileException e) {
 			throw new IOException("Could not write settings.ini.", e);
@@ -279,9 +278,9 @@ public class SettingsIniInterface {
 	/**
 	 * Returns path to settings file.
 	 *
-	 * @return path as String
+	 * @return path of the settings file
 	 */
-	public String getSettingsFilePath() {
+	public Path getSettingsFilePath() {
 		return settingsFilePath;
 	}
 	
@@ -290,7 +289,7 @@ public class SettingsIniInterface {
 	 *
 	 * @param path
 	 */
-	public void setSettingsFilePath(final String path) {
+	public void setSettingsFilePath(final Path path) {
 		settingsFilePath = path;
 	}
 	

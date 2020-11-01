@@ -24,27 +24,27 @@ public class FileService {
 	 * @throws IOException
 	 * 		when something goes wrong
 	 */
-	public void copyFileOrDirectory(final File source, final File target) throws IOException {
-		if (source.isDirectory()) {
+	public void copyFileOrDirectory(final Path source, final Path target) throws IOException {
+		if (Files.isDirectory(source)) {
 			// create folder if not existing
-			if (!target.exists() && !target.mkdirs()) {
-				final String msg = "Could not create directory " + target.getAbsolutePath();
-				throw new IOException(msg);
+			if (!Files.exists(target)) {
+				Files.createDirectories(target);
 			}
 			
 			// copy all contained files recursively
-			final String[] fileList = source.list();
-			if (fileList == null) {
-				final String msg = "Source directory's files returned null";
-				throw new IOException(msg);
+			try (final Stream<Path> stream = Files.walk(source)) {
+				stream.forEach(file -> {
+					try {
+						Files.copy(file, target.resolve(source.relativize(file)), StandardCopyOption.REPLACE_EXISTING);
+					} catch (final IOException e) {
+						throw new RuntimeException(e.getMessage(), e);
+					}
+				});
 			}
-			for (final String file : fileList) {
-				// Recursive traversal of directories
-				copyFileOrDirectory(new File(source, file), new File(target, file));
-			}
+			
 		} else {
 			// copy a file
-			Files.copy(source.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
+			Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
 		}
 	}
 	
@@ -77,13 +77,13 @@ public class FileService {
 	/**
 	 * Returns the size of the specified directory in bytes.
 	 *
-	 * @param f
+	 * @param path
 	 * @return size of all contained files in bytes
 	 * @throws IOException
 	 */
-	public long getDirectorySize(final File f) throws IOException {
+	public long getDirectorySize(final Path path) throws IOException {
 		final long size;
-		try (final Stream<Path> walk = Files.walk(f.toPath())) {
+		try (final Stream<Path> walk = Files.walk(path)) {
 			size = walk.filter(p -> p.toFile().isFile()).mapToLong(p -> p.toFile().length()).sum();
 		}
 		return size;
@@ -95,10 +95,11 @@ public class FileService {
 	 * @param directory
 	 * @throws IOException
 	 */
-	public void cleanDirectory(final File directory) throws IOException {
+	public void cleanDirectory(final Path directory) throws IOException {
 		for (int i = 500; i > 0; --i) {
 			try {
-				FileUtils.cleanDirectory(directory);
+				// TODO check if it can be rewritten using nio streams
+				FileUtils.cleanDirectory(directory.toFile());
 				return;
 			} catch (final IOException e) {
 				if (i <= 1) {
@@ -123,23 +124,23 @@ public class FileService {
 	 * @throws IOException
 	 * 		if it is not a directory or another problem occurred
 	 */
-	public boolean isEmptyDirectory(final File directory) throws IOException {
+	public boolean isEmptyDirectory(final Path directory) throws IOException {
 		return getFileCountOfDirectory(directory) <= 0;
 	}
 	
 	/**
 	 * Returns the count of files within the specified directory.
 	 *
-	 * @param f
+	 * @param path
 	 * @return count of files in directory and subdirectories
 	 * @throws IOException
 	 */
-	public long getFileCountOfDirectory(final File f) throws IOException {
-		if (!f.exists()) {
+	public long getFileCountOfDirectory(final Path path) throws IOException {
+		if (!Files.exists(path)) {
 			return 0;
 		}
 		final long count;
-		try (final Stream<Path> walk = Files.walk(f.toPath())) {
+		try (final Stream<Path> walk = Files.walk(path)) {
 			count = walk.filter(p -> p.toFile().isFile()).count();
 		}
 		return count;

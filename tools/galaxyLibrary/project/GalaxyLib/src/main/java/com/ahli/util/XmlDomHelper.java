@@ -46,7 +46,7 @@ public final class XmlDomHelper {
 	public static Node getNamedItemIgnoringCase(final NamedNodeMap nodes, final String name) {
 		final Node node = nodes.getNamedItem(name);
 		if (node == null) {
-			for (int i = 0, len = nodes.getLength(); i < len; i++) {
+			for (int i = 0, len = nodes.getLength(); i < len; ++i) {
 				final Node curNode = nodes.item(i);
 				if (name.equalsIgnoreCase(curNode.getNodeName())) {
 					return curNode;

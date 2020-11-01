@@ -25,8 +25,9 @@ import interfacebuilder.threads.SpringForkJoinWorkerThreadFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileSystemView;
 import java.io.File;
+import java.nio.file.Path;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 
@@ -55,13 +56,13 @@ public class AppConfiguration {
 	}
 	
 	@Bean
-	protected String documentsPath() {
-		return new JFileChooser().getFileSystemView().getDefaultDirectory().toString();
+	protected Path documentsPath() {
+		return FileSystemView.getFileSystemView().getDefaultDirectory().toPath();
 	}
 	
 	@Bean
-	protected String cachePath() {
-		return System.getProperty("user.home") + File.separator + ".GalaxyObsUI" + File.separator + "cache";
+	protected Path cachePath() {
+		return Path.of(System.getProperty("user.home") + File.separator + ".GalaxyObsUI" + File.separator + "cache");
 	}
 	
 	@Bean
@@ -70,29 +71,30 @@ public class AppConfiguration {
 	}
 	
 	@Bean
-	protected String mpqCachePath() {
-		return tempDirectory() + "ObserverInterfaceBuilder" + File.separator + "_ExtractedMpq";
+	protected Path mpqCachePath() {
+		return Path.of(tempDirectory().toString(), "ObserverInterfaceBuilder", "_ExtractedMpq");
 	}
 	
 	@Bean
-	protected String mpqEditorPath() {
-		return basePath().getParent() + File.separator + "tools" + File.separator + "plugins" + File.separator + "mpq" +
-				File.separator + "MPQEditor.exe";
+	protected Path mpqEditorPath() {
+		return Path.of(basePath().getParent() + File.separator + "tools" + File.separator + "plugins" + File.separator +
+				"mpq" +
+				File.separator + "MPQEditor.exe");
 	}
 	
 	@Bean
-	protected String tempDirectory() {
-		return System.getProperty("java.io.tmpdir");
+	protected Path tempDirectory() {
+		return Path.of(System.getProperty("java.io.tmpdir"));
 	}
 	
 	@Bean
-	protected File basePath() {
+	protected Path basePath() {
 		return JarHelper.getJarDir(InterfaceBuilderApp.class);
 	}
 	
 	@Bean
-	protected String miningTempPath() {
-		return tempDirectory() + "ObserverInterfaceBuilder" + File.separator + "_Mining";
+	protected Path miningTempPath() {
+		return tempDirectory().resolve("ObserverInterfaceBuilder" + File.separator + "_Mining");
 	}
 	
 	@Bean
@@ -155,13 +157,13 @@ public class AppConfiguration {
 	}
 	
 	@Bean
-	protected String iniSettingsPath() {
-		return basePath().getParent() + File.separator + "settings.ini";
+	protected Path iniSettingsPath() {
+		return basePath().getParent().resolve("settings.ini");
 	}
 	
 	@Bean
-	protected String baseUiPath() {
-		return basePath().getParent() + File.separator + "baseUI";
+	protected Path baseUiPath() {
+		return basePath().getParent().resolve("baseUI");
 	}
 	
 	@Bean

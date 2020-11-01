@@ -21,7 +21,6 @@ import org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -47,8 +46,7 @@ final class KryoServiceTest {
 	@Test
 	public void testMetaFile() throws IOException {
 		final Kryo kryo = kryoService.getKryoForBaseUiMetaFile();
-		final Path path = Path.of(System.getProperty("java.io.tmpdir") + File.separator + "interfaceBuilderTest" +
-				File.separator + "testMetaFile");
+		final Path path = Path.of(System.getProperty("java.io.tmpdir"), "interfaceBuilderTest", "testMetaFile");
 		Files.createDirectories(path.getParent());
 		
 		final KryoGameInfo kryoGameInfoA =
@@ -70,8 +68,7 @@ final class KryoServiceTest {
 	@Test
 	public void testCacheMetaFile() throws IOException, UIException {
 		final Kryo kryo = kryoService.getKryoForUICatalog();
-		final Path path = Path.of(System.getProperty("java.io.tmpdir") + File.separator + "interfaceBuilderTest" +
-				File.separator + "testCacheMetaFile");
+		final Path path = Path.of(System.getProperty("java.io.tmpdir"), "interfaceBuilderTest", "testCacheMetaFile");
 		Files.createDirectories(path.getParent());
 		
 		final KryoGameInfo kryoGameInfoA =

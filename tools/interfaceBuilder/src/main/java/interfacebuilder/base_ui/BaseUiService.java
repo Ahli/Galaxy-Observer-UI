@@ -48,16 +48,15 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveAction;
 
 public class BaseUiService {
-	private static final String UNKNOWN_GAME_EXCEPTION = "Unknown Game";
 	private static final Logger logger = LogManager.getLogger(BaseUiService.class);
 	private static final String META_FILE_NAME = ".meta";
 	
@@ -81,13 +80,13 @@ public class BaseUiService {
 	 */
 	public boolean isOutdated(final Game game, final boolean usePtr) throws IOException {
 		final GameDef gameDef = gameService.getNewGameDef(game);
-		final File gameBaseUI = new File(configService.getBaseUiPath(gameDef));
+		final Path gameBaseUI = configService.getBaseUiPath(gameDef);
 		
-		if (!gameBaseUI.exists() || fileService.isEmptyDirectory(gameBaseUI)) {
+		if (!Files.exists(gameBaseUI) || fileService.isEmptyDirectory(gameBaseUI)) {
 			return true;
 		}
 		
-		final File baseUiMetaFileDir = new File(configService.getBaseUiPath(gameDef));
+		final Path baseUiMetaFileDir = configService.getBaseUiPath(gameDef);
 		final KryoGameInfo baseUiInfo;
 		try {
 			baseUiInfo = readMetaFile(baseUiMetaFileDir);
@@ -115,8 +114,8 @@ public class BaseUiService {
 		return !isUpToDate;
 	}
 	
-	private KryoGameInfo readMetaFile(final File directory) throws IOException {
-		final Path path = Paths.get(directory.getAbsolutePath(), META_FILE_NAME);
+	private KryoGameInfo readMetaFile(final Path directory) throws IOException {
+		final Path path = directory.resolve(META_FILE_NAME);
 		if (Files.exists(path)) {
 			final Kryo kryo = kryoService.getKryoForBaseUiMetaFile();
 			final List<Class<?>> payloadClasses = new ArrayList<>();
@@ -128,7 +127,7 @@ public class BaseUiService {
 	
 	public int[] getVersion(final GameDef gameDef, final boolean isPtr) {
 		final int[] versions = new int[4];
-		final Path path = Paths.get(gameService.getGameDirPath(gameDef, isPtr), gameDef.getSupportDirectoryX64(),
+		final Path path = Path.of(gameService.getGameDirPath(gameDef, isPtr), gameDef.getSupportDirectoryX64(),
 				gameDef.getSwitcherExeNameX64());
 		try {
 			final PE pe = PEParser.parse(path.toFile());
@@ -174,18 +173,17 @@ public class BaseUiService {
 		logger.info("Extracting baseUI for {}", game);
 		
 		final GameDef gameDef = gameService.getNewGameDef(game);
-		final File destination = new File(configService.getBaseUiPath(gameDef));
+		final Path destination = configService.getBaseUiPath(gameDef);
 		
 		try {
-			if (!destination.exists() && !destination.mkdirs()) {
-				logger.error("Directory {} could not be created.", destination);
-				return null;
+			if (!Files.exists(destination)) {
+				Files.createDirectories(destination);
 			}
 			fileService.cleanDirectory(destination);
 			discCacheService.remove(gameDef.getName(), usePtr);
 		} catch (final IOException e) {
 			logger.error(String.format("Directory %s could not be cleaned.", destination), e);
-			return null;
+			return Collections.emptyList();
 		}
 		
 		final List<ForkJoinTask<Void>> tasks = new ArrayList<>(4);
@@ -195,7 +193,7 @@ public class BaseUiService {
 		int i = 0;
 		for (final String mask : queryMasks) {
 			final Appender outputAppender = outputs[i];
-			i++;
+			++i;
 			final ForkJoinTask<Void> task = new RecursiveAction() {
 				@Override
 				protected void compute() {
@@ -255,8 +253,7 @@ public class BaseUiService {
 	 * @throws InterruptedException
 	 */
 	private static boolean extract(final File extractorExe, final String gamePath, final String mask,
-			final File destination,
-			final Appender out) throws IOException, InterruptedException {
+			final Path destination, final Appender out) throws IOException, InterruptedException {
 		final ProcessBuilder pb =
 				new ProcessBuilder(extractorExe.getAbsolutePath(), gamePath + File.separator, mask,
 						destination + File.separator);
@@ -284,9 +281,9 @@ public class BaseUiService {
 		return retry;
 	}
 	
-	private void writeToMetaFile(final File directory, final String gameName, final int[] version, final boolean isPtr)
+	private void writeToMetaFile(final Path directory, final String gameName, final int[] version, final boolean isPtr)
 			throws IOException {
-		final Path path = Paths.get(directory.getAbsolutePath(), META_FILE_NAME);
+		final Path path = directory.resolve(META_FILE_NAME);
 		final KryoGameInfo metaInfo = new KryoGameInfo(version, gameName, isPtr);
 		final List<Object> payload = new ArrayList<>();
 		payload.add(metaInfo);
@@ -321,9 +318,9 @@ public class BaseUiService {
 	 */
 	public void parseBaseUI(final GameData gameData) {
 		// lock per game
-		synchronized (gameData.getGameDef().getName()) {
+		final String gameName = gameData.getGameDef().getName();
+		synchronized (gameName) {
 			UICatalog uiCatalog = gameData.getUiCatalog();
-			final String gameName = gameData.getGameDef().getName();
 			if (uiCatalog != null) {
 				if (logger.isTraceEnabled()) {
 					logger.trace("Aborting parsing baseUI for '{}' as was already parsed.", gameName);
@@ -334,10 +331,10 @@ public class BaseUiService {
 				boolean needToParseAgain = true;
 				
 				/*!(game.getNewGameDef() instanceof SC2GameDef) &&*/
-				final String baseUiPath = configService.getBaseUiPath(gameData.getGameDef());
+				final Path baseUiPath = configService.getBaseUiPath(gameData.getGameDef());
 				boolean isPtr = false;
 				try {
-					isPtr = isPtr(new File(baseUiPath));
+					isPtr = isPtr(baseUiPath);
 				} catch (final IOException e) {
 					// do nothing
 					if (logger.isTraceEnabled()) {
@@ -425,7 +422,7 @@ public class BaseUiService {
 	 * @return true if PTR; false if not or no file is existing
 	 * @throws IOException
 	 */
-	public boolean isPtr(final File baseUiDirectory) throws IOException {
+	public boolean isPtr(final Path baseUiDirectory) throws IOException {
 		final KryoGameInfo kryoGameInfo = readMetaFile(baseUiDirectory);
 		return kryoGameInfo != null && kryoGameInfo.isPtr();
 	}
@@ -442,7 +439,7 @@ public class BaseUiService {
 	}
 	
 	public boolean cacheIsUpToDate(final GameDef gameDef, final boolean usePtr) throws IOException {
-		final File baseUiMetaFileDir = new File(configService.getBaseUiPath(gameDef));
+		final Path baseUiMetaFileDir = configService.getBaseUiPath(gameDef);
 		final Path cacheFilePath = discCacheService.getCacheFilePath(gameDef.getName(), usePtr);
 		return cacheIsUpToDate(cacheFilePath, baseUiMetaFileDir);
 	}
@@ -452,7 +449,7 @@ public class BaseUiService {
 	 * @param metaFileDir
 	 * @return
 	 */
-	public boolean cacheIsUpToDate(final Path cacheFile, final File metaFileDir) throws IOException {
+	public boolean cacheIsUpToDate(final Path cacheFile, final Path metaFileDir) throws IOException {
 		// no cache -> not up to date
 		if (!Files.exists(cacheFile)) {
 			return false;
@@ -478,7 +475,7 @@ public class BaseUiService {
 	}
 	
 	public boolean isHeroesPtrActive() {
-		final File baseUiMetaFileDir = new File(configService.getBaseUiPath(gameService.getNewGameDef(Game.HEROES)));
+		final Path baseUiMetaFileDir = configService.getBaseUiPath(gameService.getNewGameDef(Game.HEROES));
 		try {
 			final KryoGameInfo baseUiInfo = readMetaFile(baseUiMetaFileDir);
 			if (baseUiInfo != null) {

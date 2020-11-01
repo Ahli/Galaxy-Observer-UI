@@ -72,12 +72,12 @@ public final class LayoutReaderDom {
 		
 		// check TEMPLATES
 		final NodeList nodes = doc.getElementsByTagName(ANY_TAG);
-		for (int i = 0, len = nodes.getLength(); i < len; i++) {
+		for (int i = 0, len = nodes.getLength(); i < len; ++i) {
 			final Node frame = nodes.item(i);
 			// check if node is a frame
 			if (frame.getNodeName().equalsIgnoreCase(FRAME)) {
 				final NamedNodeMap attributes = frame.getAttributes();
-				for (int j = 0; j < attributes.getLength(); j++) {
+				for (int j = 0, alen = attributes.getLength(); j < alen; ++j) {
 					final Node attr = attributes.item(j);
 					
 					// attribute is Template
@@ -124,7 +124,7 @@ public final class LayoutReaderDom {
 		// constantUsage
 		// nodes = doc.getElementsByTagName("*");
 		final ArrayList<String> usedConstants = new ArrayList<>();
-		for (int i = 0, len = nodes.getLength(); i < len; i++) {
+		for (int i = 0, len = nodes.getLength(); i < len; ++i) {
 			final Node node = nodes.item(i);
 			
 			// String nodeName = node.getNodeName();
@@ -139,12 +139,11 @@ public final class LayoutReaderDom {
 			
 			// if (true) {
 			final NamedNodeMap attributes = node.getAttributes();
-			for (int j = 0; j < attributes.getLength(); j++) {
+			for (int j = 0, alen = attributes.getLength(); j < alen; ++j) {
 				final Node attribute = attributes.item(j);
-				final String attrName = attribute.getNodeName();
-				final String attrValue = attribute.getNodeValue();
 				
 				// attribute name
+				final String attrName = attribute.getNodeName();
 				if (attrName.startsWith(CONSTANT_MARKER) && doesNotAppearInList(attrName, usedConstants) &&
 						doesConstantNotAppearInList(attrName, ownConstants)) {
 					if (logger.isTraceEnabled()) {
@@ -154,6 +153,7 @@ public final class LayoutReaderDom {
 					list.add(attrName);
 				}
 				// attribute value
+				final String attrValue = attribute.getNodeValue();
 				if (attrValue.startsWith(CONSTANT_MARKER) && doesNotAppearInList(attrValue, usedConstants) &&
 						doesConstantNotAppearInList(attrValue, ownConstants)) {
 					if (logger.isTraceEnabled()) {
@@ -214,10 +214,10 @@ public final class LayoutReaderDom {
 		// create list of own constant definitions
 		final ArrayList<String> ownConstants = new ArrayList<>();
 		final NodeList constants = doc.getElementsByTagName(CONSTANT);
-		for (int i = 0, len = constants.getLength(); i < len; i++) {
+		for (int i = 0, len = constants.getLength(); i < len; ++i) {
 			final Node constant = constants.item(i);
 			final NamedNodeMap attributes = constant.getAttributes();
-			for (int j = 0; j < attributes.getLength(); j++) {
+			for (int j = 0, alen = attributes.getLength(); j < alen; ++j) {
 				final Node attr = attributes.item(j);
 				// attribute is Template
 				if (attr.getNodeName().equalsIgnoreCase(NAME)) {

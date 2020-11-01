@@ -85,7 +85,7 @@ public class DescIndexData {
 	 * @return
 	 */
 	public boolean removeLayoutIntPath(final String intPath) {
-		for (int i = 0; i < fileIntPathList.size(); i++) {
+		for (int i = 0, len = fileIntPathList.size(); i < len; ++i) {
 			final Pair<Path, String> p = fileIntPathList.get(i);
 			if (p.getValue().equals(intPath)) {
 				fileIntPathList.remove(i);
@@ -155,7 +155,7 @@ public class DescIndexData {
 	 * @return
 	 */
 	public Path getLayoutFilePath(final String intPath) {
-		for (int i = 0; i < fileIntPathList.size(); i++) {
+		for (int i = 0, len = fileIntPathList.size(); i < len; ++i) {
 			final Pair<Path, String> p = fileIntPathList.get(i);
 			if (p.getValue().equals(intPath)) {
 				return p.getKey();
@@ -214,17 +214,17 @@ public class DescIndexData {
 		}
 		
 		boolean insertOccurred = true;
-		for (int counter = 0; insertOccurred && counter < Math.pow(fileIntPathList.size(), 4); counter++) {
+		for (int counter = 0; insertOccurred && counter < Math.pow(fileIntPathList.size(), 4); ++counter) {
 			if (logger.isTraceEnabled()) {
 				logger.trace("counter={}", counter);
 			}
 			insertOccurred = false;
-			for (int i = 0; i < dependencies.size(); i++) {
+			for (int i = 0, len = dependencies.size(); i < len; ++i) {
 				
 				final List<String> curLayoutDepList = dependencies.get(i);
 				final Pair<Path, String> pair = fileIntPathList.get(i);
 				
-				for (int j = 0; j < curLayoutDepList.size(); j++) {
+				for (int j = 0, len2 = curLayoutDepList.size(); j < len2; ++j) {
 					
 					String curDependencyTo = curLayoutDepList.get(j);
 					
@@ -239,7 +239,7 @@ public class DescIndexData {
 						// check if it appears before the template
 						if (i > 0) {
 							y:
-							for (int i2 = 0; i2 < i; i2++) {
+							for (int i2 = 0; i2 < i; ++i2) {
 								// Pair<File, String> otherPair =
 								// fileIntPathList.get(i2);
 								// String fileName =
@@ -256,7 +256,7 @@ public class DescIndexData {
 						}
 						if (!constantDefinedBefore) {
 							y:
-							for (int i2 = i + 1; i2 < dependencies.size(); i2++) {
+							for (int i2 = i + 1, len3 = dependencies.size(); i2 < len3; ++i2) {
 								final Pair<Path, String> otherPair = fileIntPathList.get(i2);
 								String fileName = otherPair.getKey().getFileName().toString();
 								final int dotIndex = fileName.lastIndexOf('.');
@@ -305,24 +305,24 @@ public class DescIndexData {
 		
 		// change order according to templates
 		insertOccurred = true;
-		for (int counter = 0; insertOccurred && counter < Math.pow(fileIntPathList.size(), 4); counter++) {
+		for (int counter = 0; insertOccurred && counter < Math.pow(fileIntPathList.size(), 4); ++counter) {
 			if (logger.isTraceEnabled()) {
 				logger.trace("counter={}", counter);
 			}
 			insertOccurred = false;
 			x:
-			for (int i = 0; i < dependencies.size(); i++) {
+			for (int i = 0; i < dependencies.size(); ++i) {
 				
 				final List<String> curLayoutDepList = dependencies.get(i);
 				final Pair<Path, String> pair = fileIntPathList.get(i);
 				
-				for (int j = 0; j < curLayoutDepList.size(); j++) {
+				for (int j = 0; j < curLayoutDepList.size(); ++j) {
 					
 					final String curDependencyTo = curLayoutDepList.get(j);
 					
 					if (!curDependencyTo.startsWith(STRING2)) {
 						// check if it appears after the template
-						for (int i2 = i + 1; i2 < dependencies.size(); i2++) {
+						for (int i2 = i + 1; i2 < dependencies.size(); ++i2) {
 							final Pair<Path, String> otherPair = fileIntPathList.get(i2);
 							String fileName = otherPair.getKey().getFileName().toString();
 							final int dotIndex = fileName.lastIndexOf('.');

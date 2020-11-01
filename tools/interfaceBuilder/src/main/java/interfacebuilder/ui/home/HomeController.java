@@ -45,6 +45,7 @@ import org.springframework.context.ApplicationContext;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
@@ -159,9 +160,9 @@ public class HomeController implements Updateable {
 			selectedBuildSize.setText(
 					p.getLastBuildSize() == null ? "-" : (String.format("%,d", p.getLastBuildSize() / 1024) + " kb"));
 			try {
-				final File f = new File(p.getProjectPath());
-				selectedDirFiles.setText(String.format("%,d", fileService.getFileCountOfDirectory(f)) + " files");
-				selectedDirSize.setText(String.format("%,d", fileService.getDirectorySize(f) / 1024) + " kb");
+				final Path path = Path.of(p.getProjectPath());
+				selectedDirFiles.setText(String.format("%,d", fileService.getFileCountOfDirectory(path)) + " files");
+				selectedDirSize.setText(String.format("%,d", fileService.getDirectorySize(path) / 1024) + " kb");
 			} catch (final IOException e) {
 				selectedDirSize.setText("-");
 				selectedDirFiles.setText("-");

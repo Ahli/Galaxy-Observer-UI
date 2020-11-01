@@ -9,10 +9,6 @@ import com.ahli.galaxy.parser.UICatalogParser;
 import com.ahli.galaxy.parser.XmlParserVtd;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
 import com.ahli.util.SilentXmlSaxErrorHandler;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOCase;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
-import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
@@ -21,9 +17,16 @@ import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
+import java.io.InputStream;
+import java.nio.file.FileVisitResult;
+import java.nio.file.FileVisitor;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 
 /**
  * Compiles MPQ stuff.
@@ -86,14 +89,25 @@ public class CompileService {
 			} else {
 				if (!repairLayoutOrder && verifyXml) {
 					// only verify XML and nothing else
-					final String[] suffixes =
-							{ ".xml", ".SC2Layout", ".stormlayout", ".stormcomponents", ".SC2Components",
-									".stormcutscene", ".SC2Cutscene", ".stormstyle", ".SC2Style" };
-					final Collection<File> filesOfCache = FileUtils
-							.listFiles(mod.getMpqCacheDirectory(), new SuffixFileFilter(suffixes, IOCase.INSENSITIVE),
-									TrueFileFilter.INSTANCE);
+					final DocumentBuilderFactory dbFac = DocumentBuilderFactory.newInstance();
+					dbFac.setNamespaceAware(false);
+					dbFac.setValidating(false);
+					dbFac.setAttribute("http://xml.org/sax/features/external-general-entities", false);
+					dbFac.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+					dbFac.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+					dbFac.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+					dbFac.setXIncludeAware(false);
+					dbFac.setExpandEntityReferences(false);
+					dbFac.setAttribute(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+					final DocumentBuilder dBuilder = dbFac.newDocumentBuilder();
+					dBuilder.setErrorHandler(new SilentXmlSaxErrorHandler());
 					
-					verifyXml(filesOfCache);
+					final String[] extensions =
+							{ "stormlayout", "SC2Layout", "stormcomponents", "SC2Components", "stormcutscene",
+									"SC2Cutscene", "stormstyle", "SC2Style", "xml" };
+					
+					final FileVisitor<Path> visitor = new XmlVerifier(dBuilder, extensions);
+					Files.walkFileTree(mod.getMpqCacheDirectory(), visitor);
 				}
 			}
 		} catch (final ParserConfigurationException | SAXException | IOException e) {
@@ -128,25 +142,50 @@ public class CompileService {
 		return uiCatalog != null ? (UICatalog) uiCatalog.deepCopy() : null;
 	}
 	
-	/**
-	 * Verifies the syntax of the xml document.
-	 */
-	private static void verifyXml(final Collection<File> files)
-			throws IOException, SAXException, ParserConfigurationException {
-		final DocumentBuilderFactory dbFac = DocumentBuilderFactory.newInstance();
-		dbFac.setNamespaceAware(false);
-		dbFac.setValidating(false);
-		dbFac.setAttribute("http://xml.org/sax/features/external-general-entities", false);
-		dbFac.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-		dbFac.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-		dbFac.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-		dbFac.setXIncludeAware(false);
-		dbFac.setExpandEntityReferences(false);
-		dbFac.setAttribute(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-		final DocumentBuilder dBuilder = dbFac.newDocumentBuilder();
-		dBuilder.setErrorHandler(new SilentXmlSaxErrorHandler());
-		for (final File file : files) {
-			dBuilder.parse(file);
+	private static final class XmlVerifier extends SimpleFileVisitor<Path> {
+		
+		private final DocumentBuilder dBuilder;
+		private final String[] extensions;
+		
+		public XmlVerifier(final DocumentBuilder dBuilder, final String[] extensions) {
+			super();
+			this.dBuilder = dBuilder;
+			this.extensions = extensions;
+		}
+		
+		@Override
+		public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
+			final String fileName = file.getFileName().toString();
+			final int i = fileName.lastIndexOf('.');
+			if (i >= 0) {
+				final String curExt = fileName.substring(i + 1);
+				boolean found = false;
+				for (final String ext : extensions) {
+					if (ext.equalsIgnoreCase(curExt)) {
+						found = true;
+						break;
+					}
+				}
+				if (found) {
+					try (final InputStream is = new BufferedInputStream(Files.newInputStream(file))) {
+						
+						dBuilder.parse(is);
+						
+					} catch (final SAXException e) {
+						if (logger.isTraceEnabled()) {
+							logger.trace("Error while verifying XML.", e);
+						}
+						throw new IOException("XML verification failed.", e);
+					}
+				}
+			}
+			return FileVisitResult.CONTINUE;
+		}
+		
+		@Override
+		public FileVisitResult visitFileFailed(final Path file, final IOException exc) throws IOException {
+			logger.error("Failed to access file: {}", file);
+			throw exc;
 		}
 	}
 }

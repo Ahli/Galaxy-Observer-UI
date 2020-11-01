@@ -11,7 +11,6 @@ import java.io.File;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 /**
  * Helper class for the executable jar file. It is capable of determining the position.
@@ -34,7 +33,7 @@ public final class JarHelper {
 	 * @param aclass
 	 * @return File at base path
 	 */
-	public static File getJarDir(final Class<?> aclass) {
+	public static Path getJarDir(final Class<?> aclass) {
 		if (logger.isTraceEnabled()) {
 			logger.trace("_FINDING JAR'S PATH");
 		}
@@ -53,9 +52,9 @@ public final class JarHelper {
 			final String check = str.substring(0, i);
 			logger.trace("target/classes location: {}", () -> check);
 			if (check.indexOf(';') < 0) {
-				final Path p = Paths.get(check).getParent().getParent();
+				final Path p = Path.of(check).getParent().getParent();
 				if (Files.exists(p)) {
-					return new File(p + File.separator + "dev");
+					return p.resolve("dev");
 				}
 			}
 			
@@ -117,7 +116,7 @@ public final class JarHelper {
 			logger.trace("_RESULT PATH: {}", str);
 		}
 		
-		return new File(str);
+		return Path.of(str);
 	}
 	
 }

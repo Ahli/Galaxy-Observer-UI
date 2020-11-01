@@ -53,11 +53,11 @@ import org.springframework.context.ApplicationContext;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -397,18 +397,16 @@ public class BrowseController implements Updateable {
 			final Updateable controller = createTab(project.getName());
 			if (controller != null) {
 				final ModData mod = gameService.getModData(project.getGame());
-				mod.setSourceDirectory(new File(project.getProjectPath()));
-				final String cachePath =
-						configService.getMpqCachePath() + File.separator + "browseCache" + File.separator +
-								project.getName();
-				final File cacheDir = new File(cachePath);
+				mod.setSourceDirectory(Path.of(project.getProjectPath()));
+				final Path cachePath =
+						Path.of(configService.getMpqCachePath().toString(), "browseCache", project.getName());
 				try {
-					Files.createDirectories(cacheDir.toPath());
+					Files.createDirectories(cachePath);
 				} catch (final IOException e) {
 					logger.error("ERROR: could not create directories.", e);
 					continue;
 				}
-				mod.setMpqCacheDirectory(cacheDir);
+				mod.setMpqCacheDirectory(cachePath);
 				
 				final MpqEditorInterface mpqi = new MpqEditorInterface(cachePath, configService.getMpqEditorPath());
 				if (!mpqi.clearCacheExtractedMpq()) {
@@ -416,7 +414,7 @@ public class BrowseController implements Updateable {
 					continue;
 				}
 				try {
-					fileService.copyFileOrDirectory(new File(project.getProjectPath()), cacheDir);
+					fileService.copyFileOrDirectory(Path.of(project.getProjectPath()), cachePath);
 				} catch (final IOException e) {
 					logger.error("ERROR: could not copy project files.", e);
 					continue;
@@ -425,7 +423,7 @@ public class BrowseController implements Updateable {
 				final DescIndexData descIndexData = new DescIndexData(mpqi);
 				mod.setDescIndexData(descIndexData);
 				
-				final File componentListFile = mpqi.getComponentListFile();
+				final Path componentListFile = mpqi.getComponentListFile();
 				mod.setComponentListFile(componentListFile);
 				
 				try {
