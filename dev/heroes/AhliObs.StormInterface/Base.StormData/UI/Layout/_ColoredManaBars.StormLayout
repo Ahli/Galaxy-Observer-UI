@@ -13,13 +13,15 @@
 	<Constant name="AurielStoredManaColor" val="ebe24c"/>
 	<Constant name="ValeeraEnergyColor" val="ebe24c"/>
 	<Constant name="TracerAmmoColor" val="3fddf6"/> <!-- 63,221,246 -->
-	<Constant name="ZaryaEnergyColor" val="ff69b4"/>
-	<Constant name="DVaEnergyColor" val="ff69b4"/> <!-- 255,105,180 -->
+	<Constant name="ZaryaEnergyColor" val="ff69b4"/> <!-- 255,105,180 -->
+	<Constant name="DVaEnergyColor" val="ff69b4"/>
 	<Constant name="MoralesEnergyColor" val="ebe24c"/>
 	<Constant name="VolskayaRobotEnergyColor" val="ff69b4"/>
 	<Constant name="JunkratAmmoColor" val="ea9a1f"/>
 	<Constant name="DeathwingBreathColor" val="f72613"/> <!-- 247,38,19 -->
-	<Constant name="GazloweScrapColor" val="ea9a1f"/> <!-- 234,154,31 -->
+	<Constant name="GazloweScrapColor" val="ea9a1f"/>
+	<Constant name="HoggerRageColor" val="aa0000"/> <!-- 170,0,0 -->
+	<Constant name="HoggerRiverpawLootHoardColor" val="aa0000"/>
 	
 	<Frame type="UnitStatusEnergyType" name="EnergyBarMagicWidthTemplate">
 		<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
@@ -192,6 +194,29 @@
 		<SegmentValue val="1"/>
 		<ColorStyle val="FuryEnergy" />
 	</Frame>
+	<Frame type="UnitStatusEnergyBar" name="HoggerRageConsoleTemplate" template="_ColoredManaBars/BaseEnergyConsoleTemplate">
+		<OwnerColor val="#HoggerRageColor" index="0"/>
+		<AllyColor val="#HoggerRageColor" index="0"/>
+		<EnemyColor val="#HoggerRageColor" index="0"/>
+		<OwnerColor val="#HoggerRageColor" index="1"/>
+		<AllyColor val="#HoggerRageColor" index="1"/>
+		<EnemyColor val="#HoggerRageColor" index="1"/>
+		<Segmented val="true" index="0"/>
+		<SegmentValue val="50"/>
+		<ColorStyle val="MeatEnergy"/>
+	</Frame>
+	<Frame type="UnitStatusEnergyBar" name="HoggerRiverpawLootHoardConsoleTemplate" template="_ColoredManaBars/BaseEnergyConsoleTemplate">
+		<OwnerColor val="#HoggerRiverpawLootHoardColor" index="0"/>
+		<AllyColor val="#HoggerRiverpawLootHoardColor" index="0"/>
+		<EnemyColor val="#HoggerRiverpawLootHoardColor" index="0"/>
+		<OwnerColor val="#HoggerRiverpawLootHoardColor" index="1"/>
+		<AllyColor val="#HoggerRiverpawLootHoardColor" index="1"/>
+		<EnemyColor val="#HoggerRiverpawLootHoardColor" index="1"/>
+		<Segmented val="true" index="0"/>
+		<Segmented val="true" index="1"/>
+		<SegmentValue val="1"/>
+		<ColorStyle val="MeatEnergy"/>
+	</Frame>
 	<!-- Observer templates -->
 	<Frame type="UnitStatusEnergyBar" name="ManaBarObserverOverviewTemplate">
 		<!-- unique colors -->
@@ -317,6 +342,17 @@
 		<Segmented val="true" index="0"/>
 		<SegmentValue val="1"/>
 		<ColorStyle val="FuryEnergy" />
+	</Frame>
+	<Frame type="UnitStatusEnergyBar" name="HoggerRageObserverOverviewTemplate">
+		<OwnerColor val="#HoggerRageColor" index="0"/>
+		<AllyColor val="#HoggerRageColor" index="0"/>
+		<EnemyColor val="#HoggerRageColor" index="0"/>
+		<OwnerColor val="#HoggerRageColor" index="1"/>
+		<AllyColor val="#HoggerRageColor" index="1"/>
+		<EnemyColor val="#HoggerRageColor" index="1"/>
+		<Segmented val="true" index="0"/>
+		<SegmentValue val="50"/>
+		<ColorStyle val="MeatEnergy"/>
 	</Frame>
 
 	<!-- Mana Bars non-generic... -->
@@ -558,6 +594,25 @@
 				</Frame>
 			</Frame>
 		</Frame>
+		<Frame type="SelectionUnitStatusPanel" name="HoggerRage">
+			<Anchor relative="$parent"/>
+			<SpecificUnit val="HeroHogger"/>
+			<Frame type="UnitStatusFrame" name="UnitStatusFrame0">
+				<Anchor relative="$parent"/>
+				<Frame type="UnitStatusEnergyBar" name="ManaBar" template="_ColoredManaBars/HoggerRageConsoleTemplate">
+				</Frame>
+			</Frame>
+		</Frame>
+		<Frame type="SelectionUnitStatusPanel" name="HoggerRiverpawLootHoard">
+			<Anchor relative="$parent"/>
+			<SpecificUnit val="HoggerRiverpawLootHoard"/>
+			<Frame type="UnitStatusFrame" name="UnitStatusFrame0">
+				<Anchor relative="$parent"/>
+				<Frame type="UnitStatusEnergyBar" name="ManaBar" template="_ColoredManaBars/HoggerRiverpawLootHoardConsoleTemplate">
+				</Frame>
+			</Frame>
+		</Frame>
+
 	</Frame>
 	
 	<Frame type="Frame" name="ObserverManaBarSwitchTemplate_L">
@@ -843,6 +898,26 @@
 				</Controller>
 			</Animation>
 		</Frame>
+
+		<Frame type="UnitStatusBehaviorAnim" name="HoggerLootHoardUnitTracker">
+			<Anchor relative="$parent"/>
+			<Behavior val="HoggerLootHoardUnitTracker"/>
+			
+			<Frame type="Frame" name="HoggerLootHoardUnitTrackerState">
+				<Anchor relative="$parent"/>
+				<Visible val="false"/>
+			</Frame>
+			
+			<Animation name="BehaviorControlAnim">
+				<Event event="BehaviorCreate" action="Reset,DirectionForward,Play"/>
+				<Event event="BehaviorDestroy" action="DirectionReverse,Play"/>
+
+				<Controller type="Visibility" end="Pause" frame="HoggerLootHoardUnitTrackerState">
+					<Key type="Bool" time="0" value="false"/>
+					<Key type="Bool" time="0" value="true"/>
+				</Controller>
+			</Animation>
+		</Frame>
 		
 		<!-- switch colors -->
 		<StateGroup name="ManaBarColorSwitcher">
@@ -897,6 +972,10 @@
 			<State name="GazloweScrap">
 				<When type="Property" frame="TinkerFocusTurrets/TinkerFocusTurretsState" visible="true"/>
 				<Action type="ApplyTemplate" frame="ManaBar" template="_ColoredManaBars/GazloweScrapObserverOverviewTemplate"/>
+			</State>
+			<State name="HoggerRage">
+				<When type="Property" frame="HoggerLootHoardUnitTracker/HoggerLootHoardUnitTrackerState" visible="true"/>
+				<Action type="ApplyTemplate" frame="ManaBar" template="_ColoredManaBars/HoggerRageObserverOverviewTemplate"/>
 			</State>
 			<State name="BlueMana">
 				<Action type="ApplyTemplate" frame="ManaBar" template="_ColoredManaBars/ManaBarObserverOverviewTemplate"/>
