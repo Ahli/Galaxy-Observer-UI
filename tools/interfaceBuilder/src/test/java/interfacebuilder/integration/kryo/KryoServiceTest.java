@@ -18,7 +18,6 @@ import org.springframework.boot.test.autoconfigure.SpringBootDependencyInjection
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 
 import java.io.IOException;
@@ -31,7 +30,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest(classes = InterfaceBuilderApp.class)
-@ContextConfiguration
 @TestExecutionListeners(
 		listeners = { MockitoTestExecutionListener.class, SpringBootDependencyInjectionTestExecutionListener.class },
 		mergeMode = TestExecutionListeners.MergeMode.REPLACE_DEFAULTS)
@@ -44,7 +42,7 @@ final class KryoServiceTest {
 	private KryoService kryoService;
 	
 	@Test
-	public void testMetaFile() throws IOException {
+	void testMetaFile() throws IOException {
 		final Kryo kryo = kryoService.getKryoForBaseUiMetaFile();
 		final Path path = Path.of(System.getProperty("java.io.tmpdir"), "interfaceBuilderTest", "testMetaFile");
 		Files.createDirectories(path.getParent());
@@ -66,7 +64,7 @@ final class KryoServiceTest {
 	}
 	
 	@Test
-	public void testCacheMetaFile() throws IOException, UIException {
+	void testCacheMetaFile() throws IOException, UIException {
 		final Kryo kryo = kryoService.getKryoForUICatalog();
 		final Path path = Path.of(System.getProperty("java.io.tmpdir"), "interfaceBuilderTest", "testCacheMetaFile");
 		Files.createDirectories(path.getParent());

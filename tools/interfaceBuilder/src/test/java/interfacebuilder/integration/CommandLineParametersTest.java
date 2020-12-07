@@ -21,7 +21,7 @@ final class CommandLineParametersTest {
 	private ProjectJpaRepository projectRepoMock;
 	
 	@Test
-	public void testStringParamCompileRun() {
+	void testStringParamCompileRun() {
 		// TODO improve test with freshly created directory
 		final CommandLineParams param = new CommandLineParams(
 				"--compileRun=D:\\Galaxy-Observer-UI\\dev\\heroes\\AhliObs.StormInterface\\Base.StormData\\UI\\Layout");
@@ -32,7 +32,7 @@ final class CommandLineParametersTest {
 	}
 	
 	@Test
-	public void testStringParamCompile() {
+	void testStringParamCompile() {
 		// TODO improve test with freshly created directory
 		final CommandLineParams param = new CommandLineParams(
 				"--compile=D:\\Galaxy-Observer-UI\\dev\\heroes\\AhliObs.StormInterface\\Base.StormData\\UI\\Layout");
@@ -43,7 +43,7 @@ final class CommandLineParametersTest {
 	}
 	
 	@Test
-	public void testStringParamRun() {
+	void testStringParamRun() {
 		// TODO improve test with freshly created directory
 		final CommandLineParams param = new CommandLineParams("--run=D:\\Path\\To\\Some\\replayFile.SC2Replay");
 		assertEquals("D:\\Path\\To\\Some\\replayFile.SC2Replay", param.getParamRunPath(), "run's path is wrong");
@@ -52,7 +52,7 @@ final class CommandLineParametersTest {
 	}
 	
 	@Test
-	public void testStringEmpty() {
+	void testStringEmpty() {
 		final CommandLineParams param = new CommandLineParams("");
 		assertNull(param.getParamRunPath(), "run's path is wrong");
 		assertFalse(param.isHasParamCompilePath(), "hasParamCompilePath is wrong");

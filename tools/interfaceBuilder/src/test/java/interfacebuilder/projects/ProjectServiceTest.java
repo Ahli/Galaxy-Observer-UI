@@ -13,7 +13,6 @@ import org.springframework.boot.test.autoconfigure.SpringBootDependencyInjection
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 
 import java.util.Arrays;
@@ -23,7 +22,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest(classes = InterfaceBuilderApp.class)
-@ContextConfiguration
 @TestExecutionListeners(
 		listeners = { MockitoTestExecutionListener.class, SpringBootDependencyInjectionTestExecutionListener.class },
 		mergeMode = TestExecutionListeners.MergeMode.REPLACE_DEFAULTS)
@@ -36,7 +34,7 @@ final class ProjectServiceTest {
 	private ProjectService projectService;
 	
 	@Test
-	public void testGetAllProjects() {
+	void testGetAllProjects() {
 		final Project project1 = new Project("name1", "path1", Game.SC2);
 		project1.setId(1);
 		final Project project2 = new Project("name2", "path2", Game.HEROES);
@@ -48,7 +46,7 @@ final class ProjectServiceTest {
 	}
 	
 	@Test
-	public void testSaveProject() {
+	void testSaveProject() {
 		final Project project = new Project("name", "path", Game.SC2);
 		project.setId(1);
 		when(projectRepoMock.save(project)).thenReturn(project);

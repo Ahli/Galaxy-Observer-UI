@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 final class StringInternerTest {
 	
 	@Test
-	public void testWeakRefStringInterner() {
+	void testWeakRefStringInterner() {
 		final double value = Math.random();
 		final String text = "HELLO WORLD! ";
 		String firstToBeInterned = text + value;
