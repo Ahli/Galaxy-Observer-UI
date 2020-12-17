@@ -98,16 +98,16 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		deduplicatedElements = deduplicate ? new UnifiedSet<>(13_000) : null;
 		parser.setConsumer(this);
 	}
-	
-	/**
-	 * @param typeTemplate
-	 * @param typeFrame
-	 * @return
-	 */
-	private static boolean checkFrameTypeCompatibility(final String typeTemplate, final String typeFrame) {
-		// TODO frame type compatibility check
-		return true;
-	}
+
+//	/**
+//	 * @param typeTemplate
+//	 * @param typeFrame
+//	 * @return
+//	 */
+//	private static boolean checkFrameTypeCompatibility(final String typeTemplate, final String typeFrame) {
+//		// TODO frame type compatibility check
+//		return true;
+//	}
 	
 	/**
 	 * Set the implicit names of controllers in animations.
@@ -351,9 +351,9 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					type = FRAME;
 				}
 				final var newElemUiFrame = (UIFrame) newElem;
-				if (!checkFrameTypeCompatibility(type, newElemUiFrame.getType())) {
-					logger.warn("WARN: The type of the frame is not compatible with the used template.");
-				}
+//				if (!checkFrameTypeCompatibility(type, newElemUiFrame.getType())) {
+//					logger.warn("WARN: The type of the frame is not compatible with the used template.");
+//				}
 				newElemUiFrame.setType(type);
 				// add to parent
 				if (curElement != null) {
@@ -784,7 +784,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			final UIAnimation uiAnimation = (UIAnimation) templateElem;
 			templateChildren = uiAnimation.getChildrenRaw();
 			if (targetElem instanceof UIAnimation) {
-				final UIAnimation target = (UIAnimation) targetElem;
+				// final UIAnimation target = (UIAnimation) targetElem;
 				// TODO events
 				// TODO controller
 				// TODO driver

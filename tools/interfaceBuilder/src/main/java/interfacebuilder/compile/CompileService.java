@@ -75,6 +75,10 @@ public class CompileService {
 				logger.info("BaseUI Cloning took {}ms.", executionTime);
 				startTime = System.currentTimeMillis();
 				
+				if (catalogClone == null) {
+					return null;
+				}
+				
 				catalogClone.setParser(new UICatalogParser(catalogClone, new XmlParserVtd(), true));
 				
 				// apply mod's UI

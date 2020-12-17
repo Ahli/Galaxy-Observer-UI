@@ -5,7 +5,6 @@ module GalaxyLib {
 	requires org.apache.commons.lang3;
 	requires transitive org.apache.logging.log4j;
 	requires vtd.xml;
-	//requires org.eclipse.collections.api;
 	requires org.eclipse.collections.impl;
 	requires java.sql; // configuration2 INI requires java.sql.Date for some reason
 	
