@@ -7,6 +7,7 @@ module GalaxyLib {
 	requires vtd.xml;
 	//requires org.eclipse.collections.api;
 	requires org.eclipse.collections.impl;
+	requires java.sql; // configuration2 INI requires java.sql.Date for some reason
 	
 	exports com.ahli.galaxy;
 	exports com.ahli.galaxy.archive;

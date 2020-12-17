@@ -195,8 +195,9 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 	 */
 	private void applyChangesToFiles() throws IOException {
 		if (!iniFile.exists()) {
-			logger.error("MpqEditor's ini file does not exist. It would be located at '" + iniFile.getAbsolutePath() +
-					"'. The editor will run with its factory settings.");
+			logger.error(
+					"MpqEditor's ini file does not exist. It would be located at '{}'. The editor will run with its factory settings.",
+					iniFile.getAbsolutePath());
 			return;
 		}
 		int gameId = 6;
@@ -328,7 +329,7 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 		final MpqEditorSettingsInterface clone = new MpqEditorSettingsInterface();
 		if (customRules != null) {
 			clone.customRules = new MpqEditorCompressionRule[customRules.length];
-			for (int i = 0, len = customRules.length; i < len; i++) {
+			for (int i = 0, len = customRules.length; i < len; ++i) {
 				customRules[i] = customRules[i] == null ? null : (MpqEditorCompressionRule) customRules[i].deepCopy();
 			}
 		}

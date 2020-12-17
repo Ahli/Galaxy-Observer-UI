@@ -23,7 +23,7 @@ import com.ahli.mpq.mpqeditor.MpqEditorCompression;
 import javafx.animation.FadeTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.event.EventHandler;
+import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -141,14 +141,11 @@ public class SettingsEditorApplication extends Application {
 			tabsCtrl.setMainApp(this);
 			
 			// ask to save on close
-			primaryStage.setOnCloseRequest(new EventHandler<>() {
-				@Override
-				public void handle(final WindowEvent event) {
-					final boolean notCancelled = askToSaveUnsavedChanges();
-					if (!notCancelled) {
-						// cancel closing
-						event.consume();
-					}
+			primaryStage.setOnCloseRequest(event -> {
+				final boolean notCancelled = askToSaveUnsavedChanges();
+				if (!notCancelled) {
+					// cancel closing
+					event.consume();
 				}
 			});
 			
@@ -173,7 +170,7 @@ public class SettingsEditorApplication extends Application {
 			initMpqInterface();
 			
 		} catch (final Exception e) {
-			logger.error("App Error: " + ExceptionUtils.getStackTrace(e), e);
+			logger.error("App Error", e);
 			this.primaryStage.setOpacity(1);
 			Alerts.buildExceptionAlert(this.primaryStage, e).showAndWait();
 			closeApp();
@@ -379,7 +376,7 @@ public class SettingsEditorApplication extends Application {
 		Platform.runLater(() -> {
 			// Update UI here
 			final StringBuilder sb = new StringBuilder(Messages.getString("Main.observerUiSettingsEditorTitle"));
-			final String openedDocPathTmp = getOpenedDocPath().toString();
+			final Path openedDocPathTmp = getOpenedDocPath();
 			if (openedDocPathTmp != null) {
 				sb.append("- [").append(openedDocPathTmp).append(']');
 			}
@@ -505,13 +502,23 @@ public class SettingsEditorApplication extends Application {
 				final List<ValueDef> settings = layoutExtReader.getSettings();
 				tabsCtrl.getSettingsData().addAll(settings);
 				
+				final ChangeListener<String> changeListener =
+						(observable, oldValue, newValue) -> notifyFileDataWasChanged();
+				
+				for (final ValueDef valueDef : hotkeys) {
+					valueDef.valueProperty().addListener(changeListener);
+				}
+				for (final ValueDef valueDef : settings) {
+					valueDef.valueProperty().addListener(changeListener);
+				}
+				
 			} catch (final MpqException | ShowToUserException e) {
-				logger.error("File could not be opened. MPQ-Error: " + ExceptionUtils.getStackTrace(e), e);
+				logger.error("File could not be opened.", e);
 				openedDocPath = null;
 				updateAppTitle();
 				showErrorAlert(e);
 			} catch (final Exception e) {
-				logger.error("File could not be opened. Error: " + ExceptionUtils.getStackTrace(e), e);
+				logger.error("File could not be opened", e);
 				openedDocPath = null;
 				updateAppTitle();
 				showExceptionAlert(e);
@@ -539,6 +546,16 @@ public class SettingsEditorApplication extends Application {
 			}
 			// special case to show readable error to user
 			throw new ShowToUserException(Messages.getString("Main.OpenedFileNoComponentList"));
+		}
+	}
+	
+	/**
+	 *
+	 */
+	public void notifyFileDataWasChanged() {
+		if (!hasUnsavedFileChanges) {
+			hasUnsavedFileChanges = true;
+			updateAppTitle();
 		}
 	}
 	
@@ -631,21 +648,11 @@ public class SettingsEditorApplication extends Application {
 			} catch (final InterruptedException e) {
 				Thread.currentThread().interrupt();
 			} catch (final IOException | ParserConfigurationException | MpqException e) {
-				logger.error(ExceptionUtils.getStackTrace(e), e);
+				logger.error("Error while saving", e);
 				showErrorAlert(e);
 			}
 		}
 		updateMenuBar();
-	}
-	
-	/**
-	 *
-	 */
-	public void notifyFileDataWasChanged() {
-		if (!hasUnsavedFileChanges) {
-			hasUnsavedFileChanges = true;
-			updateAppTitle();
-		}
 	}
 	
 	/**

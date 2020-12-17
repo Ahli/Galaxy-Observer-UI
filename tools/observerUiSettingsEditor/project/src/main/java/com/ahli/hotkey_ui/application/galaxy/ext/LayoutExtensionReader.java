@@ -39,15 +39,19 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 public class LayoutExtensionReader {
 	private static final String CONSTANT = "constant";
-	private static final String DEFAULT = "default";
-	private static final String DESCRIPTION = "description";
-	private static final String HOTKEY_SETTING_REGEX = "(?=@hotkey|@setting)/i";
+	private static final String ATTRIBUTE_CONSTANT = "constant";
+	private static final String ATTRIBUTE_DEFAULT = "default";
+	private static final String ATTRIBUTE_DESCRIPTION = "description";
+	private static final String ATTRIBUTE_VALUES = "values";
+	private static final String ATTRIBUTE_TYPE = "type";
+	private static final String ATTRIBUTES_REGEX = "(?i)(?=(constant|default|description|values|type)[\\s]*=)";
+	private static final String HOTKEY_OR_SETTING_REGEX = "(?=@hotkey|@setting)/i";
 	private static final String HOTKEY = "@hotkey";
 	private static final String SETTING = "@setting";
-	private static final String CONSTANT_DEFAULT_DESCRIPTION_REGEX = "(?i)(?=(constant|default|description)[\\s]*=)";
 	private static final String NAME = "name";
 	private static final String VAL = "val";
 	private static final String ERROR_PARSING_FILE = "Error parsing file.";
@@ -85,7 +89,7 @@ public class LayoutExtensionReader {
 		final int quoteEnd = part.lastIndexOf('"');
 		final int quoteStart = part.indexOf('"');
 		if (quoteStart < 0 || quoteStart >= quoteEnd) {
-			return null;
+			return part;
 		}
 		return part.substring(quoteStart + 1, quoteEnd);
 	}
@@ -129,7 +133,7 @@ public class LayoutExtensionReader {
 				setValueDefCurValue(name, val, hotkeys, settings);
 			} else {
 				if (logger.isWarnEnabled()) {
-					logger.warn("Constant has no 'val' attribute defined.");
+					logger.warn("Constant '{}' has no 'val' attribute defined.", name);
 				}
 			}
 		} else {
@@ -292,30 +296,28 @@ public class LayoutExtensionReader {
 	 * @param textInput
 	 */
 	public void processCommentText(final String textInput) {
-		String constant;
-		String description;
-		String defaultValue;
-		
 		logger.debug("textInput:{}", () -> textInput);
 		try {
 			// split at keywords @hotkey or @setting without removing, case insensitive
-			for (String text : textInput.split(HOTKEY_SETTING_REGEX)) {
+			for (String text : textInput.split(HOTKEY_OR_SETTING_REGEX)) {
 				if (logger.isDebugEnabled()) {
 					logger.debug("token start:{}", text);
 				}
 				text = text.trim();
 				
-				constant = "";
-				description = "";
-				defaultValue = "";
-				
-				final boolean isHotkey = text.toLowerCase(Locale.ROOT).startsWith(HOTKEY);
-				final boolean isSetting = text.toLowerCase(Locale.ROOT).startsWith(SETTING);
-				
-				if (isHotkey || isSetting) {
+				final String lowerCaseText = text.toLowerCase(Locale.ROOT);
+				final boolean isHotkey = lowerCaseText.startsWith(HOTKEY);
+				if (isHotkey || lowerCaseText.startsWith(SETTING)) {
 					if (logger.isDebugEnabled()) {
 						logger.debug("detected hotkey or setting");
 					}
+					
+					String constant = "";
+					String description = "";
+					String defaultValue = "";
+					String type = "";
+					String[] allowedValues = null;
+					
 					// move behind keyword
 					final int pos = isHotkey ? HOTKEY.length() : SETTING.length();
 					String toProcess = text.substring(pos);
@@ -324,41 +326,49 @@ public class LayoutExtensionReader {
 					toProcess = toProcess.substring(1 + toProcess.indexOf('(')).trim();
 					
 					// split at keyword
-					for (String part : toProcess.split(CONSTANT_DEFAULT_DESCRIPTION_REGEX)) {
+					for (String part : toProcess.split(ATTRIBUTES_REGEX)) {
 						part = part.trim();
-						final String partLower = part.toLowerCase(Locale.ROOT);
 						if (logger.isTraceEnabled()) {
 							logger.trace("part: {}", part);
 						}
-						if (partLower.startsWith(CONSTANT)) {
-							// move beyond '='
-							part = getValueAfterEqualsChar(part);
+						final String partLower = part.toLowerCase(Locale.ROOT);
+						part = getValueAfterEqualsChar(part);
+						if (partLower.startsWith(ATTRIBUTE_CONSTANT)) {
 							constant = getValueWithinQuotes(part);
 							if (logger.isTraceEnabled()) {
 								logger.trace("constant = {}", constant);
 							}
-						} else if (partLower.startsWith(DEFAULT)) {
-							// move beyond '='
-							part = getValueAfterEqualsChar(part);
+						} else if (partLower.startsWith(ATTRIBUTE_DEFAULT)) {
 							defaultValue = getValueWithinQuotes(part);
 							if (logger.isTraceEnabled()) {
 								logger.trace("default = {}", defaultValue);
 							}
-						} else if (partLower.startsWith(DESCRIPTION)) {
-							// move beyond '='
-							part = getValueAfterEqualsChar(part);
+						} else if (partLower.startsWith(ATTRIBUTE_DESCRIPTION)) {
 							description = getValueWithinQuotes(part);
 							if (logger.isTraceEnabled()) {
 								logger.trace("description = {}", description);
 							}
+						} else if (partLower.startsWith(ATTRIBUTE_VALUES)) {
+							allowedValues = part.split("/");
+							for (int i = 0; i < allowedValues.length; ++i) {
+								allowedValues[i] = getValueWithinQuotes(allowedValues[i]);
+							}
+							if (logger.isTraceEnabled()) {
+								logger.trace("values = {}", part);
+							}
+						} else if (partLower.startsWith(ATTRIBUTE_TYPE)) {
+							type = getValueWithinQuotes(part).trim();
+							if (logger.isTraceEnabled()) {
+								logger.trace("type = {}", part);
+							}
 						}
 					}
 					
-					if (constant != null && !"".equals(constant)) {
+					if (!constant.isEmpty()) {
 						if (isHotkey) {
 							addHotkeyValueDef(constant, description, defaultValue, "");
 						} else {
-							addSettingValueDef(constant, description, defaultValue, "");
+							addSettingValueDef(constant, description, defaultValue, "", type, allowedValues);
 						}
 					}
 				}
@@ -379,8 +389,8 @@ public class LayoutExtensionReader {
 	}
 	
 	public void addSettingValueDef(final String constant, final String description, final String defaultValue,
-			final String curValue) {
-		final ValueDef def = new ValueDef(constant, curValue, description, defaultValue);
+			final String curValue, final String type, final String[] allowedValues) {
+		final ValueDef def = new ValueDef(constant, curValue, description, defaultValue, type, allowedValues);
 		settings.add(def);
 	}
 	
@@ -527,18 +537,26 @@ public class LayoutExtensionReader {
 					
 					for (final ValueDef item : hotkeys) {
 						if (item.getId().equalsIgnoreCase(name)) {
-							if (logger.isDebugEnabled()) {
-								logger.debug("updating hotkey constant: {}, with val: {}", name, val);
+							if (!Objects.equals(item.getValue(), val)) {
+								if (logger.isDebugEnabled()) {
+									logger.debug("updating hotkey constant: '{}' with val: '{}' from '{}'", name,
+											item.getValue(), val);
+								}
+								valAttrNode.setNodeValue(item.getValue());
 							}
-							valAttrNode.setNodeValue(item.getValue());
+							return;
 						}
 					}
 					for (final ValueDef item : settings) {
 						if (item.getId().equalsIgnoreCase(name)) {
-							if (logger.isDebugEnabled()) {
-								logger.debug("updating setting constant: {}, with val: {}", name, val);
+							if (!Objects.equals(item.getValue(), val)) {
+								if (logger.isDebugEnabled()) {
+									logger.debug("updating setting constant: '{}' with val: '{}' from '{}'", name,
+											item.getValue(), val);
+								}
+								valAttrNode.setNodeValue(item.getValue());
 							}
-							valAttrNode.setNodeValue(item.getValue());
+							return;
 						}
 					}
 				} else {

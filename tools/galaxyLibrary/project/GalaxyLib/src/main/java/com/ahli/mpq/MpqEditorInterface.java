@@ -8,7 +8,6 @@ import com.ahli.mpq.mpqeditor.MpqEditorCompression;
 import com.ahli.mpq.mpqeditor.MpqEditorCompressionRule;
 import com.ahli.mpq.mpqeditor.MpqEditorSettingsInterface;
 import com.ahli.util.DeepCopyable;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
@@ -130,7 +129,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 			try {
 				XmlCompressorDom.processCache(mpqCachePath, 1);
 			} catch (final ParserConfigurationException | SAXException | TransformerConfigurationException e) {
-				logger.error(ExceptionUtils.getStackTrace(e));
+				logger.error("Error while compressing files in the cache", e);
 			}
 			
 		} else {

@@ -5,6 +5,8 @@ package com.ahli.hotkey_ui.application.model;
 
 import javafx.beans.property.SimpleStringProperty;
 
+import java.util.Locale;
+
 /**
  * Class that defines a Hotkey or Settings value to be used in UI.
  *
@@ -15,6 +17,8 @@ public class ValueDef {
 	private final SimpleStringProperty value;
 	private final SimpleStringProperty description;
 	private final SimpleStringProperty defaultValue;
+	private final String[] allowedValues;
+	private final ValueType type;
 	
 	/**
 	 * Constructor.
@@ -29,6 +33,37 @@ public class ValueDef {
 		this.value = new SimpleStringProperty(value);
 		this.description = new SimpleStringProperty(description);
 		this.defaultValue = new SimpleStringProperty(defaultValue);
+		allowedValues = null;
+		type = ValueType.TEXT;
+	}
+	
+	/**
+	 * Constructor.
+	 *
+	 * @param id
+	 * @param value
+	 * @param description
+	 * @param defaultValue
+	 */
+	public ValueDef(final String id, final String value, final String description, final String defaultValue,
+			final String type, final String[] allowedValues) {
+		this.id = new SimpleStringProperty(id);
+		this.value = new SimpleStringProperty(value);
+		this.description = new SimpleStringProperty(description);
+		this.defaultValue = new SimpleStringProperty(defaultValue);
+		this.allowedValues = allowedValues;
+		
+		ValueType resultType;
+		try {
+			resultType = ValueType.valueOf(type.toUpperCase(Locale.ROOT));
+		} catch (final IllegalArgumentException e) {
+			resultType = ValueType.TEXT;
+		}
+		this.type = resultType;
+		
+		if (resultType.equals(ValueType.BOOLEAN) && defaultValue.isEmpty()) {
+			setDefaultValue("false");
+		}
 	}
 	
 	/**
@@ -117,6 +152,14 @@ public class ValueDef {
 	// required to make UI track changes
 	public SimpleStringProperty idProperty() {
 		return id;
+	}
+	
+	public ValueType getType() {
+		return type;
+	}
+	
+	public String[] getAllowedValues() {
+		return allowedValues;
 	}
 	
 }
