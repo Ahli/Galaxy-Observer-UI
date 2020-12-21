@@ -193,8 +193,6 @@
 					<Anchor side="Left" relative="$parent/MapScore" pos="Min" offset="0"/>
 					<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
 					<Height val="38"/>
-					<AcceptsMouseTooltip val="true"/>
-					<Tooltip val="#Hotkey - Toggle Chat"/>
 					
 					<Frame type="Button" name="ButtonUnticked" template="StandardTemplates/StandardCheckBoxLabelTemplate/Button">
 						<Anchor side="Top" relative="$parent" pos="Min" offset="1"/>
@@ -437,33 +435,126 @@
 				</Frame>
 				
 				<!-- unit info -->
-				<Frame type="CheckBox" name="UnitInfo" template="StandardTemplates/StandardCheckBoxLabelTemplate">
+				<Frame type="Frame" name="UnitInfo">
 					<Anchor side="Top" relative="$parent/ReplayControls" pos="Max" offset="7"/>
 					<Anchor side="Left" relative="$parent/ReplayControls" pos="Min" offset="0"/>
 					<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
 					<Height val="38"/>
-					<Tooltip val="#Hotkey - Toggle Unit selection UI (Khaldor Mode)"/>
-					<Muted val="true"/>
 					
-					<Frame type="Button" name="Button">
-						<Shortcut val="#Hotkey - Toggle Unit selection UI (Khaldor Mode)"/>
-					</Frame>
-					
-					<Frame type="Image" name="CheckImage">
-						<Animation name="Ahlimation">
-							<Event event="OnShown" action="DirectionForward,Play"/>
-							<Event event="OnHidden" action="DirectionReverse,Play"/>
-							<Controller type="Visibility" end="Pause" frame="$parent/$parent/$parent/$parent/$parent/$parent/ConsoleUIContainer/KhaldorModeToggle/KhaldorModeToggle">
-								<Key type="Bool" time="0" value="false"/>
+					<Frame type="Button" name="ButtonUnticked" template="StandardTemplates/StandardCheckBoxLabelTemplate/Button">
+						<Anchor side="Top" relative="$parent" pos="Min" offset="1"/>
+						<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+						<Width val="36"/>
+						<Height val="36"/>
+						<Tooltip val="#Hotkey - Toggle Unit selection UI"/>
+						
+						<Frame type="Image" name="NormalImage">
+							<Anchor relative="$parent"/>
+							<Texture val="@UI/Storm_Checkbox_Normal"/>
+							<StateCount val="1"/>
+							<DesaturateOnDisable val="false"/>
+							<DisabledAlpha val="64"/>
+						</Frame>
+
+						<Frame type="Image" name="HoverImage">
+							<Anchor relative="$parent"/>
+							<Texture val="@UI/Storm_Checkbox_Hover"/>
+							<StateCount val="1"/>
+							<DesaturateOnDisable val="false"/>
+							<DisabledAlpha val="64"/>
+						</Frame>
+						
+						<Animation name="MouseClick">
+							<Event event="OnMouseUp" action="Reset,Play"/>
+							<Controller type="Visibility" end="Pause" frame="$parent/CheckImage">
 								<Key type="Bool" time="0" value="true"/>
 							</Controller>
 						</Animation>
+						
+					</Frame>
+					<Frame type="Button" name="ButtonTicked" template="StandardTemplates/StandardCheckBoxLabelTemplate/Button">
+						<Anchor side="Top" relative="$parent" pos="Min" offset="1"/>
+						<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+						<Width val="36"/>
+						<Height val="36"/>
+						<Visible val="false"/>
+						<CollapseLayout val="true"/>
+						<Tooltip val="#Hotkey - Toggle Unit selection UI"/>
+						
+						<Frame type="Image" name="NormalImage">
+							<Anchor relative="$parent"/>
+							<Texture val="@UI/Storm_Checkbox_Normal"/>
+							<StateCount val="1"/>
+							<DesaturateOnDisable val="false"/>
+							<DisabledAlpha val="64"/>
+						</Frame>
+
+						<Frame type="Image" name="HoverImage">
+							<Anchor relative="$parent"/>
+							<Texture val="@UI/Storm_Checkbox_Hover"/>
+							<StateCount val="1"/>
+							<DesaturateOnDisable val="false"/>
+							<DisabledAlpha val="64"/>
+						</Frame>
+						
+						<!-- Intercept button clicks -->
+						<Animation name="MouseClick">
+							<Event event="OnMouseUp" action="Reset,Play"/>
+							<Controller type="Visibility" end="Pause" frame="$parent/CheckImage">
+								<Key type="Bool" time="0" value="false"/>
+							</Controller>
+						</Animation>
+						
 					</Frame>
 
+					<!-- Hotkey -->
+					<Frame type="ToggleControl" name="CheckImage">
+						<Anchor relative="$parent"/>
+						<Shortcut val="#Hotkey - Toggle Unit selection UI"/>
+						<Visible val="#SelectedUnitInfoInitiallyHidden"/>
+						<AcceptsMouse val="false"/>
+						
+						<Frame type="Image" name="CheckImage">
+							<Anchor relative="$parent/$parent/ButtonUnticked"/>
+							<Texture val="@UI/Storm_Checkbox_CheckMark"/>
+							<DesaturateOnDisable val="false"/>
+							<DisabledAlpha val="64"/>
+							
+							<Animation name="Show">
+								<Event event="OnShown" action="Reset,Play"/>
+								<Controller type="Visibility" end="Pause" frame="$parent/$parent/$parent/$parent/$parent/$parent/$parent/ConsoleUIContainer/UnitInfoToggle/UnitInfoToggle">
+									<Key type="Bool" time="0" value="true"/>
+								</Controller>
+								<Controller type="Visibility" end="Pause" frame="$parent/$parent/ButtonUnticked">
+									<Key type="Bool" time="0" value="false"/>
+								</Controller>
+								<Controller type="Visibility" end="Pause" frame="$parent/$parent/ButtonTicked">
+									<Key type="Bool" time="0" value="true"/>
+								</Controller>
+							</Animation>
+							<Animation name="Hide">
+								<Event event="OnHidden" action="Reset,Play"/>
+								<Controller type="Visibility" end="Pause" frame="$parent/$parent/$parent/$parent/$parent/$parent/$parent/ConsoleUIContainer/UnitInfoToggle/UnitInfoToggle">
+									<Key type="Bool" time="0" value="false"/>
+								</Controller>
+								<Controller type="Visibility" end="Pause" frame="$parent/$parent/ButtonUnticked">
+									<Key type="Bool" time="0" value="true"/>
+								</Controller>
+								<Controller type="Visibility" end="Pause" frame="$parent/$parent/ButtonTicked">
+									<Key type="Bool" time="0" value="false"/>
+								</Controller>
+							</Animation>
+						</Frame>
+					</Frame>
+					
 					<Frame type="Label" name="Label">
+						<Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
+						<Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+						<Anchor side="Left" relative="$parent/ButtonUnticked" pos="Max" offset="10"/>
 						<Style val="@AhliFeatureControl"/>
 						<Text val="@Ahli/SettingUnitInfo"/>
 					</Frame>
+
 				</Frame>
 				
 				<!-- talent notifications -->
