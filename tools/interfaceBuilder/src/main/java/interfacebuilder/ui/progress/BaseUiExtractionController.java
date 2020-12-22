@@ -4,12 +4,13 @@
 package interfacebuilder.ui.progress;
 
 import com.ahli.galaxy.game.def.abstracts.GameDef;
-import interfacebuilder.InterfaceBuilderApp;
 import interfacebuilder.base_ui.BaseUiService;
 import interfacebuilder.base_ui.ExtractBaseUiTask;
 import interfacebuilder.compress.GameService;
 import interfacebuilder.projects.enums.Game;
+import interfacebuilder.ui.AppController;
 import interfacebuilder.ui.Updateable;
+import interfacebuilder.ui.navigation.NavigationController;
 import interfacebuilder.ui.progress.appender.Appender;
 import interfacebuilder.ui.progress.appender.TextFlowAppender;
 import javafx.fxml.FXML;
@@ -17,6 +18,8 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextFlow;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.concurrent.ForkJoinPool;
 
 public class BaseUiExtractionController implements Updateable {
 	
@@ -43,6 +46,12 @@ public class BaseUiExtractionController implements Updateable {
 	@Autowired
 	private GameService gameService;
 	private ErrorTabController errorTabController;
+	@Autowired
+	private NavigationController navigationController;
+	@Autowired
+	private ForkJoinPool executor;
+	@Autowired
+	private AppController appController;
 	
 	public BaseUiExtractionController() {
 		threadNames = new String[3];
@@ -77,12 +86,15 @@ public class BaseUiExtractionController implements Updateable {
 		output[2] = new TextFlowAppender(txtArea3);
 		
 		final String[] queryMasks = BaseUiService.getQueryMasks(game);
-		areaLabel1.setText(String.format("Extracting %s files", queryMasks[0]));
-		areaLabel2.setText(String.format("Extracting %s files", queryMasks[1]));
-		areaLabel3.setText(String.format("Extracting %s files", queryMasks[2]));
+		final String msg = "Extracting %s files";
+		areaLabel1.setText(String.format(msg, queryMasks[0]));
+		areaLabel2.setText(String.format(msg, queryMasks[1]));
+		areaLabel3.setText(String.format(msg, queryMasks[2]));
 		
-		final ExtractBaseUiTask task = new ExtractBaseUiTask(baseUiService, game, usePtr, output, errorTabController);
-		InterfaceBuilderApp.getInstance().getExecutor().execute(task);
+		final ExtractBaseUiTask task =
+				new ExtractBaseUiTask(appController, baseUiService, game, usePtr, output, errorTabController,
+						navigationController);
+		executor.execute(task);
 	}
 	
 	public String[] getThreadNames() {

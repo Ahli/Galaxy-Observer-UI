@@ -49,6 +49,7 @@ module interfacex.builder {
 	exports interfacebuilder to javafx.graphics, javafx.fxml, spring.context;
 	opens interfacebuilder to javafx.fxml, spring.core, spring.beans;
 	opens interfacebuilder.config to spring.core;
+	opens interfacebuilder.ui to spring.core;
 	opens interfacebuilder.compress to org.hibernate.orm.core, spring.core;
 	// open to unnamed for unit test
 	opens interfacebuilder.projects; // to org.hibernate.orm.core, spring.core, spring.beans;
@@ -71,6 +72,8 @@ module interfacex.builder {
 	exports interfacebuilder.integration;
 	exports interfacebuilder.ui.navigation;
 	exports interfacebuilder.ui.progress.appender;
+	exports interfacebuilder.ui;
+	exports interfacebuilder.threads;
 	
 	// for public API only
 	exports interfacebuilder.ui.progress;

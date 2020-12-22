@@ -12,7 +12,6 @@ import com.ahli.galaxy.ui.DescIndexReader;
 import com.ahli.mpq.MpqEditorInterface;
 import com.ahli.mpq.MpqException;
 import com.ahli.mpq.mpqeditor.MpqEditorCompression;
-import interfacebuilder.InterfaceBuilderApp;
 import interfacebuilder.base_ui.BaseUiService;
 import interfacebuilder.compile.CompileService;
 import interfacebuilder.compress.RuleSet;
@@ -22,6 +21,7 @@ import interfacebuilder.integration.SettingsIniInterface;
 import interfacebuilder.projects.Project;
 import interfacebuilder.projects.ProjectService;
 import interfacebuilder.projects.enums.Game;
+import interfacebuilder.ui.AppController;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +36,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.ForkJoinPool;
 
 public class MpqBuilderService {
 	private static final Logger logger = LogManager.getLogger(MpqBuilderService.class);
@@ -56,6 +57,10 @@ public class MpqBuilderService {
 	@Autowired
 	@Qualifier("heroesBaseGameData")
 	private GameData heroesBaseGameData;
+	@Autowired
+	private ForkJoinPool executor;
+	@Autowired
+	private AppController appController;
 	
 	/**
 	 * Schedules a task to find and build a project based on the specified path.
@@ -90,8 +95,8 @@ public class MpqBuilderService {
 	 * @param project
 	 */
 	public void build(final Project project, final boolean useCmdLineSettings) {
-		final BuildTask task = new BuildTask(project, useCmdLineSettings, this, baseUiService);
-		InterfaceBuilderApp.getInstance().getExecutor().execute(task);
+		final BuildTask task = new BuildTask(appController, project, useCmdLineSettings, this, baseUiService);
+		executor.execute(task);
 	}
 	
 	/**
@@ -117,7 +122,7 @@ public class MpqBuilderService {
 	 */
 	void buildSpecificUI(final Path interfaceDirectory, final GameData game, final boolean useCmdLineSettings,
 			final Project project) {
-		if (InterfaceBuilderApp.getInstance().getExecutor().isShutdown()) {
+		if (executor.isShutdown()) {
 			logger.error("ERROR: Executor shut down. Skipping building a UI...");
 			return;
 		}
@@ -140,7 +145,7 @@ public class MpqBuilderService {
 		
 		// create tasks for the worker pool
 		try {
-			InterfaceBuilderApp.getInstance()
+			appController
 					.addThreadLoggerTab(Thread.currentThread().getName(), interfaceDirectory.getFileName().toString(),
 							false);
 			// create unique cache path
@@ -215,8 +220,7 @@ public class MpqBuilderService {
 			final boolean compressXml, final int compressMpq, final boolean buildUnprotectedToo,
 			final boolean repairLayoutOrder, final boolean verifyLayout, final boolean verifyXml, final Project project)
 			throws IOException, InterruptedException {
-		InterfaceBuilderApp.getInstance()
-				.printInfoLogMessageToGeneral(sourceFile.getFileName() + " started construction.");
+		appController.printInfoLogMessageToGeneral(sourceFile.getFileName() + " started construction.");
 		
 		final GameDef gameDef = game.getGameDef();
 		
@@ -323,12 +327,10 @@ public class MpqBuilderService {
 			project.setLastBuildSize(size);
 			logger.info("Finished building... {}. Size: {}kb", sourceFileName, size / 1024);
 			projectService.saveProject(project);
-			InterfaceBuilderApp.getInstance()
-					.printInfoLogMessageToGeneral(sourceFileName + " finished construction.");
+			appController.printInfoLogMessageToGeneral(sourceFileName + " finished construction.");
 		} catch (final IOException | MpqException e) {
 			logger.error("ERROR: unable to construct final Interface file.", e);
-			InterfaceBuilderApp.getInstance()
-					.printErrorLogMessageToGeneral(sourceFileName + " could not be created.");
+			appController.printErrorLogMessageToGeneral(sourceFileName + " could not be created.");
 		}
 	}
 	

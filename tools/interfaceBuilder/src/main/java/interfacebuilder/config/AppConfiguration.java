@@ -22,6 +22,7 @@ import interfacebuilder.integration.kryo.KryoService;
 import interfacebuilder.projects.ProjectService;
 import interfacebuilder.threads.CleaningForkJoinPool;
 import interfacebuilder.threads.SpringForkJoinWorkerThreadFactory;
+import interfacebuilder.ui.AppController;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -148,7 +149,12 @@ public class AppConfiguration {
 	protected ForkJoinPool forkJoinPool() {
 		final int maxThreads = Math.max(1, Runtime.getRuntime().availableProcessors() / 2);
 		return new CleaningForkJoinPool(maxThreads, new SpringForkJoinWorkerThreadFactory(), null, true, maxThreads,
-				256, 1, null, 5_000L, TimeUnit.MILLISECONDS);
+				256, 1, null, 5_000L, TimeUnit.MILLISECONDS, appController());
+	}
+	
+	@Bean
+	protected AppController appController() {
+		return new AppController();
 	}
 	
 	@Bean
@@ -185,5 +191,4 @@ public class AppConfiguration {
 	protected KryoService kryoService() {
 		return new KryoService();
 	}
-	
 }

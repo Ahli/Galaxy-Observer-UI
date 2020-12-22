@@ -3,7 +3,6 @@
 
 package interfacebuilder.threads;
 
-import interfacebuilder.InterfaceBuilderApp;
 import interfacebuilder.integration.log4j.StylizedTextAreaAppender;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,7 +18,11 @@ import java.util.concurrent.ForkJoinTask;
 public abstract class CleaningForkJoinTask extends ForkJoinTask<Void> {
 	private static final Logger logger = LogManager.getLogger(CleaningForkJoinTask.class);
 	
-	// TODO maybe make this more generic, so this can be re-used -> define interface & call member of that to clean up
+	private final CleaningForkJoinTaskCleaner cleaner;
+	
+	public CleaningForkJoinTask(final CleaningForkJoinTaskCleaner cleaner) {
+		this.cleaner = cleaner;
+	}
 	
 	@Override
 	public Void getRawResult() {
@@ -44,7 +47,7 @@ public abstract class CleaningForkJoinTask extends ForkJoinTask<Void> {
 			return false;
 		} finally {
 			StylizedTextAreaAppender.finishedWork(Thread.currentThread().getName(), true, 50);
-			InterfaceBuilderApp.tryCleanUp();
+			cleaner.tryCleanUp();
 		}
 	}
 	

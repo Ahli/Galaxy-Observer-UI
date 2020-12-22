@@ -3,7 +3,6 @@
 
 package interfacebuilder.ui.home;
 
-import interfacebuilder.InterfaceBuilderApp;
 import interfacebuilder.compress.GameService;
 import interfacebuilder.i18n.Messages;
 import interfacebuilder.integration.FileService;
@@ -36,7 +35,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.stage.Window;
-import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,6 +86,10 @@ public class HomeController implements Updateable {
 	private FileService fileService;
 	@Autowired
 	private GameService gameService;
+	@Autowired
+	private TabPaneController tabPaneController;
+	@Autowired
+	private NavigationController navigationController;
 	
 	private ObservableList<Project> projectsObservable;
 	
@@ -98,15 +100,13 @@ public class HomeController implements Updateable {
 	/**
 	 * Automatically called by FxmlLoader
 	 */
+	@SuppressWarnings("java:S1905") // unnecessary cast warning (cast is necessary here)
 	public void initialize() {
 		// grab list of projects per game
 		projectsObservable = FXCollections.observableList(projectService.getAllProjects());
 		selectionList.setItems(projectsObservable);
 		selectionList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-		selectionList.setCellFactory(new Callback<>() {
-			@Override
-			public ListCell<Project> call(final ListView<Project> p) {
-				return new ListCell<>() {
+		selectionList.setCellFactory(listViewProject -> new ListCell<>() {
 					@Override
 					protected void updateItem(final Project project, final boolean empty) {
 						super.updateItem(project, empty);
@@ -122,9 +122,8 @@ public class HomeController implements Updateable {
 							}
 						}
 					}
-				};
-			}
-		});
+				}
+		);
 		selectionList.getSelectionModel().selectAll();
 		selectionList.getSelectionModel().getSelectedItems()
 				.addListener((InvalidationListener) observable -> updateSelectedDetailsPanel());
@@ -206,7 +205,7 @@ public class HomeController implements Updateable {
 		dialog.initOwner(addProject.getScene().getWindow());
 		final Optional<Project> result = dialog.showAndWait();
 		if (result.isPresent()) {
-			logger.trace("dialog 'add project' result: {}", () -> result.get());
+			logger.trace("dialog 'add project' result: {}", result::get);
 			projectsObservable.add(result.get());
 		}
 	}
@@ -222,7 +221,7 @@ public class HomeController implements Updateable {
 		dialog.initOwner(newProject.getScene().getWindow());
 		final Optional<Project> result = dialog.showAndWait();
 		if (result.isPresent()) {
-			logger.trace("dialog 'new project' result: {}", () -> result.get());
+			logger.trace("dialog 'new project' result: {}", result::get);
 			projectsObservable.add(result.get());
 		}
 	}
@@ -242,7 +241,7 @@ public class HomeController implements Updateable {
 			((AddProjectDialogController) loader.getController()).getContentController().setProjectToEdit(project);
 			final Optional<Project> result = dialog.showAndWait();
 			if (result.isPresent()) {
-				logger.trace("dialog 'edit project' result: {}", () -> result.get());
+				logger.trace("dialog 'edit project' result: {}", result::get);
 				updateProjectList();
 			}
 		}
@@ -266,7 +265,7 @@ public class HomeController implements Updateable {
 	public void buildSelectedAction() {
 		final List<Project> selectedItems = selectionList.getSelectionModel().getSelectedItems();
 		if (!selectedItems.isEmpty()) {
-			InterfaceBuilderApp.getInstance().getNavigationController().clickProgress();
+			navigationController.clickProgress();
 			projectService.build(selectedItems, false);
 		}
 	}
@@ -332,7 +331,7 @@ public class HomeController implements Updateable {
 			final Parent content = loader.load("classpath:view/ProgressTab_CompressionMining.fxml");
 			final String tabName = String.format("%s Compression Mining", project.getName());
 			
-			final TabPane tabPane = TabPaneController.getInstance().getTabPane();
+			final TabPane tabPane = tabPaneController.getTabPane();
 			final ObservableList<Tab> tabs = tabPane.getTabs();
 			Tab newTab = null;
 			
@@ -354,7 +353,7 @@ public class HomeController implements Updateable {
 				final Tab newTabFinal = newTab;
 				closeItem.setOnAction(event -> {
 					logger.trace("close tab");
-					TabPaneController.getInstance().getTabPane().getTabs().remove(newTabFinal);
+					tabPaneController.getTabPane().getTabs().remove(newTabFinal);
 					controller.stopMining();
 				});
 				contextMenu.getItems().addAll(closeItem);
@@ -363,7 +362,7 @@ public class HomeController implements Updateable {
 				tabs.add(newTab);
 				controller.setProject(project);
 				// switch to progress and the new tab
-				NavigationController.getInstance().clickProgress();
+				navigationController.clickProgress();
 				tabPane.getSelectionModel().select(newTab);
 				// start mining
 				controller.startMining();
@@ -371,7 +370,7 @@ public class HomeController implements Updateable {
 				// CASE: recycle existing Tab
 				
 				// switch to progress and the new tab
-				NavigationController.getInstance().clickProgress();
+				navigationController.clickProgress();
 				tabPane.getSelectionModel().select(newTab);
 			}
 		}

@@ -43,9 +43,10 @@ public class ProjectService {
 	private static final Logger logger = LogManager.getLogger(ProjectService.class);
 	@Autowired
 	private ProjectJpaRepository projectRepo;
-	
 	@Autowired
 	private MpqBuilderService mpqBuilderService;
+	@Autowired
+	private NavigationController navigationController;
 	
 	/**
 	 * Returns whether the specified path contains a compilable file for the specified game.
@@ -108,7 +109,7 @@ public class ProjectService {
 		}
 		if (building) {
 			// switch to progress
-			NavigationController.getInstance().clickProgress();
+			navigationController.clickProgress();
 		}
 	}
 	

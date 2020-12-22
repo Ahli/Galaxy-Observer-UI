@@ -8,6 +8,7 @@ import com.ahli.galaxy.ui.interfaces.UICatalog;
 import interfacebuilder.base_ui.BaseUiService;
 import interfacebuilder.config.ConfigService;
 import interfacebuilder.threads.CleaningForkJoinTask;
+import interfacebuilder.threads.CleaningForkJoinTaskCleaner;
 import interfacebuilder.ui.browse.BrowseTabController;
 
 public class BrowseCompileTask extends CleaningForkJoinTask {
@@ -18,8 +19,10 @@ public class BrowseCompileTask extends CleaningForkJoinTask {
 	private final BaseUiService baseUiService;
 	private final ConfigService configService;
 	
-	public BrowseCompileTask(final ModData mod, final BrowseTabController controller,
-			final CompileService compileService, final BaseUiService baseUiService, final ConfigService configService) {
+	public BrowseCompileTask(final CleaningForkJoinTaskCleaner cleaner, final ModData mod,
+			final BrowseTabController controller, final CompileService compileService,
+			final BaseUiService baseUiService, final ConfigService configService) {
+		super(cleaner);
 		this.mod = mod;
 		this.controller = controller;
 		this.compileService = compileService;

@@ -3,9 +3,10 @@
 
 package interfacebuilder.base_ui;
 
-import interfacebuilder.InterfaceBuilderApp;
 import interfacebuilder.projects.enums.Game;
 import interfacebuilder.threads.CleaningForkJoinTask;
+import interfacebuilder.threads.CleaningForkJoinTaskCleaner;
+import interfacebuilder.ui.navigation.NavigationController;
 import interfacebuilder.ui.progress.ErrorTabController;
 import interfacebuilder.ui.progress.appender.Appender;
 import javafx.application.Platform;
@@ -20,14 +21,18 @@ public class ExtractBaseUiTask extends CleaningForkJoinTask {
 	private final Appender[] output;
 	private final BaseUiService baseUiService;
 	private final ErrorTabController errorTabController;
+	private final NavigationController navigationController;
 	
-	public ExtractBaseUiTask(final BaseUiService baseUiService, final Game game, final boolean usePtr,
-			final Appender[] output, final ErrorTabController errorTabController) {
+	public ExtractBaseUiTask(final CleaningForkJoinTaskCleaner cleaner, final BaseUiService baseUiService,
+			final Game game, final boolean usePtr, final Appender[] output, final ErrorTabController errorTabController,
+			final NavigationController navigationController) {
+		super(cleaner);
 		this.baseUiService = baseUiService;
 		this.game = game;
 		this.usePtr = usePtr;
 		this.output = output;
 		this.errorTabController = errorTabController;
+		this.navigationController = navigationController;
 	}
 	
 	@Override
@@ -45,7 +50,7 @@ public class ExtractBaseUiTask extends CleaningForkJoinTask {
 			} else {
 				return;
 			}
-			InterfaceBuilderApp.getInstance().getNavigationController().closeNotification(notificationId);
+			navigationController.closeNotification(notificationId);
 		});
 		
 		for (final var task : tasks) {

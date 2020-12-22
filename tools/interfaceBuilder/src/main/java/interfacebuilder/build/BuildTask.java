@@ -7,6 +7,7 @@ import com.ahli.galaxy.game.GameData;
 import interfacebuilder.base_ui.BaseUiService;
 import interfacebuilder.projects.Project;
 import interfacebuilder.threads.CleaningForkJoinTask;
+import interfacebuilder.threads.CleaningForkJoinTaskCleaner;
 
 import java.nio.file.Path;
 
@@ -17,8 +18,9 @@ public class BuildTask extends CleaningForkJoinTask {
 	private final MpqBuilderService mpqBuilderService;
 	private final BaseUiService baseUiService;
 	
-	public BuildTask(final Project project, final boolean useCmdLineSettings,
+	public BuildTask(final CleaningForkJoinTaskCleaner cleaner, final Project project, final boolean useCmdLineSettings,
 			final MpqBuilderService mpqBuilderService, final BaseUiService baseUiService) {
+		super(cleaner);
 		this.project = project;
 		this.useCmdLineSettings = useCmdLineSettings;
 		this.mpqBuilderService = mpqBuilderService;

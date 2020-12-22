@@ -3,8 +3,8 @@
 
 package interfacebuilder.ui.progress;
 
-import interfacebuilder.InterfaceBuilderApp;
 import interfacebuilder.integration.log4j.StylizedTextAreaAppender;
+import interfacebuilder.ui.AppController;
 import interfacebuilder.ui.Updateable;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -12,28 +12,18 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.text.TextFlow;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class TabPaneController implements Updateable {
-	private static TabPaneController instance;
 	
 	@FXML
 	private TabPane tabPane;
 	
-	public TabPaneController() {
-		if (instance == null) {
-			instance = this;
-		} else {
-			throw new ExceptionInInitializerError("Cannot create multiple TabPaneControllers.");
-		}
-	}
+	@Autowired
+	private AppController appController;
 	
-	/**
-	 * Returns the singleton instance.
-	 *
-	 * @return instance or null
-	 */
-	public static TabPaneController getInstance() {
-		return instance;
+	public TabPaneController() {
+		// nothing to do
 	}
 	
 	/**
@@ -53,7 +43,7 @@ public class TabPaneController implements Updateable {
 		tab.setContent(scrollPane);
 		
 		final ErrorTabController errorTabCtrl = new ErrorTabController(tab, txtArea, false, true, false);
-		InterfaceBuilderApp.getInstance().addErrorTabController(errorTabCtrl);
+		appController.addErrorTabController(errorTabCtrl);
 		StylizedTextAreaAppender.setGeneralController(errorTabCtrl);
 	}
 	

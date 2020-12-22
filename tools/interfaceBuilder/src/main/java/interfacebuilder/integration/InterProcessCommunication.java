@@ -3,8 +3,8 @@
 
 package interfacebuilder.integration;
 
-import interfacebuilder.InterfaceBuilderApp;
 import interfacebuilder.integration.log4j.InterProcessCommunicationAppender;
+import interfacebuilder.ui.AppController;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -20,9 +20,32 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
-public class InterProcessCommunication {
+public class InterProcessCommunication implements AutoCloseable {
 	private static final Logger logger = LogManager.getLogger(InterProcessCommunication.class);
-	private static ServerSocket serverSocket;
+	private AppController appController;
+	private ServerSocket serverSocket;
+	
+	public InterProcessCommunication() {
+		// nothing to do
+	}
+	
+	public InterProcessCommunication(final AppController appController) {
+		this.appController = appController;
+	}
+	
+	public void setAppController(final AppController appController) {
+		this.appController = appController;
+	}
+	
+	/**
+	 * @throws IOException
+	 */
+	@Override
+	public void close() throws IOException {
+		if (serverSocket != null) {
+			serverSocket.close();
+		}
+	}
 	
 	/**
 	 * Initiates the communication between processes.
@@ -31,7 +54,7 @@ public class InterProcessCommunication {
 	 * @param port
 	 * @return true, if this instance acts as the server; else false
 	 */
-	public static boolean initInterProcessCommunication(final String[] args, final int port) {
+	public boolean initInterProcessCommunication(final String[] args, final int port) {
 		try {
 			serverSocket = new ServerSocket(port, 4, InetAddress.getByAddress(new byte[] { 127, 0, 0, 1 }));
 		} catch (final UnknownHostException e) {
@@ -74,26 +97,7 @@ public class InterProcessCommunication {
 			while (true) {
 				try {
 					clientSocket = serverSocket.accept();
-					try (final PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true,
-							StandardCharsets.UTF_8); final BufferedReader in = new BufferedReader(
-							new InputStreamReader(clientSocket.getInputStream(), StandardCharsets.UTF_8))) {
-						InterProcessCommunicationAppender.setPrintWriter(out);
-						String inputLine;
-						while ((inputLine = in.readLine()) != null) {
-							logger.info("received message from client: {}", inputLine);
-							final List<String> params =
-									Arrays.asList(inputLine.substring(1, inputLine.length() - 1).split(", "));
-							executeCommand(params);
-						}
-					} catch (final IOException e) {
-						// client closed connection
-						if (logger.isTraceEnabled()) {
-							logger.trace("client closed connection.", e);
-						}
-					} finally {
-						InterProcessCommunicationAppender.setPrintWriter(null);
-						clientSocket.close();
-					}
+					handleConnection(clientSocket);
 				} catch (final IOException e) {
 					final String message = e.getMessage();
 					if ("socket closed".equalsIgnoreCase(message) || "Socket is closed".equals(message) ||
@@ -112,30 +116,42 @@ public class InterProcessCommunication {
 		return true;
 	}
 	
+	private void handleConnection(final Socket clientSocket) throws IOException {
+		try (clientSocket; final PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true,
+				StandardCharsets.UTF_8); final BufferedReader in = new BufferedReader(
+				new InputStreamReader(clientSocket.getInputStream(), StandardCharsets.UTF_8))) {
+			InterProcessCommunicationAppender.setPrintWriter(out);
+			String inputLine;
+			while ((inputLine = in.readLine()) != null) {
+				logger.info("received message from client: {}", inputLine);
+				final List<String> params =
+						Arrays.asList(inputLine.substring(1, inputLine.length() - 1).split(", "));
+				executeCommand(params);
+			}
+		} catch (final IOException e) {
+			// client closed connection
+			if (logger.isTraceEnabled()) {
+				logger.trace("client closed connection.", e);
+			}
+		} finally {
+			InterProcessCommunicationAppender.setPrintWriter(null);
+		}
+	}
+	
 	/**
 	 * Executes the specified command line arguments.
 	 *
 	 * @param paramList
 	 */
-	private static void executeCommand(final List<String> paramList) {
+	private void executeCommand(final List<String> paramList) {
 		final CommandLineParams params = new CommandLineParams(paramList.toArray(new String[0]));
 		params.setParamsOriginateFromExternalSource(true);
 		
 		if (params.isHasParamCompilePath()) {
-			InterfaceBuilderApp.getInstance()
-					.buildStartReplayExit(InterfaceBuilderApp.getInstance().getPrimaryStage(), params);
+			appController.buildStartReplayExit(appController.getPrimaryStage(), params);
 		} else {
 			// end communication as no task was given
 			InterProcessCommunicationAppender.sendTerminationSignal();
-		}
-	}
-	
-	/**
-	 * @throws IOException
-	 */
-	public static void close() throws IOException {
-		if (serverSocket != null) {
-			serverSocket.close();
 		}
 	}
 }

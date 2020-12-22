@@ -3,7 +3,6 @@
 
 package interfacebuilder.integration.log4j;
 
-import interfacebuilder.InterfaceBuilderApp;
 import javafx.application.Platform;
 import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.Core;
@@ -106,19 +105,19 @@ public final class InterProcessCommunicationAppender extends AbstractAppender {
 			
 			// send message to client
 			try {
-				if (InterfaceBuilderApp.javaFxInitialized) {
-					final String message = new String(getLayout().toByteArray(event), StandardCharsets.UTF_8);
-					Platform.runLater(() -> {
-						try {
-							if (printWriter != null) {
-								printWriter.print(message);
-								printWriter.flush();
-							}
-						} catch (final Exception e) {
-							System.err.println("Error while sending message to IPC client: " + e.getMessage());
+				//if (InterfaceBuilderApp.javaFxInitialized) {
+				final String message = new String(getLayout().toByteArray(event), StandardCharsets.UTF_8);
+				Platform.runLater(() -> {
+					try {
+						if (printWriter != null) {
+							printWriter.print(message);
+							printWriter.flush();
 						}
-					});
-				}
+					} catch (final Exception e) {
+						System.err.println("Error while sending message to IPC client: " + e.getMessage());
+					}
+				});
+				//}
 			} catch (final IllegalStateException ex) {
 				ex.printStackTrace();
 			} finally {

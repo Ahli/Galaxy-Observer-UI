@@ -34,7 +34,6 @@ public class NavigationController {
 	public static final int BROWSE_TAB = 2;
 	public static final int SETTINGS_TAB = 3;
 	private static final Logger logger = LogManager.getLogger(NavigationController.class);
-	private static NavigationController instance;
 	/* ContentPages:
 	 * 0: taskChoice
 	 * 1: tabPane
@@ -63,20 +62,7 @@ public class NavigationController {
 	private int activeContent = -1;
 	
 	public NavigationController() {
-		if (instance == null) {
-			instance = this;
-		} else {
-			throw new ExceptionInInitializerError("Cannot create multiple NavigationControllers.");
-		}
-	}
-	
-	/**
-	 * Returns the singleton instance.
-	 *
-	 * @return instance or null
-	 */
-	public static NavigationController getInstance() {
-		return instance;
+		// nothing to do
 	}
 	
 	/**
@@ -128,7 +114,7 @@ public class NavigationController {
 			final Object controller = loader.getController();
 			controllers[index] = (controller instanceof Updateable) ? (Updateable) controller : null;
 		} catch (final IOException e) {
-			logger.error("failed to load FXML: " + path + ".", e);
+			logger.error("failed to load FXML: {}." + path + ".", e);
 			contentPages[index] = null;
 			controllers[index] = null;
 		}

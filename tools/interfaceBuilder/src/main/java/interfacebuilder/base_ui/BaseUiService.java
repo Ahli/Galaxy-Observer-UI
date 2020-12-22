@@ -10,7 +10,6 @@ import com.ahli.galaxy.parser.XmlParserVtd;
 import com.ahli.galaxy.ui.UICatalogImpl;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
 import com.esotericsoftware.kryo.Kryo;
-import interfacebuilder.InterfaceBuilderApp;
 import interfacebuilder.compress.GameService;
 import interfacebuilder.config.ConfigService;
 import interfacebuilder.integration.FileService;
@@ -19,6 +18,7 @@ import interfacebuilder.integration.kryo.KryoGameInfo;
 import interfacebuilder.integration.kryo.KryoService;
 import interfacebuilder.integration.log4j.StylizedTextAreaAppender;
 import interfacebuilder.projects.enums.Game;
+import interfacebuilder.ui.AppController;
 import interfacebuilder.ui.progress.appender.Appender;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOCase;
@@ -70,6 +70,8 @@ public class BaseUiService {
 	private DiscCacheService discCacheService;
 	@Autowired
 	private KryoService kryoService;
+	@Autowired
+	private AppController app;
 	
 	/**
 	 * Checks if the specified game's baseUI is older than the game files.
@@ -265,6 +267,7 @@ public class BaseUiService {
 		// empty output buffers and print to console
 		try (final InputStream is = process.getInputStream()) {
 			do {
+				//noinspection BusyWait
 				Thread.sleep(50);
 				final String log = IOUtils.toString(is, Charset.defaultCharset());
 				if (log.contains("Unhandled Exception: System.IO.IOException: The process cannot access the file")) {
@@ -358,7 +361,6 @@ public class BaseUiService {
 					// parse baseUI
 					uiCatalog = new UICatalogImpl();
 					uiCatalog.setParser(new UICatalogParser(uiCatalog, new XmlParserVtd(), true));
-					final var app = InterfaceBuilderApp.getInstance();
 					app.printInfoLogMessageToGeneral("Starting to parse base " + gameName + " UI.");
 					app.addThreadLoggerTab(Thread.currentThread().getName(),
 							gameData.getGameDef().getNameHandle() + "UI", true);

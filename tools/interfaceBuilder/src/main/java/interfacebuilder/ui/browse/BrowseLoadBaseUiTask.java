@@ -6,6 +6,7 @@ package interfacebuilder.ui.browse;
 import com.ahli.galaxy.game.GameData;
 import interfacebuilder.base_ui.BaseUiService;
 import interfacebuilder.threads.CleaningForkJoinTask;
+import interfacebuilder.threads.CleaningForkJoinTaskCleaner;
 
 public class BrowseLoadBaseUiTask extends CleaningForkJoinTask {
 	
@@ -13,8 +14,9 @@ public class BrowseLoadBaseUiTask extends CleaningForkJoinTask {
 	private final BrowseTabController controller;
 	private final BaseUiService baseUiService;
 	
-	public BrowseLoadBaseUiTask(final GameData gameData, final BrowseTabController controller,
-			final BaseUiService baseUiService) {
+	public BrowseLoadBaseUiTask(final CleaningForkJoinTaskCleaner cleaner, final GameData gameData,
+			final BrowseTabController controller, final BaseUiService baseUiService) {
+		super(cleaner);
 		this.gameData = gameData;
 		this.controller = controller;
 		this.baseUiService = baseUiService;

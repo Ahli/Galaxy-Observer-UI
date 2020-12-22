@@ -8,7 +8,6 @@ import com.ahli.galaxy.archive.ComponentsListReaderDom;
 import com.ahli.galaxy.archive.DescIndexData;
 import com.ahli.galaxy.game.GameData;
 import com.ahli.mpq.MpqEditorInterface;
-import interfacebuilder.InterfaceBuilderApp;
 import interfacebuilder.base_ui.BaseUiService;
 import interfacebuilder.build.MpqBuilderService;
 import interfacebuilder.compile.BrowseCompileTask;
@@ -22,6 +21,7 @@ import interfacebuilder.projects.Project;
 import interfacebuilder.projects.ProjectService;
 import interfacebuilder.projects.enums.Game;
 import interfacebuilder.ui.Alerts;
+import interfacebuilder.ui.AppController;
 import interfacebuilder.ui.FXMLSpringLoader;
 import interfacebuilder.ui.Updateable;
 import interfacebuilder.ui.navigation.NavigationController;
@@ -45,7 +45,6 @@ import javafx.scene.control.TabPane;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.TextFlow;
-import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +59,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ForkJoinPool;
 
 import static interfacebuilder.InterfaceBuilderApp.FATAL_ERROR;
 
@@ -95,6 +95,12 @@ public class BrowseController implements Updateable {
 	private CompileService compileService;
 	@Autowired
 	private FileService fileService;
+	@Autowired
+	private NavigationController navigationController;
+	@Autowired
+	private AppController appController;
+	@Autowired
+	private ForkJoinPool executor;
 	
 	// prevent GC of controllers
 	private List<Updateable> controllers;
@@ -118,26 +124,21 @@ public class BrowseController implements Updateable {
 				FXCollections.observableList(projectService.getAllProjects());
 		projectListView.setItems(projectsObservable);
 		projectListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-		projectListView.setCellFactory(new Callback<>() {
+		projectListView.setCellFactory(listViewProject -> new ListCell<>() {
 			@Override
-			public ListCell<Project> call(final ListView<Project> p) {
-				return new ListCell<>() {
-					@Override
-					protected void updateItem(final Project project, final boolean empty) {
-						super.updateItem(project, empty);
-						if (empty || project == null) {
-							setText(null);
-							setGraphic(null);
-						} else {
-							setText(project.getName());
-							try {
-								setGraphic(getListItemGameImage(project));
-							} catch (final IOException e) {
-								logger.error("Failed to find image resource.", e);
-							}
-						}
+			protected void updateItem(final Project project, final boolean empty) {
+				super.updateItem(project, empty);
+				if (empty || project == null) {
+					setText(null);
+					setGraphic(null);
+				} else {
+					setText(project.getName());
+					try {
+						setGraphic(getListItemGameImage(project));
+					} catch (final IOException e) {
+						logger.error("Failed to find image resource.", e);
 					}
-				};
+				}
 			}
 		});
 	}
@@ -212,12 +213,12 @@ public class BrowseController implements Updateable {
 			extractBaseUi(Game.SC2, false);
 		} catch (final IOException e) {
 			logger.error("Error extracting Heroes Base UI.", e);
-			Alerts.buildExceptionAlert(InterfaceBuilderApp.getInstance().getPrimaryStage(), e).showAndWait();
+			Alerts.buildExceptionAlert(appController.getPrimaryStage(), e).showAndWait();
 		}
 	}
 	
 	private void extractBaseUi(final Game game, final boolean usePtr) throws IOException {
-		final ObservableList<Tab> tabs = InterfaceBuilderApp.getInstance().getTabPane().getTabs();
+		final ObservableList<Tab> tabs = appController.getTabPane().getTabs();
 		final String tabName = "Extract " + game.name();
 		Tab newTab = null;
 		BaseUiExtractionController extractionController = null;
@@ -262,7 +263,7 @@ public class BrowseController implements Updateable {
 			closeItem.setOnAction(event -> {
 				final Tab t = newTabFinal.get();
 				if (t != null) {
-					InterfaceBuilderApp.getInstance().getTabPane().getTabs().remove(t);
+					appController.getTabPane().getTabs().remove(t);
 				}
 				final BaseUiExtractionController c = newControllerFinal.get();
 				if (c != null) {
@@ -283,7 +284,7 @@ public class BrowseController implements Updateable {
 					}
 					final Tab t = newTabFinal.get();
 					if (t != null) {
-						InterfaceBuilderApp.getInstance().getTabPane().getTabs().add(t);
+						appController.getTabPane().getTabs().add(t);
 					}
 				} catch (final Exception e) {
 					logger.fatal(FATAL_ERROR, e);
@@ -310,8 +311,8 @@ public class BrowseController implements Updateable {
 			}
 		}
 		// select progress & tab
-		InterfaceBuilderApp.getInstance().getTabPane().getSelectionModel().select(newTab);
-		NavigationController.getInstance().clickProgress();
+		appController.getTabPane().getSelectionModel().select(newTab);
+		navigationController.clickProgress();
 		
 		extractionController.start(game, usePtr);
 	}
@@ -323,7 +324,7 @@ public class BrowseController implements Updateable {
 			updatePtrStatusLabel(usePtr);
 		} catch (final IOException e) {
 			logger.error("Error extracting Heroes Base UI.", e);
-			Alerts.buildExceptionAlert(InterfaceBuilderApp.getInstance().getPrimaryStage(), e).showAndWait();
+			Alerts.buildExceptionAlert(appController.getPrimaryStage(), e).showAndWait();
 		}
 	}
 	
@@ -337,8 +338,8 @@ public class BrowseController implements Updateable {
 		final Updateable controller = createTab(gameData.getGameDef().getName());
 		if (controller != null) {
 			final BrowseLoadBaseUiTask task =
-					new BrowseLoadBaseUiTask(gameData, (BrowseTabController) controller, baseUiService);
-			InterfaceBuilderApp.getInstance().getExecutor().execute(task);
+					new BrowseLoadBaseUiTask(appController, gameData, (BrowseTabController) controller, baseUiService);
+			appController.getExecutor().execute(task);
 		}
 	}
 	
@@ -435,9 +436,9 @@ public class BrowseController implements Updateable {
 				}
 				
 				final BrowseCompileTask task =
-						new BrowseCompileTask(mod, (BrowseTabController) controller, compileService, baseUiService,
-								configService);
-				InterfaceBuilderApp.getInstance().getExecutor().execute(task);
+						new BrowseCompileTask(appController, mod, (BrowseTabController) controller, compileService,
+								baseUiService, configService);
+				executor.execute(task);
 			}
 		}
 	}

@@ -15,6 +15,6 @@ public class Main {
 	 * 		command line arguments
 	 */
 	public static void main(final String[] args) {
-		InterfaceBuilderApp.init(args);
+		InterfaceBuilderApp.launch(args);
 	}
 }

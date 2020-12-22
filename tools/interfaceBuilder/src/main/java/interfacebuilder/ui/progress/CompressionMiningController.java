@@ -9,7 +9,6 @@ import com.ahli.mpq.MpqException;
 import com.ahli.mpq.mpqeditor.MpqEditorCompressionRule;
 import com.ahli.mpq.mpqeditor.MpqEditorCompressionRuleMask;
 import com.ahli.mpq.mpqeditor.MpqEditorCompressionRuleSize;
-import interfacebuilder.InterfaceBuilderApp;
 import interfacebuilder.compress.GameService;
 import interfacebuilder.compress.RandomCompressionMiner;
 import interfacebuilder.compress.RuleSet;
@@ -37,6 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.concurrent.ForkJoinPool;
 
 import static interfacebuilder.InterfaceBuilderApp.FATAL_ERROR;
 
@@ -80,6 +80,8 @@ public class CompressionMiningController implements Updateable {
 	private ConfigService configService;
 	@Autowired
 	private FileService fileService;
+	@Autowired
+	private ForkJoinPool executor;
 	
 	private Project project;
 	private ObservableList<MpqEditorCompressionRule> ruleSetObservableItems;
@@ -257,7 +259,7 @@ public class CompressionMiningController implements Updateable {
 			}
 		};
 		attemptCounterLabel.setText("0");
-		InterfaceBuilderApp.getInstance().getExecutor().execute(task);
+		executor.execute(task);
 		miningButton.setText(Messages.getString("progress.compressionMining.stopMining"));
 	}
 	
