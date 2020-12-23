@@ -239,6 +239,10 @@ public class BrowseController implements Updateable {
 			
 			final ScrollPane scrollPane = new ScrollPane(newTxtArea);
 			scrollPane.getStyleClass().add("virtualized-scroll-pane");
+			scrollPane.setPannable(true);
+			
+			// auto-downscrolling
+			scrollPane.vvalueProperty().bind(newTxtArea.heightProperty());
 			
 			final FXMLSpringLoader loader = new FXMLSpringLoader(appContext);
 			final var rootNode = loader.<AnchorPane>load("classpath:view/ProgressTab_ExtractBaseUi.fxml");
