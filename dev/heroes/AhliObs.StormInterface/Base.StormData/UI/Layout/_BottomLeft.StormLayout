@@ -5575,6 +5575,7 @@
 			<Visible val="false"/>
 			<AcceptsMouse val="false"/>
 			<RenderPriority val="0"/>
+			<Handle val="ToggleControlObserverTools"/>
 			
 			<!-- Status Animations -->
 			<Animation name="StatusControl">
@@ -5583,64 +5584,49 @@
 
 				<Controller type="Visibility" end="Pause" frame="$parent/ObserverPanelMovingContainer/ReplayPanel">
 					<Key type="Bool" time="0.0" value="false"/>
-					<Key type="Bool" time="0.4999" value="false"/>
+					<Key type="Bool" time="0.5" value="false"/>
 					<Key type="Bool" time="0.5" value="true"/>
 					<Key type="Bool" time="1.0" value="true"/>
 				</Controller>
 
 			</Animation>
 			
-			<!-- OnShown => Show -->
-			<Animation name="EventRedirectShow">
-				<Event event="OnShown" action="Play"/>
-				<Controller type="Event" end="Stop">
-					<Key type="Event" time="0" event="Show"/>
-				</Controller>
-			</Animation>
-			<!-- OnHidden => Hide -->
-			<Animation name="EventRedirectHide">
-				<Event event="OnHidden" action="Play"/>
-				<Controller type="Event" end="Stop">
-					<Key type="Event" time="0" event="Hide"/>
-				</Controller>
-			</Animation>
-			
 			<!-- Transition Animations -->
 			<Animation name="TransitionAnimations">
 				<Event event="Show" action="DirectionForward,Play"/>
 				<Event event="Hide" action="DirectionReverse,Play"/>
+				<Event event="OnShown" action="DirectionForward,Play"/>
+				<Event event="OnHidden" action="DirectionReverse,Play"/>
 				
 				<Controller type="Fade" end="Pause" frame="$parent/ObserverPanelMovingContainer/ReplayPanel">
 					<Key type="Curve" time="0.0" value="0"/>
 					<Key type="Curve" time="0.5" value="0"/>
 					<Key type="Curve" time="1.0" value="255"/>
 				</Controller>
-				
+				<Controller type="Fade" end="Pause" frame="$parent/ObserverPanelMovingContainer/ObserverPanel">
+					<Key type="Curve" time="0.0" value="0"/>
+					<Key type="Curve" time="0.5" value="0"/>
+					<Key type="Curve" time="1.0" value="255"/>
+				</Controller>
 				<Controller type="Anchor" end="Pause" side="Left" relative="true" frame="$parent/ObserverPanelMovingContainer/ReplayPanel">
-					<Key type="Curve" time="0.0" value="-300" inout="Fast"/>
-					<Key type="Curve" time="0.5" value="-300" inout="Fast"/>
-					<Key type="Curve" time="1.0" value="0" inout="Slow"/>
+					<Key type="Curve" time="0.0" value="0" inout="Fast"/>
+					<Key type="Curve" time="0.5" value="0" inout="Fast"/>
+					<Key type="Curve" time="1.0" value="300" inout="Slow"/>
 				</Controller>
 				<Controller type="Anchor" end="Pause" side="Top" relative="true" frame="$parent/$parent/ConsoleUIContainer/UnitSelectionInfoVerticalPositionControl/B">
 					<Key type="Curve" time="0.0" value="140" inout="Slow"/>
 					<Key type="Curve" time="0.5" value="0" inout="Slow"/>
 					<Key type="Curve" time="1.0" value="0" inout="Slow"/>
 				</Controller>
-				<!-- <Controller type="Anchor" end="Pause" side="Left" relative="true" frame="$parent/ChatBarHorizOffset_A">
-					<Key type="Curve" time="0.0" value="-200" inout="Slow"/>
-					<Key type="Curve" time="0.5" value="0" inout="Slow"/>
-					<Key type="Curve" time="1.0" value="0" inout="Slow"/>
-				</Controller> -->
 				<Controller type="Dimension" dimension="Width" relative="False" percentage="False" end="Pause" frame="$parent/ChatBarHorizOffset_A">
-					<Key type="Curve" time="0" value="1" inout="Fast"/>
+					<Key type="Curve" time="0" value="1" inout="Slow"/>
 					<Key type="Curve" time="0.5" value="201" inout="Slow"/>
 					<Key type="Curve" time="1.0" value="201" inout="Slow"/>
 				</Controller>
 				
 			</Animation>
 			
-			
-		</Frame>		
+		</Frame>
 	</Frame>
 	<!-- Observer/replay panel -->
 	<Frame type="Frame" name="GameUI/UIContainer/FullscreenUpperContainer/ObserverPanelStartFrame" file="GameUI">
@@ -5655,15 +5641,15 @@
 	<Frame type="MovingFrame" name="GameUI/UIContainer/FullscreenUpperContainer/ObserverPanelMovingContainer" file="GameUI">
 		<Anchor relative="$parent/ObserverPanelStartFrame"/>
 		
-		<!-- panel is put offscreen (bottom @ -100) at the start to hide the pulldown, First time showing ReplayPanel will reveal it -->
 		<Frame type="ObserverPanel" name="ObserverPanel">
 			<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
 			<Anchor side="Top" relative="$this" pos="Min" offset="0"/>
-			<Anchor side="Bottom" relative="$parent" pos="Max" offset="-100"/>
+			<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
 			<Width val="400"/>
 			<Height val="68"/>
 			<AcceptsMouse val="false"/>
 			<RenderPriority val="513"/>
+			<Alpha val="0"/>
 			
 			<Frame type="Pulldown" name="ViewPulldown">
 				<Anchor side="Top" relative="$parent/$parent/ReplayPanel/PlayButton" pos="Min" offset="0"/>
@@ -5676,15 +5662,15 @@
 				<Handle val="ViewPulldown"/>
 			<!-- <Options val="NoWrapping"/> NOT ACCEPTED :X but I fixed it via reducing vertical size of ItemContainer -->
 				
-				<Frame type="Image" name="PulldownArrow">
-					<Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-					<Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+				<Frame type="Image" name="ArrowImage">
 					<Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
 					<Rotation val="180"/>
 				</Frame>
-				<Frame type="Image" name="PulldownArrowHover">
-					<Anchor side="Top" relative="$parent" pos="Mid" offset="0"/>
-					<Anchor side="Bottom" relative="$parent" pos="Mid" offset="0"/>
+				<Frame type="Image" name="ArrowHoverImage">
+					<Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
+					<Rotation val="180"/>
+				</Frame>
+				<Frame type="Image" name="ArrowDisabledImage">
 					<Anchor side="Right" relative="$parent" pos="Max" offset="-10"/>
 					<Rotation val="180"/>
 				</Frame>
@@ -5708,55 +5694,94 @@
 		</Frame>
 		
 		<Frame type="ReplayPanel" name="ReplayPanel">
-			<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+			<Anchor side="Left" relative="$parent" pos="Min" offset="-300"/>
 			<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
 			<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
 			<Anchor side="Right" relative="$this" pos="Max" offset="0"/>
 			<Width val="420"/>
 			<Height val="0"/>
 			<Handle val="ReplayPanel"/>
+			<Alpha val="0"/>
 			
-			<!-- default offset top: -60 -->	
-			<Frame type="Image" name="BackgroundImage">
-				<Anchor side="Top" relative="$parent/ProgressSlider" pos="Min" offset="-52"/>
+			<Frame type="Button" name="PlayButton">
+				<Anchor side="Bottom" relative="$parent" pos="Max" offset="-15"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="17"/>
 			</Frame>
-		
-			<!-- default offset bottom: -10 -->
+			
 			<Frame type="Slider" name="ProgressSlider">
 				<Anchor side="Bottom" relative="$parent/PlayButton" pos="Min" offset="-5"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="25"/>
+				<Anchor side="Right" relative="$parent" pos="Max" offset="-25"/>
+				<Height val="30"/>
+			</Frame>
+			<Frame type="Image" name="BackgroundImage">
+				<Anchor side="Top" relative="$parent/ProgressSlider" pos="Min" offset="-52"/>
+				<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+				<Anchor side="Right" relative="$this" pos="Max" offset="0"/>
+				<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+				<Width val="420"/>
 			</Frame>
 			<Frame type="Label" name="SpeedValue">
 				<Anchor side="Bottom" relative="$parent/ProgressSlider" pos="Min" offset="-3"/>
+				<Anchor side="Right" relative="$parent/BackgroundImage" pos="Max" offset="-25"/>
 			</Frame>
 			<Frame type="Label" name="TimeValue">
 				<Anchor side="Bottom" relative="$parent/ProgressSlider" pos="Min" offset="-3"/>
+				<Anchor side="Left" relative="$parent/BackgroundImage" pos="Min" offset="30"/>
 			</Frame>
-
 			<Frame type="Button" name="IncSpeedButton">
-				<Anchor side="Left" relative="$parent/$parent/ObserverPanel/ViewPulldown" pos="Max" offset="0"/>
+				<Anchor side="Left" relative="$ViewPulldown" pos="Max" offset="0"/>
+				<Anchor side="Bottom" relative="$parent/PlayButton" pos="Max" offset="0"/>
 			</Frame>
 			<Frame type="Button" name="DecSpeedButton">
 				<Anchor side="Left" relative="$parent/IncSpeedButton" pos="Max" offset="0"/>
 				<Anchor side="Right" relative="$this" pos="Max" offset="0"/>
+				<Anchor side="Bottom" relative="$parent/PlayButton" pos="Max" offset="0"/>
+			</Frame>
+			<Frame type="Button" name="HideTimelineButton">
+				<Anchor side="Right" relative="$parent" pos="Max" offset="-17"/>
+				<Anchor side="Bottom" relative="$parent/PlayButton" pos="Max" offset="0"/>
 			</Frame>
 			
-			<Animation name="FirstTimeShown">
-				<Event event="OnShown" action="Play"/>
-				<!-- end="Pause" because it should only play once. It is only here to initially detect that a replay is used.
-					 Unfortunately, it will also run in live games when the observer tools are toggled the first time. -->
-				<Controller type="Visibility" end="Pause" frame="$parent/$parent/ToggleControlObserverTools">
-					<Key type="Bool" time="0.0" value="true"/>
-				</Controller>
-				<Controller type="Event" end="Pause" frame="$parent/$parent/ToggleControlObserverTools">
-					<Key type="Event" time="0.0" event="OnShown"/>
-				</Controller>
-				<Controller type="Visibility" end="Pause" frame="$parent/$parent/InterfaceControl/Menu/Container/ReplayControls/CheckImage">
-					<Key type="Bool" time="0.0" value="true"/>
-				</Controller>
-				<Controller type="Anchor" end="Pause" side="Bottom" relative="false" frame="$parent/ObserverPanel">
-					<Key type="Curve" time="0.0" value="0" inout="Fast"/>
+			<!-- Used to detect the setting -->
+			<Frame type="Frame" name="StateReplayUiAlreadyInitialized">
+				<Anchor relative="$parent"/>
+				<Visible val="false"/>
+				<Enabled val="#ObserverControlsInitiallyHidden"/>
+			</Frame>
+			
+			<Animation name="SetAlreadyInitializedFlag">
+				<Event event="Set" action="Play"/>
+				
+				<Controller type="Visibility" end="Pause" frame="StateReplayUiAlreadyInitialized">
+					<Key type="Bool" time="0" value="true"/>
 				</Controller>
 			</Animation>
+			
+			<!-- When in a replay, initialize UI for the shown controls -->
+			<StateGroup name="FirstTimeShownState">
+				<DefaultState val="Initialized"/>
+				<State name="InitReplayWithVisibleControls">
+					<When type="Property" frame="StateReplayUiAlreadyInitialized" visible="false"/>
+					<When type="Property" frame="StateReplayUiAlreadyInitialized" enabled="false"/><!-- Setting is visible -->
+					<When type="Property" frame="$this" visible="true"/>
+					<Action type="SetProperty" frame="$ToggleControlObserverTools" visible="true" undo="false"/>
+					<Action type="SendEvent" frame="$ToggleControlObserverTools" event="OnShown"/>
+					<Action type="SetProperty" frame="$parent/$parent/InterfaceControl/Menu/Container/ReplayControls/CheckImage" visible="true" undo="false"/>
+					<Action type="SendEvent" event="Set"/>
+				</State>
+				<State name="InitReplayWithHiddenControls">
+					<When type="Property" frame="StateReplayUiAlreadyInitialized" visible="false"/>
+					<When type="Property" frame="StateReplayUiAlreadyInitialized" enabled="true"/><!-- Setting is hidden -->
+					<When type="Property" frame="$this" visible="true"/>
+					<Action type="SetProperty" frame="$ToggleControlObserverTools" visible="true" undo="false"/>
+					<Action type="SendEvent" frame="$ToggleControlObserverTools" event="OnShown"/>
+					<Action type="SetProperty" frame="$parent/$parent/InterfaceControl/Menu/Container/ReplayControls/CheckImage" visible="true" undo="false"/>
+					<Action type="SendEvent" frame="$parent/$parent/InterfaceControl/Menu/Container/ReplayControls/ButtonTicked" event="DelayedHide"/>
+					<Action type="SendEvent" event="Set"/>
+				</State>
+				<State name="Initialized"/>
+			</StateGroup>
 			
 		</Frame>
 		
