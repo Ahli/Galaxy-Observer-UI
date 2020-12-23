@@ -5,7 +5,7 @@ This is a toolset to create Observer Interface files for StarCraft II and Heroes
 
 ### User Installation:
 Required Software (for Windows):
-* [Java 14](https://jdk.java.net/14/)
+* [Java 14 or higher](https://adoptopenjdk.net)
 * A text editor preferably with XML syntax support, e.g. [Notepad++](https://notepad-plus-plus.org/) with the [NppExec plugin](https://sourceforge.net/projects/npp-plugins/files/NppExec/)
 
 ### Using the Builder:
@@ -21,9 +21,9 @@ To compile a selected archive and start a replay, consult the 'ReadMe.txt' in th
 
 ### Tools-Developer Installation:
 Required Software (for Windows):
-* [Java 14](https://jdk.java.net/14/)
+* [Java 14 or higher](https://adoptopenjdk.net)
 * Java IDE, for example [IntelliJ](https://www.jetbrains.com/idea/download/#section=windows) or [Eclipse for Java Developers](https://www.eclipse.org/downloads/eclipse-packages/)
-* A text editor preferably with XML syntax support, e.g. [Notepad++](https://notepad-plus-plus.org/) with the [NppExec plugin](https://sourceforge.net/projects/npp-plugins/files/NppExec/) or alternatively [VSCode](https://code.visualstudio.com) with [Talv's SC2Layout plugin](https://github.com/Talv/sc2-layouts)
+* A text editor preferably with XML syntax support, e.g. [Notepad++](https://notepad-plus-plus.org/) with optionally the [NppExec plugin](https://sourceforge.net/projects/npp-plugins/files/NppExec/) or alternatively [VSCode](https://code.visualstudio.com) with [Talv's SC2Layout plugin](https://github.com/Talv/sc2-layouts)
 * Git or some of its GUI software like [Sourcetree](https://www.sourcetreeapp.com/).
 * [NSIS](https://nsis.sourceforge.io/Main_Page) to create installers for Settings Editor
 
@@ -38,4 +38,3 @@ Required Software (for Windows):
 
 ## Further Software already included:
 * [MPQ Editor by Ladislav Zezula](http://www.zezula.net/en/mpq/download.html). It is used to open and create MPQ files.
-* [CASCexplorer by tomrus88](https://github.com/WoW-Tools/CASCExplorer/releases). It is used to extract the base UI from the games.
