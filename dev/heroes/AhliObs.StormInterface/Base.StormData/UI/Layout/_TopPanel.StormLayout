@@ -795,6 +795,23 @@
 						</Frame>
 					</Frame>
 
+					<Frame type="UnitStatusBehaviorIcon" name="RexxarSpiritBondCooldown">
+						<Anchor relative="$parent"/>
+						<Behavior val="RexxarSpiritBondCooldown"/>
+						
+						<Frame type="BehaviorIcon" name="BehaviorIcon">
+							<Anchor relative="$parent"/>
+							
+							<Frame type="Label" name="CooldownLabel">
+								<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+								<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+								<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+								<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+								<Alpha val="0"/>
+							</Frame>
+						</Frame>
+					</Frame>
+
 				</Frame>
 				
 			</Frame>
@@ -1240,6 +1257,22 @@
 				</State>
 			</StateGroup>
 		</Frame>
+		<Frame type="Label" name="HeroDeathTimeLabel_Misha">
+			<Anchor side="Top" relative="$parent/HeroPortraitImage" pos="Mid" offset="8"/>
+			<Anchor side="Bottom" relative="$parent/HeroPortraitImage" pos="Mid" offset="8"/>
+			<Anchor side="Left" relative="$parent/HeroPortraitImage" pos="Min" offset="38"/>
+			<Anchor side="Right" relative="$parent/HeroPortraitImage" pos="Max" offset="38"/>
+			<Style val="Ahli_ObserverTeam_DeathTimerSmall_Blue"/>
+			<Unclipped val="true"/>
+			
+			<StateGroup name="Colorblind">
+				<State name="Default"/>
+				<State name="ColorBlindEnabled">
+					<When type="Option" colorblind="True"/>
+					<Action type="SetProperty" style="Ahli_ObserverTeam_DeathTimerSmall_Blue_CB"/>
+				</State>
+			</StateGroup>
+		</Frame>
 		
 		<!-- @Override -->
 		<Frame type="Image" name="HeroDeathCondensedIcon">
@@ -1358,6 +1391,45 @@
 				</State>
 				<State name="NotViking">
 					<When type="Property" frame="$parent/HeroPortraitImage" operator="NotEqual" texture="assets\textures\storm_ui_ingame_hero_loadingscreen_lostvikings.dds"/>
+					<Action type="SetProperty" visible="false"/>
+				</State>
+				<State name="Other">
+					<Action type="SetProperty" color="FFFFFF"/>
+				</State>
+			</StateGroup>
+		</Frame>
+		<Frame type="Image" name="HeroPortraitImage_Misha">
+			<Anchor side="Bottom" relative="$parent/HeroPortraitImage" pos="Max" offset="0"/>
+			<Anchor side="Right" relative="$parent/HeroPortraitImage" pos="Max" offset="0"/>
+			<Width val="96"/>
+			<Height val="42"/>
+			<AlphaMaskTexture val="@UI/obs_alphaMask_portrait"/>
+			<Texture val="Assets\Textures\storm_ui_ingame_targetinfopanel_unit_hero_misha.dds"/>
+			<RenderPriority val="511"/>
+			
+			<StateGroup name="VisibilityAndTintControl">
+				<DefaultState val="Other"/>
+				<State name="HeroDead">
+					<When type="Property" frame="$parent/HeroPortraitImage" texture="assets\textures\storm_ui_ingame_hero_loadingscreen_rexxar.dds"/>
+					<When type="Property" frame="$parent/HeroDeathTimeLabel2" visible="true"/>
+					<Action type="SetProperty" visible="false"/>
+					<Action type="SetProperty" frame="$parent/HeroDeathTimeLabel_Misha" alpha="0"/>
+				</State>
+				<State name="MishaDead">
+					<When type="Property" frame="$parent/HeroPortraitImage" texture="assets\textures\storm_ui_ingame_hero_loadingscreen_rexxar.dds"/>
+					<When type="Property" frame="$parent/HeroDeathTimeLabel_Misha" visible="true"/>
+					<When type="Property" frame="$parent/HeroDeathTimeLabel2" visible="false"/>
+					<Action type="SetProperty" color="4A4A4A"/>
+					<Action type="SetProperty" visible="true"/>
+				</State>
+				<State name="MishaAlive">
+					<When type="Property" frame="$parent/HeroPortraitImage" texture="assets\textures\storm_ui_ingame_hero_loadingscreen_rexxar.dds"/>
+					<When type="Property" frame="$parent/HeroDeathTimeLabel_Misha" visible="false"/>
+					<Action type="SetProperty" color="FFFFFF"/>
+					<Action type="SetProperty" visible="true"/>
+				</State>
+				<State name="NotRexxar">
+					<When type="Property" frame="$parent/HeroPortraitImage" operator="NotEqual" texture="assets\textures\storm_ui_ingame_hero_loadingscreen_rexxar.dds"/>
 					<Action type="SetProperty" visible="false"/>
 				</State>
 				<State name="Other">
@@ -1542,6 +1614,50 @@
 				</Controller>
 			</Animation>
 		</Frame>
+		<Frame type="Image" name="HeroDeathIconImage_Misha">
+			<Anchor side="Left" relative="$parent/HeroDeathTimeLabel_Misha" pos="Mid" offset="0"/>
+			<Anchor side="Right" relative="$parent/HeroDeathTimeLabel_Misha" pos="Mid" offset="0"/>
+			<Anchor side="Top" relative="$parent/HeroDeathTimeLabel_Misha" pos="Mid" offset="-5"/>
+			<Anchor side="Bottom" relative="$parent/HeroDeathTimeLabel_Misha" pos="Mid" offset="-5"/>
+			<Width val="42"/>
+			<Height val="48.75"/>
+			<Texture val="_Assets\Textures\topBar_deathIcon_blue.dds"/>
+			<Alpha val="0"/>
+			
+			<StateGroup name="Colorblind">
+				<State name="Default"/>
+				<State name="ColorBlindEnabled">
+					<When type="Option" colorblind="True"/>
+					<Action type="SetProperty" Texture="_Assets\Textures\topBar_deathIcon_cyan.dds"/>
+				</State>
+			</StateGroup>
+			
+			<Animation name="HeroDeathAnim">
+				<Event event="OnShown" frame="$parent/HeroDeathTimeLabel_Misha" action="Reset,Play"/>
+				<Event event="OnHidden" frame="$parent/HeroDeathTimeLabel_Misha" action="Reset,Stop"/>
+				
+				<Controller type="Fade" end="Pause">
+					<Key type="Curve" time="0" value="0" inout="Fast"/>
+					<Key type="Curve" time=".35" value="255" inout="Slow"/>
+					<Key type="Curve" time="1.1" value="0" inout="Slow"/>
+				</Controller>
+				<Controller type="Fade" end="Pause" frame="$parent/HeroDeathTimeLabel_Misha">
+					<Key type="Curve" time="0" value="0" inout="Fast"/>
+					<Key type="Curve" time=".70" value="0" inout="Slow"/>
+					<Key type="Curve" time="1.2" value="255" inout="Slow"/>
+				</Controller>
+				<Controller type="Dimension" dimension="Width" relative="False" percentage="True" end="Pause">
+					<Key type="Curve" time="0" value="0"/>
+					<Key type="Curve" time=".35" value="100"/>
+					<Key type="Curve" time="1.1" value="200"/>
+				</Controller>
+				<Controller type="Dimension" dimension="Height" relative="False" percentage="True" end="Pause">
+					<Key type="Curve" time="0" value="0"/>
+					<Key type="Curve" time=".35" value="100"/>
+					<Key type="Curve" time="1.1" value="200"/>
+				</Controller>
+			</Animation>
+		</Frame>
 		
 	</Frame>
 	<Frame type="Frame" name="HeroOverviewTemplateL" template="_TopPanel/HeroOverviewTemplate_Base">
@@ -1631,6 +1747,17 @@
 				</State>
 			</StateGroup>
 		</Frame>
+		<Frame type="Label" name="HeroDeathTimeLabel_Misha">
+			<Style val="Ahli_ObserverTeam_DeathTimerSmall_Red"/>
+			
+			<StateGroup name="Colorblind">
+				<State name="Default"/>
+				<State name="ColorBlindEnabled">
+					<When type="Option" colorblind="True"/>
+					<Action type="SetProperty" style="Ahli_ObserverTeam_DeathTimerSmall_Red_CB"/>
+				</State>
+			</StateGroup>
+		</Frame>
 		
 		<Frame type="Image" name="HeroPortraitImage_Baleog" template="StormObserverPanel/HeroOverviewTemplate_R/HeroPortraitImage">
 			<RenderPriority val="511"/>
@@ -1643,6 +1770,10 @@
 		<Frame type="Image" name="HeroPortraitImage_Erik" template="StormObserverPanel/HeroOverviewTemplate_R/HeroPortraitImage">
 			<RenderPriority val="511"/>
 			<Texture val="_Assets\Textures\topBar_lostVikingErik.dds"/>
+		</Frame>
+		<Frame type="Image" name="HeroPortraitImage_Misha">
+			<Anchor side="Right" relative="$parent/HeroPortraitImage" pos="Max" offset="-10"/>
+			<AlphaMaskTexture val="@UI/obs_alphaMask_portrait_mirrored"/>
 		</Frame>
 		
 		<Frame type="Image" name="HeroDeathIconImage">
@@ -1690,7 +1821,17 @@
 				</State>
 			</StateGroup>
 		</Frame>
-
+		<Frame type="Image" name="HeroDeathIconImage_Misha">
+			<Texture val="_Assets\Textures\topBar_deathIcon_red.dds"/>
+			
+			<StateGroup name="Colorblind">
+				<State name="Default"/>
+				<State name="ColorBlindEnabled">
+					<When type="Option" colorblind="True"/>
+					<Action type="SetProperty" Texture="_Assets\Textures\topBar_deathIcon_orange.dds"/>
+				</State>
+			</StateGroup>
+		</Frame>
 		
 	</Frame>
 	
@@ -1825,6 +1966,10 @@
 					<Text val="{$PartyFramePanel/Team1HeroOverview/HeroOverview1/HeroDeathTimeVikingErikLabel/@Text}"/>
 					<Visible val="{$PartyFramePanel/Team1HeroOverview/HeroOverview1/HeroDeathTimeVikingErikLabel/@Visible}"/>
 				</Frame>
+				<Frame type="Label" name="HeroDeathTimeLabel_Misha">
+					<Text val="{$HeroTalentsPanelContainer/PlayerFrame0/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/RexxarSpiritBondCooldown/BehaviorIcon/CooldownLabel/@Text}"/>
+					<Visible val="{$HeroTalentsPanelContainer/PlayerFrame0/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/RexxarSpiritBondCooldown/@Visible}"/>
+				</Frame>
 			</Frame>
 			<Frame type="Frame" name="HeroOverview2" template="_TopPanel/HeroOverviewTemplateL">
 				<Frame type="Label" name="HeroDeathTimeLabel2">
@@ -1863,6 +2008,10 @@
 				<Frame type="Label" name="HeroDeathTimeLabel_Erik">
 					<Text val="{$PartyFramePanel/Team1HeroOverview/HeroOverview2/HeroDeathTimeVikingErikLabel/@Text}"/>
 					<Visible val="{$PartyFramePanel/Team1HeroOverview/HeroOverview2/HeroDeathTimeVikingErikLabel/@Visible}"/>
+				</Frame>
+				<Frame type="Label" name="HeroDeathTimeLabel_Misha">
+					<Text val="{$HeroTalentsPanelContainer/PlayerFrame1/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/RexxarSpiritBondCooldown/BehaviorIcon/CooldownLabel/@Text}"/>
+					<Visible val="{$HeroTalentsPanelContainer/PlayerFrame1/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/RexxarSpiritBondCooldown/@Visible}"/>
 				</Frame>
 			</Frame>
 			<Frame type="Frame" name="HeroOverview3" template="_TopPanel/HeroOverviewTemplateL">
@@ -1903,6 +2052,10 @@
 					<Text val="{$PartyFramePanel/Team1HeroOverview/HeroOverview3/HeroDeathTimeVikingErikLabel/@Text}"/>
 					<Visible val="{$PartyFramePanel/Team1HeroOverview/HeroOverview3/HeroDeathTimeVikingErikLabel/@Visible}"/>
 				</Frame>
+				<Frame type="Label" name="HeroDeathTimeLabel_Misha">
+					<Text val="{$HeroTalentsPanelContainer/PlayerFrame2/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/RexxarSpiritBondCooldown/BehaviorIcon/CooldownLabel/@Text}"/>
+					<Visible val="{$HeroTalentsPanelContainer/PlayerFrame2/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/RexxarSpiritBondCooldown/@Visible}"/>
+				</Frame>
 			</Frame>
 			<Frame type="Frame" name="HeroOverview4" template="_TopPanel/HeroOverviewTemplateL">
 				<Frame type="Label" name="HeroDeathTimeLabel2">
@@ -1942,6 +2095,10 @@
 					<Text val="{$PartyFramePanel/Team1HeroOverview/HeroOverview4/HeroDeathTimeVikingErikLabel/@Text}"/>
 					<Visible val="{$PartyFramePanel/Team1HeroOverview/HeroOverview4/HeroDeathTimeVikingErikLabel/@Visible}"/>
 				</Frame>
+				<Frame type="Label" name="HeroDeathTimeLabel_Misha">
+					<Text val="{$HeroTalentsPanelContainer/PlayerFrame3/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/RexxarSpiritBondCooldown/BehaviorIcon/CooldownLabel/@Text}"/>
+					<Visible val="{$HeroTalentsPanelContainer/PlayerFrame3/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/RexxarSpiritBondCooldown/@Visible}"/>
+				</Frame>
 			</Frame>
 			<Frame type="Frame" name="HeroOverview5" template="_TopPanel/HeroOverviewTemplateL">
 				<Frame type="Label" name="HeroDeathTimeLabel2">
@@ -1980,6 +2137,10 @@
 				<Frame type="Label" name="HeroDeathTimeLabel_Erik">
 					<Text val="{$PartyFramePanel/Team1HeroOverview/HeroOverview5/HeroDeathTimeVikingErikLabel/@Text}"/>
 					<Visible val="{$PartyFramePanel/Team1HeroOverview/HeroOverview5/HeroDeathTimeVikingErikLabel/@Visible}"/>
+				</Frame>
+				<Frame type="Label" name="HeroDeathTimeLabel_Misha">
+					<Text val="{$HeroTalentsPanelContainer/PlayerFrame4/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/RexxarSpiritBondCooldown/BehaviorIcon/CooldownLabel/@Text}"/>
+					<Visible val="{$HeroTalentsPanelContainer/PlayerFrame4/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/RexxarSpiritBondCooldown/@Visible}"/>
 				</Frame>
 			</Frame>
 			
@@ -2184,6 +2345,10 @@
 					<Text val="{$PartyFramePanel/Team2HeroOverview/HeroOverview1/HeroDeathTimeVikingErikLabel/@Text}"/>
 					<Visible val="{$PartyFramePanel/Team2HeroOverview/HeroOverview1/HeroDeathTimeVikingErikLabel/@Visible}"/>
 				</Frame>
+				<Frame type="Label" name="HeroDeathTimeLabel_Misha">
+					<Text val="{$HeroTalentsPanelContainer/PlayerFrame5/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/RexxarSpiritBondCooldown/BehaviorIcon/CooldownLabel/@Text}"/>
+					<Visible val="{$HeroTalentsPanelContainer/PlayerFrame5/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/RexxarSpiritBondCooldown/@Visible}"/>
+				</Frame>
 			</Frame>
 			<Frame type="Frame" name="HeroOverview2" template="_TopPanel/HeroOverviewTemplateR">
 				<Frame type="Label" name="HeroDeathTimeLabel2">
@@ -2222,6 +2387,10 @@
 				<Frame type="Label" name="HeroDeathTimeLabel_Erik">
 					<Text val="{$PartyFramePanel/Team2HeroOverview/HeroOverview2/HeroDeathTimeVikingErikLabel/@Text}"/>
 					<Visible val="{$PartyFramePanel/Team2HeroOverview/HeroOverview2/HeroDeathTimeVikingErikLabel/@Visible}"/>
+				</Frame>
+				<Frame type="Label" name="HeroDeathTimeLabel_Misha">
+					<Text val="{$HeroTalentsPanelContainer/PlayerFrame6/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/RexxarSpiritBondCooldown/BehaviorIcon/CooldownLabel/@Text}"/>
+					<Visible val="{$HeroTalentsPanelContainer/PlayerFrame6/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/RexxarSpiritBondCooldown/@Visible}"/>
 				</Frame>
 			</Frame>
 			<Frame type="Frame" name="HeroOverview3" template="_TopPanel/HeroOverviewTemplateR">
@@ -2262,6 +2431,10 @@
 					<Text val="{$PartyFramePanel/Team2HeroOverview/HeroOverview3/HeroDeathTimeVikingErikLabel/@Text}"/>
 					<Visible val="{$PartyFramePanel/Team2HeroOverview/HeroOverview3/HeroDeathTimeVikingErikLabel/@Visible}"/>
 				</Frame>
+				<Frame type="Label" name="HeroDeathTimeLabel_Misha">
+					<Text val="{$HeroTalentsPanelContainer/PlayerFrame7/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/RexxarSpiritBondCooldown/BehaviorIcon/CooldownLabel/@Text}"/>
+					<Visible val="{$HeroTalentsPanelContainer/PlayerFrame7/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/RexxarSpiritBondCooldown/@Visible}"/>
+				</Frame>
 			</Frame>
 			<Frame type="Frame" name="HeroOverview4" template="_TopPanel/HeroOverviewTemplateR">
 				<Frame type="Label" name="HeroDeathTimeLabel2">
@@ -2301,6 +2474,10 @@
 					<Text val="{$PartyFramePanel/Team2HeroOverview/HeroOverview4/HeroDeathTimeVikingErikLabel/@Text}"/>
 					<Visible val="{$PartyFramePanel/Team2HeroOverview/HeroOverview4/HeroDeathTimeVikingErikLabel/@Visible}"/>
 				</Frame>
+				<Frame type="Label" name="HeroDeathTimeLabel_Misha">
+					<Text val="{$HeroTalentsPanelContainer/PlayerFrame8/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/RexxarSpiritBondCooldown/BehaviorIcon/CooldownLabel/@Text}"/>
+					<Visible val="{$HeroTalentsPanelContainer/PlayerFrame8/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/RexxarSpiritBondCooldown/@Visible}"/>
+				</Frame>
 			</Frame>
 			<Frame type="Frame" name="HeroOverview5" template="_TopPanel/HeroOverviewTemplateR">
 				<Frame type="Label" name="HeroDeathTimeLabel2">
@@ -2339,6 +2516,10 @@
 				<Frame type="Label" name="HeroDeathTimeLabel_Erik">
 					<Text val="{$PartyFramePanel/Team2HeroOverview/HeroOverview5/HeroDeathTimeVikingErikLabel/@Text}"/>
 					<Visible val="{$PartyFramePanel/Team2HeroOverview/HeroOverview5/HeroDeathTimeVikingErikLabel/@Visible}"/>
+				</Frame>
+				<Frame type="Label" name="HeroDeathTimeLabel_Misha">
+					<Text val="{$HeroTalentsPanelContainer/PlayerFrame9/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/RexxarSpiritBondCooldown/BehaviorIcon/CooldownLabel/@Text}"/>
+					<Visible val="{$HeroTalentsPanelContainer/PlayerFrame9/TalentsContainerFrame/SelectionUnitStatusPanel/UnitStatusFrame0/RexxarSpiritBondCooldown/@Visible}"/>
 				</Frame>
 			</Frame>
 			
