@@ -21,7 +21,7 @@ module interfacex.builder {
 	requires org.apache.logging.log4j.core;
 	requires com.esotericsoftware.kryo;
 	//requires com.esotericsoftware.minlog;
-	requires pecoff4j;
+	requires com.kichik.pecoff4j;
 	//requires org.eclipse.collections.api;
 	requires org.eclipse.collections.impl;
 	
