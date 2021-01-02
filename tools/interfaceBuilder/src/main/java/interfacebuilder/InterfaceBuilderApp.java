@@ -191,8 +191,8 @@ public class InterfaceBuilderApp extends Application {
 			//noinspection ResultOfMethodCallIgnored
 			executor.awaitTermination(120L, TimeUnit.SECONDS);
 		} catch (final InterruptedException e) {
-			logger.error(
-					"ERROR: Executor timed out waiting for Worker Theads to terminate. A Thread might run rampage.", e);
+			logger.error("ERROR: Executor timed out waiting for Worker Theads to terminate. A Thread might run rampage.",
+					e);
 			Thread.currentThread().interrupt();
 		}
 		logger.info("App waves Goodbye!");

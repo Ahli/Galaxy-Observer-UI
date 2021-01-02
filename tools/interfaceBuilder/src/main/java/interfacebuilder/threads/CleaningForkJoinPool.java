@@ -11,12 +11,29 @@ public class CleaningForkJoinPool extends ForkJoinPool {
 	
 	private final CleaningForkJoinTaskCleaner cleaner;
 	
-	public CleaningForkJoinPool(final int parallelism, final ForkJoinWorkerThreadFactory factory,
-			final Thread.UncaughtExceptionHandler handler, final boolean asyncMode, final int corePoolSize,
-			final int maximumPoolSize, final int minimumRunnable, final Predicate<? super ForkJoinPool> saturate,
-			final long keepAliveTime, final TimeUnit unit, final CleaningForkJoinTaskCleaner cleaner) {
-		super(parallelism, factory, handler, asyncMode, corePoolSize, maximumPoolSize, minimumRunnable, saturate,
-				keepAliveTime, unit);
+	public CleaningForkJoinPool(
+			final int parallelism,
+			final ForkJoinWorkerThreadFactory factory,
+			final Thread.UncaughtExceptionHandler handler,
+			final boolean asyncMode,
+			final int corePoolSize,
+			final int maximumPoolSize,
+			final int minimumRunnable,
+			final Predicate<? super ForkJoinPool> saturate,
+			final long keepAliveTime,
+			final TimeUnit unit,
+			final CleaningForkJoinTaskCleaner cleaner) {
+		super(
+				parallelism,
+				factory,
+				handler,
+				asyncMode,
+				corePoolSize,
+				maximumPoolSize,
+				minimumRunnable,
+				saturate,
+				keepAliveTime,
+				unit);
 		this.cleaner = cleaner;
 	}
 	

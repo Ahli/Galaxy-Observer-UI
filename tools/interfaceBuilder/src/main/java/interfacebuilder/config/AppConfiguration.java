@@ -19,12 +19,16 @@ import interfacebuilder.integration.JarHelper;
 import interfacebuilder.integration.ReplayFinder;
 import interfacebuilder.integration.SettingsIniInterface;
 import interfacebuilder.integration.kryo.KryoService;
+import interfacebuilder.projects.ProjectJpaRepository;
 import interfacebuilder.projects.ProjectService;
 import interfacebuilder.threads.CleaningForkJoinPool;
+import interfacebuilder.threads.CleaningForkJoinTaskCleaner;
 import interfacebuilder.threads.SpringForkJoinWorkerThreadFactory;
 import interfacebuilder.ui.AppController;
+import interfacebuilder.ui.navigation.NavigationController;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 
 import javax.swing.filechooser.FileSystemView;
 import java.io.File;
@@ -57,52 +61,167 @@ public class AppConfiguration {
 	}
 	
 	@Bean
-	protected Path documentsPath() {
-		return FileSystemView.getFileSystemView().getDefaultDirectory().toPath();
-	}
-	
-	@Bean
-	protected Path cachePath() {
-		return Path.of(System.getProperty("user.home") + File.separator + ".GalaxyObsUI" + File.separator + "cache");
-	}
-	
-	@Bean
 	protected MpqEditorInterface mpqEditorInterface() {
-		return new MpqEditorInterface(mpqCachePath(), mpqEditorPath());
+		return new MpqEditorInterface(mpqCachePath(tempDirectory()), mpqEditorPath(basePath()));
 	}
 	
-	@Bean
-	protected Path mpqCachePath() {
-		return Path.of(tempDirectory().toString(), "ObserverInterfaceBuilder", "_ExtractedMpq");
+	protected Path mpqCachePath(final Path tempDirectory) {
+		return Path.of(tempDirectory.toString(), "ObserverInterfaceBuilder", "_ExtractedMpq");
 	}
 	
-	@Bean
-	protected Path mpqEditorPath() {
-		return Path.of(basePath().getParent() + File.separator + "tools" + File.separator + "plugins" + File.separator +
-				"mpq" +
-				File.separator + "MPQEditor.exe");
-	}
-	
-	@Bean
 	protected Path tempDirectory() {
 		return Path.of(System.getProperty("java.io.tmpdir"));
 	}
 	
-	@Bean
+	protected Path mpqEditorPath(final Path basePath) {
+		return Path.of(
+				basePath.getParent() + File.separator + "tools" + File.separator + "plugins" + File.separator + "mpq" +
+						File.separator + "MPQEditor.exe");
+	}
+	
 	protected Path basePath() {
 		return JarHelper.getJarDir(InterfaceBuilderApp.class);
 	}
 	
 	@Bean
-	protected Path miningTempPath() {
-		return tempDirectory().resolve("ObserverInterfaceBuilder" + File.separator + "_Mining");
+	protected CompileService compileService() {
+		return new CompileService();
 	}
 	
 	@Bean
-	protected File cascExtractorExeFile() {
-		return new File(
-				basePath().getParent() + File.separator + "tools" + File.separator + "plugins" + File.separator +
-						"casc" + File.separator + "CascExtractor.exe");
+	protected ProjectService projectService(
+			final ProjectJpaRepository projectJpaRepository,
+			@Lazy final MpqBuilderService mpqBuilderService,
+			final NavigationController navigationController) {
+		return new ProjectService(projectJpaRepository, mpqBuilderService, navigationController);
+	}
+	
+	@Bean
+	protected MpqBuilderService mpqBuilderService(
+			final ConfigService configService,
+			final CompileService compileService,
+			final FileService fileService,
+			final ProjectService projectService,
+			final BaseUiService baseUiService,
+			final GameData sc2BaseGameData,
+			final GameData heroesBaseGameData,
+			final ForkJoinPool forkJoinPool,
+			final AppController appController) {
+		return new MpqBuilderService(
+				configService,
+				compileService,
+				fileService,
+				projectService,
+				baseUiService,
+				sc2BaseGameData,
+				heroesBaseGameData,
+				forkJoinPool,
+				appController);
+	}
+	
+	@Bean
+	protected ReplayFinder replayService() {
+		return new ReplayFinder();
+	}
+	
+	@Bean
+	protected ForkJoinPool forkJoinPool(final CleaningForkJoinTaskCleaner cleaner) {
+		final int maxThreads = Math.max(1, Runtime.getRuntime().availableProcessors() / 2);
+		return new CleaningForkJoinPool(
+				maxThreads,
+				new SpringForkJoinWorkerThreadFactory(),
+				null,
+				true,
+				maxThreads,
+				256,
+				1,
+				null,
+				5_000L,
+				TimeUnit.MILLISECONDS,
+				cleaner);
+	}
+	
+	@Bean
+	protected AppController appController() {
+		return new AppController();
+	}
+	
+	@Bean
+	protected BaseUiService baseUiService(
+			final ConfigService configService,
+			final FileService fileService,
+			final DiscCacheService discCacheService,
+			final KryoService kryoService,
+			final AppController appController,
+			final GameService gameService) {
+		return new BaseUiService(configService, gameService, fileService, discCacheService, kryoService, appController);
+	}
+	
+	@Bean
+	protected GameService gameService(final ConfigService configService) {
+		return new GameService(configService);
+	}
+	
+	@Bean
+	protected FileService fileService() {
+		return new FileService();
+	}
+	
+	@Bean
+	protected DiscCacheService discCacheService(final ConfigService configService, final KryoService kryoService) {
+		return new DiscCacheService(configService, kryoService);
+	}
+	
+	@Bean
+	protected KryoService kryoService() {
+		return new KryoService();
+	}
+	
+	@Bean
+	protected ConfigService configService(
+			final String raceId,
+			final String consoleSkinId,
+			final File cascExtractorExeFile,
+			final SettingsIniInterface settingsIniInterface) {
+		final Path tmpPath = tempDirectory();
+		final Path basePath = basePath();
+		return new ConfigService(
+				mpqCachePath(tmpPath),
+				basePath,
+				documentsPath(),
+				mpqEditorPath(basePath),
+				settingsIniInterface,
+				raceId,
+				consoleSkinId,
+				baseUiPath(basePath),
+				cascExtractorExeFile,
+				cachePath(),
+				miningTempPath(tmpPath));
+	}
+	
+	protected Path documentsPath() {
+		return FileSystemView.getFileSystemView().getDefaultDirectory().toPath();
+	}
+	
+	protected Path baseUiPath(final Path basePath) {
+		return basePath.getParent().resolve("baseUI");
+	}
+	
+	protected Path cachePath() {
+		return Path.of(System.getProperty("user.home") + File.separator + ".GalaxyObsUI" + File.separator + "cache");
+	}
+	
+	protected Path miningTempPath(final Path tempDirectory) {
+		return tempDirectory.resolve("ObserverInterfaceBuilder" + File.separator + "_Mining");
+	}
+	
+	@Bean
+	protected SettingsIniInterface settingsIniInterface() {
+		return new SettingsIniInterface(iniSettingsPath(basePath()));
+	}
+	
+	protected Path iniSettingsPath(final Path basePath) {
+		return basePath.getParent().resolve("settings.ini");
 	}
 	
 	@Bean
@@ -116,79 +235,9 @@ public class AppConfiguration {
 	}
 	
 	@Bean
-	protected MpqBuilderService mpqBuilderService() {
-		return new MpqBuilderService();
-	}
-	
-	@Bean
-	protected ConfigService configService() {
-		return new ConfigService();
-	}
-	
-	@Bean
-	protected CompileService compileService() {
-		return new CompileService();
-	}
-	
-	@Bean
-	protected ProjectService projectService() {
-		return new ProjectService();
-	}
-	
-	@Bean
-	protected FileService fileService() {
-		return new FileService();
-	}
-	
-	@Bean
-	protected ReplayFinder replayService() {
-		return new ReplayFinder();
-	}
-	
-	@Bean
-	protected ForkJoinPool forkJoinPool() {
-		final int maxThreads = Math.max(1, Runtime.getRuntime().availableProcessors() / 2);
-		return new CleaningForkJoinPool(maxThreads, new SpringForkJoinWorkerThreadFactory(), null, true, maxThreads,
-				256, 1, null, 5_000L, TimeUnit.MILLISECONDS, appController());
-	}
-	
-	@Bean
-	protected AppController appController() {
-		return new AppController();
-	}
-	
-	@Bean
-	protected SettingsIniInterface settingsIniInterface() {
-		return new SettingsIniInterface(iniSettingsPath());
-	}
-	
-	@Bean
-	protected Path iniSettingsPath() {
-		return basePath().getParent().resolve("settings.ini");
-	}
-	
-	@Bean
-	protected Path baseUiPath() {
-		return basePath().getParent().resolve("baseUI");
-	}
-	
-	@Bean
-	protected GameService gameService() {
-		return new GameService();
-	}
-	
-	@Bean
-	protected BaseUiService baseUiService() {
-		return new BaseUiService();
-	}
-	
-	@Bean
-	protected DiscCacheService discCacheService() {
-		return new DiscCacheService();
-	}
-	
-	@Bean
-	protected KryoService kryoService() {
-		return new KryoService();
+	protected File cascExtractorExeFile() {
+		return new File(
+				basePath().getParent() + File.separator + "tools" + File.separator + "plugins" + File.separator +
+						"casc" + File.separator + "CascExtractor.exe");
 	}
 }

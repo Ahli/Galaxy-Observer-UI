@@ -11,7 +11,6 @@ import interfacebuilder.integration.kryo.KryoGameInfo;
 import interfacebuilder.integration.kryo.KryoService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,10 +20,13 @@ import java.util.List;
 
 public class DiscCacheService {
 	private static final Logger logger = LogManager.getLogger(DiscCacheService.class);
-	@Autowired
-	private ConfigService configService;
-	@Autowired
-	private KryoService kryoService;
+	private final ConfigService configService;
+	private final KryoService kryoService;
+	
+	public DiscCacheService(final ConfigService configService, final KryoService kryoService) {
+		this.configService = configService;
+		this.kryoService = kryoService;
+	}
 	
 	/**
 	 * @param catalog
@@ -45,8 +47,12 @@ public class DiscCacheService {
 		kryoService.put(p, payload, kryo);
 		logger.info(
 				"Cached UI for {} - templates={}, blizzOnlyTemplates={}, constants={}, blizzOnlyConstants={}, devLayouts={}",
-				gameDefName, catalog.getTemplates().size(), catalog.getBlizzOnlyTemplates().size(),
-				catalog.getConstants().size(), catalog.getBlizzOnlyConstants().size(), catalog.getDevLayouts().size());
+				gameDefName,
+				catalog.getTemplates().size(),
+				catalog.getBlizzOnlyTemplates().size(),
+				catalog.getConstants().size(),
+				catalog.getBlizzOnlyConstants().size(),
+				catalog.getDevLayouts().size());
 	}
 	
 	/**

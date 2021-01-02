@@ -14,10 +14,8 @@ public class AddProjectDialogController {
 	private Pane contentPane;
 	@FXML
 	private AddProjectController contentPaneController;
-	
 	@FXML
 	private Dialog<Project> dialog;
-	
 	
 	public AddProjectDialogController() {
 		// nothing to do

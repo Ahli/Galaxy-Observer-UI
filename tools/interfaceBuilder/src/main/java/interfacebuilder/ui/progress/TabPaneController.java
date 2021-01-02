@@ -12,18 +12,15 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.text.TextFlow;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class TabPaneController implements Updateable {
 	
+	private final AppController appController;
 	@FXML
 	private TabPane tabPane;
 	
-	@Autowired
-	private AppController appController;
-	
-	public TabPaneController() {
-		// nothing to do
+	public TabPaneController(final AppController appController) {
+		this.appController = appController;
 	}
 	
 	/**

@@ -41,8 +41,12 @@ public final class InterProcessCommunicationAppender extends AbstractAppender {
 	 * @param layout
 	 * @param ignoreExceptions
 	 */
-	protected InterProcessCommunicationAppender(final String name, final Filter filter,
-			final Layout<? extends Serializable> layout, final boolean ignoreExceptions, final Property... properties) {
+	protected InterProcessCommunicationAppender(
+			final String name,
+			final Filter filter,
+			final Layout<? extends Serializable> layout,
+			final boolean ignoreExceptions,
+			final Property... properties) {
 		super(name, filter, layout, ignoreExceptions, properties);
 		if (instance == null) {
 			instance = this;
@@ -64,7 +68,8 @@ public final class InterProcessCommunicationAppender extends AbstractAppender {
 	 * @return The TextAreaAppender
 	 */
 	@PluginFactory
-	public static InterProcessCommunicationAppender createAppender(@PluginAttribute("name") final String name,
+	public static InterProcessCommunicationAppender createAppender(
+			@PluginAttribute("name") final String name,
 			@PluginElement("Layout") final Layout<? extends Serializable> layout,
 			@PluginElement("Filter") final Filter filter) {
 		if (name == null) {

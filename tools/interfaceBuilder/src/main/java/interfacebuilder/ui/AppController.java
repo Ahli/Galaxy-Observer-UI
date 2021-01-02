@@ -50,27 +50,41 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 	public static final String FATAL_ERROR = "FATAL ERROR: ";
 	private static final Logger logger = LogManager.getLogger(AppController.class);
 	private final List<ErrorTabController> errorTabControllers;
+	private ForkJoinPool executor;
+	private TabPaneController tabPaneController;
+	private BaseUiService baseUiService;
+	private MpqBuilderService mpqBuilderService;
+	private GameService gameService;
+	private ReplayFinder replayFinder;
+	private ConfigService configService;
+	private ConfigurableApplicationContext appContext;
 	private Stage primaryStage;
 	private NavigationController navigationController;
-	@Autowired
-	private ForkJoinPool executor;
-	@Autowired
-	private TabPaneController tabPaneController;
-	@Autowired
-	private BaseUiService baseUiService;
-	@Autowired
-	private MpqBuilderService mpqBuilderService;
-	@Autowired
-	private GameService gameService;
-	@Autowired
-	private ReplayFinder replayFinder;
-	@Autowired
-	private ConfigService configService;
-	@Autowired
-	private ConfigurableApplicationContext appContext;
 	
 	public AppController() {
 		errorTabControllers = new ArrayList<>(0);
+	}
+	
+	// Lazy Constructor injection does not work as java-modules requires access to swap out the proxy class with the bean
+	// usual Constructor parameter bean injection does not work due to circular dependencies
+	@Autowired
+	protected void initBeans(
+			final ForkJoinPool executor,
+			final TabPaneController tabPaneController,
+			final BaseUiService baseUiService,
+			final MpqBuilderService mpqBuilderService,
+			final GameService gameService,
+			final ReplayFinder replayFinder,
+			final ConfigService configService,
+			final ConfigurableApplicationContext appContext) {
+		this.executor = executor;
+		this.tabPaneController = tabPaneController;
+		this.baseUiService = baseUiService;
+		this.mpqBuilderService = mpqBuilderService;
+		this.gameService = gameService;
+		this.replayFinder = replayFinder;
+		this.configService = configService;
+		this.appContext = appContext;
 	}
 	
 	/**
@@ -83,7 +97,7 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 		Platform.runLater(() -> {
 			// free space of baseUI
 			if (executor != null && executor.isQuiescent() && mpqBuilderService != null) {
-				logger.info("Freeing up resources");
+				logger.debug("Freeing up resources");
 				mpqBuilderService.getGameData(Game.SC2).setUiCatalog(null);
 				mpqBuilderService.getGameData(Game.HEROES).setUiCatalog(null);
 				// GC1 is the default GC and can now release RAM -> actually good to do after a task because we use a
@@ -153,8 +167,8 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 	 * @param threadName
 	 * @param tabName
 	 */
-	public void addThreadLoggerTab(final String threadName, final String tabName,
-			final boolean errorsDoNotPreventExit) {
+	public void addThreadLoggerTab(
+			final String threadName, final String tabName, final boolean errorsDoNotPreventExit) {
 		final ObservableList<Tab> tabs = getTabPane().getTabs();
 		Tab newTab = null;
 		
@@ -295,27 +309,26 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 	public void checkBaseUiUpdate() {
 		try {
 			if (baseUiService.isOutdated(Game.SC2, false)) {
-				navigationController.appendNotification(
-						new Notification(Messages.getString("browse.notification.sc2OutOfDate"),
-								NavigationController.BROWSE_TAB, "sc2OutOfDate"));
+				navigationController.appendNotification(new Notification(Messages.getString(
+						"browse.notification.sc2OutOfDate"), NavigationController.BROWSE_TAB, "sc2OutOfDate"));
 			}
 		} catch (final IOException e) {
 			logger.error("Error during SC2 baseUI update check.", e);
 		}
 		try {
 			if (baseUiService.isOutdated(Game.HEROES, false)) {
-				navigationController.appendNotification(
-						new Notification(Messages.getString("browse.notification.heroesOutOfDate"),
-								NavigationController.BROWSE_TAB, "heroesOutOfDate"));
+				navigationController.appendNotification(new Notification(Messages.getString(
+						"browse.notification.heroesOutOfDate"), NavigationController.BROWSE_TAB, "heroesOutOfDate"));
 			}
 		} catch (final IOException e) {
 			logger.error("Error during Heroes baseUI update check.", e);
 		}
 		try {
 			if (baseUiService.isOutdated(Game.HEROES, true)) {
-				navigationController.appendNotification(
-						new Notification(Messages.getString("browse.notification.heroesPtrOutOfDate"),
-								NavigationController.BROWSE_TAB, "heroesPtrOutOfDate"));
+				navigationController.appendNotification(new Notification(
+						Messages.getString("browse.notification.heroesPtrOutOfDate"),
+						NavigationController.BROWSE_TAB,
+						"heroesPtrOutOfDate"));
 			}
 		} catch (final IOException e) {
 			logger.error("Error during Heroes PTR baseUI update check.", e);

@@ -49,9 +49,13 @@ public class CompileService {
 	 * @return UICatalog describing the UI when verifyLayout was enabled; else null
 	 * @throws InterruptedException
 	 */
-	public UICatalog compile(final ModData mod, final String raceId, final boolean repairLayoutOrder,
-			final boolean verifyLayout, final boolean verifyXml, final String consoleSkinId)
-			throws InterruptedException {
+	public UICatalog compile(
+			final ModData mod,
+			final String raceId,
+			final boolean repairLayoutOrder,
+			final boolean verifyLayout,
+			final boolean verifyXml,
+			final String consoleSkinId) throws InterruptedException {
 		UICatalog catalogClone = null;
 		try {
 			long startTime;

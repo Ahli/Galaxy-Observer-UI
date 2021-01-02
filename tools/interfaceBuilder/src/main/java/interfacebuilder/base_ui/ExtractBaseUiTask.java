@@ -23,8 +23,13 @@ public class ExtractBaseUiTask extends CleaningForkJoinTask {
 	private final ErrorTabController errorTabController;
 	private final NavigationController navigationController;
 	
-	public ExtractBaseUiTask(final CleaningForkJoinTaskCleaner cleaner, final BaseUiService baseUiService,
-			final Game game, final boolean usePtr, final Appender[] output, final ErrorTabController errorTabController,
+	public ExtractBaseUiTask(
+			final CleaningForkJoinTaskCleaner cleaner,
+			final BaseUiService baseUiService,
+			final Game game,
+			final boolean usePtr,
+			final Appender[] output,
+			final ErrorTabController errorTabController,
 			final NavigationController navigationController) {
 		super(cleaner);
 		this.baseUiService = baseUiService;

@@ -27,12 +27,23 @@ public abstract class GameDef {
 	protected final String supportDirectoryX32;
 	protected final String supportDirectoryX64;
 	
-	public GameDef(final String name, final String nameHandle, final String modFileEnding,
-			final String[] coreModsOrDirectories, final String defaultRaceId, final String defaultConsoleSkinId,
-			final String documentsGameDirectoryName, final String layoutFileEnding, final String baseDataFolderName,
-			final String rootExeName, final String switcherExeNameX32, final String switcherExeNameX64,
-			final String supportDirectoryX32, final String supportDirectoryX64,
-			final String documentsInterfaceSubdirectoryName, final String modsSubDirectory,
+	public GameDef(
+			final String name,
+			final String nameHandle,
+			final String modFileEnding,
+			final String[] coreModsOrDirectories,
+			final String defaultRaceId,
+			final String defaultConsoleSkinId,
+			final String documentsGameDirectoryName,
+			final String layoutFileEnding,
+			final String baseDataFolderName,
+			final String rootExeName,
+			final String switcherExeNameX32,
+			final String switcherExeNameX64,
+			final String supportDirectoryX32,
+			final String supportDirectoryX64,
+			final String documentsInterfaceSubdirectoryName,
+			final String modsSubDirectory,
 			final String ptrRootExeName) {
 		this.name = name;
 		this.nameHandle = nameHandle;

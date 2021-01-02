@@ -430,15 +430,16 @@ public class SettingsEditorApplication extends Application {
 		final FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle(Messages.getString("Main.openObserverInterfaceTitle"));
 		
-		final ExtensionFilter genExtFilter =
-				new ExtensionFilter(Messages.getString("Main.sc2HeroesObserverInterfaceExtFilter"),
-						SC2_INTERFACE_FILE_FILTER, STORM_INTERFACE_FILE_FILTER);
+		final ExtensionFilter genExtFilter = new ExtensionFilter(
+				Messages.getString("Main.sc2HeroesObserverInterfaceExtFilter"),
+				SC2_INTERFACE_FILE_FILTER,
+				STORM_INTERFACE_FILE_FILTER);
 		
-		fileChooser.getExtensionFilters()
-				.addAll(new ExtensionFilter(Messages.getString("Main.allFilesFilter"), "*.*"), genExtFilter,
-						new ExtensionFilter(Messages.getString("Main.sc2InterfaceFilter"), SC2_INTERFACE_FILE_FILTER),
-						new ExtensionFilter(Messages.getString("Main.heroesInterfaceFilter"),
-								STORM_INTERFACE_FILE_FILTER));
+		fileChooser.getExtensionFilters().addAll(
+				new ExtensionFilter(Messages.getString("Main.allFilesFilter"), "*.*"),
+				genExtFilter,
+				new ExtensionFilter(Messages.getString("Main.sc2InterfaceFilter"), SC2_INTERFACE_FILE_FILTER),
+				new ExtensionFilter(Messages.getString("Main.heroesInterfaceFilter"), STORM_INTERFACE_FILE_FILTER));
 		fileChooser.setSelectedExtensionFilter(genExtFilter);
 		final File f = fileChooser.showOpenDialog(primaryStage);
 		
@@ -616,15 +617,16 @@ public class SettingsEditorApplication extends Application {
 		final FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle(Messages.getString("Main.saveUiTitle"));
 		
-		final ExtensionFilter genExtFilter =
-				new ExtensionFilter(Messages.getString("Main.sc2HeroesObserverInterfaceExtFilter"),
-						SC2_INTERFACE_FILE_FILTER, STORM_INTERFACE_FILE_FILTER);
+		final ExtensionFilter genExtFilter = new ExtensionFilter(
+				Messages.getString("Main.sc2HeroesObserverInterfaceExtFilter"),
+				SC2_INTERFACE_FILE_FILTER,
+				STORM_INTERFACE_FILE_FILTER);
 		
-		fileChooser.getExtensionFilters()
-				.addAll(new ExtensionFilter(Messages.getString("Main.allFilesFilter"), "*.*"), genExtFilter,
-						new ExtensionFilter(Messages.getString("Main.sc2InterfaceFilter"), SC2_INTERFACE_FILE_FILTER),
-						new ExtensionFilter(Messages.getString("Main.heroesInterfaceFilter"),
-								STORM_INTERFACE_FILE_FILTER));
+		fileChooser.getExtensionFilters().addAll(
+				new ExtensionFilter(Messages.getString("Main.allFilesFilter"), "*.*"),
+				genExtFilter,
+				new ExtensionFilter(Messages.getString("Main.sc2InterfaceFilter"), SC2_INTERFACE_FILE_FILTER),
+				new ExtensionFilter(Messages.getString("Main.heroesInterfaceFilter"), STORM_INTERFACE_FILE_FILTER));
 		fileChooser.setSelectedExtensionFilter(genExtFilter);
 		
 		final Path loadedF = getOpenedDocPath();
@@ -640,8 +642,7 @@ public class SettingsEditorApplication extends Application {
 				if (parentFile == null) {
 					throw new IOException(String.format("Parent of File %s is null.", f));
 				}
-				mpqi.buildMpq(parentFile.toPath(), f.getName(), false,
-						MpqEditorCompression.BLIZZARD_SC2_HEROES, false);
+				mpqi.buildMpq(parentFile.toPath(), f.getName(), false, MpqEditorCompression.BLIZZARD_SC2_HEROES, false);
 				hasUnsavedFileChanges = false;
 				openedDocPath = f.toPath();
 				updateAppTitle();

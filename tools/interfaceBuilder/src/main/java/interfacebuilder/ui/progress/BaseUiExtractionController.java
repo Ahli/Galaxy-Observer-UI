@@ -17,7 +17,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextFlow;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.concurrent.ForkJoinPool;
 
@@ -25,6 +24,11 @@ public class BaseUiExtractionController implements Updateable {
 	
 	private static int threadCount;
 	private final String[] threadNames;
+	private final BaseUiService baseUiService;
+	private final GameService gameService;
+	private final NavigationController navigationController;
+	private final ForkJoinPool executor;
+	private final AppController appController;
 	@FXML
 	public VBox loggingArea;
 	@FXML
@@ -41,19 +45,19 @@ public class BaseUiExtractionController implements Updateable {
 	private TextFlow txtArea3;
 	@FXML
 	private Label areaLabel3;
-	@Autowired
-	private BaseUiService baseUiService;
-	@Autowired
-	private GameService gameService;
 	private ErrorTabController errorTabController;
-	@Autowired
-	private NavigationController navigationController;
-	@Autowired
-	private ForkJoinPool executor;
-	@Autowired
-	private AppController appController;
 	
-	public BaseUiExtractionController() {
+	public BaseUiExtractionController(
+			final BaseUiService baseUiService,
+			final GameService gameServic,
+			final NavigationController navigationController,
+			final ForkJoinPool executor,
+			final AppController appController) {
+		this.baseUiService = baseUiService;
+		gameService = gameServic;
+		this.navigationController = navigationController;
+		this.executor = executor;
+		this.appController = appController;
 		threadNames = new String[3];
 		for (int i = 0; i < threadNames.length; ++i) {
 			threadNames[i] = "extractThread_" + ++threadCount;
@@ -91,9 +95,13 @@ public class BaseUiExtractionController implements Updateable {
 		areaLabel2.setText(String.format(msg, queryMasks[1]));
 		areaLabel3.setText(String.format(msg, queryMasks[2]));
 		
-		final ExtractBaseUiTask task =
-				new ExtractBaseUiTask(appController, baseUiService, game, usePtr, output, errorTabController,
-						navigationController);
+		final ExtractBaseUiTask task = new ExtractBaseUiTask(appController,
+				baseUiService,
+				game,
+				usePtr,
+				output,
+				errorTabController,
+				navigationController);
 		executor.execute(task);
 	}
 	

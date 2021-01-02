@@ -35,8 +35,8 @@ public final class Alerts {
 	 * @param content
 	 * @return
 	 */
-	public static Alert buildYesNoCancelAlert(final Window owner, final String title, final String header,
-			final String content) {
+	public static Alert buildYesNoCancelAlert(
+			final Window owner, final String title, final String header, final String content) {
 		final long time = System.nanoTime();
 		final ButtonType yesButton = new ButtonType(Messages.getString("General.YesButton"), ButtonData.YES);
 		final ButtonType noButton = new ButtonType(Messages.getString("General.NoButton"), ButtonData.NO);
@@ -57,8 +57,8 @@ public final class Alerts {
 	 * @param content
 	 * @return
 	 */
-	public static Alert buildErrorAlert(final Window owner, final String title, final String header,
-			final String content) {
+	public static Alert buildErrorAlert(
+			final Window owner, final String title, final String header, final String content) {
 		final long time = System.nanoTime();
 		final ButtonType okButton = createOkButton();
 		final Alert alert = new Alert(AlertType.ERROR, content, okButton);
@@ -80,8 +80,8 @@ public final class Alerts {
 	 * @param content
 	 * @return
 	 */
-	public static Alert buildWarningAlert(final Window owner, final String title, final String header,
-			final String content) {
+	public static Alert buildWarningAlert(
+			final Window owner, final String title, final String header, final String content) {
 		final long time = System.nanoTime();
 		final ButtonType okButton = createOkButton();
 		final Alert alert = new Alert(AlertType.WARNING, content, okButton);
@@ -100,8 +100,8 @@ public final class Alerts {
 	 * @param imageUrl
 	 * @return
 	 */
-	public static Alert buildAboutAlert(final Window owner, final String title, final String header,
-			final String content, final String imageUrl) {
+	public static Alert buildAboutAlert(
+			final Window owner, final String title, final String header, final String content, final String imageUrl) {
 		final long time = System.nanoTime();
 		final ButtonType okButton = createOkButton();
 		final Alert alert = new Alert(AlertType.INFORMATION, content, okButton);

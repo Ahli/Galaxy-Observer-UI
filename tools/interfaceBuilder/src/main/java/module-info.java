@@ -3,6 +3,9 @@ Building within IntelliJ does not work due to apache geronimo specs not being a 
 generated.
 */
 module interfacex.builder {
+	
+	requires static lombok; // static ones can be absent at run time
+	
 	// javafx
 	requires java.desktop;
 	requires java.persistence;
@@ -68,7 +71,9 @@ module interfacex.builder {
 	opens interfacebuilder.ui.settings to spring.core, javafx.fxml;
 	opens interfacebuilder.ui.browse to spring.core, javafx.fxml;
 	opens interfacebuilder.ui.progress to javafx.fxml, spring.core;
+	opens interfacebuilder.threads to spring.core;
 	exports interfacebuilder.integration.log4j to org.apache.logging.log4j.core;
+	
 	exports interfacebuilder.integration;
 	exports interfacebuilder.ui.navigation;
 	exports interfacebuilder.ui.progress.appender;

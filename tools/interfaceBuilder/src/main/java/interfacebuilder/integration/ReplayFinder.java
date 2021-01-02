@@ -60,8 +60,8 @@ public class ReplayFinder {
 	 * 		Signals that an I/O exception has occurred.
 	 */
 	public File getLastUsedReplay(final boolean isHeroes, final Path documentsPath) throws IOException {
-		final Path basePath = documentsPath
-				.resolve((isHeroes ? "Heroes of the Storm" : "StarCraft II") + File.separator + "Variables.txt");
+		final Path basePath = documentsPath.resolve(
+				(isHeroes ? "Heroes of the Storm" : "StarCraft II") + File.separator + "Variables.txt");
 		if (logger.isTraceEnabled()) {
 			logger.trace(basePath);
 		}

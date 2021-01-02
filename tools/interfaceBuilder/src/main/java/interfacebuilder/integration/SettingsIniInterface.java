@@ -70,9 +70,8 @@ public class SettingsIniInterface {
 		try {
 			readSettingsFromFilePrivate();
 		} catch (final IOException e) {
-			logger.error(
-					String.format("Failed to load settings from ini at construction. Filepath=%s", settingsFilePath),
-					e);
+			logger.error(String.format("Failed to load settings from ini at construction. Filepath=%s",
+					settingsFilePath), e);
 		}
 	}
 	
@@ -135,8 +134,9 @@ public class SettingsIniInterface {
 	public void writeSettingsToFile() throws IOException {
 		final Parameters params = new Parameters();
 		final FileBasedConfigurationBuilder<INIConfiguration> b =
-				new FileBasedConfigurationBuilder<>(INIConfiguration.class)
-						.configure(params.ini().setFile(settingsFilePath.toFile()).setEncoding(UTF_8));
+				new FileBasedConfigurationBuilder<>(INIConfiguration.class).configure(params.ini()
+						.setFile(settingsFilePath.toFile())
+						.setEncoding(UTF_8));
 		INIConfiguration ini;
 		try {
 			// load current file

@@ -37,7 +37,6 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Window;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 
 import java.io.IOException;
@@ -50,6 +49,12 @@ import java.util.Optional;
 
 public class HomeController implements Updateable {
 	private static final Logger logger = LogManager.getLogger(HomeController.class);
+	private final ApplicationContext appContext;
+	private final ProjectService projectService;
+	private final FileService fileService;
+	private final GameService gameService;
+	private final TabPaneController tabPaneController;
+	private final NavigationController navigationController;
 	@FXML
 	private Pane selectedPanel;
 	@FXML
@@ -71,30 +76,28 @@ public class HomeController implements Updateable {
 	@FXML
 	private Button addProject;
 	@FXML
+	private ListView<Project> selectionList;
+	@FXML
 	private Button removeProject;
 	@FXML
 	private Button editProject;
-	@Autowired
-	private ApplicationContext appContext;
-	@FXML
-	private ListView<Project> selectionList;
 	@FXML
 	private Button buildSelection;
-	@Autowired
-	private ProjectService projectService;
-	@Autowired
-	private FileService fileService;
-	@Autowired
-	private GameService gameService;
-	@Autowired
-	private TabPaneController tabPaneController;
-	@Autowired
-	private NavigationController navigationController;
-	
 	private ObservableList<Project> projectsObservable;
 	
-	public HomeController() {
-		// nothing to do
+	public HomeController(
+			final ApplicationContext appContext,
+			final ProjectService projectService,
+			final FileService fileService,
+			final GameService gameService,
+			final TabPaneController tabPaneController,
+			final NavigationController navigationController) {
+		this.appContext = appContext;
+		this.projectService = projectService;
+		this.fileService = fileService;
+		this.gameService = gameService;
+		this.tabPaneController = tabPaneController;
+		this.navigationController = navigationController;
 	}
 	
 	/**
@@ -107,25 +110,25 @@ public class HomeController implements Updateable {
 		selectionList.setItems(projectsObservable);
 		selectionList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		selectionList.setCellFactory(listViewProject -> new ListCell<>() {
-					@Override
-					protected void updateItem(final Project project, final boolean empty) {
-						super.updateItem(project, empty);
-						if (empty || project == null) {
-							setText(null);
-							setGraphic(null);
-						} else {
-							setText(project.getName());
-							try {
-								setGraphic(getListItemGameImage(project));
-							} catch (final IOException e) {
-								logger.error("Failed to find image resource.", e);
-							}
-						}
+			@Override
+			protected void updateItem(final Project project, final boolean empty) {
+				super.updateItem(project, empty);
+				if (empty || project == null) {
+					setText(null);
+					setGraphic(null);
+				} else {
+					setText(project.getName());
+					try {
+						setGraphic(getListItemGameImage(project));
+					} catch (final IOException e) {
+						logger.error("Failed to find image resource.", e);
 					}
 				}
-		);
+			}
+		});
 		selectionList.getSelectionModel().selectAll();
-		selectionList.getSelectionModel().getSelectedItems()
+		selectionList.getSelectionModel()
+				.getSelectedItems()
 				.addListener((InvalidationListener) observable -> updateSelectedDetailsPanel());
 	}
 	
@@ -153,10 +156,10 @@ public class HomeController implements Updateable {
 			final Project p = selectedItems.get(0);
 			selectedName.setText(p.getName());
 			final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-			selectedBuildDate
-					.setText(p.getLastBuildDateTime() == null ? "-" : p.getLastBuildDateTime().format(formatter));
+			selectedBuildDate.setText(
+					p.getLastBuildDateTime() == null ? "-" : p.getLastBuildDateTime().format(formatter));
 			selectedBuildSize.setText(
-					p.getLastBuildSize() == null ? "-" : (String.format("%,d", p.getLastBuildSize() / 1024) + " kb"));
+					p.getLastBuildSize() == 0 ? "-" : (String.format("%,d", p.getLastBuildSize() / 1024) + " kb"));
 			try {
 				final Path path = Path.of(p.getProjectPath());
 				selectedDirFiles.setText(String.format("%,d", fileService.getFileCountOfDirectory(path)) + " files");
@@ -168,8 +171,7 @@ public class HomeController implements Updateable {
 			}
 			selectedPath.setText(p.getProjectPath());
 			try {
-				selectedImage
-						.setImage(new Image(getResourceAsUrl(gameService.getGameItemPath(p.getGame())).toString()));
+				selectedImage.setImage(new Image(getResourceAsUrl(gameService.getGameItemPath(p.getGame())).toString()));
 			} catch (final IOException e) {
 				logger.error("Failed to load image from project's game setting.", e);
 			}
@@ -279,8 +281,8 @@ public class HomeController implements Updateable {
 			final Project[] items = selectedItems.toArray(new Project[0]);
 			final Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
 			alert.initOwner(getWindow());
-			alert.setTitle(
-					String.format("Remove selected Project from list? - %s items selected", selectedItems.size()));
+			alert.setTitle(String.format("Remove selected Project from list? - %s items selected",
+					selectedItems.size()));
 			alert.setHeaderText("Are you sure you want to remove the selected projects?" + "\n" +
 					"This will not remove any files from the project.");
 			final Optional<ButtonType> result = alert.showAndWait();

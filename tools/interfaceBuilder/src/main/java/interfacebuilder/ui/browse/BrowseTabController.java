@@ -150,7 +150,8 @@ public class BrowseTabController implements Updateable {
 		flowFactory = new TextFlowFactory();
 		
 		// must be strong EventHandler reference
-		frameTree.getSelectionModel().selectedItemProperty()
+		frameTree.getSelectionModel()
+				.selectedItemProperty()
 				.addListener((observable, oldValue, newValue) -> showInTableView(newValue));
 		frameTree.setCellFactory(treeView -> new CustomTreeCell(flowFactory));
 		
@@ -176,7 +177,8 @@ public class BrowseTabController implements Updateable {
 					framesTotal = 0;
 					createTree(template);
 					if (logger.isTraceEnabled()) {
-						logger.trace("Tree creation: {}ms , {} frames", (System.currentTimeMillis() - start),
+						logger.trace("Tree creation: {}ms , {} frames",
+								(System.currentTimeMillis() - start),
 								framesTotal);
 					}
 				}
@@ -194,8 +196,7 @@ public class BrowseTabController implements Updateable {
 		tableView.getSortOrder().add(columnAttributes);
 		
 		// filter (must be strong reference)
-		treeFilter.textProperty()
-				.addListener((observable, oldValue, newValue) -> filterTree(newValue));
+		treeFilter.textProperty().addListener((observable, oldValue, newValue) -> filterTree(newValue));
 		
 		// Path header
 		final ObservableList<Node> children = pathTextFlow.getChildren();
@@ -367,11 +368,10 @@ public class BrowseTabController implements Updateable {
 							/* I could not get this code any faster than this form (caching toUpperCase() was not
 							faster) */
 							return queryString.getValue().isEmpty() || (element.getName() != null &&
-									AutoCompleteComboBox
-											.containsIgnoreCase(element.getName(), queryString.getValue())) ||
-									(element instanceof UIFrame &&
-											AutoCompleteComboBox.containsIgnoreCase(((UIFrame) element).getType(),
-													queryString.getValue()));
+									AutoCompleteComboBox.containsIgnoreCase(element.getName(),
+											queryString.getValue())) || (element instanceof UIFrame &&
+									AutoCompleteComboBox.containsIgnoreCase(((UIFrame) element).getType(),
+											queryString.getValue()));
 						}
 					}), queryString));
 			

@@ -5,56 +5,48 @@ package interfacebuilder.config;
 
 import com.ahli.galaxy.game.def.abstracts.GameDef;
 import interfacebuilder.integration.SettingsIniInterface;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.io.File;
 import java.nio.file.Path;
 
 public class ConfigService {
 	
-	@Autowired
-	@Qualifier("mpqCachePath")
-	private Path mpqCachePath;
+	private final Path mpqCachePath;
+	private final Path basePath;
+	private final Path documentsPath;
+	private final Path mpqEditorPath;
+	private final SettingsIniInterface iniSettings;
+	private final String raceId;
+	private final String consoleSkinId;
+	private final Path baseUiPath;
+	private final File cascExtractorExeFile;
+	private final Path cachePath;
+	private final Path miningTempPath;
 	
-	@Autowired
-	@Qualifier("basePath")
-	private Path basePath;
-	
-	@Autowired
-	@Qualifier("documentsPath")
-	private Path documentsPath;
-	
-	@Autowired
-	@Qualifier("mpqEditorPath")
-	private Path mpqEditorPath;
-	
-	@Autowired
-	private SettingsIniInterface iniSettings;
-	
-	@Autowired
-	@Qualifier("raceId")
-	private String raceId;
-	
-	@Autowired
-	@Qualifier("consoleSkinId")
-	private String consoleSkinId;
-	
-	@Autowired
-	@Qualifier("baseUiPath")
-	private Path baseUiPath;
-	
-	@Autowired
-	@Qualifier("cascExtractorExeFile")
-	private File cascExtractorExeFile;
-	
-	@Autowired
-	@Qualifier("cachePath")
-	private Path cachePath;
-	
-	@Autowired
-	@Qualifier("miningTempPath")
-	private Path miningTempPath;
+	public ConfigService(
+			final Path mpqCachePath,
+			final Path basePath,
+			final Path documentsPath,
+			final Path mpqEditorPath,
+			final SettingsIniInterface iniSettings,
+			final String raceId,
+			final String consoleSkinId,
+			final Path baseUiPath,
+			final File cascExtractorExeFile,
+			final Path cachePath,
+			final Path miningTempPath) {
+		this.mpqCachePath = mpqCachePath;
+		this.basePath = basePath;
+		this.documentsPath = documentsPath;
+		this.mpqEditorPath = mpqEditorPath;
+		this.iniSettings = iniSettings;
+		this.raceId = raceId;
+		this.consoleSkinId = consoleSkinId;
+		this.baseUiPath = baseUiPath;
+		this.cascExtractorExeFile = cascExtractorExeFile;
+		this.cachePath = cachePath;
+		this.miningTempPath = miningTempPath;
+	}
 	
 	public Path getMpqEditorPath() {
 		return mpqEditorPath;

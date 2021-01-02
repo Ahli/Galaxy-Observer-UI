@@ -21,7 +21,6 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 
 import java.io.IOException;
@@ -41,6 +40,7 @@ public class NavigationController {
 	private final Parent[] contentPages = new Parent[4];
 	private final Updateable[] controllers = new Updateable[4];
 	private final List<Notification> notifications = new ArrayList<>();
+	private final ApplicationContext appContext;
 	@FXML
 	private AnchorPane selectedMarker;
 	@FXML
@@ -49,8 +49,6 @@ public class NavigationController {
 	private Label notificationLabel;
 	@FXML
 	private AnchorPane notificationBar;
-	@Autowired
-	private ApplicationContext appContext;
 	@FXML
 	private AnchorPane contentContainer;
 	@FXML
@@ -61,8 +59,8 @@ public class NavigationController {
 	private Button progress;
 	private int activeContent = -1;
 	
-	public NavigationController() {
-		// nothing to do
+	public NavigationController(final ApplicationContext appContext) {
+		this.appContext = appContext;
 	}
 	
 	/**
@@ -89,10 +87,12 @@ public class NavigationController {
 		
 		notificationBar.setVisible(false);
 		notificationBar.managedProperty().bind(notificationBar.visibleProperty());
-		notificationBar.setBackground(new Background(
-				new BackgroundFill(Color.color(211D / 256D, 168D / 255D, 3D / 255D), CornerRadii.EMPTY, Insets.EMPTY)));
-		selectedMarker.setBackground(new Background(
-				new BackgroundFill(Color.color(211D / 256D, 168D / 255D, 3D / 255D), CornerRadii.EMPTY, Insets.EMPTY)));
+		notificationBar.setBackground(new Background(new BackgroundFill(Color.color(211D / 256D,
+				168D / 255D,
+				3D / 255D), CornerRadii.EMPTY, Insets.EMPTY)));
+		selectedMarker.setBackground(new Background(new BackgroundFill(Color.color(211D / 256D, 168D / 255D, 3D / 255D),
+				CornerRadii.EMPTY,
+				Insets.EMPTY)));
 		
 		// content pages
 		initFXML("classpath:view/Content_Home.fxml", 0);

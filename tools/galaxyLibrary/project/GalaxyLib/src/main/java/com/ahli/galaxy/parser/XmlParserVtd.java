@@ -85,7 +85,10 @@ public class XmlParserVtd extends XmlParserAbstract {
 					attrTypes.add(nav.toRawStringLowerCase(i));
 					attrValues.add(nav.toRawString(i + 1));
 				}
-				consumer.parse(nav.getCurrentDepth() + 1, nav.toRawStringLowerCase(nav.getCurrentIndex()), attrTypes,
+				consumer.parse(
+						nav.getCurrentDepth() + 1,
+						nav.toRawStringLowerCase(nav.getCurrentIndex()),
+						attrTypes,
 						attrValues);
 				attrTypes.clear();
 				attrValues.clear();

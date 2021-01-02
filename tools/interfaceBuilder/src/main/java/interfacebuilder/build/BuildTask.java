@@ -15,11 +15,15 @@ public class BuildTask extends CleaningForkJoinTask {
 	
 	private final Project project;
 	private final boolean useCmdLineSettings;
-	private final MpqBuilderService mpqBuilderService;
-	private final BaseUiService baseUiService;
+	private final transient MpqBuilderService mpqBuilderService;
+	private final transient BaseUiService baseUiService;
 	
-	public BuildTask(final CleaningForkJoinTaskCleaner cleaner, final Project project, final boolean useCmdLineSettings,
-			final MpqBuilderService mpqBuilderService, final BaseUiService baseUiService) {
+	public BuildTask(
+			final CleaningForkJoinTaskCleaner cleaner,
+			final Project project,
+			final boolean useCmdLineSettings,
+			final MpqBuilderService mpqBuilderService,
+			final BaseUiService baseUiService) {
 		super(cleaner);
 		this.project = project;
 		this.useCmdLineSettings = useCmdLineSettings;

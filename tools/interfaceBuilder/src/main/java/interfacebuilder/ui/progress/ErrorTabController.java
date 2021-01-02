@@ -36,8 +36,12 @@ public final class ErrorTabController {
 	 * @param colorizeTitle
 	 * @param noResultIcon
 	 */
-	public ErrorTabController(final Tab tab, final TextFlow textArea, final boolean colorizeTitle,
-			final boolean noResultIcon, final boolean errorsDoNotPreventExit) {
+	public ErrorTabController(
+			final Tab tab,
+			final TextFlow textArea,
+			final boolean colorizeTitle,
+			final boolean noResultIcon,
+			final boolean errorsDoNotPreventExit) {
 		this.tab = tab;
 		this.textArea = textArea;
 		this.colorizeTitle = colorizeTitle;

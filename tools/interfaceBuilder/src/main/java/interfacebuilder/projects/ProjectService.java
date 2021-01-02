@@ -17,7 +17,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.dao.DataAccessException;
@@ -41,12 +40,18 @@ import java.util.List;
 public class ProjectService {
 	private static final String DIRECTORY_SYMBOL = "/";
 	private static final Logger logger = LogManager.getLogger(ProjectService.class);
-	@Autowired
-	private ProjectJpaRepository projectRepo;
-	@Autowired
-	private MpqBuilderService mpqBuilderService;
-	@Autowired
-	private NavigationController navigationController;
+	private final ProjectJpaRepository projectRepo;
+	private final MpqBuilderService mpqBuilderService;
+	private final NavigationController navigationController;
+	
+	public ProjectService(
+			final ProjectJpaRepository projectRepo,
+			final MpqBuilderService mpqBuilderService,
+			final NavigationController navigationController) {
+		this.projectRepo = projectRepo;
+		this.mpqBuilderService = mpqBuilderService;
+		this.navigationController = navigationController;
+	}
 	
 	/**
 	 * Returns whether the specified path contains a compilable file for the specified game.
@@ -76,7 +81,7 @@ public class ProjectService {
 	 * @return
 	 */
 	public List<Project> getAllProjects() {
-		return projectRepo.findAll();
+		return ProjectEntity.toProjects(projectRepo.findAll());
 	}
 	
 	/**
@@ -88,7 +93,7 @@ public class ProjectService {
 	 */
 	public Project saveProject(final Project project) {
 		try {
-			return projectRepo.save(project);
+			return ProjectEntity.toProject(projectRepo.save(ProjectEntity.fromProject(project)));
 		} catch (final DataAccessException e) {
 			logger.error(e);
 			throw e;
@@ -119,7 +124,7 @@ public class ProjectService {
 	 * @param project
 	 */
 	public void deleteProject(final Project project) {
-		projectRepo.delete(project);
+		projectRepo.delete(ProjectEntity.fromProject(project));
 	}
 	
 	/**
@@ -129,17 +134,17 @@ public class ProjectService {
 	 * @return list of Projects with matching path
 	 */
 	public List<Project> getProjectsOfPath(final String path) {
-		return projectRepo.findAll(new Example<>() {
+		return ProjectEntity.toProjects(projectRepo.findAll(new Example<>() {
 			@Override
-			public Project getProbe() {
-				return new Project(null, path, null);
+			public ProjectEntity getProbe() {
+				return new ProjectEntity(null, path, null);
 			}
 			
 			@Override
 			public ExampleMatcher getMatcher() {
 				return ExampleMatcher.matchingAll().withIgnoreNullValues();
 			}
-		});
+		}));
 	}
 	
 	
@@ -153,7 +158,7 @@ public class ProjectService {
 	public RuleSet fetchBestCompressionRuleSet(final Project project) {
 		if (!Hibernate.isInitialized(project.getBestCompressionRuleSet())) {
 			// grab from DB wire compression rules to old instance
-			final Project project2 = projectRepo.getOne(project.getId());
+			final ProjectEntity project2 = projectRepo.getOne(project.getId());
 			try {
 				Hibernate.initialize(project2.getBestCompressionRuleSet());
 			} catch (final HibernateException e) {

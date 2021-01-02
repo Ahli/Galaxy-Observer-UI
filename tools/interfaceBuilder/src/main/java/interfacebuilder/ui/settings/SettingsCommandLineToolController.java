@@ -3,6 +3,7 @@
 
 package interfacebuilder.ui.settings;
 
+import interfacebuilder.config.ConfigService;
 import interfacebuilder.integration.SettingsIniInterface;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -30,8 +31,8 @@ public class SettingsCommandLineToolController extends SettingsAutoSaveControlle
 	@FXML
 	private CheckBox checkXml;
 	
-	public SettingsCommandLineToolController() {
-		// nothing to do
+	public SettingsCommandLineToolController(final ConfigService configService) {
+		super(configService);
 	}
 	
 	/**

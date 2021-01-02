@@ -26,12 +26,16 @@ final class StringInternerTest {
 		
 		// second intern
 		final String secondToBeInterned = text + value;
-		assertNotSame(firstToBeInterned, secondToBeInterned,
+		assertNotSame(
+				firstToBeInterned,
+				secondToBeInterned,
 				"first and second interned are same reference - VM is breaking this test with optimizations");
 		String secondInterned = StringInterner.intern(secondToBeInterned);
 		
 		assertEquals(secondInterned, firstInterned, "second interned changed value during interning - first vs second");
-		assertEquals(secondInterned, secondToBeInterned,
+		assertEquals(
+				secondInterned,
+				secondToBeInterned,
 				"second interned changed value during interning - second input vs output");
 		assertNotSame(secondInterned, secondToBeInterned, "second interned delivered same reference back");
 		assertSame(firstInterned, secondInterned, "first interned received different reference");

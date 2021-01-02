@@ -63,8 +63,12 @@ public class UICatalogImpl implements UICatalog {
 	 *
 	 * @throws ParserConfigurationException
 	 */
-	public UICatalogImpl(final int templatesCapacity, final int blizzOnlyTemplatesCapacity, final int constantsCapacity,
-			final int blizzOnlyConstantsCapacity, final int blizzOnlyLayoutsCapacity) {
+	public UICatalogImpl(
+			final int templatesCapacity,
+			final int blizzOnlyTemplatesCapacity,
+			final int constantsCapacity,
+			final int blizzOnlyConstantsCapacity,
+			final int blizzOnlyLayoutsCapacity) {
 		templates = new ArrayList<>(templatesCapacity);
 		blizzOnlyTemplates = new ArrayList<>(blizzOnlyTemplatesCapacity);
 		constants = new ArrayList<>(constantsCapacity);
@@ -142,8 +146,9 @@ public class UICatalogImpl implements UICatalog {
 	 * @throws InterruptedException
 	 * 		if the current thread was interrupted
 	 */
-	private void processLayouts(final List<String> toProcessList, final String basePath, final String raceId,
-			final String consoleSkinId) throws InterruptedException {
+	private void processLayouts(
+			final List<String> toProcessList, final String basePath, final String raceId, final String consoleSkinId)
+			throws InterruptedException {
 		String basePathTemp;
 		for (final String intPath : toProcessList) {
 			final boolean isDevLayout = blizzOnlyLayouts.contains(intPath);
@@ -172,8 +177,10 @@ public class UICatalogImpl implements UICatalog {
 				try {
 					processLayoutFile(layoutFilePath, raceId, isDevLayout, consoleSkinId, parser);
 				} catch (final IOException e) {
-					logger.error(String.format("ERROR: encountered an Exception while processing the layout file '%s'.",
-							layoutFilePath), e);
+					logger.error(
+							String.format("ERROR: encountered an Exception while processing the layout file '%s'.",
+									layoutFilePath),
+							e);
 				}
 				if (Thread.interrupted()) {
 					throw new InterruptedException();
@@ -183,14 +190,18 @@ public class UICatalogImpl implements UICatalog {
 	}
 	
 	@Override
-	public void processLayoutFile(final Path p, final String raceId, final boolean isDevLayout,
-			final String consoleSkinId, final ParsedXmlConsumer parser) throws IOException {
+	public void processLayoutFile(
+			final Path p,
+			final String raceId,
+			final boolean isDevLayout,
+			final String consoleSkinId,
+			final ParsedXmlConsumer parser) throws IOException {
 		parser.parseFile(p, raceId, isDevLayout, consoleSkinId);
 	}
 	
 	@Override
-	public void processInclude(final String path, final boolean isDevLayout, final String raceId,
-			final String consoleSkinId) {
+	public void processInclude(
+			final String path, final boolean isDevLayout, final String raceId, final String consoleSkinId) {
 		if (logger.isTraceEnabled()) {
 			logger.trace("processing Include appearing within a real layout");
 		}
@@ -323,8 +334,8 @@ public class UICatalogImpl implements UICatalog {
 	}
 	
 	@Override
-	public String getConstantValue(final String constantRef, final String raceId, final boolean isDevLayout,
-			final String consoleSkinId) {
+	public String getConstantValue(
+			final String constantRef, final String raceId, final boolean isDevLayout, final String consoleSkinId) {
 		int i = 0;
 		if (constantRef.length() > 0) {
 			while (constantRef.charAt(i) == '#') {
@@ -359,12 +370,14 @@ public class UICatalogImpl implements UICatalog {
 				}
 			}
 		} else if (i >= 4) {
-			logger.error("ERROR: Encountered a constant definition with three #'{}' when its maximum is two '#'.",
+			logger.error(
+					"ERROR: Encountered a constant definition with three #'{}' when its maximum is two '#'.",
 					constantRef);
 		}
 		
 		if (!isDevLayout) {
-			logger.warn("WARNING: Did not find a constant definition for '{}', so '{}' is used instead.", constantRef,
+			logger.warn("WARNING: Did not find a constant definition for '{}', so '{}' is used instead.",
+					constantRef,
 					constantName);
 		} else {
 			// inside blizz-only

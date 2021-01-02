@@ -15,18 +15,20 @@ import javafx.stage.Window;
 import javafx.util.Duration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 
 public abstract class SettingsAutoSaveController implements Updateable {
 	private static final Logger logger = LogManager.getLogger(SettingsAutoSaveController.class);
 	
-	@Autowired
 	protected ConfigService configService;
 	@FXML
 	private Label savedAnimLabel;
 	private boolean lastSaveFailed;
+	
+	protected SettingsAutoSaveController(final ConfigService configService) {
+		this.configService = configService;
+	}
 	
 	/**
 	 * Automatically called by FxmlLoader

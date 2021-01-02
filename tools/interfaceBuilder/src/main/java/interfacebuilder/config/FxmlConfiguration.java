@@ -3,6 +3,13 @@
 
 package interfacebuilder.config;
 
+import interfacebuilder.base_ui.BaseUiService;
+import interfacebuilder.build.MpqBuilderService;
+import interfacebuilder.compile.CompileService;
+import interfacebuilder.compress.GameService;
+import interfacebuilder.integration.FileService;
+import interfacebuilder.projects.ProjectService;
+import interfacebuilder.ui.AppController;
 import interfacebuilder.ui.browse.BrowseController;
 import interfacebuilder.ui.browse.BrowseTabController;
 import interfacebuilder.ui.home.AddProjectController;
@@ -20,10 +27,13 @@ import interfacebuilder.ui.settings.SettingsController;
 import interfacebuilder.ui.settings.SettingsGamesPathsController;
 import interfacebuilder.ui.settings.SettingsGuiToolController;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
+
+import java.util.concurrent.ForkJoinPool;
 
 @Lazy
 @Configuration
@@ -34,54 +44,67 @@ public class FxmlConfiguration {
 	
 	@Bean
 	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-	protected ViewRuleSetController viewRuleSetController() {
-		return new ViewRuleSetController();
-	}
-	
-	@Bean
-	protected NavigationController navigationController() {
-		return new NavigationController();
+	protected ViewRuleSetController viewRuleSetController(final ProjectService projectService) {
+		return new ViewRuleSetController(projectService);
 	}
 	
 	@Bean
 	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-	protected HomeController homeController() {
-		return new HomeController();
+	protected HomeController homeController(
+			final ApplicationContext appContext,
+			final ProjectService projectService,
+			final FileService fileService,
+			final GameService gameService,
+			final AppController appController,
+			final NavigationController navigationController) {
+		return new HomeController(
+				appContext,
+				projectService,
+				fileService,
+				gameService,
+				tabPaneController(appController),
+				navigationController);
+	}
+	
+	@Bean
+	protected TabPaneController tabPaneController(final AppController appController) {
+		return new TabPaneController(appController);
+	}
+	
+	@Bean
+	protected NavigationController navigationController(final ApplicationContext appContext) {
+		return new NavigationController(appContext);
 	}
 	
 	@Bean
 	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-	protected SettingsCommandLineToolController settingsCommandLineToolController() {
-		return new SettingsCommandLineToolController();
+	protected SettingsCommandLineToolController settingsCommandLineToolController(final ConfigService configService) {
+		return new SettingsCommandLineToolController(configService);
 	}
 	
 	@Bean
 	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-	protected SettingsController settingsController() {
-		return new SettingsController();
+	protected SettingsController settingsController(final ApplicationContext appContext) {
+		return new SettingsController(appContext);
 	}
 	
 	@Bean
 	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-	protected SettingsGamesPathsController settingsGamesPathsController() {
-		return new SettingsGamesPathsController();
+	protected SettingsGamesPathsController settingsGamesPathsController(final ConfigService configService) {
+		return new SettingsGamesPathsController(configService);
 	}
 	
 	@Bean
 	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-	protected SettingsGuiToolController settingsGuiToolController() {
-		return new SettingsGuiToolController();
-	}
-	
-	@Bean
-	protected TabPaneController tabPaneController() {
-		return new TabPaneController();
+	protected SettingsGuiToolController settingsGuiToolController(final ConfigService configService) {
+		return new SettingsGuiToolController(configService);
 	}
 	
 	@Bean
 	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-	protected NewProjectController newProjectController() {
-		return new NewProjectController();
+	protected NewProjectController newProjectController(
+			final ProjectService projectService, final FileService fileService) {
+		return new NewProjectController(projectService, fileService);
 	}
 	
 	@Bean
@@ -92,8 +115,9 @@ public class FxmlConfiguration {
 	
 	@Bean
 	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-	protected AddProjectController addProjectController() {
-		return new AddProjectController();
+	protected AddProjectController addProjectController(
+			final ProjectService projectService, final FileService fileService) {
+		return new AddProjectController(projectService, fileService);
 	}
 	
 	@Bean
@@ -104,14 +128,41 @@ public class FxmlConfiguration {
 	
 	@Bean
 	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-	protected CompressionMiningController compressionMiningController() {
-		return new CompressionMiningController();
+	protected CompressionMiningController compressionMiningController(
+			final GameService gameService,
+			final ProjectService projectService,
+			final ConfigService configService,
+			final FileService fileService,
+			final ForkJoinPool executor) {
+		return new CompressionMiningController(gameService, projectService, configService, fileService, executor);
 	}
 	
 	@Bean
 	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-	protected BrowseController browseController() {
-		return new BrowseController();
+	protected BrowseController browseController(
+			final ApplicationContext appContext,
+			final BaseUiService baseUiService,
+			final ConfigService configService,
+			final MpqBuilderService mpqBuilderService,
+			final ProjectService projectService,
+			final GameService gameService,
+			final CompileService compileService,
+			final FileService fileService,
+			final NavigationController navigationController,
+			final AppController appController,
+			final ForkJoinPool executor) {
+		return new BrowseController(
+				appContext,
+				baseUiService,
+				configService,
+				mpqBuilderService,
+				projectService,
+				gameService,
+				compileService,
+				fileService,
+				navigationController,
+				appController,
+				executor);
 	}
 	
 	@Bean
@@ -122,7 +173,12 @@ public class FxmlConfiguration {
 	
 	@Bean
 	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-	protected BaseUiExtractionController baseUiExtractionController() {
-		return new BaseUiExtractionController();
+	protected BaseUiExtractionController baseUiExtractionController(
+			final BaseUiService baseUiService,
+			final GameService gameServic,
+			final NavigationController navigationController,
+			final ForkJoinPool executor,
+			final AppController appController) {
+		return new BaseUiExtractionController(baseUiService, gameServic, navigationController, executor, appController);
 	}
 }

@@ -98,16 +98,16 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		deduplicatedElements = deduplicate ? new UnifiedSet<>(13_000) : null;
 		parser.setConsumer(this);
 	}
-
-//	/**
-//	 * @param typeTemplate
-//	 * @param typeFrame
-//	 * @return
-//	 */
-//	private static boolean checkFrameTypeCompatibility(final String typeTemplate, final String typeFrame) {
-//		// TODO frame type compatibility check
-//		return true;
-//	}
+	
+	//	/**
+	//	 * @param typeTemplate
+	//	 * @param typeFrame
+	//	 * @return
+	//	 */
+	//	private static boolean checkFrameTypeCompatibility(final String typeTemplate, final String typeFrame) {
+	//		// TODO frame type compatibility check
+	//		return true;
+	//	}
 	
 	/**
 	 * Set the implicit names of controllers in animations.
@@ -139,8 +139,8 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	 * @param path
 	 * @return
 	 */
-	private static UIElement findTemplateFromList(final Iterable<UITemplate> templates, final String fileName,
-			final String path) {
+	private static UIElement findTemplateFromList(
+			final Iterable<UITemplate> templates, final String fileName, final String path) {
 		final String newPath = UIElement.removeLeftPathLevel(path);
 		
 		for (final UITemplate curTemplate : templates) {
@@ -164,8 +164,8 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	 * @param newName
 	 * @return
 	 */
-	private static UIElement instanciateTemplateFromList(final List<UITemplate> templates, final String fileName,
-			final String path, final String newName) {
+	private static UIElement instanciateTemplateFromList(
+			final List<UITemplate> templates, final String fileName, final String path, final String newName) {
 		final UIElement frameFromPath = findTemplateFromList(templates, fileName, path);
 		final UIElement clone = frameFromPath != null ? (UIElement) frameFromPath.deepCopy() : null;
 		if (clone != null) {
@@ -221,8 +221,9 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	}
 	
 	@Override
-	public void parse(final int level, final String tagName, final List<String> attrTypes,
-			final List<String> attrValues) throws UIException {
+	public void parse(
+			final int level, final String tagName, final List<String> attrTypes, final List<String> attrValues)
+			throws UIException {
 		logger.trace("level={}, tag={}", () -> level, () -> tagName);
 		if (tagName == null) {
 			logger.error("ERROR: tag in XML is null.");
@@ -351,9 +352,9 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					type = FRAME;
 				}
 				final var newElemUiFrame = (UIFrame) newElem;
-//				if (!checkFrameTypeCompatibility(type, newElemUiFrame.getType())) {
-//					logger.warn("WARN: The type of the frame is not compatible with the used template.");
-//				}
+				//				if (!checkFrameTypeCompatibility(type, newElemUiFrame.getType())) {
+				//					logger.warn("WARN: The type of the frame is not compatible with the used template.");
+				//				}
 				newElemUiFrame.setType(type);
 				// add to parent
 				if (curElement != null) {
@@ -561,7 +562,8 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	
 	private void applyTemplateElementToElement(final String pathParam, final UIElement targetElem) {
 		if (logger.isTraceEnabled()) {
-			logger.trace("Applying Template of path {} to element {} - searching the template", pathParam,
+			logger.trace("Applying Template of path {} to element {} - searching the template",
+					pathParam,
 					targetElem.getName());
 		}
 		final String path = pathParam.replace('\\', '/');
@@ -624,7 +626,8 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			templateInstance = instanciateTemplateFromList(catalog.getBlizzOnlyTemplates(), fileName, path, newName);
 			if (templateInstance != null) {
 				if (!curIsDevLayout) {
-					logger.error("ERROR: the non-Blizz-only frame '{}' uses a Blizz-only template '{}'.", curElement,
+					logger.error("ERROR: the non-Blizz-only frame '{}' uses a Blizz-only template '{}'.",
+							curElement,
 							path);
 				}
 				return templateInstance;
@@ -693,7 +696,8 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				} else {
 					logger.error(
 							"'Anchor' attribute has unrecognizable value for 'side='. Value is '{}' in parent element: {}",
-							side, curElement.getName());
+							side,
+							curElement.getName());
 				}
 				if (sideVal != null) {
 					if (offset == null) {
@@ -701,7 +705,8 @@ public class UICatalogParser implements ParsedXmlConsumer {
 								curElement.getName());
 					} else {
 						if (pos == null) {
-							logger.error("'Anchor' attribute has no 'pos' attribute defined in parent element: {}",
+							logger.error(
+									"'Anchor' attribute has no 'pos' attribute defined in parent element: {}",
 									curElement.getName());
 						} else {
 							if (relative == null) {
@@ -740,14 +745,22 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			if (targetElem instanceof UIFrame) {
 				final UIFrame target = (UIFrame) targetElem;
 				// TODO do not set the undefined anchors (-> track if a side was defined or is on the initial value)
-				target.setAnchor(UIAnchorSide.TOP, frame.getAnchorRelative(UIAnchorSide.TOP),
-						frame.getAnchorPos(UIAnchorSide.TOP), frame.getAnchorOffset(UIAnchorSide.TOP));
-				target.setAnchor(UIAnchorSide.LEFT, frame.getAnchorRelative(UIAnchorSide.LEFT),
-						frame.getAnchorPos(UIAnchorSide.LEFT), frame.getAnchorOffset(UIAnchorSide.LEFT));
-				target.setAnchor(UIAnchorSide.BOTTOM, frame.getAnchorRelative(UIAnchorSide.BOTTOM),
-						frame.getAnchorPos(UIAnchorSide.BOTTOM), frame.getAnchorOffset(UIAnchorSide.BOTTOM));
-				target.setAnchor(UIAnchorSide.RIGHT, frame.getAnchorRelative(UIAnchorSide.RIGHT),
-						frame.getAnchorPos(UIAnchorSide.RIGHT), frame.getAnchorOffset(UIAnchorSide.RIGHT));
+				target.setAnchor(UIAnchorSide.TOP,
+						frame.getAnchorRelative(UIAnchorSide.TOP),
+						frame.getAnchorPos(UIAnchorSide.TOP),
+						frame.getAnchorOffset(UIAnchorSide.TOP));
+				target.setAnchor(UIAnchorSide.LEFT,
+						frame.getAnchorRelative(UIAnchorSide.LEFT),
+						frame.getAnchorPos(UIAnchorSide.LEFT),
+						frame.getAnchorOffset(UIAnchorSide.LEFT));
+				target.setAnchor(UIAnchorSide.BOTTOM,
+						frame.getAnchorRelative(UIAnchorSide.BOTTOM),
+						frame.getAnchorPos(UIAnchorSide.BOTTOM),
+						frame.getAnchorOffset(UIAnchorSide.BOTTOM));
+				target.setAnchor(UIAnchorSide.RIGHT,
+						frame.getAnchorRelative(UIAnchorSide.RIGHT),
+						frame.getAnchorPos(UIAnchorSide.RIGHT),
+						frame.getAnchorOffset(UIAnchorSide.RIGHT));
 				
 				copyAttributes(frame.getAttributes(), target.getAttributes());
 			} else {
@@ -910,7 +923,10 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			}
 			logger.info(
 					"postProcessDeduplications: {}, attributeDeduplications: {}, constantsDeduplications={}, maxDequeSize: {}, totalDeduplicatedElements: {}",
-					postProcessDeduplications, attributeDeduplications, constantDeduplications, maxDequeSize,
+					postProcessDeduplications,
+					attributeDeduplications,
+					constantDeduplications,
+					maxDequeSize,
 					deduplicatedElements.size());
 		}
 	}

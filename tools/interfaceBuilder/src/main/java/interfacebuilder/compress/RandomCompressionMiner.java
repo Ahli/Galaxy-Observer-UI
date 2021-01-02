@@ -60,8 +60,9 @@ public class RandomCompressionMiner {
 	 * @throws MpqException
 	 * @throws InterruptedException
 	 */
-	public RandomCompressionMiner(final ModData mod, final Path mpqCachePath, final Path mpqEditorPath,
-			final FileService fileService) throws IOException, MpqException, InterruptedException {
+	public RandomCompressionMiner(
+			final ModData mod, final Path mpqCachePath, final Path mpqEditorPath, final FileService fileService)
+			throws IOException, MpqException, InterruptedException {
 		this(mod, mpqCachePath, mpqEditorPath, new MpqEditorCompressionRule[0], fileService);
 	}
 	
@@ -77,9 +78,12 @@ public class RandomCompressionMiner {
 	 * @throws MpqException
 	 * @throws InterruptedException
 	 */
-	public RandomCompressionMiner(final ModData mod, final Path mpqCachePath, final Path mpqEditorPath,
-			final MpqEditorCompressionRule[] oldBestRuleset, final FileService fileService)
-			throws IOException, MpqException, InterruptedException {
+	public RandomCompressionMiner(
+			final ModData mod,
+			final Path mpqCachePath,
+			final Path mpqEditorPath,
+			final MpqEditorCompressionRule[] oldBestRuleset,
+			final FileService fileService) throws IOException, MpqException, InterruptedException {
 		this.mod = mod;
 		final String id = Long.toString(Thread.currentThread().getId());
 		mpqInterface = new MpqEditorInterface(mpqCachePath.resolve(id), mpqEditorPath);
@@ -151,18 +155,18 @@ public class RandomCompressionMiner {
 	 * @param cacheDir
 	 * @return
 	 */
-	private static MpqEditorCompressionRule[] addRulesForFiles(final MpqEditorCompressionRule[] oldBestRuleset,
-			final List<File> untrackedFiles, final Path cacheDir) {
+	private static MpqEditorCompressionRule[] addRulesForFiles(
+			final MpqEditorCompressionRule[] oldBestRuleset, final List<File> untrackedFiles, final Path cacheDir) {
 		final int oldRuleCount = oldBestRuleset.length;
 		final MpqEditorCompressionRule[] merged = new MpqEditorCompressionRule[oldRuleCount + untrackedFiles.size()];
 		// copy old
 		System.arraycopy(oldBestRuleset, 0, merged, 0, oldRuleCount);
 		// insert new untracked
 		for (int i = 0, len = untrackedFiles.size(); i < len; ++i) {
-			merged[oldRuleCount + i] =
-					new MpqEditorCompressionRuleMask(getFileMask(untrackedFiles.get(i).toPath(), cacheDir))
-							.setSingleUnit(true).setCompress(true)
-							.setCompressionMethod(MpqEditorCompressionRuleMethod.NONE);
+			merged[oldRuleCount + i] = new MpqEditorCompressionRuleMask(getFileMask(untrackedFiles.get(i).toPath(),
+					cacheDir)).setSingleUnit(true)
+					.setCompress(true)
+					.setCompressionMethod(MpqEditorCompressionRuleMethod.NONE);
 		}
 		return merged;
 	}
@@ -173,8 +177,8 @@ public class RandomCompressionMiner {
 	 * @param dirty
 	 * @return
 	 */
-	private static MpqEditorCompressionRule[] removeUnusedMaskEnries(final MpqEditorCompressionRule[] dirty,
-			final Path cacheDir) {
+	private static MpqEditorCompressionRule[] removeUnusedMaskEnries(
+			final MpqEditorCompressionRule[] dirty, final Path cacheDir) {
 		final List<MpqEditorCompressionRule> clean = new ArrayList<>();
 		String mask;
 		for (final MpqEditorCompressionRule rule : dirty) {

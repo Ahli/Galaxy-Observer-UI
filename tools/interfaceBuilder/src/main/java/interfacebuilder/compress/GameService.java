@@ -11,12 +11,13 @@ import com.ahli.galaxy.game.def.abstracts.GameDef;
 import interfacebuilder.config.ConfigService;
 import interfacebuilder.integration.SettingsIniInterface;
 import interfacebuilder.projects.enums.Game;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class GameService {
-	@Autowired
-	private ConfigService configService;
+	private final ConfigService configService;
 	
+	public GameService(final ConfigService configService) {
+		this.configService = configService;
+	}
 	
 	/**
 	 * Returns a ModData instance containing the specified game definition.

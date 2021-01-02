@@ -47,7 +47,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.TextFlow;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.xml.sax.SAXException;
 
@@ -65,7 +64,17 @@ import static interfacebuilder.InterfaceBuilderApp.FATAL_ERROR;
 
 public class BrowseController implements Updateable {
 	private static final Logger logger = LogManager.getLogger(BrowseController.class);
-	
+	private final ApplicationContext appContext;
+	private final BaseUiService baseUiService;
+	private final ConfigService configService;
+	private final MpqBuilderService mpqBuilderService;
+	private final ProjectService projectService;
+	private final GameService gameService;
+	private final CompileService compileService;
+	private final FileService fileService;
+	private final NavigationController navigationController;
+	private final AppController appController;
+	private final ForkJoinPool executor;
 	@FXML
 	public ListView<Project> projectListView;
 	@FXML
@@ -78,35 +87,32 @@ public class BrowseController implements Updateable {
 	private Label ptrStatusLabel;
 	@FXML
 	private ChoiceBox<String> heroesChoiceBox;
-	
-	@Autowired
-	private ApplicationContext appContext;
-	@Autowired
-	private BaseUiService baseUiService;
-	@Autowired
-	private ConfigService configService;
-	@Autowired
-	private MpqBuilderService mpqBuilderService;
-	@Autowired
-	private ProjectService projectService;
-	@Autowired
-	private GameService gameService;
-	@Autowired
-	private CompileService compileService;
-	@Autowired
-	private FileService fileService;
-	@Autowired
-	private NavigationController navigationController;
-	@Autowired
-	private AppController appController;
-	@Autowired
-	private ForkJoinPool executor;
-	
 	// prevent GC of controllers
 	private List<Updateable> controllers;
 	
-	public BrowseController() {
-		// nothing to do
+	public BrowseController(
+			final ApplicationContext appContext,
+			final BaseUiService baseUiService,
+			final ConfigService configService,
+			final MpqBuilderService mpqBuilderService,
+			final ProjectService projectService,
+			final GameService gameService,
+			final CompileService compileService,
+			final FileService fileService,
+			final NavigationController navigationController,
+			final AppController appController,
+			final ForkJoinPool executor) {
+		this.appContext = appContext;
+		this.baseUiService = baseUiService;
+		this.configService = configService;
+		this.mpqBuilderService = mpqBuilderService;
+		this.projectService = projectService;
+		this.gameService = gameService;
+		this.compileService = compileService;
+		this.fileService = fileService;
+		this.navigationController = navigationController;
+		this.appController = appController;
+		this.executor = executor;
 	}
 	
 	/**
@@ -114,8 +120,8 @@ public class BrowseController implements Updateable {
 	 */
 	public void initialize() {
 		controllers = new ArrayList<>();
-		heroesChoiceBox.setItems(
-				FXCollections.observableArrayList(Messages.getString("browse.live"), Messages.getString("browse.ptr")));
+		heroesChoiceBox.setItems(FXCollections.observableArrayList(Messages.getString("browse.live"),
+				Messages.getString("browse.ptr")));
 		final boolean ptrActive = baseUiService.isHeroesPtrActive();
 		heroesChoiceBox.getSelectionModel().select(ptrActive ? 1 : 0);
 		updatePtrStatusLabel(ptrActive);
@@ -261,7 +267,7 @@ public class BrowseController implements Updateable {
 			// context menu with close option
 			final ContextMenu contextMenu = new ContextMenu();
 			final MenuItem closeItem = new MenuItem(Messages.getString("contextmenu.close"));
-			final WeakReference<BaseUiExtractionController> newControllerFinal =
+			final WeakReference<BaseUiExtractionController> weakRefExtrController =
 					new WeakReference<>(extractionController);
 			final WeakReference<Tab> newTabFinal = new WeakReference<>(newTab);
 			closeItem.setOnAction(event -> {
@@ -269,7 +275,7 @@ public class BrowseController implements Updateable {
 				if (t != null) {
 					appController.getTabPane().getTabs().remove(t);
 				}
-				final BaseUiExtractionController c = newControllerFinal.get();
+				final BaseUiExtractionController c = weakRefExtrController.get();
 				if (c != null) {
 					controllers.remove(c);
 					StylizedTextAreaAppender.unregister(c.getErrorTabController());
@@ -282,7 +288,7 @@ public class BrowseController implements Updateable {
 			// which results in UI edits not in UI thread -> error
 			Platform.runLater(() -> {
 				try {
-					final BaseUiExtractionController c = newControllerFinal.get();
+					final BaseUiExtractionController c = weakRefExtrController.get();
 					if (c != null) {
 						c.loggingArea.getChildren().add(scrollPane);
 					}
@@ -343,7 +349,7 @@ public class BrowseController implements Updateable {
 		if (controller != null) {
 			final BrowseLoadBaseUiTask task =
 					new BrowseLoadBaseUiTask(appController, gameData, (BrowseTabController) controller, baseUiService);
-			appController.getExecutor().execute(task);
+			executor.execute(task);
 		}
 	}
 	
@@ -378,6 +384,7 @@ public class BrowseController implements Updateable {
 				if (c != null) {
 					controllers.remove(c);
 				}
+				appController.tryCleanUp();
 			});
 			contextMenu.getItems().addAll(closeItem);
 			newTab.setContextMenu(contextMenu);
@@ -432,16 +439,19 @@ public class BrowseController implements Updateable {
 				mod.setComponentListFile(componentListFile);
 				
 				try {
-					descIndexData.setDescIndexPathAndClear(ComponentsListReaderDom
-							.getDescIndexPath(componentListFile, mod.getGameData().getGameDef()));
+					descIndexData.setDescIndexPathAndClear(ComponentsListReaderDom.getDescIndexPath(componentListFile,
+							mod.getGameData().getGameDef()));
 				} catch (final ParserConfigurationException | SAXException | IOException e) {
 					logger.error("ERROR: unable to read DescIndex path.", e);
 					continue;
 				}
 				
-				final BrowseCompileTask task =
-						new BrowseCompileTask(appController, mod, (BrowseTabController) controller, compileService,
-								baseUiService, configService);
+				final BrowseCompileTask task = new BrowseCompileTask(appController,
+						mod,
+						(BrowseTabController) controller,
+						compileService,
+						baseUiService,
+						configService);
 				executor.execute(task);
 			}
 		}

@@ -15,7 +15,6 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 
 import java.io.IOException;
@@ -27,15 +26,14 @@ public class SettingsController implements Updateable {
 	 */
 	@SuppressWarnings("unchecked")
 	private final TreeItem<String>[] categories = new TreeItem[3];
-	@Autowired
-	private ApplicationContext appContext;
+	private final ApplicationContext appContext;
 	@FXML
 	private TreeView<String> categoryTree;
 	@FXML
 	private ScrollPane contentContainer;
 	
-	public SettingsController() {
-		// nothing to do
+	public SettingsController(final ApplicationContext appContext) {
+		this.appContext = appContext;
 	}
 	
 	/**
@@ -50,8 +48,10 @@ public class SettingsController implements Updateable {
 		// load page for selected setting
 		categoryTree.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<>() {
 			@Override
-			public void changed(final ObservableValue<? extends TreeItem<String>> observable,
-					final TreeItem<String> oldVal, final TreeItem<String> newVal) {
+			public void changed(
+					final ObservableValue<? extends TreeItem<String>> observable,
+					final TreeItem<String> oldVal,
+					final TreeItem<String> newVal) {
 				if (oldVal != newVal && newVal != null &&
 						newVal == categoryTree.getSelectionModel().getSelectedItem()) {
 					loadSettingsContent(newVal);

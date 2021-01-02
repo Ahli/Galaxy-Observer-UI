@@ -31,7 +31,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -42,7 +41,11 @@ import static interfacebuilder.InterfaceBuilderApp.FATAL_ERROR;
 
 public class CompressionMiningController implements Updateable {
 	private static final Logger logger = LogManager.getLogger(CompressionMiningController.class);
-	
+	private final GameService gameService;
+	private final ProjectService projectService;
+	private final ConfigService configService;
+	private final FileService fileService;
+	private final ForkJoinPool executor;
 	@FXML
 	private Button miningButton;
 	@FXML
@@ -71,44 +74,41 @@ public class CompressionMiningController implements Updateable {
 	private TableColumn<MpqEditorCompressionRule, String> columnIncludeSectorChecksum;
 	@FXML
 	private TableColumn<MpqEditorCompressionRule, String> columnMarkedForDeletion;
-	
-	@Autowired
-	private GameService gameService;
-	@Autowired
-	private ProjectService projectService;
-	@Autowired
-	private ConfigService configService;
-	@Autowired
-	private FileService fileService;
-	@Autowired
-	private ForkJoinPool executor;
-	
 	private Project project;
 	private ObservableList<MpqEditorCompressionRule> ruleSetObservableItems;
 	private Runnable task;
 	private boolean stopTaskNow = false;
 	private RandomCompressionMiner expCompMiner;
 	
-	public CompressionMiningController() {
-		// nothing to do
+	public CompressionMiningController(
+			final GameService gameService,
+			final ProjectService projectService,
+			final ConfigService configService,
+			final FileService fileService,
+			final ForkJoinPool executor) {
+		this.gameService = gameService;
+		this.projectService = projectService;
+		this.configService = configService;
+		this.fileService = fileService;
+		this.executor = executor;
 	}
 	
 	/**
 	 * Automatically called by FxmlLoader
 	 */
 	public void initialize() {
-		columnCompress.setCellValueFactory(
-				cellData -> new SimpleBooleanProperty(cellData.getValue().isCompress()).asString());
-		columnEncrypt
-				.setCellValueFactory(cellData -> new SimpleBooleanProperty(cellData.getValue().isEncrypt()).asString());
-		columnEncryptAdjusted.setCellValueFactory(
-				cellData -> new SimpleBooleanProperty(cellData.getValue().isEncryptAdjusted()).asString());
-		columnIncludeSectorChecksum.setCellValueFactory(
-				cellData -> new SimpleBooleanProperty(cellData.getValue().isIncludeSectorChecksum()).asString());
-		columnMarkedForDeletion.setCellValueFactory(
-				cellData -> new SimpleBooleanProperty(cellData.getValue().isMarkedForDeletion()).asString());
-		columnSingleFile.setCellValueFactory(
-				cellData -> new SimpleBooleanProperty(cellData.getValue().isSingleUnit()).asString());
+		columnCompress.setCellValueFactory(cellData -> new SimpleBooleanProperty(cellData.getValue()
+				.isCompress()).asString());
+		columnEncrypt.setCellValueFactory(cellData -> new SimpleBooleanProperty(cellData.getValue()
+				.isEncrypt()).asString());
+		columnEncryptAdjusted.setCellValueFactory(cellData -> new SimpleBooleanProperty(cellData.getValue()
+				.isEncryptAdjusted()).asString());
+		columnIncludeSectorChecksum.setCellValueFactory(cellData -> new SimpleBooleanProperty(cellData.getValue()
+				.isIncludeSectorChecksum()).asString());
+		columnMarkedForDeletion.setCellValueFactory(cellData -> new SimpleBooleanProperty(cellData.getValue()
+				.isMarkedForDeletion()).asString());
+		columnSingleFile.setCellValueFactory(cellData -> new SimpleBooleanProperty(cellData.getValue()
+				.isSingleUnit()).asString());
 		columnMaskSize.setCellValueFactory(cellData -> {
 			final MpqEditorCompressionRule rule = cellData.getValue();
 			if (rule instanceof MpqEditorCompressionRuleMask) {
@@ -120,8 +120,9 @@ public class CompressionMiningController implements Updateable {
 				return new SimpleStringProperty("");
 			}
 		});
-		columnCompressionAlgo.setCellValueFactory(
-				cellData -> new SimpleStringProperty(cellData.getValue().getCompressionMethod().toString()));
+		columnCompressionAlgo.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue()
+				.getCompressionMethod()
+				.toString()));
 		columnType.setCellValueFactory(cellData -> {
 			final MpqEditorCompressionRule rule = cellData.getValue();
 			if (rule instanceof MpqEditorCompressionRuleMask) {
@@ -205,8 +206,12 @@ public class CompressionMiningController implements Updateable {
 					final MpqEditorCompressionRule[] prevBestCompressionRules =
 							(bestCompressionRuleSet != null) ? bestCompressionRuleSet.getCompressionRules() : null;
 					
-					expCompMiner = new RandomCompressionMiner(mod, configService.getMpqCachePath(),
-							configService.getMpqEditorPath(), prevBestCompressionRules, fileService);
+					expCompMiner = new RandomCompressionMiner(
+							mod,
+							configService.getMpqCachePath(),
+							configService.getMpqEditorPath(),
+							prevBestCompressionRules,
+							fileService);
 					bestSize = expCompMiner.getBestSize();
 						/* save initial as best, if there was no best before
 						initial one might have been altered by the miner */

@@ -37,7 +37,6 @@ import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -60,18 +59,27 @@ public class BaseUiService {
 	private static final Logger logger = LogManager.getLogger(BaseUiService.class);
 	private static final String META_FILE_NAME = ".meta";
 	
-	@Autowired
-	private ConfigService configService;
-	@Autowired
-	private GameService gameService;
-	@Autowired
-	private FileService fileService;
-	@Autowired
-	private DiscCacheService discCacheService;
-	@Autowired
-	private KryoService kryoService;
-	@Autowired
-	private AppController app;
+	private final ConfigService configService;
+	private final GameService gameService;
+	private final FileService fileService;
+	private final DiscCacheService discCacheService;
+	private final KryoService kryoService;
+	private final AppController app;
+	
+	public BaseUiService(
+			final ConfigService configService,
+			final GameService gameService,
+			final FileService fileService,
+			final DiscCacheService discCacheService,
+			final KryoService kryoService,
+			final AppController app) {
+		this.configService = configService;
+		this.gameService = gameService;
+		this.fileService = fileService;
+		this.discCacheService = discCacheService;
+		this.kryoService = kryoService;
+		this.app = app;
+	}
 	
 	/**
 	 * Checks if the specified game's baseUI is older than the game files.
@@ -129,7 +137,8 @@ public class BaseUiService {
 	
 	public int[] getVersion(final GameDef gameDef, final boolean isPtr) {
 		final int[] versions = new int[4];
-		final Path path = Path.of(gameService.getGameDirPath(gameDef, isPtr), gameDef.getSupportDirectoryX64(),
+		final Path path = Path.of(gameService.getGameDirPath(gameDef, isPtr),
+				gameDef.getSupportDirectoryX64(),
 				gameDef.getSwitcherExeNameX64());
 		try {
 			final PE pe = PEParser.parse(path.toFile());
@@ -254,11 +263,16 @@ public class BaseUiService {
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	private static boolean extract(final File extractorExe, final String gamePath, final String mask,
-			final Path destination, final Appender out) throws IOException, InterruptedException {
-		final ProcessBuilder pb =
-				new ProcessBuilder(extractorExe.getAbsolutePath(), gamePath + File.separator, mask,
-						destination + File.separator);
+	private static boolean extract(
+			final File extractorExe,
+			final String gamePath,
+			final String mask,
+			final Path destination,
+			final Appender out) throws IOException, InterruptedException {
+		final ProcessBuilder pb = new ProcessBuilder(extractorExe.getAbsolutePath(),
+				gamePath + File.separator,
+				mask,
+				destination + File.separator);
 		// put error and normal output into the same stream
 		pb.redirectErrorStream(true);
 		
@@ -363,7 +377,8 @@ public class BaseUiService {
 					uiCatalog.setParser(new UICatalogParser(uiCatalog, new XmlParserVtd(), true));
 					app.printInfoLogMessageToGeneral("Starting to parse base " + gameName + " UI.");
 					app.addThreadLoggerTab(Thread.currentThread().getName(),
-							gameData.getGameDef().getNameHandle() + "UI", true);
+							gameData.getGameDef().getNameHandle() + "UI",
+							true);
 					final String gameDir = configService.getBaseUiPath(gameData.getGameDef()) + File.separator +
 							gameData.getGameDef().getModsSubDirectory();
 					try {
@@ -382,7 +397,8 @@ public class BaseUiService {
 							
 							for (final File descIndexFile : descIndexFiles) {
 								logger.info("parsing descIndexFile '{}'", descIndexFile.getPath());
-								uiCatalog.processDescIndex(descIndexFile, gameData.getGameDef().getDefaultRaceId(),
+								uiCatalog.processDescIndex(descIndexFile,
+										gameData.getGameDef().getDefaultRaceId(),
 										gameData.getGameDef().getDefaultConsoleSkinId());
 							}
 						}

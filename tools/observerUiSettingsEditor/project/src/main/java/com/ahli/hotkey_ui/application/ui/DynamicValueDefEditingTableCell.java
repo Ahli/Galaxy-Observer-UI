@@ -107,8 +107,7 @@ public class DynamicValueDefEditingTableCell extends TableCell<ValueDef, String>
 	}
 	
 	private void createChoiceEditor(final ValueDef data) {
-		final ObservableList<String> items =
-				FXCollections.observableArrayList(data.getAllowedValues());
+		final ObservableList<String> items = FXCollections.observableArrayList(data.getAllowedValues());
 		final ComboBox<String> comboBox = new ComboBox<>(items);
 		
 		comboBox.valueProperty().addListener((obs, oldItem, newItem) -> {

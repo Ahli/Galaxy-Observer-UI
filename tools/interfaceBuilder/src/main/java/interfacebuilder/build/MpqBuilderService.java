@@ -24,8 +24,6 @@ import interfacebuilder.projects.enums.Game;
 import interfacebuilder.ui.AppController;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -41,26 +39,36 @@ import java.util.concurrent.ForkJoinPool;
 public class MpqBuilderService {
 	private static final Logger logger = LogManager.getLogger(MpqBuilderService.class);
 	
-	@Autowired
-	private ConfigService configService;
-	@Autowired
-	private CompileService compileService;
-	@Autowired
-	private FileService fileService;
-	@Autowired
-	private ProjectService projectService;
-	@Autowired
-	private BaseUiService baseUiService;
-	@Autowired
-	@Qualifier("sc2BaseGameData")
-	private GameData sc2BaseGameData;
-	@Autowired
-	@Qualifier("heroesBaseGameData")
-	private GameData heroesBaseGameData;
-	@Autowired
-	private ForkJoinPool executor;
-	@Autowired
-	private AppController appController;
+	private final ConfigService configService;
+	private final CompileService compileService;
+	private final FileService fileService;
+	private final ProjectService projectService;
+	private final BaseUiService baseUiService;
+	private final GameData sc2BaseGameData;
+	private final GameData heroesBaseGameData;
+	private final ForkJoinPool executor;
+	private final AppController appController;
+	
+	public MpqBuilderService(
+			final ConfigService configService,
+			final CompileService compileService,
+			final FileService fileService,
+			final ProjectService projectService,
+			final BaseUiService baseUiService,
+			final GameData sc2BaseGameData,
+			final GameData heroesBaseGameData,
+			final ForkJoinPool executor,
+			final AppController appController) {
+		this.configService = configService;
+		this.compileService = compileService;
+		this.fileService = fileService;
+		this.projectService = projectService;
+		this.baseUiService = baseUiService;
+		this.sc2BaseGameData = sc2BaseGameData;
+		this.heroesBaseGameData = heroesBaseGameData;
+		this.executor = executor;
+		this.appController = appController;
+	}
 	
 	/**
 	 * Schedules a task to find and build a project based on the specified path.
@@ -120,7 +128,10 @@ public class MpqBuilderService {
 	 * @param game
 	 * @param useCmdLineSettings
 	 */
-	void buildSpecificUI(final Path interfaceDirectory, final GameData game, final boolean useCmdLineSettings,
+	void buildSpecificUI(
+			final Path interfaceDirectory,
+			final GameData game,
+			final boolean useCmdLineSettings,
 			final Project project) {
 		if (executor.isShutdown()) {
 			logger.error("ERROR: Executor shut down. Skipping building a UI...");
@@ -139,20 +150,18 @@ public class MpqBuilderService {
 		}
 		if (game.getUiCatalog() == null && verifyLayout) {
 			// parse default UI
-			throw new IllegalStateException(
-					String.format("Base UI of game '%s' has not been parsed.", game.getGameDef().getName()));
+			throw new IllegalStateException(String.format("Base UI of game '%s' has not been parsed.",
+					game.getGameDef().getName()));
 		}
 		
 		// create tasks for the worker pool
 		try {
-			appController
-					.addThreadLoggerTab(Thread.currentThread().getName(), interfaceDirectory.getFileName().toString(),
-							false);
+			appController.addThreadLoggerTab(Thread.currentThread().getName(),
+					interfaceDirectory.getFileName().toString(),
+					false);
 			// create unique cache path
-			final MpqEditorInterface threadsMpqInterface =
-					new MpqEditorInterface(
-							configService.getMpqCachePath().resolve(Long.toString(Thread.currentThread().getId())),
-							configService.getMpqEditorPath());
+			final MpqEditorInterface threadsMpqInterface = new MpqEditorInterface(configService.getMpqCachePath()
+					.resolve(Long.toString(Thread.currentThread().getId())), configService.getMpqEditorPath());
 			
 			// work
 			final boolean compressXml;
@@ -183,8 +192,16 @@ public class MpqBuilderService {
 				}
 			}
 			threadsMpqInterface.clearCacheExtractedMpq();
-			buildFile(interfaceDirectory, game, threadsMpqInterface, compressXml, compressMpqSetting,
-					buildUnprotectedToo, repairLayoutOrder, verifyLayout, verifyXml, project);
+			buildFile(interfaceDirectory,
+					game,
+					threadsMpqInterface,
+					compressXml,
+					compressMpqSetting,
+					buildUnprotectedToo,
+					repairLayoutOrder,
+					verifyLayout,
+					verifyXml,
+					project);
 			threadsMpqInterface.clearCacheExtractedMpq();
 		} catch (final InterruptedException e) {
 			Thread.currentThread().interrupt();
@@ -216,10 +233,17 @@ public class MpqBuilderService {
 	 * 		when something goes wrong
 	 * @throws InterruptedException
 	 */
-	private void buildFile(final Path sourceFile, final GameData game, final MpqEditorInterface mpqi,
-			final boolean compressXml, final int compressMpq, final boolean buildUnprotectedToo,
-			final boolean repairLayoutOrder, final boolean verifyLayout, final boolean verifyXml, final Project project)
-			throws IOException, InterruptedException {
+	private void buildFile(
+			final Path sourceFile,
+			final GameData game,
+			final MpqEditorInterface mpqi,
+			final boolean compressXml,
+			final int compressMpq,
+			final boolean buildUnprotectedToo,
+			final boolean repairLayoutOrder,
+			final boolean verifyLayout,
+			final boolean verifyXml,
+			final Project project) throws IOException, InterruptedException {
 		appController.printInfoLogMessageToGeneral(sourceFile.getFileName() + " started construction.");
 		
 		final GameDef gameDef = game.getGameDef();
@@ -294,8 +318,8 @@ public class MpqBuilderService {
 		mod.setDescIndexData(descIndexData);
 		
 		try {
-			descIndexData
-					.setDescIndexPathAndClear(ComponentsListReaderDom.getDescIndexPath(componentListFile, gameDef));
+			descIndexData.setDescIndexPathAndClear(ComponentsListReaderDom.getDescIndexPath(componentListFile,
+					gameDef));
 		} catch (final ParserConfigurationException | SAXException | IOException e) {
 			final String msg = "ERROR: unable to read DescIndex path.";
 			logger.error(msg, e);
@@ -312,14 +336,21 @@ public class MpqBuilderService {
 		logger.info("Compiling... {}", sourceFile.getFileName());
 		
 		// perform checks/improvements on code
-		compileService.compile(mod, configService.getRaceId(), repairLayoutOrder, verifyLayout, verifyXml,
+		compileService.compile(mod,
+				configService.getRaceId(),
+				repairLayoutOrder,
+				verifyLayout,
+				verifyXml,
 				configService.getConsoleSkinId());
 		
 		logger.info("Building... {}", sourceFile.getFileName());
 		
 		final String sourceFileName = sourceFile.getFileName().toString();
 		try {
-			mpqi.buildMpq(targetFile, sourceFileName, compressXml, getCompressionModeOfSetting(compressMpq),
+			mpqi.buildMpq(targetFile,
+					sourceFileName,
+					compressXml,
+					getCompressionModeOfSetting(compressMpq),
 					buildUnprotectedToo);
 			
 			project.setLastBuildDateTime(LocalDateTime.now());

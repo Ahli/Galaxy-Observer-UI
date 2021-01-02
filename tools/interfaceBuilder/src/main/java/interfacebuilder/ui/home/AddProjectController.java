@@ -21,28 +21,25 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.Window;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 
 public class AddProjectController {
 	private static final Logger logger = LogManager.getLogger(AddProjectController.class);
-	
+	private final ProjectService projectService;
+	private final FileService fileService;
 	@FXML
 	private ChoiceBox<Game> gameDropdown;
 	@FXML
 	private TextField projectPathLabel;
 	@FXML
 	private TextField projectNameLabel;
-	@Autowired
-	private ProjectService projectService;
-	@Autowired
-	private FileService fileService;
 	private Dialog<Project> dialog;
 	private Project project;
 	
-	public AddProjectController() {
-		// nothing to do
+	public AddProjectController(final ProjectService projectService, final FileService fileService) {
+		this.projectService = projectService;
+		this.fileService = fileService;
 	}
 	
 	public void browsePathAction() {

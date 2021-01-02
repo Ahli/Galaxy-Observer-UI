@@ -104,7 +104,10 @@ public class XmlParserDom extends XmlParserAbstract {
 						attrValues.add(attr.getNodeValue());
 					}
 				}
-				consumer.parse(getLevel(node.getParentNode()), node.getNodeName().toLowerCase(Locale.ROOT), attrTypes,
+				consumer.parse(
+						getLevel(node.getParentNode()),
+						node.getNodeName().toLowerCase(Locale.ROOT),
+						attrTypes,
 						attrValues);
 				attrTypes.clear();
 				attrValues.clear();

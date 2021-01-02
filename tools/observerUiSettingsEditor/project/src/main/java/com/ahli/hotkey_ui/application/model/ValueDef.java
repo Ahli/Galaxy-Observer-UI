@@ -45,8 +45,13 @@ public class ValueDef {
 	 * @param description
 	 * @param defaultValue
 	 */
-	public ValueDef(final String id, final String value, final String description, final String defaultValue,
-			final String type, final String[] allowedValues) {
+	public ValueDef(
+			final String id,
+			final String value,
+			final String description,
+			final String defaultValue,
+			final String type,
+			final String[] allowedValues) {
 		this.id = new SimpleStringProperty(id);
 		this.value = new SimpleStringProperty(value);
 		this.description = new SimpleStringProperty(description);

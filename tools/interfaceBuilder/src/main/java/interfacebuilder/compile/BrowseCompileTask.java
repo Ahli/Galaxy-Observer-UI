@@ -19,9 +19,13 @@ public class BrowseCompileTask extends CleaningForkJoinTask {
 	private final BaseUiService baseUiService;
 	private final ConfigService configService;
 	
-	public BrowseCompileTask(final CleaningForkJoinTaskCleaner cleaner, final ModData mod,
-			final BrowseTabController controller, final CompileService compileService,
-			final BaseUiService baseUiService, final ConfigService configService) {
+	public BrowseCompileTask(
+			final CleaningForkJoinTaskCleaner cleaner,
+			final ModData mod,
+			final BrowseTabController controller,
+			final CompileService compileService,
+			final BaseUiService baseUiService,
+			final ConfigService configService) {
 		super(cleaner);
 		this.mod = mod;
 		this.controller = controller;

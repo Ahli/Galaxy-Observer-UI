@@ -42,8 +42,9 @@ public class MenuBarController {
 	public void initialize() {
 		menuOpen.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN));
 		menuSave.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN));
-		menuSaveAs.setAccelerator(
-				new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
+		menuSaveAs.setAccelerator(new KeyCodeCombination(KeyCode.S,
+				KeyCombination.CONTROL_DOWN,
+				KeyCombination.ALT_DOWN));
 		menuClose.setAccelerator(new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN));
 	}
 	

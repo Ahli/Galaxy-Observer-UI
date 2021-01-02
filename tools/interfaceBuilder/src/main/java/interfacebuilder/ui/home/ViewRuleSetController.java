@@ -20,11 +20,11 @@ import javafx.scene.control.DialogPane;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 
 public class ViewRuleSetController {
+	private final ProjectService projectService;
 	@FXML
 	private TableColumn<MpqEditorCompressionRule, String> columnMarkedForDeletion;
 	@FXML
@@ -43,17 +43,13 @@ public class ViewRuleSetController {
 	private TableColumn<MpqEditorCompressionRule, String> columnMaskSize;
 	@FXML
 	private TableColumn<MpqEditorCompressionRule, String> columnType;
-	
 	@FXML
 	private TableView<MpqEditorCompressionRule> ruleSetTable;
 	@FXML
 	private Dialog<Void> dialog;
 	
-	@Autowired
-	private ProjectService projectService;
-	
-	public ViewRuleSetController() {
-		// nothing to do
+	public ViewRuleSetController(final ProjectService projectService) {
+		this.projectService = projectService;
 	}
 	
 	/**
@@ -63,18 +59,18 @@ public class ViewRuleSetController {
 		final DialogPane dialogPane = dialog.getDialogPane();
 		dialogPane.getButtonTypes().addAll(ButtonType.OK);
 		
-		columnCompress.setCellValueFactory(
-				cellData -> new SimpleBooleanProperty(cellData.getValue().isCompress()).asString());
-		columnEncrypt
-				.setCellValueFactory(cellData -> new SimpleBooleanProperty(cellData.getValue().isEncrypt()).asString());
-		columnEncryptAdjusted.setCellValueFactory(
-				cellData -> new SimpleBooleanProperty(cellData.getValue().isEncryptAdjusted()).asString());
-		columnIncludeSectorChecksum.setCellValueFactory(
-				cellData -> new SimpleBooleanProperty(cellData.getValue().isIncludeSectorChecksum()).asString());
-		columnMarkedForDeletion.setCellValueFactory(
-				cellData -> new SimpleBooleanProperty(cellData.getValue().isMarkedForDeletion()).asString());
-		columnSingleFile.setCellValueFactory(
-				cellData -> new SimpleBooleanProperty(cellData.getValue().isSingleUnit()).asString());
+		columnCompress.setCellValueFactory(cellData -> new SimpleBooleanProperty(cellData.getValue()
+				.isCompress()).asString());
+		columnEncrypt.setCellValueFactory(cellData -> new SimpleBooleanProperty(cellData.getValue()
+				.isEncrypt()).asString());
+		columnEncryptAdjusted.setCellValueFactory(cellData -> new SimpleBooleanProperty(cellData.getValue()
+				.isEncryptAdjusted()).asString());
+		columnIncludeSectorChecksum.setCellValueFactory(cellData -> new SimpleBooleanProperty(cellData.getValue()
+				.isIncludeSectorChecksum()).asString());
+		columnMarkedForDeletion.setCellValueFactory(cellData -> new SimpleBooleanProperty(cellData.getValue()
+				.isMarkedForDeletion()).asString());
+		columnSingleFile.setCellValueFactory(cellData -> new SimpleBooleanProperty(cellData.getValue()
+				.isSingleUnit()).asString());
 		columnMaskSize.setCellValueFactory(cellData -> {
 			final MpqEditorCompressionRule rule = cellData.getValue();
 			if (rule instanceof MpqEditorCompressionRuleMask) {
@@ -86,8 +82,9 @@ public class ViewRuleSetController {
 				return new SimpleStringProperty("");
 			}
 		});
-		columnCompressionAlgo.setCellValueFactory(
-				cellData -> new SimpleStringProperty(cellData.getValue().getCompressionMethod().toString()));
+		columnCompressionAlgo.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue()
+				.getCompressionMethod()
+				.toString()));
 		columnType.setCellValueFactory(cellData -> {
 			final MpqEditorCompressionRule rule = cellData.getValue();
 			if (rule instanceof MpqEditorCompressionRuleMask) {

@@ -23,29 +23,26 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.Window;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 import java.io.IOException;
 
 public class NewProjectController {
 	private static final Logger logger = LogManager.getLogger(NewProjectController.class);
-	
+	private final ProjectService projectService;
+	private final FileService fileService;
 	@FXML
 	private ChoiceBox<Game> gameDropdown;
 	@FXML
 	private TextField projectPathLabel;
 	@FXML
 	private TextField projectNameLabel;
-	@Autowired
-	private ProjectService projectService;
-	@Autowired
-	private FileService fileService;
 	private Dialog<Project> dialog;
 	private Project project;
 	
-	public NewProjectController() {
-		// nothing to do
+	public NewProjectController(final ProjectService projectService, final FileService fileService) {
+		this.projectService = projectService;
+		this.fileService = fileService;
 	}
 	
 	public void browsePathAction() {
@@ -114,8 +111,11 @@ public class NewProjectController {
 		final String path = projectPathLabel.getText();
 		final var existingProjects = projectService.getProjectsOfPath(path);
 		if (!existingProjects.isEmpty()) {
-			final Alert alert = Alerts.buildErrorAlert(dialog.getOwner(), "An Error occurred",
-					"Project's path already used in another project", String.format(
+			final Alert alert = Alerts.buildErrorAlert(
+					dialog.getOwner(),
+					"An Error occurred",
+					"Project's path already used in another project",
+					String.format(
 							"Could not create a Project for path '%s' as it is already registered in another project.",
 							path));
 			alert.showAndWait();
@@ -129,9 +129,11 @@ public class NewProjectController {
 			project = projectService.saveProject(project);
 		} catch (final Exception e) {
 			logger.error("ERROR: Could not create project.", e);
-			final Alert alert =
-					Alerts.buildErrorAlert(dialog.getOwner(), "An Error occurred", "Could not create the Project.",
-							String.format("Could not create a Project in '%s'", path) + e.getLocalizedMessage());
+			final Alert alert = Alerts.buildErrorAlert(
+					dialog.getOwner(),
+					"An Error occurred",
+					"Could not create the Project.",
+					String.format("Could not create a Project in '%s'", path) + e.getLocalizedMessage());
 			alert.showAndWait();
 			return;
 		}
@@ -145,9 +147,11 @@ public class NewProjectController {
 		} catch (final IOException e) {
 			logger.error("ERROR: Could not create template for project.", e);
 			projectService.deleteProject(project);
-			final Alert alert =
-					Alerts.buildErrorAlert(dialog.getOwner(), "An Error occurred", "Could not create the Template.",
-							String.format("Could not create a Template in '%s'", path) + e.getLocalizedMessage());
+			final Alert alert = Alerts.buildErrorAlert(
+					dialog.getOwner(),
+					"An Error occurred",
+					"Could not create the Template.",
+					String.format("Could not create a Template in '%s'", path) + e.getLocalizedMessage());
 			alert.showAndWait();
 		}
 	}

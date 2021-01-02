@@ -29,8 +29,8 @@ public final class Alerts {
 	 * @param content
 	 * @return
 	 */
-	public static Alert buildYesNoCancelAlert(final Window owner, final String title, final String header,
-			final String content) {
+	public static Alert buildYesNoCancelAlert(
+			final Window owner, final String title, final String header, final String content) {
 		final ButtonType yesButton = new ButtonType(Messages.getString("general.yesButton"), ButtonData.YES);
 		final ButtonType noButton = new ButtonType(Messages.getString("general.noButton"), ButtonData.NO);
 		final ButtonType cancelButton =
@@ -49,8 +49,8 @@ public final class Alerts {
 	 * @param content
 	 * @return
 	 */
-	public static Alert buildErrorAlert(final Window owner, final String title, final String header,
-			final String content) {
+	public static Alert buildErrorAlert(
+			final Window owner, final String title, final String header, final String content) {
 		final ButtonType okButton = createOkButton();
 		final Alert alert = new Alert(AlertType.ERROR, content, okButton);
 		alert.initOwner(owner);
@@ -70,8 +70,8 @@ public final class Alerts {
 	 * @param content
 	 * @return
 	 */
-	public static Alert buildWarningAlert(final Window owner, final String title, final String header,
-			final String content) {
+	public static Alert buildWarningAlert(
+			final Window owner, final String title, final String header, final String content) {
 		final ButtonType okButton = createOkButton();
 		final Alert alert = new Alert(AlertType.WARNING, content, okButton);
 		alert.initOwner(owner);
@@ -88,8 +88,8 @@ public final class Alerts {
 	 * @param imageUrl
 	 * @return
 	 */
-	public static Alert buildAboutAlert(final Window owner, final String title, final String header,
-			final String content, final String imageUrl) {
+	public static Alert buildAboutAlert(
+			final Window owner, final String title, final String header, final String content, final String imageUrl) {
 		final ButtonType okButton = createOkButton();
 		final Alert alert = new Alert(AlertType.INFORMATION, content, okButton);
 		alert.initOwner(owner);

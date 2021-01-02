@@ -5,6 +5,7 @@ package interfacebuilder.ui.settings;
 
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import interfacebuilder.config.ConfigService;
 import interfacebuilder.integration.FileService;
 import interfacebuilder.integration.SettingsIniInterface;
 import javafx.event.ActionEvent;
@@ -38,8 +39,8 @@ public class SettingsGamesPathsController extends SettingsAutoSaveController {
 	@Autowired
 	private FileService fileService;
 	
-	public SettingsGamesPathsController() {
-		// nothing to do
+	public SettingsGamesPathsController(final ConfigService configService) {
+		super(configService);
 	}
 	
 	/**
@@ -165,11 +166,10 @@ public class SettingsGamesPathsController extends SettingsAutoSaveController {
 	 * @param is64bit
 	 * @return
 	 */
-	private static boolean switcherExists(final String gameDirectoryPath, final String switcherName,
-			final boolean is64bit) {
-		return new File(
-				gameDirectoryPath + File.separator + "Support" + (is64bit ? "64" : "") + File.separator + switcherName)
-				.exists();
+	private static boolean switcherExists(
+			final String gameDirectoryPath, final String switcherName, final boolean is64bit) {
+		return new File(gameDirectoryPath + File.separator + "Support" + (is64bit ? "64" : "") + File.separator +
+				switcherName).exists();
 	}
 	
 	@FXML

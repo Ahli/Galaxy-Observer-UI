@@ -61,8 +61,8 @@ public final class XmlCompressorDom {
 		
 		logger.info("Compressing XML files...");
 		logger.trace("cachePath: {}", () -> cachePath);
-
-//		final Collection<File> filesOfCache = FileUtils.listFiles(new File(cachePath), null, true);
+		
+		//		final Collection<File> filesOfCache = FileUtils.listFiles(new File(cachePath), null, true);
 		
 		final DocumentBuilderFactory dbFac = DocumentBuilderFactory.newInstance();
 		dbFac.setNamespaceAware(false);
@@ -137,8 +137,8 @@ public final class XmlCompressorDom {
 		private final DocumentBuilder dBuilder;
 		private final int ignoreCommentCountPerFile;
 		
-		public FileProcessor(final DocumentBuilder dBuilder, final Transformer transformer,
-				final int ignoreCommentCountPerFile) {
+		public FileProcessor(
+				final DocumentBuilder dBuilder, final Transformer transformer, final int ignoreCommentCountPerFile) {
 			super();
 			this.dBuilder = dBuilder;
 			this.transformer = transformer;

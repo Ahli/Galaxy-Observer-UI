@@ -69,8 +69,8 @@ public class InterProcessCommunication implements AutoCloseable {
 			
 			try (final Socket socket = new Socket(InetAddress.getByAddress(new byte[] { 127, 0, 0, 1 }), port)) {
 				try (final PrintWriter out = new PrintWriter(socket.getOutputStream(), true, StandardCharsets.UTF_8);
-				     final BufferedReader in = new BufferedReader(
-						     new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8))) {
+				     final BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream(),
+						     StandardCharsets.UTF_8))) {
 					// sending parameters
 					final String command = Arrays.toString(args);
 					logger.info("Sending: {}", command);
@@ -117,15 +117,15 @@ public class InterProcessCommunication implements AutoCloseable {
 	}
 	
 	private void handleConnection(final Socket clientSocket) throws IOException {
-		try (clientSocket; final PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true,
-				StandardCharsets.UTF_8); final BufferedReader in = new BufferedReader(
-				new InputStreamReader(clientSocket.getInputStream(), StandardCharsets.UTF_8))) {
+		try (clientSocket;
+		     final PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true, StandardCharsets.UTF_8);
+		     final BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(),
+				     StandardCharsets.UTF_8))) {
 			InterProcessCommunicationAppender.setPrintWriter(out);
 			String inputLine;
 			while ((inputLine = in.readLine()) != null) {
 				logger.info("received message from client: {}", inputLine);
-				final List<String> params =
-						Arrays.asList(inputLine.substring(1, inputLine.length() - 1).split(", "));
+				final List<String> params = Arrays.asList(inputLine.substring(1, inputLine.length() - 1).split(", "));
 				executeCommand(params);
 			}
 		} catch (final IOException e) {

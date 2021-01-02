@@ -32,8 +32,8 @@ final class RecursiveVtdTest {
 		final Runtime rt = Runtime.getRuntime();
 		final long startMem = rt.totalMemory() - rt.freeMemory();
 		final long startTime = System.currentTimeMillis();
-		final Path p = Path.of(
-				"D:\\Galaxy-Observer-UI\\baseUI\\heroes\\mods\\core.stormmod\\base.stormdata\\UI\\Layout\\UI\\GameUI.StormLayout");
+		final Path p =
+				Path.of("D:\\Galaxy-Observer-UI\\baseUI\\heroes\\mods\\core.stormmod\\base.stormdata\\UI\\Layout\\UI\\GameUI.StormLayout");
 		final VTDGen vtd;
 		
 		try {

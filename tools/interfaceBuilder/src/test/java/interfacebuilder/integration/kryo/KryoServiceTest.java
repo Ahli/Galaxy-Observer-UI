@@ -8,17 +8,7 @@ import com.ahli.galaxy.ui.UIConstant;
 import com.ahli.galaxy.ui.UIFrame;
 import com.ahli.galaxy.ui.exception.UIException;
 import com.esotericsoftware.kryo.Kryo;
-import interfacebuilder.InterfaceBuilderApp;
-import interfacebuilder.projects.ProjectJpaRepository;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.SpringBootDependencyInjectionTestExecutionListener;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener;
-import org.springframework.test.context.TestExecutionListeners;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -28,18 +18,9 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@ExtendWith(MockitoExtension.class)
-@SpringBootTest(classes = InterfaceBuilderApp.class)
-@TestExecutionListeners(
-		listeners = { MockitoTestExecutionListener.class, SpringBootDependencyInjectionTestExecutionListener.class },
-		mergeMode = TestExecutionListeners.MergeMode.REPLACE_DEFAULTS)
 final class KryoServiceTest {
 	
-	@MockBean
-	private ProjectJpaRepository projectRepoMock;
-	
-	@Autowired
-	private KryoService kryoService;
+	private final KryoService kryoService = new KryoService();
 	
 	@Test
 	void testMetaFile() throws IOException {

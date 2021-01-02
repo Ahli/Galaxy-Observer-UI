@@ -80,8 +80,9 @@ public class KryoService {
 		}
 	}
 	
-	public List<Object> get(final Path path, final Iterable<Class<?>> payloadClasses, final Kryo kryo,
-			final int stopAfterIndex) throws IOException {
+	public List<Object> get(
+			final Path path, final Iterable<Class<?>> payloadClasses, final Kryo kryo, final int stopAfterIndex)
+			throws IOException {
 		try (final InflaterInputStream in = new InflaterInputStream(Files.newInputStream(path))) {
 			try (final Input input = new Input(in)) {
 				final List<Object> result = new ArrayList<>();

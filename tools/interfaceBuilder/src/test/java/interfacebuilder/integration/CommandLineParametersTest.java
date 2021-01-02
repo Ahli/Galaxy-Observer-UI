@@ -3,29 +3,23 @@
 
 package interfacebuilder.integration;
 
-import interfacebuilder.projects.ProjectJpaRepository;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@ExtendWith(MockitoExtension.class)
 final class CommandLineParametersTest {
-	
-	@MockBean
-	private ProjectJpaRepository projectRepoMock;
 	
 	@Test
 	void testStringParamCompileRun() {
 		// TODO improve test with freshly created directory
 		final CommandLineParams param = new CommandLineParams(
 				"--compileRun=D:\\Galaxy-Observer-UI\\dev\\heroes\\AhliObs.StormInterface\\Base.StormData\\UI\\Layout");
-		assertEquals("D:\\Galaxy-Observer-UI\\dev\\heroes\\AhliObs.StormInterface", param.getParamCompilePath(),
+		assertEquals(
+				"D:\\Galaxy-Observer-UI\\dev\\heroes\\AhliObs.StormInterface",
+				param.getParamCompilePath(),
 				"compileRun's path is wrong");
 		assertTrue(param.isHasParamCompilePath(), "hasParamCompilePath is wrong");
 		assertNull(param.getParamRunPath(), "run path wrongfully set when command is: --compileRun");
@@ -36,7 +30,9 @@ final class CommandLineParametersTest {
 		// TODO improve test with freshly created directory
 		final CommandLineParams param = new CommandLineParams(
 				"--compile=D:\\Galaxy-Observer-UI\\dev\\heroes\\AhliObs.StormInterface\\Base.StormData\\UI\\Layout");
-		assertEquals("D:\\Galaxy-Observer-UI\\dev\\heroes\\AhliObs.StormInterface", param.getParamCompilePath(),
+		assertEquals(
+				"D:\\Galaxy-Observer-UI\\dev\\heroes\\AhliObs.StormInterface",
+				param.getParamCompilePath(),
 				"compile's path is wrong");
 		assertTrue(param.isHasParamCompilePath(), "hasParamCompilePath is wrong");
 		assertNull(param.getParamRunPath(), "run path wrongfully set when command is: --compile");

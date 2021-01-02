@@ -99,8 +99,8 @@ public class LayoutExtensionReader {
 	 *
 	 * @param childNodes
 	 */
-	private static void readConstants(final NodeList childNodes, final List<ValueDef> hotkeys,
-			final List<ValueDef> settings) {
+	private static void readConstants(
+			final NodeList childNodes, final List<ValueDef> hotkeys, final List<ValueDef> settings) {
 		for (int i = 0, len = childNodes.getLength(); i < len; i++) {
 			final Node curNode = childNodes.item(i);
 			
@@ -147,8 +147,8 @@ public class LayoutExtensionReader {
 	 * @param name
 	 * @param val
 	 */
-	private static void setValueDefCurValue(final String name, final String val, final List<ValueDef> hotkeys,
-			final List<ValueDef> settings) {
+	private static void setValueDefCurValue(
+			final String name, final String val, final List<ValueDef> hotkeys, final List<ValueDef> settings) {
 		for (final ValueDef item : hotkeys) {
 			if (item.getId().equalsIgnoreCase(name)) {
 				item.setValue(val);
@@ -382,14 +382,19 @@ public class LayoutExtensionReader {
 		}
 	}
 	
-	public void addHotkeyValueDef(final String constant, final String description, final String defaultValue,
-			final String curValue) {
+	public void addHotkeyValueDef(
+			final String constant, final String description, final String defaultValue, final String curValue) {
 		final ValueDef def = new ValueDef(constant, curValue, description, defaultValue);
 		hotkeys.add(def);
 	}
 	
-	public void addSettingValueDef(final String constant, final String description, final String defaultValue,
-			final String curValue, final String type, final String[] allowedValues) {
+	public void addSettingValueDef(
+			final String constant,
+			final String description,
+			final String defaultValue,
+			final String curValue,
+			final String type,
+			final String[] allowedValues) {
 		final ValueDef def = new ValueDef(constant, curValue, description, defaultValue, type, allowedValues);
 		settings.add(def);
 	}
@@ -449,8 +454,12 @@ public class LayoutExtensionReader {
 		private final List<ValueDef> hotkeys;
 		private final List<ValueDef> settings;
 		
-		public LayoutFileUpdater(final DocumentBuilder dBuilder, final Transformer transformer,
-				final String[] extensions, final List<ValueDef> hotkeys, final List<ValueDef> settings) {
+		public LayoutFileUpdater(
+				final DocumentBuilder dBuilder,
+				final Transformer transformer,
+				final String[] extensions,
+				final List<ValueDef> hotkeys,
+				final List<ValueDef> settings) {
 			super();
 			this.dBuilder = dBuilder;
 			this.transformer = transformer;
@@ -503,8 +512,8 @@ public class LayoutExtensionReader {
 			return FileVisitResult.CONTINUE;
 		}
 		
-		private static void modifyConstants(final NodeList childNodes, final List<ValueDef> hotkeys,
-				final List<ValueDef> settings) {
+		private static void modifyConstants(
+				final NodeList childNodes, final List<ValueDef> hotkeys, final List<ValueDef> settings) {
 			for (int i = 0, len = childNodes.getLength(); i < len; i++) {
 				final Node curNode = childNodes.item(i);
 				
@@ -526,8 +535,8 @@ public class LayoutExtensionReader {
 		 *
 		 * @param node
 		 */
-		private static void modifyConstant(final Node node, final List<ValueDef> hotkeys,
-				final List<ValueDef> settings) {
+		private static void modifyConstant(
+				final Node node, final List<ValueDef> hotkeys, final List<ValueDef> settings) {
 			final Node nameAttrNode = getNamedItemIgnoreCase(node.getAttributes(), NAME);
 			if (nameAttrNode != null) {
 				final String name = nameAttrNode.getNodeValue();
@@ -539,8 +548,11 @@ public class LayoutExtensionReader {
 						if (item.getId().equalsIgnoreCase(name)) {
 							if (!Objects.equals(item.getValue(), val)) {
 								if (logger.isDebugEnabled()) {
-									logger.debug("updating hotkey constant: '{}' with val: '{}' from '{}'", name,
-											item.getValue(), val);
+									logger.debug(
+											"updating hotkey constant: '{}' with val: '{}' from '{}'",
+											name,
+											item.getValue(),
+											val);
 								}
 								valAttrNode.setNodeValue(item.getValue());
 							}
@@ -551,8 +563,11 @@ public class LayoutExtensionReader {
 						if (item.getId().equalsIgnoreCase(name)) {
 							if (!Objects.equals(item.getValue(), val)) {
 								if (logger.isDebugEnabled()) {
-									logger.debug("updating setting constant: '{}' with val: '{}' from '{}'", name,
-											item.getValue(), val);
+									logger.debug(
+											"updating setting constant: '{}' with val: '{}' from '{}'",
+											name,
+											item.getValue(),
+											val);
 								}
 								valAttrNode.setNodeValue(item.getValue());
 							}
