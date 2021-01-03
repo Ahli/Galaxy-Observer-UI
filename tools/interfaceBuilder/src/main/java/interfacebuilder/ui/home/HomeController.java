@@ -16,6 +16,8 @@ import interfacebuilder.ui.progress.TabPaneController;
 import javafx.beans.InvalidationListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
@@ -352,12 +354,7 @@ public class HomeController implements Updateable {
 				// context menu with close option
 				final ContextMenu contextMenu = new ContextMenu();
 				final MenuItem closeItem = new MenuItem(Messages.getString("contextmenu.close"));
-				final Tab newTabFinal = newTab;
-				closeItem.setOnAction(event -> {
-					logger.trace("close tab");
-					tabPaneController.getTabPane().getTabs().remove(newTabFinal);
-					controller.stopMining();
-				});
+				closeItem.setOnAction(new CloseMiningTabAction(newTab, controller));
 				contextMenu.getItems().addAll(closeItem);
 				newTab.setContextMenu(contextMenu);
 				
@@ -375,6 +372,23 @@ public class HomeController implements Updateable {
 				navigationController.clickProgress();
 				tabPane.getSelectionModel().select(newTab);
 			}
+		}
+	}
+	
+	private static class CloseMiningTabAction implements EventHandler<ActionEvent> {
+		private final Tab tab;
+		private final CompressionMiningController controller;
+		
+		public CloseMiningTabAction(final Tab tab, final CompressionMiningController controller) {
+			this.tab = tab;
+			this.controller = controller;
+		}
+		
+		@Override
+		public void handle(final ActionEvent event) {
+			tab.getTabPane().getTabs().remove(tab);
+			tab.setContextMenu(null);
+			controller.stopMining();
 		}
 	}
 }

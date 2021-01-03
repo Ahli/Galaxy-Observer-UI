@@ -30,6 +30,8 @@ import interfacebuilder.ui.progress.ErrorTabController;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.ChoiceBox;
@@ -52,7 +54,6 @@ import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -87,7 +88,6 @@ public class BrowseController implements Updateable {
 	private Label ptrStatusLabel;
 	@FXML
 	private ChoiceBox<String> heroesChoiceBox;
-	// prevent GC of controllers
 	private List<Updateable> controllers;
 	
 	public BrowseController(
@@ -267,35 +267,18 @@ public class BrowseController implements Updateable {
 			// context menu with close option
 			final ContextMenu contextMenu = new ContextMenu();
 			final MenuItem closeItem = new MenuItem(Messages.getString("contextmenu.close"));
-			final WeakReference<BaseUiExtractionController> weakRefExtrController =
-					new WeakReference<>(extractionController);
-			final WeakReference<Tab> newTabFinal = new WeakReference<>(newTab);
-			closeItem.setOnAction(event -> {
-				final Tab t = newTabFinal.get();
-				if (t != null) {
-					appController.getTabPane().getTabs().remove(t);
-				}
-				final BaseUiExtractionController c = weakRefExtrController.get();
-				if (c != null) {
-					controllers.remove(c);
-					StylizedTextAreaAppender.unregister(c.getErrorTabController());
-				}
-			});
+			closeItem.setOnAction(new ExtractBaseUiCloseAction(newTab, extractionController, controllers));
 			contextMenu.getItems().addAll(closeItem);
 			newTab.setContextMenu(contextMenu);
 			
 			// runlater needs to appear below the edits above, else it might be added before
 			// which results in UI edits not in UI thread -> error
+			final Tab newTabFinal = newTab;
+			final ObservableList<Node> controllerLoggingAreaChildren = extractionController.loggingArea.getChildren();
 			Platform.runLater(() -> {
 				try {
-					final BaseUiExtractionController c = weakRefExtrController.get();
-					if (c != null) {
-						c.loggingArea.getChildren().add(scrollPane);
-					}
-					final Tab t = newTabFinal.get();
-					if (t != null) {
-						appController.getTabPane().getTabs().add(t);
-					}
+					controllerLoggingAreaChildren.add(scrollPane);
+					appController.getTabPane().getTabs().add(newTabFinal);
 				} catch (final Exception e) {
 					logger.fatal(FATAL_ERROR, e);
 				}
@@ -373,19 +356,10 @@ public class BrowseController implements Updateable {
 			// context menu with close option
 			final ContextMenu contextMenu = new ContextMenu();
 			final MenuItem closeItem = new MenuItem(Messages.getString("contextmenu.close"));
-			final WeakReference<Updateable> controllerRef = new WeakReference<>(controller);
-			final WeakReference<Tab> newTabFinal = new WeakReference<>(newTab);
-			closeItem.setOnAction(event -> {
-				final Tab t = newTabFinal.get();
-				if (t != null) {
-					tabPane.getTabs().remove(t);
-				}
-				final Updateable c = controllerRef.get();
-				if (c != null) {
-					controllers.remove(c);
-				}
-				appController.tryCleanUp();
-			});
+			closeItem.setOnAction(new CloseTabAction(newTab,
+					(BrowseTabController) controller,
+					controllers,
+					appController));
 			contextMenu.getItems().addAll(closeItem);
 			newTab.setContextMenu(contextMenu);
 			
@@ -454,6 +428,61 @@ public class BrowseController implements Updateable {
 						configService);
 				executor.execute(task);
 			}
+		}
+	}
+	
+	private static class CloseTabAction implements EventHandler<ActionEvent> {
+		private final Tab tab;
+		private final BrowseTabController controller;
+		private final List<Updateable> controllers;
+		private final AppController appController;
+		
+		public CloseTabAction(
+				final Tab tab,
+				final BrowseTabController controller,
+				final List<Updateable> controllers,
+				final AppController appController) {
+			this.tab = tab;
+			this.controller = controller;
+			this.controllers = controllers;
+			this.appController = appController;
+		}
+		
+		@Override
+		public void handle(final ActionEvent event) {
+			tab.getTabPane().getTabs().remove(tab);
+			tab.setContextMenu(null);
+			controllers.remove(controller);
+			// TODO BrowseTabController is not garbage collected => remove heavy data
+			controller.setData(null);
+			
+			// TODO Tab is not garbage collected due to Scene's mouseHandler
+			appController.tryCleanUp();
+		}
+	}
+	
+	private static class ExtractBaseUiCloseAction implements EventHandler<ActionEvent> {
+		private final Tab tab;
+		private final BaseUiExtractionController controller;
+		private final List<Updateable> controllers;
+		
+		public ExtractBaseUiCloseAction(
+				final Tab tab, final BaseUiExtractionController controller, final List<Updateable> controllers) {
+			this.tab = tab;
+			this.controller = controller;
+			this.controllers = controllers;
+		}
+		
+		@Override
+		public void handle(final ActionEvent event) {
+			tab.getTabPane().getTabs().remove(tab);
+			controllers.remove(controller);
+			controller.setErrorTabControl(null);
+			StylizedTextAreaAppender.unregister(controller.getErrorTabController());
+			// for some reason this class was not garbage collected
+			tab.getContextMenu().getItems().get(0).setOnAction(null);
+			tab.getContextMenu().getItems().clear();
+			tab.setContextMenu(null);
 		}
 	}
 }

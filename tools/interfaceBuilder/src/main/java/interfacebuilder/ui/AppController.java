@@ -22,6 +22,8 @@ import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -40,7 +42,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ForkJoinPool;
@@ -202,29 +203,16 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 			// context menu with close option
 			final ContextMenu contextMenu = new ContextMenu();
 			final MenuItem closeItem = new MenuItem(Messages.getString("contextmenu.close"));
-			final WeakReference<ErrorTabController> controllerRef = new WeakReference<>(errorTabCtrl);
-			final WeakReference<Tab> newTabFinal = new WeakReference<>(newTab);
-			closeItem.setOnAction(event -> {
-				final Tab t = newTabFinal.get();
-				if (t != null) {
-					getTabPane().getTabs().remove(t);
-				}
-				final ErrorTabController c = controllerRef.get();
-				if (c != null) {
-					errorTabControllers.remove(c);
-				}
-			});
+			closeItem.setOnAction(new CloseThreadLoggerTabAction(newTab, errorTabCtrl, errorTabControllers));
 			contextMenu.getItems().addAll(closeItem);
 			newTab.setContextMenu(contextMenu);
 			
 			// runlater needs to appear below the edits above, else it might be added before
 			// which results in UI edits not in UI thread -> error
+			final Tab newTabFinal = newTab;
 			Platform.runLater(() -> {
 				try {
-					final Tab t = newTabFinal.get();
-					if (t != null) {
-						getTabPane().getTabs().add(t);
-					}
+					getTabPane().getTabs().add(newTabFinal);
 				} catch (final Exception e) {
 					logger.fatal(FATAL_ERROR, e);
 				}
@@ -519,4 +507,23 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 		});
 	}
 	
+	private static class CloseThreadLoggerTabAction implements EventHandler<ActionEvent> {
+		private final Tab tab;
+		private final ErrorTabController controller;
+		private final List<ErrorTabController> controllers;
+		
+		public CloseThreadLoggerTabAction(
+				final Tab tab, final ErrorTabController controller, final List<ErrorTabController> controllers) {
+			this.tab = tab;
+			this.controller = controller;
+			this.controllers = controllers;
+		}
+		
+		@Override
+		public void handle(final ActionEvent event) {
+			tab.getTabPane().getTabs().remove(tab);
+			tab.setContextMenu(null);
+			controllers.remove(controller);
+		}
+	}
 }

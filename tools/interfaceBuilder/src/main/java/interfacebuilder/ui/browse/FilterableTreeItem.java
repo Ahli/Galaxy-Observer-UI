@@ -14,36 +14,45 @@ import javafx.scene.control.TreeItem;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
+import java.util.concurrent.Callable;
+import java.util.function.Predicate;
 
 public class FilterableTreeItem<T> extends TreeItem<T> {
+	private final ObjectProperty<TreeItemPredicate<T>> predicate;
 	private final ObservableList<TreeItem<T>> sourceList;
-	
-	private final ObjectProperty<TreeItemPredicate<T>> predicate = new SimpleObjectProperty<>();
 	
 	public FilterableTreeItem(final T value) {
 		super(value);
+		predicate = new SimpleObjectProperty<>();
 		sourceList = FXCollections.observableArrayList();
 		final FilteredList<TreeItem<T>> filteredList = new FilteredList<>(sourceList);
 		
-		filteredList.predicateProperty().bind(Bindings.createObjectBinding(() -> child -> {
-			// Set the predicate of child items to force filtering
-			if (child instanceof FilterableTreeItem) {
-				final FilterableTreeItem<T> filterableChild = (FilterableTreeItem<T>) child;
-				filterableChild.setPredicate(predicate.get());
+		filteredList.predicateProperty().bind(Bindings.createObjectBinding(new Callable<>() {
+			@Override
+			public Predicate<? super TreeItem<T>> call() {
+				return this::test;
 			}
-			// If there is no predicate, keep this tree item
-			if (predicate.get() == null) {
-				return true;
+			
+			private boolean test(final TreeItem<T> child) {
+				// Set the predicate of child items to force filtering
+				if (child instanceof FilterableTreeItem) {
+					final FilterableTreeItem<T> filterableChild = (FilterableTreeItem<T>) child;
+					filterableChild.setPredicate(predicate.get());
+				}
+				// If there is no predicate or if there are children, keep this tree item
+				if (predicate.get() == null || !child.getChildren().isEmpty()) {
+					return true;
+				}
+				// Otherwise ask the TreeItemPredicate
+				return predicate.get().test(FilterableTreeItem.this, child.getValue());
 			}
-			// If there are children, keep this tree item
-			if (!child.getChildren().isEmpty()) {
-				return true;
-			}
-			// Otherwise ask the TreeItemPredicate
-			return predicate.get().test(this, child.getValue());
 		}, predicate));
 		
-		setHiddenFieldChildrenPrivate(filteredList);
+		setHiddenFieldChildren(filteredList);
+	}
+	
+	public void setPredicate(final TreeItemPredicate<T> predicate) {
+		this.predicate.set(predicate);
 	}
 	
 	/**
@@ -51,7 +60,7 @@ public class FilterableTreeItem<T> extends TreeItem<T> {
 	 * ListChangeListener} in {@link TreeItem} childrenListener to the list
 	 */
 	@SuppressWarnings("unchecked")
-	private void setHiddenFieldChildrenPrivate(final ObservableList<TreeItem<T>> list) {
+	private void setHiddenFieldChildren(final ObservableList<TreeItem<T>> list) {
 		final Field children = ReflectionUtils.findField(getClass(), "children");
 		if (children != null) {
 			/* TODO requires "--add-opens=javafx.controls/javafx.scene.control=interfacex.builder" in VM options in
@@ -69,14 +78,6 @@ public class FilterableTreeItem<T> extends TreeItem<T> {
 	}
 	
 	/**
-	 * Set the hidden private field {@link TreeItem} children through reflection and hook the hidden {@link
-	 * ListChangeListener} in {@link TreeItem} childrenListener to the list
-	 */
-	protected void setHiddenFieldChildren(final ObservableList<TreeItem<T>> list) {
-		setHiddenFieldChildrenPrivate(list);
-	}
-	
-	/**
 	 * Returns the list of children that is backing the filtered list.
 	 *
 	 * @return underlying list of children
@@ -85,15 +86,7 @@ public class FilterableTreeItem<T> extends TreeItem<T> {
 		return sourceList;
 	}
 	
-	public final ObjectProperty<TreeItemPredicate<T>> predicateProperty() {
+	public ObjectProperty<TreeItemPredicate<T>> predicateProperty() {
 		return predicate;
-	}
-	
-	public final TreeItemPredicate<T> getPredicate() {
-		return predicate.get();
-	}
-	
-	public final void setPredicate(final TreeItemPredicate<T> predicate) {
-		this.predicate.set(predicate);
 	}
 }
