@@ -71,7 +71,7 @@ public class LayoutExtensionReader {
 	private static Node getNamedItemIgnoreCase(final NamedNodeMap nodes, final String name) {
 		final Node node = nodes.getNamedItem(name);
 		if (node == null) {
-			for (int i = 0, len = nodes.getLength(); i < len; i++) {
+			for (int i = 0, len = nodes.getLength(); i < len; ++i) {
 				final Node curNode = nodes.item(i);
 				if (name.equalsIgnoreCase(curNode.getNodeName())) {
 					return curNode;
@@ -101,7 +101,7 @@ public class LayoutExtensionReader {
 	 */
 	private static void readConstants(
 			final NodeList childNodes, final List<ValueDef> hotkeys, final List<ValueDef> settings) {
-		for (int i = 0, len = childNodes.getLength(); i < len; i++) {
+		for (int i = 0, len = childNodes.getLength(); i < len; ++i) {
 			final Node curNode = childNodes.item(i);
 			
 			if (curNode.getNodeType() == Node.ELEMENT_NODE) {
@@ -127,19 +127,13 @@ public class LayoutExtensionReader {
 			final Node valAttrNode = getNamedItemIgnoreCase(node.getAttributes(), VAL);
 			if (valAttrNode != null) {
 				final String val = valAttrNode.getNodeValue();
-				if (logger.isDebugEnabled()) {
-					logger.debug("Constant: name = {}, val = {}", name, val);
-				}
+				logger.debug("Constant: name = {}, val = {}", name, val);
 				setValueDefCurValue(name, val, hotkeys, settings);
 			} else {
-				if (logger.isWarnEnabled()) {
-					logger.warn("Constant '{}' has no 'val' attribute defined.", name);
-				}
+				logger.warn("Constant '{}' has no 'val' attribute defined.", name);
 			}
 		} else {
-			if (logger.isWarnEnabled()) {
-				logger.warn("Constant has no 'name' attribute defined.");
-			}
+			logger.warn("Constant has no 'name' attribute defined.");
 		}
 	}
 	
@@ -161,9 +155,7 @@ public class LayoutExtensionReader {
 				return;
 			}
 		}
-		if (logger.isDebugEnabled()) {
-			logger.debug("no ValueDef found with name: {}", name);
-		}
+		logger.debug("no ValueDef found with name: {}", name);
 	}
 	
 	/**
@@ -204,9 +196,7 @@ public class LayoutExtensionReader {
 	 * @throws SAXException
 	 */
 	public void processLayoutFiles(final Iterable<File> layoutFiles) throws ParserConfigurationException, SAXException {
-		if (logger.isInfoEnabled()) {
-			logger.info("Scanning for XML file...");
-		}
+		logger.info("Scanning for XML file...");
 		
 		final DocumentBuilderFactory dbFac = DocumentBuilderFactory.newInstance();
 		dbFac.setNamespaceAware(false);
@@ -229,16 +219,12 @@ public class LayoutExtensionReader {
 			try {
 				doc = dBuilder.parse(curFile);
 			} catch (final SAXParseException | IOException e) {
-				if (logger.isTraceEnabled()) {
-					logger.trace(ERROR_PARSING_FILE, e);
-				}
+				logger.trace(ERROR_PARSING_FILE, e);
 				// couldn't parse, most likely no XML file
 				continue;
 			}
 			
-			if (logger.isDebugEnabled()) {
-				logger.debug("comments - processing file: {}", curFile.getPath());
-			}
+			logger.debug("comments - processing file: {}", curFile.getPath());
 			
 			// read comments
 			final Element elem = doc.getDocumentElement();
@@ -251,16 +237,12 @@ public class LayoutExtensionReader {
 				// parse XML file
 				doc = dBuilder.parse(curFile);
 			} catch (final SAXParseException | IOException e) {
-				if (logger.isTraceEnabled()) {
-					logger.trace(ERROR_PARSING_FILE, e);
-				}
+				logger.trace(ERROR_PARSING_FILE, e);
 				// couldn't parse, most likely no XML file
 				continue;
 			}
 			
-			if (logger.isDebugEnabled()) {
-				logger.debug("constants - processing file: {}", curFile.getPath());
-			}
+			logger.debug("constants - processing file: {}", curFile.getPath());
 			
 			// read constants
 			final Element elem = doc.getDocumentElement();
@@ -275,7 +257,7 @@ public class LayoutExtensionReader {
 	 * @param childNodes
 	 */
 	private void readComments(final NodeList childNodes) {
-		for (int i = 0, len = childNodes.getLength(); i < len; i++) {
+		for (int i = 0, len = childNodes.getLength(); i < len; ++i) {
 			final Node curNode = childNodes.item(i);
 			
 			if (curNode.getNodeType() == Node.COMMENT_NODE) {
@@ -296,21 +278,17 @@ public class LayoutExtensionReader {
 	 * @param textInput
 	 */
 	public void processCommentText(final String textInput) {
-		logger.debug("textInput:{}", () -> textInput);
+		logger.debug("textInput:{}", textInput);
 		try {
 			// split at keywords @hotkey or @setting without removing, case insensitive
 			for (String text : textInput.split(HOTKEY_OR_SETTING_REGEX)) {
-				if (logger.isDebugEnabled()) {
-					logger.debug("token start:{}", text);
-				}
+				logger.debug("token start:{}", text);
 				text = text.trim();
 				
 				final String lowerCaseText = text.toLowerCase(Locale.ROOT);
 				final boolean isHotkey = lowerCaseText.startsWith(HOTKEY);
 				if (isHotkey || lowerCaseText.startsWith(SETTING)) {
-					if (logger.isDebugEnabled()) {
-						logger.debug("detected hotkey or setting");
-					}
+					logger.debug("detected hotkey or setting");
 					
 					String constant = "";
 					String description = "";
@@ -328,39 +306,27 @@ public class LayoutExtensionReader {
 					// split at keyword
 					for (String part : toProcess.split(ATTRIBUTES_REGEX)) {
 						part = part.trim();
-						if (logger.isTraceEnabled()) {
-							logger.trace("part: {}", part);
-						}
+						logger.trace("part: {}", part);
 						final String partLower = part.toLowerCase(Locale.ROOT);
 						part = getValueAfterEqualsChar(part);
 						if (partLower.startsWith(ATTRIBUTE_CONSTANT)) {
 							constant = getValueWithinQuotes(part);
-							if (logger.isTraceEnabled()) {
-								logger.trace("constant = {}", constant);
-							}
+							logger.trace("constant = {}", constant);
 						} else if (partLower.startsWith(ATTRIBUTE_DEFAULT)) {
 							defaultValue = getValueWithinQuotes(part);
-							if (logger.isTraceEnabled()) {
-								logger.trace("default = {}", defaultValue);
-							}
+							logger.trace("default = {}", defaultValue);
 						} else if (partLower.startsWith(ATTRIBUTE_DESCRIPTION)) {
 							description = getValueWithinQuotes(part);
-							if (logger.isTraceEnabled()) {
-								logger.trace("description = {}", description);
-							}
+							logger.trace("description = {}", description);
 						} else if (partLower.startsWith(ATTRIBUTE_VALUES)) {
 							allowedValues = part.split("/");
 							for (int i = 0; i < allowedValues.length; ++i) {
 								allowedValues[i] = getValueWithinQuotes(allowedValues[i]);
 							}
-							if (logger.isTraceEnabled()) {
-								logger.trace("values = {}", part);
-							}
+							logger.trace("values = {}", part);
 						} else if (partLower.startsWith(ATTRIBUTE_TYPE)) {
 							type = getValueWithinQuotes(part).trim();
-							if (logger.isTraceEnabled()) {
-								logger.trace("type = {}", part);
-							}
+							logger.trace("type = {}", part);
 						}
 					}
 					
@@ -376,9 +342,7 @@ public class LayoutExtensionReader {
 		} catch (final RuntimeException e) {
 			throw e;
 		} catch (final Exception e) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("Parsing Comment failed.", e);
-			}
+			logger.trace("Parsing Comment failed.", e);
 		}
 	}
 	
@@ -406,9 +370,7 @@ public class LayoutExtensionReader {
 	 * @throws SAXException
 	 */
 	public void updateLayoutFiles(final Path projectInCache) throws ParserConfigurationException {
-		if (logger.isInfoEnabled()) {
-			logger.info("Scanning for XML file...");
-		}
+		logger.info("Scanning for XML file...");
 		final DocumentBuilderFactory dbFac = DocumentBuilderFactory.newInstance();
 		dbFac.setNamespaceAware(false);
 		dbFac.setValidating(false);
@@ -486,15 +448,11 @@ public class LayoutExtensionReader {
 					try (final InputStream is = new BufferedInputStream(Files.newInputStream(file))) {
 						doc = dBuilder.parse(is);
 					} catch (final SAXException e) {
-						if (logger.isTraceEnabled()) {
-							logger.trace(ERROR_PARSING_FILE, e);
-						}
+						logger.trace(ERROR_PARSING_FILE, e);
 						throw new IOException(ERROR_PARSING_FILE, e);
 					}
 					
-					if (logger.isDebugEnabled()) {
-						logger.debug("processing file: {}", file);
-					}
+					logger.debug("processing file: {}", file);
 					
 					// process files
 					final Element elem = doc.getDocumentElement();
@@ -514,7 +472,7 @@ public class LayoutExtensionReader {
 		
 		private static void modifyConstants(
 				final NodeList childNodes, final List<ValueDef> hotkeys, final List<ValueDef> settings) {
-			for (int i = 0, len = childNodes.getLength(); i < len; i++) {
+			for (int i = 0, len = childNodes.getLength(); i < len; ++i) {
 				final Node curNode = childNodes.item(i);
 				
 				if (curNode.getNodeType() == Node.ELEMENT_NODE) {
@@ -546,15 +504,13 @@ public class LayoutExtensionReader {
 					
 					for (final ValueDef item : hotkeys) {
 						if (item.getId().equalsIgnoreCase(name)) {
-							if (!Objects.equals(item.getValue(), val)) {
-								if (logger.isDebugEnabled()) {
-									logger.debug(
-											"updating hotkey constant: '{}' with val: '{}' from '{}'",
-											name,
-											item.getValue(),
-											val);
-								}
-								valAttrNode.setNodeValue(item.getValue());
+							final String itemVal = item.getValue();
+							if (!Objects.equals(itemVal, val)) {
+								logger.debug("updating hotkey constant: '{}' with val: '{}' from '{}'",
+										name,
+										itemVal,
+										val);
+								valAttrNode.setNodeValue(itemVal);
 							}
 							return;
 						}
@@ -562,27 +518,21 @@ public class LayoutExtensionReader {
 					for (final ValueDef item : settings) {
 						if (item.getId().equalsIgnoreCase(name)) {
 							if (!Objects.equals(item.getValue(), val)) {
-								if (logger.isDebugEnabled()) {
-									logger.debug(
-											"updating setting constant: '{}' with val: '{}' from '{}'",
-											name,
-											item.getValue(),
-											val);
-								}
-								valAttrNode.setNodeValue(item.getValue());
+								final String itemVal = item.getValue();
+								logger.debug("updating setting constant: '{}' with val: '{}' from '{}'",
+										name,
+										itemVal,
+										val);
+								valAttrNode.setNodeValue(itemVal);
 							}
 							return;
 						}
 					}
 				} else {
-					if (logger.isWarnEnabled()) {
-						logger.warn("Constant has no 'val' attribute defined.");
-					}
+					logger.warn("Constant has no 'val' attribute defined.");
 				}
 			} else {
-				if (logger.isWarnEnabled()) {
-					logger.warn("Constant has no 'name' attribute defined.");
-				}
+				logger.warn("Constant has no 'name' attribute defined.");
 			}
 		}
 		

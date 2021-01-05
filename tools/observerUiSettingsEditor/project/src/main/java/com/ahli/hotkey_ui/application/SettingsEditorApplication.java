@@ -183,9 +183,7 @@ public class SettingsEditorApplication extends Application {
 			primaryStage.getIcons()
 					.add(new Image(SettingsEditorApplication.class.getResourceAsStream("/res/ahliLogo.png")));
 		} catch (final NullPointerException e) {
-			final String msg = "Error loading resource";
-			logger.error(msg);
-			logger.trace(msg, e);
+			logger.error("Error loading resource", e);
 			primaryStage.getIcons().add(new Image("ahliLogo.png"));
 		}
 	}
@@ -219,10 +217,12 @@ public class SettingsEditorApplication extends Application {
 				.add(SettingsEditorApplication.class.getResource("/view/application.css").toExternalForm());
 		
 		if (logger.isTraceEnabled()) {
-			logger.trace("installed font families: {}", Font.getFamilies());
-			logger.trace("Locale dflt is '{}'", Locale.getDefault());
-			logger.trace("Locale of Messages.class is '{}'", Messages.getBundle().getLocale());
-			logger.trace("Locale china: {}", Locale.SIMPLIFIED_CHINESE);
+			logger.trace(
+					"installed font families: {}\nLocale dflt is '{}'\nLocale of Messages.class is '{}'\nLocale china: {}",
+					Font.getFamilies(),
+					Locale.getDefault(),
+					Messages.getBundle().getLocale(),
+					Locale.SIMPLIFIED_CHINESE);
 		}
 		if (Messages.checkIfTargetResourceIsUsed(Locale.CHINA)) {
 			logger.trace("apply Chinese css");
@@ -395,9 +395,7 @@ public class SettingsEditorApplication extends Application {
 	 */
 	private void showErrorAlert(final Exception e) {
 		Platform.runLater(() -> {
-			if (logger.isTraceEnabled()) {
-				logger.trace("showing error popup");
-			}
+			logger.trace("showing error popup");
 			final String title = Messages.getString("Main.anErrorOccured");
 			final String content = e.getMessage();
 			final Alert alert = Alerts.buildErrorAlert(getPrimaryStage(), title, title, content);
@@ -452,14 +450,12 @@ public class SettingsEditorApplication extends Application {
 	 * @param file
 	 */
 	public void openMpqFileThreaded(final Path file) {
-		new Thread() {
-			@Override
-			public void run() {
-				Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
-				setName(getName().replaceFirst("Thread", "Open"));
-				openMpqFile(file);
-			}
-		}.start();
+		new Thread(() -> {
+			final Thread curThread = Thread.currentThread();
+			curThread.setPriority(Thread.NORM_PRIORITY);
+			curThread.setName(curThread.getName().replaceFirst("Thread", "Open"));
+			openMpqFile(file);
+		}).start();
 	}
 	
 	/**
@@ -526,9 +522,7 @@ public class SettingsEditorApplication extends Application {
 			}
 			updateMenuBar();
 		} else {
-			if (logger.isTraceEnabled()) {
-				logger.trace("File to open was null, most likely due to 'cancel'.");
-			}
+			logger.trace("File to open was null, most likely due to 'cancel'.");
 		}
 		logger.trace("opened mpq within {}ms.", () -> (System.nanoTime() - time) / 1_000_000);
 	}
@@ -542,9 +536,7 @@ public class SettingsEditorApplication extends Application {
 		try {
 			return mpqi.isHeroesMpq();
 		} catch (final MpqException e) {
-			if (logger.isTraceEnabled()) {
-				logger.trace("Error while checking if namespace is heroes", e);
-			}
+			logger.error("Error while checking if namespace is heroes", e);
 			// special case to show readable error to user
 			throw new ShowToUserException(Messages.getString("Main.OpenedFileNoComponentList"));
 		}
@@ -567,9 +559,7 @@ public class SettingsEditorApplication extends Application {
 	 */
 	private void showExceptionAlert(final Exception e) {
 		Platform.runLater(() -> {
-			if (logger.isTraceEnabled()) {
-				logger.trace("showing exception popup");
-			}
+			logger.trace("showing exception popup");
 			final Alert alert = Alerts.buildExceptionAlert(getPrimaryStage(), e);
 			alert.showAndWait();
 		});
@@ -595,14 +585,12 @@ public class SettingsEditorApplication extends Application {
 	 * Saves the currently opened document.
 	 */
 	public void saveUiMpqThreaded() {
-		new Thread() {
-			@Override
-			public void run() {
-				Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
-				setName(getName().replaceFirst("Thread", "Save"));
-				saveUiMpq();
-			}
-		}.start();
+		new Thread(() -> {
+			final Thread curThread = Thread.currentThread();
+			curThread.setPriority(Thread.NORM_PRIORITY);
+			curThread.setName(curThread.getName().replaceFirst("Thread", "Save"));
+			saveUiMpq();
+		}).start();
 	}
 	
 	/**

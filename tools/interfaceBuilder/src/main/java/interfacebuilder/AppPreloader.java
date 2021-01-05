@@ -20,7 +20,7 @@ public class AppPreloader extends Preloader {
 	private Stage stage;
 	
 	public AppPreloader() {
-		// nothing to do
+		super();
 	}
 	
 	@Override

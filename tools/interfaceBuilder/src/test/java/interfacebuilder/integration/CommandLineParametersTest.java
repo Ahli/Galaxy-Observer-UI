@@ -16,6 +16,7 @@ final class CommandLineParametersTest {
 	void testStringParamCompileRun() {
 		// TODO improve test with freshly created directory
 		final CommandLineParams param = new CommandLineParams(
+				true,
 				"--compileRun=D:\\Galaxy-Observer-UI\\dev\\heroes\\AhliObs.StormInterface\\Base.StormData\\UI\\Layout");
 		assertEquals(
 				"D:\\Galaxy-Observer-UI\\dev\\heroes\\AhliObs.StormInterface",
@@ -29,6 +30,7 @@ final class CommandLineParametersTest {
 	void testStringParamCompile() {
 		// TODO improve test with freshly created directory
 		final CommandLineParams param = new CommandLineParams(
+				true,
 				"--compile=D:\\Galaxy-Observer-UI\\dev\\heroes\\AhliObs.StormInterface\\Base.StormData\\UI\\Layout");
 		assertEquals(
 				"D:\\Galaxy-Observer-UI\\dev\\heroes\\AhliObs.StormInterface",
@@ -41,7 +43,7 @@ final class CommandLineParametersTest {
 	@Test
 	void testStringParamRun() {
 		// TODO improve test with freshly created directory
-		final CommandLineParams param = new CommandLineParams("--run=D:\\Path\\To\\Some\\replayFile.SC2Replay");
+		final CommandLineParams param = new CommandLineParams(true, "--run=D:\\Path\\To\\Some\\replayFile.SC2Replay");
 		assertEquals("D:\\Path\\To\\Some\\replayFile.SC2Replay", param.getParamRunPath(), "run's path is wrong");
 		assertFalse(param.isHasParamCompilePath(), "hasParamCompilePath is wrong");
 		assertNull(param.getParamCompilePath(), "compile path wrongfully set when command is: --run");
@@ -49,7 +51,7 @@ final class CommandLineParametersTest {
 	
 	@Test
 	void testStringEmpty() {
-		final CommandLineParams param = new CommandLineParams("");
+		final CommandLineParams param = new CommandLineParams(true, "");
 		assertNull(param.getParamRunPath(), "run's path is wrong");
 		assertFalse(param.isHasParamCompilePath(), "hasParamCompilePath is wrong");
 		assertNull(param.getParamCompilePath(), "compile path is wrong");

@@ -41,9 +41,8 @@ public class ReplayFinder {
 			logger.error("Failed to receive last used replay.", e);
 		}
 		if (replay == null || !replay.exists() || !replay.isFile()) {
-			if (logger.isTraceEnabled()) {
-				logger.trace("Last used replay is invalid, getting newest replay instead.");
-			}
+			logger.trace("Last used replay is invalid, getting newest replay instead.");
+			
 			replay = getNewestReplay(isHeroes, documentsPath);
 		}
 		return replay;
@@ -62,9 +61,7 @@ public class ReplayFinder {
 	public File getLastUsedReplay(final boolean isHeroes, final Path documentsPath) throws IOException {
 		final Path basePath = documentsPath.resolve(
 				(isHeroes ? "Heroes of the Storm" : "StarCraft II") + File.separator + "Variables.txt");
-		if (logger.isTraceEnabled()) {
-			logger.trace(basePath);
-		}
+		logger.trace(basePath);
 		
 		String line;
 		String replayPath = null;
@@ -78,9 +75,7 @@ public class ReplayFinder {
 				}
 			}
 		}
-		if (logger.isTraceEnabled()) {
-			logger.trace("replayPath: {}", replayPath);
-		}
+		logger.trace("replayPath: {}", replayPath);
 		if (replayPath == null) {
 			return null;
 		}
@@ -105,36 +100,26 @@ public class ReplayFinder {
 			basePath = documentsPath.resolve("StarCraft II" + File.separator + "Accounts");
 			extensions = new String[] { "SC2Replay" };
 		}
-		if (logger.isTraceEnabled()) {
-			logger.trace(basePath);
-		}
+		logger.trace(basePath);
 		
 		// TODO rewrite using nio
 		final Collection<File> allReplays =
 				FileUtils.listFiles(basePath.toFile(), TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
 		
-		if (logger.isTraceEnabled()) {
-			logger.trace("# Replays found: {}", allReplays.size());
-		}
+		logger.trace("# Replays found: {}", allReplays.size());
 		
 		long newestDate = Long.MIN_VALUE;
 		File newestReplay = null;
 		for (final File curReplay : allReplays) {
 			// check extension of file
 			final String curReplayName = curReplay.getName();
-			if (logger.isTraceEnabled()) {
-				logger.trace("curReplay name: {}", curReplayName);
-			}
+			logger.trace("curReplay name: {}", curReplayName);
 			final String extension = FilenameUtils.getExtension(curReplayName);
-			if (logger.isTraceEnabled()) {
-				logger.trace("extension: {}", extension);
-			}
+			logger.trace("extension: {}", extension);
 			if (curReplay.isFile() && extension.equalsIgnoreCase(extensions[0])) {
 				// check date
 				final long curDate = curReplay.lastModified();
-				if (logger.isTraceEnabled()) {
-					logger.trace("curDate: {}", curDate);
-				}
+				logger.trace("curDate: {}", curDate);
 				if (curDate > newestDate) {
 					newestDate = curDate;
 					newestReplay = curReplay;

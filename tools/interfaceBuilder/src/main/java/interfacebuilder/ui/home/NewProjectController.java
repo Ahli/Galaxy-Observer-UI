@@ -97,9 +97,7 @@ public class NewProjectController {
 	 * 		button click event
 	 */
 	public void newProjectAction(final Event event) {
-		if (logger.isTraceEnabled()) {
-			logger.trace("new project action event fired");
-		}
+		logger.trace("new project action event fired");
 		final Game game = gameDropdown.getValue();
 		if (game == null) {
 			// eat event before it reaches the resultConverter
@@ -141,9 +139,7 @@ public class NewProjectController {
 		// try creating the template & clean up the project if it fails
 		try {
 			projectService.createTemplateProjectFiles(project);
-			if (logger.isTraceEnabled()) {
-				logger.trace("new project template created");
-			}
+			logger.trace("new project template created");
 		} catch (final IOException e) {
 			logger.error("ERROR: Could not create template for project.", e);
 			projectService.deleteProject(project);

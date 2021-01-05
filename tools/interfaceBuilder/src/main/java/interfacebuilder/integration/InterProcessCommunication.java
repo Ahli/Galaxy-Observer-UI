@@ -25,12 +25,12 @@ public class InterProcessCommunication implements AutoCloseable {
 	private AppController appController;
 	private ServerSocket serverSocket;
 	
-	public InterProcessCommunication() {
-		// nothing to do
-	}
-	
-	public InterProcessCommunication(final AppController appController) {
-		this.appController = appController;
+	public static boolean isPortFree(final int port) {
+		try (final var ignored1 = new ServerSocket(port, 4, InetAddress.getByAddress(new byte[] { 127, 0, 0, 1 }))) {
+			return true;
+		} catch (final IOException ignored) {
+			return false;
+		}
 	}
 	
 	public void setAppController(final AppController appController) {
@@ -44,60 +44,89 @@ public class InterProcessCommunication implements AutoCloseable {
 	public void close() throws IOException {
 		if (serverSocket != null) {
 			serverSocket.close();
+			serverSocket = null;
 		}
 	}
 	
 	/**
-	 * Initiates the communication between processes.
+	 * Create a server daemon thread and listen to the specified port.
 	 *
-	 * @param args
 	 * @param port
-	 * @return true, if this instance acts as the server; else false
+	 * @return a running IpcServerThread listening to the specified socket; else null
 	 */
-	public boolean initInterProcessCommunication(final String[] args, final int port) {
+	public IpcServerThread actAsServer(final int port) {
 		try {
+			if (serverSocket != null) {
+				serverSocket.close();
+			}
 			serverSocket = new ServerSocket(port, 4, InetAddress.getByAddress(new byte[] { 127, 0, 0, 1 }));
 		} catch (final UnknownHostException e) {
 			logger.fatal("Could not retrieve localhost address.", e);
-			return false;
+			return null;
 		} catch (final IOException e) {
-			if (logger.isTraceEnabled()) {
-				logger.trace("Server socket error.", e);
-			}
+			logger.trace("Server socket error.", e);
 			// port taken, so app is already running
-			logger.info("App already running. Passing over command line arguments.");
-			
-			try (final Socket socket = new Socket(InetAddress.getByAddress(new byte[] { 127, 0, 0, 1 }), port)) {
-				try (final PrintWriter out = new PrintWriter(socket.getOutputStream(), true, StandardCharsets.UTF_8);
-				     final BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream(),
-						     StandardCharsets.UTF_8))) {
-					// sending parameters
-					final String command = Arrays.toString(args);
-					logger.info("Sending: {}", command);
-					out.println(command);
-					
-					// receive answers
-					String inputLine;
-					while ((inputLine = in.readLine()) != null) {
-						if ("#BYE".equals(inputLine)) {
-							return false;
-						} else {
-							logger.info(inputLine);
-						}
-					}
-				}
-			} catch (final IOException e1) {
-				logger.fatal("Exception while sending parameters to primary instance.", e1);
-			}
-			return false;
+			return null;
 		}
 		
-		final Thread serverThread = new Thread(() -> {
-			Socket clientSocket;
-			while (true) {
+		final IpcServerThread serverThread = new IpcServerThread("IPCserver", serverSocket);
+		serverThread.start();
+		return serverThread;
+	}
+	
+	/**
+	 * Sends the arguments to the specified port. Received answers are logged.
+	 * <p>
+	 * This is a blocking instruction!
+	 *
+	 * @param args
+	 * @param port
+	 * @return true, if a connection with a server was established and stopped; else false
+	 */
+	public boolean sendToServer(final String[] args, final int port) {
+		
+		try (final Socket socket = new Socket(InetAddress.getByAddress(new byte[] { 127, 0, 0, 1 }), port)) {
+			try (final PrintWriter out = new PrintWriter(socket.getOutputStream(), true, StandardCharsets.UTF_8);
+			     final BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream(),
+					     StandardCharsets.UTF_8))) {
+				// sending parameters
+				final String command = Arrays.toString(args);
+				logger.info("Sending: {}", command);
+				out.println(command);
+				
+				// receive answers
+				String inputLine;
+				while ((inputLine = in.readLine()) != null) {
+					if ("#BYE".equals(inputLine)) {
+						return true;
+					} else {
+						logger.info(inputLine);
+					}
+				}
+			}
+		} catch (final IOException e1) {
+			logger.fatal("Exception while sending parameters to primary instance.", e1);
+		}
+		return false;
+	}
+	
+	public static class IpcServerThread extends Thread {
+		
+		private final ServerSocket serverSocket;
+		private AppController appController;
+		
+		private IpcServerThread(final String name, final ServerSocket serverSocket) {
+			super(name);
+			setDaemon(true);
+			setPriority(Thread.MIN_PRIORITY);
+			this.serverSocket = serverSocket;
+		}
+		
+		@Override
+		public void run() {
+			while (!serverSocket.isClosed()) {
 				try {
-					clientSocket = serverSocket.accept();
-					handleConnection(clientSocket);
+					handleConnectionAsServer(serverSocket.accept());
 				} catch (final IOException e) {
 					final String message = e.getMessage();
 					if ("socket closed".equalsIgnoreCase(message) || "Socket is closed".equals(message) ||
@@ -108,50 +137,55 @@ public class InterProcessCommunication implements AutoCloseable {
 					logger.error("I/O Exception while waiting for client connections.", e);
 				}
 			}
-		});
-		serverThread.setName("IPCserver");
-		serverThread.setDaemon(true);
-		serverThread.setPriority(Thread.MIN_PRIORITY);
-		serverThread.start();
-		return true;
-	}
-	
-	private void handleConnection(final Socket clientSocket) throws IOException {
-		try (clientSocket;
-		     final PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true, StandardCharsets.UTF_8);
-		     final BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(),
-				     StandardCharsets.UTF_8))) {
-			InterProcessCommunicationAppender.setPrintWriter(out);
-			String inputLine;
-			while ((inputLine = in.readLine()) != null) {
-				logger.info("received message from client: {}", inputLine);
-				final List<String> params = Arrays.asList(inputLine.substring(1, inputLine.length() - 1).split(", "));
-				executeCommand(params);
-			}
-		} catch (final IOException e) {
-			// client closed connection
-			if (logger.isTraceEnabled()) {
-				logger.trace("client closed connection.", e);
-			}
-		} finally {
-			InterProcessCommunicationAppender.setPrintWriter(null);
 		}
-	}
-	
-	/**
-	 * Executes the specified command line arguments.
-	 *
-	 * @param paramList
-	 */
-	private void executeCommand(final List<String> paramList) {
-		final CommandLineParams params = new CommandLineParams(paramList.toArray(new String[0]));
-		params.setParamsOriginateFromExternalSource(true);
 		
-		if (params.isHasParamCompilePath()) {
-			appController.buildStartReplayExit(appController.getPrimaryStage(), params);
-		} else {
-			// end communication as no task was given
-			InterProcessCommunicationAppender.sendTerminationSignal();
+		private void handleConnectionAsServer(final Socket clientSocket) throws IOException {
+			try (clientSocket;
+			     final PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true, StandardCharsets.UTF_8);
+			     final BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(),
+					     StandardCharsets.UTF_8))) {
+				InterProcessCommunicationAppender.setPrintWriter(out);
+				String inputLine;
+				while ((inputLine = in.readLine()) != null) {
+					logger.info("received message from client: {}", inputLine);
+					final List<String> params =
+							Arrays.asList(inputLine.substring(1, inputLine.length() - 1).split(", "));
+					executeCommand(params);
+				}
+			} catch (final IOException e) {
+				// client closed connection
+				logger.trace("client closed connection.", e);
+			} catch (final Exception e) {
+				logger.fatal("FATAL ERROR: ", e);
+			} finally {
+				InterProcessCommunicationAppender.setPrintWriter(null);
+			}
+		}
+		
+		/**
+		 * Executes the specified command line arguments.
+		 *
+		 * @param paramList
+		 */
+		private void executeCommand(final List<String> paramList) {
+			final CommandLineParams params = new CommandLineParams(true, paramList.toArray(new String[0]));
+			
+			if (params.isHasParamCompilePath() && appController != null) {
+				appController.buildStartReplayExit(params);
+			} else if (params.getParamRunPath() != null && !params.getParamRunPath().isEmpty() &&
+					appController != null) {
+				appController.runGameWithReplay(params);
+			} else {
+				if (appController == null) {
+					logger.error("Server is not ready to process commands, yet.");
+				}
+				// end communication as no task was given
+				InterProcessCommunicationAppender.sendTerminationSignal();
+			}
+		}
+		
+		public void setAppController(final AppController appController) {
+			this.appController = appController;
 		}
 	}
 }

@@ -60,12 +60,12 @@ public final class DescIndexReader {
 		dbFac.setExpandEntityReferences(false);
 		dbFac.setAttribute(XMLConstants.FEATURE_SECURE_PROCESSING, true);
 		final DocumentBuilder dBuilder = dbFac.newDocumentBuilder();
-		logger.trace("reading layouts from descIndexFile: {}", () -> f);
+		logger.trace("reading layouts from descIndexFile: {}", f);
 		final Document doc = dBuilder.parse(f);
 		
 		// must be in a DataComponent node
 		final NodeList nodeList = doc.getElementsByTagName("*");
-		for (int i = 0, len = nodeList.getLength(); i < len; i++) {
+		for (int i = 0, len = nodeList.getLength(); i < len; ++i) {
 			final Node node = nodeList.item(i);
 			if ("Include".equalsIgnoreCase(node.getNodeName())) {
 				final NamedNodeMap attributes = node.getAttributes();
@@ -77,7 +77,7 @@ public final class DescIndexReader {
 				}
 				
 				list.add(path);
-				logger.trace("Adding layout path to layoutPathList: {}", () -> path);
+				logger.trace("Adding layout path to layoutPathList: {}", path);
 			}
 		}
 		return list;

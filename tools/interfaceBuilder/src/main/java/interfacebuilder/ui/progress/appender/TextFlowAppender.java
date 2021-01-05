@@ -12,7 +12,7 @@ import javafx.scene.text.TextFlow;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import static interfacebuilder.InterfaceBuilderApp.FATAL_ERROR;
+import static interfacebuilder.ui.AppController.FATAL_ERROR;
 
 public class TextFlowAppender implements Appender {
 	private static final String STYLE = "INFO";

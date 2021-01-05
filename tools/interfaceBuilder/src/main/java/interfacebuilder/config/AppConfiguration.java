@@ -8,17 +8,19 @@ import com.ahli.galaxy.game.def.HeroesGameDef;
 import com.ahli.galaxy.game.def.SC2GameDef;
 import com.ahli.galaxy.game.def.abstracts.GameDef;
 import com.ahli.mpq.MpqEditorInterface;
-import interfacebuilder.InterfaceBuilderApp;
+import interfacebuilder.SpringBootApplication;
 import interfacebuilder.base_ui.BaseUiService;
 import interfacebuilder.base_ui.DiscCacheService;
 import interfacebuilder.build.MpqBuilderService;
 import interfacebuilder.compile.CompileService;
 import interfacebuilder.compress.GameService;
+import interfacebuilder.compress.RuleSet;
 import interfacebuilder.integration.FileService;
 import interfacebuilder.integration.JarHelper;
 import interfacebuilder.integration.ReplayFinder;
 import interfacebuilder.integration.SettingsIniInterface;
 import interfacebuilder.integration.kryo.KryoService;
+import interfacebuilder.projects.ProjectEntity;
 import interfacebuilder.projects.ProjectJpaRepository;
 import interfacebuilder.projects.ProjectService;
 import interfacebuilder.threads.CleaningForkJoinPool;
@@ -26,9 +28,13 @@ import interfacebuilder.threads.CleaningForkJoinTaskCleaner;
 import interfacebuilder.threads.SpringForkJoinWorkerThreadFactory;
 import interfacebuilder.ui.AppController;
 import interfacebuilder.ui.navigation.NavigationController;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import javax.swing.filechooser.FileSystemView;
 import java.io.File;
@@ -36,32 +42,46 @@ import java.nio.file.Path;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 
-
 @Configuration
+@EntityScan(basePackageClasses = { ProjectEntity.class, RuleSet.class })
+@EnableJpaRepositories(basePackageClasses = ProjectJpaRepository.class)
 public class AppConfiguration {
+	
+	private static final Logger logger = LogManager.getLogger(AppConfiguration.class);
+	
+	protected AppConfiguration() {
+	}
 	
 	@Bean
 	protected GameData sc2BaseGameData() {
+		logger.debug("init bean: sc2BaseGameData");
 		return new GameData(sc2GameDef());
 	}
 	
 	@Bean
 	protected GameDef sc2GameDef() {
+		
+		logger.debug("init bean: sc2GameDef");
 		return new SC2GameDef();
 	}
 	
 	@Bean
 	protected GameData heroesBaseGameData() {
+		
+		logger.debug("init bean: heroesBaseGameData");
 		return new GameData(heroesGameDef());
 	}
 	
 	@Bean
 	protected GameDef heroesGameDef() {
+		
+		logger.debug("init bean: heroesGameDef");
 		return new HeroesGameDef();
 	}
 	
 	@Bean
 	protected MpqEditorInterface mpqEditorInterface() {
+		logger.debug("init bean: mpqEditorInterface");
 		return new MpqEditorInterface(mpqCachePath(tempDirectory()), mpqEditorPath(basePath()));
 	}
 	
@@ -80,11 +100,13 @@ public class AppConfiguration {
 	}
 	
 	protected Path basePath() {
-		return JarHelper.getJarDir(InterfaceBuilderApp.class);
+		return JarHelper.getJarDir(SpringBootApplication.class);
 	}
 	
 	@Bean
 	protected CompileService compileService() {
+		
+		logger.debug("init bean: compileService");
 		return new CompileService();
 	}
 	
@@ -93,6 +115,7 @@ public class AppConfiguration {
 			final ProjectJpaRepository projectJpaRepository,
 			@Lazy final MpqBuilderService mpqBuilderService,
 			final NavigationController navigationController) {
+		logger.debug("init bean: projectService");
 		return new ProjectService(projectJpaRepository, mpqBuilderService, navigationController);
 	}
 	
@@ -107,6 +130,7 @@ public class AppConfiguration {
 			final GameData heroesBaseGameData,
 			final ForkJoinPool forkJoinPool,
 			final AppController appController) {
+		logger.debug("init bean: mpqBuilderService");
 		return new MpqBuilderService(
 				configService,
 				compileService,
@@ -121,11 +145,14 @@ public class AppConfiguration {
 	
 	@Bean
 	protected ReplayFinder replayService() {
+		
+		logger.debug("init bean: replayService");
 		return new ReplayFinder();
 	}
 	
 	@Bean
 	protected ForkJoinPool forkJoinPool(final CleaningForkJoinTaskCleaner cleaner) {
+		logger.debug("init bean: forkJoinPool");
 		final int maxThreads = Math.max(1, Runtime.getRuntime().availableProcessors() / 2);
 		return new CleaningForkJoinPool(
 				maxThreads,
@@ -143,6 +170,7 @@ public class AppConfiguration {
 	
 	@Bean
 	protected AppController appController() {
+		logger.debug("init bean: appController");
 		return new AppController();
 	}
 	
@@ -154,35 +182,42 @@ public class AppConfiguration {
 			final KryoService kryoService,
 			final AppController appController,
 			final GameService gameService) {
+		logger.debug("init bean: baseUiService");
 		return new BaseUiService(configService, gameService, fileService, discCacheService, kryoService, appController);
 	}
 	
 	@Bean
 	protected GameService gameService(final ConfigService configService) {
+		
+		logger.debug("init bean: gameService");
 		return new GameService(configService);
 	}
 	
 	@Bean
 	protected FileService fileService() {
+		
+		
+		logger.debug("init bean: fileService");
 		return new FileService();
 	}
 	
 	@Bean
 	protected DiscCacheService discCacheService(final ConfigService configService, final KryoService kryoService) {
+		logger.debug("init bean: discCacheService");
 		return new DiscCacheService(configService, kryoService);
 	}
 	
 	@Bean
 	protected KryoService kryoService() {
+		
+		logger.debug("init bean: kryoService");
 		return new KryoService();
 	}
 	
 	@Bean
 	protected ConfigService configService(
-			final String raceId,
-			final String consoleSkinId,
-			final File cascExtractorExeFile,
 			final SettingsIniInterface settingsIniInterface) {
+		logger.debug("init bean: configService");
 		final Path tmpPath = tempDirectory();
 		final Path basePath = basePath();
 		return new ConfigService(
@@ -191,10 +226,10 @@ public class AppConfiguration {
 				documentsPath(),
 				mpqEditorPath(basePath),
 				settingsIniInterface,
-				raceId,
-				consoleSkinId,
+				raceId(),
+				consoleSkinId(),
 				baseUiPath(basePath),
-				cascExtractorExeFile,
+				cascExtractorExeFile(),
 				cachePath(),
 				miningTempPath(tmpPath));
 	}
@@ -203,8 +238,22 @@ public class AppConfiguration {
 		return FileSystemView.getFileSystemView().getDefaultDirectory().toPath();
 	}
 	
+	protected String raceId() {
+		return "Terr";
+	}
+	
+	protected String consoleSkinId() {
+		return "ClassicTerran";
+	}
+	
 	protected Path baseUiPath(final Path basePath) {
 		return basePath.getParent().resolve("baseUI");
+	}
+	
+	protected File cascExtractorExeFile() {
+		return new File(
+				basePath().getParent() + File.separator + "tools" + File.separator + "plugins" + File.separator +
+						"casc" + File.separator + "CascExtractor.exe");
 	}
 	
 	protected Path cachePath() {
@@ -217,27 +266,12 @@ public class AppConfiguration {
 	
 	@Bean
 	protected SettingsIniInterface settingsIniInterface() {
+		
+		logger.debug("init bean: settingsIniInterface");
 		return new SettingsIniInterface(iniSettingsPath(basePath()));
 	}
 	
 	protected Path iniSettingsPath(final Path basePath) {
 		return basePath.getParent().resolve("settings.ini");
-	}
-	
-	@Bean
-	protected String raceId() {
-		return "Terr";
-	}
-	
-	@Bean
-	protected String consoleSkinId() {
-		return "ClassicTerran";
-	}
-	
-	@Bean
-	protected File cascExtractorExeFile() {
-		return new File(
-				basePath().getParent() + File.separator + "tools" + File.separator + "plugins" + File.separator +
-						"casc" + File.separator + "CascExtractor.exe");
 	}
 }

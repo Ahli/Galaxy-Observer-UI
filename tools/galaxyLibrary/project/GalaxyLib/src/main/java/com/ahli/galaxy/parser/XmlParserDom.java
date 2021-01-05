@@ -84,7 +84,7 @@ public class XmlParserDom extends XmlParserAbstract {
 	
 	@Override
 	public void parseFile(final Path p) throws IOException {
-		logger.trace("parsing layout file: {}", () -> p.getFileName());
+		logger.trace("parsing layout file: {}", p::getFileName);
 		try {
 			final NodeList elements = dBuilder.parse(p.toFile()).getElementsByTagName(ANY_TAG);
 			Node node;
@@ -94,11 +94,11 @@ public class XmlParserDom extends XmlParserAbstract {
 			int j;
 			final int len;
 			int len2;
-			for (j = 0, len = elements.getLength(); j < len; j++) {
+			for (j = 0, len = elements.getLength(); j < len; ++j) {
 				node = elements.item(j);
 				attributes = node.getAttributes();
 				if (attributes != null) {
-					for (i = 0, len2 = attributes.getLength(); i < len2; i++) {
+					for (i = 0, len2 = attributes.getLength(); i < len2; ++i) {
 						attr = attributes.item(i);
 						attrTypes.add(attr.getNodeName().toLowerCase(Locale.ROOT));
 						attrValues.add(attr.getNodeValue());
@@ -129,7 +129,7 @@ public class XmlParserDom extends XmlParserAbstract {
 		Node n = parent;
 		while (n != null) {
 			n = n.getParentNode();
-			i++;
+			++i;
 		}
 		return i;
 	}

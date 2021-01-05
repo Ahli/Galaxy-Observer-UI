@@ -57,10 +57,10 @@ public final class XmlCompressorDom {
 	 * @throws TransformerConfigurationException
 	 */
 	public static void processCache(final Path cachePath, final int ignoreCommentCountPerFile)
-			throws ParserConfigurationException, SAXException, TransformerConfigurationException, IOException {
+			throws ParserConfigurationException, TransformerConfigurationException, IOException {
 		
 		logger.info("Compressing XML files...");
-		logger.trace("cachePath: {}", () -> cachePath);
+		logger.trace("cachePath: {}", cachePath);
 		
 		//		final Collection<File> filesOfCache = FileUtils.listFiles(new File(cachePath), null, true);
 		
@@ -153,13 +153,11 @@ public final class XmlCompressorDom {
 				doc = dBuilder.parse(is);
 				
 			} catch (final IOException | SAXException e) {
-				if (logger.isTraceEnabled()) {
-					logger.trace("Error while compressing xml.", e);
-				}
+				logger.trace("Error while compressing xml.", e);
 				return FileVisitResult.CONTINUE;
 			}
 			
-			logger.trace("compression - processing file: {}", () -> file);
+			logger.trace("compression - processing file: {}", file);
 			
 			// process all nodes
 			final NodeList nodes = doc.getElementsByTagName(ANY_TAGNAME);

@@ -96,9 +96,7 @@ public final class LayoutReaderDom {
 							final String layoutName = dependency.substring(0, firstIndex);
 							if (!layoutName.equalsIgnoreCase(nameWOfileEnding) &&
 									doesNotAppearInList(layoutName, list)) {
-								if (logger.isTraceEnabled()) {
-									logger.trace("{} has dependency to {}", nameWOfileEnding, layoutName);
-								}
+								logger.trace("{} has dependency to {}", nameWOfileEnding, layoutName);
 								list.add(layoutName);
 							}
 						}
@@ -146,9 +144,7 @@ public final class LayoutReaderDom {
 				final String attrName = attribute.getNodeName();
 				if (attrName.startsWith(CONSTANT_MARKER) && doesNotAppearInList(attrName, usedConstants) &&
 						doesConstantNotAppearInList(attrName, ownConstants)) {
-					if (logger.isTraceEnabled()) {
-						logger.trace("{} uses undefined constant {}", nameWOfileEnding, attrName);
-					}
+					logger.trace("{} uses undefined constant {}", nameWOfileEnding, attrName);
 					usedConstants.add(attrName);
 					list.add(attrName);
 				}
@@ -156,9 +152,7 @@ public final class LayoutReaderDom {
 				final String attrValue = attribute.getNodeValue();
 				if (attrValue.startsWith(CONSTANT_MARKER) && doesNotAppearInList(attrValue, usedConstants) &&
 						doesConstantNotAppearInList(attrValue, ownConstants)) {
-					if (logger.isTraceEnabled()) {
-						logger.trace("{} uses undefined constant {}", nameWOfileEnding, attrValue);
-					}
+					logger.trace("{} uses undefined constant {}", nameWOfileEnding, attrValue);
 					usedConstants.add(attrValue);
 					list.add(attrValue);
 				}
@@ -221,8 +215,9 @@ public final class LayoutReaderDom {
 				final Node attr = attributes.item(j);
 				// attribute is Template
 				if (attr.getNodeName().equalsIgnoreCase(NAME)) {
-					ownConstants.add(attr.getNodeValue());
-					logger.trace("FOUND CONSTANT DEFINITION: {}", () -> attr.getNodeValue());
+					final String nodeValue = attr.getNodeValue();
+					ownConstants.add(nodeValue);
+					logger.trace("FOUND CONSTANT DEFINITION: {}", nodeValue);
 				}
 				// else
 				// System.out.println("REJECTED CONSTANT ATTR: " +

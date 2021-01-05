@@ -6,22 +6,30 @@ package interfacebuilder.integration;
 import javafx.application.Application;
 
 import java.io.File;
+import java.io.Serializable;
+import java.util.Collections;
 import java.util.Map;
 
-public class CommandLineParams {
+public class CommandLineParams implements Serializable {
 	public static final String PARAM_PREFIX = "--";
+	public static final String EQUAL = "=";
+	public static final String SERVER = "server";
 	private static final String COMPILE_RUN = "compileRun";
 	private static final String COMPILE = "compile";
-	private static final String EQUAL = "=";
 	private static final String RUN = "run";
 	private final String paramRunPath;
 	private final boolean compileAndRun;
 	private final boolean hasParamCompilePath;
 	private final String paramCompilePath;
 	private final boolean wasStartedWithParameters;
-	private boolean paramsOriginateFromExternalSource;
+	private final boolean paramsOriginateFromExternalSource;
 	
-	public CommandLineParams(final String... params) {
+	public CommandLineParams() {
+		this(false);
+	}
+	
+	public CommandLineParams(final boolean paramsOriginateFromExternalSource, final String... params) {
+		this.paramsOriginateFromExternalSource = paramsOriginateFromExternalSource;
 		wasStartedWithParameters = (params.length > 0);
 		String paramCompilePathTmp = getParamsValue(params, PARAM_PREFIX + COMPILE_RUN + EQUAL);
 		if (paramCompilePathTmp != null) {
@@ -76,7 +84,8 @@ public class CommandLineParams {
 	}
 	
 	public CommandLineParams(final Application.Parameters params) {
-		final Map<String, String> namedParams = params.getNamed();
+		paramsOriginateFromExternalSource = false;
+		final Map<String, String> namedParams = params != null ? params.getNamed() : Collections.emptyMap();
 		// named params
 		// e.g. "--paramname=value".
 		wasStartedWithParameters = !namedParams.isEmpty();
@@ -96,6 +105,14 @@ public class CommandLineParams {
 		// RUN PARAM
 		// --run="F:\Games\Heroes of the Storm\Support\HeroesSwitcher.exe"
 		paramRunPath = namedParams.get(RUN);
+	}
+	
+	public static String getServerThreadId(final String... params) {
+		return getParamsValue(params, PARAM_PREFIX + SERVER + EQUAL);
+	}
+	
+	public static String getServerThreadId(final Application.Parameters params) {
+		return params != null ? params.getNamed().get(SERVER) : "";
 	}
 	
 	public String getParamCompilePath() {
@@ -122,7 +139,4 @@ public class CommandLineParams {
 		return paramsOriginateFromExternalSource;
 	}
 	
-	public void setParamsOriginateFromExternalSource(final boolean paramsOriginateFromExternalSource) {
-		this.paramsOriginateFromExternalSource = paramsOriginateFromExternalSource;
-	}
 }

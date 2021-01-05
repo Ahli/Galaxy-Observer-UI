@@ -137,10 +137,7 @@ public class DescIndexData {
 		}
 		fileIntPathList.add(new Pair<>(p, intPath2));
 		
-		if (logger.isTraceEnabled()) {
-			logger.trace("added Layout path: {}", intPath2);
-			logger.trace("added File path: {}", p);
-		}
+		logger.trace("added Layout path: {}\nadded File path: {}", intPath2, p);
 	}
 	
 	/**
@@ -205,9 +202,7 @@ public class DescIndexData {
 			
 			// add calculated list of dependencies from layout file
 			layoutDeps = LayoutReaderDom.getDependencyLayouts(f, curConstants);
-			if (logger.isTraceEnabled()) {
-				logger.trace("Dependencies found: {}", layoutDeps);
-			}
+			logger.trace("Dependencies found: {}", layoutDeps);
 			
 			ownConstants.add(curConstants);
 			dependencies.add(layoutDeps);
@@ -215,9 +210,7 @@ public class DescIndexData {
 		
 		boolean insertOccurred = true;
 		for (int counter = 0; insertOccurred && counter < Math.pow(fileIntPathList.size(), 4); ++counter) {
-			if (logger.isTraceEnabled()) {
-				logger.trace("counter={}", counter);
-			}
+			logger.trace("counter={}", counter);
 			insertOccurred = false;
 			for (int i = 0, len = dependencies.size(); i < len; ++i) {
 				
@@ -229,9 +222,7 @@ public class DescIndexData {
 					String curDependencyTo = curLayoutDepList.get(j);
 					
 					if (curDependencyTo.startsWith(STRING2)) {
-						if (logger.isTraceEnabled()) {
-							logger.trace("DEPENDENCY: {}", curDependencyTo);
-						}
+						logger.trace("DEPENDENCY: {}", curDependencyTo);
 						while (curDependencyTo.startsWith(STRING2)) {
 							curDependencyTo = curDependencyTo.substring(1);
 						}
@@ -318,9 +309,7 @@ public class DescIndexData {
 		// change order according to templates
 		insertOccurred = true;
 		for (int counter = 0; insertOccurred && counter < Math.pow(fileIntPathList.size(), 4); ++counter) {
-			if (logger.isTraceEnabled()) {
-				logger.trace("counter={}", counter);
-			}
+			logger.trace("counter={}", counter);
 			insertOccurred = false;
 			x:
 			for (int i = 0; i < dependencies.size(); ++i) {

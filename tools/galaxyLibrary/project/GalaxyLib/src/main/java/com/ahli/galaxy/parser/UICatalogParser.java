@@ -115,15 +115,13 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	 * @param thisElem
 	 */
 	private static void setImplicitControllerNames(final UIAnimation thisElem) {
-		if (logger.isTraceEnabled()) {
-			logger.trace("Setting implicit controller names for UIAnimation {}", thisElem.getName());
-		}
+		logger.trace("Setting implicit controller names for UIAnimation {}", thisElem.getName());
 		final List<UIElement> controllers = thisElem.getControllers();
 		for (final UIElement uiElem : controllers) {
 			final UIController contr = (UIController) uiElem;
 			if (contr.getName() == null) {
 				final String type = contr.getValue(TYPE);
-				logger.trace("type = {}", () -> type);
+				logger.trace("type = {}", type);
 				contr.setName(getImplicitName(type, controllers));
 				contr.setNameIsImplicit(true);
 			}
@@ -184,9 +182,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	 * @return
 	 */
 	private static String getImplicitName(final String type, final List<UIElement> controllers) {
-		if (logger.isTraceEnabled()) {
-			logger.trace("Constructing implicit controller name");
-		}
+		logger.trace("Constructing implicit controller name");
 		if (type == null) {
 			logger.error("'type=\"...\"' of Controller is not set or invalid.");
 			return "";
@@ -198,10 +194,10 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			
 			if (controllers.stream()
 					.noneMatch(t -> t.getName() != null && t.getName().compareToIgnoreCase(name) == 0)) {
-				logger.trace("Constructing implicit controller name: {}", () -> name);
+				logger.trace("Constructing implicit controller name: {}", name);
 				return name;
 			}
-			logger.trace("Implicit controller name existing: {}", () -> name);
+			logger.trace("Implicit controller name existing: {}", name);
 			++i;
 		}
 	}
@@ -224,7 +220,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	public void parse(
 			final int level, final String tagName, final List<String> attrTypes, final List<String> attrValues)
 			throws UIException {
-		logger.trace("level={}, tag={}", () -> level, () -> tagName);
+		logger.trace("level={}, tag={}", level, tagName);
 		if (tagName == null) {
 			logger.error("ERROR: tag in XML is null.");
 			return;
@@ -238,23 +234,18 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			curElement = null; // no parent frame
 			// default editing mode unless the parsed aspect defines another one
 			//editingMode = false;
-			if (logger.isTraceEnabled()) {
-				logger.trace("resetting path to root");
-			}
+			logger.trace("resetting path to root");
 		} else {
 			while (level <= curLevel) {
 				curLevel--;
 				// curLevel - 2 because root is level 2 on list index 0
 				curElement = curPath.get(curLevel - 2);
-				if (logger.isTraceEnabled()) {
-					logger.trace("shrinking path: curElement={}, level={}", curElement, curLevel);
-					logger.trace("path  pre-dropLast: {}", curPath);
-				}
+				logger.trace("shrinking path: curElement={}, level={}\npath  pre-dropLast: {}",
+						curElement,
+						curLevel,
+						curPath);
 				curPath.remove(curPath.size() - 1);
-				
-				if (logger.isTraceEnabled()) {
-					logger.trace("path afterDropLast: {}", curPath);
-				}
+				logger.trace("path afterDropLast: {}", curPath);
 			}
 		}
 		
@@ -537,15 +528,11 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		// register template
 		if (level == 2) {
 			if (newElem != null) {
-				if (logger.isTraceEnabled()) {
-					logger.trace("adding new template: '{}' added to '{}'", newElem.getName(), curFileName);
-				}
+				logger.trace("adding new template: '{}' added to '{}'", newElem.getName(), curFileName);
 				// curTemplate =
 				catalog.addTemplate(curFileName, newElem, curIsDevLayout);
 			} else {
-				if (logger.isTraceEnabled()) {
-					logger.trace("skipped creating a template because newElem was null. curFileName: {}", curFileName);
-				}
+				logger.trace("skipped creating a template because newElem was null. curFileName: {}", curFileName);
 			}
 		}
 		
@@ -561,11 +548,9 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	}
 	
 	private void applyTemplateElementToElement(final String pathParam, final UIElement targetElem) {
-		if (logger.isTraceEnabled()) {
-			logger.trace("Applying Template of path {} to element {} - searching the template",
-					pathParam,
-					targetElem.getName());
-		}
+		logger.trace("Applying Template of path {} to element {} - searching the template",
+				pathParam,
+				targetElem.getName());
 		final String path = pathParam.replace('\\', '/');
 		final int seperatorIndex = path.indexOf('/');
 		if (seperatorIndex < 0) {
@@ -605,9 +590,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			return null;
 		}
 		
-		if (logger.isTraceEnabled()) {
-			logger.trace("Instanciating Template of path {}", path);
-		}
+		logger.trace("Instanciating Template of path {}", path);
 		path = path.replace('\\', '/');
 		final int seperatorIndex = path.indexOf('/');
 		if (seperatorIndex < 0) {
@@ -668,9 +651,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		if (curElement instanceof UIFrame) {
 			final UIFrame frame = (UIFrame) curElement;
 			if (side == null) {
-				if (logger.isTraceEnabled()) {
-					logger.trace("relative={}, offset={}", relative, offset);
-				}
+				logger.trace("relative={}, offset={}", relative, offset);
 				if (relative == null) {
 					logger.error("'Anchor' attribute has no 'relative' attribute defined in parent element: {}",
 							curElement.getName());
@@ -733,9 +714,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		if (targetElem == null) {
 			return;
 		}
-		if (logger.isTraceEnabled()) {
-			logger.trace("Applying template {} to element {}", templateElem.getName(), targetElem.getName());
-		}
+		logger.trace("Applying template {} to element {}", templateElem.getName(), targetElem.getName());
 		
 		final List<UIElement> templateChildren;
 		
@@ -764,7 +743,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				
 				copyAttributes(frame.getAttributes(), target.getAttributes());
 			} else {
-				logger.error("Attempting to apply a template of type {} to a different type.", "Frame");
+				logger.error("Attempting to apply a template of type Frame to a different type.");
 			}
 			
 			
@@ -779,7 +758,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				target.setDefaultState(stateGroup.getDefaultState());
 				// states are the children
 			} else {
-				logger.error("Attempting to apply a template of type {} to a different type.", "StateGroup");
+				logger.error("Attempting to apply a template of type StateGroup to a different type.");
 			}
 		} else if (templateElem instanceof UIController) {
 			final UIController uiController = (UIController) templateElem;
@@ -791,7 +770,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				// TODO isNameImplicit?
 				// TODO next edit overrides?
 			} else {
-				logger.error("Attempting to apply a template of type {} to a different type.", "UIController");
+				logger.error("Attempting to apply a template of type UIController to a different type.");
 			}
 		} else if (templateElem instanceof UIAnimation) {
 			final UIAnimation uiAnimation = (UIAnimation) templateElem;
@@ -802,7 +781,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				// TODO controller
 				// TODO driver
 			} else {
-				logger.error("Attempting to apply a template of type {} to a different type.", "UIAnimation");
+				logger.error("Attempting to apply a template of type UIAnimation to a different type.");
 			}
 		} else if (templateElem instanceof UIState) {
 			final UIState uiState = (UIState) templateElem;
@@ -814,7 +793,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				// TODO nextAdditionShouldOverrideWhens
 				copyAttributes(uiState.getWhens(), target.getWhens());
 			} else {
-				logger.error("Attempting to apply a template of type {} to a different type.", "UIState");
+				logger.error("Attempting to apply a template of type UIState to a different type.");
 			}
 		} else {
 			templateChildren = null;
@@ -908,8 +887,10 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			for (final UIElement elem : addedElements) {
 				addedFinalElements.putIfAbsent(elem, elem);
 			}
-			logger.info("elements added that can be deduplicated during postprocessing: {}", addedElements.size());
-			logger.info("unique elements added that were deduplicated during parsing: {}", addedFinalElements.size());
+			logger.info(
+					"elements added that can be deduplicated during postprocessing: {}\nunique elements added that were deduplicated during parsing: {}",
+					addedElements.size(),
+					addedFinalElements.size());
 			addedElements = null;
 			toDeduplicate = new ArrayDeque<>(74_000);
 			// replace instancesb

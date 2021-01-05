@@ -187,17 +187,13 @@ public class RandomCompressionMiner {
 				if (isValidFileSpecificMask(mask, cacheDir)) {
 					clean.add(rule);
 				} else {
-					if (logger.isTraceEnabled()) {
-						logger.trace("removing rule from ruleset due to invalid mask: {}", mask);
-					}
+					logger.trace("removing rule from ruleset due to invalid mask: {}", mask);
 				}
 			} else {
 				if (rule != null) {
 					clean.add(rule);
 				} else {
-					if (logger.isTraceEnabled()) {
-						logger.trace("removing null entry from ruleset");
-					}
+					logger.trace("removing null entry from ruleset");
 				}
 			}
 		}

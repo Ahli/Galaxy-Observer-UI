@@ -10,7 +10,6 @@ import com.ahli.mpq.mpqeditor.MpqEditorSettingsInterface;
 import com.ahli.util.DeepCopyable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
@@ -134,7 +133,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 			// extra file compression
 			try {
 				XmlCompressorDom.processCache(mpqCachePath, 1);
-			} catch (final ParserConfigurationException | SAXException | TransformerConfigurationException e) {
+			} catch (final ParserConfigurationException | TransformerConfigurationException e) {
 				logger.error("Error while compressing files in the cache", e);
 			}
 			
@@ -248,11 +247,9 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 				CMD_C + QUOTE + QUOTE + mpqEditorPath + QUOTE + " n " + QUOTE + mpqPath + QUOTE + " " + maxFileCount +
 						QUOTE;
 		
-		logger.trace(EXECUTING, () -> cmd);
+		logger.trace(EXECUTING, cmd);
 		Runtime.getRuntime().exec(cmd).waitFor();
-		if (logger.isTraceEnabled()) {
-			logger.trace(EXECUTION_FINISHED);
-		}
+		logger.trace(EXECUTION_FINISHED);
 	}
 	
 	/**
@@ -272,11 +269,9 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 		final String cmd =
 				CMD_C + QUOTE + QUOTE + mpqEditorPath + QUOTE + " a " + QUOTE + mpqPath + QUOTE + " " + QUOTE +
 						sourceFilePath + QUOTE + " " + QUOTE + targetName + QUOTE + " /r" + QUOTE;
-		logger.trace(EXECUTING, () -> cmd);
+		logger.trace(EXECUTING, cmd);
 		Runtime.getRuntime().exec(cmd).waitFor();
-		if (logger.isTraceEnabled()) {
-			logger.trace(EXECUTION_FINISHED);
-		}
+		logger.trace(EXECUTION_FINISHED);
 	}
 	
 	/**
@@ -292,11 +287,9 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 		}
 		final String cmd =
 				CMD_C + QUOTE + QUOTE + mpqEditorPath + QUOTE + " compact " + QUOTE + mpqPath + QUOTE + QUOTE;
-		logger.trace(EXECUTING, () -> cmd);
+		logger.trace(EXECUTING, cmd);
 		Runtime.getRuntime().exec(cmd).waitFor();
-		if (logger.isTraceEnabled()) {
-			logger.trace(EXECUTION_FINISHED);
-		}
+		logger.trace(EXECUTION_FINISHED);
 		
 	}
 	
@@ -316,8 +309,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	 * @throws MpqException
 	 */
 	public void extractEntireMPQ(final String mpqSourcePath) throws InterruptedException, IOException, MpqException {
-		logger.trace("mpqCachePath: {}", () -> mpqCachePath);
-		logger.trace("mpqSourcePath: {}", () -> mpqSourcePath);
+		logger.trace("mpqCachePath: {}\nmpqSourcePath: {}", mpqCachePath, mpqSourcePath);
 		
 		clearCacheExtractedMpq();
 		
@@ -340,9 +332,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 			try {
 				deleteDir(path);
 			} catch (final IOException e) {
-				if (logger.isTraceEnabled()) {
-					logger.error("clearing Cache FAILED", e);
-				}
+				logger.error("clearing Cache FAILED", e);
 				return false;
 			}
 		}
@@ -368,21 +358,9 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 		final String cmd =
 				CMD_C + QUOTE + QUOTE + mpqEditorPath + QUOTE + " e " + QUOTE + mpqPath + QUOTE + " " + QUOTE +
 						fileName + QUOTE + " " + QUOTE + targetPath + QUOTE + (inclSubFolders ? " /fp" : "") + QUOTE;
-		logger.trace(EXECUTING, () -> cmd);
+		logger.trace(EXECUTING, cmd);
 		Runtime.getRuntime().exec(cmd).waitFor();
-		if (logger.isTraceEnabled()) {
-			logger.trace(EXECUTION_FINISHED);
-		}
-		
-		// // MONITOR https://github.com/inwc3/JMPQ3 if it can handle sc2 files
-		// someday to potentially replace MpqEditor.exe
-		// File mpq = new File(mpqPath);
-		// logging.trace("Extract from Mpq: "+mpq.getAbsolutePath());
-		// JMpqEditor editor = new JMpqEditor(mpq, MPQOpenOption.FORCE_V0);
-		// File cache = new File(mpqCachePath);
-		// cache.mkdirs();
-		// logging.trace("Extract into: "+cache.getAbsolutePath());
-		// editor.extractAllFiles(cache);
+		logger.trace(EXECUTION_FINISHED);
 	}
 	
 	/**
@@ -409,6 +387,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	 * @param path
 	 * @return
 	 */
+	@SuppressWarnings("ResultOfMethodCallIgnored")
 	public static void deleteDir(final Path path) throws IOException {
 		if (Files.isDirectory(path)) {
 			try (final Stream<Path> walk = Files.walk(path)) {
@@ -435,11 +414,9 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 		final String cmd =
 				CMD_C + QUOTE + QUOTE + mpqEditorPath + QUOTE + " s " + QUOTE + mpqPath + QUOTE + " " + QUOTE +
 						scriptPath + QUOTE + QUOTE;
-		logger.trace(EXECUTING, () -> cmd);
+		logger.trace(EXECUTING, cmd);
 		Runtime.getRuntime().exec(cmd).waitFor();
-		if (logger.isTraceEnabled()) {
-			logger.trace(EXECUTION_FINISHED);
-		}
+		logger.trace(EXECUTION_FINISHED);
 	}
 	
 	/**
@@ -458,11 +435,9 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 		final String cmd =
 				CMD_C + QUOTE + QUOTE + mpqEditorPath + QUOTE + " d " + QUOTE + mpqPath + QUOTE + " " + QUOTE +
 						filePath + QUOTE + QUOTE;
-		logger.trace(EXECUTING, () -> cmd);
+		logger.trace(EXECUTING, cmd);
 		Runtime.getRuntime().exec(cmd).waitFor();
-		if (logger.isTraceEnabled()) {
-			logger.trace(EXECUTION_FINISHED);
-		}
+		logger.trace(EXECUTION_FINISHED);
 	}
 	
 	/**
@@ -482,11 +457,9 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 		final String cmd =
 				CMD_C + QUOTE + QUOTE + mpqEditorPath + QUOTE + " r " + QUOTE + mpqPath + QUOTE + " " + QUOTE +
 						oldfilePath + QUOTE + " " + QUOTE + newFilePath + QUOTE + QUOTE;
-		logger.trace(EXECUTING, () -> cmd);
+		logger.trace(EXECUTING, cmd);
 		Runtime.getRuntime().exec(cmd).waitFor();
-		if (logger.isTraceEnabled()) {
-			logger.trace(EXECUTION_FINISHED);
-		}
+		logger.trace(EXECUTION_FINISHED);
 	}
 	
 	/**

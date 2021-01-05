@@ -34,23 +34,20 @@ public final class JarHelper {
 	 * @return File at base path
 	 */
 	public static Path getJarDir(final Class<?> aclass) {
-		if (logger.isTraceEnabled()) {
-			logger.trace("_FINDING JAR'S PATH");
-		}
-		
+		logger.trace("_FINDING JAR'S PATH");
 		
 		// ATTEMPT #1
 		//		final File f = new File(System.getProperty("java.class.path"));
 		//		final File dir = f.getAbsoluteFile().getParentFile();
 		final File dir = new ApplicationHome(aclass).getDir();
 		String str = dir.toString();
-		logger.trace("Attempt#1 java.class.path: {}", () -> dir.toString());
+		logger.trace("Attempt#1 java.class.path: {}", dir::toString);
 		
 		// check if started in eclipse
 		final int i = str.indexOf(File.separator + "target" + File.separator + "classes");
 		if (i > 0) {
 			final String check = str.substring(0, i);
-			logger.trace("target/classes location: {}", () -> check);
+			logger.trace("target/classes location: {}", check);
 			if (check.indexOf(';') < 0) {
 				final Path p = Path.of(check).getParent().getParent();
 				if (Files.exists(p)) {
@@ -65,7 +62,7 @@ public final class JarHelper {
 			// notepad++'s directory...
 			
 			str = uri.getPath();
-			logger.trace("_URI path: {}", () -> uri.getPath());
+			logger.trace("_URI path: {}", uri::getPath);
 			
 			// fix for intellij
 			if (str.endsWith("/tools/./")) {
@@ -94,17 +91,13 @@ public final class JarHelper {
 /*			if (!url.toString().startsWith("rsrc:./")) {
 				// wild guess that we are in test environment
 				str += "/testEnv/dev/";
-				if (logger.isTraceEnabled()) {
-					logger.trace("assuming Test Environment: " + str);
-				}
+				logger.trace("assuming Test Environment: " + str);
 			}*/
 			
 		} else {
 			if (str.contains(".jar;")) {
 				str = str.substring(0, str.indexOf(".jar"));
-				if (logger.isTraceEnabled()) {
-					logger.trace("path before .jar: {}", str);
-				}
+				logger.trace("path before .jar: {}", str);
 				final int lastFileSepIndex = str.lastIndexOf(File.separator);
 				if (lastFileSepIndex >= 0) {
 					str = str.substring(0, lastFileSepIndex);
@@ -112,9 +105,7 @@ public final class JarHelper {
 			}
 			
 		}
-		if (logger.isTraceEnabled()) {
-			logger.trace("_RESULT PATH: {}", str);
-		}
+		logger.trace("_RESULT PATH: {}", str);
 		
 		return Path.of(str);
 	}

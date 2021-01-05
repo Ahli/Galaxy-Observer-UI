@@ -61,7 +61,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ForkJoinPool;
 
-import static interfacebuilder.InterfaceBuilderApp.FATAL_ERROR;
+import static interfacebuilder.ui.AppController.FATAL_ERROR;
 
 public class BrowseController implements Updateable {
 	private static final Logger logger = LogManager.getLogger(BrowseController.class);
@@ -207,9 +207,7 @@ public class BrowseController implements Updateable {
 			}
 		} catch (final IOException e) {
 			sb.append(" - could not check game version");
-			if (logger.isTraceEnabled()) {
-				logger.trace("Error: could not check game version", e);
-			}
+			logger.trace("Error: could not check game version", e);
 		}
 		return sb.toString();
 	}

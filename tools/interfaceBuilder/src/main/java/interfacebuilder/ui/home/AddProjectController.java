@@ -100,9 +100,7 @@ public class AddProjectController {
 	}
 	
 	public void addProjectAction(final Event event) {
-		if (logger.isTraceEnabled()) {
-			logger.trace("add project action event fired");
-		}
+		logger.trace("add project action event fired");
 		final Game game = gameDropdown.getValue();
 		if (game == null) {
 			// eat event before it reaches the resultConverter

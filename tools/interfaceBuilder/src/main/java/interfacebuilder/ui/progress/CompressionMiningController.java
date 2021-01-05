@@ -37,7 +37,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.ForkJoinPool;
 
-import static interfacebuilder.InterfaceBuilderApp.FATAL_ERROR;
+import static interfacebuilder.ui.AppController.FATAL_ERROR;
+
 
 public class CompressionMiningController implements Updateable {
 	private static final Logger logger = LogManager.getLogger(CompressionMiningController.class);

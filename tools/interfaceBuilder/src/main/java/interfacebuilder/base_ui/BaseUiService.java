@@ -116,9 +116,10 @@ public class BaseUiService {
 			isUpToDate = versionExe[i] <= versionBaseUi[i];
 		}
 		if (logger.isTraceEnabled()) {
-			logger.trace(
-					"Exe version check - exe=" + Arrays.toString(versionExe) + " - " + Arrays.toString(versionBaseUi) +
-							" - upToDate=" + isUpToDate);
+			logger.trace("Exe version check - exe={} - {} - upToDate={}",
+					Arrays.toString(versionExe),
+					Arrays.toString(versionBaseUi),
+					isUpToDate);
 		}
 		
 		return !isUpToDate;
@@ -156,7 +157,7 @@ public class BaseUiService {
 					final String key = table.getString(j).getKey();
 					if ("FileVersion".equals(key)) {
 						final String value = table.getString(j).getValue();
-						logger.trace("found FileVersion={}", () -> value);
+						logger.trace("found FileVersion={}", value);
 						
 						final String[] parts = value.split("\\.");
 						for (int k = 0; k < 4; k++) {
@@ -339,9 +340,7 @@ public class BaseUiService {
 		synchronized (gameName) {
 			UICatalog uiCatalog = gameData.getUiCatalog();
 			if (uiCatalog != null) {
-				if (logger.isTraceEnabled()) {
-					logger.trace("Aborting parsing baseUI for '{}' as was already parsed.", gameName);
-				}
+				logger.trace("Aborting parsing baseUI for '{}' as was already parsed.", gameName);
 			} else {
 				final long startTime = System.currentTimeMillis();
 				logger.info("Loading baseUI for {}", gameName);
@@ -354,9 +353,7 @@ public class BaseUiService {
 					isPtr = isPtr(baseUiPath);
 				} catch (final IOException e) {
 					// do nothing
-					if (logger.isTraceEnabled()) {
-						logger.trace("Ignoring error in isPtr() check on baseUiPath.", e);
-					}
+					logger.trace("Ignoring error in isPtr() check on baseUiPath.", e);
 				}
 				try {
 					if (cacheIsUpToDateCheckException(gameData.getGameDef(), isPtr)) {
@@ -364,9 +361,7 @@ public class BaseUiService {
 						uiCatalog = discCacheService.getCachedBaseUi(gameName, isPtr);
 						gameData.setUiCatalog(uiCatalog);
 						needToParseAgain = false;
-						if (logger.isTraceEnabled()) {
-							logger.trace("Loaded baseUI for '{}' from cache", gameName);
-						}
+						logger.trace("Loaded baseUI for '{}' from cache", gameName);
 					}
 				} catch (final IOException e) {
 					logger.warn("ERROR: loading cached base UI failed.", e);
@@ -404,11 +399,9 @@ public class BaseUiService {
 						}
 						uiCatalog.postProcessParsing();
 						gameData.setUiCatalog(uiCatalog);
-						if (logger.isTraceEnabled()) {
-							logger.trace("Parsed BaseUI for {}", gameName);
-						}
+						logger.trace("Parsed BaseUI for {}", gameName);
 					} catch (final SAXException | IOException | ParserConfigurationException e) {
-						logger.error("ERROR parsing base UI catalog for '" + gameName + "'.", e);
+						logger.error(String.format("ERROR parsing base UI catalog for '%s'.", gameName), e);
 					} catch (final InterruptedException e) {
 						Thread.currentThread().interrupt();
 					} finally {
@@ -486,9 +479,7 @@ public class BaseUiService {
 		for (int i = 0; i < versionCache.length && isUpToDate; ++i) {
 			isUpToDate = versionCache[i] == versionBaseUi[i];
 		}
-		if (logger.isTraceEnabled()) {
-			logger.trace("Cache and baseUI versions match: {}", isUpToDate);
-		}
+		logger.trace("Cache and baseUI versions match: {}", isUpToDate);
 		return isUpToDate;
 	}
 	

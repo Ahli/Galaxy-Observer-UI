@@ -3,7 +3,7 @@
 
 package interfacebuilder.projects;
 
-import interfacebuilder.InterfaceBuilderApp;
+import interfacebuilder.SpringBootApplication;
 import interfacebuilder.projects.enums.Game;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @DataJpaTest
-@ContextConfiguration(classes = InterfaceBuilderApp.class)
+@ContextConfiguration(classes = SpringBootApplication.class)
 @TestExecutionListeners(
 		listeners = { MockitoTestExecutionListener.class, SpringBootDependencyInjectionTestExecutionListener.class },
 		mergeMode = TestExecutionListeners.MergeMode.REPLACE_DEFAULTS)

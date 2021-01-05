@@ -53,7 +53,7 @@ public final class XmlCompressorVtd {
 	public static void processCache(final String cachePath, final int ignoreCommentCountPerFile) {
 		
 		logger.info("Compressing XML files...");
-		logger.trace("cachePath: {}", () -> cachePath);
+		logger.trace("cachePath: {}", cachePath);
 		
 		// TODO rewrite with nio walker
 		final Collection<File> filesOfCache = FileUtils.listFiles(new File(cachePath), null, true);
@@ -61,16 +61,14 @@ public final class XmlCompressorVtd {
 		final VTDGen vtd = new VTDGen();
 		
 		for (final File curFile : filesOfCache) {
-			logger.trace("compression - processing file: {}", () -> curFile.getPath());
+			logger.trace("compression - processing file: {}", curFile::getPath);
 			
 			try {
 				// setdoc causes a nullpointer error due to an internal bug
 				vtd.setDoc_BR(Files.readAllBytes(curFile.toPath()));
 				vtd.parse(false);
 			} catch (final IOException | ParseException e) {
-				if (logger.isTraceEnabled()) {
-					logger.trace("Error while compressing xml.", e);
-				}
+				logger.trace("Error while compressing xml.", e);
 				continue;
 			}
 			
@@ -112,7 +110,7 @@ public final class XmlCompressorVtd {
 				
 				xm.output(curFile.getAbsolutePath());
 			} catch (final ModifyException | XPathParseException | XPathEvalException | NavException | IOException | TranscodeException e) {
-				logger.error("ERROR: while compressing xml file " + curFile.getAbsolutePath(), e);
+				logger.error(String.format("ERROR: while compressing xml file %s", curFile.getAbsolutePath()), e);
 			}
 		}
 	}

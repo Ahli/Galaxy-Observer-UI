@@ -19,9 +19,7 @@ public class WrappingTextTableCell extends TableCell<ValueDef, String> {
 	@Override
 	protected void updateItem(final String item, final boolean empty) {
 		if (empty || item == null) {
-			if (logger.isTraceEnabled()) {
-				logger.trace("update wrapping table cell - null");
-			}
+			logger.trace("update wrapping table cell - null");
 			super.updateItem(item, empty);
 			super.setGraphic(null);
 			super.setText(null);
@@ -30,9 +28,7 @@ public class WrappingTextTableCell extends TableCell<ValueDef, String> {
 			final boolean equals = item.equals(getItem());
 			super.updateItem(item, false);
 			if (!equals) {
-				if (logger.isTraceEnabled()) {
-					logger.trace("update wrapping table cell - newLabel {}", item);
-				}
+				logger.trace("update wrapping table cell - newLabel {}", item);
 				final Label l = new Label(item);
 				l.setWrapText(true);
 				final VBox box = new VBox(l);
@@ -42,9 +38,7 @@ public class WrappingTextTableCell extends TableCell<ValueDef, String> {
 				});
 				super.setGraphic(box);
 			} else {
-				if (logger.isTraceEnabled()) {
-					logger.trace("update wrapping table cell - equal");
-				}
+				logger.trace("update wrapping table cell - equal");
 			}
 		}
 	}

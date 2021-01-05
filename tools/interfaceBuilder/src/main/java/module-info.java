@@ -98,5 +98,4 @@ module interfacex.builder {
 	//	requires spring.boot.actuator;
 	//	requires spring.boot.actuator.autoconfigure;
 	//	requires spring.boot.starter.actuator;
-	
 }

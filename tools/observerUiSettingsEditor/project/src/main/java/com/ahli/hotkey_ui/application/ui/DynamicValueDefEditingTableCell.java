@@ -27,26 +27,20 @@ public class DynamicValueDefEditingTableCell extends TableCell<ValueDef, String>
 			if (!equals) {
 				updateItemNotEquals(item);
 			} else {
-				if (logger.isTraceEnabled()) {
-					logger.trace("update valuedef-edit table cell - equal");
-				}
+				logger.trace("update valuedef-edit table cell - equal");
 			}
 		}
 	}
 	
 	private void updateItemNull(final String item, final boolean empty) {
-		if (logger.isTraceEnabled()) {
-			logger.trace("update valuedef-edit table cell - null");
-		}
+		logger.trace("update valuedef-edit table cell - null");
 		super.updateItem(item, empty);
 		super.setGraphic(null);
 		super.setText(null);
 	}
 	
 	private void updateItemNotEquals(final String item) {
-		if (logger.isTraceEnabled()) {
-			logger.trace("update valuedef-edit table cell - newLabel {}", item);
-		}
+		logger.trace("update valuedef-edit table cell - newLabel {}", item);
 		final ValueDef data = getTableRow().getItem();
 		if (data != null) {
 			switch (data.getType()) {
@@ -77,6 +71,7 @@ public class DynamicValueDefEditingTableCell extends TableCell<ValueDef, String>
 		super.setGraphic(comboBox);
 	}
 	
+	@SuppressWarnings("java:S5411") // Use the primitive boolean expression here
 	private void createNumberEditor(final ValueDef data, final String item) {
 		final TextField textField = new TextField(item);
 		
@@ -125,6 +120,7 @@ public class DynamicValueDefEditingTableCell extends TableCell<ValueDef, String>
 		super.setGraphic(comboBox);
 	}
 	
+	@SuppressWarnings("java:S5411") // Use the primitive boolean expression here
 	private void createTextEditor(final ValueDef data, final String item) {
 		final TextField textField = new TextField(item);
 		

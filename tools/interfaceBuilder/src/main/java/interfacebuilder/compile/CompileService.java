@@ -180,9 +180,7 @@ public class CompileService {
 						dBuilder.parse(is);
 						
 					} catch (final SAXException e) {
-						if (logger.isTraceEnabled()) {
-							logger.trace("Error while verifying XML.", e);
-						}
+						logger.trace("Error while verifying XML.", e);
 						throw new IOException("XML verification failed.", e);
 					}
 				}

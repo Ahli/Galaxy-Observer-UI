@@ -49,7 +49,7 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.function.Predicate;
 
-import static interfacebuilder.InterfaceBuilderApp.FATAL_ERROR;
+import static interfacebuilder.ui.AppController.FATAL_ERROR;
 
 public class BrowseTabController implements Updateable {
 	private static final String PATH_SEPARATOR = " > ";
@@ -409,6 +409,7 @@ public class BrowseTabController implements Updateable {
 				final ObservableValue<? extends TreeItem<UIElement>> observable,
 				final TreeItem<UIElement> oldValue,
 				final TreeItem<UIElement> newValue) {
+			logger.trace("selection in tree changed: {}", newValue);
 			controller.showInTableView(newValue);
 		}
 	}
@@ -443,14 +444,13 @@ public class BrowseTabController implements Updateable {
 	private class FileSelectionEventHandler implements EventHandler<ActionEvent> {
 		@Override
 		public void handle(final ActionEvent event) {
-			Platform.runLater(() -> {
-				try {
-					final String selectedFileName = fileSelector.getSelectionModel().getSelectedItem();
-					updateTemplateDropdown(selectedFileName);
-				} catch (final Exception e) {
-					logger.fatal(FATAL_ERROR, e);
-				}
-			});
+			logger.trace("selection of file changed: {}", () -> fileSelector.getSelectionModel().getSelectedItem());
+			try {
+				final String selectedFileName = fileSelector.getSelectionModel().getSelectedItem();
+				updateTemplateDropdown(selectedFileName);
+			} catch (final Exception e) {
+				logger.fatal(FATAL_ERROR, e);
+			}
 		}
 		
 		/**
@@ -489,16 +489,10 @@ public class BrowseTabController implements Updateable {
 		
 		@Override
 		public void handle(final ActionEvent event) {
-			Platform.runLater(this::updateTreeTemplate);
-		}
-		
-		/**
-		 * Updates the tree to display the selected template
-		 */
-		private void updateTreeTemplate() {
 			try {
 				if (templateMap != null) {
 					final String selectedTemplateRootElem = templateSelector.getSelectionModel().getSelectedItem();
+					logger.trace("selection of template changed: {}", selectedTemplateRootElem);
 					final UITemplate template = templateMap.get(selectedTemplateRootElem);
 					if (template != curTreeTemplate) {
 						final long start = System.currentTimeMillis();
@@ -585,9 +579,7 @@ public class BrowseTabController implements Updateable {
 				str = queriedFilter;
 				flowFactory.setHighlight(str);
 				queryString.set(str.toUpperCase());
-				if (logger.isTraceEnabled()) {
-					logger.trace("filter apply: {}ms - {}", (System.currentTimeMillis() - startTime), str);
-				}
+				logger.trace("filter apply: {}ms - {}", (System.currentTimeMillis() - startTime), str);
 			}
 			Platform.runLater(new TreeFilteringUiRunnable(str, filter));
 		}

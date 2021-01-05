@@ -95,7 +95,7 @@ public class ProjectService {
 		try {
 			return ProjectEntity.toProject(projectRepo.save(ProjectEntity.fromProject(project)));
 		} catch (final DataAccessException e) {
-			logger.error(e);
+			logger.error("Saving project failed", e);
 			throw e;
 		}
 	}
@@ -183,17 +183,15 @@ public class ProjectService {
 		
 		final Path projPath = Path.of(project.getProjectPath());
 		final var resolver = new PathMatchingResourcePatternResolver();
-		if (logger.isTraceEnabled()) {
-			logger.trace("creating template");
-		}
+		logger.trace("creating template");
 		final int jarIntPathLen = jarIntPath.length();
 		for (final Resource res : resolver.getResources("classpath*:" + jarIntPath + "**")) {
 			final String uri = res.getURI().toString();
-			logger.trace("extracting file {}", () -> uri);
+			logger.trace("extracting file {}", uri);
 			final int i = uri.indexOf(jarIntPath);
 			final String intPath = uri.substring(i + jarIntPathLen);
 			final Path path = projPath.resolve(intPath);
-			logger.trace("writing file {}", () -> path);
+			logger.trace("writing file {}", path);
 			if (!uri.endsWith(DIRECTORY_SYMBOL)) {
 				Files.createDirectories(path.getParent());
 				try (final InputStream in = new BufferedInputStream(res.getInputStream(), 1024)) {
@@ -203,8 +201,6 @@ public class ProjectService {
 				Files.createDirectories(path);
 			}
 		}
-		if (logger.isTraceEnabled()) {
-			logger.trace("create template finished");
-		}
+		logger.trace("create template finished");
 	}
 }

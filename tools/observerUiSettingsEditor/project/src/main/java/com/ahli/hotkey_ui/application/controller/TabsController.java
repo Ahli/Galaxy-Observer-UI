@@ -80,9 +80,7 @@ public class TabsController {
 	 */
 	@FXML
 	public void initialize() {
-		if (logger.isTraceEnabled()) {
-			logger.trace("initializing");
-		}
+		logger.trace("initializing");
 		
 		hotkeysNameCol.setCellValueFactory(new PropertyValueFactory<>("id"));
 		hotkeysDescriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));

@@ -126,16 +126,17 @@ public class UICatalogImpl implements UICatalog {
 		
 		final String descIndexPath = f.getAbsolutePath();
 		final String basePath = descIndexPath.substring(0, descIndexPath.length() - f.getName().length());
-		logger.trace("descIndexPath={}", () -> descIndexPath);
-		logger.trace("basePath={}", () -> basePath);
+		logger.trace("descIndexPath={}\nbasePath={}", descIndexPath, basePath);
 		
 		processLayouts(combinedList, basePath, raceId, consoleSkinId);
 		
-		if (logger.isTraceEnabled()) {
-			logger.trace(
-					"UICatalogSizes: " + templates.size() + " " + blizzOnlyTemplates.size() + " " + constants.size() +
-							" " + blizzOnlyConstants.size() + " " + blizzOnlyLayouts.size());
-		}
+		logger.trace(
+				"UICatalogSizes: templates={}, blizzTemplates={}, constants={}, blizzConstants={}, blizzLayouts={}",
+				templates.size(),
+				blizzOnlyTemplates.size(),
+				constants.size(),
+				blizzOnlyConstants.size(),
+				blizzOnlyLayouts.size());
 	}
 	
 	/**
@@ -152,17 +153,14 @@ public class UICatalogImpl implements UICatalog {
 		String basePathTemp;
 		for (final String intPath : toProcessList) {
 			final boolean isDevLayout = blizzOnlyLayouts.contains(intPath);
-			logger.trace("intPath={}", () -> intPath);
-			logger.trace("isDevLayout={}", () -> isDevLayout);
+			logger.trace("intPath={}\nisDevLayout={}", intPath, isDevLayout);
 			basePathTemp = basePath;
 			int lastIndex = 0;
 			while (!new File(basePathTemp + File.separator + intPath).exists() && lastIndex != -1) {
 				lastIndex = basePathTemp.lastIndexOf(File.separatorChar);
 				if (lastIndex != -1) {
 					basePathTemp = basePathTemp.substring(0, lastIndex);
-					if (logger.isTraceEnabled()) {
-						logger.trace("basePathTemp={}", basePathTemp);
-					}
+					logger.trace("basePathTemp={}", basePathTemp);
 				} else {
 					if (!isDevLayout) {
 						logger.error("ERROR: Cannot find layout file: {}", intPath);
@@ -177,10 +175,9 @@ public class UICatalogImpl implements UICatalog {
 				try {
 					processLayoutFile(layoutFilePath, raceId, isDevLayout, consoleSkinId, parser);
 				} catch (final IOException e) {
-					logger.error(
-							String.format("ERROR: encountered an Exception while processing the layout file '%s'.",
-									layoutFilePath),
-							e);
+					logger.error(String.format(
+							"ERROR: encountered an Exception while processing the layout file '%s'.",
+							layoutFilePath), e);
 				}
 				if (Thread.interrupted()) {
 					throw new InterruptedException();
@@ -202,18 +199,14 @@ public class UICatalogImpl implements UICatalog {
 	@Override
 	public void processInclude(
 			final String path, final boolean isDevLayout, final String raceId, final String consoleSkinId) {
-		if (logger.isTraceEnabled()) {
-			logger.trace("processing Include appearing within a real layout");
-		}
+		logger.trace("processing Include appearing within a real layout");
 		
 		String basePathTemp = getCurBasePath();
 		while (!Files.exists(Path.of(basePathTemp, path))) {
 			final int lastIndex = basePathTemp.lastIndexOf(File.separatorChar);
 			if (lastIndex != -1) {
 				basePathTemp = basePathTemp.substring(0, lastIndex);
-				if (logger.isTraceEnabled()) {
-					logger.trace("basePathTemp={}", basePathTemp);
-				}
+				logger.trace("basePathTemp={}", basePathTemp);
 			} else {
 				if (!isDevLayout) {
 					logger.error("ERROR: Cannot find layout file: {}", path);
@@ -348,7 +341,7 @@ public class UICatalogImpl implements UICatalog {
 		}
 		final String prefix = constantRef.substring(0, i);
 		final String constantName = constantRef.substring(i);
-		logger.trace("Encountered Constant: prefix='{}', constantName='{}'", () -> prefix, () -> constantName);
+		logger.trace("Encountered Constant: prefix='{}', constantName='{}'", prefix, constantName);
 		for (final UIConstant c : constants) {
 			if (c.getName().equalsIgnoreCase(constantName)) {
 				return c.getValue();
