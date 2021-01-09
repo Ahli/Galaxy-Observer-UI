@@ -64,13 +64,13 @@ public class XmlParserDom extends XmlParserAbstract {
 		} catch (final ParserConfigurationException e) {
 			logger.error(e);
 		}
-		attrTypes = new ArrayList<>();
-		attrValues = new ArrayList<>();
+		attrTypes = new ArrayList<>(3);
+		attrValues = new ArrayList<>(3);
 	}
 	
 	@Override
-	public void setConsumer(final ParsedXmlConsumer consumer2) {
-		consumer = consumer2;
+	public void setConsumer(final ParsedXmlConsumer consumer) {
+		this.consumer = consumer;
 		init();
 	}
 	

@@ -137,9 +137,8 @@ public final class XmlCompressorDom {
 		private final DocumentBuilder dBuilder;
 		private final int ignoreCommentCountPerFile;
 		
-		public FileProcessor(
+		private FileProcessor(
 				final DocumentBuilder dBuilder, final Transformer transformer, final int ignoreCommentCountPerFile) {
-			super();
 			this.dBuilder = dBuilder;
 			this.transformer = transformer;
 			this.ignoreCommentCountPerFile = ignoreCommentCountPerFile;

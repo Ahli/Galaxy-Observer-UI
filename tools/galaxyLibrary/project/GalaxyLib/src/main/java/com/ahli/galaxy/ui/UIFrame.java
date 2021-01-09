@@ -105,15 +105,15 @@ public class UIFrame extends UIElement {
 				clone.attributes.add((UIAttribute) attributes.get(i).deepCopy());
 			}
 		}
-		if (relative != DFLT_RELATIVE) {
+		if (!Arrays.equals(relative, DFLT_RELATIVE)) {
 			clone.relative = new String[4];
 			System.arraycopy(relative, 0, clone.relative, 0, 4);
 		}
-		if (offset != DFLT_OFFSET) {
+		if (!Arrays.equals(offset, DFLT_OFFSET)) {
 			clone.offset = new String[4];
 			System.arraycopy(offset, 0, clone.offset, 0, 4);
 		}
-		if (pos != DFLT_POS) {
+		if (!Arrays.equals(pos, DFLT_POS)) {
 			clone.pos = new String[4];
 			System.arraycopy(pos, 0, clone.pos, 0, 4);
 		}
@@ -179,8 +179,7 @@ public class UIFrame extends UIElement {
 	 */
 	public UIAttribute getValue(final String key) {
 		if (attributes != null) {
-			for (int i = 0, len = attributes.size(); i < len; ++i) {
-				final UIAttribute a = attributes.get(i);
+			for (final UIAttribute a : attributes) {
 				if (a.getName().equalsIgnoreCase(key)) {
 					return a;
 				}
@@ -232,7 +231,7 @@ public class UIFrame extends UIElement {
 		if (THIS.equalsIgnoreCase(relative)) {
 			this.relative = DFLT_RELATIVE;
 		} else {
-			if (this.relative == DFLT_RELATIVE) {
+			if (Arrays.equals(this.relative, DFLT_RELATIVE)) {
 				this.relative = new String[4];
 			}
 			this.relative[0] = StringInterner.intern(relative);
@@ -243,7 +242,7 @@ public class UIFrame extends UIElement {
 		if (offset == null || ZERO.equals(offset)) {
 			this.offset = DFLT_OFFSET;
 		} else {
-			if (this.offset == DFLT_OFFSET) {
+			if (Arrays.equals(this.offset, DFLT_OFFSET)) {
 				this.offset = new String[4];
 			}
 			this.offset[0] = StringInterner.intern(offset);
@@ -270,7 +269,7 @@ public class UIFrame extends UIElement {
 	 * @param relative
 	 */
 	public void setAnchorRelative(final UIAnchorSide side, final String relative) {
-		if (this.relative == DFLT_RELATIVE) {
+		if (Arrays.equals(this.relative, DFLT_RELATIVE)) {
 			if (THIS.equalsIgnoreCase(relative)) {
 				return;
 			}
@@ -288,7 +287,7 @@ public class UIFrame extends UIElement {
 	 * @param pos
 	 */
 	public void setAnchorPos(final UIAnchorSide side, final String pos) {
-		if (this.pos == DFLT_POS) {
+		if (Arrays.equals(this.pos, DFLT_POS)) {
 			if (DFLT_POS[side.ordinal()].equalsIgnoreCase(pos)) {
 				return;
 			}
@@ -309,7 +308,7 @@ public class UIFrame extends UIElement {
 	 * @param offset
 	 */
 	public void setAnchorOffset(final UIAnchorSide side, final String offset) {
-		if (this.offset == DFLT_OFFSET) {
+		if (Arrays.equals(this.offset, DFLT_OFFSET)) {
 			if (ZERO.equals(offset)) {
 				return;
 			}

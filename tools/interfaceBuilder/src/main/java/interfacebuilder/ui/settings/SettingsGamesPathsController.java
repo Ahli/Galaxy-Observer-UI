@@ -150,6 +150,7 @@ public class SettingsGamesPathsController extends SettingsAutoSaveController {
 	 * 		label set visible if invalid, can be null
 	 */
 	private static void validatePath(final String path, final String switcher, final Label invalidLabel) {
+		@SuppressWarnings("BooleanVariableAlwaysNegated")
 		boolean valid = false;
 		if (path != null) {
 			valid = switcherExists(path, switcher, false) ||

@@ -39,7 +39,7 @@ public class NavigationController {
 	 * 2: settings */
 	private final Parent[] contentPages = new Parent[4];
 	private final Updateable[] controllers = new Updateable[4];
-	private final List<Notification> notifications = new ArrayList<>();
+	private final List<Notification> notifications = new ArrayList<>(0);
 	private final ApplicationContext appContext;
 	@FXML
 	private AnchorPane selectedMarker;
@@ -87,12 +87,12 @@ public class NavigationController {
 		
 		notificationBar.setVisible(false);
 		notificationBar.managedProperty().bind(notificationBar.visibleProperty());
-		notificationBar.setBackground(new Background(new BackgroundFill(Color.color(211D / 256D,
-				168D / 255D,
-				3D / 255D), CornerRadii.EMPTY, Insets.EMPTY)));
-		selectedMarker.setBackground(new Background(new BackgroundFill(Color.color(211D / 256D, 168D / 255D, 3D / 255D),
-				CornerRadii.EMPTY,
-				Insets.EMPTY)));
+		notificationBar.setBackground(new Background(new BackgroundFill(Color.color(211.0D / 256.0D,
+				168.0D / 255.0D,
+				3.0D / 255.0D), CornerRadii.EMPTY, Insets.EMPTY)));
+		selectedMarker.setBackground(new Background(new BackgroundFill(Color.color(211.0D / 256.0D,
+				168.0D / 255.0D,
+				3.0D / 255.0D), CornerRadii.EMPTY, Insets.EMPTY)));
 		
 		// content pages
 		initFXML("classpath:view/Content_Home.fxml", 0);
@@ -114,7 +114,7 @@ public class NavigationController {
 			final Object controller = loader.getController();
 			controllers[index] = (controller instanceof Updateable) ? (Updateable) controller : null;
 		} catch (final IOException e) {
-			logger.error("failed to load FXML: {}." + path + ".", e);
+			logger.error(String.format("failed to load FXML: %s.", path), e);
 			contentPages[index] = null;
 			controllers[index] = null;
 		}

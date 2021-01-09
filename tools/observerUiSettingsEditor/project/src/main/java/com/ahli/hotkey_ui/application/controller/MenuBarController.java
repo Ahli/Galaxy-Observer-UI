@@ -32,10 +32,6 @@ public class MenuBarController {
 	@FXML
 	private MenuItem menuClose;
 	
-	public MenuBarController() {
-		// nothing to do
-	}
-	
 	/**
 	 * Automatically called on Controller initialization.
 	 */
@@ -99,11 +95,11 @@ public class MenuBarController {
 	 * Updates the menu bar's items.
 	 */
 	public void updateMenuBar() {
-		final boolean docLoaded = main.isValidOpenedDocPath();
+		final boolean docNotLoaded = main.isInvalidOpenedDocPath();
 		
-		menuSave.setDisable(!docLoaded);
-		menuSaveAs.setDisable(!docLoaded);
-		menuClose.setDisable(!docLoaded);
+		menuSave.setDisable(docNotLoaded);
+		menuSaveAs.setDisable(docNotLoaded);
+		menuClose.setDisable(docNotLoaded);
 	}
 	
 	/**

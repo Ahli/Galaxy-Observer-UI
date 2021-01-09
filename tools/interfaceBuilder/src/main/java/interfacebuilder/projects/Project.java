@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 public class Project {
-	private int id;
+	private final int id;
 	private String name;
 	private String projectPath;
 	private Game game;
@@ -31,6 +31,7 @@ public class Project {
 		this.name = name;
 		this.projectPath = projectPath;
 		this.game = game;
+		this.id = 0;
 	}
 	
 }

@@ -8,7 +8,7 @@ package com.ahli.hotkey_ui.application;
  *
  * @author Ahli
  */
-public class Main {
+public final class Main {
 	
 	//	static {
 	//		System.setProperty("log4j2.debug", "true");

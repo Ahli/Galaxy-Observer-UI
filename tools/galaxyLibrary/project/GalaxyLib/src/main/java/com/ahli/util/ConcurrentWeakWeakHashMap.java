@@ -112,7 +112,7 @@ public class ConcurrentWeakWeakHashMap<K> implements ConcurrentMap<K, K> {
 	}
 	
 	private WeakReferenceWithHash<?> newKeyByObj(final Object obj) {
-		//noinspection rawtypes
+		//noinspection rawtypes,unchecked
 		return new WeakReferenceWithHash(obj, queue);
 	}
 	
@@ -142,6 +142,7 @@ public class ConcurrentWeakWeakHashMap<K> implements ConcurrentMap<K, K> {
 	public void putAll(final Map<? extends K, ? extends K> m) {
 		purgeKeys();
 		for (final Entry<? extends K, ? extends K> entry : m.entrySet()) {
+			@SuppressWarnings("ObjectAllocationInLoop")
 			final var keyWeakRef = newKey(entry.getKey());
 			map.put(keyWeakRef, keyWeakRef);
 		}
@@ -155,28 +156,7 @@ public class ConcurrentWeakWeakHashMap<K> implements ConcurrentMap<K, K> {
 	
 	@Override
 	public Set<K> keySet() {
-		return new AbstractSet<>() {
-			@Override
-			public Iterator<K> iterator() {
-				purgeKeys();
-				return new WeakSafeIterator<>(map.keySet().iterator()) {
-					@Override
-					protected K extract(final WeakReferenceWithHash<K> u) {
-						return u.get();
-					}
-				};
-			}
-			
-			@Override
-			public boolean contains(final Object o) {
-				return containsKey(o);
-			}
-			
-			@Override
-			public int size() {
-				return map.size();
-			}
-		};
+		return new WeakHashMapKeySet<>(this);
 	}
 	
 	@Override
@@ -198,28 +178,7 @@ public class ConcurrentWeakWeakHashMap<K> implements ConcurrentMap<K, K> {
 	
 	@Override
 	public Set<Entry<K, K>> entrySet() {
-		return new AbstractSet<>() {
-			@Override
-			public Iterator<Entry<K, K>> iterator() {
-				purgeKeys();
-				return new WeakSafeIterator<>(map.entrySet().iterator()) {
-					@Override
-					protected Entry<K, K> extract(final Entry<WeakReferenceWithHash<K>, WeakReferenceWithHash<K>> u) {
-						final K key = u.getKey().get();
-						if (key == null) {
-							return null;
-						} else {
-							return new SimpleEntry<>(key, u.getValue().get());
-						}
-					}
-				};
-			}
-			
-			@Override
-			public int size() {
-				return map.size();
-			}
-		};
+		return new WeakHashMapEntrySet<>(this);
 	}
 	
 	private static final class WeakReferenceWithHash<T> extends java.lang.ref.WeakReference<T> {
@@ -234,9 +193,9 @@ public class ConcurrentWeakWeakHashMap<K> implements ConcurrentMap<K, K> {
 		@Override
 		public boolean equals(final Object obj) {
 			return obj != null && obj.getClass() == getClass() &&
-					((this == obj || super.get() == ((WeakReferenceWithHash<?>) obj).get()) ||
+					((this == obj || get() == ((WeakReferenceWithHash<?>) obj).get()) ||
 							(hashCode == ((WeakReferenceWithHash<?>) obj).hashCode &&
-									Objects.equals(super.get(), ((WeakReferenceWithHash<?>) obj).get())));
+									Objects.equals(get(), ((WeakReferenceWithHash<?>) obj).get())));
 		}
 		
 		@Override
@@ -250,7 +209,7 @@ public class ConcurrentWeakWeakHashMap<K> implements ConcurrentMap<K, K> {
 		private final Iterator<U> weakIterator;
 		protected T strongNext;
 		
-		public WeakSafeIterator(final Iterator<U> weakIterator) {
+		private WeakSafeIterator(final Iterator<U> weakIterator) {
 			this.weakIterator = weakIterator;
 			advance();
 		}
@@ -273,7 +232,7 @@ public class ConcurrentWeakWeakHashMap<K> implements ConcurrentMap<K, K> {
 		}
 		
 		@Override
-		@SuppressWarnings("squid:S2272") // does not throw NoSuchElementException
+		@SuppressWarnings({ "squid:S2272", "IteratorNextCanNotThrowNoSuchElementException" })
 		public final T next() {
 			final T next = strongNext;
 			advance();
@@ -282,7 +241,81 @@ public class ConcurrentWeakWeakHashMap<K> implements ConcurrentMap<K, K> {
 		
 		@Override
 		public void remove() {
-			throw new UnsupportedOperationException();
+			throw new UnsupportedOperationException("Not supported");
+		}
+	}
+	
+	private static final class WeakHashMapKeySet<K> extends AbstractSet<K> {
+		
+		private final ConcurrentWeakWeakHashMap<K> weakHashMap;
+		
+		private WeakHashMapKeySet(final ConcurrentWeakWeakHashMap<K> weakHashMap) {
+			this.weakHashMap = weakHashMap;
+		}
+		
+		@Override
+		public Iterator<K> iterator() {
+			weakHashMap.purgeKeys();
+			return new WeakHashMapKeySetIterator<>(weakHashMap.map.keySet().iterator());
+		}
+		
+		@Override
+		public boolean contains(final Object o) {
+			//noinspection SuspiciousMethodCalls
+			return weakHashMap.containsKey(o);
+		}
+		
+		@Override
+		public int size() {
+			return weakHashMap.map.size();
+		}
+		
+	}
+	
+	private static final class WeakHashMapKeySetIterator<K> extends WeakSafeIterator<K, WeakReferenceWithHash<K>> {
+		private WeakHashMapKeySetIterator(final Iterator<WeakReferenceWithHash<K>> iterator) {
+			super(iterator);
+		}
+		
+		@Override
+		protected K extract(final WeakReferenceWithHash<K> u) {
+			return u.get();
+		}
+	}
+	
+	private static final class WeakHashMapEntrySet<K> extends AbstractSet<Entry<K, K>> {
+		private final ConcurrentWeakWeakHashMap<K> weakHashMap;
+		
+		private WeakHashMapEntrySet(final ConcurrentWeakWeakHashMap<K> weakHashMap) {
+			this.weakHashMap = weakHashMap;
+		}
+		
+		@Override
+		public Iterator<Entry<K, K>> iterator() {
+			weakHashMap.purgeKeys();
+			return new WeakHashMapEntrySetIterator<>(weakHashMap.map.entrySet().iterator());
+		}
+		
+		@Override
+		public int size() {
+			return weakHashMap.map.size();
+		}
+		
+		private static final class WeakHashMapEntrySetIterator<K>
+				extends WeakSafeIterator<Entry<K, K>, Entry<WeakReferenceWithHash<K>, WeakReferenceWithHash<K>>> {
+			private WeakHashMapEntrySetIterator(final Iterator<Entry<WeakReferenceWithHash<K>, WeakReferenceWithHash<K>>> weakIterator) {
+				super(weakIterator);
+			}
+			
+			@Override
+			protected Entry<K, K> extract(final Entry<WeakReferenceWithHash<K>, WeakReferenceWithHash<K>> u) {
+				final K key = u.getKey().get();
+				if (key == null) {
+					return null;
+				} else {
+					return new SimpleEntry<>(key, u.getValue().get());
+				}
+			}
 		}
 	}
 }

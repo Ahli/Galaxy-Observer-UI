@@ -18,6 +18,9 @@ import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryo.util.HashMapReferenceResolver;
 import com.esotericsoftware.kryo.util.ListReferenceResolver;
+import interfacebuilder.integration.kryo.serializer.KryoGameInfoSerializer;
+import interfacebuilder.integration.kryo.serializer.KryoInternStringArraySerializer;
+import interfacebuilder.integration.kryo.serializer.KryoInternStringSerializer;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -39,7 +42,7 @@ public class KryoService {
 		final Kryo kryo = new Kryo(new HashMapReferenceResolver());
 		kryo.register(ArrayList.class, 9);
 		kryo.register(UIAttribute.class, 10);
-		kryo.register(String[].class, 11);
+		kryo.register(String[].class, new KryoInternStringArraySerializer());
 		kryo.register(UIFrame.class, 12);
 		kryo.register(UITemplate.class, 13);
 		kryo.register(UIConstant.class, 14);
@@ -48,27 +51,26 @@ public class KryoService {
 		kryo.register(UIAnimation.class, 17);
 		kryo.register(UIStateGroup.class, 18);
 		kryo.register(UICatalogImpl.class, 19);
-		kryo.register(KryoGameInfo.class, 20);
+		kryo.register(KryoGameInfo.class, new KryoGameInfoSerializer());
 		kryo.register(int[].class, 21);
 		kryo.register(byte[].class, 22);
 		kryo.setRegistrationRequired(true);
-		kryo.register(String.class, new InternStringSerializer());
+		kryo.register(String.class, new KryoInternStringSerializer());
 		return kryo;
 	}
 	
 	public Kryo getKryoForBaseUiMetaFile() {
 		final Kryo kryo = new Kryo(new ListReferenceResolver());
-		kryo.register(KryoGameInfo.class, 9);
+		kryo.register(KryoGameInfo.class, new KryoGameInfoSerializer());
 		kryo.register(int[].class, 10);
 		kryo.setRegistrationRequired(true);
 		return kryo;
 	}
 	
-	public List<Object> get(final Path path, final Iterable<Class<?>> payloadClasses, final Kryo kryo)
-			throws IOException {
+	public List<Object> get(final Path path, final List<Class<?>> payloadClasses, final Kryo kryo) throws IOException {
 		try (final InflaterInputStream in = new InflaterInputStream(Files.newInputStream(path))) {
 			try (final Input input = new Input(in)) {
-				final List<Object> result = new ArrayList<>();
+				final List<Object> result = new ArrayList<>(payloadClasses.size());
 				for (final var clazz : payloadClasses) {
 					result.add(kryo.readObject(input, clazz));
 				}
@@ -81,11 +83,11 @@ public class KryoService {
 	}
 	
 	public List<Object> get(
-			final Path path, final Iterable<Class<?>> payloadClasses, final Kryo kryo, final int stopAfterIndex)
+			final Path path, final List<Class<?>> payloadClasses, final Kryo kryo, final int stopAfterIndex)
 			throws IOException {
 		try (final InflaterInputStream in = new InflaterInputStream(Files.newInputStream(path))) {
 			try (final Input input = new Input(in)) {
-				final List<Object> result = new ArrayList<>();
+				final List<Object> result = new ArrayList<>(payloadClasses.size());
 				int i = 0;
 				for (final var clazz : payloadClasses) {
 					result.add(kryo.readObject(input, clazz));

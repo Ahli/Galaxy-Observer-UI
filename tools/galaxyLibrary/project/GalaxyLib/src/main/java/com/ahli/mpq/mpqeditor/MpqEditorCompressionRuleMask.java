@@ -10,7 +10,6 @@ public class MpqEditorCompressionRuleMask extends MpqEditorCompressionRule {
 	private String mask;
 	
 	public MpqEditorCompressionRuleMask(final String mask) {
-		super();
 		this.mask = mask;
 	}
 	
@@ -26,8 +25,7 @@ public class MpqEditorCompressionRuleMask extends MpqEditorCompressionRule {
 	
 	@Override
 	public String toString() {
-		return "Mask:" + getMask() + "=" + super.getAttributeString() + ", " + super.getCompressionMethodString() +
-				", 0xFFFFFFFF";
+		return "Mask:" + getMask() + "=" + getAttributeString() + ", " + getCompressionMethodString() + ", 0xFFFFFFFF";
 	}
 	
 	public String getMask() {

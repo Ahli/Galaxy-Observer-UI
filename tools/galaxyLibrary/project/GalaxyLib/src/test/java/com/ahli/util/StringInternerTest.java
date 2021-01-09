@@ -14,8 +14,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 final class StringInternerTest {
 	
+	@SuppressWarnings("UnusedAssignment")
 	@Test
 	void testWeakRefStringInterner() {
+		@SuppressWarnings("UnsecureRandomNumberGeneration")
 		final double value = Math.random();
 		final String text = "HELLO WORLD! ";
 		String firstToBeInterned = text + value;
@@ -42,6 +44,7 @@ final class StringInternerTest {
 		
 		// test garbage collection
 		final var referenceQueue = new ReferenceQueue<String>();
+		@SuppressWarnings("unused")
 		final var weakRef = new WeakReference<>(firstInterned, referenceQueue);
 		firstToBeInterned = null;
 		firstInterned = null;

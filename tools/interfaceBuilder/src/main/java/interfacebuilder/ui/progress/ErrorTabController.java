@@ -26,7 +26,7 @@ public final class ErrorTabController {
 	private boolean running;
 	private boolean encounteredWarning;
 	private State state = State.NOT_STARTED;
-	private boolean errorsDoNotPreventExit;
+	private boolean errorPreventsExit;
 	
 	/**
 	 * Constructor
@@ -41,12 +41,12 @@ public final class ErrorTabController {
 			final TextFlow textArea,
 			final boolean colorizeTitle,
 			final boolean noResultIcon,
-			final boolean errorsDoNotPreventExit) {
+			final boolean errorPreventsExit) {
 		this.tab = tab;
 		this.textArea = textArea;
 		this.colorizeTitle = colorizeTitle;
 		showResultIcon = !noResultIcon;
-		this.errorsDoNotPreventExit = errorsDoNotPreventExit;
+		this.errorPreventsExit = errorPreventsExit;
 	}
 	
 	/**
@@ -169,12 +169,12 @@ public final class ErrorTabController {
 		}
 	}
 	
-	public boolean isErrorsDoNotPreventExit() {
-		return errorsDoNotPreventExit;
+	public boolean isErrorPreventsExit() {
+		return errorPreventsExit;
 	}
 	
-	public void setErrorsDoNotPreventExit(final boolean errorsDoNotPreventExit) {
-		this.errorsDoNotPreventExit = errorsDoNotPreventExit;
+	public void setErrorPreventsExit(final boolean errorPreventsExit) {
+		this.errorPreventsExit = errorPreventsExit;
 	}
 	
 	private enum State {NOT_STARTED, RUNNING, WARNING, ERROR, GOOD}

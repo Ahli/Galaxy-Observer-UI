@@ -38,7 +38,7 @@ public class JavafxApplication extends Application {
 		}
 	}
 	
-	private InterProcessCommunication.IpcServerThread findServerThread(final String id) {
+	private static InterProcessCommunication.IpcServerThread findServerThread(final String id) {
 		try {
 			if (id != null && !id.isEmpty()) {
 				final long idLong = Long.parseLong(id);
@@ -56,7 +56,7 @@ public class JavafxApplication extends Application {
 		return null;
 	}
 	
-	private String[] toArray(final Parameters param) {
+	private static String[] toArray(final Parameters param) {
 		return param != null ? param.getRaw().toArray(new String[0]) : new String[0];
 	}
 	

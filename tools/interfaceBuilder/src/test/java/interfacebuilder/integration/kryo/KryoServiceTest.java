@@ -30,12 +30,12 @@ final class KryoServiceTest {
 		
 		final KryoGameInfo kryoGameInfoA =
 				new KryoGameInfo(new int[] { 42, 12, 44, 12345 }, "Heroes of the Storm", false);
-		final List<Object> payload = new ArrayList<>();
+		final List<Object> payload = new ArrayList<>(1);
 		payload.add(kryoGameInfoA);
 		
 		kryoService.put(path, payload, kryo);
 		
-		final List<Class<?>> payloadClasses = new ArrayList<>();
+		final List<Class<?>> payloadClasses = new ArrayList<>(1);
 		payloadClasses.add(KryoGameInfo.class);
 		
 		final KryoGameInfo kryoGameInfoB = (KryoGameInfo) kryoService.get(path, payloadClasses, kryo).get(0);
@@ -55,14 +55,14 @@ final class KryoServiceTest {
 		final UICatalogImpl uiCatalogA = new UICatalogImpl(1, 1, 1, 0, 1);
 		uiCatalogA.addTemplate("fileName", new UIFrame("frame", "type"), false);
 		uiCatalogA.addConstant(new UIConstant("asd asd asd", "qqq"), false);
-		final List<Object> payload = new ArrayList<>();
+		final List<Object> payload = new ArrayList<>(2);
 		payload.add((uiCatalogA));
 		payload.add(kryoGameInfoA);
 		
 		kryoService.put(path, payload, kryo);
 		
 		final Kryo kryo2 = kryoService.getKryoForUICatalog();
-		final List<Class<?>> payloadClasses = new ArrayList<>();
+		final List<Class<?>> payloadClasses = new ArrayList<>(2);
 		payloadClasses.add(UICatalogImpl.class);
 		payloadClasses.add(KryoGameInfo.class);
 		

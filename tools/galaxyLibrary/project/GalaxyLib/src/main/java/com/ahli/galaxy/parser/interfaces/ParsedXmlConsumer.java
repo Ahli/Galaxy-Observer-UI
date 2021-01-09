@@ -13,7 +13,7 @@ public interface ParsedXmlConsumer {
 	
 	void parseFile(Path p, String raceId, boolean isDevLayout, String consoleSkinId) throws IOException;
 	
-	void parse(int level, String lowerCase, List<String> attrTypes, List<String> attrValues) throws UIException;
+	void parse(int level, String tagName, List<String> attrTypes, List<String> attrValues) throws UIException;
 	
 	void endLayoutFile();
 	

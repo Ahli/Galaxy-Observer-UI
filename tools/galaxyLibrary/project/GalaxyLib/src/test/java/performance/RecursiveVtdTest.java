@@ -16,8 +16,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 final class RecursiveVtdTest {
-	private static final List<Object> list = new ArrayList<>();
+	private static final List<Object> list = new ArrayList<>(10);
 	private static final String TAG = "*";
+	
+	private RecursiveVtdTest() {
+	}
 	
 	public static void main(final String[] args) {
 		final long endMem;
@@ -28,12 +31,12 @@ final class RecursiveVtdTest {
 			e1.printStackTrace();
 			Thread.currentThread().interrupt();
 		}
-		System.out.println("memory: " + Runtime.getRuntime().totalMemory());
 		final Runtime rt = Runtime.getRuntime();
 		final long startMem = rt.totalMemory() - rt.freeMemory();
+		System.out.println("memory: " + ((float) startMem) / (1 << 20) + " MB.");
 		final long startTime = System.currentTimeMillis();
 		final Path p =
-				Path.of("D:\\Galaxy-Observer-UI\\baseUI\\heroes\\mods\\core.stormmod\\base.stormdata\\UI\\Layout\\UI\\GameUI.StormLayout");
+				Path.of("C:\\projects\\GalaxyObsUi\\baseUI\\heroes\\mods\\core.stormmod\\base.stormdata\\UI\\Layout\\UI\\GameUI.StormLayout");
 		final VTDGen vtd;
 		
 		try {
@@ -58,7 +61,7 @@ final class RecursiveVtdTest {
 		if (iterations != 0) {
 			System.out.println(
 					"recursive traversal took " + executionTime + "ms. Per iteration: " + executionTime / iterations +
-							"ms.");
+							"." + executionTime % iterations * 10 / iterations + "ms.");
 		} else {
 			System.out.println("no iterations performed");
 		}

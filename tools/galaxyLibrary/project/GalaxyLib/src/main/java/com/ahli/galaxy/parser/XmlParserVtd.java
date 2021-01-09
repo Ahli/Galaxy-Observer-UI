@@ -47,13 +47,13 @@ public class XmlParserVtd extends XmlParserAbstract {
 		if (vtd == null) {
 			vtd = new VTDGen();
 		}
-		attrTypes = new ArrayList<>();
-		attrValues = new ArrayList<>();
+		attrTypes = new ArrayList<>(3);
+		attrValues = new ArrayList<>(3);
 	}
 	
 	@Override
-	public void setConsumer(final ParsedXmlConsumer consumer2) {
-		consumer = consumer2;
+	public void setConsumer(final ParsedXmlConsumer consumer) {
+		this.consumer = consumer;
 		init();
 	}
 	
@@ -67,7 +67,7 @@ public class XmlParserVtd extends XmlParserAbstract {
 	
 	@Override
 	public void parseFile(final Path p) throws IOException {
-		logger.trace("parsing layout file: {}", () -> p.getFileName());
+		logger.trace("parsing layout file: {}", p::getFileName);
 		try {
 			final byte[] bytes = Files.readAllBytes(p);
 			// setdoc causes a nullpointer error due to an internal bug

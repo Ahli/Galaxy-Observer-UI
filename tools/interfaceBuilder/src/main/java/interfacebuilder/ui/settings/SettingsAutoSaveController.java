@@ -21,7 +21,7 @@ import java.io.IOException;
 public abstract class SettingsAutoSaveController implements Updateable {
 	private static final Logger logger = LogManager.getLogger(SettingsAutoSaveController.class);
 	
-	protected ConfigService configService;
+	protected final ConfigService configService;
 	@FXML
 	private Label savedAnimLabel;
 	private boolean lastSaveFailed;

@@ -54,12 +54,12 @@ public class UIState extends UIElement {
 	public Object deepCopy() {
 		final UIState clone = new UIState(getName(), whens.size(), actions.size());
 		final List<UIAttribute> whensClone = clone.whens;
-		for (int i = 0, len = whens.size(); i < len; i++) {
-			whensClone.add((UIAttribute) whens.get(i).deepCopy());
+		for (UIAttribute when : whens) {
+			whensClone.add((UIAttribute) when.deepCopy());
 		}
 		final List<UIAttribute> actionsClone = clone.actions;
-		for (int i = 0, len = actions.size(); i < len; i++) {
-			actionsClone.add((UIAttribute) actions.get(i).deepCopy());
+		for (UIAttribute action : actions) {
+			actionsClone.add((UIAttribute) action.deepCopy());
 		}
 		clone.nextAdditionShouldOverrideActions = nextAdditionShouldOverrideActions;
 		clone.nextAdditionShouldOverrideWhens = nextAdditionShouldOverrideWhens;

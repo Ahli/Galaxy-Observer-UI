@@ -3,7 +3,7 @@
 
 package interfacebuilder.ui.progress;
 
-import com.ahli.galaxy.game.def.abstracts.GameDef;
+import com.ahli.galaxy.game.GameDef;
 import interfacebuilder.base_ui.BaseUiService;
 import interfacebuilder.base_ui.ExtractBaseUiTask;
 import interfacebuilder.compress.GameService;
@@ -59,16 +59,9 @@ public class BaseUiExtractionController implements Updateable {
 		this.executor = executor;
 		this.appController = appController;
 		threadNames = new String[3];
-		for (int i = 0; i < threadNames.length; ++i) {
-			threadNames[i] = "extractThread_" + ++threadCount;
-		}
-	}
-	
-	/**
-	 * Automatically called by FxmlLoader
-	 */
-	public void initialize() {
-		// nothing to do
+		threadNames[0] = "extractThread_" + ++threadCount;
+		threadNames[1] = "extractThread_" + ++threadCount;
+		threadNames[2] = "extractThread_" + ++threadCount;
 	}
 	
 	@Override
@@ -78,7 +71,7 @@ public class BaseUiExtractionController implements Updateable {
 	
 	public void start(final Game game, final boolean usePtr) {
 		errorTabController.setRunning(true);
-		final GameDef exportedGameDef = gameService.getNewGameDef(game);
+		final GameDef exportedGameDef = gameService.getGameDef(game);
 		final String ptrString = usePtr ? " PTR" : "";
 		titleLabel.setText(String.format("Extract %s's Base UI", exportedGameDef.getName() + ptrString));
 		txtArea1.getChildren().clear();

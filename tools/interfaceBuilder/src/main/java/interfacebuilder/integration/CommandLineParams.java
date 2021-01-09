@@ -71,7 +71,7 @@ public class CommandLineParams implements Serializable {
 	private static String getInterfaceRootFromPath(final String path) {
 		String str = path;
 		if (path != null) {
-			while (str.length() > 0 && !str.endsWith("Interface")) {
+			while (!str.isEmpty() && !str.endsWith("Interface")) {
 				final int lastIndex = str.lastIndexOf(File.separatorChar);
 				if (lastIndex != -1) {
 					str = str.substring(0, lastIndex);

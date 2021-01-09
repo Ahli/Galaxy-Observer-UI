@@ -11,7 +11,6 @@ public class MpqEditorCompressionRuleSize extends MpqEditorCompressionRule {
 	private int maxSize;
 	
 	public MpqEditorCompressionRuleSize(final int minSize, final int maxSize) {
-		super();
 		this.minSize = minSize;
 		this.maxSize = maxSize;
 	}
@@ -34,8 +33,8 @@ public class MpqEditorCompressionRuleSize extends MpqEditorCompressionRule {
 	
 	@Override
 	public String toString() {
-		return "Size:" + minSize + "-" + maxSize + "=" + super.getAttributeString() + ", " +
-				super.getCompressionMethodString() + ", 0xFFFFFFFF";
+		return "Size:" + minSize + "-" + maxSize + "=" + getAttributeString() + ", " + getCompressionMethodString() +
+				", 0xFFFFFFFF";
 	}
 	
 	public int getMinSize() {

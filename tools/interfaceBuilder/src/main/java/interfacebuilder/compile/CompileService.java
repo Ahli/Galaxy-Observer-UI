@@ -155,8 +155,7 @@ public class CompileService {
 		private final DocumentBuilder dBuilder;
 		private final String[] extensions;
 		
-		public XmlVerifier(final DocumentBuilder dBuilder, final String[] extensions) {
-			super();
+		private XmlVerifier(final DocumentBuilder dBuilder, final String[] extensions) {
 			this.dBuilder = dBuilder;
 			this.extensions = extensions;
 		}

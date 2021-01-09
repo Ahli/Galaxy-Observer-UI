@@ -30,7 +30,6 @@ module interfacex.builder {
 	
 	// spring
 	//requires jakarta.activation;
-	requires java.xml.bind; // provides javax/xml/jaxbexception
 	requires org.hibernate.orm.core;
 	requires spring.beans;
 	requires spring.boot.autoconfigure;
@@ -40,9 +39,10 @@ module interfacex.builder {
 	requires spring.data.commons;
 	requires spring.data.jpa;
 	requires spring.tx;
-	requires com.fasterxml.classmate;
-	requires net.bytebuddy;
-	requires java.sql;
+	requires com.fasterxml.classmate;//redundant, but required!
+	requires net.bytebuddy; // redundant, but required!
+	requires java.sql; //redundant, but required!
+	requires java.xml.bind; // provides javax/xml/jaxbexception //redundant, but required!
 	requires org.apache.commons.lang3;
 	
 	// own projects

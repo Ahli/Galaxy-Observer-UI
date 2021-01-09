@@ -18,11 +18,10 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.List;
+import java.util.regex.Pattern;
 
 public class InterProcessCommunication implements AutoCloseable {
 	private static final Logger logger = LogManager.getLogger(InterProcessCommunication.class);
-	private AppController appController;
 	private ServerSocket serverSocket;
 	
 	public static boolean isPortFree(final int port) {
@@ -33,8 +32,40 @@ public class InterProcessCommunication implements AutoCloseable {
 		}
 	}
 	
-	public void setAppController(final AppController appController) {
-		this.appController = appController;
+	/**
+	 * Sends the arguments to the specified port. Received answers are logged.
+	 * <p>
+	 * This is a blocking instruction!
+	 *
+	 * @param args
+	 * @param port
+	 * @return true, if a connection with a server was established and stopped; else false
+	 */
+	public static boolean sendToServer(final String[] args, final int port) {
+		
+		try (final Socket socket = new Socket(InetAddress.getByAddress(new byte[] { 127, 0, 0, 1 }), port)) {
+			try (final PrintWriter out = new PrintWriter(socket.getOutputStream(), true, StandardCharsets.UTF_8);
+			     final BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream(),
+					     StandardCharsets.UTF_8))) {
+				// sending parameters
+				final String command = Arrays.toString(args);
+				logger.info("Sending: {}", command);
+				out.println(command);
+				
+				// receive answers
+				String inputLine;
+				while ((inputLine = in.readLine()) != null) {
+					if ("#BYE".equals(inputLine)) {
+						return true;
+					} else {
+						logger.info(inputLine);
+					}
+				}
+			}
+		} catch (final IOException e1) {
+			logger.fatal("Exception while sending parameters to primary instance.", e1);
+		}
+		return false;
 	}
 	
 	/**
@@ -74,44 +105,9 @@ public class InterProcessCommunication implements AutoCloseable {
 		return serverThread;
 	}
 	
-	/**
-	 * Sends the arguments to the specified port. Received answers are logged.
-	 * <p>
-	 * This is a blocking instruction!
-	 *
-	 * @param args
-	 * @param port
-	 * @return true, if a connection with a server was established and stopped; else false
-	 */
-	public boolean sendToServer(final String[] args, final int port) {
+	public static final class IpcServerThread extends Thread {
 		
-		try (final Socket socket = new Socket(InetAddress.getByAddress(new byte[] { 127, 0, 0, 1 }), port)) {
-			try (final PrintWriter out = new PrintWriter(socket.getOutputStream(), true, StandardCharsets.UTF_8);
-			     final BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream(),
-					     StandardCharsets.UTF_8))) {
-				// sending parameters
-				final String command = Arrays.toString(args);
-				logger.info("Sending: {}", command);
-				out.println(command);
-				
-				// receive answers
-				String inputLine;
-				while ((inputLine = in.readLine()) != null) {
-					if ("#BYE".equals(inputLine)) {
-						return true;
-					} else {
-						logger.info(inputLine);
-					}
-				}
-			}
-		} catch (final IOException e1) {
-			logger.fatal("Exception while sending parameters to primary instance.", e1);
-		}
-		return false;
-	}
-	
-	public static class IpcServerThread extends Thread {
-		
+		private static final Pattern COMMA_SEPARATED_REGEX_PATTERN = Pattern.compile(", ");
 		private final ServerSocket serverSocket;
 		private AppController appController;
 		
@@ -139,7 +135,7 @@ public class InterProcessCommunication implements AutoCloseable {
 			}
 		}
 		
-		private void handleConnectionAsServer(final Socket clientSocket) throws IOException {
+		private void handleConnectionAsServer(final Socket clientSocket) {
 			try (clientSocket;
 			     final PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true, StandardCharsets.UTF_8);
 			     final BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(),
@@ -148,8 +144,8 @@ public class InterProcessCommunication implements AutoCloseable {
 				String inputLine;
 				while ((inputLine = in.readLine()) != null) {
 					logger.info("received message from client: {}", inputLine);
-					final List<String> params =
-							Arrays.asList(inputLine.substring(1, inputLine.length() - 1).split(", "));
+					final String[] params =
+							COMMA_SEPARATED_REGEX_PATTERN.split(inputLine.substring(1, inputLine.length() - 1));
 					executeCommand(params);
 				}
 			} catch (final IOException e) {
@@ -165,10 +161,10 @@ public class InterProcessCommunication implements AutoCloseable {
 		/**
 		 * Executes the specified command line arguments.
 		 *
-		 * @param paramList
+		 * @param parameters
 		 */
-		private void executeCommand(final List<String> paramList) {
-			final CommandLineParams params = new CommandLineParams(true, paramList.toArray(new String[0]));
+		private void executeCommand(final String[] parameters) {
+			final CommandLineParams params = new CommandLineParams(true, parameters);
 			
 			if (params.isHasParamCompilePath() && appController != null) {
 				appController.buildStartReplayExit(params);

@@ -3,50 +3,18 @@
 
 package com.ahli.galaxy.game;
 
-import com.ahli.galaxy.game.def.abstracts.GameDef;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
+import lombok.Data;
 
 /**
  * Class containing the data of a game (Sc2/Heroes/...).
  *
  * @author Ahli
  */
+@Data
 public class GameData {
 	
 	private final GameDef gameDef;
 	private UICatalog uiCatalog;
-	
-	/**
-	 * Constructor.
-	 *
-	 * @param gameDef
-	 * 		game described by the data
-	 */
-	public GameData(final GameDef gameDef) {
-		this.gameDef = gameDef;
-		uiCatalog = null;
-	}
-	
-	/**
-	 * @return the uiCatalog
-	 */
-	public UICatalog getUiCatalog() {
-		return uiCatalog;
-	}
-	
-	/**
-	 * @param uiCatalog
-	 * 		the uiCatalog to set
-	 */
-	public void setUiCatalog(final UICatalog uiCatalog) {
-		this.uiCatalog = uiCatalog;
-	}
-	
-	/**
-	 * @return the gameDef
-	 */
-	public GameDef getGameDef() {
-		return gameDef;
-	}
 	
 }

@@ -5,9 +5,7 @@ package interfacebuilder.compress;
 
 import com.ahli.galaxy.ModData;
 import com.ahli.galaxy.game.GameData;
-import com.ahli.galaxy.game.def.HeroesGameDef;
-import com.ahli.galaxy.game.def.SC2GameDef;
-import com.ahli.galaxy.game.def.abstracts.GameDef;
+import com.ahli.galaxy.game.GameDef;
 import interfacebuilder.config.ConfigService;
 import interfacebuilder.integration.SettingsIniInterface;
 import interfacebuilder.projects.enums.Game;
@@ -26,7 +24,7 @@ public class GameService {
 	 * @return
 	 */
 	public ModData getModData(final Game game) {
-		return new ModData(new GameData(getNewGameDef(game)));
+		return new ModData(new GameData(getGameDef(game)));
 	}
 	
 	/**
@@ -35,10 +33,10 @@ public class GameService {
 	 * @param game
 	 * @return
 	 */
-	public GameDef getNewGameDef(final Game game) {
+	public GameDef getGameDef(final Game game) {
 		return switch (game) {
-			case SC2 -> new SC2GameDef();
-			case HEROES -> new HeroesGameDef();
+			case SC2 -> GameDef.buildSc2GameDef();
+			case HEROES -> GameDef.buildHeroesGameDef();
 		};
 	}
 	
@@ -66,10 +64,10 @@ public class GameService {
 	public String getGameDirPath(final GameDef gameDef, final boolean isPtr) {
 		final SettingsIniInterface iniSettings = configService.getIniSettings();
 		
-		if (gameDef instanceof SC2GameDef) {
+		if (GameDef.isSc2(gameDef)) {
 			return iniSettings.getSc2Path();
 		}
-		if (gameDef instanceof HeroesGameDef) {
+		if (GameDef.isHeroes(gameDef)) {
 			return isPtr ? iniSettings.getHeroesPtrPath() : iniSettings.getHeroesPath();
 		}
 		return null;

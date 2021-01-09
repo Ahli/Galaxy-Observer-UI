@@ -3,7 +3,6 @@
 
 package com.ahli.hotkey_ui.application.controller;
 
-import com.ahli.hotkey_ui.application.SettingsEditorApplication;
 import com.ahli.hotkey_ui.application.i18n.Messages;
 import com.ahli.hotkey_ui.application.model.ValueDef;
 import com.ahli.hotkey_ui.application.ui.DynamicValueDefEditingTableCell;
@@ -45,7 +44,6 @@ public class TabsController {
 	
 	private final ObservableList<ValueDef> hotkeysData = FXCollections.observableArrayList();
 	private final ObservableList<ValueDef> settingsData = FXCollections.observableArrayList();
-	private SettingsEditorApplication main;
 	@FXML
 	private TableView<ValueDef> hotkeysTable;
 	@FXML
@@ -70,10 +68,6 @@ public class TabsController {
 	private TableColumn<ValueDef, String> settingsValueCol;
 	@FXML
 	private TableColumn<ValueDef, Boolean> settingsActionsCol;
-	
-	public TabsController() {
-		// nothing to do
-	}
 	
 	/**
 	 * On Controller initialization.
@@ -106,20 +100,6 @@ public class TabsController {
 		
 		hotkeysTable.setItems(hotkeysData);
 		settingsTable.setItems(settingsData);
-	}
-	
-	/**
-	 * @return the main
-	 */
-	public SettingsEditorApplication getMain() {
-		return main;
-	}
-	
-	/**
-	 * @param main
-	 */
-	public void setMainApp(final SettingsEditorApplication main) {
-		this.main = main;
 	}
 	
 	/**

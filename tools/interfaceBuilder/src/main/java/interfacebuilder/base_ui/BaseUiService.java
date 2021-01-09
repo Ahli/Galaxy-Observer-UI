@@ -4,7 +4,7 @@
 package interfacebuilder.base_ui;
 
 import com.ahli.galaxy.game.GameData;
-import com.ahli.galaxy.game.def.abstracts.GameDef;
+import com.ahli.galaxy.game.GameDef;
 import com.ahli.galaxy.parser.UICatalogParser;
 import com.ahli.galaxy.parser.XmlParserVtd;
 import com.ahli.galaxy.ui.UICatalogImpl;
@@ -89,7 +89,7 @@ public class BaseUiService {
 	 * @return true, if outdated
 	 */
 	public boolean isOutdated(final Game game, final boolean usePtr) throws IOException {
-		final GameDef gameDef = gameService.getNewGameDef(game);
+		final GameDef gameDef = gameService.getGameDef(game);
 		final Path gameBaseUI = configService.getBaseUiPath(gameDef);
 		
 		if (!Files.exists(gameBaseUI) || fileService.isEmptyDirectory(gameBaseUI)) {
@@ -129,7 +129,7 @@ public class BaseUiService {
 		final Path path = directory.resolve(META_FILE_NAME);
 		if (Files.exists(path)) {
 			final Kryo kryo = kryoService.getKryoForBaseUiMetaFile();
-			final List<Class<?>> payloadClasses = new ArrayList<>();
+			final List<Class<?>> payloadClasses = new ArrayList<>(1);
 			payloadClasses.add(KryoGameInfo.class);
 			return (KryoGameInfo) kryoService.get(path, payloadClasses, kryo).get(0);
 		}
@@ -149,6 +149,7 @@ public class BaseUiService {
 			
 			for (final ResourceEntry entry : entries) {
 				final byte[] data = entry.getData();
+				@SuppressWarnings("ObjectAllocationInLoop")
 				final VersionInfo version = ResourceParser.readVersionInfo(data);
 				
 				final StringFileInfo strings = version.getStringFileInfo();
@@ -184,7 +185,7 @@ public class BaseUiService {
 	public List<ForkJoinTask<Void>> extract(final Game game, final boolean usePtr, final Appender[] outputs) {
 		logger.info("Extracting baseUI for {}", game);
 		
-		final GameDef gameDef = gameService.getNewGameDef(game);
+		final GameDef gameDef = gameService.getGameDef(game);
 		final Path destination = configService.getBaseUiPath(gameDef);
 		
 		try {
@@ -204,40 +205,12 @@ public class BaseUiService {
 		final String[] queryMasks = getQueryMasks(game);
 		int i = 0;
 		for (final String mask : queryMasks) {
-			final Appender outputAppender = outputs[i];
-			++i;
-			final ForkJoinTask<Void> task = new RecursiveAction() {
-				@Override
-				protected void compute() {
-					try {
-						if (extract(extractorExe, gamePath, mask, destination, outputAppender)) {
-							Thread.sleep(50);
-							if (extract(extractorExe, gamePath, mask, destination, outputAppender)) {
-								logger.warn(
-										"Extraction failed due to a file access. Try closing the Battle.net App, if it is running and this fails to extract all files.");
-							}
-						}
-					} catch (final IOException e) {
-						logger.error("Extracting files from CASC via CascExtractor failed.", e);
-					} catch (final InterruptedException e) {
-						Thread.currentThread().interrupt();
-					}
-				}
-			};
-			tasks.add(task);
+			final Appender outputAppender = outputs[i++];
+			//noinspection ObjectAllocationInLoop
+			tasks.add(new CascFileExtractionTask(extractorExe, gamePath, mask, destination, outputAppender));
 		}
 		
-		final ForkJoinTask<Void> task = new RecursiveAction() {
-			@Override
-			protected void compute() {
-				final int[] version = getVersion(gameDef, usePtr);
-				try {
-					writeToMetaFile(destination, gameDef.getName(), version, usePtr);
-				} catch (final IOException e) {
-					logger.error("Failed to write metafile: ", e);
-				}
-			}
-		};
+		final ForkJoinTask<Void> task = new ExtractVersionTask(gameDef, usePtr, destination, this);
 		tasks.add(task);
 		
 		return tasks;
@@ -254,56 +227,12 @@ public class BaseUiService {
 		};
 	}
 	
-	/**
-	 * @param extractorExe
-	 * @param gamePath
-	 * @param mask
-	 * @param destination
-	 * @param out
-	 * @return
-	 * @throws IOException
-	 * @throws InterruptedException
-	 */
-	private static boolean extract(
-			final File extractorExe,
-			final String gamePath,
-			final String mask,
-			final Path destination,
-			final Appender out) throws IOException, InterruptedException {
-		final ProcessBuilder pb = new ProcessBuilder(extractorExe.getAbsolutePath(),
-				gamePath + File.separator,
-				mask,
-				destination + File.separator);
-		// put error and normal output into the same stream
-		pb.redirectErrorStream(true);
-		
-		boolean retry = false;
-		final Process process = pb.start();
-		// empty output buffers and print to console
-		try (final InputStream is = process.getInputStream()) {
-			do {
-				//noinspection BusyWait
-				Thread.sleep(50);
-				final String log = IOUtils.toString(is, Charset.defaultCharset());
-				if (log.contains("Unhandled Exception: System.IO.IOException: The process cannot access the file")) {
-					retry = true;
-				} else {
-					if (out != null) {
-						out.append(log);
-					} else {
-						logger.info(log);
-					}
-				}
-			} while (process.isAlive());
-		}
-		return retry;
-	}
 	
 	private void writeToMetaFile(final Path directory, final String gameName, final int[] version, final boolean isPtr)
 			throws IOException {
 		final Path path = directory.resolve(META_FILE_NAME);
 		final KryoGameInfo metaInfo = new KryoGameInfo(version, gameName, isPtr);
-		final List<Object> payload = new ArrayList<>();
+		final List<Object> payload = new ArrayList<>(1);
 		payload.add(metaInfo);
 		final Kryo kryo = kryoService.getKryoForBaseUiMetaFile();
 		kryoService.put(path, payload, kryo);
@@ -370,10 +299,10 @@ public class BaseUiService {
 					// parse baseUI
 					uiCatalog = new UICatalogImpl();
 					uiCatalog.setParser(new UICatalogParser(uiCatalog, new XmlParserVtd(), true));
-					app.printInfoLogMessageToGeneral("Starting to parse base " + gameName + " UI.");
+					AppController.printInfoLogMessageToGeneral("Starting to parse base " + gameName + " UI.");
 					app.addThreadLoggerTab(Thread.currentThread().getName(),
 							gameData.getGameDef().getNameHandle() + "UI",
-							true);
+							false);
 					final String gameDir = configService.getBaseUiPath(gameData.getGameDef()) + File.separator +
 							gameData.getGameDef().getModsSubDirectory();
 					try {
@@ -381,11 +310,13 @@ public class BaseUiService {
 								new WildcardFileFilter("descindex.*layout", IOCase.INSENSITIVE);
 						for (final String modOrDir : gameData.getGameDef().getCoreModsOrDirectories()) {
 							
+							@SuppressWarnings("ObjectAllocationInLoop")
 							final File directory = new File(gameDir + File.separator + modOrDir);
 							if (!directory.exists() || !directory.isDirectory()) {
 								throw new IOException("BaseUI does not exist.");
 							}
 							
+							@SuppressWarnings("ObjectAllocationInLoop")
 							final Collection<File> descIndexFiles =
 									FileUtils.listFiles(directory, fileFilter, TrueFileFilter.INSTANCE);
 							logger.info("number of descIndexFiles found: {}", descIndexFiles.size());
@@ -409,7 +340,7 @@ public class BaseUiService {
 					}
 					final String msg = "Finished parsing base UI for " + gameName + ".";
 					logger.info(msg);
-					app.printInfoLogMessageToGeneral(msg);
+					AppController.printInfoLogMessageToGeneral(msg);
 					try {
 						discCacheService.put(uiCatalog, gameName, isPtr, getVersion(gameData.getGameDef(), isPtr));
 					} catch (final IOException e) {
@@ -442,9 +373,9 @@ public class BaseUiService {
 		try {
 			return cacheIsUpToDate(gameDef, usePtr);
 		} catch (final NoSuchFileException e) {
-			logger.trace("No cache exists for " + gameDef.getName(), e);
+			logger.trace(String.format("No cache exists for %s", gameDef.getName()), e);
 		} catch (final IOException e) {
-			logger.info("Failed to check cache status of " + gameDef.getName() + ":", e);
+			logger.info(String.format("Failed to check cache status of %s:", gameDef.getName()), e);
 		}
 		return false;
 	}
@@ -484,7 +415,7 @@ public class BaseUiService {
 	}
 	
 	public boolean isHeroesPtrActive() {
-		final Path baseUiMetaFileDir = configService.getBaseUiPath(gameService.getNewGameDef(Game.HEROES));
+		final Path baseUiMetaFileDir = configService.getBaseUiPath(gameService.getGameDef(Game.HEROES));
 		try {
 			final KryoGameInfo baseUiInfo = readMetaFile(baseUiMetaFileDir);
 			if (baseUiInfo != null) {
@@ -494,5 +425,117 @@ public class BaseUiService {
 			logger.error("ERROR while checking if ptr is active via baseUI cache file", e);
 		}
 		return false;
+	}
+	
+	private static final class CascFileExtractionTask extends RecursiveAction {
+		private final File extractorExe;
+		private final String gamePath;
+		private final String mask;
+		private final Path destination;
+		private final Appender outputAppender;
+		
+		private CascFileExtractionTask(
+				final File extractorExe,
+				final String gamePath,
+				final String mask,
+				final Path destination,
+				final Appender outputAppender) {
+			this.extractorExe = extractorExe;
+			this.gamePath = gamePath;
+			this.mask = mask;
+			this.destination = destination;
+			this.outputAppender = outputAppender;
+		}
+		
+		@Override
+		protected void compute() {
+			try {
+				if (extract(extractorExe, gamePath, mask, destination, outputAppender)) {
+					Thread.sleep(50);
+					if (extract(extractorExe, gamePath, mask, destination, outputAppender)) {
+						logger.warn(
+								"Extraction failed due to a file access. Try closing the Battle.net App, if it is running and this fails to extract all files.");
+					}
+				}
+			} catch (final IOException e) {
+				logger.error("Extracting files from CASC via CascExtractor failed.", e);
+			} catch (final InterruptedException e) {
+				Thread.currentThread().interrupt();
+			}
+		}
+		
+		/**
+		 * @param extractorExe
+		 * @param gamePath
+		 * @param mask
+		 * @param destination
+		 * @param out
+		 * @return
+		 * @throws IOException
+		 * @throws InterruptedException
+		 */
+		private static boolean extract(
+				final File extractorExe,
+				final String gamePath,
+				final String mask,
+				final Path destination,
+				final Appender out) throws IOException, InterruptedException {
+			final ProcessBuilder pb = new ProcessBuilder(extractorExe.getAbsolutePath(),
+					gamePath + File.separator,
+					mask,
+					destination + File.separator);
+			// put error and normal output into the same stream
+			pb.redirectErrorStream(true);
+			
+			boolean retry = false;
+			final Process process = pb.start();
+			// empty output buffers and print to console
+			try (final InputStream is = process.getInputStream()) {
+				do {
+					//noinspection BusyWait
+					Thread.sleep(50);
+					final String log = IOUtils.toString(is, Charset.defaultCharset());
+					if (log.contains("Unhandled Exception: System.IO.IOException: The process cannot access the file")) {
+						retry = true;
+					} else {
+						if (out != null) {
+							out.append(log);
+						} else {
+							logger.info(log);
+						}
+					}
+				} while (process.isAlive());
+			}
+			return retry;
+		}
+	}
+	
+	private static final class ExtractVersionTask extends RecursiveAction {
+		
+		private final GameDef gameDef;
+		private final boolean usePtr;
+		private final Path destination;
+		private final BaseUiService baseUiService;
+		
+		private ExtractVersionTask(
+				final GameDef gameDef,
+				final boolean usePtr,
+				final Path destination,
+				final BaseUiService baseUiService) {
+			this.gameDef = gameDef;
+			this.usePtr = usePtr;
+			this.destination = destination;
+			this.baseUiService = baseUiService;
+		}
+		
+		@Override
+		protected void compute() {
+			final int[] version = baseUiService.getVersion(gameDef, usePtr);
+			try {
+				baseUiService.writeToMetaFile(destination, gameDef.getName(), version, usePtr);
+			} catch (final IOException e) {
+				logger.error("Failed to write metafile: ", e);
+			}
+		}
 	}
 }

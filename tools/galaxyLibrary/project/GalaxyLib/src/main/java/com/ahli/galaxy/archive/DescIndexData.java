@@ -55,7 +55,7 @@ public class DescIndexData {
 	 */
 	public DescIndexData(final MpqInterface mpqi) {
 		this.mpqi = mpqi;
-		fileIntPathList = new ArrayList<>();
+		fileIntPathList = new ArrayList<>(10);
 	}
 	
 	/**
@@ -152,8 +152,7 @@ public class DescIndexData {
 	 * @return
 	 */
 	public Path getLayoutFilePath(final String intPath) {
-		for (int i = 0, len = fileIntPathList.size(); i < len; ++i) {
-			final Pair<Path, String> p = fileIntPathList.get(i);
+		for (final Pair<Path, String> p : fileIntPathList) {
 			if (p.getValue().equals(intPath)) {
 				return p.getKey();
 			}
@@ -190,8 +189,8 @@ public class DescIndexData {
 	 * @throws ParserConfigurationException
 	 */
 	public void orderLayoutFiles() throws ParserConfigurationException, SAXException, IOException {
-		final List<List<String>> dependencies = new ArrayList<>();
-		final List<List<String>> ownConstants = new ArrayList<>();
+		final List<List<String>> dependencies = new ArrayList<>(10);
+		final List<List<String>> ownConstants = new ArrayList<>(10);
 		
 		// grab dependencies and constant definitions for every layout file
 		List<String> layoutDeps;
@@ -226,7 +225,7 @@ public class DescIndexData {
 						while (curDependencyTo.startsWith(STRING2)) {
 							curDependencyTo = curDependencyTo.substring(1);
 						}
-						boolean constantDefinedBefore = false;
+						boolean constantNotDefinedBefore = true;
 						// check if it appears before the template
 						if (i > 0) {
 							y:
@@ -239,13 +238,13 @@ public class DescIndexData {
 								// fileName.lastIndexOf('.'));
 								for (final String constant : ownConstants.get(i2)) {
 									if (constant.equals(curDependencyTo)) {
-										constantDefinedBefore = true;
+										constantNotDefinedBefore = false;
 										break y;
 									}
 								}
 							}
 						}
-						if (!constantDefinedBefore) {
+						if (constantNotDefinedBefore) {
 							y:
 							for (int i2 = i + 1, len3 = dependencies.size(); i2 < len3; ++i2) {
 								final Pair<Path, String> otherPair = fileIntPathList.get(i2);

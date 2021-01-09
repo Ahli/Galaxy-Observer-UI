@@ -3,9 +3,6 @@
 
 package interfacebuilder.compress;
 
-//import jakarta.persistence.AttributeConverter;
-//import jakarta.persistence.Converter;
-
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 import java.util.ArrayList;
@@ -21,7 +18,7 @@ public class StringArrayToListConverter implements AttributeConverter<String[], 
 	@Override
 	public List<String> convertToDatabaseColumn(final String[] attribute) {
 		if (attribute == null || attribute.length <= 0) {
-			return new ArrayList<>();
+			return new ArrayList<>(10);
 		}
 		return Arrays.asList(attribute);
 	}
@@ -29,10 +26,11 @@ public class StringArrayToListConverter implements AttributeConverter<String[], 
 	@Override
 	public String[] convertToEntityAttribute(final List<String> dbData) {
 		if (dbData == null || dbData.isEmpty()) {
+			//noinspection ZeroLengthArrayAllocation
 			return new String[0];
 		}
 		
-		return dbData.toArray(new String[0]);
+		return dbData.toArray(new String[dbData.size()]);
 	}
 	
 }

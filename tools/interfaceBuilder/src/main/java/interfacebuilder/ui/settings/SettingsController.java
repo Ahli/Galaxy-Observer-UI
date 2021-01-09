@@ -46,18 +46,7 @@ public class SettingsController implements Updateable {
 		addCategoryItem(new TreeItem<>("Command Line Mode"), 2);
 		
 		// load page for selected setting
-		categoryTree.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<>() {
-			@Override
-			public void changed(
-					final ObservableValue<? extends TreeItem<String>> observable,
-					final TreeItem<String> oldVal,
-					final TreeItem<String> newVal) {
-				if (oldVal != newVal && newVal != null &&
-						newVal == categoryTree.getSelectionModel().getSelectedItem()) {
-					loadSettingsContent(newVal);
-				}
-			}
-		});
+		categoryTree.getSelectionModel().selectedItemProperty().addListener(new PageSelectionListener(this));
 	}
 	
 	/**
@@ -120,7 +109,7 @@ public class SettingsController implements Updateable {
 		try {
 			return loader.load(path);
 		} catch (final IOException e) {
-			logger.error("failed to load FXML: " + path + ".", e);
+			logger.error(String.format("failed to load FXML: %s.", path), e);
 		}
 		return null;
 	}
@@ -131,6 +120,25 @@ public class SettingsController implements Updateable {
 		// select first category if nothing is selected
 		if (selectionModel.getSelectedItem() == null) {
 			selectionModel.select(categoryTree.getRow(categories[0]));
+		}
+	}
+	
+	private static final class PageSelectionListener implements ChangeListener<TreeItem<String>> {
+		private final SettingsController settingsController;
+		
+		private PageSelectionListener(final SettingsController settingsController) {
+			this.settingsController = settingsController;
+		}
+		
+		@Override
+		public void changed(
+				final ObservableValue<? extends TreeItem<String>> observable,
+				final TreeItem<String> oldVal,
+				final TreeItem<String> newVal) {
+			if (oldVal != newVal && newVal != null &&
+					newVal == settingsController.categoryTree.getSelectionModel().getSelectedItem()) {
+				settingsController.loadSettingsContent(newVal);
+			}
 		}
 	}
 }

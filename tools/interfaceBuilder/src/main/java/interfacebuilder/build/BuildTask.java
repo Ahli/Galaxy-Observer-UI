@@ -15,8 +15,8 @@ public class BuildTask extends CleaningForkJoinTask {
 	
 	private final Project project;
 	private final boolean useCmdLineSettings;
-	private final transient MpqBuilderService mpqBuilderService;
-	private final transient BaseUiService baseUiService;
+	private final MpqBuilderService mpqBuilderService;
+	private final BaseUiService baseUiService;
 	
 	public BuildTask(
 			final CleaningForkJoinTaskCleaner cleaner,

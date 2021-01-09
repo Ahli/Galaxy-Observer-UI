@@ -138,7 +138,7 @@ public class NewProjectController {
 		
 		// try creating the template & clean up the project if it fails
 		try {
-			projectService.createTemplateProjectFiles(project);
+			ProjectService.createTemplateProjectFiles(project);
 			logger.trace("new project template created");
 		} catch (final IOException e) {
 			logger.error("ERROR: Could not create template for project.", e);

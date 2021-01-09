@@ -3,7 +3,6 @@
 
 package com.ahli.galaxy.ui.interfaces;
 
-import com.ahli.galaxy.parser.UICatalogParser;
 import com.ahli.galaxy.parser.interfaces.ParsedXmlConsumer;
 import com.ahli.galaxy.ui.UIConstant;
 import com.ahli.galaxy.ui.UITemplate;
@@ -29,7 +28,7 @@ public interface UICatalog extends DeepCopyable {
 	/**
 	 * Sets/Clears the XML Parser.
 	 */
-	void setParser(UICatalogParser parser);
+	void setParser(ParsedXmlConsumer parser);
 	
 	/**
 	 * @param f

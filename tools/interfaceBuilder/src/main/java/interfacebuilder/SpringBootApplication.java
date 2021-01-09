@@ -34,7 +34,7 @@ import static interfacebuilder.ui.AppController.FATAL_ERROR;
 		//"org.springframework.boot.autoconfigure.transaction.TransactionAutoConfiguration", // req
 		"org.springframework.boot.autoconfigure.transaction.jta.JtaAutoConfiguration" })
 @Import({ AppConfiguration.class, FxmlConfiguration.class })
-public class SpringBootApplication {
+public final class SpringBootApplication {
 	
 	public static final int INTER_PROCESS_COMMUNICATION_PORT = 12317;
 	
@@ -60,7 +60,7 @@ public class SpringBootApplication {
 	
 	private static boolean actAsClient(final String[] args) {
 		try (final InterProcessCommunication interProcessCommunication = new InterProcessCommunication()) {
-			if (interProcessCommunication.sendToServer(args, INTER_PROCESS_COMMUNICATION_PORT)) {
+			if (InterProcessCommunication.sendToServer(args, INTER_PROCESS_COMMUNICATION_PORT)) {
 				return true;
 			} else {
 				logger.error("InterProcessCommunication as Client failed as port is not free anymore");
@@ -95,20 +95,6 @@ public class SpringBootApplication {
 		
 		setJavaFxPreloader(AppPreloader.class.getCanonicalName());
 		Application.launch(JavafxApplication.class, argsWithServerThread(args, serverThread));
-		
-		/*
-		final JavafxApplication fxApp = new JavafxApplication(serverThread, args);
-		Platform.startup(() -> {
-			//launch JavaFx application
-			try {
-				fxApp.init();
-				final Stage primaryStage = new Stage();
-				fxApp.start(primaryStage);
-				fxApp.stop();
-			} catch (final Exception ex) {
-				ex.printStackTrace();
-			}
-		});*/
 	}
 	
 	private static String[] argsWithServerThread(final String[] args, final Thread serverThread) {

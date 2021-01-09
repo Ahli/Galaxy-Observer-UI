@@ -8,8 +8,6 @@ import interfacebuilder.projects.enums.Game;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -22,31 +20,23 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-//import jakarta.persistence.CascadeType;
-//import jakarta.persistence.Column;
-//import jakarta.persistence.Entity;
-//import jakarta.persistence.EnumType;
-//import jakarta.persistence.Enumerated;
-//import jakarta.persistence.FetchType;
-//import jakarta.persistence.GeneratedValue;
-//import jakarta.persistence.GenerationType;
-//import jakarta.persistence.Id;
-//import jakarta.persistence.OneToOne;
-//import jakarta.persistence.Table;
-
 @Entity
 @Table(name = "project")
 @Data
 @Builder
-@EqualsAndHashCode
-@ToString
 @AllArgsConstructor
-public class ProjectEntity {
+public class ProjectEntity implements Serializable {
+	
+	@Serial
+	private static final long serialVersionUID = -7732465886025160494L;
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;

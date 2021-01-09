@@ -68,7 +68,7 @@ public final class LayoutReaderDom {
 		final DocumentBuilder dBuilder = dbFac.newDocumentBuilder();
 		final Document doc = dBuilder.parse(f);
 		
-		final ArrayList<String> list = new ArrayList<>();
+		final ArrayList<String> list = new ArrayList<>(10);
 		
 		// check TEMPLATES
 		final NodeList nodes = doc.getElementsByTagName(ANY_TAG);
@@ -95,7 +95,7 @@ public final class LayoutReaderDom {
 							firstIndex = Math.min(firstIndex, firstIndex2);
 							final String layoutName = dependency.substring(0, firstIndex);
 							if (!layoutName.equalsIgnoreCase(nameWOfileEnding) &&
-									doesNotAppearInList(layoutName, list)) {
+									isNotAppearingInList(layoutName, list)) {
 								logger.trace("{} has dependency to {}", nameWOfileEnding, layoutName);
 								list.add(layoutName);
 							}
@@ -121,7 +121,7 @@ public final class LayoutReaderDom {
 		
 		// constantUsage
 		// nodes = doc.getElementsByTagName("*");
-		final ArrayList<String> usedConstants = new ArrayList<>();
+		final ArrayList<String> usedConstants = new ArrayList<>(10);
 		for (int i = 0, len = nodes.getLength(); i < len; ++i) {
 			final Node node = nodes.item(i);
 			
@@ -142,16 +142,16 @@ public final class LayoutReaderDom {
 				
 				// attribute name
 				final String attrName = attribute.getNodeName();
-				if (attrName.startsWith(CONSTANT_MARKER) && doesNotAppearInList(attrName, usedConstants) &&
-						doesConstantNotAppearInList(attrName, ownConstants)) {
+				if (attrName.startsWith(CONSTANT_MARKER) && isNotAppearingInList(attrName, usedConstants) &&
+						isConstantNotAppearingInList(attrName, ownConstants)) {
 					logger.trace("{} uses undefined constant {}", nameWOfileEnding, attrName);
 					usedConstants.add(attrName);
 					list.add(attrName);
 				}
 				// attribute value
 				final String attrValue = attribute.getNodeValue();
-				if (attrValue.startsWith(CONSTANT_MARKER) && doesNotAppearInList(attrValue, usedConstants) &&
-						doesConstantNotAppearInList(attrValue, ownConstants)) {
+				if (attrValue.startsWith(CONSTANT_MARKER) && isNotAppearingInList(attrValue, usedConstants) &&
+						isConstantNotAppearingInList(attrValue, ownConstants)) {
 					logger.trace("{} uses undefined constant {}", nameWOfileEnding, attrValue);
 					usedConstants.add(attrValue);
 					list.add(attrValue);
@@ -186,7 +186,7 @@ public final class LayoutReaderDom {
 	 * @param list
 	 * @return
 	 */
-	private static boolean doesNotAppearInList(final String query, final List<String> list) {
+	private static boolean isNotAppearingInList(final String query, final List<String> list) {
 		for (final String n : list) {
 			if (n.equalsIgnoreCase(query)) {
 				return false;
@@ -206,7 +206,7 @@ public final class LayoutReaderDom {
 	 */
 	public static List<String> getLayoutsConstantDefinitions(final Document doc) {
 		// create list of own constant definitions
-		final ArrayList<String> ownConstants = new ArrayList<>();
+		final ArrayList<String> ownConstants = new ArrayList<>(10);
 		final NodeList constants = doc.getElementsByTagName(CONSTANT);
 		for (int i = 0, len = constants.getLength(); i < len; ++i) {
 			final Node constant = constants.item(i);
@@ -232,7 +232,7 @@ public final class LayoutReaderDom {
 	 * @param list
 	 * @return
 	 */
-	private static boolean doesConstantNotAppearInList(final String constUsage, final List<String> list) {
+	private static boolean isConstantNotAppearingInList(final String constUsage, final List<String> list) {
 		
 		String name = constUsage;
 		

@@ -59,8 +59,11 @@ public final class XmlCompressorVtd {
 		final Collection<File> filesOfCache = FileUtils.listFiles(new File(cachePath), null, true);
 		
 		final VTDGen vtd = new VTDGen();
+		final AutoPilot ap = new AutoPilot();
+		final XMLModifier xm = new XMLModifier();
 		
 		for (final File curFile : filesOfCache) {
+			//noinspection ObjectAllocationInLoop
 			logger.trace("compression - processing file: {}", curFile::getPath);
 			
 			try {
@@ -72,10 +75,10 @@ public final class XmlCompressorVtd {
 				continue;
 			}
 			
-			final VTDNav nav = vtd.getNav();
-			final AutoPilot ap = new AutoPilot(nav);
 			try {
-				final XMLModifier xm = new XMLModifier(nav);
+				final VTDNav nav = vtd.getNav();
+				ap.bind(nav);
+				xm.bind(nav);
 				// remove comment nodes except first one
 				ap.selectXPath(COMMENT_XPATH);
 				for (int i = 0; i < ignoreCommentCountPerFile; ++i) {
@@ -104,7 +107,7 @@ public final class XmlCompressorVtd {
 					final int len = nav.getTokenLength(i);
 					final long l = nav.trimWhiteSpaces((((long) len) << 32) | offset, VTDNav.WS_BOTH);
 					final int nlen = (int) (l >> 32);
-					final int nos = (int) l;
+					final int nos = Math.toIntExact(l);
 					xm.updateToken(i, nav, nos, nlen);
 				}
 				

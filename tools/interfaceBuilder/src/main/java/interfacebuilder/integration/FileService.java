@@ -64,6 +64,7 @@ public class FileService {
 				i = pathTmp.lastIndexOf(sep);
 				if (i != -1) {
 					pathTmp = pathTmp.substring(0, i);
+					//noinspection ObjectAllocationInLoop
 					f = new File(pathTmp);
 				} else {
 					f = null;

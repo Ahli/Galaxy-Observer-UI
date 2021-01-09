@@ -44,6 +44,7 @@ import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -94,7 +95,7 @@ public class BrowseTabController implements Updateable {
 	/**
 	 * Indicates that the filter query Thread is still working on searches.
 	 */
-	private volatile boolean queryRunning;
+	private volatile boolean queryIdling;
 	/**
 	 * Value used for the next Query executed. This needs to be on the controller instance's scope, so it can be
 	 * overridden to skip unnecessary searches.
@@ -105,6 +106,7 @@ public class BrowseTabController implements Updateable {
 	private FrameTreeSelectionChangedHandler treeSelectionlistener;
 	
 	public BrowseTabController() {
+		queryIdling = true;
 		queryString = new SimpleStringProperty("");
 		
 		fileSelector = new AutoCompleteComboBox();
@@ -123,7 +125,7 @@ public class BrowseTabController implements Updateable {
 		if (attributes.size() == 2 && VAL.equals(attributes.get(0))) {
 			return attributes.get(1);
 		}
-		final StringBuilder str = new StringBuilder().append(attributes.get(0)).append('=').append(attributes.get(1));
+		final StringBuilder str = new StringBuilder(16).append(attributes.get(0)).append('=').append(attributes.get(1));
 		for (int i = 2, len = attributes.size(); i < len; i += 2) {
 			str.append(ATTRIBUTE_SEPARATOR).append(attributes.get(i)).append('=').append(attributes.get(i + 1));
 		}
@@ -146,13 +148,13 @@ public class BrowseTabController implements Updateable {
 	 * Automatically called by FxmlLoader
 	 */
 	public void initialize() {
-		AnchorPane.setTopAnchor(fileSelector, 5d);
-		AnchorPane.setLeftAnchor(fileSelector, 5d);
-		AnchorPane.setRightAnchor(fileSelector, 5d);
+		AnchorPane.setTopAnchor(fileSelector, 5.0d);
+		AnchorPane.setLeftAnchor(fileSelector, 5.0d);
+		AnchorPane.setRightAnchor(fileSelector, 5.0d);
 		
-		AnchorPane.setTopAnchor(templateSelector, 35d);
-		AnchorPane.setLeftAnchor(templateSelector, 5d);
-		AnchorPane.setRightAnchor(templateSelector, 5d);
+		AnchorPane.setTopAnchor(templateSelector, 35.0d);
+		AnchorPane.setLeftAnchor(templateSelector, 5.0d);
+		AnchorPane.setRightAnchor(templateSelector, 5.0d);
 		
 		anchorPane.getChildren().add(fileSelector);
 		anchorPane.getChildren().add(templateSelector);
@@ -166,24 +168,14 @@ public class BrowseTabController implements Updateable {
 		templateMap = new UnifiedMap<>();
 		
 		// must be strong EventHandler reference
-		fileSelector.setOnAction(new FileSelectionEventHandler());
+		fileSelector.setOnAction(new FileSelectionEventHandler(this));
 		
 		// must be strong EventHandler reference
-		templateSelector.setOnAction(new TemplateSelectionEventHandler());
+		templateSelector.setOnAction(new TemplateSelectionEventHandler(this));
 		
 		// table
-		columnAttributes.setCellValueFactory(new Callback<>() {
-			@Override
-			public ObservableValue<String> call(final TableColumn.CellDataFeatures<Map.Entry<String, String>, String> p) {
-				return new SimpleObjectProperty<>(p.getValue().getKey());
-			}
-		});
-		columnValues.setCellValueFactory(new Callback<>() {
-			@Override
-			public ObservableValue<String> call(final TableColumn.CellDataFeatures<Map.Entry<String, String>, String> p) {
-				return new SimpleObjectProperty<>(p.getValue().getValue());
-			}
-		});
+		columnAttributes.setCellValueFactory(new KeyCellFactory());
+		columnValues.setCellValueFactory(new ValueCellFactory());
 		columnAttributes.prefWidthProperty().bind(tableView.widthProperty().divide(3));
 		columnValues.prefWidthProperty().bind(tableView.widthProperty().divide(1.5).subtract(5));
 		columnAttributes.sortTypeProperty().set(TableColumn.SortType.ASCENDING);
@@ -203,21 +195,25 @@ public class BrowseTabController implements Updateable {
 	/**
 	 * @param filter
 	 */
-	private synchronized void filterTree(final String filter) {
-		queriedFilter = filter;
-		if (!queryRunning) {
-			queryRunning = true;
-			final TreeItem<UIElement> root = frameTree.getRoot();
-			final TreeItem<UIElement> selectedItem = frameTree.getSelectionModel().getSelectedItem();
-			final Node tableViewPlaceholderText = tableView.getPlaceholder();
-			tableView.setPlaceholder(new Text(""));
-			frameTree.setRoot(null);
-			
-			new Thread(new TreeFilteringRunnable(filter, root, selectedItem, tableViewPlaceholderText),
-					"BrowseFilter").start();
+	private void filterTree(final String filter) {
+		synchronized (this) {
+			queriedFilter = filter;
+			if (queryIdling) {
+				queryIdling = false;
+				final TreeItem<UIElement> root = frameTree.getRoot();
+				final TreeItem<UIElement> selectedItem = frameTree.getSelectionModel().getSelectedItem();
+				final Node tableViewPlaceholderText = tableView.getPlaceholder();
+				tableView.setPlaceholder(new Text(""));
+				frameTree.setRoot(null);
+				
+				new Thread(
+						new TreeFilteringRunnable(filter, root, selectedItem, tableViewPlaceholderText, this),
+						"BrowseFilter").start();
+			}
 		}
 	}
 	
+	@SuppressWarnings("ObjectAllocationInLoop")
 	private void showInTableView(final TreeItem<UIElement> selected) {
 		updatePath(selected);
 		if (selected == null) {
@@ -301,7 +297,7 @@ public class BrowseTabController implements Updateable {
 			children.remove(1);
 		}
 		if (elem != null) {
-			final String path = addParentPath(new StringBuilder(), elem).toString();
+			final String path = addParentPath(new StringBuilder(16), elem).toString();
 			final Text text = new Text(path);
 			text.setStyle("-fx-fill: white; -fx-font-smoothing-type: lcd;");
 			children.add(text);
@@ -370,10 +366,10 @@ public class BrowseTabController implements Updateable {
 	/**
 	 * Cell Factory for TreeCells that contain a TextFlow
 	 */
-	private static class FlowTreeCellFactory implements Callback<TreeView<UIElement>, TreeCell<UIElement>> {
+	private static final class FlowTreeCellFactory implements Callback<TreeView<UIElement>, TreeCell<UIElement>> {
 		private final TextFlowFactory flowFactory;
 		
-		public FlowTreeCellFactory(final TextFlowFactory flowFactory) {
+		private FlowTreeCellFactory(final TextFlowFactory flowFactory) {
 			this.flowFactory = flowFactory;
 		}
 		
@@ -383,10 +379,10 @@ public class BrowseTabController implements Updateable {
 		}
 	}
 	
-	private static class TreeFilteringChangeListener implements ChangeListener<String> {
+	private static final class TreeFilteringChangeListener implements ChangeListener<String> {
 		private final BrowseTabController controller;
 		
-		public TreeFilteringChangeListener(final BrowseTabController controller) {
+		private TreeFilteringChangeListener(final BrowseTabController controller) {
 			this.controller = controller;
 		}
 		
@@ -397,10 +393,10 @@ public class BrowseTabController implements Updateable {
 		}
 	}
 	
-	private static class FrameTreeSelectionChangedHandler implements ChangeListener<TreeItem<UIElement>> {
+	private static final class FrameTreeSelectionChangedHandler implements ChangeListener<TreeItem<UIElement>> {
 		private final BrowseTabController controller;
 		
-		public FrameTreeSelectionChangedHandler(final BrowseTabController controller) {
+		private FrameTreeSelectionChangedHandler(final BrowseTabController controller) {
 			this.controller = controller;
 		}
 		
@@ -414,39 +410,70 @@ public class BrowseTabController implements Updateable {
 		}
 	}
 	
-	private static class SearchCallable implements Callable<TreeItemPredicate<UIElement>> {
+	private static final class SearchCallable implements Callable<TreeItemPredicate<UIElement>> {
 		private final StringProperty queryString;
 		
-		public SearchCallable(final StringProperty queryString) {
+		private SearchCallable(final StringProperty queryString) {
 			this.queryString = queryString;
 		}
 		
 		@Override
 		public TreeItemPredicate<UIElement> call() {
-			return TreeItemPredicate.create(new Predicate<>() {
-				/* do not turn the Predicate into a lambda -> for some reason it becomes 2-3x slower except
-				for first usage */
-				@SuppressWarnings("squid:S1067") // reduce number of conditional operators
-				@Override
-				public boolean test(final UIElement element) {
-							/* I could not get this code any faster than this form (caching toUpperCase() was not
-							faster) */
-					return queryString.getValue().isEmpty() || (element.getName() != null &&
-							AutoCompleteComboBox.containsIgnoreCase(element.getName(), queryString.getValue())) ||
-							(element instanceof UIFrame &&
-									AutoCompleteComboBox.containsIgnoreCase(((UIFrame) element).getType(),
-											queryString.getValue()));
-				}
-			});
+			return TreeItemPredicate.create(new QueryPredicate(queryString));
+		}
+		
+		private static final class QueryPredicate implements Predicate<UIElement> {
+			private final StringProperty queryString;
+			
+			private QueryPredicate(final StringProperty queryString) {
+				this.queryString = queryString;
+			}
+			
+			/* do not turn the Predicate into a lambda -> for some reason it becomes 2-3x slower except
+						for first usage */
+			@SuppressWarnings("squid:S1067") // reduce number of conditional operators
+			@Override
+			public boolean test(final UIElement element) {
+						/* I could not get this code any faster than this form (caching toUpperCase() was not
+						faster) */
+				return queryString.getValue().isEmpty() || (element.getName() != null &&
+						AutoCompleteComboBox.containsIgnoreCase(element.getName(), queryString.getValue())) ||
+						(element instanceof UIFrame &&
+								AutoCompleteComboBox.containsIgnoreCase(((UIFrame) element).getType(),
+										queryString.getValue()));
+			}
 		}
 	}
 	
-	private class FileSelectionEventHandler implements EventHandler<ActionEvent> {
+	private static class KeyCellFactory implements
+			Callback<TableColumn.CellDataFeatures<Map.Entry<String, String>, String>, ObservableValue<String>> {
+		@Override
+		public ObservableValue<String> call(final TableColumn.CellDataFeatures<Map.Entry<String, String>, String> p) {
+			return new SimpleObjectProperty<>(p.getValue().getKey());
+		}
+	}
+	
+	private static class ValueCellFactory implements
+			Callback<TableColumn.CellDataFeatures<Map.Entry<String, String>, String>, ObservableValue<String>> {
+		@Override
+		public ObservableValue<String> call(final TableColumn.CellDataFeatures<Map.Entry<String, String>, String> p) {
+			return new SimpleObjectProperty<>(p.getValue().getValue());
+		}
+	}
+	
+	private static final class FileSelectionEventHandler implements EventHandler<ActionEvent> {
+		private final BrowseTabController browseTabController;
+		
+		private FileSelectionEventHandler(final BrowseTabController browseTabController) {
+			this.browseTabController = browseTabController;
+		}
+		
 		@Override
 		public void handle(final ActionEvent event) {
-			logger.trace("selection of file changed: {}", () -> fileSelector.getSelectionModel().getSelectedItem());
+			logger.trace("selection of file changed: {}",
+					() -> browseTabController.fileSelector.getSelectionModel().getSelectedItem());
 			try {
-				final String selectedFileName = fileSelector.getSelectionModel().getSelectedItem();
+				final String selectedFileName = browseTabController.fileSelector.getSelectionModel().getSelectedItem();
 				updateTemplateDropdown(selectedFileName);
 			} catch (final Exception e) {
 				logger.fatal(FATAL_ERROR, e);
@@ -457,16 +484,16 @@ public class BrowseTabController implements Updateable {
 		 * @param fileName
 		 */
 		private void updateTemplateDropdown(final String fileName) {
-			if (uiCatalog != null) {
-				templateMap.clear();
-				final List<String> templatesOfFile = new ArrayList<>();
+			if (browseTabController.uiCatalog != null) {
+				browseTabController.templateMap.clear();
+				final List<String> templatesOfFile = new ArrayList<>(10);
 				String firstSelection = null;
 				String name;
-				for (final UITemplate template : uiCatalog.getTemplates()) {
+				for (final UITemplate template : browseTabController.uiCatalog.getTemplates()) {
 					if (template.getFileName().equals(fileName)) {
 						name = template.getElement().getName();
 						templatesOfFile.add(name);
-						templateMap.put(name, template);
+						browseTabController.templateMap.put(name, template);
 						if (name.equals(GAME_UI)) {
 							firstSelection = name;
 						}
@@ -474,35 +501,41 @@ public class BrowseTabController implements Updateable {
 				}
 				final ObservableList<String> elementNames =
 						FXCollections.observableList(new ArrayList<>(templatesOfFile));
-				templateSelector.setItems(elementNames);
+				browseTabController.templateSelector.setItems(elementNames);
 				if (firstSelection != null) {
-					templateSelector.setValue(firstSelection);
+					browseTabController.templateSelector.setValue(firstSelection);
 				} else {
-					templateSelector.selectionModelProperty().get().selectFirst();
+					browseTabController.templateSelector.selectionModelProperty().get().selectFirst();
 				}
 			}
 		}
 	}
 	
-	private class TemplateSelectionEventHandler implements EventHandler<ActionEvent> {
-		private UITemplate curTreeTemplate = null;
+	private static final class TemplateSelectionEventHandler implements EventHandler<ActionEvent> {
+		private final BrowseTabController browseTabController;
+		private UITemplate curTreeTemplate;
+		
+		private TemplateSelectionEventHandler(final BrowseTabController browseTabController) {
+			this.browseTabController = browseTabController;
+		}
 		
 		@Override
 		public void handle(final ActionEvent event) {
 			try {
-				if (templateMap != null) {
-					final String selectedTemplateRootElem = templateSelector.getSelectionModel().getSelectedItem();
+				if (browseTabController.templateMap != null) {
+					final String selectedTemplateRootElem =
+							browseTabController.templateSelector.getSelectionModel().getSelectedItem();
 					logger.trace("selection of template changed: {}", selectedTemplateRootElem);
-					final UITemplate template = templateMap.get(selectedTemplateRootElem);
+					final UITemplate template = browseTabController.templateMap.get(selectedTemplateRootElem);
 					if (template != curTreeTemplate) {
 						final long start = System.currentTimeMillis();
 						curTreeTemplate = template;
-						framesTotal = 0;
+						browseTabController.framesTotal = 0;
 						createTree(template);
 						if (logger.isTraceEnabled()) {
 							logger.trace("Tree creation: {}ms , {} frames",
 									(System.currentTimeMillis() - start),
-									framesTotal);
+									browseTabController.framesTotal);
 						}
 					}
 				}
@@ -520,18 +553,20 @@ public class BrowseTabController implements Updateable {
 				final FilterableTreeItem<UIElement> rootItem = new FilterableTreeItem<>(rootElement);
 				
 				// set filter predicate
-				rootItem.predicateProperty().bind(Bindings.createObjectBinding(searchCallable, queryString));
+				rootItem.predicateProperty()
+						.bind(Bindings.createObjectBinding(browseTabController.searchCallable,
+								browseTabController.queryString));
 				
-				frameTree.setRoot(rootItem);
-				framesTotal += 1;
+				browseTabController.frameTree.setRoot(rootItem);
+				browseTabController.framesTotal += 1;
 				final ObservableList<TreeItem<UIElement>> treeItemChildren = rootItem.getInternalChildren();
 				for (final UIElement child : rootElement.getChildren()) {
 					createTree(child, treeItemChildren);
 				}
 				rootItem.expandedProperty().setValue(true);
-				frameTree.getSelectionModel().select(0);
+				browseTabController.frameTree.getSelectionModel().select(0);
 			} else {
-				frameTree.setRoot(null);
+				browseTabController.frameTree.setRoot(null);
 			}
 		}
 		
@@ -542,7 +577,7 @@ public class BrowseTabController implements Updateable {
 		private void createTree(final UIElement element, final ObservableList<TreeItem<UIElement>> parentsChildren) {
 			final FilterableTreeItem<UIElement> treeItem = new FilterableTreeItem<>(element);
 			parentsChildren.add(treeItem);
-			framesTotal += 1;
+			browseTabController.framesTotal += 1;
 			final ObservableList<TreeItem<UIElement>> treeItemChildren = treeItem.getInternalChildren();
 			final List<UIElement> children = element.getChildrenRaw();
 			if (children != null) {
@@ -554,62 +589,85 @@ public class BrowseTabController implements Updateable {
 		}
 	}
 	
-	private class TreeFilteringRunnable implements Runnable {
+	private static final class TreeFilteringRunnable implements Runnable {
 		private final String filter;
 		private final TreeItem<UIElement> root;
 		private final TreeItem<UIElement> selectedItem;
 		private final Node tableViewPlaceholderText;
+		private final BrowseTabController browseTabController;
 		
-		public TreeFilteringRunnable(
+		private TreeFilteringRunnable(
 				final String filter,
 				final TreeItem<UIElement> root,
 				final TreeItem<UIElement> selectedItem,
-				final Node tableViewPlaceholderText) {
+				final Node tableViewPlaceholderText,
+				final BrowseTabController browseTabController) {
 			this.filter = filter;
 			this.root = root;
 			this.selectedItem = selectedItem;
 			this.tableViewPlaceholderText = tableViewPlaceholderText;
+			this.browseTabController = browseTabController;
 		}
 		
 		@Override
 		public void run() {
 			String str = null;
-			while (!queriedFilter.equals(str)) {
+			while (!browseTabController.queriedFilter.equals(str)) {
 				final long startTime = System.currentTimeMillis();
-				str = queriedFilter;
-				flowFactory.setHighlight(str);
-				queryString.set(str.toUpperCase());
+				str = browseTabController.queriedFilter;
+				browseTabController.flowFactory.setHighlight(str);
+				browseTabController.queryString.set(str.toUpperCase(Locale.getDefault()));
 				logger.trace("filter apply: {}ms - {}", (System.currentTimeMillis() - startTime), str);
 			}
-			Platform.runLater(new TreeFilteringUiRunnable(str, filter));
+			Platform.runLater(new TreeFilteringUiRunnable(str,
+					filter,
+					browseTabController,
+					root,
+					selectedItem,
+					tableViewPlaceholderText));
 		}
 		
-		private class TreeFilteringUiRunnable implements Runnable {
+		private static final class TreeFilteringUiRunnable implements Runnable {
 			private final String curFilter;
 			private final String filter;
+			private final BrowseTabController browseTabController;
+			private final TreeItem<UIElement> selectedItem;
+			private final Node tableViewPlaceholderText;
+			private final TreeItem<UIElement> root;
 			
-			public TreeFilteringUiRunnable(final String curFilter, final String filter) {
+			private TreeFilteringUiRunnable(
+					final String curFilter,
+					final String filter,
+					final BrowseTabController browseTabController,
+					final TreeItem<UIElement> root,
+					final TreeItem<UIElement> selectedItem,
+					final Node tableViewPlaceholderText) {
 				this.curFilter = curFilter;
 				this.filter = filter;
+				this.browseTabController = browseTabController;
+				this.root = root;
+				this.selectedItem = selectedItem;
+				this.tableViewPlaceholderText = tableViewPlaceholderText;
 			}
 			
 			@Override
 			public void run() {
 				try {
-					if (frameTree != null && queriedFilter != null) {
+					if (browseTabController.frameTree != null && browseTabController.queriedFilter != null) {
+						final TreeView<UIElement> frameTree = browseTabController.frameTree;
 						frameTree.setRoot(root);
 						frameTree.getSelectionModel().select(selectedItem);
-						tableView.setPlaceholder(tableViewPlaceholderText);
+						browseTabController.tableView.setPlaceholder(tableViewPlaceholderText);
 						final int selectedIndex = frameTree.getSelectionModel().getSelectedIndex();
 						// scroll to slightly above the selected item
 						frameTree.scrollTo(Math.max(selectedIndex - 4, 0));
 						// clear tableview & path if the selected item is not visible OR re-show it when visible
-						showInTableView(selectedIndex < 0 ? null : selectedItem);
-						queryRunning = false;
-						if (!queryRunning && !queriedFilter.equals(curFilter)) {
+						browseTabController.showInTableView(selectedIndex < 0 ? null : selectedItem);
+						browseTabController.queryIdling = false;
+						if (!browseTabController.queryIdling && !browseTabController.queriedFilter.equals(curFilter)) {
 							//Query set, but Filter Thread is dead. -> try again
 							logger.error("Query set, but Filter Thread is dead. -> try again. Does this work?");
-							filterTree(filter);
+							browseTabController.filterTree(filter);
 						}
 					}
 				} catch (final Exception e) {

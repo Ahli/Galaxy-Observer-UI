@@ -24,27 +24,29 @@ public class AutoCompleteComboBox extends ComboBox<String> {
 	
 	/** Construct a new AutoCompleteTextField. */
 	public AutoCompleteComboBox() {
-		super();
 		setEditable(true);
 		
 		entriesPopup = new ContextMenu();
 		
-		TextField editor = this.getEditor();
+		final TextField editor = getEditor();
 		if (editor != null) {
 			editor.textProperty().addListener((observableValue, oldVal, newVal) -> {
-				if (newVal.length() == 0 || !AutoCompleteComboBox.this.isFocused()) {
+				if (newVal.isEmpty() || !isFocused()) {
 					entriesPopup.hide();
 				} else {
 					// TODO visually show the matching area in contextmenu's texts
 					final List<CustomMenuItem> menuItems = new LinkedList<>();
 					final int maxEntries = 20;
 					int curEntries = 0;
-					for (String item : getItems()) {
+					for (final String item : getItems()) {
 						if (containsIgnoreCase(item, newVal)) {
+							@SuppressWarnings("ObjectAllocationInLoop")
 							final Label entryLabel = new Label(item);
+							@SuppressWarnings("ObjectAllocationInLoop")
 							final CustomMenuItem menuItem = new CustomMenuItem(entryLabel, true);
+							//noinspection ObjectAllocationInLoop
 							menuItem.setOnAction(event -> {
-								AutoCompleteComboBox.this.getSelectionModel().select(item);
+								getSelectionModel().select(item);
 								entriesPopup.hide();
 							});
 							menuItems.add(menuItem);

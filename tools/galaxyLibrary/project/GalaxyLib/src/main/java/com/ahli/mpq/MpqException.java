@@ -3,6 +3,8 @@
 
 package com.ahli.mpq;
 
+import java.io.Serial;
+
 /**
  * Exception created while handling MPQ archives.
  *
@@ -10,11 +12,14 @@ package com.ahli.mpq;
  */
 public class MpqException extends Exception {
 	
+	@Serial
+	private static final long serialVersionUID = -2467412777989985295L;
+	
 	/**
-	 * @param string
+	 * @param message
 	 */
-	public MpqException(final String string) {
-		super(string);
+	public MpqException(final String message) {
+		super(message);
 	}
 	
 	/**
@@ -25,10 +30,10 @@ public class MpqException extends Exception {
 	}
 	
 	/**
-	 * @param msg
+	 * @param message
 	 * @param e
 	 */
-	public MpqException(final String msg, final Exception e) {
-		super(msg, e);
+	public MpqException(final String message, final Exception e) {
+		super(message, e);
 	}
 }

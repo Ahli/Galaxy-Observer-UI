@@ -119,7 +119,7 @@ public class BrowseController implements Updateable {
 	 * Automatically called by FxmlLoader
 	 */
 	public void initialize() {
-		controllers = new ArrayList<>();
+		controllers = new ArrayList<>(0);
 		heroesChoiceBox.setItems(FXCollections.observableArrayList(Messages.getString("browse.live"),
 				Messages.getString("browse.ptr")));
 		final boolean ptrActive = baseUiService.isHeroesPtrActive();
@@ -191,7 +191,7 @@ public class BrowseController implements Updateable {
 	
 	private String buildBaseUiDetailsString(final Game game, final boolean isPtr) {
 		final StringBuilder sb = new StringBuilder(25); // big enough for default case
-		final int[] version = baseUiService.getVersion(gameService.getNewGameDef(game), isPtr);
+		final int[] version = baseUiService.getVersion(gameService.getGameDef(game), isPtr);
 		for (final int v : version) {
 			sb.append(v).append('.');
 		}
@@ -254,7 +254,7 @@ public class BrowseController implements Updateable {
 			newTab.setContent(rootNode);
 			
 			extractionController = loader.getController();
-			final ErrorTabController errorTabCtrl = new ErrorTabController(newTab, newTxtArea, true, false, true);
+			final ErrorTabController errorTabCtrl = new ErrorTabController(newTab, newTxtArea, true, false, false);
 			extractionController.setErrorTabControl(errorTabCtrl);
 			controllers.add(extractionController);
 			
@@ -392,6 +392,7 @@ public class BrowseController implements Updateable {
 				}
 				mod.setMpqCacheDirectory(cachePath);
 				
+				@SuppressWarnings("ObjectAllocationInLoop")
 				final MpqEditorInterface mpqi = new MpqEditorInterface(cachePath, configService.getMpqEditorPath());
 				if (!mpqi.clearCacheExtractedMpq()) {
 					logger.error("ERROR: could not clear cache directory.");
@@ -404,6 +405,7 @@ public class BrowseController implements Updateable {
 					continue;
 				}
 				
+				@SuppressWarnings("ObjectAllocationInLoop")
 				final DescIndexData descIndexData = new DescIndexData(mpqi);
 				mod.setDescIndexData(descIndexData);
 				
@@ -418,6 +420,7 @@ public class BrowseController implements Updateable {
 					continue;
 				}
 				
+				@SuppressWarnings("ObjectAllocationInLoop")
 				final BrowseCompileTask task = new BrowseCompileTask(appController,
 						mod,
 						(BrowseTabController) controller,
@@ -429,13 +432,13 @@ public class BrowseController implements Updateable {
 		}
 	}
 	
-	private static class CloseTabAction implements EventHandler<ActionEvent> {
+	private static final class CloseTabAction implements EventHandler<ActionEvent> {
 		private final Tab tab;
 		private final BrowseTabController controller;
 		private final List<Updateable> controllers;
 		private final AppController appController;
 		
-		public CloseTabAction(
+		private CloseTabAction(
 				final Tab tab,
 				final BrowseTabController controller,
 				final List<Updateable> controllers,
@@ -459,12 +462,12 @@ public class BrowseController implements Updateable {
 		}
 	}
 	
-	private static class ExtractBaseUiCloseAction implements EventHandler<ActionEvent> {
+	private static final class ExtractBaseUiCloseAction implements EventHandler<ActionEvent> {
 		private final Tab tab;
 		private final BaseUiExtractionController controller;
 		private final List<Updateable> controllers;
 		
-		public ExtractBaseUiCloseAction(
+		private ExtractBaseUiCloseAction(
 				final Tab tab, final BaseUiExtractionController controller, final List<Updateable> controllers) {
 			this.tab = tab;
 			this.controller = controller;

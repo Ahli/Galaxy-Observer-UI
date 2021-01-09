@@ -37,8 +37,6 @@ public final class JarHelper {
 		logger.trace("_FINDING JAR'S PATH");
 		
 		// ATTEMPT #1
-		//		final File f = new File(System.getProperty("java.class.path"));
-		//		final File dir = f.getAbsoluteFile().getParentFile();
 		final File dir = new ApplicationHome(aclass).getDir();
 		String str = dir.toString();
 		logger.trace("Attempt#1 java.class.path: {}", dir::toString);
@@ -84,15 +82,6 @@ public final class JarHelper {
 			if (str.endsWith("/./")) {
 				str = str.substring(0, str.length() - 3);
 			}
-			
-			//			final URL url = aclass.getProtectionDomain().getCodeSource().getLocation();
-			// class returns "rsrc:./", if 2nd option during jar export was
-			// chosen
-/*			if (!url.toString().startsWith("rsrc:./")) {
-				// wild guess that we are in test environment
-				str += "/testEnv/dev/";
-				logger.trace("assuming Test Environment: " + str);
-			}*/
 			
 		} else {
 			if (str.contains(".jar;")) {

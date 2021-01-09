@@ -7,7 +7,7 @@ import com.ahli.galaxy.ModData;
 import com.ahli.galaxy.archive.ComponentsListReaderDom;
 import com.ahli.galaxy.archive.DescIndexData;
 import com.ahli.galaxy.game.GameData;
-import com.ahli.galaxy.game.def.abstracts.GameDef;
+import com.ahli.galaxy.game.GameDef;
 import com.ahli.galaxy.ui.DescIndexReader;
 import com.ahli.mpq.MpqEditorInterface;
 import com.ahli.mpq.MpqException;
@@ -82,9 +82,9 @@ public class MpqBuilderService {
 		final List<Project> projectsOfPath = projectService.getProjectsOfPath(path);
 		if (projectsOfPath.isEmpty()) {
 			final Game game;
-			if (projectService.pathContainsCompileableForGame(path, heroesBaseGameData)) {
+			if (ProjectService.pathContainsCompileableForGame(path, heroesBaseGameData)) {
 				game = Game.HEROES;
-			} else if (projectService.pathContainsCompileableForGame(path, sc2BaseGameData)) {
+			} else if (ProjectService.pathContainsCompileableForGame(path, sc2BaseGameData)) {
 				game = Game.SC2;
 			} else {
 				throw new IllegalArgumentException("Specified path '" + path + "' did not contain any project.");
@@ -158,7 +158,7 @@ public class MpqBuilderService {
 		try {
 			appController.addThreadLoggerTab(Thread.currentThread().getName(),
 					interfaceDirectory.getFileName().toString(),
-					false);
+					true);
 			// create unique cache path
 			final MpqEditorInterface threadsMpqInterface = new MpqEditorInterface(configService.getMpqCachePath()
 					.resolve(Long.toString(Thread.currentThread().getId())), configService.getMpqEditorPath());
@@ -244,7 +244,7 @@ public class MpqBuilderService {
 			final boolean verifyLayout,
 			final boolean verifyXml,
 			final Project project) throws IOException, InterruptedException {
-		appController.printInfoLogMessageToGeneral(sourceFile.getFileName() + " started construction.");
+		AppController.printInfoLogMessageToGeneral(sourceFile.getFileName() + " started construction.");
 		
 		final GameDef gameDef = game.getGameDef();
 		
@@ -358,10 +358,10 @@ public class MpqBuilderService {
 			project.setLastBuildSize(size);
 			logger.info("Finished building... {}. Size: {}kb", sourceFileName, size / 1024);
 			projectService.saveProject(project);
-			appController.printInfoLogMessageToGeneral(sourceFileName + " finished construction.");
+			AppController.printInfoLogMessageToGeneral(sourceFileName + " finished construction.");
 		} catch (final IOException | MpqException e) {
 			logger.error("ERROR: unable to construct final Interface file.", e);
-			appController.printErrorLogMessageToGeneral(sourceFileName + " could not be created.");
+			AppController.printErrorLogMessageToGeneral(sourceFileName + " could not be created.");
 		}
 	}
 	

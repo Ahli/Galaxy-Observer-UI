@@ -78,7 +78,7 @@ public class CompressionMiningController implements Updateable {
 	private Project project;
 	private ObservableList<MpqEditorCompressionRule> ruleSetObservableItems;
 	private Runnable task;
-	private boolean stopTaskNow = false;
+	private boolean keepTaskRunning;
 	private RandomCompressionMiner expCompMiner;
 	
 	public CompressionMiningController(
@@ -92,6 +92,7 @@ public class CompressionMiningController implements Updateable {
 		this.configService = configService;
 		this.fileService = fileService;
 		this.executor = executor;
+		keepTaskRunning = true;
 	}
 	
 	/**
@@ -190,7 +191,7 @@ public class CompressionMiningController implements Updateable {
 		if (task != null) {
 			return;
 		}
-		stopTaskNow = false;
+		keepTaskRunning = true;
 		task = () -> {
 			Path modTargetFile = null;
 			try {
@@ -227,7 +228,7 @@ public class CompressionMiningController implements Updateable {
 				updateUiSizeToBeat(bestSize);
 				long lastSize;
 				final RandomCompressionMiner comprMiner = expCompMiner;
-				for (int attempts = 1; !stopTaskNow && attempts < Integer.MAX_VALUE; ++attempts) {
+				for (int attempts = 1; keepTaskRunning && attempts < Integer.MAX_VALUE; ++attempts) {
 					comprMiner.randomizeRules();
 					lastSize = comprMiner.build();
 					updateUiAttemptSize(lastSize, attempts);
@@ -235,6 +236,7 @@ public class CompressionMiningController implements Updateable {
 						if (validateTargetFile(mod, expCompMiner.getMpqInterface())) {
 							bestSize = lastSize;
 							logger.info("Mined better compression of size {} kb.", lastSize / 1024);
+							//noinspection ObjectAllocationInLoop
 							project.setBestCompressionRuleSet(new RuleSet(comprMiner.getBestCompressionRules()));
 							projectService.saveProject(project);
 							updateUiSizeToBeat(lastSize);
@@ -276,7 +278,7 @@ public class CompressionMiningController implements Updateable {
 		if (task == null) {
 			return;
 		}
-		stopTaskNow = true;
+		keepTaskRunning = false;
 		task = null;
 		if (expCompMiner != null) {
 			final long newBest = expCompMiner.getBestSize();
@@ -339,7 +341,7 @@ public class CompressionMiningController implements Updateable {
 	 * @param mpqInterface
 	 * @return
 	 */
-	private boolean validateTargetFile(final ModData mod, final MpqEditorInterface mpqInterface) {
+	private static boolean validateTargetFile(final ModData mod, final MpqEditorInterface mpqInterface) {
 		final Path targetFile = mod.getTargetFile();
 		if (targetFile == null) {
 			return false;

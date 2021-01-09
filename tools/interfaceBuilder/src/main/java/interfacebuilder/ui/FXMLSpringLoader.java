@@ -39,7 +39,7 @@ public class FXMLSpringLoader extends FXMLLoader implements ApplicationContextAw
 	public <T> T load(final String resourceLocation) throws IOException {
 		if (context != null) {
 			final var res = context.getResource(resourceLocation);
-			super.setLocation(res.getURL());
+			setLocation(res.getURL());
 			try (final InputStream is = res.getInputStream()) {
 				return load(is);
 			}

@@ -20,8 +20,11 @@ import java.util.List;
 import java.util.Locale;
 
 final class RecursiveDOMTest {
-	private static final List<Object> list = new ArrayList<>();
+	private static final List<Object> list = new ArrayList<>(10);
 	private static final String TAG = "*";
+	
+	private RecursiveDOMTest() {
+	}
 	
 	public static void main(final String[] args) {
 		final long endMem;
@@ -32,13 +35,12 @@ final class RecursiveDOMTest {
 			e1.printStackTrace();
 			Thread.currentThread().interrupt();
 		}
-		System.out.println("memory: " + Runtime.getRuntime().totalMemory());
 		final Runtime rt = Runtime.getRuntime();
 		final long startMem = rt.totalMemory() - rt.freeMemory();
+		System.out.println("memory: " + ((float) startMem) / (1 << 20) + " MB.");
 		final long startTime = System.currentTimeMillis();
 		final File f = new File(
-				"D:\\Galaxy-Observer-UI\\baseUI\\heroes\\mods\\core.stormmod\\base.stormdata\\UI\\Layout\\UI\\GameUI" +
-						".StormLayout");
+				"C:\\projects\\GalaxyObsUi\\baseUI\\heroes\\mods\\core.stormmod\\base.stormdata\\UI\\Layout\\UI\\GameUI.StormLayout");
 		final DocumentBuilder dBuilder;
 		
 		try {
@@ -73,7 +75,7 @@ final class RecursiveDOMTest {
 		if (iterations != 0) {
 			System.out.println(
 					"recursive traversal took " + executionTime + "ms. Per iteration: " + executionTime / iterations +
-							"ms.");
+							"." + executionTime % iterations * 10 / iterations + "ms.");
 		} else {
 			System.out.println("no iterations performed");
 		}

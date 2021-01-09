@@ -5,9 +5,7 @@ package com.ahli.hotkey_ui.application;
 
 import com.ahli.galaxy.archive.ComponentsListReaderDom;
 import com.ahli.galaxy.archive.DescIndexData;
-import com.ahli.galaxy.game.def.HeroesGameDef;
-import com.ahli.galaxy.game.def.SC2GameDef;
-import com.ahli.galaxy.game.def.abstracts.GameDef;
+import com.ahli.galaxy.game.GameDef;
 import com.ahli.galaxy.ui.DescIndexReader;
 import com.ahli.hotkey_ui.application.controller.MenuBarController;
 import com.ahli.hotkey_ui.application.controller.TabsController;
@@ -77,10 +75,6 @@ public class SettingsEditorApplication extends Application {
 	private boolean hasUnsavedFileChanges;
 	private LayoutExtensionReader layoutExtReader;
 	
-	public SettingsEditorApplication() {
-		// nothing to do
-	}
-	
 	/**
 	 * Entry point of Application.
 	 *
@@ -138,12 +132,11 @@ public class SettingsEditorApplication extends Application {
 			logger.trace("initialized tab layout within {}ms.", () -> (System.nanoTime() - time2) / 1_000_000);
 			rootLayout.setCenter(tabPane);
 			tabsCtrl = loader.getController();
-			tabsCtrl.setMainApp(this);
 			
 			// ask to save on close
 			primaryStage.setOnCloseRequest(event -> {
-				final boolean notCancelled = askToSaveUnsavedChanges();
-				if (!notCancelled) {
+				final boolean cancelled = !askToSaveUnsavedChanges();
+				if (cancelled) {
 					// cancel closing
 					event.consume();
 				}
@@ -323,7 +316,7 @@ public class SettingsEditorApplication extends Application {
 		final long time = System.nanoTime();
 		
 		// cannot save, if not valid
-		if (!isValidOpenedDocPath()) {
+		if (isInvalidOpenedDocPath()) {
 			return;
 		}
 		
@@ -354,8 +347,8 @@ public class SettingsEditorApplication extends Application {
 	 *
 	 * @return
 	 */
-	public boolean isValidOpenedDocPath() {
-		return openedDocPath != null && !"".equals(openedDocPath.toString());
+	public boolean isInvalidOpenedDocPath() {
+		return openedDocPath == null || "".equals(openedDocPath.toString());
 	}
 	
 	/**
@@ -453,6 +446,7 @@ public class SettingsEditorApplication extends Application {
 		new Thread(() -> {
 			final Thread curThread = Thread.currentThread();
 			curThread.setPriority(Thread.NORM_PRIORITY);
+			//noinspection DynamicRegexReplaceableByCompiledPattern
 			curThread.setName(curThread.getName().replaceFirst("Thread", "Open"));
 			openMpqFile(file);
 		}).start();
@@ -475,7 +469,7 @@ public class SettingsEditorApplication extends Application {
 				}
 				
 				final boolean isNamespaceHeroes = isNameSpaceHeroes(mpqi);
-				final GameDef game = isNamespaceHeroes ? new HeroesGameDef() : new SC2GameDef();
+				final GameDef game = isNamespaceHeroes ? GameDef.buildHeroesGameDef() : GameDef.buildSc2GameDef();
 				
 				// load desc index from mpq
 				descIndex.setDescIndexPathAndClear(ComponentsListReaderDom.getDescIndexPath(componentListFile, game));
@@ -588,6 +582,7 @@ public class SettingsEditorApplication extends Application {
 		new Thread(() -> {
 			final Thread curThread = Thread.currentThread();
 			curThread.setPriority(Thread.NORM_PRIORITY);
+			//noinspection DynamicRegexReplaceableByCompiledPattern
 			curThread.setName(curThread.getName().replaceFirst("Thread", "Save"));
 			saveUiMpq();
 		}).start();
@@ -598,7 +593,7 @@ public class SettingsEditorApplication extends Application {
 	 */
 	public void saveAsUiMpq() {
 		// cannot save, if not valid
-		if (!isValidOpenedDocPath()) {
+		if (isInvalidOpenedDocPath()) {
 			return;
 		}
 		

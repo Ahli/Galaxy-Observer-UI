@@ -9,7 +9,6 @@ import java.util.Objects;
 public class MpqEditorCompressionRuleDefault extends MpqEditorCompressionRule {
 	
 	public MpqEditorCompressionRuleDefault() {
-		super();
 	}
 	
 	/**
@@ -23,7 +22,7 @@ public class MpqEditorCompressionRuleDefault extends MpqEditorCompressionRule {
 	
 	@Override
 	public String toString() {
-		return "Default=" + super.getAttributeString() + ", " + super.getCompressionMethodString() + ", 0xFFFFFFFF";
+		return "Default=" + getAttributeString() + ", " + getCompressionMethodString() + ", 0xFFFFFFFF";
 	}
 	
 	@Override

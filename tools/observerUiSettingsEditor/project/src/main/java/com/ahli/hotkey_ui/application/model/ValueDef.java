@@ -66,7 +66,7 @@ public class ValueDef {
 		}
 		this.type = resultType;
 		
-		if (resultType.equals(ValueType.BOOLEAN) && defaultValue.isEmpty()) {
+		if (resultType == ValueType.BOOLEAN && defaultValue.isEmpty()) {
 			setDefaultValue("false");
 		}
 	}

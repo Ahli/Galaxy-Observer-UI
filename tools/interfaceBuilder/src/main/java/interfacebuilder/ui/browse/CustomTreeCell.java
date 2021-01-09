@@ -11,7 +11,6 @@ public class CustomTreeCell extends TreeCell<UIElement> {
 	private final TextFlowFactory flowFactory;
 	
 	public CustomTreeCell(final TextFlowFactory flowFactory) {
-		super();
 		this.flowFactory = flowFactory;
 	}
 	

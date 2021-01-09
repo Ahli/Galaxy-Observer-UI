@@ -42,8 +42,8 @@ public class BrowseCompileTask extends CleaningForkJoinTask {
 			final String raceId = configService.getRaceId();
 			final String consoleSkinId = configService.getConsoleSkinId();
 			final UICatalog uiCatalog = compileService.compile(mod, raceId, false, true, true, consoleSkinId);
-			mod.setUi(uiCatalog);
-			controller.setData(mod.getUi());
+			mod.setUiCatalog(uiCatalog);
+			controller.setData(mod.getUiCatalog());
 		} catch (final InterruptedException e) {
 			Thread.currentThread().interrupt();
 			return false;

@@ -3,7 +3,7 @@
 
 package interfacebuilder.config;
 
-import com.ahli.galaxy.game.def.abstracts.GameDef;
+import com.ahli.galaxy.game.GameDef;
 import interfacebuilder.integration.SettingsIniInterface;
 
 import java.io.File;

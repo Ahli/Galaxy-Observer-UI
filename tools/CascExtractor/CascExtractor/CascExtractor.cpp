@@ -54,17 +54,18 @@ int main(const int argc, const char* const argv[])
 		HANDLE hStorage;
 
 		if (!CascOpenStorage(path, 0, &hStorage)) {
-			std::cerr << "ERROR: opening storage: " << GetLastError() << std::endl;
+			std::cerr << "ERROR: opening storage: " << GetCascError() << std::endl;
 			return EXIT_FAILURE;
 		}
 
 		std::cout << "Finding files with mask: " << mask << std::endl;
 
 		const LPCTSTR listFile = NULL;
-		const PCASC_FIND_DATA pFindData = &CASC_FIND_DATA();
+		CASC_FIND_DATA findData = {};
+		const PCASC_FIND_DATA pFindData = &findData;
 		HANDLE hFind = CascFindFirstFile(hStorage, mask, pFindData, listFile);
 		if (hFind == INVALID_HANDLE_VALUE) {
-			if (GetLastError() == ERROR_SUCCESS) {
+			if (GetCascError() == ERROR_SUCCESS) {
 				std::cout << "Found 0 files for mask: " << mask << std::endl;
 				CascFindClose(hFind);
 				CleanUpStorage(hStorage);
@@ -102,16 +103,17 @@ int main(const int argc, const char* const argv[])
 		std::cout << "Extracted " << results << " file" << (results == 1 ? "" : "s") << " for mask: " << mask << std::endl;
 
 		// clean up
-		const bool findFailed = (GetLastError() != ERROR_NO_MORE_FILES && GetLastError() != ERROR_SUCCESS);
+		const bool findFailed = (GetCascError() != ERROR_NO_MORE_FILES && GetCascError() != ERROR_SUCCESS);
 		const int exitCode = findFailed ? EXIT_FAILURE : EXIT_SUCCESS;
 		return CleanUp(exitCode, hStorage, hFind);
 	}
-	catch (std::exception e) {
+	catch (const std::exception& e) {
 		std::cout << "ERROR: " << e.what() << std::endl;
 	}
 	catch (...) {
 		std::cout << "An unknown fatal error occurred." << std::endl;
 	}
+	return 0;
 }
 
 /// <summary>
@@ -159,7 +161,7 @@ static bool CleanUpFind(HANDLE hFind) noexcept {
 
 template <typename T> T* CASC_ALLOC(size_t nCount) noexcept
 {
-	return (T*)malloc(nCount * sizeof(T));
+	return static_cast<T*>(malloc(nCount * sizeof(T)));
 }
 
 template <typename T> void CASC_FREE(T*& ptr) noexcept
@@ -224,9 +226,9 @@ static bool ExtractFile(HANDLE hStorage, const CASC_FIND_DATA& findData, const c
 			// and the amount of memcpys will be almost zero
 			for (DWORD i = 0; i < fileInfo.SpanCount && dwErrCode == ERROR_SUCCESS; i++)
 			{
-				const PCASC_FILE_SPAN_INFO const pFileSpan = pSpans + i;
+				const PCASC_FILE_SPAN_INFO pFileSpan = pSpans + i;
 				LPBYTE pbFileSpan = nullptr;
-				const DWORD cbFileSpan = (DWORD)(pFileSpan->EndOffset - pFileSpan->StartOffset);
+				const DWORD cbFileSpan = static_cast<DWORD>(pFileSpan->EndOffset - pFileSpan->StartOffset);
 
 				// Do not read empty spans.
 				if (cbFileSpan == 0)
@@ -248,7 +250,7 @@ static bool ExtractFile(HANDLE hStorage, const CASC_FIND_DATA& findData, const c
 				{
 					// Do not report some errors; for example, when the file is encrypted,
 					// we can't do much about it. Only report it if we are going to extract one file
-					switch (dwErrCode = GetLastError())
+					switch (dwErrCode = GetCascError())
 					{
 					case ERROR_SUCCESS: {
 					} break;
@@ -319,7 +321,7 @@ static bool ExtractFile(HANDLE hStorage, const CASC_FIND_DATA& findData, const c
 	else
 	{
 		std::cout << "   WARNING: could not open file: " << szOpenName << std::endl;
-		dwErrCode = GetLastError();
+		dwErrCode = GetCascError();
 	}
 
 	//std::cout << "   returning error code: " << dwErrCode << std::endl;

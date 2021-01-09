@@ -1,6 +1,6 @@
 package interfacebuilder.ui;
 
-import com.ahli.galaxy.game.def.abstracts.GameDef;
+import com.ahli.galaxy.game.GameDef;
 import com.ahli.util.StringInterner;
 import interfacebuilder.JavafxApplication;
 import interfacebuilder.base_ui.BaseUiService;
@@ -9,7 +9,7 @@ import interfacebuilder.compress.GameService;
 import interfacebuilder.config.ConfigService;
 import interfacebuilder.i18n.Messages;
 import interfacebuilder.integration.CommandLineParams;
-import interfacebuilder.integration.ReplayFinder;
+import interfacebuilder.integration.ReplayService;
 import interfacebuilder.integration.SettingsIniInterface;
 import interfacebuilder.integration.log4j.InterProcessCommunicationAppender;
 import interfacebuilder.integration.log4j.StylizedTextAreaAppender;
@@ -59,14 +59,30 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 	private BaseUiService baseUiService;
 	private MpqBuilderService mpqBuilderService;
 	private GameService gameService;
-	private ReplayFinder replayFinder;
 	private ConfigService configService;
 	private ConfigurableApplicationContext appContext;
 	private Stage primaryStage;
 	private NavigationController navigationController;
+	private ReplayService replayService;
 	
 	public AppController() {
 		errorTabControllers = new ArrayList<>(0);
+	}
+	
+	/**
+	 * Prints a message to the message log.
+	 *
+	 * @param msg
+	 * 		the message
+	 */
+	public static void printErrorLogMessageToGeneral(final String msg) {
+		Platform.runLater(() -> {
+			try {
+				logger.error(msg);
+			} catch (final Exception e) {
+				logger.fatal(FATAL_ERROR, e);
+			}
+		});
 	}
 	
 	// Lazy Constructor injection does not work as java-modules requires access to swap out the proxy class with the bean
@@ -78,16 +94,16 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 			@Lazy final BaseUiService baseUiService,
 			@Lazy final MpqBuilderService mpqBuilderService,
 			final GameService gameService,
-			final ReplayFinder replayFinder,
 			final ConfigService configService,
+			final ReplayService replayService,
 			final ConfigurableApplicationContext appContext) {
 		this.executor = executor;
 		this.tabPaneController = tabPaneController;
 		this.baseUiService = baseUiService;
 		this.mpqBuilderService = mpqBuilderService;
 		this.gameService = gameService;
-		this.replayFinder = replayFinder;
 		this.configService = configService;
+		this.replayService = replayService;
 		this.appContext = appContext;
 	}
 	
@@ -319,7 +335,7 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 	 */
 	private boolean anyErrorTrackerEncounteredError() {
 		for (final ErrorTabController ctrl : errorTabControllers) {
-			if (ctrl.hasEncounteredError() && !ctrl.isErrorsDoNotPreventExit()) {
+			if (ctrl.hasEncounteredError() && ctrl.isErrorPreventsExit()) {
 				return true;
 			}
 		}
@@ -349,7 +365,7 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 			if (params.getParamCompilePath().contains(File.separator + "heroes" + File.separator)) {
 				// Heroes
 				isHeroes = true;
-				gameDef = gameService.getNewGameDef(Game.HEROES);
+				gameDef = gameService.getGameDef(Game.HEROES);
 				final boolean isPtr = baseUiService.isHeroesPtrActive();
 				final String supportDir = gameDef.getSupportDirectoryX64();
 				final String swicherExe = gameDef.getSwitcherExeNameX64();
@@ -359,7 +375,7 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 			} else {
 				// SC2
 				isHeroes = false;
-				gameDef = gameService.getNewGameDef(Game.SC2);
+				gameDef = gameService.getGameDef(Game.SC2);
 				final boolean is64bit = settings.isSc64bit();
 				final String supportDir = is64bit ? gameDef.getSupportDirectoryX64() : gameDef.getSupportDirectoryX32();
 				final String swicherExe = is64bit ? gameDef.getSwitcherExeNameX64() : gameDef.getSwitcherExeNameX32();
@@ -368,7 +384,7 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 		}
 		logger.info("Game location: {}", gamePath);
 		
-		final File replay = replayFinder.getLastUsedOrNewestReplay(isHeroes, configService.getDocumentsPath());
+		final File replay = replayService.getLastUsedOrNewestReplay(isHeroes, configService.getDocumentsPath());
 		if (replay != null && replay.exists() && replay.isFile()) {
 			logger.info("Starting game with replay: {}", replay.getName());
 			try {
@@ -390,7 +406,7 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 	 */
 	private void clearErrorTrackers() {
 		for (final ErrorTabController ctrl : errorTabControllers) {
-			if (ctrl.hasEncounteredError() && !ctrl.isErrorsDoNotPreventExit()) {
+			if (ctrl.hasEncounteredError() && ctrl.isErrorPreventsExit()) {
 				ctrl.clearError(false);
 			}
 		}
@@ -402,7 +418,7 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 	 * @param msg
 	 * 		the message
 	 */
-	public void printInfoLogMessageToGeneral(final String msg) {
+	public static void printInfoLogMessageToGeneral(final String msg) {
 		Platform.runLater(() -> {
 			try {
 				logger.info(msg);
@@ -438,7 +454,7 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 	 * @param tabName
 	 */
 	public void addThreadLoggerTab(
-			final String threadName, final String tabName, final boolean errorsDoNotPreventExit) {
+			final String threadName, final String tabName, final boolean errorPreventsExit) {
 		final ObservableList<Tab> tabs = getTabPane().getTabs();
 		Tab newTab = null;
 		
@@ -455,7 +471,7 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 			final TextFlow newTxtArea = new TextFlow();
 			newTxtArea.getStyleClass().add("styled-text-area");
 			final ErrorTabController errorTabCtrl =
-					new ErrorTabController(newTab, newTxtArea, true, false, errorsDoNotPreventExit);
+					new ErrorTabController(newTab, newTxtArea, true, false, errorPreventsExit);
 			errorTabCtrl.setRunning(true);
 			errorTabControllers.add(errorTabCtrl);
 			
@@ -493,7 +509,7 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 				StylizedTextAreaAppender.setWorkerTaskController(errorTabCtrl, threadName);
 				Platform.runLater(() -> {
 					try {
-						errorTabCtrl.setErrorsDoNotPreventExit(errorsDoNotPreventExit);
+						errorTabCtrl.setErrorPreventsExit(errorPreventsExit);
 						errorTabCtrl.clearError(false);
 						errorTabCtrl.clearWarning(false);
 						errorTabCtrl.setRunning(true);
@@ -539,22 +555,6 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 	}
 	
 	/**
-	 * Prints a message to the message log.
-	 *
-	 * @param msg
-	 * 		the message
-	 */
-	public void printErrorLogMessageToGeneral(final String msg) {
-		Platform.runLater(() -> {
-			try {
-				logger.error(msg);
-			} catch (final Exception e) {
-				logger.fatal(FATAL_ERROR, e);
-			}
-		});
-	}
-	
-	/**
 	 * Returns the primary Stage of the App.
 	 *
 	 * @return
@@ -563,31 +563,12 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 		return primaryStage;
 	}
 	
-	public void onAppClosing() {
-		logger.info("App is about to shut down.");
-		if (!executor.isShutdown()) {
-			executor.shutdownNow();
-		} else {
-			logger.info("Executor was already shut down.");
-		}
-		try {
-			//noinspection ResultOfMethodCallIgnored
-			executor.awaitTermination(120L, TimeUnit.SECONDS);
-		} catch (final InterruptedException e) {
-			logger.error("ERROR: Executor timed out waiting for Worker Theads to terminate. A Thread might run rampage.",
-					e);
-			Thread.currentThread().interrupt();
-		}
-		logger.info("App waves Goodbye!");
-		appContext.stop();
-	}
-	
-	private static class CloseThreadLoggerTabAction implements EventHandler<ActionEvent> {
+	private static final class CloseThreadLoggerTabAction implements EventHandler<ActionEvent> {
 		private final Tab tab;
 		private final ErrorTabController controller;
 		private final List<ErrorTabController> controllers;
 		
-		public CloseThreadLoggerTabAction(
+		private CloseThreadLoggerTabAction(
 				final Tab tab, final ErrorTabController controller, final List<ErrorTabController> controllers) {
 			this.tab = tab;
 			this.controller = controller;

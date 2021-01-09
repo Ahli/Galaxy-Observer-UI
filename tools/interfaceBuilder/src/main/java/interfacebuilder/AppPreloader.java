@@ -19,26 +19,22 @@ public class AppPreloader extends Preloader {
 	private static final Logger logger = LogManager.getLogger(AppPreloader.class);
 	private Stage stage;
 	
-	public AppPreloader() {
-		super();
-	}
-	
 	@Override
-	public void start(final Stage stage) {
-		this.stage = stage;
+	public void start(final Stage primaryStage) {
+		stage = primaryStage;
 		final ProgressIndicator progressIndicator = new ProgressIndicator(-1);
 		final Scene scene = new Scene(progressIndicator, 90, 90);
-		stage.initStyle(StageStyle.TRANSPARENT);
+		primaryStage.initStyle(StageStyle.TRANSPARENT);
 		scene.setFill(Color.TRANSPARENT);
 		try {
 			scene.getStylesheets().add(getClass().getResource("/view/preload.css").toURI().toString());
 		} catch (final URISyntaxException e) {
 			logger.error("preloader stylesheet loading error", e);
 		}
-		stage.setScene(scene);
-		stage.setTitle("Interface Builder");
-		stage.getIcons().add(new Image(getClass().getResourceAsStream("/res/ahli.png")));
-		stage.show();
+		primaryStage.setScene(scene);
+		primaryStage.setTitle("Interface Builder");
+		primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/res/ahli.png")));
+		primaryStage.show();
 	}
 	
 	@Override

@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 public class LayoutExtensionReader {
 	private static final String CONSTANT = "constant";
@@ -48,20 +49,16 @@ public class LayoutExtensionReader {
 	private static final String ATTRIBUTE_DESCRIPTION = "description";
 	private static final String ATTRIBUTE_VALUES = "values";
 	private static final String ATTRIBUTE_TYPE = "type";
-	private static final String ATTRIBUTES_REGEX = "(?i)(?=(constant|default|description|values|type)[\\s]*=)";
-	private static final String HOTKEY_OR_SETTING_REGEX = "(?=@hotkey|@setting)/i";
 	private static final String HOTKEY = "@hotkey";
 	private static final String SETTING = "@setting";
 	private static final String NAME = "name";
 	private static final String VAL = "val";
 	private static final String ERROR_PARSING_FILE = "Error parsing file.";
 	private static final Logger logger = LogManager.getLogger(LayoutExtensionReader.class);
-	private List<ValueDef> hotkeys = new ArrayList<>();
-	private List<ValueDef> settings = new ArrayList<>();
-	
-	public LayoutExtensionReader() {
-		// nothing to do
-	}
+	private static final Pattern HOTKEY_SETTING_REGEX_PATTERN = Pattern.compile("(?=@hotkey|@setting)/i");
+	private static final Pattern ATTRIBUTES_REGEX_PATTERN = Pattern.compile("(?i)(?=(?:constant|default|description|values|type)[\\s]*=)");
+	private List<ValueDef> hotkeys = new ArrayList<>(10);
+	private List<ValueDef> settings = new ArrayList<>(10);
 	
 	/**
 	 * @param nodes
@@ -281,7 +278,7 @@ public class LayoutExtensionReader {
 		logger.debug("textInput:{}", textInput);
 		try {
 			// split at keywords @hotkey or @setting without removing, case insensitive
-			for (String text : textInput.split(HOTKEY_OR_SETTING_REGEX)) {
+			for (String text : HOTKEY_SETTING_REGEX_PATTERN.split(textInput)) {
 				logger.debug("token start:{}", text);
 				text = text.trim();
 				
@@ -304,7 +301,7 @@ public class LayoutExtensionReader {
 					toProcess = toProcess.substring(1 + toProcess.indexOf('(')).trim();
 					
 					// split at keyword
-					for (String part : toProcess.split(ATTRIBUTES_REGEX)) {
+					for (String part : ATTRIBUTES_REGEX_PATTERN.split(toProcess)) {
 						part = part.trim();
 						logger.trace("part: {}", part);
 						final String partLower = part.toLowerCase(Locale.ROOT);
@@ -416,13 +413,12 @@ public class LayoutExtensionReader {
 		private final List<ValueDef> hotkeys;
 		private final List<ValueDef> settings;
 		
-		public LayoutFileUpdater(
+		private LayoutFileUpdater(
 				final DocumentBuilder dBuilder,
 				final Transformer transformer,
 				final String[] extensions,
 				final List<ValueDef> hotkeys,
 				final List<ValueDef> settings) {
-			super();
 			this.dBuilder = dBuilder;
 			this.transformer = transformer;
 			this.extensions = extensions;

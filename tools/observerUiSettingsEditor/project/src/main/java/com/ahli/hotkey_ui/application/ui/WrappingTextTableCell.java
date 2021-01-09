@@ -21,13 +21,13 @@ public class WrappingTextTableCell extends TableCell<ValueDef, String> {
 		if (empty || item == null) {
 			logger.trace("update wrapping table cell - null");
 			super.updateItem(item, empty);
-			super.setGraphic(null);
-			super.setText(null);
+			setGraphic(null);
+			setText(null);
 		} else {
 			// check if old value equals new value
-			final boolean equals = item.equals(getItem());
+			final boolean notEquals = !item.equals(getItem());
 			super.updateItem(item, false);
-			if (!equals) {
+			if (notEquals) {
 				logger.trace("update wrapping table cell - newLabel {}", item);
 				final Label l = new Label(item);
 				l.setWrapText(true);
@@ -36,7 +36,7 @@ public class WrappingTextTableCell extends TableCell<ValueDef, String> {
 					box.setPrefHeight(newValue.doubleValue() + 7);
 					Platform.runLater(() -> getTableRow().requestLayout());
 				});
-				super.setGraphic(box);
+				setGraphic(box);
 			} else {
 				logger.trace("update wrapping table cell - equal");
 			}

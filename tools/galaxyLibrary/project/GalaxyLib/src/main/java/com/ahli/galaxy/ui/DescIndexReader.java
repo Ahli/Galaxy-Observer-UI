@@ -47,8 +47,6 @@ public final class DescIndexReader {
 	 */
 	public static List<String> getLayoutPathList(final File f, final boolean ignoreRequiredToLoadEntries)
 			throws SAXException, IOException, ParserConfigurationException {
-		final ArrayList<String> list = new ArrayList<>();
-		
 		final DocumentBuilderFactory dbFac = DocumentBuilderFactory.newInstance();
 		dbFac.setNamespaceAware(false);
 		dbFac.setValidating(false);
@@ -63,6 +61,7 @@ public final class DescIndexReader {
 		logger.trace("reading layouts from descIndexFile: {}", f);
 		final Document doc = dBuilder.parse(f);
 		
+		final ArrayList<String> list = new ArrayList<>(10);
 		// must be in a DataComponent node
 		final NodeList nodeList = doc.getElementsByTagName("*");
 		for (int i = 0, len = nodeList.getLength(); i < len; ++i) {

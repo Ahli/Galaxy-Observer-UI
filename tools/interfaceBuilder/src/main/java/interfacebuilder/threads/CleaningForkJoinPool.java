@@ -40,20 +40,29 @@ public class CleaningForkJoinPool extends ForkJoinPool {
 	@Override
 	public void execute(final Runnable task) {
 		if (task == null) {
-			throw new NullPointerException();
+			throw new NullPointerException(null);
 		}
 		if (task instanceof CleaningForkJoinTask) {
 			// is already a CleaningForkJoinTask
 			super.execute(task);
 		} else {
 			// wrap into CleaningForkJoinTask
-			super.execute(new CleaningForkJoinTask(cleaner) {
-				@Override
-				protected boolean work() {
-					task.run();
-					return true;
-				}
-			});
+			execute(new TaskStarter(cleaner, task));
+		}
+	}
+	
+	private static final class TaskStarter extends CleaningForkJoinTask {
+		private final Runnable task;
+		
+		private TaskStarter(final CleaningForkJoinTaskCleaner cleaner, final Runnable task) {
+			super(cleaner);
+			this.task = task;
+		}
+		
+		@Override
+		protected boolean work() {
+			task.run();
+			return true;
 		}
 	}
 }

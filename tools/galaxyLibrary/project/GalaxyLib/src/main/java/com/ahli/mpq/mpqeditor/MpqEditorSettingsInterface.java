@@ -43,18 +43,18 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 	private static final String GAME_ID = "GameId";
 	private static final String OPTIONS = "Options";
 	private static final String UTF_8 = "UTF-8";
-	private final File iniFile;
-	private final File rulesetFile;
-	private File iniFileBackUp;
-	private File rulesetFileBackUp;
+	private final Path iniFile;
+	private final Path rulesetFile;
+	private Path iniFileBackUp;
+	private Path rulesetFileBackUp;
 	private boolean backupActive;
 	private MpqEditorCompressionRule[] customRules;
 	
 	private MpqEditorCompression compression = MpqEditorCompression.BLIZZARD_SC2_HEROES;
 	
 	public MpqEditorSettingsInterface() {
-		iniFile = new File(System.getenv(APPDATA) + File.separator + MPQEDITOR_INI);
-		rulesetFile = new File(System.getenv(APPDATA) + File.separator + MPQEDITOR_RULESET_INI);
+		iniFile = Path.of(System.getenv(APPDATA) + File.separator + MPQEDITOR_INI);
+		rulesetFile = Path.of(System.getenv(APPDATA) + File.separator + MPQEDITOR_RULESET_INI);
 	}
 	
 	/**
@@ -83,17 +83,13 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 	 * @param originalFileName
 	 * @throws IOException
 	 */
-	private static void restoreFileFromBackUp(final File backUpFileName, final File originalFileName)
+	private static void restoreFileFromBackUp(final Path backUpFileName, final Path originalFileName)
 			throws IOException {
-		if (backUpFileName != null && backUpFileName.exists()) {
-			if (originalFileName.exists()) {
-				Files.delete(originalFileName.toPath());
+		if (backUpFileName != null && Files.exists(backUpFileName)) {
+			if (Files.exists(originalFileName)) {
+				Files.delete(originalFileName);
 			}
-			if (!backUpFileName.renameTo(originalFileName)) {
-				throw new IOException(
-						"Could not restore original via renaming " + backUpFileName.getAbsolutePath() + " to " +
-								originalFileName.getName());
-			}
+			Files.move(backUpFileName, originalFileName);
 		}
 	}
 	
@@ -156,34 +152,36 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 			return;
 		}
 		
-		final String directoryPath = iniFile.getParent();
+		final Path directoryPath = iniFile.getParent();
 		int i = 0;
-		File backupFile;
+		Path backupFile;
 		
 		// ruleset file
-		if (rulesetFile.exists()) {
+		if (Files.exists(rulesetFile)) {
 			do {
-				backupFile = new File(directoryPath + File.separator + "MPQEditor_Ruleset_" + i + ".tmp");
-				i++;
+				//noinspection ObjectAllocationInLoop
+				backupFile = directoryPath.resolve("MPQEditor_Ruleset_" + i + ".tmp");
+				++i;
 				if (i > 999) {
 					throw new IOException("Could not find unique name for MPQEditor_Ruleset.ini's backup copy.");
 				}
-			} while (backupFile.exists());
-			Files.copy(rulesetFile.toPath(), backupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+			} while (Files.exists(backupFile));
+			Files.copy(rulesetFile, backupFile, StandardCopyOption.REPLACE_EXISTING);
 			rulesetFileBackUp = backupFile;
 		}
 		
 		// ini file
-		if (iniFile.exists()) {
+		if (Files.exists(iniFile)) {
 			i = 0;
 			do {
-				backupFile = new File(directoryPath + File.separator + "MPQEditor_" + i + ".tmp");
-				i++;
+				//noinspection ObjectAllocationInLoop
+				backupFile = directoryPath.resolve("MPQEditor_" + i + ".tmp");
+				++i;
 				if (i > 999) {
 					throw new IOException("Could not find unique name for MPQEditor.ini's backup copy.");
 				}
-			} while (backupFile.exists());
-			Files.copy(iniFile.toPath(), backupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+			} while (Files.exists(backupFile));
+			Files.copy(iniFile, backupFile, StandardCopyOption.REPLACE_EXISTING);
 			iniFileBackUp = backupFile;
 		}
 		
@@ -194,15 +192,15 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 	 * Applies the necessary changes to the ini files.
 	 */
 	private void applyChangesToFiles() throws IOException {
-		if (!iniFile.exists()) {
+		if (!Files.exists(iniFile)) {
 			logger.error(
 					"MpqEditor's ini file does not exist. It would be located at '{}'. The editor will run with its factory settings.",
-					iniFile.getAbsolutePath());
+					iniFile.toAbsolutePath());
 			return;
 		}
 		int gameId = 6;
 		try {
-			final INIBuilderParameters params = new Parameters().ini().setFile(iniFile).setEncoding(UTF_8);
+			final INIBuilderParameters params = new Parameters().ini().setFile(iniFile.toFile()).setEncoding(UTF_8);
 			final FileBasedConfigurationBuilder<INIConfiguration> b =
 					new FileBasedConfigurationBuilder<>(INIConfiguration.class).configure(params);
 			final INIConfiguration ini = b.getConfiguration();
@@ -236,9 +234,10 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 	 */
 	private void writeMpqRuleset() throws IOException {
 		INIConfiguration ini = null;
-		if (rulesetFile.exists()) {
+		if (Files.exists(rulesetFile)) {
 			try {
-				final INIBuilderParameters params = new Parameters().ini().setFile(rulesetFile).setEncoding(UTF_8);
+				final INIBuilderParameters params =
+						new Parameters().ini().setFile(rulesetFile.toFile()).setEncoding(UTF_8);
 				final FileBasedConfigurationBuilder<INIConfiguration> b =
 						new FileBasedConfigurationBuilder<>(INIConfiguration.class).configure(params);
 				ini = b.getConfiguration();
@@ -262,9 +261,9 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 		switch (compression) {
 			case CUSTOM:
 				if (customRules != null) {
-					for (int i = 0, len = customRules.length; i < len; i++) {
-						if (customRules[i] != null) {
-							ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, customRules[i].toString());
+					for (final MpqEditorCompressionRule customRule : customRules) {
+						if (customRule != null) {
+							ini.addProperty(CUSTOM_RULE_PROPERTY_KEY, customRule.toString());
 						} else {
 							throw new IllegalArgumentException(
 									"Compression Rules in MpqEditorSettingsInterface has null entry");
@@ -283,22 +282,20 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 				break;
 		}
 		
-		final Path rulesetFilePath = rulesetFile.toPath();
-		
-		try (final BufferedWriter bw = Files.newBufferedWriter(rulesetFilePath)) {
+		try (final BufferedWriter bw = Files.newBufferedWriter(rulesetFile)) {
 			ini.write(bw);
 		} catch (final ConfigurationException | IOException e) {
-			throw new IOException("Could not write '" + rulesetFile.getAbsolutePath() + "'.", e);
+			throw new IOException("Could not write '" + rulesetFile.toAbsolutePath() + "'.", e);
 		}
 		
 		// remove custom ruleset line beginnings
 		if (compression == MpqEditorCompression.CUSTOM) {
 			final List<String> editedLines;
-			try (final Stream<String> lineStream = Files.lines(rulesetFilePath)) {
+			try (final Stream<String> lineStream = Files.lines(rulesetFile)) {
 				editedLines =
 						lineStream.map(line -> line.replace(SPACESPACEEQUALSSPACE, "")).collect(Collectors.toList());
 			}
-			try (final BufferedWriter bw = Files.newBufferedWriter(rulesetFilePath)) {
+			try (final BufferedWriter bw = Files.newBufferedWriter(rulesetFile)) {
 				final String separator = System.lineSeparator();
 				for (final String line : editedLines) {
 					bw.write(line);

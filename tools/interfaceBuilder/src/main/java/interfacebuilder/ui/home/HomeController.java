@@ -280,7 +280,7 @@ public class HomeController implements Updateable {
 	public void removeSelectedAction() {
 		final List<Project> selectedItems = selectionList.getSelectionModel().getSelectedItems();
 		if (!selectedItems.isEmpty()) {
-			final Project[] items = selectedItems.toArray(new Project[0]);
+			final Project[] items = selectedItems.toArray(new Project[selectedItems.size()]);
 			final Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
 			alert.initOwner(getWindow());
 			alert.setTitle(String.format("Remove selected Project from list? - %s items selected",
@@ -375,11 +375,11 @@ public class HomeController implements Updateable {
 		}
 	}
 	
-	private static class CloseMiningTabAction implements EventHandler<ActionEvent> {
+	private static final class CloseMiningTabAction implements EventHandler<ActionEvent> {
 		private final Tab tab;
 		private final CompressionMiningController controller;
 		
-		public CloseMiningTabAction(final Tab tab, final CompressionMiningController controller) {
+		private CloseMiningTabAction(final Tab tab, final CompressionMiningController controller) {
 			this.tab = tab;
 			this.controller = controller;
 		}

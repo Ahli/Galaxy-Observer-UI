@@ -4,9 +4,7 @@
 package interfacebuilder.config;
 
 import com.ahli.galaxy.game.GameData;
-import com.ahli.galaxy.game.def.HeroesGameDef;
-import com.ahli.galaxy.game.def.SC2GameDef;
-import com.ahli.galaxy.game.def.abstracts.GameDef;
+import com.ahli.galaxy.game.GameDef;
 import com.ahli.mpq.MpqEditorInterface;
 import interfacebuilder.SpringBootApplication;
 import interfacebuilder.base_ui.BaseUiService;
@@ -17,7 +15,7 @@ import interfacebuilder.compress.GameService;
 import interfacebuilder.compress.RuleSet;
 import interfacebuilder.integration.FileService;
 import interfacebuilder.integration.JarHelper;
-import interfacebuilder.integration.ReplayFinder;
+import interfacebuilder.integration.ReplayService;
 import interfacebuilder.integration.SettingsIniInterface;
 import interfacebuilder.integration.kryo.KryoService;
 import interfacebuilder.projects.ProjectEntity;
@@ -55,28 +53,14 @@ public class AppConfiguration {
 	@Bean
 	protected GameData sc2BaseGameData() {
 		logger.debug("init bean: sc2BaseGameData");
-		return new GameData(sc2GameDef());
-	}
-	
-	@Bean
-	protected GameDef sc2GameDef() {
-		
-		logger.debug("init bean: sc2GameDef");
-		return new SC2GameDef();
+		return new GameData(GameDef.buildSc2GameDef());
 	}
 	
 	@Bean
 	protected GameData heroesBaseGameData() {
 		
 		logger.debug("init bean: heroesBaseGameData");
-		return new GameData(heroesGameDef());
-	}
-	
-	@Bean
-	protected GameDef heroesGameDef() {
-		
-		logger.debug("init bean: heroesGameDef");
-		return new HeroesGameDef();
+		return new GameData(GameDef.buildHeroesGameDef());
 	}
 	
 	@Bean
@@ -101,6 +85,12 @@ public class AppConfiguration {
 	
 	protected Path basePath() {
 		return JarHelper.getJarDir(SpringBootApplication.class);
+	}
+	
+	@Bean
+	protected ReplayService replayService() {
+		logger.debug("init bean replayService");
+		return new ReplayService();
 	}
 	
 	@Bean
@@ -141,13 +131,6 @@ public class AppConfiguration {
 				heroesBaseGameData,
 				forkJoinPool,
 				appController);
-	}
-	
-	@Bean
-	protected ReplayFinder replayService() {
-		
-		logger.debug("init bean: replayService");
-		return new ReplayFinder();
 	}
 	
 	@Bean

@@ -3,6 +3,8 @@
 
 package com.ahli.hotkey_ui.application.ui;
 
+import java.io.Serial;
+
 /**
  * An Exception that is meant to be shown to the user of the application. The Exception should be localized.
  *
@@ -10,23 +12,26 @@ package com.ahli.hotkey_ui.application.ui;
  */
 public final class ShowToUserException extends Exception {
 	
+	@Serial
+	private static final long serialVersionUID = -464012745193110294L;
+	
 	/**
 	 * Constructor.
 	 *
-	 * @param msg
+	 * @param message
 	 */
-	public ShowToUserException(final String msg) {
-		super(msg);
+	public ShowToUserException(final String message) {
+		super(message);
 	}
 	
 	/**
 	 * Constructor.
 	 *
-	 * @param msg
+	 * @param message
 	 * @param e
 	 */
-	public ShowToUserException(final String msg, final Exception e) {
-		super(msg, e);
+	public ShowToUserException(final String message, final Exception e) {
+		super(message, e);
 	}
 	
 	/**

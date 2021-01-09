@@ -13,8 +13,11 @@ import javafx.scene.control.TextField;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.regex.Pattern;
+
 public class DynamicValueDefEditingTableCell extends TableCell<ValueDef, String> {
 	private static final Logger logger = LogManager.getLogger(DynamicValueDefEditingTableCell.class);
+	private static final Pattern NUMBER_INPUT_REGEX_PATTERN = Pattern.compile("(?:[-])?\\d{0,7}(?:[.]\\d{0,4})?");
 	
 	@Override
 	protected void updateItem(final String item, final boolean empty) {
@@ -22,9 +25,9 @@ public class DynamicValueDefEditingTableCell extends TableCell<ValueDef, String>
 			updateItemNull(item, empty);
 		} else {
 			// check if old value equals new value
-			final boolean equals = item.equals(getItem());
+			final boolean notEquals = !item.equals(getItem());
 			super.updateItem(item, false);
-			if (!equals) {
+			if (notEquals) {
 				updateItemNotEquals(item);
 			} else {
 				logger.trace("update valuedef-edit table cell - equal");
@@ -35,8 +38,8 @@ public class DynamicValueDefEditingTableCell extends TableCell<ValueDef, String>
 	private void updateItemNull(final String item, final boolean empty) {
 		logger.trace("update valuedef-edit table cell - null");
 		super.updateItem(item, empty);
-		super.setGraphic(null);
-		super.setText(null);
+		setGraphic(null);
+		setText(null);
 	}
 	
 	private void updateItemNotEquals(final String item) {
@@ -49,7 +52,7 @@ public class DynamicValueDefEditingTableCell extends TableCell<ValueDef, String>
 				default -> createChoiceOrTextEditor(data, item);
 			}
 		} else {
-			super.setGraphic(null);
+			setGraphic(null);
 		}
 	}
 	
@@ -68,7 +71,7 @@ public class DynamicValueDefEditingTableCell extends TableCell<ValueDef, String>
 			comboBox.getSelectionModel().select(data.getDefaultValue());
 		}
 		
-		super.setGraphic(comboBox);
+		setGraphic(comboBox);
 	}
 	
 	@SuppressWarnings("java:S5411") // Use the primitive boolean expression here
@@ -79,7 +82,7 @@ public class DynamicValueDefEditingTableCell extends TableCell<ValueDef, String>
 			if (!isFocussed) {
 				final TextField control = (TextField) ((ReadOnlyBooleanProperty) obs).getBean();
 				final String input = control.getText().trim();
-				if (input.matches("([-])?\\d{0,7}([\\.]\\d{0,4})?")) {
+				if (NUMBER_INPUT_REGEX_PATTERN.matcher(input).matches()) {
 					data.valueProperty().set(input);
 				} else {
 					control.setText(data.valueProperty().getValue());
@@ -89,7 +92,7 @@ public class DynamicValueDefEditingTableCell extends TableCell<ValueDef, String>
 		
 		textField.setText(data.getValue());
 		
-		super.setGraphic(textField);
+		setGraphic(textField);
 	}
 	
 	private void createChoiceOrTextEditor(final ValueDef data, final String item) {
@@ -117,7 +120,7 @@ public class DynamicValueDefEditingTableCell extends TableCell<ValueDef, String>
 			comboBox.getSelectionModel().select(data.getDefaultValue());
 		}
 		
-		super.setGraphic(comboBox);
+		setGraphic(comboBox);
 	}
 	
 	@SuppressWarnings("java:S5411") // Use the primitive boolean expression here
@@ -133,6 +136,6 @@ public class DynamicValueDefEditingTableCell extends TableCell<ValueDef, String>
 		
 		textField.setText(data.getValue());
 		
-		super.setGraphic(textField);
+		setGraphic(textField);
 	}
 }

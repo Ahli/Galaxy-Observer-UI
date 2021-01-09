@@ -54,13 +54,49 @@ public class ProjectService {
 	}
 	
 	/**
+	 * @param project
+	 * @throws IOException
+	 */
+	public static void createTemplateProjectFiles(final Project project) throws IOException {
+		final String jarIntPath;
+		if (project.getGame() == Game.SC2) {
+			jarIntPath = "templates/sc2/interface/";
+		} else {
+			jarIntPath = "templates/heroes/interface/";
+		}
+		
+		final Path projPath = Path.of(project.getProjectPath());
+		final var resolver = new PathMatchingResourcePatternResolver();
+		logger.trace("creating template");
+		final int jarIntPathLen = jarIntPath.length();
+		for (final Resource res : resolver.getResources("classpath*:" + jarIntPath + "**")) {
+			final String uri = res.getURI().toString();
+			logger.trace("extracting file {}", uri);
+			final int i = uri.indexOf(jarIntPath);
+			final String intPath = uri.substring(i + jarIntPathLen);
+			final Path path = projPath.resolve(intPath);
+			logger.trace("writing file {}", path);
+			if (!uri.endsWith(DIRECTORY_SYMBOL)) {
+				Files.createDirectories(path.getParent());
+				//noinspection ObjectAllocationInLoop
+				try (final InputStream in = new BufferedInputStream(res.getInputStream(), 1_024)) {
+					Files.copy(in, path, StandardCopyOption.REPLACE_EXISTING);
+				}
+			} else {
+				Files.createDirectories(path);
+			}
+		}
+		logger.trace("create template finished");
+	}
+	
+	/**
 	 * Returns whether the specified path contains a compilable file for the specified game.
 	 *
 	 * @param path
 	 * @param game
 	 * @return
 	 */
-	public boolean pathContainsCompileableForGame(final String path, final GameData game) {
+	public static boolean pathContainsCompileableForGame(final String path, final GameData game) {
 		// detection via layout file ending as defined in the GameData's GameDef
 		final String[] extensions = new String[1];
 		extensions[0] = game.getGameDef().getLayoutFileEnding();
@@ -134,19 +170,8 @@ public class ProjectService {
 	 * @return list of Projects with matching path
 	 */
 	public List<Project> getProjectsOfPath(final String path) {
-		return ProjectEntity.toProjects(projectRepo.findAll(new Example<>() {
-			@Override
-			public ProjectEntity getProbe() {
-				return new ProjectEntity(null, path, null);
-			}
-			
-			@Override
-			public ExampleMatcher getMatcher() {
-				return ExampleMatcher.matchingAll().withIgnoreNullValues();
-			}
-		}));
+		return ProjectEntity.toProjects(projectRepo.findAll(new ProjectsPathMatcher(path)));
 	}
-	
 	
 	/**
 	 * Initializes the BestCompressionRuleSet field of the specified project and returns it.
@@ -169,38 +194,21 @@ public class ProjectService {
 		return project.getBestCompressionRuleSet();
 	}
 	
-	/**
-	 * @param project
-	 * @throws IOException
-	 */
-	public void createTemplateProjectFiles(final Project project) throws IOException {
-		final String jarIntPath;
-		if (project.getGame() == Game.SC2) {
-			jarIntPath = "templates/sc2/interface/";
-		} else {
-			jarIntPath = "templates/heroes/interface/";
+	private static final class ProjectsPathMatcher implements Example<ProjectEntity> {
+		private final String path;
+		
+		private ProjectsPathMatcher(final String path) {
+			this.path = path;
 		}
 		
-		final Path projPath = Path.of(project.getProjectPath());
-		final var resolver = new PathMatchingResourcePatternResolver();
-		logger.trace("creating template");
-		final int jarIntPathLen = jarIntPath.length();
-		for (final Resource res : resolver.getResources("classpath*:" + jarIntPath + "**")) {
-			final String uri = res.getURI().toString();
-			logger.trace("extracting file {}", uri);
-			final int i = uri.indexOf(jarIntPath);
-			final String intPath = uri.substring(i + jarIntPathLen);
-			final Path path = projPath.resolve(intPath);
-			logger.trace("writing file {}", path);
-			if (!uri.endsWith(DIRECTORY_SYMBOL)) {
-				Files.createDirectories(path.getParent());
-				try (final InputStream in = new BufferedInputStream(res.getInputStream(), 1024)) {
-					Files.copy(in, path, StandardCopyOption.REPLACE_EXISTING);
-				}
-			} else {
-				Files.createDirectories(path);
-			}
+		@Override
+		public ProjectEntity getProbe() {
+			return new ProjectEntity(null, path, null);
 		}
-		logger.trace("create template finished");
+		
+		@Override
+		public ExampleMatcher getMatcher() {
+			return ExampleMatcher.matchingAll().withIgnoreNullValues();
+		}
 	}
 }

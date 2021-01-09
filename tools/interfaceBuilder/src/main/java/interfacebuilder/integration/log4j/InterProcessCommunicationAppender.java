@@ -41,7 +41,7 @@ public final class InterProcessCommunicationAppender extends AbstractAppender {
 	 * @param layout
 	 * @param ignoreExceptions
 	 */
-	protected InterProcessCommunicationAppender(
+	private InterProcessCommunicationAppender(
 			final String name,
 			final Filter filter,
 			final Layout<? extends Serializable> layout,
@@ -86,15 +86,10 @@ public final class InterProcessCommunicationAppender extends AbstractAppender {
 	
 	public static void sendTerminationSignal() {
 		if (printWriter != null) {
-			final InterProcessCommunicationAppender instance = getInstance();
 			if (instance != null) {
 				printWriter.println("#BYE");
 			}
 		}
-	}
-	
-	private static InterProcessCommunicationAppender getInstance() {
-		return instance;
 	}
 	
 	/**

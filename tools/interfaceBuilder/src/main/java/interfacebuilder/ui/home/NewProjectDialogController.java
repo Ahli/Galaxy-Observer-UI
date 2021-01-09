@@ -18,11 +18,6 @@ public class NewProjectDialogController {
 	@FXML
 	private Dialog<Project> dialog;
 	
-	
-	public NewProjectDialogController() {
-		// nothing to do
-	}
-	
 	public NewProjectController getContentController() {
 		return contentPaneController;
 	}

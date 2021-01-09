@@ -3,6 +3,8 @@
 
 package com.ahli.galaxy.ui.exception;
 
+import java.io.Serial;
+
 /**
  * Exception of the UI Parsing/Validation.
  *
@@ -10,26 +12,29 @@ package com.ahli.galaxy.ui.exception;
  */
 public class UIException extends Exception {
 	
+	@Serial
+	private static final long serialVersionUID = -4719408127547238653L;
+	
 	/**
 	 * Constructor.
 	 *
-	 * @param string
+	 * @param message
 	 * 		the message
 	 */
-	public UIException(final String string) {
-		super(string);
+	public UIException(final String message) {
+		super(message);
 	}
 	
 	/**
 	 * Constructor.
 	 *
-	 * @param string
+	 * @param message
 	 * 		the message
 	 * @param e
 	 * 		the contained Exception
 	 */
-	public UIException(final String string, final Exception e) {
-		super(string, e);
+	public UIException(final String message, final Exception e) {
+		super(message, e);
 	}
 	
 	/**

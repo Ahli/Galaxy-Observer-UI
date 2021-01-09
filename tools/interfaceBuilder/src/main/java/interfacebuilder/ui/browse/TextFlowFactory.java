@@ -22,10 +22,6 @@ public class TextFlowFactory {
 	
 	private String query;
 	
-	public TextFlowFactory() {
-		// nothing to do
-	}
-	
 	public void setHighlight(final String query) {
 		this.query = query;
 	}
@@ -66,17 +62,17 @@ public class TextFlowFactory {
 		return flow;
 	}
 	
-	private void append(final TextFlow flow, final Text text) {
+	private static void append(final TextFlow flow, final Text text) {
 		flow.getChildren().add(text);
 	}
 	
-	private Text textUnimportant(final String label) {
+	private static Text textUnimportant(final String label) {
 		final Text text = new Text(label);
 		text.setStyle("-fx-fill: grey; -fx-font-smoothing-type: lcd;");
 		return text;
 	}
 	
-	private void append(final TextFlow flow, final Text[] text) {
+	private static void append(final TextFlow flow, final Text[] text) {
 		flow.getChildren().addAll(text);
 	}
 	
@@ -113,7 +109,7 @@ public class TextFlowFactory {
 		return text;
 	}
 	
-	private void applyVisualHighlight(final Text text) {
+	private static void applyVisualHighlight(final Text text) {
 		final Blend blend = new Blend();
 		blend.setMode(BlendMode.MULTIPLY);
 		

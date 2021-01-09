@@ -33,7 +33,7 @@ public class UICatalogImpl implements UICatalog {
 	
 	private static final String UNDERSCORE = "_";
 	private static final Logger logger = LogManager.getLogger(UICatalogImpl.class);
-	private UICatalogParser parser;
+	private ParsedXmlConsumer parser;
 	
 	// members
 	private List<UITemplate> templates;
@@ -52,9 +52,9 @@ public class UICatalogImpl implements UICatalog {
 	 */
 	public UICatalogImpl() {
 		templates = new ArrayList<>(2500);
-		blizzOnlyTemplates = new ArrayList<>();
+		blizzOnlyTemplates = new ArrayList<>(10);
 		constants = new ArrayList<>(800);
-		blizzOnlyConstants = new ArrayList<>();
+		blizzOnlyConstants = new ArrayList<>(10);
 		blizzOnlyLayouts = new ArrayList<>(25);
 	}
 	
@@ -109,7 +109,7 @@ public class UICatalogImpl implements UICatalog {
 	}
 	
 	@Override
-	public void setParser(final UICatalogParser parser) {
+	public void setParser(final ParsedXmlConsumer parser) {
 		this.parser = parser;
 	}
 	
@@ -175,11 +175,13 @@ public class UICatalogImpl implements UICatalog {
 				try {
 					processLayoutFile(layoutFilePath, raceId, isDevLayout, consoleSkinId, parser);
 				} catch (final IOException e) {
-					logger.error(String.format(
-							"ERROR: encountered an Exception while processing the layout file '%s'.",
-							layoutFilePath), e);
+					logger.error(
+							String.format("ERROR: encountered an Exception while processing the layout file '%s'.",
+									layoutFilePath),
+							e);
 				}
 				if (Thread.interrupted()) {
+					//noinspection NewExceptionWithoutArguments
 					throw new InterruptedException();
 				}
 			}
@@ -234,7 +236,7 @@ public class UICatalogImpl implements UICatalog {
 	
 	@Override
 	public UITemplate[] getTemplatesOfPath(final String file) {
-		final List<UITemplate> foundTemplates = new ArrayList<>();
+		final List<UITemplate> foundTemplates = new ArrayList<>(1);
 		for (final var template : templates) {
 			if (template.getFileName().equalsIgnoreCase(file)) {
 				foundTemplates.add(template);
@@ -249,7 +251,7 @@ public class UICatalogImpl implements UICatalog {
 		if (foundTemplates.isEmpty()) {
 			logger.warn("WARN: cannot find Layout file: {}", file);
 		}
-		return foundTemplates.toArray(new UITemplate[0]);
+		return foundTemplates.toArray(new UITemplate[foundTemplates.size()]);
 	}
 	
 	@Override
@@ -330,7 +332,7 @@ public class UICatalogImpl implements UICatalog {
 	public String getConstantValue(
 			final String constantRef, final String raceId, final boolean isDevLayout, final String consoleSkinId) {
 		int i = 0;
-		if (constantRef.length() > 0) {
+		if (!constantRef.isEmpty()) {
 			while (constantRef.charAt(i) == '#') {
 				i++;
 			}

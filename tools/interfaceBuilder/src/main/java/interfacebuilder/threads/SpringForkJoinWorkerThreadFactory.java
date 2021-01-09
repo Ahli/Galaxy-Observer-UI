@@ -17,7 +17,7 @@ public class SpringForkJoinWorkerThreadFactory implements ForkJoinPool.ForkJoinW
 		return new MyForkJoinWorkerThread(pool);
 	}
 	
-	private static class MyForkJoinWorkerThread extends ForkJoinWorkerThread {
+	private static final class MyForkJoinWorkerThread extends ForkJoinWorkerThread {
 		
 		private MyForkJoinWorkerThread(final ForkJoinPool pool) {
 			super(pool);

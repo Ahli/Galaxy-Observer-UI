@@ -7,16 +7,9 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public class KryoGameInfo {
-	private int[] version;
-	private String gameName;
-	private boolean isPtr;
-	
-	public KryoGameInfo() {
-		// required for Kryo
-		gameName = "";
-		isPtr = false;
-		version = new int[4];
-	}
+	private final int[] version;
+	private final String gameName;
+	private final boolean isPtr;
 	
 	public KryoGameInfo(final int[] version, final String gameName, final boolean isPtr) {
 		this.version = version;
@@ -28,24 +21,12 @@ public class KryoGameInfo {
 		return gameName;
 	}
 	
-	public void setGameName(final String gameName) {
-		this.gameName = gameName;
-	}
-	
 	public boolean isPtr() {
 		return isPtr;
 	}
 	
-	public void setPtr(final boolean isPtr) {
-		this.isPtr = isPtr;
-	}
-	
 	public int[] getVersion() {
 		return version;
-	}
-	
-	public void setVersion(final int[] version) {
-		this.version = version;
 	}
 	
 	@Override

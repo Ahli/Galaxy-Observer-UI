@@ -19,7 +19,7 @@ import java.util.ResourceBundle;
 public final class Messages {
 	private static final String BUNDLE_NAME = "galaxylib_i18n.galaxyLibMessages";
 	private static final Logger logger = LogManager.getLogger(Messages.class);
-	private static ResourceBundle resourceBundle = ResourceBundle.getBundle(BUNDLE_NAME);
+	private static ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE_NAME);
 	
 	private static Locale usedLocale = Locale.getDefault();
 	
@@ -38,9 +38,9 @@ public final class Messages {
 	 */
 	public static String getString(final String key) {
 		try {
-			return resourceBundle.getString(key);
+			return bundle.getString(key);
 		} catch (final MissingResourceException e) {
-			logger.error("ERROR: failed to receive String for " + key, e);
+			logger.error(String.format("ERROR: failed to receive String for %s", key), e);
 			return '!' + key + '!';
 		}
 	}
@@ -51,7 +51,7 @@ public final class Messages {
 	 * @return the ResourceBundle
 	 */
 	public static ResourceBundle getBundle() {
-		return resourceBundle;
+		return bundle;
 	}
 	
 	/**
@@ -61,7 +61,7 @@ public final class Messages {
 	 * 		the Locale
 	 */
 	public static void setBundle(final Locale loc) {
-		resourceBundle = ResourceBundle.getBundle(BUNDLE_NAME, loc);
+		bundle = ResourceBundle.getBundle(BUNDLE_NAME, loc);
 		usedLocale = loc;
 	}
 	
@@ -82,7 +82,7 @@ public final class Messages {
 	 * @return whether the specified Locale is used or not
 	 */
 	public static boolean checkIfTargetResourceIsUsed(final Locale locale) {
-		final boolean result = resourceBundle.equals(ResourceBundle.getBundle(BUNDLE_NAME, locale));
+		final boolean result = bundle.equals(ResourceBundle.getBundle(BUNDLE_NAME, locale));
 		logger.trace("compare used locale's resource '{}' with one for locale '{}', result: {}",
 				usedLocale,
 				locale,

@@ -14,20 +14,17 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Transient;
 import java.io.IOException;
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-//import jakarta.persistence.ElementCollection;
-//import jakarta.persistence.Entity;
-//import jakarta.persistence.FetchType;
-//import jakarta.persistence.GeneratedValue;
-//import jakarta.persistence.GenerationType;
-//import jakarta.persistence.Id;
-//import jakarta.persistence.Transient;
-
 @Entity
-public class RuleSet {
+public class RuleSet implements Serializable {
+	
+	@Serial
+	private static final long serialVersionUID = -8442665535029507145L;
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)

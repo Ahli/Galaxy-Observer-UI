@@ -1,18 +1,18 @@
 module GalaxyLib {
+	requires static lombok; // static ones can be absent at run time
+	
 	requires java.xml;
 	requires org.apache.commons.configuration2;
 	requires org.apache.commons.io;
-	requires org.apache.commons.lang3;
+	//requires org.apache.commons.lang3; // redundant... not required?
 	requires transitive org.apache.logging.log4j;
 	requires vtd.xml;
 	requires org.eclipse.collections.impl;
-	requires java.sql; // configuration2 INI requires java.sql.Date for some reason
+	requires java.sql; // configuration2 INI requires java.sql.Date for some reason // redundant, but required!
 	
 	exports com.ahli.galaxy;
 	exports com.ahli.galaxy.archive;
 	exports com.ahli.galaxy.game;
-	exports com.ahli.galaxy.game.def;
-	exports com.ahli.galaxy.game.def.abstracts;
 	exports com.ahli.galaxy.parser;
 	exports com.ahli.galaxy.parser.abstracts;
 	exports com.ahli.galaxy.parser.interfaces;

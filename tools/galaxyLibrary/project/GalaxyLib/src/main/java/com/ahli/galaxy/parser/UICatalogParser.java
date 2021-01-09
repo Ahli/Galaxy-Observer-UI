@@ -67,7 +67,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	private static final Logger logger = LogManager.getLogger(UICatalogParser.class);
 	private final UICatalog catalog;
 	private final XmlParser parser;
-	private final List<UIElement> curPath = new ArrayList<>();
+	private final List<UIElement> curPath = new ArrayList<>(10);
 	private final List<UIState> statesToClose;
 	private final List<Integer> statesToCloseLevel;
 	private final Map<UIElement, UIElement> addedFinalElements;
@@ -90,12 +90,13 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	public UICatalogParser(final UICatalog catalog, final XmlParser parser, final boolean deduplicate) {
 		this.catalog = catalog;
 		this.parser = parser;
-		statesToClose = new ArrayList<>();
-		statesToCloseLevel = new ArrayList<>();
+		statesToClose = new ArrayList<>(10);
+		statesToCloseLevel = new ArrayList<>(10);
 		addedFinalElements = new UnifiedMap<>();
 		paramDeduplicate = deduplicate;
 		addedElements = deduplicate ? new ArrayList<>(35_000) : null;
 		deduplicatedElements = deduplicate ? new UnifiedSet<>(13_000) : null;
+		//noinspection ThisEscapedInObjectConstruction
 		parser.setConsumer(this);
 	}
 	
@@ -181,6 +182,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	 * @param controllers
 	 * @return
 	 */
+	@SuppressWarnings("ObjectAllocationInLoop")
 	private static String getImplicitName(final String type, final List<UIElement> controllers) {
 		logger.trace("Constructing implicit controller name");
 		if (type == null) {
@@ -199,6 +201,135 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			}
 			logger.trace("Implicit controller name existing: {}", name);
 			++i;
+		}
+	}
+	
+	@SuppressWarnings("squid:S4973")
+	private static void copyAttributes(
+			final List<UIAttribute> attributesSource, final List<UIAttribute> attributesTarget) {
+		for (final UIAttribute attrSource : attributesSource) {
+			boolean noChanges = true;
+			final String sourceName = attrSource.getName();
+			// override attribute => remove existing one with same tag
+			for (final UIAttribute attrTarget : attributesTarget) {
+				final String targetName = attrTarget.getName();
+				// both null or equal
+				if (Objects.equals(targetName, sourceName)) {
+					attrTarget.setKeyValues(attrSource.getKeyValues());
+					noChanges = false;
+					break;
+				}
+			}
+			if (noChanges) {
+				// no matching existing attribute -> add
+				attributesTarget.add((UIAttribute) attrSource.deepCopy());
+			}
+		}
+	}
+	
+	/**
+	 * Copies a template's element into the target element. Iteratively calls all child elements to do the same.
+	 *
+	 * @param templateElem
+	 * @param targetElem
+	 */
+	private static void applyTemplateElementToElement(final UIElement templateElem, final UIElement targetElem) {
+		if (targetElem == null) {
+			return;
+		}
+		logger.trace("Applying template {} to element {}", templateElem.getName(), targetElem.getName());
+		
+		final List<UIElement> templateChildren;
+		
+		if (templateElem instanceof UIFrame) {
+			final UIFrame frame = (UIFrame) templateElem;
+			templateChildren = frame.getChildrenRaw();
+			if (targetElem instanceof UIFrame) {
+				final UIFrame target = (UIFrame) targetElem;
+				// TODO do not set the undefined anchors (-> track if a side was defined or is on the initial value)
+				target.setAnchor(UIAnchorSide.TOP,
+						frame.getAnchorRelative(UIAnchorSide.TOP),
+						frame.getAnchorPos(UIAnchorSide.TOP),
+						frame.getAnchorOffset(UIAnchorSide.TOP));
+				target.setAnchor(UIAnchorSide.LEFT,
+						frame.getAnchorRelative(UIAnchorSide.LEFT),
+						frame.getAnchorPos(UIAnchorSide.LEFT),
+						frame.getAnchorOffset(UIAnchorSide.LEFT));
+				target.setAnchor(UIAnchorSide.BOTTOM,
+						frame.getAnchorRelative(UIAnchorSide.BOTTOM),
+						frame.getAnchorPos(UIAnchorSide.BOTTOM),
+						frame.getAnchorOffset(UIAnchorSide.BOTTOM));
+				target.setAnchor(UIAnchorSide.RIGHT,
+						frame.getAnchorRelative(UIAnchorSide.RIGHT),
+						frame.getAnchorPos(UIAnchorSide.RIGHT),
+						frame.getAnchorOffset(UIAnchorSide.RIGHT));
+				
+				copyAttributes(frame.getAttributes(), target.getAttributes());
+			} else {
+				logger.error("Attempting to apply a template of type Frame to a different type.");
+			}
+			
+			
+			//		} else if (templateElem instanceof UIAttribute) {
+			//			final UIAttribute attr = (UIAttribute) templateElem;
+			//			templateChildren = attr.getChildrenRaw();
+		} else if (templateElem instanceof UIStateGroup) {
+			final UIStateGroup stateGroup = (UIStateGroup) templateElem;
+			templateChildren = stateGroup.getChildrenRaw();
+			if (targetElem instanceof UIStateGroup) {
+				final UIStateGroup target = (UIStateGroup) targetElem;
+				target.setDefaultState(stateGroup.getDefaultState());
+				// states are the children
+			} else {
+				logger.error("Attempting to apply a template of type StateGroup to a different type.");
+			}
+		} else if (templateElem instanceof UIController) {
+			final UIController uiController = (UIController) templateElem;
+			templateChildren = uiController.getChildrenRaw();
+			if (targetElem instanceof UIController) {
+				final UIController target = (UIController) targetElem;
+				copyAttributes(uiController.getKeys(), target.getKeys());
+				// TODO attributesKeyValueList
+				// TODO isNameImplicit?
+				// TODO next edit overrides?
+			} else {
+				logger.error("Attempting to apply a template of type UIController to a different type.");
+			}
+		} else if (templateElem instanceof UIAnimation) {
+			final UIAnimation uiAnimation = (UIAnimation) templateElem;
+			templateChildren = uiAnimation.getChildrenRaw();
+			if (targetElem instanceof UIAnimation) {
+				// final UIAnimation target = (UIAnimation) targetElem;
+				// TODO events
+				// TODO controller
+				// TODO driver
+			} else {
+				logger.error("Attempting to apply a template of type UIAnimation to a different type.");
+			}
+		} else if (templateElem instanceof UIState) {
+			final UIState uiState = (UIState) templateElem;
+			templateChildren = uiState.getChildrenRaw();
+			if (targetElem instanceof UIState) {
+				final UIState target = (UIState) targetElem;
+				// TODO nextAdditionShouldOverrideActions
+				copyAttributes(uiState.getActions(), target.getActions());
+				// TODO nextAdditionShouldOverrideWhens
+				copyAttributes(uiState.getWhens(), target.getWhens());
+			} else {
+				logger.error("Attempting to apply a template of type UIState to a different type.");
+			}
+		} else {
+			templateChildren = null;
+		}
+		
+		// copy template's children
+		if (templateChildren != null) {
+			for (final var templateChild : templateChildren) {
+				if (templateChild.getName() != null) {
+					final UIElement targetChild = targetElem.receiveFrameFromPath(templateChild.getName());
+					applyTemplateElementToElement(templateChild, targetChild);
+				}
+			}
 		}
 	}
 	
@@ -282,6 +413,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			// This is the editing mode!
 			if (name == null) {
 				logger.error("Template is used without defining a name.");
+				//noinspection UnsecureRandomNumberGeneration
 				name = "UnnamedFrame" + Math.random();
 			}
 			
@@ -700,134 +832,6 @@ public class UICatalogParser implements ParsedXmlConsumer {
 						}
 					}
 				}
-			}
-		}
-	}
-	
-	/**
-	 * Copies a template's element into the target element. Iteratively calls all child elements to do the same.
-	 *
-	 * @param templateElem
-	 * @param targetElem
-	 */
-	private void applyTemplateElementToElement(final UIElement templateElem, final UIElement targetElem) {
-		if (targetElem == null) {
-			return;
-		}
-		logger.trace("Applying template {} to element {}", templateElem.getName(), targetElem.getName());
-		
-		final List<UIElement> templateChildren;
-		
-		if (templateElem instanceof UIFrame) {
-			final UIFrame frame = (UIFrame) templateElem;
-			templateChildren = frame.getChildrenRaw();
-			if (targetElem instanceof UIFrame) {
-				final UIFrame target = (UIFrame) targetElem;
-				// TODO do not set the undefined anchors (-> track if a side was defined or is on the initial value)
-				target.setAnchor(UIAnchorSide.TOP,
-						frame.getAnchorRelative(UIAnchorSide.TOP),
-						frame.getAnchorPos(UIAnchorSide.TOP),
-						frame.getAnchorOffset(UIAnchorSide.TOP));
-				target.setAnchor(UIAnchorSide.LEFT,
-						frame.getAnchorRelative(UIAnchorSide.LEFT),
-						frame.getAnchorPos(UIAnchorSide.LEFT),
-						frame.getAnchorOffset(UIAnchorSide.LEFT));
-				target.setAnchor(UIAnchorSide.BOTTOM,
-						frame.getAnchorRelative(UIAnchorSide.BOTTOM),
-						frame.getAnchorPos(UIAnchorSide.BOTTOM),
-						frame.getAnchorOffset(UIAnchorSide.BOTTOM));
-				target.setAnchor(UIAnchorSide.RIGHT,
-						frame.getAnchorRelative(UIAnchorSide.RIGHT),
-						frame.getAnchorPos(UIAnchorSide.RIGHT),
-						frame.getAnchorOffset(UIAnchorSide.RIGHT));
-				
-				copyAttributes(frame.getAttributes(), target.getAttributes());
-			} else {
-				logger.error("Attempting to apply a template of type Frame to a different type.");
-			}
-			
-			
-			//		} else if (templateElem instanceof UIAttribute) {
-			//			final UIAttribute attr = (UIAttribute) templateElem;
-			//			templateChildren = attr.getChildrenRaw();
-		} else if (templateElem instanceof UIStateGroup) {
-			final UIStateGroup stateGroup = (UIStateGroup) templateElem;
-			templateChildren = stateGroup.getChildrenRaw();
-			if (targetElem instanceof UIStateGroup) {
-				final UIStateGroup target = (UIStateGroup) targetElem;
-				target.setDefaultState(stateGroup.getDefaultState());
-				// states are the children
-			} else {
-				logger.error("Attempting to apply a template of type StateGroup to a different type.");
-			}
-		} else if (templateElem instanceof UIController) {
-			final UIController uiController = (UIController) templateElem;
-			templateChildren = uiController.getChildrenRaw();
-			if (targetElem instanceof UIController) {
-				final UIController target = (UIController) targetElem;
-				copyAttributes(uiController.getKeys(), target.getKeys());
-				// TODO attributesKeyValueList
-				// TODO isNameImplicit?
-				// TODO next edit overrides?
-			} else {
-				logger.error("Attempting to apply a template of type UIController to a different type.");
-			}
-		} else if (templateElem instanceof UIAnimation) {
-			final UIAnimation uiAnimation = (UIAnimation) templateElem;
-			templateChildren = uiAnimation.getChildrenRaw();
-			if (targetElem instanceof UIAnimation) {
-				// final UIAnimation target = (UIAnimation) targetElem;
-				// TODO events
-				// TODO controller
-				// TODO driver
-			} else {
-				logger.error("Attempting to apply a template of type UIAnimation to a different type.");
-			}
-		} else if (templateElem instanceof UIState) {
-			final UIState uiState = (UIState) templateElem;
-			templateChildren = uiState.getChildrenRaw();
-			if (targetElem instanceof UIState) {
-				final UIState target = (UIState) targetElem;
-				// TODO nextAdditionShouldOverrideActions
-				copyAttributes(uiState.getActions(), target.getActions());
-				// TODO nextAdditionShouldOverrideWhens
-				copyAttributes(uiState.getWhens(), target.getWhens());
-			} else {
-				logger.error("Attempting to apply a template of type UIState to a different type.");
-			}
-		} else {
-			templateChildren = null;
-		}
-		
-		// copy template's children
-		if (templateChildren != null) {
-			for (final var templateChild : templateChildren) {
-				if (templateChild.getName() != null) {
-					final UIElement targetChild = targetElem.receiveFrameFromPath(templateChild.getName());
-					applyTemplateElementToElement(templateChild, targetChild);
-				}
-			}
-		}
-	}
-	
-	@SuppressWarnings("squid:S4973")
-	private void copyAttributes(final List<UIAttribute> attributesSource, final List<UIAttribute> attributesTarget) {
-		for (final UIAttribute attrSource : attributesSource) {
-			boolean edited = false;
-			final String sourceName = attrSource.getName();
-			// override attribute => remove existing one with same tag
-			for (final UIAttribute attrTarget : attributesTarget) {
-				final String targetName = attrTarget.getName();
-				// both null or equal
-				if (Objects.equals(targetName, sourceName)) {
-					attrTarget.setKeyValues(attrSource.getKeyValues());
-					edited = true;
-					break;
-				}
-			}
-			if (!edited) {
-				// no matching existing attribute -> add
-				attributesTarget.add((UIAttribute) attrSource.deepCopy());
 			}
 		}
 	}
