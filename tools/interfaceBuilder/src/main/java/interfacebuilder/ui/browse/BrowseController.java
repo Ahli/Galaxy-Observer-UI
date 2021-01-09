@@ -28,6 +28,7 @@ import interfacebuilder.ui.navigation.NavigationController;
 import interfacebuilder.ui.progress.BaseUiExtractionController;
 import interfacebuilder.ui.progress.ErrorTabController;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -239,13 +240,15 @@ public class BrowseController implements Updateable {
 			newTab = new Tab(tabName);
 			
 			final TextFlow newTxtArea = new TextFlow();
-			newTxtArea.getStyleClass().add("styled-text-area");
 			
 			final ScrollPane scrollPane = new ScrollPane(newTxtArea);
 			scrollPane.setPannable(true);
 			
 			// auto-downscrolling
 			scrollPane.vvalueProperty().bind(newTxtArea.heightProperty());
+			
+			// hide unless a text appears because it should usually be empty
+			scrollPane.visibleProperty().bind(Bindings.isNotEmpty(newTxtArea.getChildren()));
 			
 			final FXMLSpringLoader loader = new FXMLSpringLoader(appContext);
 			final var rootNode = loader.<AnchorPane>load("classpath:view/ProgressTab_ExtractBaseUi.fxml");
@@ -271,7 +274,8 @@ public class BrowseController implements Updateable {
 			// runlater needs to appear below the edits above, else it might be added before
 			// which results in UI edits not in UI thread -> error
 			final Tab newTabFinal = newTab;
-			final ObservableList<Node> controllerLoggingAreaChildren = extractionController.loggingArea.getChildren();
+			final ObservableList<Node> controllerLoggingAreaChildren =
+					extractionController.getLoggingArea().getChildren();
 			Platform.runLater(() -> {
 				try {
 					controllerLoggingAreaChildren.add(scrollPane);

@@ -4,6 +4,7 @@
 package interfacebuilder.ui.progress.appender;
 
 import javafx.application.Platform;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.text.FontSmoothingType;
@@ -18,6 +19,7 @@ public class TextFlowAppender implements Appender {
 	private static final String STYLE = "INFO";
 	private static final Logger logger = LogManager.getLogger(TextFlowAppender.class);
 	private final TextFlow textFlow;
+	private SimpleBooleanProperty endedProp;
 	
 	public TextFlowAppender(final TextFlow textFlow) {
 		this.textFlow = textFlow;
@@ -36,6 +38,23 @@ public class TextFlowAppender implements Appender {
 				logger.fatal(FATAL_ERROR, e);
 			}
 		});
+	}
+	
+	@Override
+	public void end() {
+		if (endedProp == null) {
+			endedProp = new SimpleBooleanProperty(true);
+		} else {
+			endedProp.set(true);
+		}
+	}
+	
+	@Override
+	public SimpleBooleanProperty endedProperty() {
+		if (endedProp == null) {
+			endedProp = new SimpleBooleanProperty(false);
+		}
+		return endedProp;
 	}
 	
 }

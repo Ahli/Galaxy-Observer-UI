@@ -4,6 +4,8 @@
 package interfacebuilder.ui.progress;
 
 import com.ahli.galaxy.game.GameDef;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import interfacebuilder.base_ui.BaseUiService;
 import interfacebuilder.base_ui.ExtractBaseUiTask;
 import interfacebuilder.compress.GameService;
@@ -13,9 +15,17 @@ import interfacebuilder.ui.Updateable;
 import interfacebuilder.ui.navigation.NavigationController;
 import interfacebuilder.ui.progress.appender.Appender;
 import interfacebuilder.ui.progress.appender.TextFlowAppender;
+import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
 import java.util.concurrent.ForkJoinPool;
@@ -29,8 +39,21 @@ public class BaseUiExtractionController implements Updateable {
 	private final NavigationController navigationController;
 	private final ForkJoinPool executor;
 	private final AppController appController;
+	
 	@FXML
-	public VBox loggingArea;
+	private FontAwesomeIconView stateImage1;
+	@FXML
+	private FontAwesomeIconView stateImage2;
+	@FXML
+	private FontAwesomeIconView stateImage3;
+	@FXML
+	private ScrollPane scrollPane1;
+	@FXML
+	private ScrollPane scrollPane2;
+	@FXML
+	private ScrollPane scrollPane3;
+	@FXML
+	private VBox loggingArea;
 	@FXML
 	private Label titleLabel;
 	@FXML
@@ -64,6 +87,23 @@ public class BaseUiExtractionController implements Updateable {
 		threadNames[2] = "extractThread_" + ++threadCount;
 	}
 	
+	public VBox getLoggingArea() {
+		return loggingArea;
+	}
+	
+	/**
+	 * Automatically called by FxmlLoader
+	 */
+	public void initialize() {
+		// auto-downscrolling
+		scrollPane1.vvalueProperty().bind(txtArea1.heightProperty());
+		scrollPane2.vvalueProperty().bind(txtArea2.heightProperty());
+		scrollPane3.vvalueProperty().bind(txtArea3.heightProperty());
+		stateImage1.setVisible(false);
+		stateImage2.setVisible(false);
+		stateImage3.setVisible(false);
+	}
+	
 	@Override
 	public void update() {
 		// nothing to do
@@ -77,10 +117,13 @@ public class BaseUiExtractionController implements Updateable {
 		txtArea1.getChildren().clear();
 		txtArea2.getChildren().clear();
 		txtArea3.getChildren().clear();
-		final Appender[] output = new Appender[3];
-		output[0] = new TextFlowAppender(txtArea1);
-		output[1] = new TextFlowAppender(txtArea2);
-		output[2] = new TextFlowAppender(txtArea3);
+		final Appender[] appenders = new Appender[3];
+		appenders[0] = new TextFlowAppender(txtArea1);
+		appenders[1] = new TextFlowAppender(txtArea2);
+		appenders[2] = new TextFlowAppender(txtArea3);
+		appenders[0].endedProperty().addListener(new EndedListener(stateImage1, txtArea1));
+		appenders[1].endedProperty().addListener(new EndedListener(stateImage2, txtArea2));
+		appenders[2].endedProperty().addListener(new EndedListener(stateImage3, txtArea3));
 		
 		final String[] queryMasks = BaseUiService.getQueryMasks(game);
 		final String msg = "Extracting %s files";
@@ -88,11 +131,21 @@ public class BaseUiExtractionController implements Updateable {
 		areaLabel2.setText(String.format(msg, queryMasks[1]));
 		areaLabel3.setText(String.format(msg, queryMasks[2]));
 		
+		stateImage1.setIcon(FontAwesomeIcon.SPINNER);
+		stateImage2.setIcon(FontAwesomeIcon.SPINNER);
+		stateImage3.setIcon(FontAwesomeIcon.SPINNER);
+		stateImage1.setFill(Color.GAINSBORO);
+		stateImage2.setFill(Color.GAINSBORO);
+		stateImage3.setFill(Color.GAINSBORO);
+		stateImage1.setVisible(true);
+		stateImage2.setVisible(true);
+		stateImage3.setVisible(true);
+		
 		final ExtractBaseUiTask task = new ExtractBaseUiTask(appController,
 				baseUiService,
 				game,
 				usePtr,
-				output,
+				appenders,
 				errorTabController,
 				navigationController);
 		executor.execute(task);
@@ -108,5 +161,55 @@ public class BaseUiExtractionController implements Updateable {
 	
 	public ErrorTabController getErrorTabController() {
 		return errorTabController;
+	}
+	
+	private static final class EndedListener implements ChangeListener<Boolean> {
+		private static final String ERROR = "ERROR:";
+		private static final String WARNING = "WARNING:";
+		private final FontAwesomeIconView stateImage;
+		private final TextFlow txtArea;
+		
+		private EndedListener(final FontAwesomeIconView stateImage, final TextFlow txtArea) {
+			this.stateImage = stateImage;
+			this.txtArea = txtArea;
+		}
+		
+		@Override
+		public void changed(
+				final ObservableValue<? extends Boolean> observable, final Boolean oldValue, final Boolean newValue) {
+			// the text children are added after the UI updates
+			Platform.runLater(() -> {
+				boolean isError = false;
+				boolean isWarning = false;
+				final ObservableList<Node> children = txtArea.getChildren();
+				if (children != null && !children.isEmpty()) {
+					for (final Node child : children) {
+						if (child instanceof Text) {
+							final Text text = (Text) child;
+							if (text.getText().contains(ERROR)) {
+								isError = true;
+								break;
+							}
+							if (text.getText().contains(WARNING)) {
+								isWarning = true;
+								break;
+							}
+						}
+					}
+				} else {
+					isError = true;
+				}
+				if (isError) {
+					stateImage.setIcon(FontAwesomeIcon.EXCLAMATION_TRIANGLE);
+					stateImage.setFill(Color.RED);
+				} else if (isWarning) {
+					stateImage.setIcon(FontAwesomeIcon.EXCLAMATION_TRIANGLE);
+					stateImage.setFill(Color.YELLOW);
+				} else {
+					stateImage.setIcon(FontAwesomeIcon.CHECK);
+					stateImage.setFill(Color.LAWNGREEN);
+				}
+			});
+		}
 	}
 }

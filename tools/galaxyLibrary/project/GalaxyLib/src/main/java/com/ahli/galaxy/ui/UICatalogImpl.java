@@ -175,10 +175,9 @@ public class UICatalogImpl implements UICatalog {
 				try {
 					processLayoutFile(layoutFilePath, raceId, isDevLayout, consoleSkinId, parser);
 				} catch (final IOException e) {
-					logger.error(
-							String.format("ERROR: encountered an Exception while processing the layout file '%s'.",
-									layoutFilePath),
-							e);
+					logger.error(String.format(
+							"ERROR: encountered an Exception while processing the layout file '%s'.",
+							layoutFilePath), e);
 				}
 				if (Thread.interrupted()) {
 					//noinspection NewExceptionWithoutArguments

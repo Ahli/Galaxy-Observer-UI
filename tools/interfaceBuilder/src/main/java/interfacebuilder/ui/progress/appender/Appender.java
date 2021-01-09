@@ -3,6 +3,8 @@
 
 package interfacebuilder.ui.progress.appender;
 
+import javafx.beans.property.SimpleBooleanProperty;
+
 public interface Appender {
 	/**
 	 * Appends the specified line to configured thing.
@@ -11,4 +13,14 @@ public interface Appender {
 	 * 		line that is added
 	 */
 	void append(String line);
+	
+	/**
+	 * Signals that the appending is now stopping.
+	 */
+	void end();
+	
+	/**
+	 * @return
+	 */
+	SimpleBooleanProperty endedProperty();
 }

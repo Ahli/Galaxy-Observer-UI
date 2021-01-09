@@ -45,7 +45,6 @@ public final class SpringBootApplication {
 	
 	public static void main(final String[] args) {
 		try {
-			// TODO InterProcessCommunication needs appController
 			// TODO app mode without GUI
 			if (InterProcessCommunication.isPortFree(INTER_PROCESS_COMMUNICATION_PORT)) {
 				if (!actAsServer(args)) {

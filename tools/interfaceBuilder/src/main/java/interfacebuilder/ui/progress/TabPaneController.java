@@ -30,7 +30,6 @@ public class TabPaneController implements Updateable {
 		
 		// log4j2 prints into txtArea
 		final TextFlow txtArea = new TextFlow();
-		txtArea.getStyleClass().add("styled-text-area");
 		final ScrollPane scrollPane = new ScrollPane(txtArea);
 		scrollPane.setPannable(true);
 		

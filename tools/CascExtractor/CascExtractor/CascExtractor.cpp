@@ -111,7 +111,7 @@ int main(const int argc, const char* const argv[])
 		std::cout << "ERROR: " << e.what() << std::endl;
 	}
 	catch (...) {
-		std::cout << "An unknown fatal error occurred." << std::endl;
+		std::cout << "ERROR: An unknown fatal error occurred." << std::endl;
 	}
 	return 0;
 }

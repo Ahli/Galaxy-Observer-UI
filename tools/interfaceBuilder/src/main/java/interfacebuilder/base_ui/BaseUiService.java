@@ -182,7 +182,8 @@ public class BaseUiService {
 	 * @param outputs
 	 * @return list of executable tasks
 	 */
-	public List<ForkJoinTask<Void>> extract(final Game game, final boolean usePtr, final Appender[] outputs) {
+	public List<ForkJoinTask<Void>> createExtractionTasks(
+			final Game game, final boolean usePtr, final Appender[] outputs) {
 		logger.info("Extracting baseUI for {}", game);
 		
 		final GameDef gameDef = gameService.getGameDef(game);
@@ -461,6 +462,8 @@ public class BaseUiService {
 				logger.error("Extracting files from CASC via CascExtractor failed.", e);
 			} catch (final InterruptedException e) {
 				Thread.currentThread().interrupt();
+			} finally {
+				outputAppender.end();
 			}
 		}
 		

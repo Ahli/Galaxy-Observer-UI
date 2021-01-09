@@ -28,6 +28,7 @@ import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -35,7 +36,6 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.image.Image;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -160,7 +160,7 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 	
 	private void initUi() throws IOException {
 		// Build Navigation
-		final BorderPane root;
+		final Parent root;
 		final FXMLSpringLoader loader = new FXMLSpringLoader(appContext);
 		try {
 			root = loader.load("classpath:view/Navigation.fxml");
@@ -472,7 +472,6 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 			// CASE: new tab
 			newTab = new Tab(tabName);
 			final TextFlow newTxtArea = new TextFlow();
-			newTxtArea.getStyleClass().add("styled-text-area");
 			final ErrorTabController errorTabCtrl =
 					new ErrorTabController(newTab, newTxtArea, true, false, errorPreventsExit);
 			errorTabCtrl.setRunning(true);

@@ -42,7 +42,7 @@ public class ExtractBaseUiTask extends CleaningForkJoinTask {
 	
 	@Override
 	protected boolean work() {
-		final List<ForkJoinTask<Void>> tasks = baseUiService.extract(game, usePtr, output);
+		final List<ForkJoinTask<Void>> tasks = baseUiService.createExtractionTasks(game, usePtr, output);
 		
 		Platform.runLater(() -> {
 			final String notificationId;
