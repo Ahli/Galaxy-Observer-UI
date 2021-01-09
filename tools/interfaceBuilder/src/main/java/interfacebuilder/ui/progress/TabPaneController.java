@@ -32,7 +32,6 @@ public class TabPaneController implements Updateable {
 		final TextFlow txtArea = new TextFlow();
 		txtArea.getStyleClass().add("styled-text-area");
 		final ScrollPane scrollPane = new ScrollPane(txtArea);
-		scrollPane.getStyleClass().add("virtualized-scroll-pane");
 		scrollPane.setPannable(true);
 		
 		// auto-downscrolling

@@ -1,3 +1,6 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 package interfacebuilder.ui;
 
 import com.ahli.galaxy.game.GameDef;
@@ -476,7 +479,6 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 			errorTabControllers.add(errorTabCtrl);
 			
 			final ScrollPane scrollPane = new ScrollPane(newTxtArea);
-			scrollPane.getStyleClass().add("virtualized-scroll-pane");
 			scrollPane.setPannable(true);
 			
 			// auto-downscrolling

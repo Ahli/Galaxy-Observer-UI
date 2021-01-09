@@ -242,7 +242,6 @@ public class BrowseController implements Updateable {
 			newTxtArea.getStyleClass().add("styled-text-area");
 			
 			final ScrollPane scrollPane = new ScrollPane(newTxtArea);
-			scrollPane.getStyleClass().add("virtualized-scroll-pane");
 			scrollPane.setPannable(true);
 			
 			// auto-downscrolling

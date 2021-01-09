@@ -1,3 +1,6 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 package interfacebuilder;
 
 import interfacebuilder.config.AppConfiguration;
@@ -59,14 +62,10 @@ public final class SpringBootApplication {
 	}
 	
 	private static boolean actAsClient(final String[] args) {
-		try (final InterProcessCommunication interProcessCommunication = new InterProcessCommunication()) {
-			if (InterProcessCommunication.sendToServer(args, INTER_PROCESS_COMMUNICATION_PORT)) {
-				return true;
-			} else {
-				logger.error("InterProcessCommunication as Client failed as port is not free anymore");
-			}
-		} catch (final IOException e) {
-			logger.error("Closing InterProcessCommunication failed", e);
+		if (InterProcessCommunication.sendToServer(args, INTER_PROCESS_COMMUNICATION_PORT)) {
+			return true;
+		} else {
+			logger.error("InterProcessCommunication as Client failed. The port might not be free anymore.");
 		}
 		return false;
 	}

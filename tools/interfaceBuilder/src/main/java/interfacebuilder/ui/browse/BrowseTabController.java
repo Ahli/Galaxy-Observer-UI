@@ -73,6 +73,7 @@ public class BrowseTabController implements Updateable {
 	private final StringProperty queryString;
 	private final Callable<TreeItemPredicate<UIElement>> searchCallable;
 	private final TextFlowFactory flowFactory;
+	private final Object instanceLock = new Object();
 	private AutoCompleteComboBox fileSelector;
 	private AutoCompleteComboBox templateSelector;
 	@FXML
@@ -196,7 +197,7 @@ public class BrowseTabController implements Updateable {
 	 * @param filter
 	 */
 	private void filterTree(final String filter) {
-		synchronized (this) {
+		synchronized (instanceLock) {
 			queriedFilter = filter;
 			if (queryIdling) {
 				queryIdling = false;

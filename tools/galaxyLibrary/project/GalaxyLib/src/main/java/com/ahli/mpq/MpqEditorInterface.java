@@ -32,6 +32,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	private static final Logger logger = LogManager.getLogger(MpqEditorInterface.class);
 	private static final String MPQ_INTERFACE_MPQ_EDITOR_NOT_FOUND = "MpqInterface.MpqEditorNotFound";
 	private static final String CMD_C = "cmd /C ";
+	private static final Object classWideLock = new Object();
 	private MpqEditorSettingsInterface settings;
 	private Path mpqEditorPath;
 	private Path mpqCachePath;
@@ -218,8 +219,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 		   Multiple different compression settings would cause race conditions and problems. */
 		final MpqEditorSettingsInterface settingsInterface = settings;
 		final String cachePath = mpqCachePath.toString();
-		//noinspection SynchronizeOnThis
-		synchronized (MpqEditorInterface.class) {
+		synchronized (classWideLock) {
 			settingsInterface.applyCompression();
 			try {
 				// build protected file
