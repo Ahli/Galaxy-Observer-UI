@@ -41,7 +41,7 @@ final class RecursiveVtdTest {
 		
 		try {
 			vtd = new VTDGen();
-			// for (int i = 0; i < 1000; i++) {
+			// for (int i = 0; i < 1000; ++i) {
 			while (System.currentTimeMillis() - startTime < 60_000) {
 				list.clear();
 				loadRecursiveXML(vtd, p);

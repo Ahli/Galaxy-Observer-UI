@@ -88,19 +88,19 @@ public class UICatalogImpl implements UICatalog {
 		// testing shows that iterators are not faster and are not thread safe
 		int i;
 		int len;
-		for (i = 0, len = templates.size(); i < len; i++) {
+		for (i = 0, len = templates.size(); i < len; ++i) {
 			clone.templates.add((UITemplate) templates.get(i).deepCopy());
 		}
-		for (i = 0, len = blizzOnlyTemplates.size(); i < len; i++) {
+		for (i = 0, len = blizzOnlyTemplates.size(); i < len; ++i) {
 			clone.blizzOnlyTemplates.add((UITemplate) blizzOnlyTemplates.get(i).deepCopy());
 		}
-		for (i = 0, len = constants.size(); i < len; i++) {
+		for (i = 0, len = constants.size(); i < len; ++i) {
 			clone.constants.add((UIConstant) constants.get(i).deepCopy());
 		}
-		for (i = 0, len = blizzOnlyConstants.size(); i < len; i++) {
+		for (i = 0, len = blizzOnlyConstants.size(); i < len; ++i) {
 			clone.blizzOnlyConstants.add((UIConstant) blizzOnlyConstants.get(i).deepCopy());
 		}
-		for (i = 0, len = blizzOnlyLayouts.size(); i < len; i++) {
+		for (i = 0, len = blizzOnlyLayouts.size(); i < len; ++i) {
 			clone.blizzOnlyLayouts.add(blizzOnlyLayouts.get(i));
 		}
 		clone.curBasePath = curBasePath;
@@ -333,7 +333,7 @@ public class UICatalogImpl implements UICatalog {
 		int i = 0;
 		if (!constantRef.isEmpty()) {
 			while (constantRef.charAt(i) == '#') {
-				i++;
+				++i;
 			}
 		}
 		// no constant tag
@@ -450,24 +450,25 @@ public class UICatalogImpl implements UICatalog {
 		}
 		final Object[] signatureFields = getSignatureFields();
 		final Object[] thatSignatureFields = ((UICatalogImpl) obj).getSignatureFields();
-		for (int i = 0; i < signatureFields.length; i++) {
+		for (int i = 0; i < signatureFields.length; ++i) {
 			if (!(signatureFields[i] instanceof Object[])) {
 				if (!Objects.equals(signatureFields[i], thatSignatureFields[i])) {
-					logger.info("equals=false - object - i={}", i);
+					logger.trace("equals=false - object - i={}", i);
 					return false;
 				}
 			} else {
 				if (!Arrays.deepEquals((Object[]) signatureFields[i], (Object[]) thatSignatureFields[i])) {
-					logger.info("equals=false - array - i={}", i);
+					logger.trace("equals=false - array - i={}", i);
 					return false;
 				}
 			}
 		}
+		logger.trace("deep equals UICatalogImpl");
 		return true;
 	}
 	
 	private Object[] getSignatureFields() {
-		return new Object[] { templates, constants, blizzOnlyTemplates, blizzOnlyConstants, blizzOnlyLayouts };
+		return new Object[] { templates, constants, blizzOnlyTemplates, blizzOnlyConstants, blizzOnlyLayouts, handles };
 	}
 	
 	@Override

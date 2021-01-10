@@ -52,10 +52,10 @@ public class UIAnimation extends UIElement {
 	@Override
 	public Object deepCopy() {
 		final UIAnimation clone = new UIAnimation(getName(), events.size(), controllers.size());
-		for (int i = 0, len = controllers.size(); i < len; i++) {
+		for (int i = 0, len = controllers.size(); i < len; ++i) {
 			clone.controllers.add((UIController) controllers.get(i).deepCopy());
 		}
-		for (int i = 0, len = events.size(); i < len; i++) {
+		for (int i = 0, len = events.size(); i < len; ++i) {
 			final UIAttribute p = events.get(i);
 			clone.events.add((UIAttribute) p.deepCopy());
 		}
@@ -183,7 +183,7 @@ public class UIAnimation extends UIElement {
 		}
 		final Object[] signatureFields = getSignatureFields();
 		final Object[] thatSignatureFields = ((UIAnimation) obj).getSignatureFields();
-		for (int i = 0; i < signatureFields.length; i++) {
+		for (int i = 0; i < signatureFields.length; ++i) {
 			if (!(signatureFields[i] instanceof Object[])) {
 				if (!Objects.equals(signatureFields[i], thatSignatureFields[i])) {
 					return false;

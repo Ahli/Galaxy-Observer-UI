@@ -112,6 +112,8 @@ public class KryoService {
 					kryo.writeObject(output, obj);
 				}
 			}
+		} catch (final KryoException e) {
+			throw new IOException(e);
 		}
 	}
 	

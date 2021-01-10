@@ -20,6 +20,7 @@ package com.ahli.util;
 
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
+import java.lang.ref.WeakReference;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.AbstractSet;
 import java.util.ArrayList;
@@ -82,6 +83,7 @@ public class ConcurrentWeakWeakHashMap<K> implements ConcurrentMap<K, K> {
 	public boolean replace(final K key, final K oldValue, final K newValue) {
 		purgeKeys();
 		final var weakKeyRefKey = newKey(key);
+		// TODO I guess this is wrong, but I don't use it...
 		return map.replace(weakKeyRefKey, weakKeyRefKey, weakKeyRefKey);
 	}
 	
@@ -181,7 +183,7 @@ public class ConcurrentWeakWeakHashMap<K> implements ConcurrentMap<K, K> {
 		return new WeakHashMapEntrySet<>(this);
 	}
 	
-	private static final class WeakReferenceWithHash<T> extends java.lang.ref.WeakReference<T> {
+	private static final class WeakReferenceWithHash<T> extends WeakReference<T> {
 		
 		private final int hashCode;
 		

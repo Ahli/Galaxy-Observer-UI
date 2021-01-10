@@ -51,10 +51,10 @@ public class UIController extends UIElement {
 	@Override
 	public Object deepCopy() {
 		final UIController clone = new UIController(getName(), attributesKeyValueList.size(), keys.size());
-		for (int i = 0, len = keys.size(); i < len; i++) {
+		for (int i = 0, len = keys.size(); i < len; ++i) {
 			clone.keys.add((UIAttribute) keys.get(i).deepCopy());
 		}
-		for (int i = 0, len = attributesKeyValueList.size(); i < len; i++) {
+		for (int i = 0, len = attributesKeyValueList.size(); i < len; ++i) {
 			clone.attributesKeyValueList.add(attributesKeyValueList.get(i));
 		}
 		clone.nextAdditionShouldOverride = nextAdditionShouldOverride;
@@ -181,7 +181,7 @@ public class UIController extends UIElement {
 		}
 		final Object[] signatureFields = getSignatureFields();
 		final Object[] thatSignatureFields = ((UIController) obj).getSignatureFields();
-		for (int i = 0; i < signatureFields.length; i++) {
+		for (int i = 0; i < signatureFields.length; ++i) {
 			if (!(signatureFields[i] instanceof Object[])) {
 				if (!Objects.equals(signatureFields[i], thatSignatureFields[i])) {
 					return false;

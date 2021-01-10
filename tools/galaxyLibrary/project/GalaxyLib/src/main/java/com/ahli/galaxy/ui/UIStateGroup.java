@@ -45,7 +45,7 @@ public class UIStateGroup extends UIElement {
 	@Override
 	public Object deepCopy() {
 		final UIStateGroup clone = new UIStateGroup(getName(), states.size());
-		for (int i = 0, len = states.size(); i < len; i++) {
+		for (int i = 0, len = states.size(); i < len; ++i) {
 			clone.states.add((UIState) states.get(i).deepCopy());
 		}
 		clone.defaultState = defaultState;
@@ -137,7 +137,7 @@ public class UIStateGroup extends UIElement {
 		}
 		final Object[] signatureFields = getSignatureFields();
 		final Object[] thatSignatureFields = ((UIStateGroup) obj).getSignatureFields();
-		for (int i = 0; i < signatureFields.length; i++) {
+		for (int i = 0; i < signatureFields.length; ++i) {
 			if (!(signatureFields[i] instanceof Object[])) {
 				if (!Objects.equals(signatureFields[i], thatSignatureFields[i])) {
 					return false;

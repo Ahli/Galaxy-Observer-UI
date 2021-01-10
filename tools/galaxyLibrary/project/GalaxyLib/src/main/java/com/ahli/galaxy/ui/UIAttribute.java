@@ -56,7 +56,7 @@ public class UIAttribute extends UIElement {
 	@Override
 	public Object deepCopy() {
 		final UIAttribute clone = new UIAttribute(getName(), keyValueList.size());
-		for (int i = 0, len = keyValueList.size(); i < len; i++) {
+		for (int i = 0, len = keyValueList.size(); i < len; ++i) {
 			clone.keyValueList.add(keyValueList.get(i));
 		}
 		return clone;
@@ -151,7 +151,7 @@ public class UIAttribute extends UIElement {
 		}
 		final Object[] signatureFields = getSignatureFields();
 		final Object[] thatSignatureFields = ((UIAttribute) obj).getSignatureFields();
-		for (int i = 0; i < signatureFields.length; i++) {
+		for (int i = 0; i < signatureFields.length; ++i) {
 			if (!(signatureFields[i] instanceof Object[])) {
 				if (!Objects.equals(signatureFields[i], thatSignatureFields[i])) {
 					return false;

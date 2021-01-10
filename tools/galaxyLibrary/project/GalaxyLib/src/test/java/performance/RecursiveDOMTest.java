@@ -55,7 +55,7 @@ final class RecursiveDOMTest {
 			dbFac.setExpandEntityReferences(false);
 			dbFac.setAttribute(XMLConstants.FEATURE_SECURE_PROCESSING, true);
 			dBuilder = dbFac.newDocumentBuilder();
-			// for (int i = 0; i < 1000; i++) {
+			// for (int i = 0; i < 1000; ++i) {
 			while (System.currentTimeMillis() - startTime < 60_000) {
 				list.clear();
 				loadRecursiveXML(dBuilder, f);
@@ -126,7 +126,7 @@ final class RecursiveDOMTest {
 			
 			attributes = node.getAttributes();
 			if (attributes != null) {
-				for (i = 0, len2 = attributes.getLength(); i < len2; i++) {
+				for (i = 0, len2 = attributes.getLength(); i < len2; ++i) {
 					attr = attributes.item(i);
 					// i will be attr name, i+1 will be attribute value
 					attrName = attr.getNodeName().toLowerCase(Locale.ROOT);
@@ -145,7 +145,7 @@ final class RecursiveDOMTest {
 		Node n = parent;
 		while (n != null) {
 			n = n.getParentNode();
-			i++;
+			++i;
 		}
 		return i;
 	}

@@ -50,7 +50,7 @@ public class RuleSet implements Serializable {
 		
 		// update string representation in DB
 		final String[] rulesStrings = new String[compressionRules.length];
-		for (int i = 0; i < compressionRules.length; i++) {
+		for (int i = 0; i < compressionRules.length; ++i) {
 			rulesStrings[i] = compressionRules[i].toString();
 		}
 		compressionRulesString = Arrays.asList(rulesStrings);
@@ -69,7 +69,7 @@ public class RuleSet implements Serializable {
 		// lazy-load array
 		if (compressionRules == null) {
 			compressionRules = new MpqEditorCompressionRule[getCompressionRulesString().size()];
-			for (int i = 0; i < compressionRules.length; i++) {
+			for (int i = 0; i < compressionRules.length; ++i) {
 				compressionRules[i] = MpqEditorCompressionRuleParser.parse(compressionRulesString.get(i));
 			}
 		}
@@ -102,7 +102,7 @@ public class RuleSet implements Serializable {
 		}
 		final Object[] signatureFields = getSignatureFields();
 		final Object[] thatSignatureFields = ((RuleSet) obj).getSignatureFields();
-		for (int i = 0; i < signatureFields.length; i++) {
+		for (int i = 0; i < signatureFields.length; ++i) {
 			if (!(signatureFields[i] instanceof Object[])) {
 				if (!Objects.equals(signatureFields[i], thatSignatureFields[i])) {
 					return false;

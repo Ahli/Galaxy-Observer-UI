@@ -251,7 +251,7 @@ public class BrowseTabController implements Updateable {
 				}
 				int i = 0;
 				for (final UIElement state : elem.getStates()) {
-					i++;
+					++i;
 					map.put(STATE_PREFIX + i, state.getName());
 				}
 			} else if (el instanceof UIAnimation) {
@@ -262,14 +262,14 @@ public class BrowseTabController implements Updateable {
 				}
 				int i = 0;
 				for (final UIAttribute event : elem.getEvents()) {
-					i++;
+					++i;
 					map.put(EVENT_PREFIX + i, prettyPrint(event));
 				}
 			} else if (el instanceof UIController) {
 				final UIController elem = (UIController) el;
 				int i = 0;
 				for (final UIAttribute attr : elem.getKeys()) {
-					i++;
+					++i;
 					map.put(KEY_PREFIX + i, prettyPrint(attr));
 				}
 				// TODO keyValueList, e.g. in a new panel where it would show template, file and type, too?
@@ -278,12 +278,12 @@ public class BrowseTabController implements Updateable {
 				final UIState elem = (UIState) el;
 				int i = 0;
 				for (final UIAttribute attr : elem.getWhens()) {
-					i++;
+					++i;
 					map.put(WHEN_PREFIX + i, prettyPrint(attr));
 				}
 				i = 0;
 				for (final UIAttribute attr : elem.getActions()) {
-					i++;
+					++i;
 					map.put(ACTION_PREFIX + i, prettyPrint(attr));
 				}
 			}

@@ -90,7 +90,7 @@ public class SettingsController implements Updateable {
 	 * @return
 	 */
 	private int getCategoryIndex(final TreeItem<String> category) {
-		for (int i = 0, len = categories.length; i < len; i++) {
+		for (int i = 0, len = categories.length; i < len; ++i) {
 			if (category == categories[i]) {
 				return i;
 			}
