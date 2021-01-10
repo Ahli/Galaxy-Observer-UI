@@ -82,9 +82,9 @@ public class MpqBuilderService {
 		final List<Project> projectsOfPath = projectService.getProjectsOfPath(path);
 		if (projectsOfPath.isEmpty()) {
 			final Game game;
-			if (ProjectService.pathContainsCompileableForGame(path, heroesBaseGameData)) {
+			if (projectService.pathContainsCompileableForGame(path, heroesBaseGameData)) {
 				game = Game.HEROES;
-			} else if (ProjectService.pathContainsCompileableForGame(path, sc2BaseGameData)) {
+			} else if (projectService.pathContainsCompileableForGame(path, sc2BaseGameData)) {
 				game = Game.SC2;
 			} else {
 				throw new IllegalArgumentException("Specified path '" + path + "' did not contain any project.");

@@ -57,7 +57,7 @@ public class ProjectService {
 	 * @param project
 	 * @throws IOException
 	 */
-	public static void createTemplateProjectFiles(final Project project) throws IOException {
+	public void createTemplateProjectFiles(final Project project) throws IOException {
 		final String jarIntPath;
 		if (project.getGame() == Game.SC2) {
 			jarIntPath = "templates/sc2/interface/";
@@ -96,7 +96,7 @@ public class ProjectService {
 	 * @param game
 	 * @return
 	 */
-	public static boolean pathContainsCompileableForGame(final String path, final GameData game) {
+	public boolean pathContainsCompileableForGame(final String path, final GameData game) {
 		// detection via layout file ending as defined in the GameData's GameDef
 		final String[] extensions = new String[1];
 		extensions[0] = game.getGameDef().getLayoutFileEnding();
