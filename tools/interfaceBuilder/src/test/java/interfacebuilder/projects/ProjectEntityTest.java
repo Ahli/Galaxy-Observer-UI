@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 class ProjectEntityTest {
 	@Test
 	@SuppressWarnings("JUnitTestMethodWithNoAssertions")
-	public void equalsContract() {
+	void equalsContract() {
 		EqualsVerifier.forClass(ProjectEntity.class).verify();
 	}
 }

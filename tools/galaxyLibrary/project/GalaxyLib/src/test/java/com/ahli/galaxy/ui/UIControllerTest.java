@@ -8,7 +8,7 @@ class UIControllerTest {
 	
 	@Test
 	@SuppressWarnings("JUnitTestMethodWithNoAssertions")
-	public void equalsContract() {
+	void equalsContract() {
 		EqualsVerifier.forClass(UIController.class)
 				.withRedefinedSuperclass()
 				.suppress(Warning.NONFINAL_FIELDS)
