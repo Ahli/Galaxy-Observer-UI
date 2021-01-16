@@ -52,7 +52,7 @@ final class KryoServiceTest {
 		
 		final KryoGameInfo kryoGameInfoA =
 				new KryoGameInfo(new int[] { 42, 12, 44, 12345 }, "Heroes of the Storm", false);
-		final UICatalogImpl uiCatalogA = new UICatalogImpl(1, 1, 1, 0, 1);
+		final UICatalogImpl uiCatalogA = new UICatalogImpl(1, 1, 1, 0, 1, 0);
 		uiCatalogA.addTemplate("fileName", new UIFrame("frame", "type"), false);
 		uiCatalogA.addConstant(new UIConstant("asd asd asd", "qqq"), false);
 		final List<Object> payload = new ArrayList<>(2);

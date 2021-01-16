@@ -30,87 +30,27 @@ public class KryoGameInfo {
 	}
 	
 	@Override
-	public boolean equals(final Object obj) {
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		if (obj == this) {
-			return true;
-		}
-		final Object[] signatureFields = getSignatureFields();
-		final Object[] thatSignatureFields = ((KryoGameInfo) obj).getSignatureFields();
-		for (int i = 0; i < signatureFields.length; ++i) {
-			final var thisObj = signatureFields[i];
-			final var thatObj = thatSignatureFields[i];
-			final boolean objectArray = thisObj instanceof Object[];
-			final boolean isArray = thisObj.getClass().isArray();
-			if (!(objectArray || isArray)) {
-				if (!Objects.equals(thisObj, thatObj)) {
-					return false;
-				}
-			} else {
-				if (objectArray) {
-					if (!Arrays.deepEquals((Object[]) thisObj, (Object[]) thatObj)) {
-						return false;
-					}
-				} else {
-					final var typeThis = thisObj.getClass().getComponentType();
-					if (!typeThis.equals(thatObj.getClass().getComponentType())) {
-						return false;
-					}
-					
-					if (typeThis.equals(int[].class)) {
-						if (!Arrays.equals((int[]) thisObj, (int[]) thatObj)) {
-							return false;
-						}
-					} else if (typeThis.equals(boolean[].class)) {
-						if (!Arrays.equals((boolean[]) thisObj, (boolean[]) thatObj)) {
-							return false;
-						}
-					} else if (typeThis.equals(short[].class)) {
-						if (!Arrays.equals((short[]) thisObj, (short[]) thatObj)) {
-							return false;
-						}
-					} else if (typeThis.equals(char[].class)) {
-						if (!Arrays.equals((char[]) thisObj, (char[]) thatObj)) {
-							return false;
-						}
-					} else if (typeThis.equals(byte[].class)) {
-						if (!Arrays.equals((byte[]) thisObj, (byte[]) thatObj)) {
-							return false;
-						}
-					} else if (typeThis.equals(long[].class)) {
-						if (!Arrays.equals((long[]) thisObj, (long[]) thatObj)) {
-							return false;
-						}
-					} else if (typeThis.equals(float[].class)) {
-						if (!Arrays.equals((float[]) thisObj, (float[]) thatObj)) {
-							return false;
-						}
-					} else if (typeThis.equals(double[].class) &&
-							!Arrays.equals((double[]) thisObj, (double[]) thatObj)) {
-						return false;
-					}
-				}
-			}
-		}
-		return true;
-	}
-	
-	private Object[] getSignatureFields() {
-		return new Object[] { gameName, version, isPtr };
-	}
-	
-	@Override
-	public int hashCode() {
-		return Objects.hash(getSignatureFields());
-	}
-	
-	@Override
 	public String toString() {
 		return "KryoGameInfo{gameName=" + gameName + ", isPtr=" + isPtr + ", version=" + Arrays.toString(version) + "}";
+	}
+	
+	@Override
+	public final boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (!(obj instanceof KryoGameInfo)) {
+			return false;
+		}
+		final KryoGameInfo that = (KryoGameInfo) obj;
+		return isPtr == that.isPtr && Arrays.equals(version, that.version) && Objects.equals(gameName, that.gameName);
+	}
+	
+	@Override
+	public final int hashCode() {
+		@SuppressWarnings("ObjectInstantiationInEqualsHashCode")
+		int result = Objects.hash(gameName, isPtr);
+		result = 31 * result + Arrays.hashCode(version);
+		return result;
 	}
 }

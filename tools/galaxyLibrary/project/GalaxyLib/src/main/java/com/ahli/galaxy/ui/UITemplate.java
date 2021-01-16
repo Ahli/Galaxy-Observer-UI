@@ -6,7 +6,6 @@ package com.ahli.galaxy.ui;
 import com.ahli.galaxy.ui.abstracts.UIElement;
 import com.ahli.util.DeepCopyable;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -105,38 +104,21 @@ public class UITemplate implements DeepCopyable {
 	}
 	
 	@Override
-	public boolean equals(final Object obj) {
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		if (obj == this) {
+	public final boolean equals(final Object obj) {
+		if (this == obj) {
 			return true;
 		}
-		final Object[] signatureFields = getSignatureFields();
-		final Object[] thatSignatureFields = ((UITemplate) obj).getSignatureFields();
-		for (int i = 0; i < signatureFields.length; ++i) {
-			if (!(signatureFields[i] instanceof Object[])) {
-				if (!Objects.equals(signatureFields[i], thatSignatureFields[i])) {
-					return false;
-				}
-			} else {
-				if (!Arrays.deepEquals((Object[]) signatureFields[i], (Object[]) thatSignatureFields[i])) {
-					return false;
-				}
-			}
+		if (!(obj instanceof UITemplate)) {
+			return false;
 		}
-		return true;
-	}
-	
-	private Object[] getSignatureFields() {
-		return new Object[] { fileName, isLocked, element };
+		final UITemplate that = (UITemplate) obj;
+		return isLocked == that.isLocked && Objects.equals(fileName, that.fileName) &&
+				Objects.equals(element, that.element);
 	}
 	
 	@Override
-	public int hashCode() {
-		return Objects.hash(getSignatureFields());
+	public final int hashCode() {
+		//noinspection ObjectInstantiationInEqualsHashCode
+		return Objects.hash(fileName, element, isLocked);
 	}
 }

@@ -8,14 +8,13 @@ import interfacebuilder.projects.enums.Game;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Data
 @ToString
-@EqualsAndHashCode
 @Builder
 @AllArgsConstructor
 public class Project {
@@ -31,7 +30,26 @@ public class Project {
 		this.name = name;
 		this.projectPath = projectPath;
 		this.game = game;
-		this.id = 0;
+		id = 0;
 	}
 	
+	@Override
+	public final boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (!(obj instanceof Project)) {
+			return false;
+		}
+		final Project project = (Project) obj;
+		return id == project.id && lastBuildSize == project.lastBuildSize && Objects.equals(name, project.name) &&
+				Objects.equals(projectPath, project.projectPath) && game == project.game &&
+				Objects.equals(lastBuildDateTime, project.lastBuildDateTime) &&
+				Objects.equals(bestCompressionRuleSet, project.bestCompressionRuleSet);
+	}
+	
+	@Override
+	public final int hashCode() {
+		return Objects.hash(id, name, projectPath, game, lastBuildDateTime, lastBuildSize, bestCompressionRuleSet);
+	}
 }

@@ -328,7 +328,7 @@ public class MpqBuilderService {
 		
 		final File descIndexFile = mpqi.getFilePathFromMpq(descIndexData.getDescIndexIntPath()).toFile();
 		try {
-			descIndexData.addLayoutIntPath(DescIndexReader.getLayoutPathList(descIndexFile, false));
+			descIndexData.addLayoutIntPath(DescIndexReader.getLayoutPathList(descIndexFile, DescIndexReader.Mode.ALL));
 		} catch (final SAXException | ParserConfigurationException | IOException | MpqException e) {
 			logger.error("unable to read Layout paths", e);
 		}

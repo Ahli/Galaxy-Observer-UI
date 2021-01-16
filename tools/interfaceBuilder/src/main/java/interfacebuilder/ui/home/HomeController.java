@@ -283,10 +283,16 @@ public class HomeController implements Updateable {
 			final Project[] items = selectedItems.toArray(new Project[selectedItems.size()]);
 			final Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
 			alert.initOwner(getWindow());
-			alert.setTitle(String.format("Remove selected Project from list? - %s items selected",
-					selectedItems.size()));
-			alert.setHeaderText("Are you sure you want to remove the selected projects?" + "\n" +
-					"This will not remove any files from the project.");
+			if (selectedItems.size() > 1) {
+				alert.setTitle(String.format("Remove selected Projects from list? - %s items selected",
+						selectedItems.size()));
+			} else {
+				alert.setTitle("Remove selected Project from list? - 1 item selected");
+			}
+			alert.setHeaderText("""
+			                       Are you sure you want to remove the selected projects?
+			                       This will not remove any files from the project.
+			                    """);
 			final Optional<ButtonType> result = alert.showAndWait();
 			if (result.isPresent() && result.get() == ButtonType.OK) {
 				for (final Project p : items) {
@@ -332,7 +338,7 @@ public class HomeController implements Updateable {
 			final Project project = selectedItems.get(0);
 			// init UI as Tab in Progress
 			final FXMLSpringLoader loader = new FXMLSpringLoader(appContext);
-			final Parent content = loader.load("classpath:view/ProgressTab_CompressionMining.fxml");
+			final Parent content = loader.load("classpath:view/Progress_CompressionMining.fxml");
 			final String tabName = String.format("%s Compression Mining", project.getName());
 			
 			final TabPane tabPane = tabPaneController.getTabPane();

@@ -6,7 +6,6 @@ package com.ahli.galaxy.ui;
 import com.ahli.galaxy.ui.abstracts.UIElement;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -39,11 +38,13 @@ public class UIAnimation extends UIElement {
 	 *
 	 * @param name
 	 * 		Element's name
+	 * @param eventsCapacity
+	 * @param controllerCapacity
 	 */
-	public UIAnimation(final String name, final int minEventsCapacity, final int minControllerCapacity) {
+	public UIAnimation(final String name, final int eventsCapacity, final int controllerCapacity) {
 		super(name);
-		events = new ArrayList<>(minEventsCapacity);
-		controllers = new ArrayList<>(minControllerCapacity);
+		events = new ArrayList<>(eventsCapacity);
+		controllers = new ArrayList<>(controllerCapacity);
 	}
 	
 	/**
@@ -171,38 +172,30 @@ public class UIAnimation extends UIElement {
 	}
 	
 	@Override
-	public boolean equals(final Object obj) {
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		if (obj == this) {
+	public final boolean equals(final Object o) {
+		if (this == o) {
 			return true;
 		}
-		final Object[] signatureFields = getSignatureFields();
-		final Object[] thatSignatureFields = ((UIAnimation) obj).getSignatureFields();
-		for (int i = 0; i < signatureFields.length; ++i) {
-			if (!(signatureFields[i] instanceof Object[])) {
-				if (!Objects.equals(signatureFields[i], thatSignatureFields[i])) {
-					return false;
-				}
-			} else {
-				if (!Arrays.deepEquals((Object[]) signatureFields[i], (Object[]) thatSignatureFields[i])) {
-					return false;
-				}
-			}
+		if (!(o instanceof UIAnimation)) {
+			return false;
 		}
-		return true;
-	}
-	
-	private Object[] getSignatureFields() {
-		return new Object[] { getName(), controllers, events, nextEventsAdditionShouldOverride, driver };
+		if (!super.equals(o)) {
+			return false;
+		}
+		final UIAnimation that = (UIAnimation) o;
+		return that.canEqual(this) && nextEventsAdditionShouldOverride == that.nextEventsAdditionShouldOverride &&
+				Objects.equals(controllers, that.controllers) && Objects.equals(events, that.events) &&
+				Objects.equals(driver, that.driver);
 	}
 	
 	@Override
-	public int hashCode() {
-		return Objects.hash(getSignatureFields());
+	public boolean canEqual(final Object other) {
+		return (other instanceof UIAnimation);
+	}
+	
+	@Override
+	public final int hashCode() {
+		//noinspection ObjectInstantiationInEqualsHashCode
+		return Objects.hash(super.hashCode(), controllers, events, nextEventsAdditionShouldOverride, driver);
 	}
 }

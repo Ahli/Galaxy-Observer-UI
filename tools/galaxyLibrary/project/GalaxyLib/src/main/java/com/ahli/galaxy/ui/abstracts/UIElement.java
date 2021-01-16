@@ -5,12 +5,14 @@ package com.ahli.galaxy.ui.abstracts;
 
 import com.ahli.util.DeepCopyable;
 import com.ahli.util.StringInterner;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
 /**
  * @author Ahli
  */
+@EqualsAndHashCode
 public abstract class UIElement implements DeepCopyable {
 	
 	private String name;

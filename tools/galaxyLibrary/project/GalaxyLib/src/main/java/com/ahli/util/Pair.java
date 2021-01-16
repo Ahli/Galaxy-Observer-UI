@@ -5,6 +5,8 @@ package com.ahli.util;
 
 import lombok.Data;
 
+import java.util.Objects;
+
 /**
  * <p> A convenience class to represent name-value pairs. </p>
  */
@@ -12,4 +14,21 @@ import lombok.Data;
 public class Pair<K, V> {
 	private final K key;
 	private final V value;
+	
+	@Override
+	public final boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (!(obj instanceof Pair)) {
+			return false;
+		}
+		final Pair<?, ?> pair = (Pair<?, ?>) obj;
+		return Objects.equals(key, pair.key) && Objects.equals(value, pair.value);
+	}
+	
+	@Override
+	public final int hashCode() {
+		return Objects.hash(key, value);
+	}
 }

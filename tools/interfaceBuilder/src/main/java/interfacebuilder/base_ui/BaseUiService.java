@@ -298,7 +298,7 @@ public class BaseUiService {
 				}
 				if (needToParseAgain) {
 					// parse baseUI
-					uiCatalog = new UICatalogImpl();
+					uiCatalog = new UICatalogImpl(gameData.getGameDef());
 					uiCatalog.setParser(new UICatalogParser(uiCatalog, new XmlParserVtd(), true));
 					AppController.printInfoLogMessageToGeneral("Starting to parse base " + gameName + " UI.");
 					app.addThreadLoggerTab(Thread.currentThread().getName(),

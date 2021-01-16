@@ -5,6 +5,7 @@ package com.ahli.galaxy.ui.interfaces;
 
 import com.ahli.galaxy.parser.interfaces.ParsedXmlConsumer;
 import com.ahli.galaxy.ui.UIConstant;
+import com.ahli.galaxy.ui.UIFrame;
 import com.ahli.galaxy.ui.UITemplate;
 import com.ahli.galaxy.ui.abstracts.UIElement;
 import com.ahli.galaxy.ui.exception.UIException;
@@ -16,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 
 public interface UICatalog extends DeepCopyable {
 	
@@ -113,6 +115,8 @@ public interface UICatalog extends DeepCopyable {
 	 * 		the blizzOnlyConstants to set
 	 */
 	void setBlizzOnlyConstants(List<UIConstant> blizzOnlyConstants);
+	
+	Map<String, UIFrame> getHandles();
 	
 	/**
 	 * @return the devLayouts

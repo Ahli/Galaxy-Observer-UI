@@ -251,7 +251,7 @@ public class BrowseController implements Updateable {
 			scrollPane.visibleProperty().bind(Bindings.isNotEmpty(newTxtArea.getChildren()));
 			
 			final FXMLSpringLoader loader = new FXMLSpringLoader(appContext);
-			final var rootNode = loader.<AnchorPane>load("classpath:view/ProgressTab_ExtractBaseUi.fxml");
+			final var rootNode = loader.<AnchorPane>load("classpath:view/Progress_ExtractBaseUi.fxml");
 			
 			newTab.setContent(rootNode);
 			
@@ -348,7 +348,7 @@ public class BrowseController implements Updateable {
 		Updateable controller = null;
 		try {
 			final FXMLSpringLoader loader = new FXMLSpringLoader(appContext);
-			final Node content = loader.load("classpath:view/Content_UiBrowser_BrowseTab.fxml");
+			final Node content = loader.load("classpath:view/Browse_BrowseTab.fxml");
 			controller = loader.getController();
 			controllers.add(controller);
 			final Tab newTab = new Tab(name, content);

@@ -90,38 +90,19 @@ public class RuleSet implements Serializable {
 	}
 	
 	@Override
-	public boolean equals(final Object obj) {
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		if (obj == this) {
+	public final boolean equals(final Object obj) {
+		if (this == obj) {
 			return true;
 		}
-		final Object[] signatureFields = getSignatureFields();
-		final Object[] thatSignatureFields = ((RuleSet) obj).getSignatureFields();
-		for (int i = 0; i < signatureFields.length; ++i) {
-			if (!(signatureFields[i] instanceof Object[])) {
-				if (!Objects.equals(signatureFields[i], thatSignatureFields[i])) {
-					return false;
-				}
-			} else {
-				if (!Arrays.deepEquals((Object[]) signatureFields[i], (Object[]) thatSignatureFields[i])) {
-					return false;
-				}
-			}
+		if (!(obj instanceof RuleSet)) {
+			return false;
 		}
-		return true;
-	}
-	
-	private Object[] getSignatureFields() {
-		return new Object[] { compressionRules };
+		final RuleSet ruleSet = (RuleSet) obj;
+		return Objects.equals(compressionRulesString, ruleSet.compressionRulesString);
 	}
 	
 	@Override
-	public int hashCode() {
-		return Objects.hash(getSignatureFields());
+	public final int hashCode() {
+		return Objects.hash(compressionRulesString);
 	}
 }

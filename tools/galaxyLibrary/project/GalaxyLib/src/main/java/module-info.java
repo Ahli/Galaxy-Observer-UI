@@ -29,4 +29,10 @@ module GalaxyLib {
 	opens com.ahli.galaxy.ui.abstracts;
 	opens com.ahli.galaxy.ui.interfaces;
 	opens com.ahli.util;
+	opens com.ahli.galaxy.parser.interfaces;
+	opens com.ahli.galaxy.game;
+	opens com.ahli.mpq;
+	opens com.ahli.galaxy.archive;
+	opens com.ahli.mpq.mpqeditor;
+	opens com.ahli.galaxy;
 }

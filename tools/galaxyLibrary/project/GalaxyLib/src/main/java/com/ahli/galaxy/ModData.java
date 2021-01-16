@@ -9,6 +9,7 @@ import com.ahli.galaxy.ui.interfaces.UICatalog;
 import lombok.Data;
 
 import java.nio.file.Path;
+import java.util.Objects;
 
 /**
  * @author Ahli
@@ -32,5 +33,33 @@ public class ModData {
 	 */
 	public ModData(final GameData game) {
 		gameData = game;
+	}
+	
+	@Override
+	public final boolean equals(final Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof ModData)) {
+			return false;
+		}
+		final ModData modData = (ModData) o;
+		return Objects.equals(gameData, modData.gameData) && Objects.equals(sourceDirectory, modData.sourceDirectory) &&
+				Objects.equals(mpqCacheDirectory, modData.mpqCacheDirectory) &&
+				Objects.equals(targetFile, modData.targetFile) &&
+				Objects.equals(descIndexData, modData.descIndexData) &&
+				Objects.equals(componentListFile, modData.componentListFile) &&
+				Objects.equals(uiCatalog, modData.uiCatalog);
+	}
+	
+	@Override
+	public final int hashCode() {
+		return Objects.hash(gameData,
+				sourceDirectory,
+				mpqCacheDirectory,
+				targetFile,
+				descIndexData,
+				componentListFile,
+				uiCatalog);
 	}
 }

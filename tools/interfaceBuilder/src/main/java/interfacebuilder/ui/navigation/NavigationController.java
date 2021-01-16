@@ -95,10 +95,10 @@ public class NavigationController {
 				3.0D / 255.0D), CornerRadii.EMPTY, Insets.EMPTY)));
 		
 		// content pages
-		initFXML("classpath:view/Content_Home.fxml", 0);
-		initFXML("classpath:view/Content_TabPane.fxml", 1);
-		initFXML("classpath:view/Content_UiBrowser.fxml", 2);
-		initFXML("classpath:view/Content_Settings.fxml", 3);
+		initFXML("classpath:view/Home.fxml", 0);
+		initFXML("classpath:view/Progress.fxml", 1);
+		initFXML("classpath:view/Browse.fxml", 2);
+		initFXML("classpath:view/Settings.fxml", 3);
 		
 		// make tabPane visible
 		showPanelContent(HOME_TAB);

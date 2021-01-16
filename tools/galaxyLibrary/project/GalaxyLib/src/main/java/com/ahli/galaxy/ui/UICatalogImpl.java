@@ -3,6 +3,7 @@
 
 package com.ahli.galaxy.ui;
 
+import com.ahli.galaxy.game.GameDef;
 import com.ahli.galaxy.parser.UICatalogParser;
 import com.ahli.galaxy.parser.XmlParserVtd;
 import com.ahli.galaxy.parser.interfaces.ParsedXmlConsumer;
@@ -12,6 +13,7 @@ import com.ahli.galaxy.ui.exception.UIException;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -20,8 +22,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /***
@@ -41,21 +43,42 @@ public class UICatalogImpl implements UICatalog {
 	private List<UIConstant> constants;
 	private List<UIConstant> blizzOnlyConstants;
 	private List<String> blizzOnlyLayouts;
+	private Map<String, UIFrame> handles;
 	
 	// internal, used during processing
 	private String curBasePath;
 	
-	/**
-	 * Constructor.
-	 *
-	 * @throws ParserConfigurationException
-	 */
 	public UICatalogImpl() {
-		templates = new ArrayList<>(2500);
-		blizzOnlyTemplates = new ArrayList<>(10);
-		constants = new ArrayList<>(800);
-		blizzOnlyConstants = new ArrayList<>(10);
-		blizzOnlyLayouts = new ArrayList<>(25);
+		dfltInit();
+	}
+	
+	private void dfltInit() {
+		init(2500, 10, 800, 10, 25, 650);
+	}
+	
+	private void init(
+			final int templatesCapacity,
+			final int blizzOnlyTemplatesCapacity,
+			final int constantsCapacity,
+			final int blizzOnlyConstantsCapacity,
+			final int blizzOnlyLayoutsCapacity,
+			final int handlesCapacity) {
+		templates = new ArrayList<>(templatesCapacity);
+		blizzOnlyTemplates = new ArrayList<>(blizzOnlyTemplatesCapacity);
+		constants = new ArrayList<>(constantsCapacity);
+		blizzOnlyConstants = new ArrayList<>(blizzOnlyConstantsCapacity);
+		blizzOnlyLayouts = new ArrayList<>(blizzOnlyLayoutsCapacity);
+		handles = new UnifiedMap<>(handlesCapacity);
+	}
+	
+	public UICatalogImpl(final GameDef gameDef) {
+		if (gameDef == null) {
+			dfltInit();
+		} else if ("sc2".equals(gameDef.getNameHandle())) {
+			init(2365, 17, 1241, 0, 14, 242);
+		} else if ("heroes".equals(gameDef.getNameHandle())) {
+			init(2088, 6, 449, 0, 11, 367);
+		}
 	}
 	
 	/**
@@ -68,12 +91,14 @@ public class UICatalogImpl implements UICatalog {
 			final int blizzOnlyTemplatesCapacity,
 			final int constantsCapacity,
 			final int blizzOnlyConstantsCapacity,
-			final int blizzOnlyLayoutsCapacity) {
+			final int blizzOnlyLayoutsCapacity,
+			final int handlesCapacity) {
 		templates = new ArrayList<>(templatesCapacity);
 		blizzOnlyTemplates = new ArrayList<>(blizzOnlyTemplatesCapacity);
 		constants = new ArrayList<>(constantsCapacity);
 		blizzOnlyConstants = new ArrayList<>(blizzOnlyConstantsCapacity);
 		blizzOnlyLayouts = new ArrayList<>(blizzOnlyLayoutsCapacity);
+		handles = new UnifiedMap<>(handlesCapacity);
 	}
 	
 	/**
@@ -81,10 +106,13 @@ public class UICatalogImpl implements UICatalog {
 	 */
 	@Override
 	public Object deepCopy() {
-		// clone with additional space for templates and constants
-		final UICatalogImpl clone =
-				new UICatalogImpl(templates.size() /* 3 / 2 + 1*/, blizzOnlyTemplates.size(), constants.size()
-						/* 3 / 2 + 1*/, blizzOnlyConstants.size(), blizzOnlyLayouts.size());
+		// clone with additional space for templates, constants, handles
+		final UICatalogImpl clone = new UICatalogImpl(templates.size() + 550,
+				blizzOnlyTemplates.size(),
+				constants.size() + 150,
+				blizzOnlyConstants.size(),
+				blizzOnlyLayouts.size(),
+				handles.size() + 300);
 		// testing shows that iterators are not faster and are not thread safe
 		int i;
 		int len;
@@ -100,9 +128,11 @@ public class UICatalogImpl implements UICatalog {
 		for (i = 0, len = blizzOnlyConstants.size(); i < len; ++i) {
 			clone.blizzOnlyConstants.add((UIConstant) blizzOnlyConstants.get(i).deepCopy());
 		}
-		for (i = 0, len = blizzOnlyLayouts.size(); i < len; ++i) {
-			clone.blizzOnlyLayouts.add(blizzOnlyLayouts.get(i));
+		clone.blizzOnlyLayouts = blizzOnlyLayouts;
+		for (final var handleEntry : handles.entrySet()) {
+			clone.handles.put(handleEntry.getKey(), handleEntry.getValue());
 		}
+		
 		clone.curBasePath = curBasePath;
 		
 		return clone;
@@ -117,17 +147,16 @@ public class UICatalogImpl implements UICatalog {
 	public void processDescIndex(final File f, final String raceId, final String consoleSkinId)
 			throws SAXException, IOException, ParserConfigurationException, InterruptedException {
 		
-		final List<String> generalLayouts = DescIndexReader.getLayoutPathList(f, true);
-		
-		final List<String> combinedList = new ArrayList<>(DescIndexReader.getLayoutPathList(f, false));
-		
-		blizzOnlyLayouts.addAll(combinedList);
-		blizzOnlyLayouts.removeAll(generalLayouts);
+		// TODO inefficient code, parses twice
+		List<String> blizzLayouts = DescIndexReader.getLayoutPathList(f, DescIndexReader.Mode.ONLY_UNLOADABLE);
+		blizzOnlyLayouts.addAll(blizzLayouts);
+		blizzLayouts = null;
 		
 		final String descIndexPath = f.getAbsolutePath();
 		final String basePath = descIndexPath.substring(0, descIndexPath.length() - f.getName().length());
 		logger.trace("descIndexPath={}\nbasePath={}", descIndexPath, basePath);
 		
+		final List<String> combinedList = DescIndexReader.getLayoutPathList(f, DescIndexReader.Mode.ALL);
 		processLayouts(combinedList, basePath, raceId, consoleSkinId);
 		
 		logger.trace(
@@ -175,9 +204,10 @@ public class UICatalogImpl implements UICatalog {
 				try {
 					processLayoutFile(layoutFilePath, raceId, isDevLayout, consoleSkinId, parser);
 				} catch (final IOException e) {
-					logger.error(String.format(
-							"ERROR: encountered an Exception while processing the layout file '%s'.",
-							layoutFilePath), e);
+					logger.error(
+							String.format("ERROR: encountered an Exception while processing the layout file '%s'.",
+									layoutFilePath),
+							e);
 				}
 				if (Thread.interrupted()) {
 					//noinspection NewExceptionWithoutArguments
@@ -428,6 +458,11 @@ public class UICatalogImpl implements UICatalog {
 	}
 	
 	@Override
+	public Map<String, UIFrame> getHandles() {
+		return handles;
+	}
+	
+	@Override
 	public List<String> getDevLayouts() {
 		return blizzOnlyLayouts;
 	}
@@ -438,41 +473,32 @@ public class UICatalogImpl implements UICatalog {
 	}
 	
 	@Override
-	public boolean equals(final Object obj) {
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		if (obj == this) {
+	public final boolean equals(final Object obj) {
+		if (this == obj) {
 			return true;
 		}
-		final Object[] signatureFields = getSignatureFields();
-		final Object[] thatSignatureFields = ((UICatalogImpl) obj).getSignatureFields();
-		for (int i = 0; i < signatureFields.length; ++i) {
-			if (!(signatureFields[i] instanceof Object[])) {
-				if (!Objects.equals(signatureFields[i], thatSignatureFields[i])) {
-					logger.trace("equals=false - object - i={}", i);
-					return false;
-				}
-			} else {
-				if (!Arrays.deepEquals((Object[]) signatureFields[i], (Object[]) thatSignatureFields[i])) {
-					logger.trace("equals=false - array - i={}", i);
-					return false;
-				}
-			}
+		if (!(obj instanceof UICatalogImpl)) {
+			return false;
 		}
-		logger.trace("deep equals UICatalogImpl");
-		return true;
-	}
-	
-	private Object[] getSignatureFields() {
-		return new Object[] { templates, constants, blizzOnlyTemplates, blizzOnlyConstants, blizzOnlyLayouts, handles };
+		final UICatalogImpl uiCatalog = (UICatalogImpl) obj;
+		return Objects.equals(parser, uiCatalog.parser) && Objects.equals(templates, uiCatalog.templates) &&
+				Objects.equals(blizzOnlyTemplates, uiCatalog.blizzOnlyTemplates) &&
+				Objects.equals(constants, uiCatalog.constants) &&
+				Objects.equals(blizzOnlyConstants, uiCatalog.blizzOnlyConstants) &&
+				Objects.equals(blizzOnlyLayouts, uiCatalog.blizzOnlyLayouts) &&
+				Objects.equals(handles, uiCatalog.handles) && Objects.equals(curBasePath, uiCatalog.curBasePath);
 	}
 	
 	@Override
-	public int hashCode() {
-		return Objects.hash(getSignatureFields());
+	public final int hashCode() {
+		//noinspection ObjectInstantiationInEqualsHashCode
+		return Objects.hash(parser,
+				templates,
+				blizzOnlyTemplates,
+				constants,
+				blizzOnlyConstants,
+				blizzOnlyLayouts,
+				handles,
+				curBasePath);
 	}
 }

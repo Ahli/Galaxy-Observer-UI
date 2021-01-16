@@ -20,9 +20,9 @@ import java.util.Objects;
  */
 public class UIFrame extends UIElement {
 	public static final String ZERO = "0";
-	private static final String THIS = "$this";
-	private static final String MIN = "MIN";
-	private static final String MAX = "MAX";
+	public static final String THIS = "$this";
+	public static final String MIN = "Min";
+	public static final String MAX = "Max";
 	private static final String[] DFLT_POS = { MIN, MIN, MAX, MAX };
 	private static final String[] DFLT_OFFSET = { ZERO, ZERO, ZERO, ZERO };
 	private static final String[] DFLT_RELATIVE = { THIS, THIS, THIS, THIS };
@@ -353,39 +353,35 @@ public class UIFrame extends UIElement {
 	}
 	
 	@Override
-	public boolean equals(final Object obj) {
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		if (obj == this) {
+	public final boolean equals(final Object o) {
+		if (this == o) {
 			return true;
 		}
-		final Object[] signatureFields = getSignatureFields();
-		final Object[] thatSignatureFields = ((UIFrame) obj).getSignatureFields();
-		for (int i = 0; i < signatureFields.length; ++i) {
-			if (!(signatureFields[i] instanceof Object[])) {
-				if (!Objects.equals(signatureFields[i], thatSignatureFields[i])) {
-					return false;
-				}
-			} else {
-				if (!Arrays.deepEquals((Object[]) signatureFields[i], (Object[]) thatSignatureFields[i])) {
-					return false;
-				}
-			}
+		if (!(o instanceof UIFrame)) {
+			return false;
 		}
-		return true;
-	}
-	
-	private Object[] getSignatureFields() {
-		return new Object[] { getName(), type, relative, pos, offset, attributes, children };
+		if (!super.equals(o)) {
+			return false;
+		}
+		final UIFrame uiFrame = (UIFrame) o;
+		return uiFrame.canEqual(this) && Arrays.deepEquals(pos, uiFrame.pos) &&
+				Arrays.deepEquals(offset, uiFrame.offset) && Arrays.deepEquals(relative, uiFrame.relative) &&
+				Objects.equals(attributes, uiFrame.attributes) && Objects.equals(type, uiFrame.type) &&
+				Objects.equals(children, uiFrame.children);
 	}
 	
 	@Override
-	public int hashCode() {
-		return Objects.hash(getSignatureFields());
+	public boolean canEqual(final Object other) {
+		return (other instanceof UIFrame);
 	}
 	
+	@Override
+	public final int hashCode() {
+		@SuppressWarnings("ObjectInstantiationInEqualsHashCode")
+		int result = Objects.hash(super.hashCode(), attributes, type, children);
+		result = 31 * result + Arrays.hashCode(pos);
+		result = 31 * result + Arrays.hashCode(offset);
+		result = 31 * result + Arrays.hashCode(relative);
+		return result;
+	}
 }

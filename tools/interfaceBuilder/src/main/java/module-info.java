@@ -53,7 +53,7 @@ module interfacex.builder {
 	opens interfacebuilder to javafx.fxml, spring.core, spring.beans;
 	opens interfacebuilder.config to spring.core;
 	opens interfacebuilder.ui to spring.core;
-	opens interfacebuilder.compress to org.hibernate.orm.core, spring.core;
+	opens interfacebuilder.compress;
 	// open to unnamed for unit test
 	opens interfacebuilder.projects; // to org.hibernate.orm.core, spring.core, spring.beans;
 	exports interfacebuilder.config to spring.beans, spring.context;

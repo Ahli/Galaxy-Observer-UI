@@ -6,7 +6,6 @@ package com.ahli.galaxy.ui;
 import com.ahli.galaxy.ui.abstracts.UIElement;
 import com.ahli.util.StringInterner;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -83,38 +82,28 @@ public class UIConstant extends UIElement {
 	}
 	
 	@Override
-	public boolean equals(final Object obj) {
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		if (obj == this) {
+	public final boolean equals(final Object o) {
+		if (this == o) {
 			return true;
 		}
-		final Object[] signatureFields = getSignatureFields();
-		final Object[] thatSignatureFields = ((UIConstant) obj).getSignatureFields();
-		for (int i = 0; i < signatureFields.length; ++i) {
-			if (!(signatureFields[i] instanceof Object[])) {
-				if (!Objects.equals(signatureFields[i], thatSignatureFields[i])) {
-					return false;
-				}
-			} else {
-				if (!Arrays.deepEquals((Object[]) signatureFields[i], (Object[]) thatSignatureFields[i])) {
-					return false;
-				}
-			}
+		if (!(o instanceof UIConstant)) {
+			return false;
 		}
-		return true;
-	}
-	
-	private Object[] getSignatureFields() {
-		return new Object[] { getName(), value };
+		if (!super.equals(o)) {
+			return false;
+		}
+		final UIConstant that = (UIConstant) o;
+		return that.canEqual(this) && Objects.equals(value, that.value);
 	}
 	
 	@Override
-	public int hashCode() {
-		return Objects.hash(getSignatureFields());
+	public boolean canEqual(final Object other) {
+		return (other instanceof UIConstant);
+	}
+	
+	@Override
+	public final int hashCode() {
+		//noinspection ObjectInstantiationInEqualsHashCode
+		return Objects.hash(super.hashCode(), value);
 	}
 }

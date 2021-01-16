@@ -68,9 +68,9 @@ public class SettingsController implements Updateable {
 		final FXMLSpringLoader loader = new FXMLSpringLoader(appContext);
 		final Object controller;
 		switch (getCategoryIndex(category)) {
-			case 0 -> content = initFXML(loader, "classpath:view/Content_Settings_GamesPaths.fxml");
-			case 1 -> content = initFXML(loader, "classpath:view/Content_Settings_GuiTool.fxml");
-			case 2 -> content = initFXML(loader, "classpath:view/Content_Settings_CommandLineTool.fxml");
+			case 0 -> content = initFXML(loader, "classpath:view/Settings_GamesPaths.fxml");
+			case 1 -> content = initFXML(loader, "classpath:view/Settings_GuiTool.fxml");
+			case 2 -> content = initFXML(loader, "classpath:view/Settings_CommandLineTool.fxml");
 			default -> {
 				logger.error("Attempted to load a settings category that does not exist");
 				return;

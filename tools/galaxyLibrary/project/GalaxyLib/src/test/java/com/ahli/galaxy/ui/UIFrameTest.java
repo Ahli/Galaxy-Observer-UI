@@ -3,6 +3,8 @@
 
 package com.ahli.galaxy.ui;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -18,10 +20,10 @@ final class UIFrameTest {
 		assertEquals("$parent", frame.getAnchorRelative(UIAnchorSide.LEFT));
 		assertEquals("$parent", frame.getAnchorRelative(UIAnchorSide.BOTTOM));
 		assertEquals("$parent", frame.getAnchorRelative(UIAnchorSide.RIGHT));
-		assertEquals("MIN", frame.getAnchorPos(UIAnchorSide.TOP));
-		assertEquals("MIN", frame.getAnchorPos(UIAnchorSide.LEFT));
-		assertEquals("MAX", frame.getAnchorPos(UIAnchorSide.BOTTOM));
-		assertEquals("MAX", frame.getAnchorPos(UIAnchorSide.RIGHT));
+		assertEquals("Min", frame.getAnchorPos(UIAnchorSide.TOP));
+		assertEquals("Min", frame.getAnchorPos(UIAnchorSide.LEFT));
+		assertEquals("Max", frame.getAnchorPos(UIAnchorSide.BOTTOM));
+		assertEquals("Max", frame.getAnchorPos(UIAnchorSide.RIGHT));
 		assertEquals("0", frame.getAnchorOffset(UIAnchorSide.TOP));
 		assertEquals("0", frame.getAnchorOffset(UIAnchorSide.LEFT));
 		assertEquals("0", frame.getAnchorOffset(UIAnchorSide.BOTTOM));
@@ -32,10 +34,10 @@ final class UIFrameTest {
 		assertEquals("$parent", frame2.getAnchorRelative(UIAnchorSide.LEFT));
 		assertEquals("$parent", frame2.getAnchorRelative(UIAnchorSide.BOTTOM));
 		assertEquals("$parent", frame2.getAnchorRelative(UIAnchorSide.RIGHT));
-		assertEquals("MIN", frame2.getAnchorPos(UIAnchorSide.TOP));
-		assertEquals("MIN", frame2.getAnchorPos(UIAnchorSide.LEFT));
-		assertEquals("MAX", frame2.getAnchorPos(UIAnchorSide.BOTTOM));
-		assertEquals("MAX", frame2.getAnchorPos(UIAnchorSide.RIGHT));
+		assertEquals("Min", frame2.getAnchorPos(UIAnchorSide.TOP));
+		assertEquals("Min", frame2.getAnchorPos(UIAnchorSide.LEFT));
+		assertEquals("Max", frame2.getAnchorPos(UIAnchorSide.BOTTOM));
+		assertEquals("Max", frame2.getAnchorPos(UIAnchorSide.RIGHT));
 		assertEquals("0", frame2.getAnchorOffset(UIAnchorSide.TOP));
 		assertEquals("0", frame2.getAnchorOffset(UIAnchorSide.LEFT));
 		assertEquals("0", frame2.getAnchorOffset(UIAnchorSide.BOTTOM));
@@ -46,10 +48,10 @@ final class UIFrameTest {
 		assertEquals("$parent", frame2.getAnchorRelative(UIAnchorSide.LEFT));
 		assertEquals("$Minimap", frame2.getAnchorRelative(UIAnchorSide.BOTTOM));
 		assertEquals("$parent", frame2.getAnchorRelative(UIAnchorSide.RIGHT));
-		assertEquals("MIN", frame2.getAnchorPos(UIAnchorSide.TOP));
-		assertEquals("MIN", frame2.getAnchorPos(UIAnchorSide.LEFT));
+		assertEquals("Min", frame2.getAnchorPos(UIAnchorSide.TOP));
+		assertEquals("Min", frame2.getAnchorPos(UIAnchorSide.LEFT));
 		assertEquals("mid", frame2.getAnchorPos(UIAnchorSide.BOTTOM));
-		assertEquals("MAX", frame2.getAnchorPos(UIAnchorSide.RIGHT));
+		assertEquals("Max", frame2.getAnchorPos(UIAnchorSide.RIGHT));
 		assertEquals("0", frame2.getAnchorOffset(UIAnchorSide.TOP));
 		assertEquals("0", frame2.getAnchorOffset(UIAnchorSide.LEFT));
 		assertEquals("11", frame2.getAnchorOffset(UIAnchorSide.BOTTOM));
@@ -66,10 +68,10 @@ final class UIFrameTest {
 		assertEquals("$parent", frame.getAnchorRelative(UIAnchorSide.LEFT));
 		assertEquals("$parent", frame.getAnchorRelative(UIAnchorSide.BOTTOM));
 		assertEquals("$parent", frame.getAnchorRelative(UIAnchorSide.RIGHT));
-		assertEquals("MIN", frame.getAnchorPos(UIAnchorSide.TOP));
-		assertEquals("MIN", frame.getAnchorPos(UIAnchorSide.LEFT));
-		assertEquals("MAX", frame.getAnchorPos(UIAnchorSide.BOTTOM));
-		assertEquals("MAX", frame.getAnchorPos(UIAnchorSide.RIGHT));
+		assertEquals("Min", frame.getAnchorPos(UIAnchorSide.TOP));
+		assertEquals("Min", frame.getAnchorPos(UIAnchorSide.LEFT));
+		assertEquals("Max", frame.getAnchorPos(UIAnchorSide.BOTTOM));
+		assertEquals("Max", frame.getAnchorPos(UIAnchorSide.RIGHT));
 		assertEquals("0", frame.getAnchorOffset(UIAnchorSide.TOP));
 		assertEquals("0", frame.getAnchorOffset(UIAnchorSide.LEFT));
 		assertEquals("0", frame.getAnchorOffset(UIAnchorSide.BOTTOM));
@@ -80,10 +82,10 @@ final class UIFrameTest {
 		assertEquals("$this", frame.getAnchorRelative(UIAnchorSide.LEFT));
 		assertEquals("$this", frame.getAnchorRelative(UIAnchorSide.BOTTOM));
 		assertEquals("$this", frame.getAnchorRelative(UIAnchorSide.RIGHT));
-		assertEquals("MIN", frame.getAnchorPos(UIAnchorSide.TOP));
-		assertEquals("MIN", frame.getAnchorPos(UIAnchorSide.LEFT));
-		assertEquals("MAX", frame.getAnchorPos(UIAnchorSide.BOTTOM));
-		assertEquals("MAX", frame.getAnchorPos(UIAnchorSide.RIGHT));
+		assertEquals("Min", frame.getAnchorPos(UIAnchorSide.TOP));
+		assertEquals("Min", frame.getAnchorPos(UIAnchorSide.LEFT));
+		assertEquals("Max", frame.getAnchorPos(UIAnchorSide.BOTTOM));
+		assertEquals("Max", frame.getAnchorPos(UIAnchorSide.RIGHT));
 		assertEquals("0", frame.getAnchorOffset(UIAnchorSide.TOP));
 		assertEquals("0", frame.getAnchorOffset(UIAnchorSide.LEFT));
 		assertEquals("0", frame.getAnchorOffset(UIAnchorSide.BOTTOM));
@@ -94,10 +96,10 @@ final class UIFrameTest {
 		assertEquals("$SomeHandle/$parent/child", frame.getAnchorRelative(UIAnchorSide.LEFT));
 		assertEquals("$SomeHandle/$parent/child", frame.getAnchorRelative(UIAnchorSide.BOTTOM));
 		assertEquals("$SomeHandle/$parent/child", frame.getAnchorRelative(UIAnchorSide.RIGHT));
-		assertEquals("MIN", frame.getAnchorPos(UIAnchorSide.TOP));
-		assertEquals("MIN", frame.getAnchorPos(UIAnchorSide.LEFT));
-		assertEquals("MAX", frame.getAnchorPos(UIAnchorSide.BOTTOM));
-		assertEquals("MAX", frame.getAnchorPos(UIAnchorSide.RIGHT));
+		assertEquals("Min", frame.getAnchorPos(UIAnchorSide.TOP));
+		assertEquals("Min", frame.getAnchorPos(UIAnchorSide.LEFT));
+		assertEquals("Max", frame.getAnchorPos(UIAnchorSide.BOTTOM));
+		assertEquals("Max", frame.getAnchorPos(UIAnchorSide.RIGHT));
 		assertEquals("10", frame.getAnchorOffset(UIAnchorSide.TOP));
 		assertEquals("10", frame.getAnchorOffset(UIAnchorSide.LEFT));
 		assertEquals("-10", frame.getAnchorOffset(UIAnchorSide.BOTTOM));
@@ -113,10 +115,10 @@ final class UIFrameTest {
 		assertEquals("$this", frame.getAnchorRelative(UIAnchorSide.LEFT));
 		assertEquals("$parent", frame.getAnchorRelative(UIAnchorSide.BOTTOM));
 		assertEquals("$this", frame.getAnchorRelative(UIAnchorSide.RIGHT));
-		assertEquals("MIN", frame.getAnchorPos(UIAnchorSide.TOP));
-		assertEquals("MIN", frame.getAnchorPos(UIAnchorSide.LEFT));
+		assertEquals("Min", frame.getAnchorPos(UIAnchorSide.TOP));
+		assertEquals("Min", frame.getAnchorPos(UIAnchorSide.LEFT));
 		assertEquals("mid", frame.getAnchorPos(UIAnchorSide.BOTTOM));
-		assertEquals("MAX", frame.getAnchorPos(UIAnchorSide.RIGHT));
+		assertEquals("Max", frame.getAnchorPos(UIAnchorSide.RIGHT));
 		assertEquals("0", frame.getAnchorOffset(UIAnchorSide.TOP));
 		assertEquals("0", frame.getAnchorOffset(UIAnchorSide.LEFT));
 		assertEquals("11", frame.getAnchorOffset(UIAnchorSide.BOTTOM));
@@ -132,10 +134,10 @@ final class UIFrameTest {
 		assertEquals("$this", frame.getAnchorRelative(UIAnchorSide.LEFT));
 		assertEquals("$parent", frame.getAnchorRelative(UIAnchorSide.BOTTOM));
 		assertEquals("$this", frame.getAnchorRelative(UIAnchorSide.RIGHT));
-		assertEquals("MIN", frame.getAnchorPos(UIAnchorSide.TOP));
-		assertEquals("MIN", frame.getAnchorPos(UIAnchorSide.LEFT));
-		assertEquals("MAX", frame.getAnchorPos(UIAnchorSide.BOTTOM));
-		assertEquals("MAX", frame.getAnchorPos(UIAnchorSide.RIGHT));
+		assertEquals("Min", frame.getAnchorPos(UIAnchorSide.TOP));
+		assertEquals("Min", frame.getAnchorPos(UIAnchorSide.LEFT));
+		assertEquals("Max", frame.getAnchorPos(UIAnchorSide.BOTTOM));
+		assertEquals("Max", frame.getAnchorPos(UIAnchorSide.RIGHT));
 		assertEquals("0", frame.getAnchorOffset(UIAnchorSide.TOP));
 		assertEquals("0", frame.getAnchorOffset(UIAnchorSide.LEFT));
 		assertEquals("0", frame.getAnchorOffset(UIAnchorSide.BOTTOM));
@@ -146,10 +148,10 @@ final class UIFrameTest {
 		assertEquals("$this", frame.getAnchorRelative(UIAnchorSide.LEFT));
 		assertEquals("$this", frame.getAnchorRelative(UIAnchorSide.BOTTOM));
 		assertEquals("$this", frame.getAnchorRelative(UIAnchorSide.RIGHT));
-		assertEquals("MIN", frame.getAnchorPos(UIAnchorSide.TOP));
-		assertEquals("MIN", frame.getAnchorPos(UIAnchorSide.LEFT));
-		assertEquals("MAX", frame.getAnchorPos(UIAnchorSide.BOTTOM));
-		assertEquals("MAX", frame.getAnchorPos(UIAnchorSide.RIGHT));
+		assertEquals("Min", frame.getAnchorPos(UIAnchorSide.TOP));
+		assertEquals("Min", frame.getAnchorPos(UIAnchorSide.LEFT));
+		assertEquals("Max", frame.getAnchorPos(UIAnchorSide.BOTTOM));
+		assertEquals("Max", frame.getAnchorPos(UIAnchorSide.RIGHT));
 		assertEquals("0", frame.getAnchorOffset(UIAnchorSide.TOP));
 		assertEquals("0", frame.getAnchorOffset(UIAnchorSide.LEFT));
 		assertEquals("0", frame.getAnchorOffset(UIAnchorSide.BOTTOM));
@@ -165,10 +167,10 @@ final class UIFrameTest {
 		assertEquals("$this", frame.getAnchorRelative(UIAnchorSide.LEFT));
 		assertEquals("$this", frame.getAnchorRelative(UIAnchorSide.BOTTOM));
 		assertEquals("$this", frame.getAnchorRelative(UIAnchorSide.RIGHT));
-		assertEquals("MIN", frame.getAnchorPos(UIAnchorSide.TOP));
-		assertEquals("MIN", frame.getAnchorPos(UIAnchorSide.LEFT));
-		assertEquals("MIN", frame.getAnchorPos(UIAnchorSide.BOTTOM));
-		assertEquals("MAX", frame.getAnchorPos(UIAnchorSide.RIGHT));
+		assertEquals("Min", frame.getAnchorPos(UIAnchorSide.TOP));
+		assertEquals("Min", frame.getAnchorPos(UIAnchorSide.LEFT));
+		assertEquals("Min", frame.getAnchorPos(UIAnchorSide.BOTTOM));
+		assertEquals("Max", frame.getAnchorPos(UIAnchorSide.RIGHT));
 		assertEquals("0", frame.getAnchorOffset(UIAnchorSide.TOP));
 		assertEquals("0", frame.getAnchorOffset(UIAnchorSide.LEFT));
 		assertEquals("0", frame.getAnchorOffset(UIAnchorSide.BOTTOM));
@@ -179,10 +181,10 @@ final class UIFrameTest {
 		assertEquals("$this", frame.getAnchorRelative(UIAnchorSide.LEFT));
 		assertEquals("$this", frame.getAnchorRelative(UIAnchorSide.BOTTOM));
 		assertEquals("$this", frame.getAnchorRelative(UIAnchorSide.RIGHT));
-		assertEquals("MIN", frame.getAnchorPos(UIAnchorSide.TOP));
-		assertEquals("MIN", frame.getAnchorPos(UIAnchorSide.LEFT));
-		assertEquals("MAX", frame.getAnchorPos(UIAnchorSide.BOTTOM));
-		assertEquals("MAX", frame.getAnchorPos(UIAnchorSide.RIGHT));
+		assertEquals("Min", frame.getAnchorPos(UIAnchorSide.TOP));
+		assertEquals("Min", frame.getAnchorPos(UIAnchorSide.LEFT));
+		assertEquals("Max", frame.getAnchorPos(UIAnchorSide.BOTTOM));
+		assertEquals("Max", frame.getAnchorPos(UIAnchorSide.RIGHT));
 		assertEquals("0", frame.getAnchorOffset(UIAnchorSide.TOP));
 		assertEquals("0", frame.getAnchorOffset(UIAnchorSide.LEFT));
 		assertEquals("0", frame.getAnchorOffset(UIAnchorSide.BOTTOM));
@@ -193,10 +195,10 @@ final class UIFrameTest {
 		assertEquals("$this", frame.getAnchorRelative(UIAnchorSide.LEFT));
 		assertEquals("$this", frame.getAnchorRelative(UIAnchorSide.BOTTOM));
 		assertEquals("$this", frame.getAnchorRelative(UIAnchorSide.RIGHT));
-		assertEquals("MIN", frame.getAnchorPos(UIAnchorSide.TOP));
-		assertEquals("MIN", frame.getAnchorPos(UIAnchorSide.LEFT));
+		assertEquals("Min", frame.getAnchorPos(UIAnchorSide.TOP));
+		assertEquals("Min", frame.getAnchorPos(UIAnchorSide.LEFT));
 		assertEquals("mid", frame.getAnchorPos(UIAnchorSide.BOTTOM));
-		assertEquals("MAX", frame.getAnchorPos(UIAnchorSide.RIGHT));
+		assertEquals("Max", frame.getAnchorPos(UIAnchorSide.RIGHT));
 		assertEquals("0", frame.getAnchorOffset(UIAnchorSide.TOP));
 		assertEquals("0", frame.getAnchorOffset(UIAnchorSide.LEFT));
 		assertEquals("0", frame.getAnchorOffset(UIAnchorSide.BOTTOM));
@@ -207,10 +209,10 @@ final class UIFrameTest {
 		assertEquals("$this", frame.getAnchorRelative(UIAnchorSide.LEFT));
 		assertEquals("$this", frame.getAnchorRelative(UIAnchorSide.BOTTOM));
 		assertEquals("$this", frame.getAnchorRelative(UIAnchorSide.RIGHT));
-		assertEquals("MIN", frame.getAnchorPos(UIAnchorSide.TOP));
-		assertEquals("MIN", frame.getAnchorPos(UIAnchorSide.LEFT));
+		assertEquals("Min", frame.getAnchorPos(UIAnchorSide.TOP));
+		assertEquals("Min", frame.getAnchorPos(UIAnchorSide.LEFT));
 		assertEquals("0.123", frame.getAnchorPos(UIAnchorSide.BOTTOM));
-		assertEquals("MAX", frame.getAnchorPos(UIAnchorSide.RIGHT));
+		assertEquals("Max", frame.getAnchorPos(UIAnchorSide.RIGHT));
 		assertEquals("0", frame.getAnchorOffset(UIAnchorSide.TOP));
 		assertEquals("0", frame.getAnchorOffset(UIAnchorSide.LEFT));
 		assertEquals("0", frame.getAnchorOffset(UIAnchorSide.BOTTOM));
@@ -226,10 +228,10 @@ final class UIFrameTest {
 		assertEquals("$this", frame.getAnchorRelative(UIAnchorSide.LEFT));
 		assertEquals("$this", frame.getAnchorRelative(UIAnchorSide.BOTTOM));
 		assertEquals("$this", frame.getAnchorRelative(UIAnchorSide.RIGHT));
-		assertEquals("MIN", frame.getAnchorPos(UIAnchorSide.TOP));
-		assertEquals("MIN", frame.getAnchorPos(UIAnchorSide.LEFT));
-		assertEquals("MAX", frame.getAnchorPos(UIAnchorSide.BOTTOM));
-		assertEquals("MAX", frame.getAnchorPos(UIAnchorSide.RIGHT));
+		assertEquals("Min", frame.getAnchorPos(UIAnchorSide.TOP));
+		assertEquals("Min", frame.getAnchorPos(UIAnchorSide.LEFT));
+		assertEquals("Max", frame.getAnchorPos(UIAnchorSide.BOTTOM));
+		assertEquals("Max", frame.getAnchorPos(UIAnchorSide.RIGHT));
 		assertEquals("0", frame.getAnchorOffset(UIAnchorSide.TOP));
 		assertEquals("0", frame.getAnchorOffset(UIAnchorSide.LEFT));
 		assertEquals("11", frame.getAnchorOffset(UIAnchorSide.BOTTOM));
@@ -240,10 +242,10 @@ final class UIFrameTest {
 		assertEquals("$this", frame.getAnchorRelative(UIAnchorSide.LEFT));
 		assertEquals("$this", frame.getAnchorRelative(UIAnchorSide.BOTTOM));
 		assertEquals("$this", frame.getAnchorRelative(UIAnchorSide.RIGHT));
-		assertEquals("MIN", frame.getAnchorPos(UIAnchorSide.TOP));
-		assertEquals("MIN", frame.getAnchorPos(UIAnchorSide.LEFT));
-		assertEquals("MAX", frame.getAnchorPos(UIAnchorSide.BOTTOM));
-		assertEquals("MAX", frame.getAnchorPos(UIAnchorSide.RIGHT));
+		assertEquals("Min", frame.getAnchorPos(UIAnchorSide.TOP));
+		assertEquals("Min", frame.getAnchorPos(UIAnchorSide.LEFT));
+		assertEquals("Max", frame.getAnchorPos(UIAnchorSide.BOTTOM));
+		assertEquals("Max", frame.getAnchorPos(UIAnchorSide.RIGHT));
 		assertEquals("0", frame.getAnchorOffset(UIAnchorSide.TOP));
 		assertEquals("0", frame.getAnchorOffset(UIAnchorSide.LEFT));
 		assertEquals("0", frame.getAnchorOffset(UIAnchorSide.BOTTOM));
@@ -254,13 +256,19 @@ final class UIFrameTest {
 		assertEquals("$this", frame.getAnchorRelative(UIAnchorSide.LEFT));
 		assertEquals("$this", frame.getAnchorRelative(UIAnchorSide.BOTTOM));
 		assertEquals("$this", frame.getAnchorRelative(UIAnchorSide.RIGHT));
-		assertEquals("MIN", frame.getAnchorPos(UIAnchorSide.TOP));
-		assertEquals("MIN", frame.getAnchorPos(UIAnchorSide.LEFT));
-		assertEquals("MAX", frame.getAnchorPos(UIAnchorSide.BOTTOM));
-		assertEquals("MAX", frame.getAnchorPos(UIAnchorSide.RIGHT));
+		assertEquals("Min", frame.getAnchorPos(UIAnchorSide.TOP));
+		assertEquals("Min", frame.getAnchorPos(UIAnchorSide.LEFT));
+		assertEquals("Max", frame.getAnchorPos(UIAnchorSide.BOTTOM));
+		assertEquals("Max", frame.getAnchorPos(UIAnchorSide.RIGHT));
 		assertEquals("0", frame.getAnchorOffset(UIAnchorSide.TOP));
 		assertEquals("0", frame.getAnchorOffset(UIAnchorSide.LEFT));
 		assertEquals("-5.2", frame.getAnchorOffset(UIAnchorSide.BOTTOM));
 		assertEquals("0", frame.getAnchorOffset(UIAnchorSide.RIGHT));
+	}
+	
+	@Test
+	@SuppressWarnings("JUnitTestMethodWithNoAssertions")
+	public void equalsContract() {
+		EqualsVerifier.forClass(UIFrame.class).withRedefinedSuperclass().suppress(Warning.NONFINAL_FIELDS).verify();
 	}
 }

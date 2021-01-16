@@ -26,6 +26,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "project")
@@ -101,4 +102,23 @@ public class ProjectEntity implements Serializable {
 				.build();
 	}
 	
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (!(obj instanceof ProjectEntity)) {
+			return false;
+		}
+		final ProjectEntity that = (ProjectEntity) obj;
+		return Objects.equals(name, that.name) && Objects.equals(projectPath, that.projectPath) && game == that.game &&
+				Objects.equals(lastBuildDateTime, that.lastBuildDateTime) &&
+				Objects.equals(lastBuildSize, that.lastBuildSize) &&
+				Objects.equals(bestCompressionRuleSet, that.bestCompressionRuleSet);
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(name, projectPath, game, lastBuildDateTime, lastBuildSize, bestCompressionRuleSet);
+	}
 }

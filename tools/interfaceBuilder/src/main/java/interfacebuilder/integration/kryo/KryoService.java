@@ -21,6 +21,7 @@ import com.esotericsoftware.kryo.util.ListReferenceResolver;
 import interfacebuilder.integration.kryo.serializer.KryoGameInfoSerializer;
 import interfacebuilder.integration.kryo.serializer.KryoInternStringArraySerializer;
 import interfacebuilder.integration.kryo.serializer.KryoInternStringSerializer;
+import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -54,6 +55,7 @@ public class KryoService {
 		kryo.register(KryoGameInfo.class, new KryoGameInfoSerializer());
 		kryo.register(int[].class, 21);
 		kryo.register(byte[].class, 22);
+		kryo.register(UnifiedMap.class, 23);
 		kryo.setRegistrationRequired(true);
 		kryo.register(String.class, new KryoInternStringSerializer());
 		return kryo;

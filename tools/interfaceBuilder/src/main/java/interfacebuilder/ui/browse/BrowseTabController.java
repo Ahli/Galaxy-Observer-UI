@@ -177,10 +177,14 @@ public class BrowseTabController implements Updateable {
 		// table
 		columnAttributes.setCellValueFactory(new KeyCellFactory());
 		columnValues.setCellValueFactory(new ValueCellFactory());
+		
+		columnValues.setCellFactory(tableColumn -> new WrappingTextTableCell());
+		
 		columnAttributes.prefWidthProperty().bind(tableView.widthProperty().divide(3));
 		columnValues.prefWidthProperty().bind(tableView.widthProperty().divide(1.5).subtract(5));
 		columnAttributes.sortTypeProperty().set(TableColumn.SortType.ASCENDING);
 		tableView.getSortOrder().add(columnAttributes);
+		
 		
 		// filter (must be strong reference)
 		treeFilterListener = new TreeFilteringChangeListener(this);

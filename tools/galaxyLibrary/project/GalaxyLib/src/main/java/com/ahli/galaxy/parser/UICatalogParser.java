@@ -65,6 +65,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	private static final String TOP = "top";
 	private static final String TYPE = "type";
 	private static final Logger logger = LogManager.getLogger(UICatalogParser.class);
+	private static final String HANDLE = "handle";
 	private final UICatalog catalog;
 	private final XmlParser parser;
 	private final List<UIElement> curPath = new ArrayList<>(10);
@@ -72,7 +73,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	private final List<Integer> statesToCloseLevel;
 	private final Map<UIElement, UIElement> addedFinalElements;
 	private final Set<UIElement> deduplicatedElements;
-	private final boolean paramDeduplicate;
+	private final boolean deduplicationAllowed;
 	private int attributeDeduplications;
 	private int constantDeduplications;
 	private List<UIElement> addedElements;
@@ -87,15 +88,21 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	private Deque<Object> toDeduplicate;
 	private int postProcessDeduplications;
 	
-	public UICatalogParser(final UICatalog catalog, final XmlParser parser, final boolean deduplicate) {
+	public UICatalogParser(final UICatalog catalog, final XmlParser parser, final boolean deduplicationAllowed) {
 		this.catalog = catalog;
 		this.parser = parser;
 		statesToClose = new ArrayList<>(10);
 		statesToCloseLevel = new ArrayList<>(10);
-		addedFinalElements = new UnifiedMap<>();
-		paramDeduplicate = deduplicate;
-		addedElements = deduplicate ? new ArrayList<>(35_000) : null;
-		deduplicatedElements = deduplicate ? new UnifiedSet<>(13_000) : null;
+		this.deduplicationAllowed = deduplicationAllowed;
+		if (deduplicationAllowed) {
+			addedFinalElements = new UnifiedMap<>();
+			addedElements = new ArrayList<>(35_000);
+			deduplicatedElements = new UnifiedSet<>(13_000);
+		} else {
+			addedFinalElements = null;
+			addedElements = null;
+			deduplicatedElements = null;
+		}
 		//noinspection ThisEscapedInObjectConstruction
 		parser.setConsumer(this);
 	}
@@ -567,7 +574,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				}
 				var newElemUiConstant = (UIConstant) newElem;
 				newElemUiConstant.setValue(val);
-				if (paramDeduplicate) {
+				if (deduplicationAllowed) {
 					final UIElement refToDuplicate = addedFinalElements.get(newElem);
 					if (refToDuplicate != null) {
 						newElemUiConstant = (UIConstant) refToDuplicate;
@@ -599,7 +606,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					newElemUiAttr.addValue(attrTypes.get(i),
 							catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout, consoleSkinId));
 				}
-				if (paramDeduplicate) {
+				if (deduplicationAllowed) {
 					final UIElement refToDuplicate = addedFinalElements.get(newElem);
 					if (refToDuplicate != null) {
 						newElem = refToDuplicate;
@@ -614,6 +621,10 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				if (curElement instanceof UIFrame) {
 					// Frame's attributes
 					((UIFrame) curElement).addAttribute((UIAttribute) newElem);
+					// register handle
+					if (HANDLE.equals(tagName)) {
+						catalog.getHandles().put(newElemUiAttr.getValue(VAL), (UIFrame) curElement);
+					}
 				} else if (curElement instanceof UIAnimation) {
 					// Animation's events
 					if (tagName.equals(EVENT)) {
@@ -760,7 +771,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	}
 	
 	private void registerInstance(final UIElement newElem) {
-		if (paramDeduplicate) {
+		if (deduplicationAllowed) {
 			addedElements.add(newElem);
 		}
 	}
@@ -886,7 +897,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	
 	@Override
 	public void deduplicate() {
-		if (paramDeduplicate) {
+		if (deduplicationAllowed) {
 			// finish mapping
 			for (final UIElement elem : addedElements) {
 				addedFinalElements.putIfAbsent(elem, elem);
@@ -896,8 +907,8 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					addedElements.size(),
 					addedFinalElements.size());
 			addedElements = null;
-			toDeduplicate = new ArrayDeque<>(74_000);
-			// replace instancesb
+			toDeduplicate = new ArrayDeque<>(9_000);
+			// replace instances
 			
 			toDeduplicate.addAll(catalog.getTemplates());
 			toDeduplicate.addAll(catalog.getBlizzOnlyTemplates());
@@ -929,7 +940,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				obj instanceof UIState)) {
 			// attributes, constants, controllers do not contain any deduplicated objects
 			// attributes and constants can be deduplicated when initially created
-			logger.error("Object cannot be handled in dedpuplication: {},", obj);
+			logger.error("Object cannot be handled in deduplication: {},", obj);
 		}
 	}
 	

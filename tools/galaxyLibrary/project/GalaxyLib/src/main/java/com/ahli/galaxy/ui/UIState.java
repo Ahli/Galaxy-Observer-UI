@@ -6,7 +6,6 @@ package com.ahli.galaxy.ui;
 import com.ahli.galaxy.ui.abstracts.UIElement;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -38,13 +37,13 @@ public class UIState extends UIElement {
 	
 	/**
 	 * @param name
-	 * @param initialWhensCapacity
-	 * @param initialActionsCapacity
+	 * @param whensCapacity
+	 * @param actionsCapacity
 	 */
-	public UIState(final String name, final int initialWhensCapacity, final int initialActionsCapacity) {
+	public UIState(final String name, final int whensCapacity, final int actionsCapacity) {
 		super(name);
-		whens = new ArrayList<>(initialWhensCapacity);
-		actions = new ArrayList<>(initialActionsCapacity);
+		whens = new ArrayList<>(whensCapacity);
+		actions = new ArrayList<>(actionsCapacity);
 	}
 	
 	/**
@@ -54,11 +53,11 @@ public class UIState extends UIElement {
 	public Object deepCopy() {
 		final UIState clone = new UIState(getName(), whens.size(), actions.size());
 		final List<UIAttribute> whensClone = clone.whens;
-		for (UIAttribute when : whens) {
+		for (final UIAttribute when : whens) {
 			whensClone.add((UIAttribute) when.deepCopy());
 		}
 		final List<UIAttribute> actionsClone = clone.actions;
-		for (UIAttribute action : actions) {
+		for (final UIAttribute action : actions) {
 			actionsClone.add((UIAttribute) action.deepCopy());
 		}
 		clone.nextAdditionShouldOverrideActions = nextAdditionShouldOverrideActions;
@@ -151,39 +150,34 @@ public class UIState extends UIElement {
 	}
 	
 	@Override
-	public boolean equals(final Object obj) {
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		if (obj == this) {
+	public final boolean equals(final Object o) {
+		if (this == o) {
 			return true;
 		}
-		final Object[] signatureFields = getSignatureFields();
-		final Object[] thatSignatureFields = ((UIState) obj).getSignatureFields();
-		for (int i = 0; i < signatureFields.length; ++i) {
-			if (!(signatureFields[i] instanceof Object[])) {
-				if (!Objects.equals(signatureFields[i], thatSignatureFields[i])) {
-					return false;
-				}
-			} else {
-				if (!Arrays.deepEquals((Object[]) signatureFields[i], (Object[]) thatSignatureFields[i])) {
-					return false;
-				}
-			}
+		if (!(o instanceof UIState)) {
+			return false;
 		}
-		return true;
-	}
-	
-	private Object[] getSignatureFields() {
-		return new Object[] { getName(), whens, actions, nextAdditionShouldOverrideActions,
-				nextAdditionShouldOverrideWhens };
+		if (!super.equals(o)) {
+			return false;
+		}
+		final UIState uiState = (UIState) o;
+		return uiState.canEqual(this) && nextAdditionShouldOverrideWhens == uiState.nextAdditionShouldOverrideWhens &&
+				nextAdditionShouldOverrideActions == uiState.nextAdditionShouldOverrideActions &&
+				Objects.equals(whens, uiState.whens) && Objects.equals(actions, uiState.actions);
 	}
 	
 	@Override
-	public int hashCode() {
-		return Objects.hash(getSignatureFields());
+	public boolean canEqual(final Object other) {
+		return (other instanceof UIState);
+	}
+	
+	@Override
+	public final int hashCode() {
+		//noinspection ObjectInstantiationInEqualsHashCode
+		return Objects.hash(super.hashCode(),
+				whens,
+				actions,
+				nextAdditionShouldOverrideWhens,
+				nextAdditionShouldOverrideActions);
 	}
 }
