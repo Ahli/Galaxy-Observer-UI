@@ -8,7 +8,7 @@ class UICatalogImplTest {
 	
 	@Test
 	@SuppressWarnings("JUnitTestMethodWithNoAssertions")
-	public void equalsContract() {
+	void equalsContract() {
 		EqualsVerifier.forClass(UICatalogImpl.class).suppress(Warning.NONFINAL_FIELDS).verify();
 	}
 }

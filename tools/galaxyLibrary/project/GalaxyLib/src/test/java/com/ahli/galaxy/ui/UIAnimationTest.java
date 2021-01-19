@@ -8,7 +8,7 @@ class UIAnimationTest {
 	
 	@Test
 	@SuppressWarnings("JUnitTestMethodWithNoAssertions")
-	public void equalsContract() {
+	void equalsContract() {
 		EqualsVerifier.forClass(UIAnimation.class).withRedefinedSuperclass().suppress(Warning.NONFINAL_FIELDS).verify();
 	}
 }

@@ -268,7 +268,7 @@ final class UIFrameTest {
 	
 	@Test
 	@SuppressWarnings("JUnitTestMethodWithNoAssertions")
-	public void equalsContract() {
+	void equalsContract() {
 		EqualsVerifier.forClass(UIFrame.class).withRedefinedSuperclass().suppress(Warning.NONFINAL_FIELDS).verify();
 	}
 }

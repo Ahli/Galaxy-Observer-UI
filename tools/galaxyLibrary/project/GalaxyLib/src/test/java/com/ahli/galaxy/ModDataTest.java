@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 class ModDataTest {
 	@Test
 	@SuppressWarnings("JUnitTestMethodWithNoAssertions")
-	public void equalsContract() {
+	void equalsContract() {
 		EqualsVerifier.forClass(ModData.class).suppress(Warning.NONFINAL_FIELDS).verify();
 	}
 }

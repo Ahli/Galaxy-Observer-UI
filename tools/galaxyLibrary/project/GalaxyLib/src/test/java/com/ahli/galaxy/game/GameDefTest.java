@@ -7,7 +7,7 @@ class GameDefTest {
 	
 	@Test
 	@SuppressWarnings("JUnitTestMethodWithNoAssertions")
-	public void equalsContract() {
+	void equalsContract() {
 		EqualsVerifier.forClass(GameDef.class).verify();
 	}
 }

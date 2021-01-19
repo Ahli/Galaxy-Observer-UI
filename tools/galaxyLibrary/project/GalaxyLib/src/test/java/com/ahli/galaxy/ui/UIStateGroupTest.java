@@ -8,7 +8,7 @@ class UIStateGroupTest {
 	
 	@Test
 	@SuppressWarnings("JUnitTestMethodWithNoAssertions")
-	public void equalsContract() {
+	void equalsContract() {
 		EqualsVerifier.forClass(UIStateGroup.class)
 				.withRedefinedSuperclass()
 				.suppress(Warning.NONFINAL_FIELDS)

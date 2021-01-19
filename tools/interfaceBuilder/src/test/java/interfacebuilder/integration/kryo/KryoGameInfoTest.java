@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 class KryoGameInfoTest {
 	@Test
 	@SuppressWarnings("JUnitTestMethodWithNoAssertions")
-	public void equalsContract() {
+	void equalsContract() {
 		EqualsVerifier.forClass(KryoGameInfo.class).verify();
 	}
 }

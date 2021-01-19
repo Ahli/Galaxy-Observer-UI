@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 class UIAttributeTest {
 	@Test
 	@SuppressWarnings("JUnitTestMethodWithNoAssertions")
-	public void equalsContract() {
+	void equalsContract() {
 		EqualsVerifier.forClass(UIAttribute.class).withRedefinedSuperclass().suppress(Warning.NONFINAL_FIELDS).verify();
 	}
 }
