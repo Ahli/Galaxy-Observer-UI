@@ -64,7 +64,7 @@ public class UIStateGroup extends UIElement {
 	 * 		the defaultState to set
 	 */
 	public void setDefaultState(final String defaultState) {
-		this.defaultState = StringInterner.intern(defaultState);
+		this.defaultState = defaultState != null ? StringInterner.intern(defaultState) : null;
 	}
 	
 	/**

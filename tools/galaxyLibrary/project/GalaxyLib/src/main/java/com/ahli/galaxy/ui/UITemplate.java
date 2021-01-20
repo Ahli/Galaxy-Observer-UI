@@ -16,6 +16,10 @@ public class UITemplate implements DeepCopyable {
 	private UIElement element;
 	private boolean isLocked;
 	
+	private UITemplate(){
+		// required for Kryo
+	}
+	
 	/**
 	 * @param fileName
 	 * @param element
@@ -23,10 +27,6 @@ public class UITemplate implements DeepCopyable {
 	public UITemplate(final String fileName, final UIElement element) {
 		this.fileName = fileName;
 		this.element = element;
-	}
-	
-	public UITemplate() {
-		// nothing to do
 	}
 	
 	/**
@@ -44,14 +44,6 @@ public class UITemplate implements DeepCopyable {
 	 */
 	public String getFileName() {
 		return fileName;
-	}
-	
-	/**
-	 * @param fileName
-	 * 		the fileName to set
-	 */
-	public void setFileName(final String fileName) {
-		this.fileName = fileName;
 	}
 	
 	/**

@@ -146,9 +146,11 @@ public interface UICatalog extends DeepCopyable {
 	 * @param fileName
 	 * @param thisElem
 	 * @param isDevLayout
+	 * @return
 	 * @throws UIException
 	 */
-	void addTemplate(final String fileName, final UIElement thisElem, final boolean isDevLayout) throws UIException;
+	UITemplate addTemplate(final String fileName, final UIElement thisElem, final boolean isDevLayout)
+			throws UIException;
 	
 	void processInclude(String path, boolean isDevLayout, String raceId, String consoleSkinId);
 	

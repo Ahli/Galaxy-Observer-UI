@@ -10,11 +10,14 @@ import com.ahli.galaxy.ui.UIStateGroup;
 import com.ahli.galaxy.ui.UITemplate;
 import com.ahli.galaxy.ui.abstracts.UIElement;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayDeque;
 import java.util.List;
 
 public class ReferenceValidator {
+	private static final Logger logger = LogManager.getLogger(ReferenceValidator.class);
 	
 	private final UICatalog uiCatalog;
 	
@@ -56,11 +59,18 @@ public class ReferenceValidator {
 		if (uiCatalog != null) {
 			final ValidatorData data = new ValidatorData(20);
 			for (final UITemplate template : uiCatalog.getTemplates()) {
-				validate(template.getElement(), data);
+				// TODO ideally only templates that are directly instanciated are used... so maybe the ones that were not referenced somewhere else and have no file-attribute
+				if ("GameUI".equalsIgnoreCase(template.getFileName()) &&
+						"GameUI".equalsIgnoreCase(template.getElement().getName())) {
+					// TODO atm only GameUI/GameUI
+					validate(template.getElement(), data);
+					break;
+				}
 			}
 		}
 	}
 	
+	// TODO validate bindings
 	private void validate(final UIElement element, final ValidatorData data) {
 		if (element instanceof UIFrame) {
 			validate((UIFrame) element, data);
@@ -68,6 +78,8 @@ public class ReferenceValidator {
 			validate((UIAnimation) element, data);
 		} else if (element instanceof UIStateGroup) {
 			validate((UIStateGroup) element, data);
+		} else {
+			logger.error("ERROR: UIElement not handled in ReferenceValidator");
 		}
 	}
 	
@@ -88,7 +100,8 @@ public class ReferenceValidator {
 	}
 	
 	private void validate(final UIStateGroup element, final ValidatorData data) {
-	
+		final List<UIElement> states = element.getStates();
+		
 	}
 	
 	private static class ValidatorData {

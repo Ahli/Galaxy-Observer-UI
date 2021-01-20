@@ -68,9 +68,10 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	private static final String HANDLE = "handle";
 	private final UICatalog catalog;
 	private final XmlParser parser;
-	private final List<UIElement> curPath = new ArrayList<>(10);
+	private final List<UIElement> curPath;
 	private final List<UIState> statesToClose;
 	private final List<Integer> statesToCloseLevel;
+	private final List<UITemplate> newTemplatesOfCurFile;
 	private final Map<UIElement, UIElement> addedFinalElements;
 	private final Set<UIElement> deduplicatedElements;
 	private final boolean deduplicationAllowed;
@@ -82,17 +83,22 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	private boolean curIsDevLayout;
 	private String raceId;
 	private String consoleSkinId;
+	private UITemplate curExtTemplate;
 	private UITemplate curTemplate;
 	//private boolean editingMode;
 	private String curFileName;
 	private Deque<Object> toDeduplicate;
 	private int postProcessDeduplications;
+	private boolean layoutFileDescLocked;
+	private int unnamedFrameCounter;
 	
 	public UICatalogParser(final UICatalog catalog, final XmlParser parser, final boolean deduplicationAllowed) {
 		this.catalog = catalog;
 		this.parser = parser;
 		statesToClose = new ArrayList<>(10);
 		statesToCloseLevel = new ArrayList<>(10);
+		curPath = new ArrayList<>(10);
+		newTemplatesOfCurFile = new ArrayList<>(250);
 		this.deduplicationAllowed = deduplicationAllowed;
 		if (deduplicationAllowed) {
 			addedFinalElements = new UnifiedMap<>();
@@ -149,10 +155,10 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			final Iterable<UITemplate> templates, final String fileName, final String path) {
 		final String newPath = UIElement.removeLeftPathLevel(path);
 		
-		for (final UITemplate curTemplate : templates) {
-			if (curTemplate.getFileName().equalsIgnoreCase(fileName)) {
+		for (final UITemplate currTemplate : templates) {
+			if (currTemplate.getFileName().equalsIgnoreCase(fileName)) {
 				// found a template file
-				final UIElement frameFromPath = curTemplate.receiveFrameFromPath(newPath);
+				final UIElement frameFromPath = currTemplate.receiveFrameFromPath(newPath);
 				
 				if (frameFromPath != null) {
 					return frameFromPath;
@@ -241,9 +247,6 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	 * @param targetElem
 	 */
 	private static void applyTemplateElementToElement(final UIElement templateElem, final UIElement targetElem) {
-		if (targetElem == null) {
-			return;
-		}
 		logger.trace("Applying template {} to element {}", templateElem.getName(), targetElem.getName());
 		
 		final List<UIElement> templateChildren;
@@ -334,7 +337,9 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			for (final var templateChild : templateChildren) {
 				if (templateChild.getName() != null) {
 					final UIElement targetChild = targetElem.receiveFrameFromPath(templateChild.getName());
-					applyTemplateElementToElement(templateChild, targetChild);
+					if(targetChild != null) {
+						applyTemplateElementToElement(templateChild, targetChild);
+					}
 				}
 			}
 		}
@@ -370,12 +375,14 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			curPath.clear();
 			curLevel = level;
 			curElement = null; // no parent frame
+			curExtTemplate = null;
+			curTemplate = null;
 			// default editing mode unless the parsed aspect defines another one
 			//editingMode = false;
 			logger.trace("resetting path to root");
 		} else {
 			while (level <= curLevel) {
-				curLevel--;
+				--curLevel;
 				// curLevel - 2 because root is level 2 on list index 0
 				curElement = curPath.get(curLevel - 2);
 				logger.trace("shrinking path: curElement={}, level={}\npath  pre-dropLast: {}",
@@ -389,19 +396,19 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		
 		// close action of states to enable overriding of whens/actions on next edit
 		int i = statesToClose.size() - 1;
-		for (; i >= 0; i--) {
+		for (; i >= 0; --i) {
 			if (statesToCloseLevel.get(i) >= level) {
 				final UIState state = statesToClose.get(i);
 				state.setNextAdditionShouldOverrideActions(true);
 				state.setNextAdditionShouldOverrideWhens(true);
 				statesToClose.remove(i);
 				statesToCloseLevel.remove(i);
-				i--;
+				--i;
 			}
 		}
 		
 		UITemplate[] potentiallyEditedTemplates = null;
-		// file in attributes or template (filtering out key and action tags as they can
+		// file in attribute or template definition (filtering out key and action tags as they can
 		// contain file=, e.g. for cutscene frames)
 		if ((i = attrTypes.indexOf(FILE)) != -1 && !KEY.equals(tagName) && !ACTION.equals(tagName)) {
 			if (level != 2) {
@@ -415,13 +422,13 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		
 		UIElement newElem = null;
 		
-		// open existing element, if editing mode is enabled
+		
+		// editing a frame in another template?
 		if (potentiallyEditedTemplates != null) {
-			// This is the editing mode!
 			if (name == null) {
-				logger.error("Template is used without defining a name.");
+				logger.error("An existing frame should be edited without defining its name.");
 				//noinspection UnsecureRandomNumberGeneration
-				name = "UnnamedFrame" + Math.random();
+				name = "UnnamedFrame" + (++unnamedFrameCounter);
 			}
 			
 			// newElement needs to be the current element
@@ -429,7 +436,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				final UIElement editedElem = template.receiveFrameFromPath(name);
 				if (editedElem != null) {
 					newElem = editedElem;
-					curTemplate = template; // entering that template
+					curExtTemplate = template; // entering that template
 					break;
 				}
 			}
@@ -438,244 +445,346 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			final int j = name.lastIndexOf('/');
 			if (j > 0) {
 				final String parentName = name.substring(0, j);
-				if (curTemplate == null) {
-					logger.error("CurTemplate is null, but there is a path in the name {}", name);
+				if (curExtTemplate == null) {
+					logger.error("ERROR: CurExtTemplate is null, but there is a path in the name {}", name);
 					curElement = null;
 				} else {
-					curElement = curTemplate.receiveFrameFromPath(parentName);
+					curElement = curExtTemplate.receiveFrameFromPath(parentName);
 				}
 			} else {
 				// newElem has no parent, it is the template's root
 				curElement = null;
 			}
-		}
-		
-		// handle template attribute
-		i = attrTypes.indexOf(TEMPLATE);
-		if (i != -1) {
-			if (newElem != null) {
-				// This is editing mode!
-				// recursively copy template (attrValues.get(i))'s attributes into existing frame (= newElem)
-				applyTemplateElementToElement(attrValues.get(i), newElem);
-				
-				// TODO this needs to become a new template, too!
+		} else {
+			// editing existing template within the current file?
+			if (level <= 2 && name != null) {
+				for (final UITemplate template : newTemplatesOfCurFile) {
+					if (template.getElement().getName().equals(name)) {
+						newElem = template.getElement();
+						curElement = null;
+						break;
+					}
+				}
 			} else {
-				// create from template (actions may use template= and need to be ignored)
-				newElem = (!ACTION.equals(tagName)) ? instanciateTemplate(attrValues.get(i), name) : null;
-				if (newElem != null) {
-					registerInstance(newElem);
+				// editing an existing sibling element?
+				if (curElement != null && name != null) {
+					// TODO name can have '/', e.g. <Frame type="Frame" name="UIContainer/FullscreenUIContainer">
+					final List<UIElement> childrenRaw = curElement.getChildrenRaw();
+					if (childrenRaw != null) {
+						for (final UIElement child : childrenRaw) {
+							// TODO what if the type is different, but name is identical?
+							if (name.equals(child.getName())) {
+								newElem = child;
+								break;
+							}
+						}
+					}
 				}
 			}
 		}
 		
-		// use lowercase for cases!
-		switch (tagName) {
-			case FRAME:
-				if (newElem == null) {
-					newElem = new UIFrame(name);
-					registerInstance(newElem);
-				}
-				String type = ((i = attrTypes.indexOf(TYPE)) != -1) ?
-						catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout, consoleSkinId) : null;
-				if (type == null) {
-					logger.error("Unknown or no type defined in child element of: {}", curElement);
-					type = FRAME;
-				}
-				final var newElemUiFrame = (UIFrame) newElem;
-				//				if (!checkFrameTypeCompatibility(type, newElemUiFrame.getType())) {
-				//					logger.warn("WARN: The type of the frame is not compatible with the used template.");
-				//				}
-				newElemUiFrame.setType(type);
-				// add to parent
-				if (curElement != null) {
-					if (curElement instanceof UIFrame) {
-						curElement.getChildren().add(newElem);
-					} else {
-						logger.error("Frame appearing in unexpected parent element: {}", curElement);
-					}
-				}
-				break;
-			case ANCHOR:
-				parseAnchor(attrTypes, attrValues);
-				return;
-			case STATE:
-				if (newElem == null) {
-					newElem = new UIState(name);
-					registerInstance(newElem);
-				}
-				if (level == 2) {
-					catalog.addTemplate(curFileName, newElem, curIsDevLayout);
+		// handle template attribute
+		if ((i = attrTypes.indexOf(TEMPLATE)) != -1) {
+			if (newElem != null) {
+				// This is editing mode!
+				if (curExtTemplate == null || !curExtTemplate.isLocked()) {
+					// recursively copy template (attrValues.get(i))'s attributes into existing frame (= newElem)
+					applyTemplateElementToElement(attrValues.get(i), newElem);
 				} else {
-					// add to parent
-					if (curElement instanceof UIStateGroup) {
-						((UIStateGroup) curElement).getStates().add(newElem);
-						
-						// set flags to override on edit after parsing children
-						statesToClose.add((UIState) newElem);
-						statesToCloseLevel.add(level);
-					} else {
-						logger.error("State appearing outside a stategroup.");
+					if (curExtTemplate != null) {
+						logger.error("ERROR: attempting to edit '{}' within the locked layout file '{}'",
+								newElem.getName(),
+								curExtTemplate.getFileName());
 					}
 				}
-				break;
-			case CONTROLLER:
-				newElem = new UIController(name);
-				registerInstance(newElem);
-				// add to parent
-				if (curElement != null) {
-					if (curElement instanceof UIAnimation) {
-						((UIAnimation) curElement).getControllers().add(newElem);
-						final var newElemUiController = (UIController) newElem;
-						for (int j = 0, len = attrValues.size(); j < len; ++j) {
-							newElemUiController.addValue(attrTypes.get(j), attrValues.get(j));
-						}
-						
+			} else {
+				// create from template (actions may use template= and need to be ignored)
+				if (!ACTION.equals(tagName)) {
+					// TODO what can have a template?
+					if (FRAME.equals(tagName) || ANIMATION.equals(tagName)) {
 						if (name == null) {
-							setImplicitControllerNames((UIAnimation) curElement);
+							logger.error("A frame has no name, but should be instanciated with template='{}'",
+									attrValues.get(i));
+							name = "UnnamedFrame" + (++unnamedFrameCounter);
+						}
+						newElem = instanciateTemplate(attrValues.get(i), name);
+						if (newElem != null) {
+							registerInstance(newElem);
 						}
 					} else {
-						logger.error("Controller appearing in unexpected parent element: {}", curElement);
+						logger.error("ERROR: unexpected 'template' attribute on '<{}>'", tagName);
 					}
 				}
-				break;
-			case ANIMATION:
-				newElem = new UIAnimation(name);
-				registerInstance(newElem);
-				// add to parent
-				if (curElement != null) {
-					if (curElement instanceof UIFrame) {
-						curElement.getChildren().add(newElem);
-					} else {
-						logger.error("Animation appearing in unexpected parent element: {}", curElement);
-					}
-				}
-				break;
-			case STATEGROUP:
-				newElem = new UIStateGroup(name);
-				registerInstance(newElem);
-				// add to parent
-				if (curElement != null) {
-					if (curElement instanceof UIFrame) {
-						(curElement).getChildren().add(newElem);
-					} else {
-						logger.error("StateGroup appearing in unexpected parent element: {}", curElement);
-					}
-				}
-				break;
-			case CONSTANT:
-				if (newElem == null) {
-					newElem = new UIConstant(name);
-				}
-				final String val = ((i = attrTypes.indexOf(VAL)) != -1) ?
-						catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout, consoleSkinId) : null;
-				if (val == null) {
-					logger.error("Constant '{}' has no value defined", name);
-					return;
-				}
-				var newElemUiConstant = (UIConstant) newElem;
-				newElemUiConstant.setValue(val);
-				if (deduplicationAllowed) {
-					final UIElement refToDuplicate = addedFinalElements.get(newElem);
-					if (refToDuplicate != null) {
-						newElemUiConstant = (UIConstant) refToDuplicate;
-						deduplicatedElements.add(refToDuplicate);
-						++constantDeduplications;
-					} else {
-						addedFinalElements.put(newElem, newElem);
-					}
-				}
-				catalog.addConstant(newElemUiConstant, curIsDevLayout);
-				return;
-			case DESC:      // nothing to do
-			case DESCFLAGS: // locked or internal
-				return;
-			case INCLUDE:
-				final int j = attrTypes.indexOf(PATH);
-				if (j != -1) {
-					final String path = attrValues.get(j);
-					final boolean isDevLayout = curIsDevLayout || attrTypes.contains(REQUIREDTOLOAD);
-					catalog.processInclude(path, isDevLayout, raceId, consoleSkinId);
-				}
-				break;
-			default:
-				// attribute or something unknown that will cause an error
-				newElem = new UIAttribute(tagName);
-				i = 0;
-				final var newElemUiAttr = (UIAttribute) newElem;
-				for (final int len = attrTypes.size(); i < len; ++i) {
-					newElemUiAttr.addValue(attrTypes.get(i),
-							catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout, consoleSkinId));
-				}
-				if (deduplicationAllowed) {
-					final UIElement refToDuplicate = addedFinalElements.get(newElem);
-					if (refToDuplicate != null) {
-						newElem = refToDuplicate;
-						deduplicatedElements.add(refToDuplicate);
-						++attributeDeduplications;
-					} else {
-						addedFinalElements.put(newElem, newElem);
-					}
-				}
-				
-				// add to parent
-				if (curElement instanceof UIFrame) {
-					// Frame's attributes
-					((UIFrame) curElement).addAttribute((UIAttribute) newElem);
-					// register handle
-					if (HANDLE.equals(tagName)) {
-						catalog.getHandles().put(newElemUiAttr.getValue(VAL), (UIFrame) curElement);
-					}
-				} else if (curElement instanceof UIAnimation) {
-					// Animation's events
-					if (tagName.equals(EVENT)) {
-						((UIAnimation) curElement).addEvent((UIAttribute) newElem);
-					} else if (tagName.equals(DRIVER)) {
-						((UIAnimation) curElement).setDriver((UIAttribute) newElem);
-					} else {
-						logger.error("found an attribute that cannot be added to UIAnimation: {}", newElem);
-					}
-				} else if (curElement instanceof UIController) {
-					// Controller's keys
-					if (tagName.equals(KEY)) {
-						((UIController) curElement).getKeys().add((UIAttribute) newElem);
-					} else {
-						logger.error("found an attribute that cannot be added to UIController: {}", newElem);
-					}
-				} else if (curElement instanceof UIStateGroup) {
-					if (tagName.equals(DEFAULTSTATE)) {
-						final String stateVal = ((UIAttribute) newElem).getValue(VAL);
-						if (stateVal != null) {
-							((UIStateGroup) curElement).setDefaultState(stateVal);
-						} else {
-							logger.error("found <DefaultState> in <StateGroup '{}'> without val", curElement.getName());
-						}
-					} else {
-						logger.error("found an attribute that cannot be added to UIController: {}", newElem);
-					}
-				} else if (curElement instanceof UIState) {
-					if (tagName.equals(WHEN)) {
-						((UIState) curElement).getWhens().add((UIAttribute) newElem);
-					} else if (tagName.equals(ACTION)) {
-						((UIState) curElement).getActions().add((UIAttribute) newElem);
-					} else {
-						logger.error("found an attribute that cannot be added to UIState: {}", newElem);
-					}
-				} else {
-					logger.error("found an attribute that cannot be added to anything: {}", newElem);
-				}
-				
-				newElem = null;
-				break;
+			}
 		}
 		
-		// register template
-		if (level == 2) {
+		// prevent editing of layouts of locked templates
+		if (curExtTemplate != null && curExtTemplate.isLocked()) {
+			if (newElem != null) {
+				logger.error("ERROR: attempting to edit '{}' within the locked layout file '{}'",
+						newElem.getName(),
+						curExtTemplate.getFileName());
+				newElem = null;
+			}
+		} else {
+			// use lowercase for cases!
+			switch (tagName) {
+				case FRAME:
+					if (newElem == null) {
+						if (name == null) {
+							logger.error("A new 'Frame' was defined without a name.");
+							name = "UnnamedFrame" + (++unnamedFrameCounter);
+						}
+						newElem = new UIFrame(name);
+						registerInstance(newElem);
+					}
+					String type = ((i = attrTypes.indexOf(TYPE)) != -1) ?
+							catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout, consoleSkinId) : null;
+					if (type == null) {
+						logger.error("Unknown or no type defined in child element of: {}", curElement);
+						type = FRAME;
+					}
+					final var newElemUiFrame = (UIFrame) newElem;
+					//				if (!checkFrameTypeCompatibility(type, newElemUiFrame.getType())) {
+					//					logger.warn("WARN: The type of the frame is not compatible with the used template.");
+					//				}
+					newElemUiFrame.setType(type);
+					// add to parent
+					if (curElement != null) {
+						if (curElement instanceof UIFrame) {
+							curElement.getChildren().add(newElem);
+						} else {
+							logger.error("Frame appearing in unexpected parent element: {}", curElement);
+						}
+					}
+					break;
+				case ANCHOR:
+					parseAnchor(attrTypes, attrValues);
+					return;
+				case STATE:
+					if (newElem == null) {
+						if (name == null) {
+							logger.error("A new 'State' was defined without a name.");
+							name = "UnnamedState" + (++unnamedFrameCounter);
+						}
+						newElem = new UIState(name);
+						registerInstance(newElem);
+					}
+					if (level == 2) {
+						catalog.addTemplate(curFileName, newElem, curIsDevLayout);
+					} else {
+						// add to parent
+						if (curElement instanceof UIStateGroup) {
+							((UIStateGroup) curElement).getStates().add(newElem);
+							
+							// set flags to override on edit after parsing children
+							statesToClose.add((UIState) newElem);
+							statesToCloseLevel.add(level);
+						} else {
+							logger.error("State appearing outside a stategroup.");
+						}
+					}
+					break;
+				case CONTROLLER:
+					// name is allowed to be null here => receives an implicit name
+					newElem = new UIController(name);
+					registerInstance(newElem);
+					// add to parent
+					if (curElement != null) {
+						if (curElement instanceof UIAnimation) {
+							((UIAnimation) curElement).getControllers().add(newElem);
+							final var newElemUiController = (UIController) newElem;
+							for (int j = 0, len = attrValues.size(); j < len; ++j) {
+								newElemUiController.addValue(attrTypes.get(j), attrValues.get(j));
+							}
+							
+							if (name == null) {
+								setImplicitControllerNames((UIAnimation) curElement);
+							}
+						} else {
+							logger.error("Controller appearing in unexpected parent element: {}", curElement);
+						}
+					}
+					break;
+				case ANIMATION:
+					if (name == null) {
+						logger.error("A new 'Animation' was defined without a name.");
+						name = "UnnamedAnimation" + (++unnamedFrameCounter);
+					}
+					newElem = new UIAnimation(name);
+					registerInstance(newElem);
+					// add to parent
+					if (curElement != null) {
+						if (curElement instanceof UIFrame) {
+							curElement.getChildren().add(newElem);
+						} else {
+							logger.error("Animation appearing in unexpected parent element: {}", curElement);
+						}
+					}
+					break;
+				case STATEGROUP:
+					if (name == null) {
+						logger.error("A new 'StateGroup' was defined without a name.");
+						name = "UnnamedStateGroup" + (++unnamedFrameCounter);
+					}
+					newElem = new UIStateGroup(name);
+					registerInstance(newElem);
+					// add to parent
+					if (curElement != null) {
+						if (curElement instanceof UIFrame) {
+							(curElement).getChildren().add(newElem);
+						} else {
+							logger.error("StateGroup appearing in unexpected parent element: {}", curElement);
+						}
+					}
+					break;
+				case CONSTANT:
+					if (newElem == null) {
+						if (name == null) {
+							logger.error("A new 'Constant' was defined without a name.");
+							name = "UnnamedConstant" + (++unnamedFrameCounter);
+						}
+						newElem = new UIConstant(name);
+					}
+					final String val = ((i = attrTypes.indexOf(VAL)) != -1) ?
+							catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout, consoleSkinId) : null;
+					if (val == null) {
+						logger.error("Constant '{}' has no value defined", name);
+						return;
+					}
+					var newElemUiConstant = (UIConstant) newElem;
+					newElemUiConstant.setValue(val);
+					if (deduplicationAllowed) {
+						final UIElement refToDuplicate = addedFinalElements.get(newElem);
+						if (refToDuplicate != null) {
+							newElemUiConstant = (UIConstant) refToDuplicate;
+							deduplicatedElements.add(refToDuplicate);
+							++constantDeduplications;
+						} else {
+							addedFinalElements.put(newElem, newElem);
+						}
+					}
+					catalog.addConstant(newElemUiConstant, curIsDevLayout);
+					return;
+				case DESC:      // nothing to do
+					return;
+				case DESCFLAGS: // locked or internal or empty to remove internal
+					if (level <= 2) {
+						// is on root level outside templates => must be 'locked'
+						final int j = attrTypes.indexOf(VAL);
+						if (j != -1) {
+							final String attrVal =
+									catalog.getConstantValue(attrValues.get(j), raceId, curIsDevLayout, consoleSkinId)
+											.trim();
+							if ("locked".equalsIgnoreCase(attrVal)) {
+								layoutFileDescLocked = true;
+							} else if (attrVal.isEmpty()) {
+								layoutFileDescLocked = false;
+							} else {
+								logger.warn(
+										"WARNING: unexpected value of <DescFlags>. Val is '{}'. Expects 'locked' or an empty value",
+										attrVal);
+								// TODO validate if this is correct
+								layoutFileDescLocked = false;
+							}
+						} else {
+							logger.error("ERROR: <DescFlags> requires a val attribute");
+						}
+					} else {
+						// TODO 'locked' only on root level; other frames can only have 'internal' or ''
+					}
+					return;
+				case INCLUDE:
+					final int j = attrTypes.indexOf(PATH);
+					if (j != -1) {
+						final String path = attrValues.get(j);
+						final boolean isDevLayout = curIsDevLayout || attrTypes.contains(REQUIREDTOLOAD);
+						catalog.processInclude(path, isDevLayout, raceId, consoleSkinId);
+					}
+					break;
+				default:
+					// attribute or something unknown that will cause an error
+					newElem = new UIAttribute(tagName);
+					i = 0;
+					final var newElemUiAttr = (UIAttribute) newElem;
+					for (final int len = attrTypes.size(); i < len; ++i) {
+						newElemUiAttr.addValue(attrTypes.get(i),
+								catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout, consoleSkinId));
+					}
+					if (deduplicationAllowed) {
+						final UIElement refToDuplicate = addedFinalElements.get(newElem);
+						if (refToDuplicate != null) {
+							newElem = refToDuplicate;
+							deduplicatedElements.add(refToDuplicate);
+							++attributeDeduplications;
+						} else {
+							addedFinalElements.put(newElem, newElem);
+						}
+					}
+					
+					// add to parent
+					if (curElement instanceof UIFrame) {
+						// Frame's attributes
+						((UIFrame) curElement).addAttribute((UIAttribute) newElem);
+						// register handle
+						if (HANDLE.equals(tagName)) {
+							catalog.getHandles().put(newElemUiAttr.getValue(VAL), (UIFrame) curElement);
+						}
+					} else if (curElement instanceof UIAnimation) {
+						// Animation's events
+						if (tagName.equals(EVENT)) {
+							((UIAnimation) curElement).addEvent((UIAttribute) newElem);
+						} else if (tagName.equals(DRIVER)) {
+							((UIAnimation) curElement).setDriver((UIAttribute) newElem);
+						} else {
+							logger.error("found an attribute that cannot be added to UIAnimation: {}", newElem);
+						}
+					} else if (curElement instanceof UIController) {
+						// Controller's keys
+						if (tagName.equals(KEY)) {
+							((UIController) curElement).getKeys().add((UIAttribute) newElem);
+						} else {
+							logger.error("found an attribute that cannot be added to UIController: {}", newElem);
+						}
+					} else if (curElement instanceof UIStateGroup) {
+						if (tagName.equals(DEFAULTSTATE)) {
+							final String stateVal = ((UIAttribute) newElem).getValue(VAL);
+							if (stateVal != null) {
+								((UIStateGroup) curElement).setDefaultState(stateVal);
+							} else {
+								logger.error("found <DefaultState> in <StateGroup '{}'> without val",
+										curElement.getName());
+							}
+						} else {
+							logger.error("found an attribute that cannot be added to UIController: {}", newElem);
+						}
+					} else if (curElement instanceof UIState) {
+						if (tagName.equals(WHEN)) {
+							((UIState) curElement).getWhens().add((UIAttribute) newElem);
+						} else if (tagName.equals(ACTION)) {
+							((UIState) curElement).getActions().add((UIAttribute) newElem);
+						} else {
+							logger.error("found an attribute that cannot be added to UIState: {}", newElem);
+						}
+					} else {
+						logger.error("found an attribute that cannot be added to anything: {}", newElem);
+					}
+					
+					newElem = null;
+					break;
+			}
+		}
+		
+		// register new templates
+		if (level == 2 && curExtTemplate == null) {
 			if (newElem != null) {
 				logger.trace("adding new template: '{}' added to '{}'", newElem.getName(), curFileName);
-				// curTemplate =
-				catalog.addTemplate(curFileName, newElem, curIsDevLayout);
+				curTemplate = catalog.addTemplate(curFileName, newElem, curIsDevLayout);
+				newTemplatesOfCurFile.add(curTemplate);
 			} else {
+				// caused by not found template="..." or an <include>
 				logger.trace("skipped creating a template because newElem was null. curFileName: {}", curFileName);
+				curTemplate = null;
 			}
 		}
 		
@@ -729,10 +838,6 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	 * @return Template instance
 	 */
 	private UIElement instanciateTemplate(String path, final String newName) {
-		if (path == null) {
-			return null;
-		}
-		
 		logger.trace("Instanciating Template of path {}", path);
 		path = path.replace('\\', '/');
 		final int seperatorIndex = path.indexOf('/');
@@ -893,6 +998,15 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		}
 		statesToClose.clear();
 		statesToCloseLevel.clear();
+		
+		// set templates locked state
+		if (layoutFileDescLocked) {
+			for (final UITemplate template : newTemplatesOfCurFile) {
+				template.setLocked(true);
+			}
+			layoutFileDescLocked = false;
+		}
+		newTemplatesOfCurFile.clear();
 	}
 	
 	@Override
@@ -907,7 +1021,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					addedElements.size(),
 					addedFinalElements.size());
 			addedElements = null;
-			toDeduplicate = new ArrayDeque<>(9_000);
+			toDeduplicate = new ArrayDeque<>(400_000);
 			// replace instances
 			
 			toDeduplicate.addAll(catalog.getTemplates());

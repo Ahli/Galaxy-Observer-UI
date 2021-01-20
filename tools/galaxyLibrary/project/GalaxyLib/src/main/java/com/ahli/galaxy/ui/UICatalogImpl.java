@@ -204,10 +204,10 @@ public class UICatalogImpl implements UICatalog {
 				try {
 					processLayoutFile(layoutFilePath, raceId, isDevLayout, consoleSkinId, parser);
 				} catch (final IOException e) {
-					logger.error(
-							String.format("ERROR: encountered an Exception while processing the layout file '%s'.",
-									layoutFilePath),
-							e);
+					final String msg = String.format(
+							"ERROR: encountered an Exception while processing the layout file '%s'.",
+							layoutFilePath);
+					logger.error(msg, e);
 				}
 				if (Thread.interrupted()) {
 					//noinspection NewExceptionWithoutArguments
@@ -294,10 +294,11 @@ public class UICatalogImpl implements UICatalog {
 	 * @param fileName
 	 * @param thisElem
 	 * @param isDevLayout
+	 * @return
 	 * @throws UIException
 	 */
 	@Override
-	public void addTemplate(final String fileName, final UIElement thisElem, final boolean isDevLayout)
+	public UITemplate addTemplate(final String fileName, final UIElement thisElem, final boolean isDevLayout)
 			throws UIException {
 		if (thisElem == null) {
 			throw new UIException("Cannot create Template definition for a 'null' UIElement.");
@@ -306,6 +307,7 @@ public class UICatalogImpl implements UICatalog {
 		final List<UITemplate> list = isDevLayout ? blizzOnlyTemplates : templates;
 		final UITemplate template = new UITemplate(fileName, thisElem);
 		list.add(template);
+		return template;
 	}
 	
 	/**
