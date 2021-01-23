@@ -463,7 +463,9 @@ public class BaseUiService {
 			} catch (final InterruptedException e) {
 				Thread.currentThread().interrupt();
 			} finally {
-				outputAppender.end();
+				if (outputAppender != null) {
+					outputAppender.end();
+				}
 			}
 		}
 		

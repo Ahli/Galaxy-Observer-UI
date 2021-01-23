@@ -60,60 +60,6 @@ public class SettingsController implements Updateable {
 		categories[index] = item;
 	}
 	
-	/**
-	 * @param category
-	 */
-	private void loadSettingsContent(final TreeItem<String> category) {
-		final Parent content;
-		final FXMLSpringLoader loader = new FXMLSpringLoader(appContext);
-		final Object controller;
-		switch (getCategoryIndex(category)) {
-			case 0 -> content = initFXML(loader, "classpath:view/Settings_GamesPaths.fxml");
-			case 1 -> content = initFXML(loader, "classpath:view/Settings_GuiTool.fxml");
-			case 2 -> content = initFXML(loader, "classpath:view/Settings_CommandLineTool.fxml");
-			default -> {
-				logger.error("Attempted to load a settings category that does not exist");
-				return;
-			}
-		}
-		controller = loader.getController();
-		if (controller instanceof Updateable) {
-			((Updateable) controller).update();
-		}
-		contentContainer.setContent(content);
-	}
-	
-	/**
-	 * Returns the index of the category within the array that stores all categories.
-	 *
-	 * @param category
-	 * @return
-	 */
-	private int getCategoryIndex(final TreeItem<String> category) {
-		for (int i = 0, len = categories.length; i < len; ++i) {
-			if (category == categories[i]) {
-				return i;
-			}
-		}
-		return -1;
-	}
-	
-	/**
-	 * Initializes the TabPane for the Compiling Progress.
-	 *
-	 * @param loader
-	 * @param path
-	 * @return
-	 */
-	private static Parent initFXML(final FXMLSpringLoader loader, final String path) {
-		try {
-			return loader.load(path);
-		} catch (final IOException e) {
-			logger.error(String.format("failed to load FXML: %s.", path), e);
-		}
-		return null;
-	}
-	
 	@Override
 	public void update() {
 		final MultipleSelectionModel<?> selectionModel = categoryTree.getSelectionModel();
@@ -137,8 +83,62 @@ public class SettingsController implements Updateable {
 				final TreeItem<String> newVal) {
 			if (oldVal != newVal && newVal != null &&
 					newVal == settingsController.categoryTree.getSelectionModel().getSelectedItem()) {
-				settingsController.loadSettingsContent(newVal);
+				loadSettingsContent(newVal);
 			}
+		}
+		
+		/**
+		 * @param category
+		 */
+		private void loadSettingsContent(final TreeItem<String> category) {
+			final Parent content;
+			final FXMLSpringLoader loader = new FXMLSpringLoader(settingsController.appContext);
+			final Object controller;
+			switch (getCategoryIndex(category)) {
+				case 0 -> content = initFXML(loader, "classpath:view/Settings_GamesPaths.fxml");
+				case 1 -> content = initFXML(loader, "classpath:view/Settings_GuiTool.fxml");
+				case 2 -> content = initFXML(loader, "classpath:view/Settings_CommandLineTool.fxml");
+				default -> {
+					logger.error("Attempted to load a settings category that does not exist");
+					return;
+				}
+			}
+			controller = loader.getController();
+			if (controller instanceof Updateable) {
+				((Updateable) controller).update();
+			}
+			settingsController.contentContainer.setContent(content);
+		}
+		
+		/**
+		 * Returns the index of the category within the array that stores all categories.
+		 *
+		 * @param category
+		 * @return
+		 */
+		private int getCategoryIndex(final TreeItem<String> category) {
+			for (int i = 0, len = settingsController.categories.length; i < len; ++i) {
+				if (category == settingsController.categories[i]) {
+					return i;
+				}
+			}
+			return -1;
+		}
+		
+		/**
+		 * Initializes the TabPane for the Compiling Progress.
+		 *
+		 * @param loader
+		 * @param path
+		 * @return
+		 */
+		private static Parent initFXML(final FXMLSpringLoader loader, final String path) {
+			try {
+				return loader.load(path);
+			} catch (final IOException e) {
+				logger.error(String.format("failed to load FXML: %s.", path), e);
+			}
+			return null;
 		}
 	}
 }

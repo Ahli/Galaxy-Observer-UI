@@ -3,7 +3,11 @@
 
 package com.ahli.galaxy.ui;
 
-import com.ahli.galaxy.ui.abstracts.UIElement;
+import com.ahli.galaxy.ui.abstracts.UIElementAbstract;
+import com.ahli.galaxy.ui.interfaces.UIAnimation;
+import com.ahli.galaxy.ui.interfaces.UIAttribute;
+import com.ahli.galaxy.ui.interfaces.UIController;
+import com.ahli.galaxy.ui.interfaces.UIElement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,13 +16,13 @@ import java.util.Objects;
 /**
  * @author Ahli
  */
-public class UIAnimation extends UIElement {
-	private List<UIElement> controllers;
-	private List<UIAttribute> events;
+public class UIAnimationMutable extends UIElementAbstract implements UIAnimation {
+	private final List<UIElement> controllers;
+	private final List<UIAttribute> events;
 	private boolean nextEventsAdditionShouldOverride;
 	private UIAttribute driver;
 	
-	public UIAnimation() {
+	public UIAnimationMutable() {
 		super(null);
 		events = new ArrayList<>(0);
 		controllers = new ArrayList<>(0);
@@ -27,7 +31,7 @@ public class UIAnimation extends UIElement {
 	/**
 	 * @param name
 	 */
-	public UIAnimation(final String name) {
+	public UIAnimationMutable(final String name) {
 		super(name);
 		events = new ArrayList<>(0);
 		controllers = new ArrayList<>(0);
@@ -41,7 +45,7 @@ public class UIAnimation extends UIElement {
 	 * @param eventsCapacity
 	 * @param controllerCapacity
 	 */
-	public UIAnimation(final String name, final int eventsCapacity, final int controllerCapacity) {
+	public UIAnimationMutable(final String name, final int eventsCapacity, final int controllerCapacity) {
 		super(name);
 		events = new ArrayList<>(eventsCapacity);
 		controllers = new ArrayList<>(controllerCapacity);
@@ -52,7 +56,7 @@ public class UIAnimation extends UIElement {
 	 */
 	@Override
 	public Object deepCopy() {
-		final UIAnimation clone = new UIAnimation(getName(), events.size(), controllers.size());
+		final UIAnimationMutable clone = new UIAnimationMutable(getName(), events.size(), controllers.size());
 		for (int i = 0, len = controllers.size(); i < len; ++i) {
 			clone.controllers.add((UIController) controllers.get(i).deepCopy());
 		}
@@ -70,36 +74,23 @@ public class UIAnimation extends UIElement {
 	/**
 	 * @return the controllers
 	 */
+	@Override
 	public List<UIElement> getControllers() {
 		return controllers;
 	}
 	
 	/**
-	 * @param controllers
-	 * 		the controllers to set
-	 */
-	public void setControllers(final List<UIElement> controllers) {
-		this.controllers = controllers;
-	}
-	
-	/**
 	 * @return the events
 	 */
+	@Override
 	public List<UIAttribute> getEvents() {
 		return events;
 	}
 	
 	/**
-	 * @param events
-	 * 		the events to set
-	 */
-	public void setEvents(final List<UIAttribute> events) {
-		this.events = events;
-	}
-	
-	/**
 	 * @param newEvent
 	 */
+	@Override
 	public void addEvent(final UIAttribute newEvent) {
 		events.add(newEvent);
 	}
@@ -107,6 +98,7 @@ public class UIAnimation extends UIElement {
 	/**
 	 * @return
 	 */
+	@Override
 	public boolean isNextEventsAdditionShouldOverride() {
 		return nextEventsAdditionShouldOverride;
 	}
@@ -114,6 +106,7 @@ public class UIAnimation extends UIElement {
 	/**
 	 * @param nextEventsAdditionShouldOverride
 	 */
+	@Override
 	public void setNextEventsAdditionShouldOverride(final boolean nextEventsAdditionShouldOverride) {
 		this.nextEventsAdditionShouldOverride = nextEventsAdditionShouldOverride;
 	}
@@ -121,6 +114,7 @@ public class UIAnimation extends UIElement {
 	/**
 	 * @return the driver
 	 */
+	@Override
 	public UIAttribute getDriver() {
 		return driver;
 	}
@@ -129,6 +123,7 @@ public class UIAnimation extends UIElement {
 	 * @param driver
 	 * 		the driver to set
 	 */
+	@Override
 	public void setDriver(final UIAttribute driver) {
 		this.driver = driver;
 	}
@@ -162,11 +157,13 @@ public class UIAnimation extends UIElement {
 	}
 	
 	@Override
+	@SuppressWarnings("java:S4144")
 	public List<UIElement> getChildren() {
 		return controllers;
 	}
 	
 	@Override
+	@SuppressWarnings("java:S4144")
 	public List<UIElement> getChildrenRaw() {
 		return controllers;
 	}
@@ -176,13 +173,13 @@ public class UIAnimation extends UIElement {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof UIAnimation)) {
+		if (!(o instanceof UIAnimationMutable)) {
 			return false;
 		}
 		if (!super.equals(o)) {
 			return false;
 		}
-		final UIAnimation that = (UIAnimation) o;
+		final UIAnimationMutable that = (UIAnimationMutable) o;
 		return that.canEqual(this) && nextEventsAdditionShouldOverride == that.nextEventsAdditionShouldOverride &&
 				Objects.equals(controllers, that.controllers) && Objects.equals(events, that.events) &&
 				Objects.equals(driver, that.driver);
@@ -190,7 +187,7 @@ public class UIAnimation extends UIElement {
 	
 	@Override
 	public boolean canEqual(final Object other) {
-		return (other instanceof UIAnimation);
+		return (other instanceof UIAnimationMutable);
 	}
 	
 	@Override

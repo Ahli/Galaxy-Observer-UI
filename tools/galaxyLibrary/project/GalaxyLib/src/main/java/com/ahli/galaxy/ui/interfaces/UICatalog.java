@@ -4,10 +4,7 @@
 package com.ahli.galaxy.ui.interfaces;
 
 import com.ahli.galaxy.parser.interfaces.ParsedXmlConsumer;
-import com.ahli.galaxy.ui.UIConstant;
-import com.ahli.galaxy.ui.UIFrame;
 import com.ahli.galaxy.ui.UITemplate;
-import com.ahli.galaxy.ui.abstracts.UIElement;
 import com.ahli.galaxy.ui.exception.UIException;
 import com.ahli.util.DeepCopyable;
 import org.xml.sax.SAXException;

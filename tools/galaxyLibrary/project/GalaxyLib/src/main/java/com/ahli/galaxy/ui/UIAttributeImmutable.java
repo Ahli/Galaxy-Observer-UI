@@ -3,7 +3,9 @@
 
 package com.ahli.galaxy.ui;
 
-import com.ahli.galaxy.ui.abstracts.UIElement;
+import com.ahli.galaxy.ui.abstracts.UIElementAbstract;
+import com.ahli.galaxy.ui.interfaces.UIAttribute;
+import com.ahli.galaxy.ui.interfaces.UIElement;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,13 +17,13 @@ import java.util.Objects;
  *
  * @author Ahli
  */
-public class UIAttribute extends UIElement {
+public class UIAttributeImmutable extends UIElementAbstract implements UIAttribute {
 	private final List<String> keyValueList;
 	
 	/**
 	 * Constructor for Kryo?
 	 */
-	private UIAttribute() {
+	private UIAttributeImmutable() {
 		super(null);
 		keyValueList = new ArrayList<>(0);
 	}
@@ -34,7 +36,7 @@ public class UIAttribute extends UIElement {
 	 * @param keyValuesList
 	 * 		List where Key and Value entries alternate: Key1, Value1, Key2, Value2, ...
 	 */
-	public UIAttribute(final String name, final List<String> keyValuesList) {
+	public UIAttributeImmutable(final String name, final List<String> keyValuesList) {
 		super(name);
 		keyValueList = keyValuesList;
 	}
@@ -80,6 +82,7 @@ public class UIAttribute extends UIElement {
 	 * @param key
 	 * @return
 	 */
+	@Override
 	public String getValue(final String key) {
 		int i = 0;
 		for (final int len = keyValueList.size(); i < len; i += 2) {
@@ -95,6 +98,7 @@ public class UIAttribute extends UIElement {
 	 *
 	 * @return
 	 */
+	@Override
 	public List<String> getKeyValues() {
 		return keyValueList;
 	}
@@ -125,6 +129,7 @@ public class UIAttribute extends UIElement {
 	}
 	
 	@Override
+	@SuppressWarnings("java:S1168")
 	public List<UIElement> getChildrenRaw() {
 		return null; // returning null is desired here
 	}
@@ -134,19 +139,19 @@ public class UIAttribute extends UIElement {
 		if (this == obj) {
 			return true;
 		}
-		if (!(obj instanceof UIAttribute)) {
+		if (!(obj instanceof UIAttributeImmutable)) {
 			return false;
 		}
 		if (!super.equals(obj)) {
 			return false;
 		}
-		final UIAttribute that = (UIAttribute) obj;
+		final UIAttributeImmutable that = (UIAttributeImmutable) obj;
 		return that.canEqual(this) && Objects.equals(keyValueList, that.keyValueList);
 	}
 	
 	@Override
 	public boolean canEqual(final Object other) {
-		return (other instanceof UIAttribute);
+		return (other instanceof UIAttributeImmutable);
 	}
 	
 	@Override

@@ -9,7 +9,7 @@ class UIStateGroupTest {
 	@Test
 	@SuppressWarnings("JUnitTestMethodWithNoAssertions")
 	void equalsContract() {
-		EqualsVerifier.forClass(UIStateGroup.class)
+		EqualsVerifier.forClass(UIStateGroupMutable.class)
 				.withRedefinedSuperclass()
 				.withIgnoredFields("hash", "hashIsZero", "hashIsDirty")
 				.suppress(Warning.NONFINAL_FIELDS)

@@ -3,7 +3,10 @@
 
 package com.ahli.galaxy.ui;
 
-import com.ahli.galaxy.ui.abstracts.UIElement;
+import com.ahli.galaxy.ui.abstracts.UIElementAbstract;
+import com.ahli.galaxy.ui.interfaces.UIAttribute;
+import com.ahli.galaxy.ui.interfaces.UIController;
+import com.ahli.galaxy.ui.interfaces.UIElement;
 import com.ahli.util.StringInterner;
 
 import java.util.ArrayList;
@@ -14,13 +17,13 @@ import java.util.Objects;
 /**
  * @author Ahli
  */
-public class UIController extends UIElement {
+public class UIControllerMutable extends UIElementAbstract implements UIController {
 	private final List<String> attributesKeyValueList;
 	private List<UIAttribute> keys;
 	private boolean nextAdditionShouldOverride;
 	private boolean nameIsImplicit = true;
 	
-	public UIController() {
+	public UIControllerMutable() {
 		super(null);
 		attributesKeyValueList = new ArrayList<>(0);
 		keys = new ArrayList<>(0);
@@ -29,7 +32,7 @@ public class UIController extends UIElement {
 	/**
 	 * @param name
 	 */
-	public UIController(final String name) {
+	public UIControllerMutable(final String name) {
 		super(name);
 		attributesKeyValueList = new ArrayList<>(0);
 		keys = new ArrayList<>(0);
@@ -40,7 +43,7 @@ public class UIController extends UIElement {
 	 * @param attributesCapacity
 	 * @param keysCapacity
 	 */
-	public UIController(final String name, final int attributesCapacity, final int keysCapacity) {
+	public UIControllerMutable(final String name, final int attributesCapacity, final int keysCapacity) {
 		super(name);
 		attributesKeyValueList = new ArrayList<>(attributesCapacity);
 		keys = new ArrayList<>(keysCapacity);
@@ -51,7 +54,8 @@ public class UIController extends UIElement {
 	 */
 	@Override
 	public Object deepCopy() {
-		final UIController clone = new UIController(getName(), attributesKeyValueList.size(), keys.size());
+		final UIControllerMutable clone =
+				new UIControllerMutable(getName(), attributesKeyValueList.size(), keys.size());
 		for (int i = 0, len = keys.size(); i < len; ++i) {
 			clone.keys.add((UIAttribute) keys.get(i).deepCopy());
 		}
@@ -66,6 +70,7 @@ public class UIController extends UIElement {
 	/**
 	 * @return the keys
 	 */
+	@Override
 	public List<UIAttribute> getKeys() {
 		return keys;
 	}
@@ -74,6 +79,7 @@ public class UIController extends UIElement {
 	 * @param keys
 	 * 		the keys to set
 	 */
+	@Override
 	public void setKeys(final List<UIAttribute> keys) {
 		this.keys = keys;
 	}
@@ -81,6 +87,7 @@ public class UIController extends UIElement {
 	/**
 	 * @return the nextAdditionShouldOverride
 	 */
+	@Override
 	public boolean isNextAdditionShouldOverride() {
 		return nextAdditionShouldOverride;
 	}
@@ -89,6 +96,7 @@ public class UIController extends UIElement {
 	 * @param nextAdditionShouldOverride
 	 * 		the nextAdditionShouldOverride to set
 	 */
+	@Override
 	public void setNextAdditionShouldOverride(final boolean nextAdditionShouldOverride) {
 		this.nextAdditionShouldOverride = nextAdditionShouldOverride;
 	}
@@ -99,6 +107,7 @@ public class UIController extends UIElement {
 	 * @param key
 	 * @param value
 	 */
+	@Override
 	public void addValue(final String key, final String value) {
 		int i = 0;
 		final int len = attributesKeyValueList.size();
@@ -120,6 +129,7 @@ public class UIController extends UIElement {
 	 * @param key
 	 * @return
 	 */
+	@Override
 	public String getValue(final String key) {
 		int i = 0;
 		for (final int len = attributesKeyValueList.size(); i < len; i += 2) {
@@ -133,6 +143,7 @@ public class UIController extends UIElement {
 	/**
 	 * @return the nameIsImplicit
 	 */
+	@Override
 	public boolean isNameIsImplicit() {
 		return nameIsImplicit;
 	}
@@ -141,6 +152,7 @@ public class UIController extends UIElement {
 	 * @param nameIsImplicit
 	 * 		the nameIsImplicit to set
 	 */
+	@Override
 	public void setNameIsImplicit(final boolean nameIsImplicit) {
 		this.nameIsImplicit = nameIsImplicit;
 	}
@@ -165,6 +177,7 @@ public class UIController extends UIElement {
 	}
 	
 	@Override
+	@SuppressWarnings("java:S1168")
 	public List<UIElement> getChildrenRaw() {
 		return null; // returning null is desired here
 	}
@@ -174,13 +187,13 @@ public class UIController extends UIElement {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof UIController)) {
+		if (!(o instanceof UIControllerMutable)) {
 			return false;
 		}
 		if (!super.equals(o)) {
 			return false;
 		}
-		final UIController that = (UIController) o;
+		final UIControllerMutable that = (UIControllerMutable) o;
 		return that.canEqual(this) && nextAdditionShouldOverride == that.nextAdditionShouldOverride &&
 				nameIsImplicit == that.nameIsImplicit &&
 				Objects.equals(attributesKeyValueList, that.attributesKeyValueList) && Objects.equals(keys, that.keys);
@@ -188,7 +201,7 @@ public class UIController extends UIElement {
 	
 	@Override
 	public boolean canEqual(final Object other) {
-		return (other instanceof UIController);
+		return (other instanceof UIControllerMutable);
 	}
 	
 	@Override

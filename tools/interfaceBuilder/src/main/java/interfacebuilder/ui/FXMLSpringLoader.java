@@ -12,6 +12,7 @@ import org.springframework.context.support.MessageSourceResourceBundle;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * A FXMLLoader with its ControllerFactory set to be the ApplicationContext's Bean. Controllers are required to be jpa
@@ -59,4 +60,23 @@ public class FXMLSpringLoader extends FXMLLoader implements ApplicationContextAw
 		}
 	}
 	
+	@Override
+	public boolean equals(final Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+		if (!super.equals(o)) {
+			return false;
+		}
+		final FXMLSpringLoader that = (FXMLSpringLoader) o;
+		return Objects.equals(context, that.context);
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(context);
+	}
 }

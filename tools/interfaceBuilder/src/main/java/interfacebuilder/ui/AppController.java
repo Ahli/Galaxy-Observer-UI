@@ -135,7 +135,7 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 				StringInterner.cleanUpGarbage();
 				logger.trace("string interner size after cleaning: {}", StringInterner::size);
 				// TODO not all Strings are removed for some reason
-				logger.trace("interner content: \n{}", StringInterner.print());
+				//logger.trace("interner content: \n{}", StringInterner.print());
 			}
 		}).start();
 	}
@@ -156,7 +156,7 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 				checkBaseUiUpdate();
 			}
 		} catch (final IOException e) {
-			throw new RuntimeException(e);
+			throw new AppControllerException(e);
 		}
 	}
 	
@@ -587,4 +587,9 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 	}
 	
 	
+	private static class AppControllerException extends RuntimeException {
+		public AppControllerException(final Exception e) {
+			super(e);
+		}
+	}
 }

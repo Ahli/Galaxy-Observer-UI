@@ -3,7 +3,10 @@
 
 package com.ahli.galaxy.ui;
 
-import com.ahli.galaxy.ui.abstracts.UIElement;
+import com.ahli.galaxy.ui.abstracts.UIElementAbstract;
+import com.ahli.galaxy.ui.interfaces.UIAttribute;
+import com.ahli.galaxy.ui.interfaces.UIElement;
+import com.ahli.galaxy.ui.interfaces.UIFrame;
 import com.ahli.util.StringInterner;
 
 import java.util.ArrayList;
@@ -18,7 +21,7 @@ import java.util.Objects;
  * NOTES: using null for certain often occurring values did not yield in
  * performance improvements
  */
-public class UIFrame extends UIElement {
+public class UIFrameMutable extends UIElementAbstract implements UIFrame {
 	public static final String ZERO = "0";
 	public static final String THIS = "$this";
 	public static final String MIN = "Min";
@@ -35,7 +38,7 @@ public class UIFrame extends UIElement {
 	private String type;
 	private List<UIElement> children;
 	
-	public UIFrame() {
+	public UIFrameMutable() {
 		super(null);
 		init();
 		attributes = null;
@@ -55,7 +58,7 @@ public class UIFrame extends UIElement {
 	 * @param name
 	 * @param type
 	 */
-	public UIFrame(final String name, final String type) {
+	public UIFrameMutable(final String name, final String type) {
 		super(name);
 		init();
 		attributes = null;
@@ -68,7 +71,7 @@ public class UIFrame extends UIElement {
 	 * @param initialAttributesCapacity
 	 * @param initialChildrenCapacity
 	 */
-	public UIFrame(final String name, final int initialAttributesCapacity, final int initialChildrenCapacity) {
+	public UIFrameMutable(final String name, final int initialAttributesCapacity, final int initialChildrenCapacity) {
 		super(name);
 		init();
 		attributes = initialAttributesCapacity > 0 ? new ArrayList<>(initialAttributesCapacity) : null;
@@ -78,7 +81,7 @@ public class UIFrame extends UIElement {
 	/**
 	 * @param name
 	 */
-	public UIFrame(final String name) {
+	public UIFrameMutable(final String name) {
 		super(name);
 		init();
 		type = null;
@@ -93,7 +96,7 @@ public class UIFrame extends UIElement {
 	public Object deepCopy() {
 		final int attrSize = attributes != null ? attributes.size() : 0;
 		final int childrenSize = children != null ? children.size() : 0;
-		final UIFrame clone = new UIFrame(getName(), attrSize, childrenSize);
+		final UIFrameMutable clone = new UIFrameMutable(getName(), attrSize, childrenSize);
 		clone.type = type;
 		if (childrenSize > 0) {
 			for (int i = 0; i < childrenSize; ++i) {
@@ -123,6 +126,7 @@ public class UIFrame extends UIElement {
 	/**
 	 * @return the type, may be null if not set
 	 */
+	@Override
 	public String getType() {
 		return type;
 	}
@@ -131,6 +135,7 @@ public class UIFrame extends UIElement {
 	 * @param type
 	 * 		the type to set
 	 */
+	@Override
 	public void setType(final String type) {
 		this.type = StringInterner.intern(type);
 	}
@@ -143,13 +148,6 @@ public class UIFrame extends UIElement {
 		return children;
 	}
 	
-	/**
-	 * @param children
-	 */
-	public void setChildren(final List<UIElement> children) {
-		this.children = children;
-	}
-	
 	@Override
 	public List<UIElement> getChildrenRaw() {
 		return children;
@@ -158,6 +156,7 @@ public class UIFrame extends UIElement {
 	/**
 	 * @param value
 	 */
+	@Override
 	public void addAttribute(final UIAttribute value) {
 		final String key = value.getName();
 		if (attributes != null) {
@@ -177,6 +176,7 @@ public class UIFrame extends UIElement {
 	 * @param key
 	 * @return
 	 */
+	@Override
 	public UIAttribute getValue(final String key) {
 		if (attributes != null) {
 			for (final UIAttribute a : attributes) {
@@ -191,6 +191,7 @@ public class UIFrame extends UIElement {
 	/**
 	 * @return
 	 */
+	@Override
 	public List<UIAttribute> getAttributes() {
 		if (attributes == null) {
 			attributes = new ArrayList<>(0);
@@ -202,6 +203,7 @@ public class UIFrame extends UIElement {
 	 * @param side
 	 * @return
 	 */
+	@Override
 	public String getAnchorRelative(final UIAnchorSide side) {
 		return relative[side.ordinal()];
 	}
@@ -210,6 +212,7 @@ public class UIFrame extends UIElement {
 	 * @param side
 	 * @return
 	 */
+	@Override
 	public String getAnchorOffset(final UIAnchorSide side) {
 		return offset[side.ordinal()];
 	}
@@ -218,6 +221,7 @@ public class UIFrame extends UIElement {
 	 * @param side
 	 * @return
 	 */
+	@Override
 	public String getAnchorPos(final UIAnchorSide side) {
 		return pos[side.ordinal()];
 	}
@@ -226,6 +230,7 @@ public class UIFrame extends UIElement {
 	 * @param relative
 	 * @param offset
 	 */
+	@Override
 	public void setAnchor(final String relative, final String offset) {
 		pos = DFLT_POS;
 		if (THIS.equalsIgnoreCase(relative)) {
@@ -258,6 +263,7 @@ public class UIFrame extends UIElement {
 	 * @param pos
 	 * @param offset
 	 */
+	@Override
 	public void setAnchor(final UIAnchorSide side, final String relative, final String pos, final String offset) {
 		setAnchorRelative(side, relative);
 		setAnchorPos(side, pos);
@@ -268,6 +274,7 @@ public class UIFrame extends UIElement {
 	 * @param side
 	 * @param relative
 	 */
+	@Override
 	public void setAnchorRelative(final UIAnchorSide side, final String relative) {
 		if (Arrays.equals(this.relative, DFLT_RELATIVE)) {
 			if (THIS.equalsIgnoreCase(relative)) {
@@ -286,6 +293,7 @@ public class UIFrame extends UIElement {
 	 * @param side
 	 * @param pos
 	 */
+	@Override
 	public void setAnchorPos(final UIAnchorSide side, final String pos) {
 		if (Arrays.equals(this.pos, DFLT_POS)) {
 			if (DFLT_POS[side.ordinal()].equalsIgnoreCase(pos)) {
@@ -307,6 +315,7 @@ public class UIFrame extends UIElement {
 	 * @param side
 	 * @param offset
 	 */
+	@Override
 	public void setAnchorOffset(final UIAnchorSide side, final String offset) {
 		if (Arrays.equals(this.offset, DFLT_OFFSET)) {
 			if (ZERO.equals(offset)) {
@@ -357,13 +366,13 @@ public class UIFrame extends UIElement {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof UIFrame)) {
+		if (!(o instanceof UIFrameMutable)) {
 			return false;
 		}
 		if (!super.equals(o)) {
 			return false;
 		}
-		final UIFrame uiFrame = (UIFrame) o;
+		final UIFrameMutable uiFrame = (UIFrameMutable) o;
 		return uiFrame.canEqual(this) && Arrays.deepEquals(pos, uiFrame.pos) &&
 				Arrays.deepEquals(offset, uiFrame.offset) && Arrays.deepEquals(relative, uiFrame.relative) &&
 				Objects.equals(attributes, uiFrame.attributes) && Objects.equals(type, uiFrame.type) &&
@@ -372,7 +381,7 @@ public class UIFrame extends UIElement {
 	
 	@Override
 	public boolean canEqual(final Object other) {
-		return (other instanceof UIFrame);
+		return (other instanceof UIFrameMutable);
 	}
 	
 	@Override

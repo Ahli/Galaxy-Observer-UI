@@ -3,7 +3,9 @@
 
 package com.ahli.galaxy.ui;
 
-import com.ahli.galaxy.ui.abstracts.UIElement;
+import com.ahli.galaxy.ui.abstracts.UIElementAbstract;
+import com.ahli.galaxy.ui.interfaces.UIConstant;
+import com.ahli.galaxy.ui.interfaces.UIElement;
 import com.ahli.util.StringInterner;
 
 import java.util.Collections;
@@ -13,18 +15,18 @@ import java.util.Objects;
 /**
  * @author Ahli
  */
-public class UIConstant extends UIElement {
+public class UIConstantImmutable extends UIElementAbstract implements UIConstant {
 	private final String value;
 	
 	/**
 	 * Constructor for Kryo?
 	 */
-	private UIConstant() {
+	private UIConstantImmutable() {
 		super(null);
 		value = null;
 	}
 	
-	public UIConstant(final String name, final String value) {
+	public UIConstantImmutable(final String name, final String value) {
 		super(name);
 		this.value = StringInterner.intern(value);
 	}
@@ -46,6 +48,7 @@ public class UIConstant extends UIElement {
 	/**
 	 * @return the value
 	 */
+	@Override
 	public String getValue() {
 		return value;
 	}
@@ -70,6 +73,7 @@ public class UIConstant extends UIElement {
 	}
 	
 	@Override
+	@SuppressWarnings("java:S1168")
 	public List<UIElement> getChildrenRaw() {
 		return null; // returning null is desired here
 	}
@@ -79,19 +83,19 @@ public class UIConstant extends UIElement {
 		if (this == obj) {
 			return true;
 		}
-		if (!(obj instanceof UIConstant)) {
+		if (!(obj instanceof UIConstantImmutable)) {
 			return false;
 		}
 		if (!super.equals(obj)) {
 			return false;
 		}
-		final UIConstant that = (UIConstant) obj;
+		final UIConstantImmutable that = (UIConstantImmutable) obj;
 		return that.canEqual(this) && Objects.equals(value, that.value);
 	}
 	
 	@Override
 	public boolean canEqual(final Object other) {
-		return (other instanceof UIConstant);
+		return (other instanceof UIConstantImmutable);
 	}
 	
 	@Override

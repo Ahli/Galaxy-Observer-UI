@@ -12,6 +12,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -151,6 +152,8 @@ public final class XmlCompressorDom {
 				
 				doc = dBuilder.parse(is);
 				
+			} catch (final SAXParseException ignored) {
+				return FileVisitResult.CONTINUE;
 			} catch (final IOException | SAXException e) {
 				logger.trace("Error while compressing xml.", e);
 				return FileVisitResult.CONTINUE;

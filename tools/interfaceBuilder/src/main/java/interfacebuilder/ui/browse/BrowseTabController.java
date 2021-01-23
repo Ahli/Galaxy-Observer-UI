@@ -4,15 +4,16 @@
 package interfacebuilder.ui.browse;
 
 import com.ahli.galaxy.ui.UIAnchorSide;
-import com.ahli.galaxy.ui.UIAnimation;
-import com.ahli.galaxy.ui.UIAttribute;
-import com.ahli.galaxy.ui.UIController;
-import com.ahli.galaxy.ui.UIFrame;
-import com.ahli.galaxy.ui.UIState;
-import com.ahli.galaxy.ui.UIStateGroup;
+import com.ahli.galaxy.ui.UIFrameMutable;
 import com.ahli.galaxy.ui.UITemplate;
-import com.ahli.galaxy.ui.abstracts.UIElement;
+import com.ahli.galaxy.ui.interfaces.UIAnimation;
+import com.ahli.galaxy.ui.interfaces.UIAttribute;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
+import com.ahli.galaxy.ui.interfaces.UIController;
+import com.ahli.galaxy.ui.interfaces.UIElement;
+import com.ahli.galaxy.ui.interfaces.UIFrame;
+import com.ahli.galaxy.ui.interfaces.UIState;
+import com.ahli.galaxy.ui.interfaces.UIStateGroup;
 import interfacebuilder.ui.Updateable;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -226,7 +227,7 @@ public class BrowseTabController implements Updateable {
 		} else {
 			final UIElement el = selected.getValue();
 			final Map<String, String> map = new UnifiedMap<>();
-			if (el instanceof UIFrame) {
+			if (el instanceof UIFrameMutable) {
 				final UIFrame elem = (UIFrame) el;
 				UIAnchorSide side = UIAnchorSide.TOP;
 				map.put(ANCHOR_TOP,
@@ -254,7 +255,7 @@ public class BrowseTabController implements Updateable {
 					map.put(DEFAULT_STATE, dfltState);
 				}
 				int i = 0;
-				for (final UIElement state : elem.getStates()) {
+				for (final UIElement state : elem.getChildren()) {
 					++i;
 					map.put(STATE_PREFIX + i, state.getName());
 				}

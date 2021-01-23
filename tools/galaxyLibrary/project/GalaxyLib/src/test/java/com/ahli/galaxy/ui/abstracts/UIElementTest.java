@@ -1,12 +1,12 @@
 package com.ahli.galaxy.ui.abstracts;
 
-import com.ahli.galaxy.ui.UIAnimation;
-import com.ahli.galaxy.ui.UIAttribute;
-import com.ahli.galaxy.ui.UIConstant;
-import com.ahli.galaxy.ui.UIController;
-import com.ahli.galaxy.ui.UIFrame;
-import com.ahli.galaxy.ui.UIState;
-import com.ahli.galaxy.ui.UIStateGroup;
+import com.ahli.galaxy.ui.UIAnimationMutable;
+import com.ahli.galaxy.ui.UIAttributeImmutable;
+import com.ahli.galaxy.ui.UIConstantImmutable;
+import com.ahli.galaxy.ui.UIControllerMutable;
+import com.ahli.galaxy.ui.UIFrameMutable;
+import com.ahli.galaxy.ui.UIStateGroupMutable;
+import com.ahli.galaxy.ui.UIStateMutable;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import org.junit.jupiter.api.Test;
@@ -14,15 +14,15 @@ import org.junit.jupiter.api.Test;
 class UIElementTest {
 	
 	@Test
-	public void equalsContract() {
-		EqualsVerifier.forClass(UIElement.class)
-				.withRedefinedSubclass(UIFrame.class)
-				.withRedefinedSubclass(UIStateGroup.class)
-				.withRedefinedSubclass(UIState.class)
-				.withRedefinedSubclass(UIAttribute.class)
-				.withRedefinedSubclass(UIAnimation.class)
-				.withRedefinedSubclass(UIConstant.class)
-				.withRedefinedSubclass(UIController.class)
+	void equalsContract() {
+		EqualsVerifier.forClass(UIElementAbstract.class)
+				.withRedefinedSubclass(UIFrameMutable.class)
+				.withRedefinedSubclass(UIStateGroupMutable.class)
+				.withRedefinedSubclass(UIStateMutable.class)
+				.withRedefinedSubclass(UIAttributeImmutable.class)
+				.withRedefinedSubclass(UIAnimationMutable.class)
+				.withRedefinedSubclass(UIConstantImmutable.class)
+				.withRedefinedSubclass(UIControllerMutable.class)
 				.withIgnoredFields("hash", "hashIsZero", "hashIsDirty")
 				.suppress(Warning.NONFINAL_FIELDS)
 				.verify();

@@ -4,8 +4,8 @@
 package interfacebuilder.integration.kryo;
 
 import com.ahli.galaxy.ui.UICatalogImpl;
-import com.ahli.galaxy.ui.UIConstant;
-import com.ahli.galaxy.ui.UIFrame;
+import com.ahli.galaxy.ui.UIConstantImmutable;
+import com.ahli.galaxy.ui.UIFrameMutable;
 import com.ahli.galaxy.ui.exception.UIException;
 import com.esotericsoftware.kryo.Kryo;
 import org.junit.jupiter.api.Test;
@@ -53,8 +53,8 @@ final class KryoServiceTest {
 		final KryoGameInfo kryoGameInfoA =
 				new KryoGameInfo(new int[] { 42, 12, 44, 12345 }, "Heroes of the Storm", false);
 		final UICatalogImpl uiCatalogA = new UICatalogImpl(1, 1, 1, 0, 1, 0);
-		uiCatalogA.addTemplate("fileName", new UIFrame("frame", "type"), false);
-		uiCatalogA.addConstant(new UIConstant("asd asd asd", "qqq"), false);
+		uiCatalogA.addTemplate("fileName", new UIFrameMutable("frame", "type"), false);
+		uiCatalogA.addConstant(new UIConstantImmutable("asd asd asd", "qqq"), false);
 		final List<Object> payload = new ArrayList<>(2);
 		payload.add((uiCatalogA));
 		payload.add(kryoGameInfoA);

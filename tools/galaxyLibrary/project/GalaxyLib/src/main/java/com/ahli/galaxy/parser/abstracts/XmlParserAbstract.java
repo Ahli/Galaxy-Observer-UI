@@ -10,7 +10,7 @@ public abstract class XmlParserAbstract implements XmlParser {
 	
 	protected ParsedXmlConsumer consumer;
 	
-	public XmlParserAbstract(final ParsedXmlConsumer consumer) {
+	protected XmlParserAbstract(final ParsedXmlConsumer consumer) {
 		this.consumer = consumer;
 	}
 	

@@ -3,14 +3,14 @@
 
 package interfacebuilder.integration.kryo;
 
-import com.ahli.galaxy.ui.UIAnimation;
-import com.ahli.galaxy.ui.UIAttribute;
+import com.ahli.galaxy.ui.UIAnimationMutable;
+import com.ahli.galaxy.ui.UIAttributeImmutable;
 import com.ahli.galaxy.ui.UICatalogImpl;
-import com.ahli.galaxy.ui.UIConstant;
-import com.ahli.galaxy.ui.UIController;
-import com.ahli.galaxy.ui.UIFrame;
-import com.ahli.galaxy.ui.UIState;
-import com.ahli.galaxy.ui.UIStateGroup;
+import com.ahli.galaxy.ui.UIConstantImmutable;
+import com.ahli.galaxy.ui.UIControllerMutable;
+import com.ahli.galaxy.ui.UIFrameMutable;
+import com.ahli.galaxy.ui.UIStateGroupMutable;
+import com.ahli.galaxy.ui.UIStateMutable;
 import com.ahli.galaxy.ui.UITemplate;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.KryoException;
@@ -42,28 +42,28 @@ public class KryoService {
 		//		Log.TRACE = false;
 		final Kryo kryo = new Kryo(new HashMapReferenceResolver());
 		kryo.register(ArrayList.class, 9);
-		kryo.register(UIAttribute.class, 10);
-		kryo.register(String[].class, new KryoInternStringArraySerializer());
-		kryo.register(UIFrame.class, 12);
+		kryo.register(UIAttributeImmutable.class, 10);
+		kryo.register(String[].class, new KryoInternStringArraySerializer(), 11);
+		kryo.register(UIFrameMutable.class, 12);
 		kryo.register(UITemplate.class, 13);
-		kryo.register(UIConstant.class, 14);
-		kryo.register(UIState.class, 15);
-		kryo.register(UIController.class, 16);
-		kryo.register(UIAnimation.class, 17);
-		kryo.register(UIStateGroup.class, 18);
+		kryo.register(UIConstantImmutable.class, 14);
+		kryo.register(UIStateMutable.class, 15);
+		kryo.register(UIControllerMutable.class, 16);
+		kryo.register(UIAnimationMutable.class, 17);
+		kryo.register(UIStateGroupMutable.class, 18);
 		kryo.register(UICatalogImpl.class, 19);
-		kryo.register(KryoGameInfo.class, new KryoGameInfoSerializer());
+		kryo.register(KryoGameInfo.class, new KryoGameInfoSerializer(), 20);
 		kryo.register(int[].class, 21);
 		kryo.register(byte[].class, 22);
 		kryo.register(UnifiedMap.class, 23);
+		kryo.register(String.class, new KryoInternStringSerializer(), 24);
 		kryo.setRegistrationRequired(true);
-		kryo.register(String.class, new KryoInternStringSerializer());
 		return kryo;
 	}
 	
 	public Kryo getKryoForBaseUiMetaFile() {
 		final Kryo kryo = new Kryo(new ListReferenceResolver());
-		kryo.register(KryoGameInfo.class, new KryoGameInfoSerializer());
+		kryo.register(KryoGameInfo.class, new KryoGameInfoSerializer(), 9);
 		kryo.register(int[].class, 10);
 		kryo.setRegistrationRequired(true);
 		return kryo;

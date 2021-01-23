@@ -6,17 +6,24 @@ package com.ahli.galaxy.parser;
 import com.ahli.galaxy.parser.interfaces.ParsedXmlConsumer;
 import com.ahli.galaxy.parser.interfaces.XmlParser;
 import com.ahli.galaxy.ui.UIAnchorSide;
-import com.ahli.galaxy.ui.UIAnimation;
-import com.ahli.galaxy.ui.UIAttribute;
-import com.ahli.galaxy.ui.UIConstant;
-import com.ahli.galaxy.ui.UIController;
-import com.ahli.galaxy.ui.UIFrame;
-import com.ahli.galaxy.ui.UIState;
-import com.ahli.galaxy.ui.UIStateGroup;
+import com.ahli.galaxy.ui.UIAnimationMutable;
+import com.ahli.galaxy.ui.UIAttributeImmutable;
+import com.ahli.galaxy.ui.UIConstantImmutable;
+import com.ahli.galaxy.ui.UIControllerMutable;
+import com.ahli.galaxy.ui.UIFrameMutable;
+import com.ahli.galaxy.ui.UIStateGroupMutable;
+import com.ahli.galaxy.ui.UIStateMutable;
 import com.ahli.galaxy.ui.UITemplate;
-import com.ahli.galaxy.ui.abstracts.UIElement;
 import com.ahli.galaxy.ui.exception.UIException;
+import com.ahli.galaxy.ui.interfaces.UIAnimation;
+import com.ahli.galaxy.ui.interfaces.UIAttribute;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
+import com.ahli.galaxy.ui.interfaces.UIConstant;
+import com.ahli.galaxy.ui.interfaces.UIController;
+import com.ahli.galaxy.ui.interfaces.UIElement;
+import com.ahli.galaxy.ui.interfaces.UIFrame;
+import com.ahli.galaxy.ui.interfaces.UIState;
+import com.ahli.galaxy.ui.interfaces.UIStateGroup;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
@@ -74,7 +81,6 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	private final boolean deduplicationAllowed;
 	private int attributeDeduplications;
 	private int constantDeduplications;
-	private List<UIElement> addedElements;
 	private UIElement curElement;
 	private int curLevel;
 	private boolean curIsDevLayout;
@@ -101,15 +107,12 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			if (catalog.getTemplates().isEmpty()) {
 				// parse a baseUI
 				addedFinalElements = new UnifiedMap<>(61_000 * 5 / 4);
-				addedElements = new ArrayList<>(35_000);
 			} else {
 				// parse obs interface
 				addedFinalElements = new UnifiedMap<>(90_000 * 5 / 4);
-				addedElements = new ArrayList<>(6_200);
 			}
 		} else {
 			addedFinalElements = null;
-			addedElements = null;
 		}
 		//noinspection ThisEscapedInObjectConstruction
 		parser.setConsumer(this);
@@ -169,27 +172,6 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			}
 		}
 		return null;
-	}
-	
-	/**
-	 * @param templates
-	 * @param fileName
-	 * @param path
-	 * @param newName
-	 * @return
-	 */
-	private static UIElement instanciateTemplateFromList(
-			final List<UITemplate> templates, final String fileName, final String path, final String newName) {
-		final UIElement frameFromPath = findTemplateFromList(templates, fileName, path);
-		final UIElement clone = frameFromPath != null ? (UIElement) frameFromPath.deepCopy() : null;
-		if (clone != null) {
-			clone.setName(newName);
-			//				if (paramDeduplicate) {
-			//					addToAddedElements(clone); // not necessary as the parent is deduplicated right
-			//					// now and elements are not modified atm.
-			//				}
-		}
-		return clone;
 	}
 	
 	/**
@@ -347,6 +329,24 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				}
 			}
 		}
+	}
+	
+	/**
+	 * @param templates
+	 * @param fileName
+	 * @param path
+	 * @param newName
+	 * @return
+	 */
+	private UIElement instanciateTemplateFromList(
+			final List<UITemplate> templates, final String fileName, final String path, final String newName) {
+		final UIElement frameFromPath = findTemplateFromList(templates, fileName, path);
+		if (frameFromPath != null) {
+			final UIElement clone = (UIElement) frameFromPath.deepCopy();
+			clone.setName(newName);
+			return clone;
+		}
+		return null;
 	}
 	
 	@Override
@@ -511,9 +511,6 @@ public class UICatalogParser implements ParsedXmlConsumer {
 							name = "UnnamedFrame" + (++unnamedFrameCounter);
 						}
 						newElem = instanciateTemplate(attrValues.get(i), name);
-						if (newElem != null) {
-							registerInstance(newElem);
-						}
 					} else {
 						logger.error("ERROR: unexpected 'template' attribute on '<{}>'", tagName);
 					}
@@ -538,8 +535,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 							logger.error("A new 'Frame' was defined without a name.");
 							name = "UnnamedFrame" + (++unnamedFrameCounter);
 						}
-						newElem = new UIFrame(name);
-						registerInstance(newElem);
+						newElem = new UIFrameMutable(name);
 					}
 					String type = ((i = attrTypes.indexOf(TYPE)) != -1) ?
 							catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout, consoleSkinId) : null;
@@ -570,15 +566,14 @@ public class UICatalogParser implements ParsedXmlConsumer {
 							logger.error("A new 'State' was defined without a name.");
 							name = "UnnamedState" + (++unnamedFrameCounter);
 						}
-						newElem = new UIState(name);
-						registerInstance(newElem);
+						newElem = new UIStateMutable(name);
 					}
 					if (level == 2) {
 						catalog.addTemplate(curFileName, newElem, curIsDevLayout);
 					} else {
 						// add to parent
 						if (curElement instanceof UIStateGroup) {
-							((UIStateGroup) curElement).getStates().add(newElem);
+							curElement.getChildren().add(newElem);
 							
 							// set flags to override on edit after parsing children
 							statesToClose.add((UIState) newElem);
@@ -590,8 +585,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					break;
 				case CONTROLLER:
 					// name is allowed to be null here => receives an implicit name
-					newElem = new UIController(name);
-					registerInstance(newElem);
+					newElem = new UIControllerMutable(name);
 					// add to parent
 					if (curElement != null) {
 						if (curElement instanceof UIAnimation) {
@@ -614,8 +608,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 						logger.error("A new 'Animation' was defined without a name.");
 						name = "UnnamedAnimation" + (++unnamedFrameCounter);
 					}
-					newElem = new UIAnimation(name);
-					registerInstance(newElem);
+					newElem = new UIAnimationMutable(name);
 					// add to parent
 					if (curElement != null) {
 						if (curElement instanceof UIFrame) {
@@ -630,8 +623,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 						logger.error("A new 'StateGroup' was defined without a name.");
 						name = "UnnamedStateGroup" + (++unnamedFrameCounter);
 					}
-					newElem = new UIStateGroup(name);
-					registerInstance(newElem);
+					newElem = new UIStateGroupMutable(name);
 					// add to parent
 					if (curElement != null) {
 						if (curElement instanceof UIFrame) {
@@ -652,7 +644,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 						logger.error("Constant '{}' has no value defined", name);
 						return;
 					}
-					var newElemUiConstant = new UIConstant(name, val);
+					UIConstant newElemUiConstant = new UIConstantImmutable(name, val);
 					newElem = newElemUiConstant;
 					if (deduplicationAllowed) {
 						final UIElement refToDuplicate = addedFinalElements.get(newElem);
@@ -712,7 +704,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 								curIsDevLayout,
 								consoleSkinId));
 					}
-					final UIAttribute newElemUiAttr = new UIAttribute(tagName, attributeKeyValueList);
+					final UIAttribute newElemUiAttr = new UIAttributeImmutable(tagName, attributeKeyValueList);
 					newElem = newElemUiAttr;
 					
 					if (deduplicationAllowed) {
@@ -878,12 +870,6 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		return null;
 	}
 	
-	private void registerInstance(final UIElement newElem) {
-		if (deduplicationAllowed) {
-			addedElements.add(newElem);
-		}
-	}
-	
 	/**
 	 * @param attrTypes
 	 * @param attrValues
@@ -911,8 +897,8 @@ public class UICatalogParser implements ParsedXmlConsumer {
 						frame.setAnchor(relative, offset);
 					} catch (final NumberFormatException e) {
 						logger.error("A frame's offset '{}' is not a numerical value. Using 0 instead.", offset);
-						frame.setAnchorOffset(UIAnchorSide.RIGHT, UIFrame.ZERO);
-						frame.setAnchorOffset(UIAnchorSide.BOTTOM, UIFrame.ZERO);
+						frame.setAnchorOffset(UIAnchorSide.RIGHT, UIFrameMutable.ZERO);
+						frame.setAnchorOffset(UIAnchorSide.BOTTOM, UIFrameMutable.ZERO);
 					}
 				}
 			} else {
@@ -955,43 +941,6 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		}
 	}
 	
-	//	private void addToAddedElements(final UIElement elem) {
-	//		addedElements.add(elem);
-	//		if (elem instanceof UIState) {
-	//			final UIState state = (UIState) elem;
-	//			addedElements.addAll(state.getActions());
-	//			addedElements.addAll(state.getWhens());
-	//		} else if (elem instanceof UIFrame) {
-	//			final UIFrame frame = (UIFrame) elem;
-	//			addedElements.addAll(frame.getAttributes());
-	//			final List<UIElement> childrenRaw = frame.getChildrenRaw();
-	//			if (childrenRaw != null) {
-	//				for (final UIElement child : childrenRaw) {
-	//					addToAddedElements(child);
-	//				}
-	//			}
-	//		} else if (elem instanceof UIStateGroup) {
-	//			final UIStateGroup stateGroup = (UIStateGroup) elem;
-	//			addedElements.addAll(stateGroup.getStates());
-	//		} else if (elem instanceof UIController) {
-	//			final UIController controller = (UIController) elem;
-	//			addedElements.addAll(controller.getKeys());
-	//		} else if (elem instanceof UIAnimation) {
-	//			final UIAnimation anim = (UIAnimation) elem;
-	//			final UIAttribute driver = anim.getDriver();
-	//			if (driver != null) {
-	//				addedElements.add(driver);
-	//			}
-	//			for (final UIElement event : anim.getEvents()) {
-	//				addToAddedElements(event);
-	//			}
-	//			for (final UIElement controller : anim.getControllers()) {
-	//				addToAddedElements(controller);
-	//			}
-	//		}
-	//		// Constants and Attributes do not contain any further elements
-	//	}
-	
 	@Override
 	public void endLayoutFile() {
 		// close all states
@@ -1015,15 +964,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	@Override
 	public void deduplicate() {
 		if (deduplicationAllowed) {
-			// finish mapping
-			for (final UIElement elem : addedElements) {
-				addedFinalElements.putIfAbsent(elem, elem);
-			}
-			logger.info(
-					"elements added that can be deduplicated during postprocessing: {}\nunique elements added that were deduplicated during parsing: {}",
-					addedElements.size(),
-					addedFinalElements.size());
-			addedElements = null;
+			logger.info("unique elements added that were deduplicated during parsing: {}", addedFinalElements.size());
 			// replace instances
 			final Deque<Object> toDeduplicate =
 					new ArrayDeque<>(catalog.getTemplates().size() + catalog.getBlizzOnlyTemplates().size());
@@ -1065,6 +1006,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		}
 	}
 	
+	@SuppressWarnings("java:S3824")
 	private void deduplicate(final UIFrame frame) {
 		//		logger.trace("deduplicating: {}", frame);
 		final List<UIElement> childrenRaw = frame.getChildrenRaw();
@@ -1086,6 +1028,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		}
 	}
 	
+	@SuppressWarnings("java:S3824")
 	private void deduplicate(final UIAnimation anim) {
 		//		logger.trace("deduplicating: {}", anim);
 		final List<UIElement> controllers = anim.getControllers();
@@ -1105,9 +1048,10 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		}
 	}
 	
+	@SuppressWarnings("java:S3824")
 	private void deduplicate(final UIStateGroup stateGroup) {
 		//		logger.trace("deduplicating: {}, deduplicatedElements; {}", stateGroup, addedFinalElements.size());
-		final List<UIElement> states = stateGroup.getStates();
+		final List<UIElement> states = stateGroup.getChildrenRaw();
 		for (int i = 0, len = states.size(); i < len; ++i) {
 			final UIElement child = states.get(i);
 			final UIElement duplicate = addedFinalElements.get(child);
@@ -1124,6 +1068,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		}
 	}
 	
+	@SuppressWarnings("java:S3824")
 	private void deduplicate(final UITemplate template) {
 		//		logger.trace("deduplicating: {}", template);
 		final UIElement elem = template.getElement();

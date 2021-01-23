@@ -20,7 +20,7 @@ public abstract class CleaningForkJoinTask extends ForkJoinTask<Void> {
 	
 	private final CleaningForkJoinTaskCleaner cleaner;
 	
-	public CleaningForkJoinTask(final CleaningForkJoinTaskCleaner cleaner) {
+	protected CleaningForkJoinTask(final CleaningForkJoinTaskCleaner cleaner) {
 		this.cleaner = cleaner;
 	}
 	

@@ -3,7 +3,7 @@
 
 package interfacebuilder.ui.browse;
 
-import com.ahli.galaxy.ui.abstracts.UIElement;
+import com.ahli.galaxy.ui.interfaces.UIElement;
 import javafx.scene.control.TreeCell;
 
 public class CustomTreeCell extends TreeCell<UIElement> {

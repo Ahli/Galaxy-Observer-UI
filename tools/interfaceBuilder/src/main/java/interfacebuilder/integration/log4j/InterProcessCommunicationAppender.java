@@ -85,10 +85,8 @@ public final class InterProcessCommunicationAppender extends AbstractAppender {
 	}
 	
 	public static void sendTerminationSignal() {
-		if (printWriter != null) {
-			if (instance != null) {
-				printWriter.println("#BYE");
-			}
+		if (printWriter != null && instance != null) {
+			printWriter.println("#BYE");
 		}
 	}
 	

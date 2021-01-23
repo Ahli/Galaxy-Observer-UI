@@ -3,7 +3,10 @@
 
 package com.ahli.galaxy.ui;
 
-import com.ahli.galaxy.ui.abstracts.UIElement;
+import com.ahli.galaxy.ui.abstracts.UIElementAbstract;
+import com.ahli.galaxy.ui.interfaces.UIElement;
+import com.ahli.galaxy.ui.interfaces.UIState;
+import com.ahli.galaxy.ui.interfaces.UIStateGroup;
 import com.ahli.util.StringInterner;
 
 import java.util.ArrayList;
@@ -13,11 +16,11 @@ import java.util.Objects;
 /**
  * @author Ahli
  */
-public class UIStateGroup extends UIElement {
+public class UIStateGroupMutable extends UIElementAbstract implements UIStateGroup {
+	private final List<UIElement> states;
 	private String defaultState;
-	private List<UIElement> states;
 	
-	public UIStateGroup() {
+	public UIStateGroupMutable() {
 		super(null);
 		states = new ArrayList<>(0);
 	}
@@ -25,7 +28,7 @@ public class UIStateGroup extends UIElement {
 	/**
 	 * @param name
 	 */
-	public UIStateGroup(final String name) {
+	public UIStateGroupMutable(final String name) {
 		super(name);
 		states = new ArrayList<>(0);
 	}
@@ -34,7 +37,7 @@ public class UIStateGroup extends UIElement {
 	 * @param name
 	 * @param statesCapacity
 	 */
-	public UIStateGroup(final String name, final int statesCapacity) {
+	public UIStateGroupMutable(final String name, final int statesCapacity) {
 		super(name);
 		states = new ArrayList<>(statesCapacity);
 	}
@@ -44,7 +47,7 @@ public class UIStateGroup extends UIElement {
 	 */
 	@Override
 	public Object deepCopy() {
-		final UIStateGroup clone = new UIStateGroup(getName(), states.size());
+		final UIStateGroupMutable clone = new UIStateGroupMutable(getName(), states.size());
 		for (int i = 0, len = states.size(); i < len; ++i) {
 			clone.states.add((UIState) states.get(i).deepCopy());
 		}
@@ -55,6 +58,7 @@ public class UIStateGroup extends UIElement {
 	/**
 	 * @return the defaultState
 	 */
+	@Override
 	public String getDefaultState() {
 		return defaultState;
 	}
@@ -63,23 +67,9 @@ public class UIStateGroup extends UIElement {
 	 * @param defaultState
 	 * 		the defaultState to set
 	 */
+	@Override
 	public void setDefaultState(final String defaultState) {
 		this.defaultState = defaultState != null ? StringInterner.intern(defaultState) : null;
-	}
-	
-	/**
-	 * @return the states
-	 */
-	public List<UIElement> getStates() {
-		return states;
-	}
-	
-	/**
-	 * @param states
-	 * 		the states to set
-	 */
-	public void setStates(final List<UIElement> states) {
-		this.states = states;
 	}
 	
 	/**
@@ -113,13 +103,11 @@ public class UIStateGroup extends UIElement {
 	
 	@Override
 	public List<UIElement> getChildren() {
-		if (states == null) {
-			states = new ArrayList<>(0);
-		}
 		return states;
 	}
 	
 	@Override
+	@SuppressWarnings("java:S4144")
 	public List<UIElement> getChildrenRaw() {
 		return states;
 	}
@@ -129,20 +117,20 @@ public class UIStateGroup extends UIElement {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof UIStateGroup)) {
+		if (!(o instanceof UIStateGroupMutable)) {
 			return false;
 		}
 		if (!super.equals(o)) {
 			return false;
 		}
-		final UIStateGroup that = (UIStateGroup) o;
+		final UIStateGroupMutable that = (UIStateGroupMutable) o;
 		return that.canEqual(this) && Objects.equals(defaultState, that.defaultState) &&
 				Objects.equals(states, that.states);
 	}
 	
 	@Override
 	public boolean canEqual(final Object other) {
-		return (other instanceof UIStateGroup);
+		return (other instanceof UIStateGroupMutable);
 	}
 	
 	@Override

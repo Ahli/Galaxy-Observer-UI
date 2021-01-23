@@ -2,14 +2,14 @@ package com.ahli.galaxy.validator;
 
 import com.ahli.galaxy.ModData;
 import com.ahli.galaxy.ui.UIAnchorSide;
-import com.ahli.galaxy.ui.UIAnimation;
-import com.ahli.galaxy.ui.UIAttribute;
-import com.ahli.galaxy.ui.UIController;
-import com.ahli.galaxy.ui.UIFrame;
-import com.ahli.galaxy.ui.UIStateGroup;
 import com.ahli.galaxy.ui.UITemplate;
-import com.ahli.galaxy.ui.abstracts.UIElement;
+import com.ahli.galaxy.ui.interfaces.UIAnimation;
+import com.ahli.galaxy.ui.interfaces.UIAttribute;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
+import com.ahli.galaxy.ui.interfaces.UIController;
+import com.ahli.galaxy.ui.interfaces.UIElement;
+import com.ahli.galaxy.ui.interfaces.UIFrame;
+import com.ahli.galaxy.ui.interfaces.UIStateGroup;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -100,8 +100,10 @@ public class ReferenceValidator {
 	}
 	
 	private void validate(final UIStateGroup element, final ValidatorData data) {
-		final List<UIElement> states = element.getStates();
+		final List<UIElement> states = element.getChildrenRaw();
+		if (states != null) {
 		
+		}
 	}
 	
 	private static class ValidatorData {

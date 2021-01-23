@@ -37,7 +37,7 @@ public class FileService {
 					try {
 						Files.copy(file, target.resolve(source.relativize(file)), StandardCopyOption.REPLACE_EXISTING);
 					} catch (final IOException e) {
-						throw new RuntimeException(e.getMessage(), e);
+						throw new FileServiceException(e.getMessage(), e);
 					}
 				});
 			}
@@ -145,5 +145,11 @@ public class FileService {
 			count = walk.filter(p -> p.toFile().isFile()).count();
 		}
 		return count;
+	}
+	
+	private static class FileServiceException extends RuntimeException {
+		public FileServiceException(final String message, final IOException e) {
+			super(message, e);
+		}
 	}
 }

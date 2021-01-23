@@ -3,12 +3,12 @@
 
 package interfacebuilder.ui.browse;
 
-import com.ahli.galaxy.ui.UIAnimation;
-import com.ahli.galaxy.ui.UIController;
-import com.ahli.galaxy.ui.UIFrame;
-import com.ahli.galaxy.ui.UIState;
-import com.ahli.galaxy.ui.UIStateGroup;
-import com.ahli.galaxy.ui.abstracts.UIElement;
+import com.ahli.galaxy.ui.interfaces.UIAnimation;
+import com.ahli.galaxy.ui.interfaces.UIController;
+import com.ahli.galaxy.ui.interfaces.UIElement;
+import com.ahli.galaxy.ui.interfaces.UIFrame;
+import com.ahli.galaxy.ui.interfaces.UIState;
+import com.ahli.galaxy.ui.interfaces.UIStateGroup;
 import javafx.scene.effect.Blend;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.BlurType;
@@ -20,6 +20,8 @@ import org.apache.commons.lang3.StringUtils;
 
 public class TextFlowFactory {
 	
+	public static final String STYLE_DFLT = "-fx-fill: white; -fx-font-smoothing-type: lcd;";
+	public static final String STYLE_HIGHLIGHTED = "-fx-fill: orange; -fx-font-smoothing-type: lcd;";
 	private String query;
 	
 	public void setHighlight(final String query) {
@@ -92,19 +94,19 @@ public class TextFlowFactory {
 			text[0] = new Text(label.substring(0, index));
 			text[1] = new Text(label.substring(index, index + query.length()));
 			text[2] = new Text(label.substring(index + query.length()));
-			text[0].setStyle("-fx-fill: white; -fx-font-smoothing-type: lcd;");
-			text[1].setStyle("-fx-fill: orange; -fx-font-smoothing-type: lcd;");
-			text[2].setStyle("-fx-fill: white; -fx-font-smoothing-type: lcd;");
+			text[0].setStyle(STYLE_DFLT);
+			text[1].setStyle(STYLE_HIGHLIGHTED);
+			text[2].setStyle(STYLE_DFLT);
 			applyVisualHighlight(text[1]);
 		} else if (count > 1) {
 			text[0] = new Text(label.substring(0, index + query.length()));
 			text[1] = new Text(label.substring(index + query.length()));
-			text[0].setStyle("-fx-fill: orange; -fx-font-smoothing-type: lcd;");
-			text[1].setStyle("-fx-fill: white; -fx-font-smoothing-type: lcd;");
+			text[0].setStyle(STYLE_HIGHLIGHTED);
+			text[1].setStyle(STYLE_DFLT);
 			applyVisualHighlight(text[0]);
 		} else {
 			text[0] = new Text(label);
-			text[0].setStyle("-fx-fill: white; -fx-font-smoothing-type: lcd;");
+			text[0].setStyle(STYLE_DFLT);
 		}
 		return text;
 	}

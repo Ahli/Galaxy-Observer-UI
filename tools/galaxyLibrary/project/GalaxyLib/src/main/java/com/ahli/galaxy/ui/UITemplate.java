@@ -3,7 +3,7 @@
 
 package com.ahli.galaxy.ui;
 
-import com.ahli.galaxy.ui.abstracts.UIElement;
+import com.ahli.galaxy.ui.interfaces.UIElement;
 import com.ahli.util.DeepCopyable;
 
 import java.util.Objects;
@@ -16,7 +16,7 @@ public class UITemplate implements DeepCopyable {
 	private UIElement element;
 	private boolean isLocked;
 	
-	private UITemplate(){
+	private UITemplate() {
 		// required for Kryo
 	}
 	

@@ -272,6 +272,26 @@ public class ConcurrentWeakWeakHashMap<K> implements ConcurrentMap<K, K> {
 			return weakHashMap.map.size();
 		}
 		
+		
+		@Override
+		public boolean equals(final Object o) {
+			if (this == o) {
+				return true;
+			}
+			if (o == null || getClass() != o.getClass()) {
+				return false;
+			}
+			if (!super.equals(o)) {
+				return false;
+			}
+			final WeakHashMapKeySet<?> that = (WeakHashMapKeySet<?>) o;
+			return Objects.equals(weakHashMap, that.weakHashMap);
+		}
+		
+		@Override
+		public int hashCode() {
+			return Objects.hash(super.hashCode(), weakHashMap);
+		}
 	}
 	
 	private static final class WeakHashMapKeySetIterator<K> extends WeakSafeIterator<K, WeakReferenceWithHash<K>> {
@@ -301,6 +321,26 @@ public class ConcurrentWeakWeakHashMap<K> implements ConcurrentMap<K, K> {
 		@Override
 		public int size() {
 			return weakHashMap.map.size();
+		}
+		
+		@Override
+		public boolean equals(final Object o) {
+			if (this == o) {
+				return true;
+			}
+			if (o == null || getClass() != o.getClass()) {
+				return false;
+			}
+			if (!super.equals(o)) {
+				return false;
+			}
+			final WeakHashMapEntrySet<?> that = (WeakHashMapEntrySet<?>) o;
+			return Objects.equals(weakHashMap, that.weakHashMap);
+		}
+		
+		@Override
+		public int hashCode() {
+			return Objects.hash(super.hashCode(), weakHashMap);
 		}
 		
 		private static final class WeakHashMapEntrySetIterator<K>

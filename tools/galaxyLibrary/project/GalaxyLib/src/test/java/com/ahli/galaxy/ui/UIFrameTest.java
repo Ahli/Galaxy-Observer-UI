@@ -3,6 +3,7 @@
 
 package com.ahli.galaxy.ui;
 
+import com.ahli.galaxy.ui.interfaces.UIFrame;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import org.junit.jupiter.api.Test;
@@ -13,7 +14,7 @@ final class UIFrameTest {
 	
 	@Test
 	void deepCopy() {
-		final UIFrame frame = new UIFrame("UIFrameTest_setAnchor");
+		final UIFrame frame = new UIFrameMutable("UIFrameTest_setAnchor");
 		
 		frame.setAnchor("$parent", "0");
 		assertEquals("$parent", frame.getAnchorRelative(UIAnchorSide.TOP));
@@ -61,7 +62,7 @@ final class UIFrameTest {
 	
 	@Test
 	void setAnchor1() {
-		final UIFrame frame = new UIFrame("UIFrameTest_setAnchor");
+		final UIFrame frame = new UIFrameMutable("UIFrameTest_setAnchor");
 		
 		frame.setAnchor("$parent", "0");
 		assertEquals("$parent", frame.getAnchorRelative(UIAnchorSide.TOP));
@@ -108,7 +109,7 @@ final class UIFrameTest {
 	
 	@Test
 	void setAnchor2() {
-		final UIFrame frame = new UIFrame("UIFrameTest_setAnchor");
+		final UIFrame frame = new UIFrameMutable("UIFrameTest_setAnchor");
 		
 		frame.setAnchor(UIAnchorSide.BOTTOM, "$parent", "mid", "11");
 		assertEquals("$this", frame.getAnchorRelative(UIAnchorSide.TOP));
@@ -127,7 +128,7 @@ final class UIFrameTest {
 	
 	@Test
 	void setAnchorRelative() {
-		final UIFrame frame = new UIFrame("UIFrameTest_setAnchor");
+		final UIFrame frame = new UIFrameMutable("UIFrameTest_setAnchor");
 		
 		frame.setAnchorRelative(UIAnchorSide.BOTTOM, "$parent");
 		assertEquals("$this", frame.getAnchorRelative(UIAnchorSide.TOP));
@@ -160,7 +161,7 @@ final class UIFrameTest {
 	
 	@Test
 	void setAnchorPos() {
-		final UIFrame frame = new UIFrame("UIFrameTest_setAnchor");
+		final UIFrame frame = new UIFrameMutable("UIFrameTest_setAnchor");
 		
 		frame.setAnchorPos(UIAnchorSide.BOTTOM, "min");
 		assertEquals("$this", frame.getAnchorRelative(UIAnchorSide.TOP));
@@ -221,7 +222,7 @@ final class UIFrameTest {
 	
 	@Test
 	void setAnchorOffset() {
-		final UIFrame frame = new UIFrame("UIFrameTest_setAnchor");
+		final UIFrame frame = new UIFrameMutable("UIFrameTest_setAnchor");
 		
 		frame.setAnchorOffset(UIAnchorSide.BOTTOM, "11");
 		assertEquals("$this", frame.getAnchorRelative(UIAnchorSide.TOP));
@@ -269,7 +270,7 @@ final class UIFrameTest {
 	@Test
 	@SuppressWarnings("JUnitTestMethodWithNoAssertions")
 	void equalsContract() {
-		EqualsVerifier.forClass(UIFrame.class)
+		EqualsVerifier.forClass(UIFrameMutable.class)
 				.withRedefinedSuperclass()
 				.withIgnoredFields("hash", "hashIsZero", "hashIsDirty")
 				.suppress(Warning.NONFINAL_FIELDS)

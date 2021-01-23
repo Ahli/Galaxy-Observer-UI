@@ -3,7 +3,10 @@
 
 package com.ahli.galaxy.ui;
 
-import com.ahli.galaxy.ui.abstracts.UIElement;
+import com.ahli.galaxy.ui.abstracts.UIElementAbstract;
+import com.ahli.galaxy.ui.interfaces.UIAttribute;
+import com.ahli.galaxy.ui.interfaces.UIElement;
+import com.ahli.galaxy.ui.interfaces.UIState;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,14 +16,14 @@ import java.util.Objects;
 /**
  * @author Ahli
  */
-public class UIState extends UIElement {
+public class UIStateMutable extends UIElementAbstract implements UIState {
 	
 	private List<UIAttribute> whens;
 	private List<UIAttribute> actions;
 	private boolean nextAdditionShouldOverrideWhens;
 	private boolean nextAdditionShouldOverrideActions;
 	
-	public UIState() {
+	public UIStateMutable() {
 		super(null);
 		whens = new ArrayList<>(0);
 		actions = new ArrayList<>(0);
@@ -29,7 +32,7 @@ public class UIState extends UIElement {
 	/**
 	 * @param name
 	 */
-	public UIState(final String name) {
+	public UIStateMutable(final String name) {
 		super(name);
 		whens = new ArrayList<>(0);
 		actions = new ArrayList<>(0);
@@ -40,7 +43,7 @@ public class UIState extends UIElement {
 	 * @param whensCapacity
 	 * @param actionsCapacity
 	 */
-	public UIState(final String name, final int whensCapacity, final int actionsCapacity) {
+	public UIStateMutable(final String name, final int whensCapacity, final int actionsCapacity) {
 		super(name);
 		whens = new ArrayList<>(whensCapacity);
 		actions = new ArrayList<>(actionsCapacity);
@@ -51,7 +54,7 @@ public class UIState extends UIElement {
 	 */
 	@Override
 	public Object deepCopy() {
-		final UIState clone = new UIState(getName(), whens.size(), actions.size());
+		final UIStateMutable clone = new UIStateMutable(getName(), whens.size(), actions.size());
 		final List<UIAttribute> whensClone = clone.whens;
 		for (final UIAttribute when : whens) {
 			whensClone.add((UIAttribute) when.deepCopy());
@@ -68,6 +71,7 @@ public class UIState extends UIElement {
 	/**
 	 * @return the whens
 	 */
+	@Override
 	public List<UIAttribute> getWhens() {
 		return whens;
 	}
@@ -76,6 +80,7 @@ public class UIState extends UIElement {
 	 * @param whens
 	 * 		the whens to set
 	 */
+	@Override
 	public void setWhens(final List<UIAttribute> whens) {
 		this.whens = whens;
 	}
@@ -83,6 +88,7 @@ public class UIState extends UIElement {
 	/**
 	 * @return the actions
 	 */
+	@Override
 	public List<UIAttribute> getActions() {
 		return actions;
 	}
@@ -91,6 +97,7 @@ public class UIState extends UIElement {
 	 * @param actions
 	 * 		the actions to set
 	 */
+	@Override
 	public void setActions(final List<UIAttribute> actions) {
 		this.actions = actions;
 	}
@@ -98,6 +105,7 @@ public class UIState extends UIElement {
 	/**
 	 * @return the nextAdditionShouldOverrideWhens
 	 */
+	@Override
 	public boolean isNextAdditionShouldOverrideWhens() {
 		return nextAdditionShouldOverrideWhens;
 	}
@@ -106,6 +114,7 @@ public class UIState extends UIElement {
 	 * @param nextAdditionShouldOverrideWhens
 	 * 		the nextAdditionShouldOverrideWhens to set
 	 */
+	@Override
 	public void setNextAdditionShouldOverrideWhens(final boolean nextAdditionShouldOverrideWhens) {
 		this.nextAdditionShouldOverrideWhens = nextAdditionShouldOverrideWhens;
 	}
@@ -113,6 +122,7 @@ public class UIState extends UIElement {
 	/**
 	 * @return the nextAdditionShouldOverrideActions
 	 */
+	@Override
 	public boolean isNextAdditionShouldOverrideActions() {
 		return nextAdditionShouldOverrideActions;
 	}
@@ -121,6 +131,7 @@ public class UIState extends UIElement {
 	 * @param nextAdditionShouldOverrideActions
 	 * 		the nextAdditionShouldOverrideActions to set
 	 */
+	@Override
 	public void setNextAdditionShouldOverrideActions(final boolean nextAdditionShouldOverrideActions) {
 		this.nextAdditionShouldOverrideActions = nextAdditionShouldOverrideActions;
 	}
@@ -145,6 +156,7 @@ public class UIState extends UIElement {
 	}
 	
 	@Override
+	@SuppressWarnings("java:S1168")
 	public List<UIElement> getChildrenRaw() {
 		return null; // returning null is desired here
 	}
@@ -154,13 +166,13 @@ public class UIState extends UIElement {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof UIState)) {
+		if (!(o instanceof UIStateMutable)) {
 			return false;
 		}
 		if (!super.equals(o)) {
 			return false;
 		}
-		final UIState uiState = (UIState) o;
+		final UIStateMutable uiState = (UIStateMutable) o;
 		return uiState.canEqual(this) && nextAdditionShouldOverrideWhens == uiState.nextAdditionShouldOverrideWhens &&
 				nextAdditionShouldOverrideActions == uiState.nextAdditionShouldOverrideActions &&
 				Objects.equals(whens, uiState.whens) && Objects.equals(actions, uiState.actions);
@@ -168,7 +180,7 @@ public class UIState extends UIElement {
 	
 	@Override
 	public boolean canEqual(final Object other) {
-		return (other instanceof UIState);
+		return (other instanceof UIStateMutable);
 	}
 	
 	@Override

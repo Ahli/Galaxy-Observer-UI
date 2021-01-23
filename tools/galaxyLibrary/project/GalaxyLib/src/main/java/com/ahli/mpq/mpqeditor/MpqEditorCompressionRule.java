@@ -18,7 +18,7 @@ public abstract class MpqEditorCompressionRule implements DeepCopyable {
 	
 	private MpqEditorCompressionRuleMethod compressionMethod = MpqEditorCompressionRuleMethod.NONE;
 	
-	public MpqEditorCompressionRule() {
+	protected MpqEditorCompressionRule() {
 		// nothing to do
 	}
 	
@@ -27,7 +27,7 @@ public abstract class MpqEditorCompressionRule implements DeepCopyable {
 	 *
 	 * @param original
 	 */
-	public MpqEditorCompressionRule(final MpqEditorCompressionRule original) {
+	protected MpqEditorCompressionRule(final MpqEditorCompressionRule original) {
 		singleUnit = original.singleUnit;
 		compress = original.compress;
 		encrypt = original.encrypt;
