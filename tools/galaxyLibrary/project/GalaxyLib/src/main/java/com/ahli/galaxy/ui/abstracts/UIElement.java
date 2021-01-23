@@ -5,16 +5,18 @@ package com.ahli.galaxy.ui.abstracts;
 
 import com.ahli.util.DeepCopyable;
 import com.ahli.util.StringInterner;
-import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
 /**
  * @author Ahli
  */
-@EqualsAndHashCode
 public abstract class UIElement implements DeepCopyable {
 	
+	// for hashcode caching
+	protected boolean hashIsDirty;
+	protected boolean hashIsZero;
+	protected int hash;
 	private String name;
 	
 	/**
@@ -45,21 +47,6 @@ public abstract class UIElement implements DeepCopyable {
 	public static String getLeftPathLevel(final String path) {
 		final int i = path.indexOf('/');
 		return (i == -1) ? path : path.substring(0, i);
-	}
-	
-	/**
-	 * @return the name
-	 */
-	public String getName() {
-		return name;
-	}
-	
-	/**
-	 * @param name
-	 * 		the name to set
-	 */
-	public void setName(final String name) {
-		this.name = name != null ? StringInterner.intern(name) : null;
 	}
 	
 	/**
@@ -94,4 +81,48 @@ public abstract class UIElement implements DeepCopyable {
 	 */
 	public abstract List<UIElement> getChildrenRaw();
 	
+	@Override
+	public boolean equals(final Object obj) {
+		// based on lombok
+		if (obj == this) {
+			return true;
+		}
+		if (!(obj instanceof UIElement)) {
+			return false;
+		}
+		final UIElement other = (UIElement) obj;
+		if (!other.canEqual(this)) {
+			return false;
+		}
+		return name == null ? other.name == null : name.equals(other.name);
+	}
+	
+	protected boolean canEqual(final Object other) {
+		return other instanceof UIElement;
+	}
+	
+	/**
+	 * @return the name
+	 */
+	public String getName() {
+		return name;
+	}
+	
+	/**
+	 * @param name
+	 * 		the name to set
+	 */
+	public void setName(final String name) {
+		this.name = name != null ? StringInterner.intern(name) : null;
+	}
+	
+	@Override
+	public int hashCode() {
+		// based on lombok
+		return 59 + (name == null ? 43 : name.hashCode());
+	}
+	
+	public void invalidateHashcode() {
+		hashIsDirty = true;
+	}
 }

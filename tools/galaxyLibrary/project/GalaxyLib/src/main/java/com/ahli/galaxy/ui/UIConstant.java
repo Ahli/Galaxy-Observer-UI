@@ -14,17 +14,14 @@ import java.util.Objects;
  * @author Ahli
  */
 public class UIConstant extends UIElement {
-	private String value;
-	
-	public UIConstant() {
-		super(null);
-	}
+	private final String value;
 	
 	/**
-	 * @param name
+	 * Constructor for Kryo?
 	 */
-	public UIConstant(final String name) {
-		super(name);
+	private UIConstant() {
+		super(null);
+		value = null;
 	}
 	
 	public UIConstant(final String name, final String value) {
@@ -37,9 +34,13 @@ public class UIConstant extends UIElement {
 	 */
 	@Override
 	public Object deepCopy() {
-		final UIConstant clone = new UIConstant(getName());
-		clone.value = value;
-		return clone;
+		// UIConstant is immutable
+		return this;
+	}
+	
+	@Override
+	public void setName(final String name) {
+		throw new UnsupportedOperationException("UIConstants are immutable");
 	}
 	
 	/**
@@ -47,14 +48,6 @@ public class UIConstant extends UIElement {
 	 */
 	public String getValue() {
 		return value;
-	}
-	
-	/**
-	 * @param value
-	 * 		the value to set
-	 */
-	public void setValue(final String value) {
-		this.value = StringInterner.intern(value);
 	}
 	
 	/**
@@ -82,17 +75,17 @@ public class UIConstant extends UIElement {
 	}
 	
 	@Override
-	public final boolean equals(final Object o) {
-		if (this == o) {
+	public final boolean equals(final Object obj) {
+		if (this == obj) {
 			return true;
 		}
-		if (!(o instanceof UIConstant)) {
+		if (!(obj instanceof UIConstant)) {
 			return false;
 		}
-		if (!super.equals(o)) {
+		if (!super.equals(obj)) {
 			return false;
 		}
-		final UIConstant that = (UIConstant) o;
+		final UIConstant that = (UIConstant) obj;
 		return that.canEqual(this) && Objects.equals(value, that.value);
 	}
 	
@@ -104,6 +97,20 @@ public class UIConstant extends UIElement {
 	@Override
 	public final int hashCode() {
 		//noinspection ObjectInstantiationInEqualsHashCode
+		int h = hash;
+		if (hashIsDirty || (h == 0 && !hashIsZero)) {
+			h = calcHashCode();
+			if (h == 0) {
+				hashIsZero = true;
+			} else {
+				hash = h;
+			}
+			hashIsDirty = false;
+		}
+		return h;
+	}
+	
+	private int calcHashCode() {
 		return Objects.hash(super.hashCode(), value);
 	}
 }

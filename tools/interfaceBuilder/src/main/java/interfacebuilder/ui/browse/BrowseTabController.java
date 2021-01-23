@@ -668,7 +668,7 @@ public class BrowseTabController implements Updateable {
 						frameTree.scrollTo(Math.max(selectedIndex - 4, 0));
 						// clear tableview & path if the selected item is not visible OR re-show it when visible
 						browseTabController.showInTableView(selectedIndex < 0 ? null : selectedItem);
-						browseTabController.queryIdling = false;
+						browseTabController.queryIdling = true;
 						if (!browseTabController.queryIdling && !browseTabController.queriedFilter.equals(curFilter)) {
 							//Query set, but Filter Thread is dead. -> try again
 							logger.error("Query set, but Filter Thread is dead. -> try again. Does this work?");

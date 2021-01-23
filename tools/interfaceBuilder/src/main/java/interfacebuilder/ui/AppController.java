@@ -131,9 +131,11 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 				System.gc();
 				System.runFinalization();
 				// clean up StringInterner's weak references that the GC removed
-				logger.trace("string interner size before cleaning: {}", StringInterner::size);
+				logger.trace("string interner size before cleaning: {}", StringInterner.size()); // instant calc!
 				StringInterner.cleanUpGarbage();
 				logger.trace("string interner size after cleaning: {}", StringInterner::size);
+				// TODO not all Strings are removed for some reason
+				logger.trace("interner content: \n{}", StringInterner.print());
 			}
 		}).start();
 	}

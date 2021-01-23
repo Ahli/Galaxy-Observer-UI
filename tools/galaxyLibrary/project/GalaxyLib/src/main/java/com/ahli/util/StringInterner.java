@@ -33,4 +33,12 @@ public final class StringInterner {
 	public static int size() {
 		return map.size();
 	}
+	
+	public static StringBuilder print() {
+		final StringBuilder sb = new StringBuilder(32);
+		for (final String key : map.keySet()) {
+			sb.append(key).append('\n');
+		}
+		return sb;
+	}
 }

@@ -20,7 +20,6 @@ import com.ahli.galaxy.ui.interfaces.UICatalog;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
-import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -30,7 +29,6 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 public class UICatalogParser implements ParsedXmlConsumer {
 	private static final String ACTION = "action";
@@ -73,7 +71,6 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	private final List<Integer> statesToCloseLevel;
 	private final List<UITemplate> newTemplatesOfCurFile;
 	private final Map<UIElement, UIElement> addedFinalElements;
-	private final Set<UIElement> deduplicatedElements;
 	private final boolean deduplicationAllowed;
 	private int attributeDeduplications;
 	private int constantDeduplications;
@@ -87,7 +84,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	private UITemplate curTemplate;
 	//private boolean editingMode;
 	private String curFileName;
-	private Deque<Object> toDeduplicate;
+	//	private Deque<Object> toDeduplicate;
 	private int postProcessDeduplications;
 	private boolean layoutFileDescLocked;
 	private int unnamedFrameCounter;
@@ -101,13 +98,18 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		newTemplatesOfCurFile = new ArrayList<>(250);
 		this.deduplicationAllowed = deduplicationAllowed;
 		if (deduplicationAllowed) {
-			addedFinalElements = new UnifiedMap<>();
-			addedElements = new ArrayList<>(35_000);
-			deduplicatedElements = new UnifiedSet<>(13_000);
+			if (catalog.getTemplates().isEmpty()) {
+				// parse a baseUI
+				addedFinalElements = new UnifiedMap<>(61_000 * 5 / 4);
+				addedElements = new ArrayList<>(35_000);
+			} else {
+				// parse obs interface
+				addedFinalElements = new UnifiedMap<>(90_000 * 5 / 4);
+				addedElements = new ArrayList<>(6_200);
+			}
 		} else {
 			addedFinalElements = null;
 			addedElements = null;
-			deduplicatedElements = null;
 		}
 		//noinspection ThisEscapedInObjectConstruction
 		parser.setConsumer(this);
@@ -224,18 +226,20 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			boolean noChanges = true;
 			final String sourceName = attrSource.getName();
 			// override attribute => remove existing one with same tag
-			for (final UIAttribute attrTarget : attributesTarget) {
+			for (int i = 0, len = attributesTarget.size(); i < len; ++i) {
+				final UIAttribute attrTarget = attributesTarget.get(i);
 				final String targetName = attrTarget.getName();
 				// both null or equal
 				if (Objects.equals(targetName, sourceName)) {
-					attrTarget.setKeyValues(attrSource.getKeyValues());
+					// UIAttributes are immutable, so the reference can be updated
+					attributesTarget.set(i, attrSource);
 					noChanges = false;
 					break;
 				}
 			}
 			if (noChanges) {
 				// no matching existing attribute -> add
-				attributesTarget.add((UIAttribute) attrSource.deepCopy());
+				attributesTarget.add(attrSource);
 			}
 		}
 	}
@@ -337,7 +341,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			for (final var templateChild : templateChildren) {
 				if (templateChild.getName() != null) {
 					final UIElement targetChild = targetElem.receiveFrameFromPath(templateChild.getName());
-					if(targetChild != null) {
+					if (targetChild != null) {
 						applyTemplateElementToElement(templateChild, targetChild);
 					}
 				}
@@ -427,7 +431,6 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		if (potentiallyEditedTemplates != null) {
 			if (name == null) {
 				logger.error("An existing frame should be edited without defining its name.");
-				//noinspection UnsecureRandomNumberGeneration
 				name = "UnnamedFrame" + (++unnamedFrameCounter);
 			}
 			
@@ -639,12 +642,9 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					}
 					break;
 				case CONSTANT:
-					if (newElem == null) {
-						if (name == null) {
-							logger.error("A new 'Constant' was defined without a name.");
-							name = "UnnamedConstant" + (++unnamedFrameCounter);
-						}
-						newElem = new UIConstant(name);
+					if (name == null) {
+						logger.error("A new 'Constant' was defined without a name.");
+						name = "UnnamedConstant" + (++unnamedFrameCounter);
 					}
 					final String val = ((i = attrTypes.indexOf(VAL)) != -1) ?
 							catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout, consoleSkinId) : null;
@@ -652,13 +652,12 @@ public class UICatalogParser implements ParsedXmlConsumer {
 						logger.error("Constant '{}' has no value defined", name);
 						return;
 					}
-					var newElemUiConstant = (UIConstant) newElem;
-					newElemUiConstant.setValue(val);
+					var newElemUiConstant = new UIConstant(name, val);
+					newElem = newElemUiConstant;
 					if (deduplicationAllowed) {
 						final UIElement refToDuplicate = addedFinalElements.get(newElem);
 						if (refToDuplicate != null) {
 							newElemUiConstant = (UIConstant) refToDuplicate;
-							deduplicatedElements.add(refToDuplicate);
 							++constantDeduplications;
 						} else {
 							addedFinalElements.put(newElem, newElem);
@@ -704,18 +703,22 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					break;
 				default:
 					// attribute or something unknown that will cause an error
-					newElem = new UIAttribute(tagName);
+					final ArrayList<String> attributeKeyValueList = new ArrayList<>(2 * attrTypes.size());
 					i = 0;
-					final var newElemUiAttr = (UIAttribute) newElem;
 					for (final int len = attrTypes.size(); i < len; ++i) {
-						newElemUiAttr.addValue(attrTypes.get(i),
-								catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout, consoleSkinId));
+						attributeKeyValueList.add(attrTypes.get(i));
+						attributeKeyValueList.add(catalog.getConstantValue(attrValues.get(i),
+								raceId,
+								curIsDevLayout,
+								consoleSkinId));
 					}
+					final UIAttribute newElemUiAttr = new UIAttribute(tagName, attributeKeyValueList);
+					newElem = newElemUiAttr;
+					
 					if (deduplicationAllowed) {
 						final UIElement refToDuplicate = addedFinalElements.get(newElem);
 						if (refToDuplicate != null) {
 							newElem = refToDuplicate;
-							deduplicatedElements.add(refToDuplicate);
 							++attributeDeduplications;
 						} else {
 							addedFinalElements.put(newElem, newElem);
@@ -1021,23 +1024,27 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					addedElements.size(),
 					addedFinalElements.size());
 			addedElements = null;
-			toDeduplicate = new ArrayDeque<>(400_000);
 			// replace instances
-			
-			toDeduplicate.addAll(catalog.getTemplates());
+			final Deque<Object> toDeduplicate =
+					new ArrayDeque<>(catalog.getTemplates().size() + catalog.getBlizzOnlyTemplates().size());
 			toDeduplicate.addAll(catalog.getBlizzOnlyTemplates());
+			toDeduplicate.addAll(catalog.getTemplates());
 			int maxDequeSize = 0;
 			while (!toDeduplicate.isEmpty()) {
 				maxDequeSize = Math.max(maxDequeSize, toDeduplicate.size());
-				deduplicate(toDeduplicate.pop());
+				final Object pop = toDeduplicate.pop();
+				logger.trace("deduplicating template content: {}, addedFinalElements: {}",
+						pop,
+						addedFinalElements.size());
+				deduplicate(pop);
 			}
 			logger.info(
-					"postProcessDeduplications: {}, attributeDeduplications: {}, constantsDeduplications={}, maxDequeSize: {}, totalDeduplicatedElements: {}",
+					"postProcessDeduplications: {}, attributeDeduplications: {}, constantsDeduplications={}, maxDequeSize: {}, addedFinalElements: {}",
 					postProcessDeduplications,
 					attributeDeduplications,
 					constantDeduplications,
 					maxDequeSize,
-					deduplicatedElements.size());
+					addedFinalElements.size());
 		}
 	}
 	
@@ -1059,6 +1066,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	}
 	
 	private void deduplicate(final UIFrame frame) {
+		//		logger.trace("deduplicating: {}", frame);
 		final List<UIElement> childrenRaw = frame.getChildrenRaw();
 		if (childrenRaw != null) {
 			for (int i = 0, len = childrenRaw.size(); i < len; ++i) {
@@ -1067,16 +1075,19 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				if (duplicate != null && child != duplicate) {
 					// replace in parent
 					childrenRaw.set(i, duplicate);
-					deduplicatedElements.add(duplicate);
 					++postProcessDeduplications;
 				} else {
-					toDeduplicate.add(child);
+					deduplicate(child);
+					if (duplicate == null) {
+						addedFinalElements.put(child, child);
+					}
 				}
 			}
 		}
 	}
 	
 	private void deduplicate(final UIAnimation anim) {
+		//		logger.trace("deduplicating: {}", anim);
 		final List<UIElement> controllers = anim.getControllers();
 		for (int i = 0, len = controllers.size(); i < len; ++i) {
 			final UIElement controller = controllers.get(i);
@@ -1084,14 +1095,18 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			if (duplicate != null && controller != duplicate) {
 				// replace in parent
 				controllers.set(i, duplicate);
-				deduplicatedElements.add(duplicate);
 				++postProcessDeduplications;
+			} else {
+				// controllers cannot be deduplicated any further at this point (Attributes were already)
+				if (duplicate == null) {
+					addedFinalElements.put(controller, controller);
+				}
 			}
-			// controllers cannot be deduplicated any further at this point (Attributes were already)
 		}
 	}
 	
 	private void deduplicate(final UIStateGroup stateGroup) {
+		//		logger.trace("deduplicating: {}, deduplicatedElements; {}", stateGroup, addedFinalElements.size());
 		final List<UIElement> states = stateGroup.getStates();
 		for (int i = 0, len = states.size(); i < len; ++i) {
 			final UIElement child = states.get(i);
@@ -1099,23 +1114,29 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			if (duplicate != null && child != duplicate) {
 				// replace in parent
 				states.set(i, duplicate);
-				deduplicatedElements.add(duplicate);
 				++postProcessDeduplications;
+			} else {
+				// states cannot be deduplicated any further at this point (Attributes were already)
+				if (duplicate == null) {
+					addedFinalElements.put(child, child);
+				}
 			}
-			// states cannot be deduplicated any further at this point (Attributes were already)
 		}
 	}
 	
 	private void deduplicate(final UITemplate template) {
+		//		logger.trace("deduplicating: {}", template);
 		final UIElement elem = template.getElement();
 		final UIElement duplicate = addedFinalElements.get(elem);
 		if (duplicate != null && elem != duplicate) {
 			// replace in parent
 			template.setElement(duplicate);
-			deduplicatedElements.add(duplicate);
 			++postProcessDeduplications;
 		} else {
-			toDeduplicate.add(elem);
+			deduplicate(elem);
+			if (duplicate == null) {
+				addedFinalElements.put(elem, elem);
+			}
 		}
 	}
 }

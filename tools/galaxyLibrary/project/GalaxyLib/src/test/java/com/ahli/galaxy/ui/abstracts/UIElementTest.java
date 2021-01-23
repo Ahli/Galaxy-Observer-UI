@@ -23,6 +23,7 @@ class UIElementTest {
 				.withRedefinedSubclass(UIAnimation.class)
 				.withRedefinedSubclass(UIConstant.class)
 				.withRedefinedSubclass(UIController.class)
+				.withIgnoredFields("hash", "hashIsZero", "hashIsDirty")
 				.suppress(Warning.NONFINAL_FIELDS)
 				.verify();
 	}

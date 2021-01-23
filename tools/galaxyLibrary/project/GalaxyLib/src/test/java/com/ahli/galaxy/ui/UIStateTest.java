@@ -8,6 +8,10 @@ class UIStateTest {
 	@Test
 	@SuppressWarnings("JUnitTestMethodWithNoAssertions")
 	void equalsContract() {
-		EqualsVerifier.forClass(UIState.class).withRedefinedSuperclass().suppress(Warning.NONFINAL_FIELDS).verify();
+		EqualsVerifier.forClass(UIState.class)
+				.withRedefinedSuperclass()
+				.withIgnoredFields("hash", "hashIsZero", "hashIsDirty")
+				.suppress(Warning.NONFINAL_FIELDS)
+				.verify();
 	}
 }

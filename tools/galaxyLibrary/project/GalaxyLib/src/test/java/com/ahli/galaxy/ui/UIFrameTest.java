@@ -269,6 +269,10 @@ final class UIFrameTest {
 	@Test
 	@SuppressWarnings("JUnitTestMethodWithNoAssertions")
 	void equalsContract() {
-		EqualsVerifier.forClass(UIFrame.class).withRedefinedSuperclass().suppress(Warning.NONFINAL_FIELDS).verify();
+		EqualsVerifier.forClass(UIFrame.class)
+				.withRedefinedSuperclass()
+				.withIgnoredFields("hash", "hashIsZero", "hashIsDirty")
+				.suppress(Warning.NONFINAL_FIELDS)
+				.verify();
 	}
 }

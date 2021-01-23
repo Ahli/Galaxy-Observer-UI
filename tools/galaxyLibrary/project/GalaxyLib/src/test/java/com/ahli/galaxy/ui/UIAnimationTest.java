@@ -9,6 +9,10 @@ class UIAnimationTest {
 	@Test
 	@SuppressWarnings("JUnitTestMethodWithNoAssertions")
 	void equalsContract() {
-		EqualsVerifier.forClass(UIAnimation.class).withRedefinedSuperclass().suppress(Warning.NONFINAL_FIELDS).verify();
+		EqualsVerifier.forClass(UIAnimation.class)
+				.withRedefinedSuperclass()
+				.withIgnoredFields("hash", "hashIsZero", "hashIsDirty")
+				.suppress(Warning.NONFINAL_FIELDS)
+				.verify();
 	}
 }

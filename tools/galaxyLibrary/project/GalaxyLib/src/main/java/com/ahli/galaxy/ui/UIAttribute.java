@@ -4,7 +4,6 @@
 package com.ahli.galaxy.ui;
 
 import com.ahli.galaxy.ui.abstracts.UIElement;
-import com.ahli.util.StringInterner;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,34 +19,24 @@ public class UIAttribute extends UIElement {
 	private final List<String> keyValueList;
 	
 	/**
-	 * Constructor for deserialization
+	 * Constructor for Kryo?
 	 */
-	public UIAttribute() {
+	private UIAttribute() {
 		super(null);
 		keyValueList = new ArrayList<>(0);
 	}
 	
 	/**
-	 * Constructor.
+	 * Constructor
 	 *
 	 * @param name
 	 * 		Element's name
+	 * @param keyValuesList
+	 * 		List where Key and Value entries alternate: Key1, Value1, Key2, Value2, ...
 	 */
-	public UIAttribute(final String name) {
+	public UIAttribute(final String name, final List<String> keyValuesList) {
 		super(name);
-		keyValueList = new ArrayList<>(0);
-	}
-	
-	/**
-	 * Constructor.
-	 *
-	 * @param name
-	 * 		Element's name
-	 * @param valuesCapacity
-	 */
-	public UIAttribute(final String name, final int valuesCapacity) {
-		super(name);
-		keyValueList = new ArrayList<>(valuesCapacity);
+		keyValueList = keyValuesList;
 	}
 	
 	/**
@@ -55,35 +44,37 @@ public class UIAttribute extends UIElement {
 	 */
 	@Override
 	public Object deepCopy() {
-		final UIAttribute clone = new UIAttribute(getName(), keyValueList.size());
-		for (int i = 0, len = keyValueList.size(); i < len; ++i) {
-			clone.keyValueList.add(keyValueList.get(i));
-		}
-		return clone;
+		// UIAttribute is immutable
+		return this;
 	}
 	
-	/**
-	 * Adds a value for the key and returns any overridden value.
-	 *
-	 * @param key
-	 * @param value
-	 */
-	public void addValue(final String key, final String value) {
-		int i = 0;
-		final int len = keyValueList.size();
-		for (; i < len; i += 2) {
-			if (keyValueList.get(i).equals(key)) {
-				break;
-			}
-		}
-		if (i >= len) {
-			// not found
-			keyValueList.add(StringInterner.intern(key));
-			keyValueList.add(StringInterner.intern(value));
-		} else {
-			keyValueList.set(i, StringInterner.intern(value));
-		}
+	@Override
+	public void setName(final String name) {
+		throw new UnsupportedOperationException("UIAttributes are immutable");
 	}
+	
+	//	/**
+	//	 * Adds a value for the key and returns any overridden value.
+	//	 *
+	//	 * @param key
+	//	 * @param value
+	//	 */
+	//	public void addValue(final String key, final String value) {
+	//		int i = 0;
+	//		final int len = keyValueList.size();
+	//		for (; i < len; i += 2) {
+	//			if (keyValueList.get(i).equals(key)) {
+	//				break;
+	//			}
+	//		}
+	//		if (i >= len) {
+	//			// not found
+	//			keyValueList.add(StringInterner.intern(key));
+	//			keyValueList.add(StringInterner.intern(value));
+	//		} else {
+	//			keyValueList.set(i, StringInterner.intern(value));
+	//		}
+	//	}
 	
 	/**
 	 * @param key
@@ -108,15 +99,15 @@ public class UIAttribute extends UIElement {
 		return keyValueList;
 	}
 	
-	/**
-	 * Clears all existing key-value-pairs and adds all entries from the list.
-	 *
-	 * @param keyValues
-	 */
-	public void setKeyValues(final List<String> keyValues) {
-		keyValueList.clear();
-		keyValueList.addAll(keyValues);
-	}
+	//	/**
+	//	 * Clears all existing key-value-pairs and adds all entries from the list.
+	//	 *
+	//	 * @param keyValues
+	//	 */
+	//	public void setKeyValues(final List<String> keyValues) {
+	//		keyValueList.clear();
+	//		keyValueList.addAll(keyValues);
+	//	}
 	
 	@Override
 	public UIElement receiveFrameFromPath(final String path) {
@@ -139,17 +130,17 @@ public class UIAttribute extends UIElement {
 	}
 	
 	@Override
-	public final boolean equals(final Object o) {
-		if (this == o) {
+	public final boolean equals(final Object obj) {
+		if (this == obj) {
 			return true;
 		}
-		if (!(o instanceof UIAttribute)) {
+		if (!(obj instanceof UIAttribute)) {
 			return false;
 		}
-		if (!super.equals(o)) {
+		if (!super.equals(obj)) {
 			return false;
 		}
-		final UIAttribute that = (UIAttribute) o;
+		final UIAttribute that = (UIAttribute) obj;
 		return that.canEqual(this) && Objects.equals(keyValueList, that.keyValueList);
 	}
 	
@@ -161,6 +152,20 @@ public class UIAttribute extends UIElement {
 	@Override
 	public final int hashCode() {
 		//noinspection ObjectInstantiationInEqualsHashCode
+		int h = hash;
+		if (hashIsDirty || (h == 0 && !hashIsZero)) {
+			h = calcHashCode();
+			if (h == 0) {
+				hashIsZero = true;
+			} else {
+				hash = h;
+			}
+			hashIsDirty = false;
+		}
+		return h;
+	}
+	
+	private int calcHashCode() {
 		return Objects.hash(super.hashCode(), keyValueList);
 	}
 }
