@@ -102,7 +102,7 @@ public class UIConstantImmutable extends UIElementAbstract implements UIConstant
 	public final int hashCode() {
 		//noinspection ObjectInstantiationInEqualsHashCode
 		int h = hash;
-		if (hashIsDirty || (h == 0 && !hashIsZero)) {
+		if ((h == 0 && !hashIsZero) || hashIsDirty) {
 			h = calcHashCode();
 			if (h == 0) {
 				hashIsZero = true;

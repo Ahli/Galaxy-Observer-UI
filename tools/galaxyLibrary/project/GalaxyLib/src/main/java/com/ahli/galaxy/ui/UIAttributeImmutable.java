@@ -55,29 +55,6 @@ public class UIAttributeImmutable extends UIElementAbstract implements UIAttribu
 		throw new UnsupportedOperationException("UIAttributes are immutable");
 	}
 	
-	//	/**
-	//	 * Adds a value for the key and returns any overridden value.
-	//	 *
-	//	 * @param key
-	//	 * @param value
-	//	 */
-	//	public void addValue(final String key, final String value) {
-	//		int i = 0;
-	//		final int len = keyValueList.size();
-	//		for (; i < len; i += 2) {
-	//			if (keyValueList.get(i).equals(key)) {
-	//				break;
-	//			}
-	//		}
-	//		if (i >= len) {
-	//			// not found
-	//			keyValueList.add(StringInterner.intern(key));
-	//			keyValueList.add(StringInterner.intern(value));
-	//		} else {
-	//			keyValueList.set(i, StringInterner.intern(value));
-	//		}
-	//	}
-	
 	/**
 	 * @param key
 	 * @return
@@ -102,16 +79,6 @@ public class UIAttributeImmutable extends UIElementAbstract implements UIAttribu
 	public List<String> getKeyValues() {
 		return keyValueList;
 	}
-	
-	//	/**
-	//	 * Clears all existing key-value-pairs and adds all entries from the list.
-	//	 *
-	//	 * @param keyValues
-	//	 */
-	//	public void setKeyValues(final List<String> keyValues) {
-	//		keyValueList.clear();
-	//		keyValueList.addAll(keyValues);
-	//	}
 	
 	@Override
 	public UIElement receiveFrameFromPath(final String path) {
@@ -158,7 +125,7 @@ public class UIAttributeImmutable extends UIElementAbstract implements UIAttribu
 	public final int hashCode() {
 		//noinspection ObjectInstantiationInEqualsHashCode
 		int h = hash;
-		if (hashIsDirty || (h == 0 && !hashIsZero)) {
+		if ((h == 0 && !hashIsZero) || hashIsDirty) {
 			h = calcHashCode();
 			if (h == 0) {
 				hashIsZero = true;

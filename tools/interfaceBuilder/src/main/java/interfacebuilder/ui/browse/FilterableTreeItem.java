@@ -27,32 +27,9 @@ public class FilterableTreeItem<T> extends TreeItem<T> {
 		sourceList = FXCollections.observableArrayList();
 		final FilteredList<TreeItem<T>> filteredList = new FilteredList<>(sourceList);
 		
-		filteredList.predicateProperty().bind(Bindings.createObjectBinding(new Callable<>() {
-			@Override
-			public Predicate<? super TreeItem<T>> call() {
-				return this::test;
-			}
-			
-			private boolean test(final TreeItem<T> child) {
-				// Set the predicate of child items to force filtering
-				if (child instanceof FilterableTreeItem) {
-					final FilterableTreeItem<T> filterableChild = (FilterableTreeItem<T>) child;
-					filterableChild.setPredicate(predicate.get());
-				}
-				// If there is no predicate or if there are children, keep this tree item
-				if (predicate.get() == null || !child.getChildren().isEmpty()) {
-					return true;
-				}
-				// Otherwise ask the TreeItemPredicate
-				return predicate.get().test(FilterableTreeItem.this, child.getValue());
-			}
-		}, predicate));
+		filteredList.predicateProperty().bind(Bindings.createObjectBinding(new BindingUpdateHandler(), predicate));
 		
 		setHiddenFieldChildren(filteredList);
-	}
-	
-	public void setPredicate(final TreeItemPredicate<T> predicate) {
-		this.predicate.set(predicate);
 	}
 	
 	/**
@@ -77,6 +54,10 @@ public class FilterableTreeItem<T> extends TreeItem<T> {
 		}
 	}
 	
+	public void setPredicate(final TreeItemPredicate<T> predicate) {
+		this.predicate.set(predicate);
+	}
+	
 	/**
 	 * Returns the list of children that is backing the filtered list.
 	 *
@@ -88,5 +69,26 @@ public class FilterableTreeItem<T> extends TreeItem<T> {
 	
 	public ObjectProperty<TreeItemPredicate<T>> predicateProperty() {
 		return predicate;
+	}
+	
+	private class BindingUpdateHandler implements Callable<Predicate<? super TreeItem<T>>> {
+		@Override
+		public Predicate<? super TreeItem<T>> call() {
+			return this::test;
+		}
+		
+		private boolean test(final TreeItem<T> child) {
+			// Set the predicate of child items to force filtering
+			if (child instanceof FilterableTreeItem) {
+				final FilterableTreeItem<T> filterableChild = (FilterableTreeItem<T>) child;
+				filterableChild.setPredicate(predicate.get());
+			}
+			// If there is no predicate or if there are children, keep this tree item
+			if (predicate.get() == null || !child.getChildren().isEmpty()) {
+				return true;
+			}
+			// Otherwise ask the TreeItemPredicate
+			return predicate.get().test(FilterableTreeItem.this, child.getValue());
+		}
 	}
 }

@@ -352,11 +352,15 @@ public class BrowseTabController implements Updateable {
 			}
 			final ObservableList<String> fileNames = FXCollections.observableList(new ArrayList<>(fileNamesSet));
 			fileNames.sort(null);
-			fileSelector.setItems(fileNames);
 			final String firstSelection = fileNamesSet.contains(GAME_UI) ? GAME_UI : fileNames.get(0);
+			logger.trace("updating dropdown - fileNames: {}, firstSelection: {}", fileNamesSet.size(), firstSelection);
 			Platform.runLater(() -> {
 				try {
+					logger.trace("updating file dropdown items");
+					fileSelector.setItems(fileNames);
+					logger.trace("updating file dropdown value");
 					fileSelector.setValue(firstSelection);
+					logger.trace("finished updating file dropdown");
 				} catch (final Exception e) {
 					logger.fatal(FATAL_ERROR, e);
 				}
@@ -495,6 +499,7 @@ public class BrowseTabController implements Updateable {
 				final List<String> templatesOfFile = new ArrayList<>(10);
 				String firstSelection = null;
 				String name;
+				logger.trace("filling templatemap");
 				for (final UITemplate template : browseTabController.uiCatalog.getTemplates()) {
 					if (template.getFileName().equals(fileName)) {
 						name = template.getElement().getName();
@@ -505,14 +510,17 @@ public class BrowseTabController implements Updateable {
 						}
 					}
 				}
+				logger.trace("templates of file: {}", templatesOfFile.size());
 				final ObservableList<String> elementNames =
 						FXCollections.observableList(new ArrayList<>(templatesOfFile));
 				browseTabController.templateSelector.setItems(elementNames);
 				if (firstSelection != null) {
+					logger.trace("first selection: {}", firstSelection);
 					browseTabController.templateSelector.setValue(firstSelection);
 				} else {
 					browseTabController.templateSelector.selectionModelProperty().get().selectFirst();
 				}
+				logger.trace("template dropdown updated");
 			}
 		}
 	}
@@ -534,15 +542,7 @@ public class BrowseTabController implements Updateable {
 					logger.trace("selection of template changed: {}", selectedTemplateRootElem);
 					final UITemplate template = browseTabController.templateMap.get(selectedTemplateRootElem);
 					if (template != curTreeTemplate) {
-						final long start = System.currentTimeMillis();
-						curTreeTemplate = template;
-						browseTabController.framesTotal = 0;
 						createTree(template);
-						if (logger.isTraceEnabled()) {
-							logger.trace("Tree creation: {}ms , {} frames",
-									(System.currentTimeMillis() - start),
-									browseTabController.framesTotal);
-						}
 					}
 				}
 			} catch (final Exception e) {
@@ -554,25 +554,44 @@ public class BrowseTabController implements Updateable {
 		 * @param template
 		 */
 		private void createTree(final UITemplate template) {
+			logger.trace("creating Tree");
+			final long start = System.currentTimeMillis();
+			curTreeTemplate = template;
+			browseTabController.framesTotal = 0;
 			if (template != null) {
 				final UIElement rootElement = template.getElement();
-				final FilterableTreeItem<UIElement> rootItem = new FilterableTreeItem<>(rootElement);
-				
-				// set filter predicate
-				rootItem.predicateProperty()
-						.bind(Bindings.createObjectBinding(browseTabController.searchCallable,
-								browseTabController.queryString));
-				
-				browseTabController.frameTree.setRoot(rootItem);
-				browseTabController.framesTotal += 1;
-				final ObservableList<TreeItem<UIElement>> treeItemChildren = rootItem.getInternalChildren();
-				for (final UIElement child : rootElement.getChildren()) {
-					createTree(child, treeItemChildren);
-				}
-				rootItem.expandedProperty().setValue(true);
-				browseTabController.frameTree.getSelectionModel().select(0);
+				new Thread(() -> {
+					final FilterableTreeItem<UIElement> rootItem = new FilterableTreeItem<>(rootElement);
+					
+					browseTabController.framesTotal += 1;
+					final ObservableList<TreeItem<UIElement>> treeItemChildren = rootItem.getInternalChildren();
+					for (final UIElement child : rootElement.getChildren()) {
+						createTree(child, treeItemChildren);
+					}
+					rootItem.expandedProperty().setValue(true);
+					// set filter predicate
+					rootItem.predicateProperty()
+							.bind(Bindings.createObjectBinding(browseTabController.searchCallable,
+									browseTabController.queryString));
+					Platform.runLater(() -> {
+						logger.trace("setting root");
+						browseTabController.frameTree.setRoot(rootItem);
+						logger.trace("selecting first entry");
+						browseTabController.frameTree.getSelectionModel().select(0);
+						if (logger.isTraceEnabled()) {
+							logger.trace("Tree creation: {}ms , {} frames",
+									(System.currentTimeMillis() - start),
+									browseTabController.framesTotal);
+						}
+					});
+				}).start();
 			} else {
 				browseTabController.frameTree.setRoot(null);
+				if (logger.isTraceEnabled()) {
+					logger.trace("Tree creation: {}ms , {} frames",
+							(System.currentTimeMillis() - start),
+							browseTabController.framesTotal);
+				}
 			}
 		}
 		
@@ -584,9 +603,9 @@ public class BrowseTabController implements Updateable {
 			final FilterableTreeItem<UIElement> treeItem = new FilterableTreeItem<>(element);
 			parentsChildren.add(treeItem);
 			browseTabController.framesTotal += 1;
-			final ObservableList<TreeItem<UIElement>> treeItemChildren = treeItem.getInternalChildren();
 			final List<UIElement> children = element.getChildrenRaw();
 			if (children != null) {
+				final ObservableList<TreeItem<UIElement>> treeItemChildren = treeItem.getInternalChildren();
 				for (final UIElement child : children) {
 					createTree(child, treeItemChildren);
 				}

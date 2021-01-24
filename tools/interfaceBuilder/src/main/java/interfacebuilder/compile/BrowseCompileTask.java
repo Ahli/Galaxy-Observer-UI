@@ -48,7 +48,6 @@ public class BrowseCompileTask extends CleaningForkJoinTask {
 			Thread.currentThread().interrupt();
 			return false;
 		}
-		
 		return true;
 	}
 	

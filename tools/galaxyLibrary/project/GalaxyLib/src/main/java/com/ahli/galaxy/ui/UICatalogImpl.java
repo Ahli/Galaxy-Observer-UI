@@ -4,6 +4,7 @@
 package com.ahli.galaxy.ui;
 
 import com.ahli.galaxy.game.GameDef;
+import com.ahli.galaxy.parser.DeduplicationIntensity;
 import com.ahli.galaxy.parser.UICatalogParser;
 import com.ahli.galaxy.parser.XmlParserVtd;
 import com.ahli.galaxy.parser.interfaces.ParsedXmlConsumer;
@@ -37,50 +38,52 @@ public class UICatalogImpl implements UICatalog {
 	
 	private static final String UNDERSCORE = "_";
 	private static final Logger logger = LogManager.getLogger(UICatalogImpl.class);
-	private ParsedXmlConsumer parser;
-	
 	// members
-	private List<UITemplate> templates;
-	private List<UITemplate> blizzOnlyTemplates;
-	private List<UIConstant> constants;
-	private List<UIConstant> blizzOnlyConstants;
+	private final List<UITemplate> templates;
+	private final List<UITemplate> blizzOnlyTemplates;
+	private final List<UIConstant> constants;
+	private final List<UIConstant> blizzOnlyConstants;
+	private final Map<String, UIFrame> handles;
 	private List<String> blizzOnlyLayouts;
-	private Map<String, UIFrame> handles;
-	
+	private ParsedXmlConsumer parser;
 	// internal, used during processing
 	private String curBasePath;
 	
 	public UICatalogImpl() {
-		dfltInit();
-	}
-	
-	private void dfltInit() {
-		init(2500, 10, 800, 10, 25, 650);
-	}
-	
-	private void init(
-			final int templatesCapacity,
-			final int blizzOnlyTemplatesCapacity,
-			final int constantsCapacity,
-			final int blizzOnlyConstantsCapacity,
-			final int blizzOnlyLayoutsCapacity,
-			final int handlesCapacity) {
-		templates = new ArrayList<>(templatesCapacity);
-		blizzOnlyTemplates = new ArrayList<>(blizzOnlyTemplatesCapacity);
-		constants = new ArrayList<>(constantsCapacity);
-		blizzOnlyConstants = new ArrayList<>(blizzOnlyConstantsCapacity);
-		blizzOnlyLayouts = new ArrayList<>(blizzOnlyLayoutsCapacity);
-		handles = new UnifiedMap<>(handlesCapacity);
+		templates = new ArrayList<>(2500);
+		blizzOnlyTemplates = new ArrayList<>(10);
+		constants = new ArrayList<>(800);
+		blizzOnlyConstants = new ArrayList<>(10);
+		blizzOnlyLayouts = new ArrayList<>(25);
+		handles = new UnifiedMap<>(650 * 5 / 4);
 	}
 	
 	public UICatalogImpl(final GameDef gameDef) {
-		if (gameDef == null) {
-			dfltInit();
-		} else if ("sc2".equals(gameDef.getNameHandle())) {
-			init(2365, 17, 1241, 0, 14, 242);
-		} else if ("heroes".equals(gameDef.getNameHandle())) {
-			init(2088, 6, 449, 0, 11, 367);
+		if (gameDef != null) {
+			if ("sc2".equals(gameDef.getNameHandle())) {
+				templates = new ArrayList<>(2365);
+				blizzOnlyTemplates = new ArrayList<>(17);
+				constants = new ArrayList<>(1241);
+				blizzOnlyConstants = new ArrayList<>(0);
+				blizzOnlyLayouts = new ArrayList<>(14);
+				handles = new UnifiedMap<>(242 * 5 / 4);
+				return;
+			} else if ("heroes".equals(gameDef.getNameHandle())) {
+				templates = new ArrayList<>(2088);
+				blizzOnlyTemplates = new ArrayList<>(6);
+				constants = new ArrayList<>(449);
+				blizzOnlyConstants = new ArrayList<>(0);
+				blizzOnlyLayouts = new ArrayList<>(11);
+				handles = new UnifiedMap<>(367 * 5 / 4);
+				return;
+			}
 		}
+		templates = new ArrayList<>(2500);
+		blizzOnlyTemplates = new ArrayList<>(10);
+		constants = new ArrayList<>(800);
+		blizzOnlyConstants = new ArrayList<>(10);
+		blizzOnlyLayouts = new ArrayList<>(25);
+		handles = new UnifiedMap<>(650 * 5 / 4);
 	}
 	
 	/**
@@ -231,7 +234,11 @@ public class UICatalogImpl implements UICatalog {
 	
 	@Override
 	public void processInclude(
-			final String path, final boolean isDevLayout, final String raceId, final String consoleSkinId) {
+			final String path,
+			final boolean isDevLayout,
+			final String raceId,
+			final String consoleSkinId,
+			final DeduplicationIntensity deduplicationAllowed) {
 		logger.trace("processing Include appearing within a real layout");
 		
 		String basePathTemp = getCurBasePath();
@@ -251,7 +258,7 @@ public class UICatalogImpl implements UICatalog {
 		}
 		final Path filePath = Path.of(basePathTemp, path);
 		final XmlParser xmlParser = new XmlParserVtd();
-		final UICatalogParser parserTemp = new UICatalogParser(this, xmlParser, true);
+		final UICatalogParser parserTemp = new UICatalogParser(this, xmlParser, deduplicationAllowed);
 		try {
 			parserTemp.parseFile(filePath, raceId, isDevLayout, consoleSkinId);
 		} catch (final IOException e) {
@@ -427,18 +434,8 @@ public class UICatalogImpl implements UICatalog {
 	}
 	
 	@Override
-	public void setTemplates(final List<UITemplate> templates) {
-		this.templates = templates;
-	}
-	
-	@Override
 	public List<UITemplate> getBlizzOnlyTemplates() {
 		return blizzOnlyTemplates;
-	}
-	
-	@Override
-	public void setBlizzOnlyTemplates(final List<UITemplate> blizzOnlyTemplates) {
-		this.blizzOnlyTemplates = blizzOnlyTemplates;
 	}
 	
 	@Override
@@ -447,18 +444,8 @@ public class UICatalogImpl implements UICatalog {
 	}
 	
 	@Override
-	public void setConstants(final List<UIConstant> constants) {
-		this.constants = constants;
-	}
-	
-	@Override
 	public List<UIConstant> getBlizzOnlyConstants() {
 		return blizzOnlyConstants;
-	}
-	
-	@Override
-	public void setBlizzOnlyConstants(final List<UIConstant> blizzOnlyConstants) {
-		this.blizzOnlyConstants = blizzOnlyConstants;
 	}
 	
 	@Override
@@ -469,11 +456,6 @@ public class UICatalogImpl implements UICatalog {
 	@Override
 	public List<String> getDevLayouts() {
 		return blizzOnlyLayouts;
-	}
-	
-	@Override
-	public void setDevLayouts(final List<String> devLayouts) {
-		blizzOnlyLayouts = devLayouts;
 	}
 	
 	@Override

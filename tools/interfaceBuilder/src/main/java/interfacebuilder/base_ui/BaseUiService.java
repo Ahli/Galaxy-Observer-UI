@@ -5,6 +5,7 @@ package interfacebuilder.base_ui;
 
 import com.ahli.galaxy.game.GameData;
 import com.ahli.galaxy.game.GameDef;
+import com.ahli.galaxy.parser.DeduplicationIntensity;
 import com.ahli.galaxy.parser.UICatalogParser;
 import com.ahli.galaxy.parser.XmlParserVtd;
 import com.ahli.galaxy.ui.UICatalogImpl;
@@ -299,7 +300,9 @@ public class BaseUiService {
 				if (needToParseAgain) {
 					// parse baseUI
 					uiCatalog = new UICatalogImpl(gameData.getGameDef());
-					uiCatalog.setParser(new UICatalogParser(uiCatalog, new XmlParserVtd(), true));
+					uiCatalog.setParser(new UICatalogParser(uiCatalog,
+							new XmlParserVtd(),
+							DeduplicationIntensity.FULL));
 					AppController.printInfoLogMessageToGeneral("Starting to parse base " + gameName + " UI.");
 					app.addThreadLoggerTab(Thread.currentThread().getName(),
 							gameData.getGameDef().getNameHandle() + "UI",

@@ -3,14 +3,17 @@
 
 package interfacebuilder.ui.browse;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Side;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import lombok.extern.log4j.Log4j2;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,6 +21,7 @@ import java.util.List;
  * <p>
  * This implementation is based on Caleb Brinkman's AutoCompleteTextField.
  */
+@Log4j2
 public class AutoCompleteComboBox extends ComboBox<String> {
 	/** The popup used to select an entry. */
 	private final ContextMenu entriesPopup;
@@ -30,43 +34,7 @@ public class AutoCompleteComboBox extends ComboBox<String> {
 		
 		final TextField editor = getEditor();
 		if (editor != null) {
-			editor.textProperty().addListener((observableValue, oldVal, newVal) -> {
-				if (newVal.isEmpty() || !isFocused()) {
-					entriesPopup.hide();
-				} else {
-					// TODO visually show the matching area in contextmenu's texts
-					final List<CustomMenuItem> menuItems = new LinkedList<>();
-					final int maxEntries = 20;
-					int curEntries = 0;
-					for (final String item : getItems()) {
-						if (containsIgnoreCase(item, newVal)) {
-							@SuppressWarnings("ObjectAllocationInLoop")
-							final Label entryLabel = new Label(item);
-							@SuppressWarnings("ObjectAllocationInLoop")
-							final CustomMenuItem menuItem = new CustomMenuItem(entryLabel, true);
-							//noinspection ObjectAllocationInLoop
-							menuItem.setOnAction(event -> {
-								getSelectionModel().select(item);
-								entriesPopup.hide();
-							});
-							menuItems.add(menuItem);
-							
-							++curEntries;
-							if (curEntries >= maxEntries) {
-								break;
-							}
-						}
-					}
-					
-					entriesPopup.getItems().clear();
-					if (!menuItems.isEmpty()) {
-						entriesPopup.getItems().addAll(menuItems);
-						entriesPopup.show(AutoCompleteComboBox.this, Side.BOTTOM, 0, 0);
-					} else {
-						entriesPopup.hide();
-					}
-				}
-			});
+			editor.textProperty().addListener(new TextChangeListener());
 		}
 		
 		focusedProperty().addListener((observableValue, aBoolean, aBoolean2) -> entriesPopup.hide());
@@ -89,7 +57,7 @@ public class AutoCompleteComboBox extends ComboBox<String> {
 		final char firstLo = Character.toLowerCase(what.charAt(0));
 		final char firstUp = Character.toUpperCase(what.charAt(0));
 		
-		for (int i = src.length() - length; i >= 0; i--) {
+		for (int i = src.length() - length; i >= 0; --i) {
 			// Quick check before calling the more expensive regionMatches() method:
 			final char ch = src.charAt(i);
 			if (ch != firstLo && ch != firstUp) {
@@ -103,4 +71,45 @@ public class AutoCompleteComboBox extends ComboBox<String> {
 		return false;
 	}
 	
+	private class TextChangeListener implements ChangeListener<String> {
+		@Override
+		public void changed(
+				final ObservableValue<? extends String> observableValue, final String oldVal, final String newVal) {
+			if (newVal.isEmpty() || !isFocused()) {
+				entriesPopup.hide();
+			} else {
+				// TODO visually show the matching area in contextmenu's texts
+				final int maxEntries = 20;
+				final List<CustomMenuItem> menuItems = new ArrayList<>(maxEntries);
+				int curEntries = 0;
+				for (final String item : getItems()) {
+					if (containsIgnoreCase(item, newVal)) {
+						@SuppressWarnings("ObjectAllocationInLoop")
+						final Label entryLabel = new Label(item);
+						@SuppressWarnings("ObjectAllocationInLoop")
+						final CustomMenuItem menuItem = new CustomMenuItem(entryLabel, true);
+						//noinspection ObjectAllocationInLoop
+						menuItem.setOnAction(event -> {
+							getSelectionModel().select(item);
+							entriesPopup.hide();
+						});
+						menuItems.add(menuItem);
+						
+						++curEntries;
+						if (curEntries >= maxEntries) {
+							break;
+						}
+					}
+				}
+				if (!menuItems.isEmpty()) {
+					entriesPopup.getItems().clear();
+					entriesPopup.getItems().addAll(menuItems);
+					entriesPopup.show(AutoCompleteComboBox.this, Side.BOTTOM, 0, 0);
+				} else {
+					entriesPopup.hide();
+					entriesPopup.getItems().clear();
+				}
+			}
+		}
+	}
 }

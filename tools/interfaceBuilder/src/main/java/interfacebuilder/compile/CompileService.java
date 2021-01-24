@@ -5,6 +5,7 @@ package interfacebuilder.compile;
 
 import com.ahli.galaxy.ModData;
 import com.ahli.galaxy.archive.DescIndexData;
+import com.ahli.galaxy.parser.DeduplicationIntensity;
 import com.ahli.galaxy.parser.UICatalogParser;
 import com.ahli.galaxy.parser.XmlParserVtd;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
@@ -83,7 +84,9 @@ public class CompileService {
 					return null;
 				}
 				
-				catalogClone.setParser(new UICatalogParser(catalogClone, new XmlParserVtd(), true));
+				catalogClone.setParser(new UICatalogParser(catalogClone,
+						new XmlParserVtd(),
+						DeduplicationIntensity.SIMPLE));
 				
 				// apply mod's UI
 				final File descIndexFile = new File(

@@ -3,6 +3,7 @@
 
 package com.ahli.galaxy.ui.interfaces;
 
+import com.ahli.galaxy.parser.DeduplicationIntensity;
 import com.ahli.galaxy.parser.interfaces.ParsedXmlConsumer;
 import com.ahli.galaxy.ui.UITemplate;
 import com.ahli.galaxy.ui.exception.UIException;
@@ -75,21 +76,9 @@ public interface UICatalog extends DeepCopyable {
 	List<UITemplate> getTemplates();
 	
 	/**
-	 * @param templates
-	 * 		the templates to set
-	 */
-	void setTemplates(List<UITemplate> templates);
-	
-	/**
 	 * @return the blizzOnlyTemplates
 	 */
 	List<UITemplate> getBlizzOnlyTemplates();
-	
-	/**
-	 * @param blizzOnlyTemplates
-	 * 		the blizzOnlyTemplates to set
-	 */
-	void setBlizzOnlyTemplates(List<UITemplate> blizzOnlyTemplates);
 	
 	/**
 	 * @return the constants
@@ -97,34 +86,19 @@ public interface UICatalog extends DeepCopyable {
 	List<UIConstant> getConstants();
 	
 	/**
-	 * @param constants
-	 * 		the constants to set
-	 */
-	void setConstants(List<UIConstant> constants);
-	
-	/**
 	 * @return the blizzOnlyConstants
 	 */
 	List<UIConstant> getBlizzOnlyConstants();
 	
 	/**
-	 * @param blizzOnlyConstants
-	 * 		the blizzOnlyConstants to set
+	 * @return Mapping of the UIFrame handles
 	 */
-	void setBlizzOnlyConstants(List<UIConstant> blizzOnlyConstants);
-	
 	Map<String, UIFrame> getHandles();
 	
 	/**
 	 * @return the devLayouts
 	 */
 	List<String> getDevLayouts();
-	
-	/**
-	 * @param devLayouts
-	 * 		the devLayouts to set
-	 */
-	void setDevLayouts(List<String> devLayouts);
 	
 	/**
 	 * @return the curBasePath
@@ -137,7 +111,7 @@ public interface UICatalog extends DeepCopyable {
 	 * @param constant
 	 * @param isDevLayout
 	 */
-	void addConstant(final UIConstant constant, final boolean isDevLayout);
+	void addConstant(UIConstant constant, boolean isDevLayout);
 	
 	/**
 	 * @param fileName
@@ -146,12 +120,16 @@ public interface UICatalog extends DeepCopyable {
 	 * @return
 	 * @throws UIException
 	 */
-	UITemplate addTemplate(final String fileName, final UIElement thisElem, final boolean isDevLayout)
-			throws UIException;
+	UITemplate addTemplate(String fileName, UIElement thisElem, boolean isDevLayout) throws UIException;
 	
-	void processInclude(String path, boolean isDevLayout, String raceId, String consoleSkinId);
+	void processInclude(
+			String path,
+			boolean isDevLayout,
+			String raceId,
+			String consoleSkinId,
+			DeduplicationIntensity deduplicationAllowed);
 	
-	UITemplate[] getTemplatesOfPath(final String file);
+	UITemplate[] getTemplatesOfPath(String file);
 	
 	/**
 	 * Post process the parsed UICatalog.

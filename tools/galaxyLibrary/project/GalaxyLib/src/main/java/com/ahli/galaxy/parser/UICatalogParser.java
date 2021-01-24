@@ -78,7 +78,9 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	private final List<Integer> statesToCloseLevel;
 	private final List<UITemplate> newTemplatesOfCurFile;
 	private final Map<UIElement, UIElement> addedFinalElements;
-	private final boolean deduplicationAllowed;
+	private final DeduplicationIntensity deduplicationIntensity;
+	private final boolean deduplicateDuringParsing;
+	private final boolean deduplicatePostProcessing;
 	private int attributeDeduplications;
 	private int constantDeduplications;
 	private UIElement curElement;
@@ -95,24 +97,40 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	private boolean layoutFileDescLocked;
 	private int unnamedFrameCounter;
 	
-	public UICatalogParser(final UICatalog catalog, final XmlParser parser, final boolean deduplicationAllowed) {
+	public UICatalogParser(
+			final UICatalog catalog, final XmlParser parser, final DeduplicationIntensity deduplicationIntensity) {
 		this.catalog = catalog;
 		this.parser = parser;
 		statesToClose = new ArrayList<>(10);
 		statesToCloseLevel = new ArrayList<>(10);
 		curPath = new ArrayList<>(10);
 		newTemplatesOfCurFile = new ArrayList<>(250);
-		this.deduplicationAllowed = deduplicationAllowed;
-		if (deduplicationAllowed) {
-			if (catalog.getTemplates().isEmpty()) {
-				// parse a baseUI
-				addedFinalElements = new UnifiedMap<>(61_000 * 5 / 4);
-			} else {
-				// parse obs interface
-				addedFinalElements = new UnifiedMap<>(90_000 * 5 / 4);
+		this.deduplicationIntensity = deduplicationIntensity;
+		logger.trace("deduplication intensity: {}", deduplicationIntensity);
+		switch (deduplicationIntensity) {
+			case NONE -> {
+				deduplicateDuringParsing = false;
+				deduplicatePostProcessing = false;
+				addedFinalElements = null;
 			}
-		} else {
-			addedFinalElements = null;
+			case SIMPLE -> {
+				deduplicateDuringParsing = true;
+				deduplicatePostProcessing = false;
+				// parse obs interface
+				addedFinalElements = new UnifiedMap<>(90_000 * 5 / 4); // TODO optimize memory
+			}
+			// FULL
+			default -> {
+				deduplicateDuringParsing = true;
+				deduplicatePostProcessing = true;
+				if (catalog.getTemplates().isEmpty()) {
+					// parse a baseUI
+					addedFinalElements = new UnifiedMap<>(61_000 * 5 / 4);
+				} else {
+					// parse obs interface
+					addedFinalElements = new UnifiedMap<>(90_000 * 5 / 4);
+				}
+			}
 		}
 		//noinspection ThisEscapedInObjectConstruction
 		parser.setConsumer(this);
@@ -646,7 +664,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					}
 					UIConstant newElemUiConstant = new UIConstantImmutable(name, val);
 					newElem = newElemUiConstant;
-					if (deduplicationAllowed) {
+					if (deduplicateDuringParsing) {
 						final UIElement refToDuplicate = addedFinalElements.get(newElem);
 						if (refToDuplicate != null) {
 							newElemUiConstant = (UIConstant) refToDuplicate;
@@ -690,7 +708,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					if (j != -1) {
 						final String path = attrValues.get(j);
 						final boolean isDevLayout = curIsDevLayout || attrTypes.contains(REQUIREDTOLOAD);
-						catalog.processInclude(path, isDevLayout, raceId, consoleSkinId);
+						catalog.processInclude(path, isDevLayout, raceId, consoleSkinId, deduplicationIntensity);
 					}
 					break;
 				default:
@@ -707,7 +725,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					final UIAttribute newElemUiAttr = new UIAttributeImmutable(tagName, attributeKeyValueList);
 					newElem = newElemUiAttr;
 					
-					if (deduplicationAllowed) {
+					if (deduplicateDuringParsing) {
 						final UIElement refToDuplicate = addedFinalElements.get(newElem);
 						if (refToDuplicate != null) {
 							newElem = refToDuplicate;
@@ -963,7 +981,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	
 	@Override
 	public void deduplicate() {
-		if (deduplicationAllowed) {
+		if (deduplicatePostProcessing) {
 			logger.info("unique elements added that were deduplicated during parsing: {}", addedFinalElements.size());
 			// replace instances
 			final Deque<Object> toDeduplicate =
