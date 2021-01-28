@@ -92,7 +92,6 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	private UITemplate curTemplate;
 	//private boolean editingMode;
 	private String curFileName;
-	//	private Deque<Object> toDeduplicate;
 	private int postProcessDeduplications;
 	private boolean layoutFileDescLocked;
 	private int unnamedFrameCounter;
