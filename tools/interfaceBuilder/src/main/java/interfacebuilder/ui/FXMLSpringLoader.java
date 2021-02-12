@@ -61,17 +61,17 @@ public class FXMLSpringLoader extends FXMLLoader implements ApplicationContextAw
 	}
 	
 	@Override
-	public boolean equals(final Object o) {
-		if (this == o) {
+	public boolean equals(final Object obj) {
+		if (this == obj) {
 			return true;
 		}
-		if (o == null || getClass() != o.getClass()) {
+		if (obj == null || getClass() != obj.getClass()) {
 			return false;
 		}
-		if (!super.equals(o)) {
+		if (!super.equals(obj)) {
 			return false;
 		}
-		final FXMLSpringLoader that = (FXMLSpringLoader) o;
+		final FXMLSpringLoader that = (FXMLSpringLoader) obj;
 		return Objects.equals(context, that.context);
 	}
 	

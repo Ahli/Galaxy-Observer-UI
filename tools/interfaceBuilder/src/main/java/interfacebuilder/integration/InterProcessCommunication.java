@@ -184,4 +184,5 @@ public class InterProcessCommunication implements AutoCloseable {
 			this.appController = appController;
 		}
 	}
+	
 }

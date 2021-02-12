@@ -5,7 +5,8 @@ package interfacebuilder.ui;
 
 import com.ahli.galaxy.game.GameDef;
 import com.ahli.util.StringInterner;
-import interfacebuilder.JavafxApplication;
+import interfacebuilder.AppClosingEvent;
+import interfacebuilder.PrimaryStageReadyEvent;
 import interfacebuilder.base_ui.BaseUiService;
 import interfacebuilder.build.MpqBuilderService;
 import interfacebuilder.compress.GameService;
@@ -141,10 +142,12 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 	}
 	
 	@EventListener
-	public void onPrimaryStageReadyEvent(final JavafxApplication.PrimaryStageReadyEvent stageReadyEvent) {
+	public void onPrimaryStageReadyEvent(final PrimaryStageReadyEvent stageReadyEvent) {
 		try {
 			primaryStage = stageReadyEvent.getStage();
-			initUi();
+			if (primaryStage != null) {
+				initUi();
+			}
 			
 			final CommandLineParams startingParams = stageReadyEvent.getStartingParams();
 			printVariables(startingParams);
@@ -224,13 +227,15 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 				Thread.currentThread().setName("Supervisor");
 				Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
 				
-				Platform.runLater(() -> {
-					try {
-						navigationController.lockNavToProgress();
-					} catch (final Exception e) {
-						logger.fatal(FATAL_ERROR, e);
-					}
-				});
+				if (primaryStage != null) {
+					Platform.runLater(() -> {
+						try {
+							navigationController.lockNavToProgress();
+						} catch (final Exception e) {
+							logger.fatal(FATAL_ERROR, e);
+						}
+					});
+				}
 				
 				mpqBuilderService.build(params.getParamCompilePath());
 				
@@ -239,13 +244,15 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 					startReplayOrQuitOrShowError(params);
 				}
 				
-				Platform.runLater(() -> {
-					try {
-						navigationController.unlockNav();
-					} catch (final Exception e) {
-						logger.fatal(FATAL_ERROR, e);
-					}
-				});
+				if (primaryStage != null) {
+					Platform.runLater(() -> {
+						try {
+							navigationController.unlockNav();
+						} catch (final Exception e) {
+							logger.fatal(FATAL_ERROR, e);
+						}
+					});
+				}
 			} catch (final Exception e) {
 				logger.fatal(FATAL_ERROR, e);
 			} finally {
@@ -423,18 +430,22 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 	 * @param msg
 	 * 		the message
 	 */
-	public static void printInfoLogMessageToGeneral(final String msg) {
-		Platform.runLater(() -> {
-			try {
-				logger.info(msg);
-			} catch (final Exception e) {
-				logger.fatal(FATAL_ERROR, e);
-			}
-		});
+	public void printInfoLogMessageToGeneral(final String msg) {
+		if (primaryStage != null) {
+			Platform.runLater(() -> {
+				try {
+					logger.info(msg);
+				} catch (final Exception e) {
+					logger.fatal(FATAL_ERROR, e);
+				}
+			});
+		} else {
+			logger.info(msg);
+		}
 	}
 	
 	@EventListener
-	public void onAppClosingEvent(final JavafxApplication.AppClosingEvent appCLosingEvent) {
+	public void onAppClosingEvent(final AppClosingEvent appCLosingEvent) {
 		logger.info("App is about to shut down.");
 		if (!executor.isShutdown()) {
 			executor.shutdownNow();
@@ -460,66 +471,68 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 	 */
 	public void addThreadLoggerTab(
 			final String threadName, final String tabName, final boolean errorPreventsExit) {
-		final ObservableList<Tab> tabs = getTabPane().getTabs();
-		Tab newTab = null;
-		
-		// re-use existing tab with that name
-		for (final Tab tab : tabs) {
-			if (tab.getText().equals(tabName)) {
-				newTab = tab;
-				break;
-			}
-		}
-		if (newTab == null) {
-			// CASE: new tab
-			newTab = new Tab(tabName);
-			final TextFlow newTxtArea = new TextFlow();
-			final ErrorTabController errorTabCtrl =
-					new ErrorTabController(newTab, newTxtArea, true, false, errorPreventsExit);
-			errorTabCtrl.setRunning(true);
-			errorTabControllers.add(errorTabCtrl);
+		if (primaryStage != null) {
+			final ObservableList<Tab> tabs = getTabPane().getTabs();
+			Tab newTab = null;
 			
-			final ScrollPane scrollPane = new ScrollPane(newTxtArea);
-			scrollPane.setPannable(true);
-			
-			// auto-downscrolling
-			scrollPane.vvalueProperty().bind(newTxtArea.heightProperty());
-			
-			newTab.setContent(scrollPane);
-			StylizedTextAreaAppender.setWorkerTaskController(errorTabCtrl, threadName);
-			
-			// context menu with close option
-			final ContextMenu contextMenu = new ContextMenu();
-			final MenuItem closeItem = new MenuItem(Messages.getString("contextmenu.close"));
-			closeItem.setOnAction(new CloseThreadLoggerTabAction(newTab, errorTabCtrl, errorTabControllers));
-			contextMenu.getItems().addAll(closeItem);
-			newTab.setContextMenu(contextMenu);
-			
-			// runlater needs to appear below the edits above, else it might be added before
-			// which results in UI edits not in UI thread -> error
-			final Tab newTabFinal = newTab;
-			Platform.runLater(() -> {
-				try {
-					getTabPane().getTabs().add(newTabFinal);
-				} catch (final Exception e) {
-					logger.fatal(FATAL_ERROR, e);
+			// re-use existing tab with that name
+			for (final Tab tab : tabs) {
+				if (tab.getText().equals(tabName)) {
+					newTab = tab;
+					break;
 				}
-			});
-		} else {
-			// CASE: recycle existing Tab
-			final ErrorTabController errorTabCtrl = getErrorTabController(tabName);
-			if (errorTabCtrl != null) {
+			}
+			if (newTab == null) {
+				// CASE: new tab
+				newTab = new Tab(tabName);
+				final TextFlow newTxtArea = new TextFlow();
+				final ErrorTabController errorTabCtrl =
+						new ErrorTabController(newTab, newTxtArea, true, false, errorPreventsExit);
+				errorTabCtrl.setRunning(true);
+				errorTabControllers.add(errorTabCtrl);
+				
+				final ScrollPane scrollPane = new ScrollPane(newTxtArea);
+				scrollPane.setPannable(true);
+				
+				// auto-downscrolling
+				scrollPane.vvalueProperty().bind(newTxtArea.heightProperty());
+				
+				newTab.setContent(scrollPane);
 				StylizedTextAreaAppender.setWorkerTaskController(errorTabCtrl, threadName);
+				
+				// context menu with close option
+				final ContextMenu contextMenu = new ContextMenu();
+				final MenuItem closeItem = new MenuItem(Messages.getString("contextmenu.close"));
+				closeItem.setOnAction(new CloseThreadLoggerTabAction(newTab, errorTabCtrl, errorTabControllers));
+				contextMenu.getItems().addAll(closeItem);
+				newTab.setContextMenu(contextMenu);
+				
+				// runlater needs to appear below the edits above, else it might be added before
+				// which results in UI edits not in UI thread -> error
+				final Tab newTabFinal = newTab;
 				Platform.runLater(() -> {
 					try {
-						errorTabCtrl.setErrorPreventsExit(errorPreventsExit);
-						errorTabCtrl.clearError(false);
-						errorTabCtrl.clearWarning(false);
-						errorTabCtrl.setRunning(true);
+						getTabPane().getTabs().add(newTabFinal);
 					} catch (final Exception e) {
 						logger.fatal(FATAL_ERROR, e);
 					}
 				});
+			} else {
+				// CASE: recycle existing Tab
+				final ErrorTabController errorTabCtrl = getErrorTabController(tabName);
+				if (errorTabCtrl != null) {
+					StylizedTextAreaAppender.setWorkerTaskController(errorTabCtrl, threadName);
+					Platform.runLater(() -> {
+						try {
+							errorTabCtrl.setErrorPreventsExit(errorPreventsExit);
+							errorTabCtrl.clearError(false);
+							errorTabCtrl.clearWarning(false);
+							errorTabCtrl.setRunning(true);
+						} catch (final Exception e) {
+							logger.fatal(FATAL_ERROR, e);
+						}
+					});
+				}
 			}
 		}
 	}
@@ -587,8 +600,8 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 	}
 	
 	
-	private static class AppControllerException extends RuntimeException {
-		public AppControllerException(final Exception e) {
+	private static final class AppControllerException extends RuntimeException {
+		private AppControllerException(final Exception e) {
 			super(e);
 		}
 	}

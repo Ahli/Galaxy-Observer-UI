@@ -13,7 +13,6 @@ import javafx.application.Preloader;
 import javafx.stage.Stage;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContextInitializer;
-import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
 
@@ -65,7 +64,6 @@ public class JavafxApplication extends Application {
 	
 	@Override
 	public void start(final Stage primaryStage) throws Exception {
-		super.stop();
 		Thread.currentThread().setName("UI");
 		Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 		final CommandLineParams startingParams = new CommandLineParams(getParameters());
@@ -87,29 +85,4 @@ public class JavafxApplication extends Application {
 		Platform.exit();
 	}
 	
-	public static class PrimaryStageReadyEvent extends ApplicationEvent {
-		
-		private final CommandLineParams startingParams;
-		
-		public PrimaryStageReadyEvent(
-				final Stage source, final CommandLineParams startingParams) {
-			super(source);
-			this.startingParams = startingParams;
-		}
-		
-		public Stage getStage() {
-			return (Stage) getSource();
-		}
-		
-		public CommandLineParams getStartingParams() {
-			return startingParams;
-		}
-	}
-	
-	public static class AppClosingEvent extends ApplicationEvent {
-		
-		public AppClosingEvent(final Object source) {
-			super(source);
-		}
-	}
 }

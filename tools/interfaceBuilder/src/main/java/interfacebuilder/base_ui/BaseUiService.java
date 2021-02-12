@@ -65,7 +65,7 @@ public class BaseUiService {
 	private final FileService fileService;
 	private final DiscCacheService discCacheService;
 	private final KryoService kryoService;
-	private final AppController app;
+	private final AppController appController;
 	
 	public BaseUiService(
 			final ConfigService configService,
@@ -73,13 +73,13 @@ public class BaseUiService {
 			final FileService fileService,
 			final DiscCacheService discCacheService,
 			final KryoService kryoService,
-			final AppController app) {
+			final AppController appController) {
 		this.configService = configService;
 		this.gameService = gameService;
 		this.fileService = fileService;
 		this.discCacheService = discCacheService;
 		this.kryoService = kryoService;
-		this.app = app;
+		this.appController = appController;
 	}
 	
 	/**
@@ -303,8 +303,8 @@ public class BaseUiService {
 					uiCatalog.setParser(new UICatalogParser(uiCatalog,
 							new XmlParserVtd(),
 							DeduplicationIntensity.FULL));
-					AppController.printInfoLogMessageToGeneral("Starting to parse base " + gameName + " UI.");
-					app.addThreadLoggerTab(Thread.currentThread().getName(),
+					appController.printInfoLogMessageToGeneral("Starting to parse base " + gameName + " UI.");
+					appController.addThreadLoggerTab(Thread.currentThread().getName(),
 							gameData.getGameDef().getNameHandle() + "UI",
 							false);
 					final String gameDir = configService.getBaseUiPath(gameData.getGameDef()) + File.separator +
@@ -344,7 +344,7 @@ public class BaseUiService {
 					}
 					final String msg = "Finished parsing base UI for " + gameName + ".";
 					logger.info(msg);
-					AppController.printInfoLogMessageToGeneral(msg);
+					appController.printInfoLogMessageToGeneral(msg);
 					try {
 						discCacheService.put(uiCatalog, gameName, isPtr, getVersion(gameData.getGameDef(), isPtr));
 					} catch (final IOException e) {

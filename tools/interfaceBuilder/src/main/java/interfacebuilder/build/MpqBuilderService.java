@@ -244,7 +244,7 @@ public class MpqBuilderService {
 			final boolean verifyLayout,
 			final boolean verifyXml,
 			final Project project) throws IOException, InterruptedException {
-		AppController.printInfoLogMessageToGeneral(sourceFile.getFileName() + " started construction.");
+		appController.printInfoLogMessageToGeneral(sourceFile.getFileName() + " started construction.");
 		
 		final GameDef gameDef = game.getGameDef();
 		
@@ -358,7 +358,7 @@ public class MpqBuilderService {
 			project.setLastBuildSize(size);
 			logger.info("Finished building... {}. Size: {}kb", sourceFileName, size / 1024);
 			projectService.saveProject(project);
-			AppController.printInfoLogMessageToGeneral(sourceFileName + " finished construction.");
+			appController.printInfoLogMessageToGeneral(sourceFileName + " finished construction.");
 		} catch (final IOException | MpqException e) {
 			logger.error("ERROR: unable to construct final Interface file.", e);
 			AppController.printErrorLogMessageToGeneral(sourceFileName + " could not be created.");

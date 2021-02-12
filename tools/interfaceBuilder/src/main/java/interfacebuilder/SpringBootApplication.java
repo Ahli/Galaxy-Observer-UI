@@ -49,7 +49,7 @@ public final class SpringBootApplication {
 			if (InterProcessCommunication.isPortFree(INTER_PROCESS_COMMUNICATION_PORT)) {
 				if (!actAsServer(args)) {
 					logger.warn("Failed to create Server Thread. Starting App without it...");
-					launchGui(args, null);
+					launch(args, null);
 				}
 			} else {
 				logger.info("App already running. Passing over command line arguments.");
@@ -73,7 +73,7 @@ public final class SpringBootApplication {
 		try (final InterProcessCommunication interProcessCommunication = new InterProcessCommunication()) {
 			final Thread serverThread = interProcessCommunication.actAsServer(INTER_PROCESS_COMMUNICATION_PORT);
 			if (serverThread != null) {
-				launchGui(args, serverThread);
+				launch(args, serverThread);
 				return true;
 			} else {
 				logger.error("InterProcessCommunication failed");
@@ -84,15 +84,39 @@ public final class SpringBootApplication {
 		return false;
 	}
 	
-	private static void launchGui(final String[] args, final Thread serverThread) {
+	private static void launch(final String[] args, final Thread serverThread) {
 		logger.trace("System's Log4j2 Configuration File: {}", () -> System.getProperty("log4j.configurationFile"));
 		logger.info(
 				"Launch arguments: {}\nMax Heap Space: {}mb.",
 				() -> Arrays.toString(args),
 				() -> Runtime.getRuntime().maxMemory() / 1_048_576L);
 		
+		boolean noGui = false;
+		for (final String arg : args) {
+			if ("--noGUI".equalsIgnoreCase(arg)) {
+				noGui = true;
+				break;
+			}
+		}
+		if (noGui) {
+			launchNoGui(args, serverThread);
+		} else {
+			launchGui(args, serverThread);
+		}
+	}
+	
+	private static void launchNoGui(final String[] args, final Thread serverThread) {
+		final NoGuiApplication app = new NoGuiApplication(args, serverThread);
+		app.start();
+	}
+	
+	private static void launchGui(final String[] args, final Thread serverThread) {
 		setJavaFxPreloader(AppPreloader.class.getCanonicalName());
 		Application.launch(JavafxApplication.class, argsWithServerThread(args, serverThread));
+	}
+	
+	private static void setJavaFxPreloader(final String canonicalPath) {
+		System.setProperty("javafx.preloader", canonicalPath);
 	}
 	
 	private static String[] argsWithServerThread(final String[] args, final Thread serverThread) {
@@ -104,10 +128,6 @@ public final class SpringBootApplication {
 			return destArray;
 		}
 		return args;
-	}
-	
-	private static void setJavaFxPreloader(final String canonicalPath) {
-		System.setProperty("javafx.preloader", canonicalPath);
 	}
 	
 }
