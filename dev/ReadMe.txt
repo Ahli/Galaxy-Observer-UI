@@ -25,3 +25,4 @@ javaw -jar D:\GalaxyObsUI\dev\compile-spring-boot.jar --compileRun="$(CURRENT_DI
 There are two modes supported:
 - If the Builder is already running, the commands are transferred. The output is send back and shown in the console.
 - If the Builder is not running, the Builder is booting, performs the task and exits itself again, if there was no error.
+	- add "--noGUI" to run without UI
