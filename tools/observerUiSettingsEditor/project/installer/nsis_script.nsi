@@ -1,11 +1,12 @@
 ; Galaxy Observer UI Settings Editor - NSIS Installer Creation Script
 ;---------------------------------------------------------------------
+Unicode True
 !define APPNAME "Observer UI Settings Editor"
 !define COMPANYNAME "Ahli"
 !define DESCRIPTION "App to edit Observer Interface files for StarCraft II and Heroes of the Storm."
 
 ; This is the size (in kB) of all the files copied into "Program Files"
-!define INSTALLSIZE 55215
+!define INSTALLSIZE 60770
 
 ; The name of the installer
 Name "${COMPANYNAME} - ${APPNAME}"
