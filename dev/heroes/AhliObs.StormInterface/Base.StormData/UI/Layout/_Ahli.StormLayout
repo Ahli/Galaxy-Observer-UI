@@ -1114,35 +1114,41 @@
 	<!-- TODO selected-unit-player-vision-support, non 5vs5 -->
 	<Frame type="Frame" name="Item" file="KillLog">
 		<!-- DEBUG CODE -->
+		<Constant name="debug" val="true"/>
 		<Frame type="Label" name="DebugLabel1">
 			<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
 			<Anchor side="Right" relative="$parent" pos="Max" offset="-100"/>
-			<Visible val="false"/>
+			<Visible val="#debug"/>
 		</Frame>
 		<Frame type="Label" name="DebugLabel2">
 			<Anchor side="Top" relative="$parent" pos="Min" offset="20"/>
 			<Anchor side="Right" relative="$parent" pos="Max" offset="-100"/>
-			<Visible val="false"/>
+			<Visible val="#debug"/>
 		</Frame>
 		<Frame type="Label" name="DebugLabel3">
 			<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
 			<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-			<Visible val="false"/>
+			<Visible val="#debug"/>
 		</Frame>
 		<Frame type="Label" name="DebugLabel4">
 			<Anchor side="Top" relative="$parent" pos="Min" offset="20"/>
 			<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-			<Visible val="false"/>
+			<Visible val="#debug"/>
 		</Frame>
 		<Frame type="Label" name="DebugLabel5">
 			<Anchor side="Top" relative="$parent" pos="Min" offset="40"/>
 			<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-			<Visible val="false"/>
+			<Visible val="#debug"/>
 		</Frame>
 		<Frame type="Label" name="DebugLabel6">
 			<Anchor side="Top" relative="$parent" pos="Min" offset="60"/>
 			<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
-			<Visible val="false"/>
+			<Visible val="#debug"/>
+		</Frame>
+		<Frame type="Label" name="DebugLabel7">
+			<Anchor side="Top" relative="$parent" pos="Min" offset="40"/>
+			<Anchor side="Right" relative="$parent" pos="Max" offset="-100"/>
+			<Visible val="#debug"/>
 		</Frame>
 		
 		<StateGroup name="SrcColorDebug">
@@ -1270,8 +1276,52 @@
 			</State>
 		</StateGroup>
 
+		<StateGroup name="VisionOnCreation">
+			<DefaultState val="Dflt"/>
+			<State name="Red"><!-- visible && notYetLockedIn && in red team vision -->
+				<When type="Property" visible="true"/>
+				<When type="Property" frame="StateVisionOnCreationNotYetLockedIn" visible="true"/>
+				<When type="Property" frame="$VisionPulldown" operator="GreaterThan" SelectedIndex="5"/>
+				<When type="Property" frame="$VisionPulldown" operator="LessThan" SelectedIndex="11"/>
+				<Action type="SetProperty" frame="DebugLabel7" undo="false" text="vc_red"/>
+				<Action type="SetProperty" frame="StateVisionOnCreationNotYetLockedIn" undo="false" visible="false"/>
+				<Action type="SetProperty" frame="StateVisionOncreationWasRed" undo="false" visible="true"/>
+			</State>
+			<State name="NotRed1"><!-- visible && notYetLockedIn && not in red team vision -->
+				<When type="Property" visible="true"/>
+				<When type="Property" frame="StateVisionOnCreationNotYetLockedIn" visible="true"/>
+				<When type="Property" frame="$VisionPulldown" operator="LessThan" SelectedIndex="6"/>
+				<Action type="SetProperty" frame="DebugLabel7" undo="false" text="vc_notRed1"/>
+				<Action type="SetProperty" frame="StateVisionOnCreationNotYetLockedIn" undo="false" visible="false"/>
+				<Action type="SetProperty" frame="StateVisionOncreationWasRed" undo="false" visible="false"/>
+			</State>
+			<State name="NotRed2"><!-- visible && notYetLockedIn && not in red team vision -->
+				<When type="Property" visible="true"/>
+				<When type="Property" frame="StateVisionOnCreationNotYetLockedIn" visible="true"/>
+				<When type="Property" frame="$VisionPulldown" operator="GreaterThan" SelectedIndex="10"/>
+				<Action type="SetProperty" frame="DebugLabel7" undo="false" text="vc_notRed2"/>
+				<Action type="SetProperty" frame="StateVisionOnCreationNotYetLockedIn" undo="false" visible="false"/>
+				<Action type="SetProperty" frame="StateVisionOncreationWasRed" undo="false" visible="false"/>
+			</State>
+			<State name="Reset">
+				<When type="Property" visible="false"/>
+				<Action type="SetProperty" frame="DebugLabel7" undo="false" text=""/>
+				<Action type="SetProperty" frame="StateVisionOnCreationNotYetLockedIn" undo="false" visible="true"/>
+			</State>
+			<State name="Dflt"/>
+		</StateGroup>
+		<Frame type="Frame" name="StateVisionOnCreationNotYetLockedIn">
+			<Anchor relative="$parent"/>
+			<Alpha val="0"/>
+		</Frame>
+		<Frame type="Frame" name="StateVisionOncreationWasRed">
+			<Anchor relative="$parent"/>
+			<Visible val="false"/>
+			<Alpha val="0"/>
+		</Frame>
+		
 		<Frame type="Frame" name="SrcPortrait">
-			<StateGroup name="Colors">
+			<StateGroup name="Colors"> <!-- TODO fix display of Chen suiciding using stagger => save player vision where the frame became visible in -->
 				<DefaultState val="Dflt"/>
 				<!-- @Override -->
 				<State name="Blue"><!-- blue & not blue & not in red player vision => blue -->
@@ -1854,18 +1904,8 @@
 					<Action type="SetState" frame="QuestResetIcon3/StrikethroughFrame" group="Colors" state="Blue"/>
 					<Action type="SetState" frame="QuestResetIcon4/StrikethroughFrame" group="Colors" state="Blue"/>
 				</State>
-				<!-- @Override -->
-				<State name="Purple"><!-- should never be visible => just use blue and make the image more transparent -->
-					<Action type="SetProperty" frame="PortraitBorder" LightAdjustColor="{$ancestor[@name=KillLogPanel]/NexusColors/@AdditionalColor[0]}"/>
-					<Action type="SetProperty" frame="PortraitBorder" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/NexusColors/@Color}"/>
-					<Action type="SetProperty" frame="PortraitBorder" texture="@UI/HUD_KillLog_Portrait_Border_Blue"/>
-					<Action type="SetProperty" frame="PortraitBorder" alpha="64"/>
-					<Action type="SetProperty" frame="$parent/DebugLabel2" text="purple"/>
-					<Action type="SetState" frame="StrikethroughFrame" group="Colors" state="Blue"/>
-					<Action type="SetState" frame="QuestResetIcon1/StrikethroughFrame" group="Colors" state="Blue"/>
-					<Action type="SetState" frame="QuestResetIcon2/StrikethroughFrame" group="Colors" state="Blue"/>
-					<Action type="SetState" frame="QuestResetIcon3/StrikethroughFrame" group="Colors" state="Blue"/>
-					<Action type="SetState" frame="QuestResetIcon4/StrikethroughFrame" group="Colors" state="Blue"/>
+				<State name="Dflt"><!-- should never be visible -->
+					<Action type="SetProperty" frame="$parent/DebugLabel2" text="dflt"/>
 				</State>
 			</StateGroup>
 			<!-- actions added to Colors stategroup... replaced these with a bogus action -->
