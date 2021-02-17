@@ -1114,7 +1114,7 @@
 	<!-- TODO selected-unit-player-vision-support, non 5vs5 -->
 	<Frame type="Frame" name="Item" file="KillLog">
 		<!-- DEBUG CODE -->
-		<Constant name="debug" val="true"/>
+		<Constant name="debug" val="false"/>
 		<Frame type="Label" name="DebugLabel1">
 			<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
 			<Anchor side="Right" relative="$parent" pos="Max" offset="-100"/>
@@ -1148,6 +1148,16 @@
 		<Frame type="Label" name="DebugLabel7">
 			<Anchor side="Top" relative="$parent" pos="Min" offset="40"/>
 			<Anchor side="Right" relative="$parent" pos="Max" offset="-100"/>
+			<Visible val="#debug"/>
+		</Frame>
+		<Frame type="Label" name="DebugLabel8">
+			<Anchor side="Top" relative="$parent" pos="Min" offset="60"/>
+			<Anchor side="Right" relative="$parent" pos="Max" offset="-100"/>
+			<Visible val="#debug"/>
+		</Frame>
+		<Frame type="Label" name="DebugLabel9">
+			<Anchor side="Top" relative="$parent" pos="Min" offset="60"/>
+			<Anchor side="Right" relative="$parent" pos="Max" offset="-200"/>
 			<Visible val="#debug"/>
 		</Frame>
 		
@@ -1276,7 +1286,7 @@
 			</State>
 		</StateGroup>
 
-		<StateGroup name="VisionOnCreation">
+		<StateGroup name="VisionOnCreation"><!-- cannot use this state as condition in other as state is only temporary -->
 			<DefaultState val="Dflt"/>
 			<State name="Red"><!-- visible && notYetLockedIn && in red team vision -->
 				<When type="Property" visible="true"/>
@@ -1285,7 +1295,7 @@
 				<When type="Property" frame="$VisionPulldown" operator="LessThan" SelectedIndex="11"/>
 				<Action type="SetProperty" frame="DebugLabel7" undo="false" text="vc_red"/>
 				<Action type="SetProperty" frame="StateVisionOnCreationNotYetLockedIn" undo="false" visible="false"/>
-				<Action type="SetProperty" frame="StateVisionOncreationWasRed" undo="false" visible="true"/>
+				<Action type="SetProperty" frame="StateVisionOnCreationWasRed" undo="false" visible="true"/>
 			</State>
 			<State name="NotRed1"><!-- visible && notYetLockedIn && not in red team vision -->
 				<When type="Property" visible="true"/>
@@ -1293,7 +1303,7 @@
 				<When type="Property" frame="$VisionPulldown" operator="LessThan" SelectedIndex="6"/>
 				<Action type="SetProperty" frame="DebugLabel7" undo="false" text="vc_notRed1"/>
 				<Action type="SetProperty" frame="StateVisionOnCreationNotYetLockedIn" undo="false" visible="false"/>
-				<Action type="SetProperty" frame="StateVisionOncreationWasRed" undo="false" visible="false"/>
+				<Action type="SetProperty" frame="StateVisionOnCreationWasRed" undo="false" visible="false"/>
 			</State>
 			<State name="NotRed2"><!-- visible && notYetLockedIn && not in red team vision -->
 				<When type="Property" visible="true"/>
@@ -1301,7 +1311,7 @@
 				<When type="Property" frame="$VisionPulldown" operator="GreaterThan" SelectedIndex="10"/>
 				<Action type="SetProperty" frame="DebugLabel7" undo="false" text="vc_notRed2"/>
 				<Action type="SetProperty" frame="StateVisionOnCreationNotYetLockedIn" undo="false" visible="false"/>
-				<Action type="SetProperty" frame="StateVisionOncreationWasRed" undo="false" visible="false"/>
+				<Action type="SetProperty" frame="StateVisionOnCreationWasRed" undo="false" visible="false"/>
 			</State>
 			<State name="Reset">
 				<When type="Property" visible="false"/>
@@ -1314,366 +1324,102 @@
 			<Anchor relative="$parent"/>
 			<Alpha val="0"/>
 		</Frame>
-		<Frame type="Frame" name="StateVisionOncreationWasRed">
+		<Frame type="Frame" name="StateVisionOnCreationWasRed">
 			<Anchor relative="$parent"/>
 			<Visible val="false"/>
 			<Alpha val="0"/>
 		</Frame>
 		
 		<Frame type="Frame" name="SrcPortrait">
-			<StateGroup name="Colors"> <!-- TODO fix display of Chen suiciding using stagger => save player vision where the frame became visible in -->
-				<DefaultState val="Dflt"/>
+			<StateGroup name="Colors">
 				<!-- @Override -->
-				<State name="Blue"><!-- blue & not blue & not in red player vision => blue -->
-					<When type="AnimationState" frame="$parent" SrcColor="Blue"/>
-					<When type="AnimationState" frame="$parent" operator="NotEqual" TgtColor="Blue"/>
-					<When type="Property" frame="$VisionPulldown" operator="LessThan" SelectedIndex="6"/>
+				<State name="Blue"><!-- kill: red & red & created in red => blue -->
 			        <When type="AnimationState" frame="$parent" KillLogItemType="Kill"/>
-					<When type="StateGroup" frame="$parent/BackgroundCutscene2" operator="NotEqual" CutsceneStatus="Inactive"/>
-					<Action type="SetProperty" frame="PortraitBorder" LightAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[0]}"/>
-					<Action type="SetProperty" frame="PortraitBorder" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@Color}"/>
-					<Action type="SetProperty" frame="PortraitBorder" texture="@UI/HUD_KillLog_Portrait_Border_Blue"/>
-					<Action type="SetProperty" frame="$parent/DebugLabel1" text="s_blue"/>
-					<Action type="SendEvent" frame="$parent/BackgroundCutscene2" event="SetAllyColor"/>
-					<Action type="SetProperty" frame="$parent/VsImage/VsImageInset" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@Color}"/>
-					<Action type="SetProperty" frame="$parent/VsImage" LightAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[1]}"/>
-					<Action type="SetProperty" frame="$parent/VsImage" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[1]}"/>
-				</State>
-				<!-- @Override -->
-				<State name="Red"><!-- red & not red & not in red player vision => red -->
-					<When type="AnimationState" frame="$parent" SrcColor="Red"/>
-					<When type="AnimationState" frame="$parent" operator="NotEqual" TgtColor="Red"/>
-					<When type="Property" frame="$VisionPulldown" operator="LessThan" SelectedIndex="6"/>
-			        <When type="AnimationState" frame="$parent" KillLogItemType="Kill"/>
-					<When type="StateGroup" frame="$parent/BackgroundCutscene2" operator="NotEqual" CutsceneStatus="Inactive"/>
-					<Action type="SetProperty" frame="PortraitBorder" LightAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[0]}"/>
-					<Action type="SetProperty" frame="PortraitBorder" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@Color}"/>
-					<Action type="SetProperty" frame="PortraitBorder" texture="@UI/HUD_KillLog_Portrait_Border_Red"/>
-					<Action type="SetProperty" frame="$parent/DebugLabel1" text="s_red"/>
-					<Action type="SendEvent" frame="$parent/BackgroundCutscene2" event="SetEnemyColor"/>
-					<Action type="SetProperty" frame="$parent/VsImage/VsImageInset" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@Color}"/>
-					<Action type="SetProperty" frame="$parent/VsImage" LightAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[1]}"/>
-					<Action type="SetProperty" frame="$parent/VsImage" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[1]}"/>
-				</State>
-				<State name="Blue2"><!-- red & red & not red player vision => blue -->
 					<When type="AnimationState" frame="$parent" SrcColor="Red"/>
 					<When type="AnimationState" frame="$parent" TgtColor="Red"/>
-					<When type="Property" frame="$VisionPulldown" operator="LessThan" SelectedIndex="6"/>
+			        <When type="Property" frame="$parent/StateVisionOnCreationWasRed" visible="true"/>
+					<Action type="SetState" group="PortraitColor" undo="false" state="Blue"/>
+					<Action type="SetProperty" frame="$parent/DebugLabel1" text="s_blue1"/>
+				</State>
+				<!-- @Override -->
+				<State name="Red"><!-- kill: blue & blue & created in red => red -->
 			        <When type="AnimationState" frame="$parent" KillLogItemType="Kill"/>
-					<When type="StateGroup" frame="$parent/BackgroundCutscene2" operator="NotEqual" CutsceneStatus="Inactive"/>
-					<Action type="SetProperty" frame="PortraitBorder" LightAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[0]}"/>
-					<Action type="SetProperty" frame="PortraitBorder" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@Color}"/>
-					<Action type="SetProperty" frame="PortraitBorder" texture="@UI/HUD_KillLog_Portrait_Border_Blue"/>
+					<When type="AnimationState" frame="$parent" SrcColor="Blue"/>
+					<When type="AnimationState" frame="$parent" TgtColor="Blue"/>
+			        <When type="Property" frame="$parent/StateVisionOnCreationWasRed" visible="true"/>
+					<Action type="SetState" group="PortraitColor" undo="false" state="Red"/>
+					<Action type="SetProperty" frame="$parent/DebugLabel1" text="s_red1"/>
+				</State>
+				<!-- @Override -->
+				<State name="Purple"><!-- purple => purple -->
+					<When type="AnimationState" frame="$parent" SrcColor="Purple"/>
+					<Action type="SetState" group="PortraitColor" undo="false" state="Purple"/>
+					<Action type="SetProperty" frame="$parent/DebugLabel1" text="s_purple"/>
+				</State>
+				<State name="Blue2"><!-- kill: red & blue & created in red => blue -->
+			        <When type="AnimationState" frame="$parent" KillLogItemType="Kill"/>
+					<When type="AnimationState" frame="$parent" SrcColor="Red"/>
+					<When type="AnimationState" frame="$parent" TgtColor="Blue"/>
+			        <When type="Property" frame="$parent/StateVisionOnCreationWasRed" visible="true"/>
+					<Action type="SetState" group="PortraitColor" undo="false" state="Blue"/>
 					<Action type="SetProperty" frame="$parent/DebugLabel1" text="s_blue2"/>
-					<Action type="SendEvent" frame="$parent/BackgroundCutscene2" event="SetAllyColor"/>
-					<Action type="SetProperty" frame="$parent/VsImage/VsImageInset" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@Color}"/>
-					<Action type="SetProperty" frame="$parent/VsImage" LightAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[1]}"/>
-					<Action type="SetProperty" frame="$parent/VsImage" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[1]}"/>
 				</State>
-				<State name="Red2"><!-- blue & blue & not red player vision => red -->
-					<When type="AnimationState" frame="$parent" SrcColor="Blue"/>
-					<When type="AnimationState" frame="$parent" TgtColor="Blue"/>
-					<When type="Property" frame="$VisionPulldown" operator="LessThan" SelectedIndex="6"/>
+				<State name="Red2"><!-- kill: blue & red & created in red => red -->
 			        <When type="AnimationState" frame="$parent" KillLogItemType="Kill"/>
-					<When type="StateGroup" frame="$parent/BackgroundCutscene2" operator="NotEqual" CutsceneStatus="Inactive"/>
-					<Action type="SetProperty" frame="PortraitBorder" LightAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[0]}"/>
-					<Action type="SetProperty" frame="PortraitBorder" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@Color}"/>
-					<Action type="SetProperty" frame="PortraitBorder" texture="@UI/HUD_KillLog_Portrait_Border_Red"/>
+					<When type="AnimationState" frame="$parent" SrcColor="Blue"/>
+					<When type="AnimationState" frame="$parent" TgtColor="Red"/>
+			        <When type="Property" frame="$parent/StateVisionOnCreationWasRed" visible="true"/>
+					<Action type="SetState" group="PortraitColor" undo="false" state="Red"/>
 					<Action type="SetProperty" frame="$parent/DebugLabel1" text="s_red2"/>
-					<Action type="SendEvent" frame="$parent/BackgroundCutscene2" event="SetEnemyColor"/>
-					<Action type="SetProperty" frame="$parent/VsImage/VsImageInset" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@Color}"/>
-					<Action type="SetProperty" frame="$parent/VsImage" LightAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[1]}"/>
-					<Action type="SetProperty" frame="$parent/VsImage" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[1]}"/>
 				</State>
-				<State name="Blue3"><!-- red & red & not red player vision => blue -->
+				<State name="Blue3"><!-- quest: red & in red player vision => blue -->
+			        <When type="AnimationState" frame="$parent" KillLogItemType="Quest"/>
 					<When type="AnimationState" frame="$parent" SrcColor="Red"/>
-					<When type="AnimationState" frame="$parent" TgtColor="Red"/>
-					<When type="Property" frame="$VisionPulldown" operator="GreaterThan" SelectedIndex="10"/>
-			        <When type="AnimationState" frame="$parent" KillLogItemType="Kill"/>
-					<When type="StateGroup" frame="$parent/BackgroundCutscene2" operator="NotEqual" CutsceneStatus="Inactive"/>
-					<Action type="SetProperty" frame="PortraitBorder" LightAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[0]}"/>
-					<Action type="SetProperty" frame="PortraitBorder" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@Color}"/>
-					<Action type="SetProperty" frame="PortraitBorder" texture="@UI/HUD_KillLog_Portrait_Border_Blue"/>
+					<When type="Property" frame="$VisionPulldown" operator="GreaterThan" SelectedIndex="5"/>
+					<When type="Property" frame="$VisionPulldown" operator="LessThan" SelectedIndex="11"/>
+					<Action type="SetState" group="PortraitColor" undo="false" state="Blue"/>
 					<Action type="SetProperty" frame="$parent/DebugLabel1" text="s_blue3"/>
-					<Action type="SendEvent" frame="$parent/BackgroundCutscene2" event="SetAllyColor"/>
-					<Action type="SetProperty" frame="$parent/VsImage/VsImageInset" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@Color}"/>
-					<Action type="SetProperty" frame="$parent/VsImage" LightAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[1]}"/>
-					<Action type="SetProperty" frame="$parent/VsImage" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[1]}"/>
 				</State>
-				<State name="Red3"><!-- blue & blue & not red player vision => red -->
+				<State name="Red3"><!-- quest: blue & in red player vision => red -->
+			        <When type="AnimationState" frame="$parent" KillLogItemType="Quest"/>
 					<When type="AnimationState" frame="$parent" SrcColor="Blue"/>
-					<When type="AnimationState" frame="$parent" TgtColor="Blue"/>
-					<When type="Property" frame="$VisionPulldown" operator="GreaterThan" SelectedIndex="10"/>
-			        <When type="AnimationState" frame="$parent" KillLogItemType="Kill"/>
-					<When type="StateGroup" frame="$parent/BackgroundCutscene2" operator="NotEqual" CutsceneStatus="Inactive"/>
-					<Action type="SetProperty" frame="PortraitBorder" LightAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[0]}"/>
-					<Action type="SetProperty" frame="PortraitBorder" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@Color}"/>
-					<Action type="SetProperty" frame="PortraitBorder" texture="@UI/HUD_KillLog_Portrait_Border_Red"/>
+					<When type="Property" frame="$VisionPulldown" operator="GreaterThan" SelectedIndex="5"/>
+					<When type="Property" frame="$VisionPulldown" operator="LessThan" SelectedIndex="11"/>
+					<Action type="SetState" group="PortraitColor" undo="false" state="Red"/>
 					<Action type="SetProperty" frame="$parent/DebugLabel1" text="s_red3"/>
-					<Action type="SendEvent" frame="$parent/BackgroundCutscene2" event="SetEnemyColor"/>
-					<Action type="SetProperty" frame="$parent/VsImage/VsImageInset" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@Color}"/>
-					<Action type="SetProperty" frame="$parent/VsImage" LightAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[1]}"/>
-					<Action type="SetProperty" frame="$parent/VsImage" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[1]}"/>
 				</State>
-				<State name="Blue4"><!-- blue & blue & red player vision => blue -->
+				<State name="Blue4"><!-- blue => blue -->
 					<When type="AnimationState" frame="$parent" SrcColor="Blue"/>
-					<When type="AnimationState" frame="$parent" TgtColor="Blue"/>
-					<When type="Property" frame="$VisionPulldown" operator="GreaterThan" SelectedIndex="5"/>
-					<When type="Property" frame="$VisionPulldown" operator="LessThan" SelectedIndex="11"/>
-			        <When type="AnimationState" frame="$parent" KillLogItemType="Kill"/>
-					<When type="StateGroup" frame="$parent/BackgroundCutscene2" operator="NotEqual" CutsceneStatus="Inactive"/>
-					<Action type="SetProperty" frame="PortraitBorder" LightAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[0]}"/>
-					<Action type="SetProperty" frame="PortraitBorder" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@Color}"/>
-					<Action type="SetProperty" frame="PortraitBorder" texture="@UI/HUD_KillLog_Portrait_Border_Blue"/>
+					<Action type="SetState" group="PortraitColor" undo="false" state="Blue"/>
 					<Action type="SetProperty" frame="$parent/DebugLabel1" text="s_blue4"/>
-					<Action type="SendEvent" frame="$parent/BackgroundCutscene2" event="SetAllyColor"/>
-					<Action type="SetProperty" frame="$parent/VsImage/VsImageInset" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@Color}"/>
-					<Action type="SetProperty" frame="$parent/VsImage" LightAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[1]}"/>
-					<Action type="SetProperty" frame="$parent/VsImage" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[1]}"/>
 				</State>
-				<State name="Red4"><!-- red & red & red player vision => red -->
+				<State name="Red4"><!-- red => red -->
 					<When type="AnimationState" frame="$parent" SrcColor="Red"/>
-					<When type="AnimationState" frame="$parent" TgtColor="Red"/>
-					<When type="Property" frame="$VisionPulldown" operator="GreaterThan" SelectedIndex="5"/>
-					<When type="Property" frame="$VisionPulldown" operator="LessThan" SelectedIndex="11"/>
-			        <When type="AnimationState" frame="$parent" KillLogItemType="Kill"/>
-					<When type="StateGroup" frame="$parent/BackgroundCutscene2" operator="NotEqual" CutsceneStatus="Inactive"/>
-					<Action type="SetProperty" frame="PortraitBorder" LightAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[0]}"/>
-					<Action type="SetProperty" frame="PortraitBorder" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@Color}"/>
-					<Action type="SetProperty" frame="PortraitBorder" texture="@UI/HUD_KillLog_Portrait_Border_Red"/>
+					<Action type="SetState" group="PortraitColor" undo="false" state="Red"/>
 					<Action type="SetProperty" frame="$parent/DebugLabel1" text="s_red4"/>
-					<Action type="SendEvent" frame="$parent/BackgroundCutscene2" event="SetEnemyColor"/>
-					<Action type="SetProperty" frame="$parent/VsImage/VsImageInset" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@Color}"/>
-					<Action type="SetProperty" frame="$parent/VsImage" LightAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[1]}"/>
-					<Action type="SetProperty" frame="$parent/VsImage" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[1]}"/>
-				</State>
-				<State name="Blue5"><!-- blue & not blue & not in red player vision => blue -->
-					<When type="AnimationState" frame="$parent" SrcColor="Blue"/>
-					<When type="AnimationState" frame="$parent" operator="NotEqual" TgtColor="Blue"/>
-					<When type="Property" frame="$VisionPulldown" operator="GreaterThan" SelectedIndex="10"/>
-			        <When type="AnimationState" frame="$parent" KillLogItemType="Kill"/>
-					<When type="StateGroup" frame="$parent/BackgroundCutscene2" operator="NotEqual" CutsceneStatus="Inactive"/>
-					<Action type="SetProperty" frame="PortraitBorder" LightAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[0]}"/>
-					<Action type="SetProperty" frame="PortraitBorder" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@Color}"/>
-					<Action type="SetProperty" frame="PortraitBorder" texture="@UI/HUD_KillLog_Portrait_Border_Blue"/>
-					<Action type="SetProperty" frame="$parent/DebugLabel1" text="s_blue5"/>
-					<Action type="SendEvent" frame="$parent/BackgroundCutscene2" event="SetAllyColor"/>
-					<Action type="SetProperty" frame="$parent/VsImage/VsImageInset" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@Color}"/>
-					<Action type="SetProperty" frame="$parent/VsImage" LightAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[1]}"/>
-					<Action type="SetProperty" frame="$parent/VsImage" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[1]}"/>
-				</State>
-				<State name="Red5"><!-- red & not red & not in red player vision => red -->
-					<When type="AnimationState" frame="$parent" SrcColor="Red"/>
-					<When type="AnimationState" frame="$parent" operator="NotEqual" TgtColor="Red"/>
-					<When type="Property" frame="$VisionPulldown" operator="GreaterThan" SelectedIndex="10"/>
-			        <When type="AnimationState" frame="$parent" KillLogItemType="Kill"/>
-					<When type="StateGroup" frame="$parent/BackgroundCutscene2" operator="NotEqual" CutsceneStatus="Inactive"/>
-					<Action type="SetProperty" frame="PortraitBorder" LightAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[0]}"/>
-					<Action type="SetProperty" frame="PortraitBorder" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@Color}"/>
-					<Action type="SetProperty" frame="PortraitBorder" texture="@UI/HUD_KillLog_Portrait_Border_Red"/>
-					<Action type="SetProperty" frame="$parent/DebugLabel1" text="s_red5"/>
-					<Action type="SendEvent" frame="$parent/BackgroundCutscene2" event="SetEnemyColor"/>
-					<Action type="SetProperty" frame="$parent/VsImage/VsImageInset" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@Color}"/>
-					<Action type="SetProperty" frame="$parent/VsImage" LightAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[1]}"/>
-					<Action type="SetProperty" frame="$parent/VsImage" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[1]}"/>
-				</State>
-				<State name="Blue6"><!-- red & not red & in red player vision => blue -->
-					<When type="AnimationState" frame="$parent" SrcColor="Red"/>
-					<When type="AnimationState" frame="$parent" operator="NotEqual" TgtColor="Red"/>
-					<When type="Property" frame="$VisionPulldown" operator="GreaterThan" SelectedIndex="5"/>
-					<When type="Property" frame="$VisionPulldown" operator="LessThan" SelectedIndex="11"/>
-			        <When type="AnimationState" frame="$parent" KillLogItemType="Kill"/>
-					<When type="StateGroup" frame="$parent/BackgroundCutscene2" operator="NotEqual" CutsceneStatus="Inactive"/>
-					<Action type="SetProperty" frame="PortraitBorder" LightAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[0]}"/>
-					<Action type="SetProperty" frame="PortraitBorder" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@Color}"/>
-					<Action type="SetProperty" frame="PortraitBorder" texture="@UI/HUD_KillLog_Portrait_Border_Blue"/>
-					<Action type="SetProperty" frame="$parent/DebugLabel1" text="s_blue6"/>
-					<Action type="SendEvent" frame="$parent/BackgroundCutscene2" event="SetAllyColor"/>
-					<Action type="SetProperty" frame="$parent/VsImage/VsImageInset" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@Color}"/>
-					<Action type="SetProperty" frame="$parent/VsImage" LightAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[1]}"/>
-					<Action type="SetProperty" frame="$parent/VsImage" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[1]}"/>
-				</State>
-				<State name="Red6"><!-- blue & not blue & in red player vision => red -->
-					<When type="AnimationState" frame="$parent" SrcColor="Blue"/>
-					<When type="AnimationState" frame="$parent" operator="NotEqual" TgtColor="Blue"/>
-					<When type="Property" frame="$VisionPulldown" operator="GreaterThan" SelectedIndex="5"/>
-					<When type="Property" frame="$VisionPulldown" operator="LessThan" SelectedIndex="11"/>
-			        <When type="AnimationState" frame="$parent" KillLogItemType="Kill"/>
-					<When type="StateGroup" frame="$parent/BackgroundCutscene2" operator="NotEqual" CutsceneStatus="Inactive"/>
-					<Action type="SetProperty" frame="PortraitBorder" LightAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[0]}"/>
-					<Action type="SetProperty" frame="PortraitBorder" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@Color}"/>
-					<Action type="SetProperty" frame="PortraitBorder" texture="@UI/HUD_KillLog_Portrait_Border_Red"/>
-					<Action type="SetProperty" frame="$parent/DebugLabel1" text="s_red6"/>
-					<Action type="SendEvent" frame="$parent/BackgroundCutscene2" event="SetEnemyColor"/>
-					<Action type="SetProperty" frame="$parent/VsImage/VsImageInset" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@Color}"/>
-					<Action type="SetProperty" frame="$parent/VsImage" LightAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[1]}"/>
-					<Action type="SetProperty" frame="$parent/VsImage" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[1]}"/>
-				</State>
-				<!-- @Override -->
-				<State name="Purple"><!-- purple & blue & not in red player vision => red -->
-					<When type="AnimationState" frame="$parent" SrcColor="Purple"/>
-					<When type="AnimationState" frame="$parent" TgtColor="Blue"/>
-					<When type="Property" frame="$VisionPulldown" operator="LessThan" SelectedIndex="6"/>
-			        <When type="AnimationState" frame="$parent" KillLogItemType="Kill"/>
-					<When type="StateGroup" frame="$parent/BackgroundCutscene2" operator="NotEqual" CutsceneStatus="Inactive"/>
-					<Action type="SetProperty" frame="PortraitBorder" LightAdjustColor="{$ancestor[@name=KillLogPanel]/NexusColors/@AdditionalColor[0]}"/>
-					<Action type="SetProperty" frame="PortraitBorder" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/NexusColors/@Color}"/>
-					<Action type="SetProperty" frame="PortraitBorder" texture="@UI/HUD_KillLog_Portrait_Border_Purple"/>
-					<Action type="SetProperty" frame="$parent/DebugLabel1" text="s_purple_red"/>
-					<Action type="SendEvent" frame="$parent/BackgroundCutscene2" event="SetEnemyColor"/>
-					<Action type="SetProperty" frame="$parent/VsImage/VsImageInset" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@Color}"/>
-					<Action type="SetProperty" frame="$parent/VsImage" LightAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[1]}"/>
-					<Action type="SetProperty" frame="$parent/VsImage" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[1]}"/>
-				</State>
-				<State name="PurpleBlue"><!-- purple & red & not in red player vision => blue -->
-					<When type="AnimationState" frame="$parent" SrcColor="Purple"/>
-					<When type="AnimationState" frame="$parent" TgtColor="Red"/>
-					<When type="Property" frame="$VisionPulldown" operator="LessThan" SelectedIndex="6"/>
-			        <When type="AnimationState" frame="$parent" KillLogItemType="Kill"/>
-					<When type="StateGroup" frame="$parent/BackgroundCutscene2" operator="NotEqual" CutsceneStatus="Inactive"/>
-					<Action type="SetProperty" frame="PortraitBorder" LightAdjustColor="{$ancestor[@name=KillLogPanel]/NexusColors/@AdditionalColor[0]}"/>
-					<Action type="SetProperty" frame="PortraitBorder" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/NexusColors/@Color}"/>
-					<Action type="SetProperty" frame="PortraitBorder" texture="@UI/HUD_KillLog_Portrait_Border_Purple"/>
-					<Action type="SetProperty" frame="$parent/DebugLabel1" text="s_purple_blue"/>
-					<Action type="SendEvent" frame="$parent/BackgroundCutscene2" event="SetAllyColor"/>
-					<Action type="SetProperty" frame="$parent/VsImage/VsImageInset" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@Color}"/>
-					<Action type="SetProperty" frame="$parent/VsImage" LightAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[1]}"/>
-					<Action type="SetProperty" frame="$parent/VsImage" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[1]}"/>
-				</State>
-				<State name="PurpleRed2"><!-- purple & blue & not in red player vision => red -->
-					<When type="AnimationState" frame="$parent" SrcColor="Purple"/>
-					<When type="AnimationState" frame="$parent" TgtColor="Blue"/>
-					<When type="Property" frame="$VisionPulldown" operator="GreaterThan" SelectedIndex="10"/>
-			        <When type="AnimationState" frame="$parent" KillLogItemType="Kill"/>
-					<When type="StateGroup" frame="$parent/BackgroundCutscene2" operator="NotEqual" CutsceneStatus="Inactive"/>
-					<Action type="SetProperty" frame="PortraitBorder" LightAdjustColor="{$ancestor[@name=KillLogPanel]/NexusColors/@AdditionalColor[0]}"/>
-					<Action type="SetProperty" frame="PortraitBorder" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/NexusColors/@Color}"/>
-					<Action type="SetProperty" frame="PortraitBorder" texture="@UI/HUD_KillLog_Portrait_Border_Purple"/>
-					<Action type="SetProperty" frame="$parent/DebugLabel1" text="s_purple_red2"/>
-					<Action type="SendEvent" frame="$parent/BackgroundCutscene2" event="SetEnemyColor"/>
-					<Action type="SetProperty" frame="$parent/VsImage/VsImageInset" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@Color}"/>
-					<Action type="SetProperty" frame="$parent/VsImage" LightAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[1]}"/>
-					<Action type="SetProperty" frame="$parent/VsImage" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[1]}"/>
-				</State>
-				<State name="PurpleBlue2"><!-- purple & red & not in red player vision => blue -->
-					<When type="AnimationState" frame="$parent" SrcColor="Purple"/>
-					<When type="AnimationState" frame="$parent" TgtColor="Red"/>
-					<When type="Property" frame="$VisionPulldown" operator="GreaterThan" SelectedIndex="10"/>
-			        <When type="AnimationState" frame="$parent" KillLogItemType="Kill"/>
-					<When type="StateGroup" frame="$parent/BackgroundCutscene2" operator="NotEqual" CutsceneStatus="Inactive"/>
-					<Action type="SetProperty" frame="PortraitBorder" LightAdjustColor="{$ancestor[@name=KillLogPanel]/NexusColors/@AdditionalColor[0]}"/>
-					<Action type="SetProperty" frame="PortraitBorder" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/NexusColors/@Color}"/>
-					<Action type="SetProperty" frame="PortraitBorder" texture="@UI/HUD_KillLog_Portrait_Border_Purple"/>
-					<Action type="SetProperty" frame="$parent/DebugLabel1" text="s_purple_blue2"/>
-					<Action type="SendEvent" frame="$parent/BackgroundCutscene2" event="SetAllyColor"/>
-					<Action type="SetProperty" frame="$parent/VsImage/VsImageInset" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@Color}"/>
-					<Action type="SetProperty" frame="$parent/VsImage" LightAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[1]}"/>
-					<Action type="SetProperty" frame="$parent/VsImage" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[1]}"/>
-				</State>
-				<State name="PurpleRed3"><!-- purple & red & in red player vision => red -->
-					<When type="AnimationState" frame="$parent" SrcColor="Purple"/>
-					<When type="AnimationState" frame="$parent" TgtColor="Red"/>
-					<When type="Property" frame="$VisionPulldown" operator="GreaterThan" SelectedIndex="5"/>
-					<When type="Property" frame="$VisionPulldown" operator="LessThan" SelectedIndex="11"/>
-			        <When type="AnimationState" frame="$parent" KillLogItemType="Kill"/>
-					<When type="StateGroup" frame="$parent/BackgroundCutscene2" operator="NotEqual" CutsceneStatus="Inactive"/>
-					<Action type="SetProperty" frame="PortraitBorder" LightAdjustColor="{$ancestor[@name=KillLogPanel]/NexusColors/@AdditionalColor[0]}"/>
-					<Action type="SetProperty" frame="PortraitBorder" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/NexusColors/@Color}"/>
-					<Action type="SetProperty" frame="PortraitBorder" texture="@UI/HUD_KillLog_Portrait_Border_Purple"/>
-					<Action type="SetProperty" frame="$parent/DebugLabel1" text="s_purple_red3"/>
-					<Action type="SendEvent" frame="$parent/BackgroundCutscene2" event="SetEnemyColor"/>
-					<Action type="SetProperty" frame="$parent/VsImage/VsImageInset" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@Color}"/>
-					<Action type="SetProperty" frame="$parent/VsImage" LightAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[1]}"/>
-					<Action type="SetProperty" frame="$parent/VsImage" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[1]}"/>
-				</State>
-				<State name="PurpleBlue3"><!-- purple & blue & in red player vision => blue -->
-					<When type="AnimationState" frame="$parent" SrcColor="Purple"/>
-					<When type="AnimationState" frame="$parent" TgtColor="Blue"/>
-					<When type="Property" frame="$VisionPulldown" operator="GreaterThan" SelectedIndex="5"/>
-					<When type="Property" frame="$VisionPulldown" operator="LessThan" SelectedIndex="11"/>
-			        <When type="AnimationState" frame="$parent" KillLogItemType="Kill"/>
-					<When type="StateGroup" frame="$parent/BackgroundCutscene2" operator="NotEqual" CutsceneStatus="Inactive"/>
-					<Action type="SetProperty" frame="PortraitBorder" LightAdjustColor="{$ancestor[@name=KillLogPanel]/NexusColors/@AdditionalColor[0]}"/>
-					<Action type="SetProperty" frame="PortraitBorder" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/NexusColors/@Color}"/>
-					<Action type="SetProperty" frame="PortraitBorder" texture="@UI/HUD_KillLog_Portrait_Border_Purple"/>
-					<Action type="SetProperty" frame="$parent/DebugLabel1" text="s_purple_blue3"/>
-					<Action type="SendEvent" frame="$parent/BackgroundCutscene2" event="SetAllyColor"/>
-					<Action type="SetProperty" frame="$parent/VsImage/VsImageInset" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@Color}"/>
-					<Action type="SetProperty" frame="$parent/VsImage" LightAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[1]}"/>
-					<Action type="SetProperty" frame="$parent/VsImage" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[1]}"/>
-				</State>
-				<State name="QuestBlue1"><!-- quest: blue & not in red player vision => blue -->
-					<When type="AnimationState" frame="$parent" SrcColor="Blue"/>
-					<When type="Property" frame="$VisionPulldown" operator="LessThan" SelectedIndex="6"/>
-			        <When type="AnimationState" frame="$parent" KillLogItemType="Quest"/>
-					<When type="StateGroup" frame="$parent/BackgroundCutscene2" operator="NotEqual" CutsceneStatus="Inactive"/>
-					<Action type="SetProperty" frame="PortraitBorder" LightAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[0]}"/>
-					<Action type="SetProperty" frame="PortraitBorder" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@Color}"/>
-					<Action type="SetProperty" frame="PortraitBorder" texture="@UI/HUD_KillLog_Portrait_Border_Blue"/>
-					<Action type="SetProperty" frame="$parent/DebugLabel1" text="s_quest_blue1"/>
-					<Action type="SendEvent" frame="$parent/BackgroundCutscene2" event="SetAllyColor"/>
-				</State>
-				<State name="QuestRed1"><!-- quest: red & not in red player vision => red -->
-					<When type="AnimationState" frame="$parent" SrcColor="Red"/>
-					<When type="Property" frame="$VisionPulldown" operator="LessThan" SelectedIndex="6"/>
-			        <When type="AnimationState" frame="$parent" KillLogItemType="Quest"/>
-					<When type="StateGroup" frame="$parent/BackgroundCutscene2" operator="NotEqual" CutsceneStatus="Inactive"/>
-					<Action type="SetProperty" frame="PortraitBorder" LightAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[0]}"/>
-					<Action type="SetProperty" frame="PortraitBorder" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@Color}"/>
-					<Action type="SetProperty" frame="PortraitBorder" texture="@UI/HUD_KillLog_Portrait_Border_Red"/>
-					<Action type="SetProperty" frame="$parent/DebugLabel1" text="s_quest_red1"/>
-					<Action type="SendEvent" frame="$parent/BackgroundCutscene2" event="SetEnemyColor"/>
-				</State>
-				<State name="QuestBlue2"><!-- quest: blue & not in red player vision => blue -->
-					<When type="AnimationState" frame="$parent" SrcColor="Blue"/>
-					<When type="Property" frame="$VisionPulldown" operator="GreaterThan" SelectedIndex="10"/>
-			        <When type="AnimationState" frame="$parent" KillLogItemType="Quest"/>
-					<When type="StateGroup" frame="$parent/BackgroundCutscene2" operator="NotEqual" CutsceneStatus="Inactive"/>
-					<Action type="SetProperty" frame="PortraitBorder" LightAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[0]}"/>
-					<Action type="SetProperty" frame="PortraitBorder" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@Color}"/>
-					<Action type="SetProperty" frame="PortraitBorder" texture="@UI/HUD_KillLog_Portrait_Border_Blue"/>
-					<Action type="SetProperty" frame="$parent/DebugLabel1" text="s_quest_blue2"/>
-					<Action type="SendEvent" frame="$parent/BackgroundCutscene2" event="SetAllyColor"/>
-				</State>
-				<State name="QuestRed2"><!-- quest: red & not in red player vision => red -->
-					<When type="AnimationState" frame="$parent" SrcColor="Red"/>
-					<When type="Property" frame="$VisionPulldown" operator="GreaterThan" SelectedIndex="10"/>
-			        <When type="AnimationState" frame="$parent" KillLogItemType="Quest"/>
-					<When type="StateGroup" frame="$parent/BackgroundCutscene2" operator="NotEqual" CutsceneStatus="Inactive"/>
-					<Action type="SetProperty" frame="PortraitBorder" LightAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[0]}"/>
-					<Action type="SetProperty" frame="PortraitBorder" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@Color}"/>
-					<Action type="SetProperty" frame="PortraitBorder" texture="@UI/HUD_KillLog_Portrait_Border_Red"/>
-					<Action type="SetProperty" frame="$parent/DebugLabel1" text="s_quest_red2"/>
-					<Action type="SendEvent" frame="$parent/BackgroundCutscene2" event="SetEnemyColor"/>
-				</State>
-				<State name="QuestBlue3"><!-- quest: red & in red player vision => blue -->
-					<When type="AnimationState" frame="$parent" SrcColor="Red"/>
-					<When type="Property" frame="$VisionPulldown" operator="GreaterThan" SelectedIndex="4"/>
-					<When type="Property" frame="$VisionPulldown" operator="LessThan" SelectedIndex="11"/>
-			        <When type="AnimationState" frame="$parent" KillLogItemType="Quest"/>
-					<When type="StateGroup" frame="$parent/BackgroundCutscene2" operator="NotEqual" CutsceneStatus="Inactive"/>
-					<Action type="SetProperty" frame="PortraitBorder" LightAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[0]}"/>
-					<Action type="SetProperty" frame="PortraitBorder" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@Color}"/>
-					<Action type="SetProperty" frame="PortraitBorder" texture="@UI/HUD_KillLog_Portrait_Border_Blue"/>
-					<Action type="SetProperty" frame="$parent/DebugLabel1" text="s_quest_blue3"/>
-					<Action type="SendEvent" frame="$parent/BackgroundCutscene2" event="SetAllyColor"/>
-				</State>
-				<State name="QuestRed3"><!-- quest: blue & in red player vision => red -->
-					<When type="AnimationState" frame="$parent" SrcColor="Blue"/>
-					<When type="Property" frame="$VisionPulldown" operator="GreaterThan" SelectedIndex="4"/>
-					<When type="Property" frame="$VisionPulldown" operator="LessThan" SelectedIndex="11"/>
-			        <When type="AnimationState" frame="$parent" KillLogItemType="Quest"/>
-					<When type="StateGroup" frame="$parent/BackgroundCutscene2" operator="NotEqual" CutsceneStatus="Inactive"/>
-					<Action type="SetProperty" frame="PortraitBorder" LightAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[0]}"/>
-					<Action type="SetProperty" frame="PortraitBorder" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@Color}"/>
-					<Action type="SetProperty" frame="PortraitBorder" texture="@UI/HUD_KillLog_Portrait_Border_Red"/>
-					<Action type="SetProperty" frame="$parent/DebugLabel1" text="s_quest_red3"/>
-					<Action type="SendEvent" frame="$parent/BackgroundCutscene2" event="SetEnemyColor"/>
-				</State>
-				<State name="Dflt">
-					<Action type="SetProperty" frame="DebugLabel1" text="s_dflt"/>
 				</State>
 			</StateGroup>
+			
+			<!-- State set by above StateGroup Colors -->
+			<StateGroup name="PortraitColor">
+				<State name="Blue">
+					<Action type="SetProperty" frame="PortraitBorder" undo="false" LightAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[0]}"/>
+					<Action type="SetProperty" frame="PortraitBorder" undo="false" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@Color}"/>
+					<Action type="SetProperty" frame="PortraitBorder" undo="false" texture="@UI/HUD_KillLog_Portrait_Border_Blue"/>
+				</State>
+				<State name="Red">
+					<Action type="SetProperty" frame="PortraitBorder" undo="false" LightAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[0]}"/>
+					<Action type="SetProperty" frame="PortraitBorder" undo="false" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@Color}"/>
+					<Action type="SetProperty" frame="PortraitBorder" undo="false" texture="@UI/HUD_KillLog_Portrait_Border_Red"/>
+				</State>
+				<State name="Purple">
+					<Action type="SetProperty" frame="PortraitBorder" undo="false" LightAdjustColor="{$ancestor[@name=KillLogPanel]/NexusColors/@AdditionalColor[0]}"/>
+					<Action type="SetProperty" frame="PortraitBorder" undo="false" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/NexusColors/@Color}"/>
+					<Action type="SetProperty" frame="PortraitBorder" undo="false" texture="@UI/HUD_KillLog_Portrait_Border_Purple"/>
+				</State>
+			</StateGroup>
+			
+			
 		</Frame>
 		
 		
@@ -1697,33 +1443,32 @@
 		</StateGroup>
 		
 		<StateGroup name="CutsceneColor">
-			<DefaultState val="None"/>
 			<!-- @Override -->
-			<State name="None">
-				<When type="StateGroup" frame="BackgroundCutscene" CutsceneStatus="Inactive"/>
-				<Action type="SetProperty" frame="$GameUI" visible="true"/>
+			<State name="None"><!-- cutscene must have been loaded -->
+				<When type="StateGroup" frame="BackgroundCutscene2" CutsceneStatus="Inactive"/>
+				<Action type="SetProperty" frame="DebugLabel8" text="cs_notLoaded"/>
 			</State>
 			<!-- @Override -->
 			<State name="SetAlly">
-				<When type="AnimationState" SrcColor="Blue"/>
-				<Action type="SetProperty" frame="$GameUI" visible="true"/>
+				<When type="StateGroup" frame="VsImage" ImageColor="Blue"/>
+				<Action type="SendEvent" frame="BackgroundCutscene2" event="SetAllyColor"/>
+				<Action type="SetProperty" frame="DebugLabel8" text="cs_blue"/>
 			</State>
 			<!-- @Override -->
 			<State name="SetEnemy">
-				<When type="AnimationState" SrcColor="Red"/>
-				<Action type="SetProperty" frame="$GameUI" visible="true"/>
+				<When type="StateGroup" frame="VsImage" ImageColor="Red"/>
+				<Action type="SendEvent" frame="BackgroundCutscene2" event="SetEnemyColor"/>
+				<Action type="SetProperty" frame="DebugLabel8" text="cs_red"/>
 			</State>
 			<!-- @Override -->
 			<State name="SetNeutralToEnemy">
-				<When type="AnimationState" SrcColor="Purple"/>
-				<When type="AnimationState" TgtColor="Red"/>
-				<Action type="SetProperty" frame="$GameUI" visible="true"/>
+				<When type="Property" frame="$GameUI" visible="false"/><!-- never -->
+				<Action type="SetProperty" frame="DebugLabel8" text="cs_red2"/>
 			</State>
 			<!-- @Override -->
 			<State name="SetNeutralToAlly">
-				<When type="AnimationState" SrcColor="Purple"/>
-				<When type="AnimationState" TgtColor="Blue"/>
-				<Action type="SetProperty" frame="$GameUI" visible="true"/>
+				<When type="Property" frame="$GameUI" visible="false"/><!-- never -->
+				<Action type="SetProperty" frame="DebugLabel8" text="cs_blue2"/>
 			</State>
 		</StateGroup>
 
@@ -1800,123 +1545,111 @@
 		
 		<Frame type="Image" name="VsImage">
 			<StateGroup name="Colors">
-				<DefaultState val="Red"/>
 				<!-- @Override -->
-				<State name="Blue">
-					<When type="AnimationState" frame="$parent" SrcColor="Blue"/>
-					<Action type="SetProperty" frame="$GameUI" visible="true"/>
+				<State name="Blue"><!-- kill: not blue src result & red tgt result => blue -->
+					<When type="AnimationState" frame="$parent" KillLogItemType="Kill"/>
+					<When type="StateGroup" frame="$parent/SrcPortrait" operator="NotEqual" PortraitColor="Blue"/>
+					<When type="StateGroup" frame="$parent/TgtPortrait0" PortraitColor="Red"/>
+					<Action type="SetState" group="ImageColor" undo="false" state="Blue"/>
+					<Action type="SetProperty" frame="$parent/DebugLabel9" text="vs_blue1"/>
 				</State>
 				<!-- @Override -->
-				<State name="BlueNeutral">
-					<When type="AnimationState" frame="$parent" TgtColor="Red"/>
-					<When type="AnimationState" frame="$parent" SrcColor="Purple"/>
-					<Action type="SetProperty" frame="$GameUI" visible="true"/>
+				<State name="BlueNeutral"><!-- kill: not red src result & blue tgt result => red -->
+					<When type="AnimationState" frame="$parent" KillLogItemType="Kill"/>
+					<When type="StateGroup" frame="$parent/SrcPortrait" operator="NotEqual" PortraitColor="Red"/>
+					<When type="StateGroup" frame="$parent/TgtPortrait0" PortraitColor="Blue"/>
+					<Action type="SetState" group="ImageColor" undo="false" state="Red"/>
+					<Action type="SetProperty" frame="$parent/DebugLabel9" text="vs_red1"/>
 				</State>
 				<!-- @Override -->
+				<State name="Red"><!-- red src result => red -->
+					<When type="StateGroup" frame="$parent/SrcPortrait" PortraitColor="Red"/>
+					<Action type="SetState" group="ImageColor" undo="false" state="Red"/>
+					<Action type="SetProperty" frame="$parent/DebugLabel9" text="vs_red2"/>
+				</State>
+				<State name="RealBlue"><!-- blue src result => blue -->
+					<When type="StateGroup" frame="$parent/SrcPortrait" PortraitColor="Blue"/>
+					<Action type="SetState" group="ImageColor" undo="false" state="Blue"/>
+					<Action type="SetProperty" frame="$parent/DebugLabel9" text="vs_blue2"/>
+				</State>
+			</StateGroup>
+			
+			<!-- State set by Colors StateGroup above, used by Cutscene -->
+			<StateGroup name="ImageColor">
 				<State name="Red">
-					<Action type="SetProperty" frame="$GameUI" visible="true"/>
+					<Action type="SetProperty" frame="VsImageInset" undo="false" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@Color}"/>
+					<Action type="SetProperty" undo="false" LightAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[1]}"/>
+					<Action type="SetProperty" undo="false" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[1]}"/>
+				</State>
+				<State name="Blue">
+					<Action type="SetProperty" frame="VsImageInset" undo="false" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@Color}"/>
+					<Action type="SetProperty" undo="false" LightAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[1]}"/>
+					<Action type="SetProperty" undo="false" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[1]}"/>
 				</State>
 			</StateGroup>
 		</Frame>
 		
 		<Frame type="Frame" name="TgtPortrait0">
 			<StateGroup name="Colors">
-				<DefaultState val="Purple"/>
 				<!-- @Override -->
-				<State name="Red"><!-- red tgtColor AND not red team vision => red -->
-					<When type="AnimationState" frame="$parent" tgtColor="Red"/>
-					<When type="Property" frame="$VisionPulldown" operator="LessThan" SelectedIndex="6"/>
-					<Action type="SetProperty" frame="PortraitBorder" LightAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[0]}"/>
-					<Action type="SetProperty" frame="PortraitBorder" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@Color}"/>
-					<Action type="SetProperty" frame="PortraitBorder" texture="@UI/HUD_KillLog_Portrait_Border_Red"/>
-					<Action type="SetProperty" frame="$parent/DebugLabel2" text="red"/>
-					<Action type="SetState" frame="StrikethroughFrame" group="Colors" state="Red"/>
-					<Action type="SetState" frame="QuestResetIcon1/StrikethroughFrame" group="Colors" state="Red"/>
-					<Action type="SetState" frame="QuestResetIcon2/StrikethroughFrame" group="Colors" state="Red"/>
-					<Action type="SetState" frame="QuestResetIcon3/StrikethroughFrame" group="Colors" state="Red"/>
-					<Action type="SetState" frame="QuestResetIcon4/StrikethroughFrame" group="Colors" state="Red"/>
-				</State>
-				<!-- @Override -->
-				<State name="Blue"><!-- blue tgtColor AND not red team vision => blue -->
-					<When type="AnimationState" frame="$parent" tgtColor="Blue"/>
-					<When type="Property" frame="$VisionPulldown" operator="LessThan" SelectedIndex="6"/>
-					<Action type="SetProperty" frame="PortraitBorder" LightAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[0]}"/>
-					<Action type="SetProperty" frame="PortraitBorder" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@Color}"/>
-					<Action type="SetProperty" frame="PortraitBorder" texture="@UI/HUD_KillLog_Portrait_Border_Blue"/>
-					<Action type="SetProperty" frame="$parent/DebugLabel2" text="blue"/>
-					<Action type="SetState" frame="StrikethroughFrame" group="Colors" state="Blue"/>
-					<Action type="SetState" frame="QuestResetIcon1/StrikethroughFrame" group="Colors" state="Blue"/>
-					<Action type="SetState" frame="QuestResetIcon2/StrikethroughFrame" group="Colors" state="Blue"/>
-					<Action type="SetState" frame="QuestResetIcon3/StrikethroughFrame" group="Colors" state="Blue"/>
-					<Action type="SetState" frame="QuestResetIcon4/StrikethroughFrame" group="Colors" state="Blue"/>
-				</State>
-				<State name="Red2"><!-- red tgtColor AND not red team vision => red -->
-					<When type="AnimationState" frame="$parent" tgtColor="Red"/>
-					<When type="Property" frame="$VisionPulldown" operator="GreaterThan" SelectedIndex="10"/>
-					<Action type="SetProperty" frame="PortraitBorder" LightAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[0]}"/>
-					<Action type="SetProperty" frame="PortraitBorder" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@Color}"/>
-					<Action type="SetProperty" frame="PortraitBorder" texture="@UI/HUD_KillLog_Portrait_Border_Red"/>
-					<Action type="SetProperty" frame="$parent/DebugLabel2" text="red2"/>
-					<Action type="SetState" frame="StrikethroughFrame" group="Colors" state="Red"/>
-					<Action type="SetState" frame="QuestResetIcon1/StrikethroughFrame" group="Colors" state="Red"/>
-					<Action type="SetState" frame="QuestResetIcon2/StrikethroughFrame" group="Colors" state="Red"/>
-					<Action type="SetState" frame="QuestResetIcon3/StrikethroughFrame" group="Colors" state="Red"/>
-					<Action type="SetState" frame="QuestResetIcon4/StrikethroughFrame" group="Colors" state="Red"/>
-				</State>
-				<State name="Blue2"><!-- blue tgtColor AND not red team vision => blue -->
-					<When type="AnimationState" frame="$parent" tgtColor="Blue"/>
-					<When type="Property" frame="$VisionPulldown" operator="GreaterThan" SelectedIndex="10"/>
-					<Action type="SetProperty" frame="PortraitBorder" LightAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[0]}"/>
-					<Action type="SetProperty" frame="PortraitBorder" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@Color}"/>
-					<Action type="SetProperty" frame="PortraitBorder" texture="@UI/HUD_KillLog_Portrait_Border_Blue"/>
-					<Action type="SetProperty" frame="$parent/DebugLabel2" text="blue2"/>
-					<Action type="SetState" frame="StrikethroughFrame" group="Colors" state="Blue"/>
-					<Action type="SetState" frame="QuestResetIcon1/StrikethroughFrame" group="Colors" state="Blue"/>
-					<Action type="SetState" frame="QuestResetIcon2/StrikethroughFrame" group="Colors" state="Blue"/>
-					<Action type="SetState" frame="QuestResetIcon3/StrikethroughFrame" group="Colors" state="Blue"/>
-					<Action type="SetState" frame="QuestResetIcon4/StrikethroughFrame" group="Colors" state="Blue"/>
-				</State>
-				<State name="RedOnRedTeamVision"><!-- blue tgtColor AND red team vision => red -->
+				<State name="Red"><!-- blue tgtColor & in red player vision => red -->
 					<When type="AnimationState" frame="$parent" tgtColor="Blue"/>
 					<When type="Property" frame="$VisionPulldown" operator="GreaterThan" SelectedIndex="5"/>
 					<When type="Property" frame="$VisionPulldown" operator="LessThan" SelectedIndex="11"/>
-					<Action type="SetProperty" frame="PortraitBorder" LightAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[0]}"/>
-					<Action type="SetProperty" frame="PortraitBorder" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@Color}"/>
-					<Action type="SetProperty" frame="PortraitBorder" texture="@UI/HUD_KillLog_Portrait_Border_Red"/>
-					<Action type="SetProperty" frame="$parent/DebugLabel2" text="redOnRed"/>
-					<Action type="SetState" frame="StrikethroughFrame" group="Colors" state="Red"/>
-					<Action type="SetState" frame="QuestResetIcon1/StrikethroughFrame" group="Colors" state="Red"/>
-					<Action type="SetState" frame="QuestResetIcon2/StrikethroughFrame" group="Colors" state="Red"/>
-					<Action type="SetState" frame="QuestResetIcon3/StrikethroughFrame" group="Colors" state="Red"/>
-					<Action type="SetState" frame="QuestResetIcon4/StrikethroughFrame" group="Colors" state="Red"/>
+					<Action type="SetState" group="PortraitColor" undo="false" state="Red"/>
+					<Action type="SetProperty" frame="$parent/DebugLabel2" undo="false" text="t_redOnRed"/>
 				</State>
-				<State name="BlueOnRedTeamVision"><!-- red tgtColor AND red team vision => blue -->
+				<!-- @Override -->
+				<State name="Blue"><!-- red tgtColor & in red player vision => blue -->
 					<When type="AnimationState" frame="$parent" tgtColor="Red"/>
 					<When type="Property" frame="$VisionPulldown" operator="GreaterThan" SelectedIndex="5"/>
 					<When type="Property" frame="$VisionPulldown" operator="LessThan" SelectedIndex="11"/>
-					<Action type="SetProperty" frame="PortraitBorder" LightAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[0]}"/>
-					<Action type="SetProperty" frame="PortraitBorder" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@Color}"/>
-					<Action type="SetProperty" frame="PortraitBorder" texture="@UI/HUD_KillLog_Portrait_Border_Blue"/>
-					<Action type="SetProperty" frame="$parent/DebugLabel2" text="blueOnRed"/>
-					<Action type="SetState" frame="StrikethroughFrame" group="Colors" state="Blue"/>
-					<Action type="SetState" frame="QuestResetIcon1/StrikethroughFrame" group="Colors" state="Blue"/>
-					<Action type="SetState" frame="QuestResetIcon2/StrikethroughFrame" group="Colors" state="Blue"/>
-					<Action type="SetState" frame="QuestResetIcon3/StrikethroughFrame" group="Colors" state="Blue"/>
-					<Action type="SetState" frame="QuestResetIcon4/StrikethroughFrame" group="Colors" state="Blue"/>
+					<Action type="SetState" group="PortraitColor" undo="false" state="Blue"/>
+					<Action type="SetProperty" frame="$parent/DebugLabel2" undo="false" text="t_blueOnRed"/>
 				</State>
-				<State name="Dflt"><!-- should never be visible -->
-					<Action type="SetProperty" frame="$parent/DebugLabel2" text="dflt"/>
+				<State name="Red2"><!-- red tgtColor => red -->
+					<When type="AnimationState" frame="$parent" tgtColor="Red"/>
+					<Action type="SetState" group="PortraitColor" undo="false" state="Red"/>
+					<Action type="SetProperty" frame="$parent/DebugLabel2" undo="false" text="t_red"/>
+				</State>
+				<State name="Blue2"><!-- blue tgtColor => blue -->
+					<When type="AnimationState" frame="$parent" tgtColor="Blue"/>
+					<Action type="SetState" group="PortraitColor" undo="false" state="Blue"/>
+					<Action type="SetProperty" frame="$parent/DebugLabel2" undo="false" text="t_blue"/>
 				</State>
 			</StateGroup>
-			<!-- actions added to Colors stategroup... replaced these with a bogus action -->
+			
+			<!-- State set by Colors -->
+			<StateGroup name="PortraitColor">
+				<State name="Blue">
+					<Action type="SetProperty" frame="PortraitBorder" undo="false" LightAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@AdditionalColor[0]}"/>
+					<Action type="SetProperty" frame="PortraitBorder" undo="false" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/AllyColors/@Color}"/>
+					<Action type="SetProperty" frame="PortraitBorder" undo="false" texture="@UI/HUD_KillLog_Portrait_Border_Blue"/>
+					<Action type="SetState" frame="StrikethroughFrame" group="Colors" undo="false" state="Blue"/>
+				</State>
+				<State name="Red">
+					<Action type="SetProperty" frame="PortraitBorder" undo="false" LightAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@AdditionalColor[0]}"/>
+					<Action type="SetProperty" frame="PortraitBorder" undo="false" DarkAdjustColor="{$ancestor[@name=KillLogPanel]/EnemyColors/@Color}"/>
+					<Action type="SetProperty" frame="PortraitBorder" undo="false" texture="@UI/HUD_KillLog_Portrait_Border_Red"/>
+					<Action type="SetState" frame="StrikethroughFrame" group="Colors" undo="false" state="Red"/>
+				</State>
+			</StateGroup>
+			
 			<StateGroup name="StrikeColors">
 				<!-- @Override -->
 				<State name="Red">
-					<Action type="SetProperty" frame="$GameUI" visible="true"/>
+					<Action type="SetState" frame="QuestResetIcon1/StrikethroughFrame" group="Colors" undo="false" state="Red"/>
+					<Action type="SetState" frame="QuestResetIcon2/StrikethroughFrame" group="Colors" undo="false" state="Red"/>
+					<Action type="SetState" frame="QuestResetIcon3/StrikethroughFrame" group="Colors" undo="false" state="Red"/>
+					<Action type="SetState" frame="QuestResetIcon4/StrikethroughFrame" group="Colors" undo="false" state="Red"/>
 				</State>
 				<!-- @Override -->
 				<State name="Blue">
 					<Action type="SetProperty" frame="$GameUI" visible="true"/>
+					<Action type="SetState" frame="QuestResetIcon1/StrikethroughFrame" group="Colors" undo="false" state="Blue"/>
+					<Action type="SetState" frame="QuestResetIcon2/StrikethroughFrame" group="Colors" undo="false" state="Blue"/>
+					<Action type="SetState" frame="QuestResetIcon3/StrikethroughFrame" group="Colors" undo="false" state="Blue"/>
+					<Action type="SetState" frame="QuestResetIcon4/StrikethroughFrame" group="Colors" undo="false" state="Blue"/>
 				</State>
 			</StateGroup>
 		</Frame>
