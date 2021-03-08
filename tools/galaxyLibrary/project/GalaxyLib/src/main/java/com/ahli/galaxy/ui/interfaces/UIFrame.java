@@ -24,6 +24,8 @@ public interface UIFrame extends UIElement {
 	
 	List<UIAttribute> getAttributes();
 	
+	List<UIAttribute> getAttributesRaw();
+	
 	String getAnchorRelative(UIAnchorSide side);
 	
 	String getAnchorOffset(UIAnchorSide side);
@@ -47,7 +49,7 @@ public interface UIFrame extends UIElement {
 	String toString();
 	
 	@Override
-	boolean equals(Object o);
+	boolean equals(Object obj);
 	
 	@Override
 	boolean canEqual(Object other);

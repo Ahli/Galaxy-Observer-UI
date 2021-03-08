@@ -245,8 +245,10 @@ public class BrowseTabController implements Updateable {
 				map.put(ANCHOR_RIGHT,
 						elem.getAnchorRelative(side) + SPACE_HIVEN_SPACE + elem.getAnchorPos(side) + SPACE_HIVEN_SPACE +
 								elem.getAnchorOffset(side));
-				for (final UIAttribute attr : elem.getAttributes()) {
-					map.put(attr.getName(), prettyPrint(attr));
+				if (elem.getAttributesRaw() != null) {
+					for (final UIAttribute attr : elem.getAttributes()) {
+						map.put(attr.getName(), prettyPrint(attr));
+					}
 				}
 			} else if (el instanceof UIStateGroup) {
 				final UIStateGroup elem = (UIStateGroup) el;

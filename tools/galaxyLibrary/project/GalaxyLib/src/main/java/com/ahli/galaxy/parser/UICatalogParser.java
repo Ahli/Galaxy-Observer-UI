@@ -276,8 +276,9 @@ public class UICatalogParser implements ParsedXmlConsumer {
 						frame.getAnchorRelative(UIAnchorSide.RIGHT),
 						frame.getAnchorPos(UIAnchorSide.RIGHT),
 						frame.getAnchorOffset(UIAnchorSide.RIGHT));
-				
-				copyAttributes(frame.getAttributes(), target.getAttributes());
+				if (frame.getAttributesRaw() != null) {
+					copyAttributes(frame.getAttributes(), target.getAttributes());
+				}
 			} else {
 				logger.error("Attempting to apply a template of type Frame to a different type.");
 			}

@@ -89,9 +89,6 @@ public class UIFrameMutable extends UIElementAbstract implements UIFrame {
 		children = null;
 	}
 	
-	/**
-	 * Returns a deep clone of this.
-	 */
 	@Override
 	public Object deepCopy() {
 		final int attrSize = attributes != null ? attributes.size() : 0;
@@ -123,18 +120,11 @@ public class UIFrameMutable extends UIElementAbstract implements UIFrame {
 		return clone;
 	}
 	
-	/**
-	 * @return the type, may be null if not set
-	 */
 	@Override
 	public String getType() {
 		return type;
 	}
 	
-	/**
-	 * @param type
-	 * 		the type to set
-	 */
 	@Override
 	public void setType(final String type) {
 		this.type = StringInterner.intern(type);
@@ -153,9 +143,6 @@ public class UIFrameMutable extends UIElementAbstract implements UIFrame {
 		return children;
 	}
 	
-	/**
-	 * @param value
-	 */
 	@Override
 	public void addAttribute(final UIAttribute value) {
 		final String key = value.getName();
@@ -172,10 +159,6 @@ public class UIFrameMutable extends UIElementAbstract implements UIFrame {
 		attributes.add(value);
 	}
 	
-	/**
-	 * @param key
-	 * @return
-	 */
 	@Override
 	public UIAttribute getValue(final String key) {
 		if (attributes != null) {
@@ -188,9 +171,6 @@ public class UIFrameMutable extends UIElementAbstract implements UIFrame {
 		return null;
 	}
 	
-	/**
-	 * @return
-	 */
 	@Override
 	public List<UIAttribute> getAttributes() {
 		if (attributes == null) {
@@ -199,37 +179,26 @@ public class UIFrameMutable extends UIElementAbstract implements UIFrame {
 		return attributes;
 	}
 	
-	/**
-	 * @param side
-	 * @return
-	 */
+	@Override
+	public List<UIAttribute> getAttributesRaw() {
+		return attributes;
+	}
+	
 	@Override
 	public String getAnchorRelative(final UIAnchorSide side) {
 		return relative[side.ordinal()];
 	}
 	
-	/**
-	 * @param side
-	 * @return
-	 */
 	@Override
 	public String getAnchorOffset(final UIAnchorSide side) {
 		return offset[side.ordinal()];
 	}
 	
-	/**
-	 * @param side
-	 * @return
-	 */
 	@Override
 	public String getAnchorPos(final UIAnchorSide side) {
 		return pos[side.ordinal()];
 	}
 	
-	/**
-	 * @param relative
-	 * @param offset
-	 */
 	@Override
 	public void setAnchor(final String relative, final String offset) {
 		pos = DFLT_POS;
@@ -257,12 +226,6 @@ public class UIFrameMutable extends UIElementAbstract implements UIFrame {
 		}
 	}
 	
-	/**
-	 * @param side
-	 * @param relative
-	 * @param pos
-	 * @param offset
-	 */
 	@Override
 	public void setAnchor(final UIAnchorSide side, final String relative, final String pos, final String offset) {
 		setAnchorRelative(side, relative);
@@ -270,10 +233,6 @@ public class UIFrameMutable extends UIElementAbstract implements UIFrame {
 		setAnchorOffset(side, offset);
 	}
 	
-	/**
-	 * @param side
-	 * @param relative
-	 */
 	@Override
 	public void setAnchorRelative(final UIAnchorSide side, final String relative) {
 		if (Arrays.equals(this.relative, DFLT_RELATIVE)) {
@@ -289,10 +248,6 @@ public class UIFrameMutable extends UIElementAbstract implements UIFrame {
 		}
 	}
 	
-	/**
-	 * @param side
-	 * @param pos
-	 */
 	@Override
 	public void setAnchorPos(final UIAnchorSide side, final String pos) {
 		if (Arrays.equals(this.pos, DFLT_POS)) {
@@ -311,10 +266,6 @@ public class UIFrameMutable extends UIElementAbstract implements UIFrame {
 		}
 	}
 	
-	/**
-	 * @param side
-	 * @param offset
-	 */
 	@Override
 	public void setAnchorOffset(final UIAnchorSide side, final String offset) {
 		if (Arrays.equals(this.offset, DFLT_OFFSET)) {
@@ -330,10 +281,6 @@ public class UIFrameMutable extends UIElementAbstract implements UIFrame {
 		}
 	}
 	
-	/**
-	 * @param path
-	 * @return
-	 */
 	@Override
 	public UIElement receiveFrameFromPath(final String path) {
 		if (path == null || path.isEmpty()) {
@@ -362,17 +309,17 @@ public class UIFrameMutable extends UIElementAbstract implements UIFrame {
 	}
 	
 	@Override
-	public final boolean equals(final Object o) {
-		if (this == o) {
+	public final boolean equals(final Object obj) {
+		if (this == obj) {
 			return true;
 		}
-		if (!(o instanceof UIFrameMutable)) {
+		if (!(obj instanceof UIFrameMutable)) {
 			return false;
 		}
-		if (!super.equals(o)) {
+		if (!super.equals(obj)) {
 			return false;
 		}
-		final UIFrameMutable uiFrame = (UIFrameMutable) o;
+		final UIFrameMutable uiFrame = (UIFrameMutable) obj;
 		return uiFrame.canEqual(this) && Arrays.deepEquals(pos, uiFrame.pos) &&
 				Arrays.deepEquals(offset, uiFrame.offset) && Arrays.deepEquals(relative, uiFrame.relative) &&
 				Objects.equals(attributes, uiFrame.attributes) && Objects.equals(type, uiFrame.type) &&
