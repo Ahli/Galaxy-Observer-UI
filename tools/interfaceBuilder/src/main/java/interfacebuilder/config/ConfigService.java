@@ -73,7 +73,7 @@ public class ConfigService {
 	}
 	
 	public Path getBaseUiPath(final GameDef gameDef) {
-		return baseUiPath.resolve(gameDef.getNameHandle());
+		return baseUiPath.resolve(gameDef.nameHandle());
 	}
 	
 	public File getCascExtractorExeFile() {

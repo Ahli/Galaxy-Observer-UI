@@ -113,7 +113,7 @@ public class BaseUiExtractionController implements Updateable {
 		errorTabController.setRunning(true);
 		final GameDef exportedGameDef = gameService.getGameDef(game);
 		final String ptrString = usePtr ? " PTR" : "";
-		titleLabel.setText(String.format("Extract %s's Base UI", exportedGameDef.getName() + ptrString));
+		titleLabel.setText(String.format("Extract %s's Base UI", exportedGameDef.name() + ptrString));
 		txtArea1.getChildren().clear();
 		txtArea2.getChildren().clear();
 		txtArea3.getChildren().clear();

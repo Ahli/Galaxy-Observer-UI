@@ -329,7 +329,7 @@ public class BrowseController implements Updateable {
 	
 	private void browseBaseUi(final Game game) {
 		final GameData gameData = mpqBuilderService.getGameData(game);
-		final Updateable controller = createTab(gameData.getGameDef().getName());
+		final Updateable controller = createTab(gameData.getGameDef().name());
 		if (controller != null) {
 			final BrowseLoadBaseUiTask task =
 					new BrowseLoadBaseUiTask(appController, gameData, (BrowseTabController) controller, baseUiService);

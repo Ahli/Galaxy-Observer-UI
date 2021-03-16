@@ -60,7 +60,7 @@ public class UICatalogImpl implements UICatalog {
 	
 	public UICatalogImpl(final GameDef gameDef) {
 		if (gameDef != null) {
-			if ("sc2".equals(gameDef.getNameHandle())) {
+			if ("sc2".equals(gameDef.nameHandle())) {
 				templates = new ArrayList<>(2365);
 				blizzOnlyTemplates = new ArrayList<>(17);
 				constants = new ArrayList<>(1241);
@@ -68,7 +68,7 @@ public class UICatalogImpl implements UICatalog {
 				blizzOnlyLayouts = new ArrayList<>(14);
 				handles = new UnifiedMap<>(242 * 5 / 4);
 				return;
-			} else if ("heroes".equals(gameDef.getNameHandle())) {
+			} else if ("heroes".equals(gameDef.nameHandle())) {
 				templates = new ArrayList<>(2088);
 				blizzOnlyTemplates = new ArrayList<>(6);
 				constants = new ArrayList<>(449);
