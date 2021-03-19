@@ -38,10 +38,9 @@ public class Project {
 		if (this == obj) {
 			return true;
 		}
-		if (!(obj instanceof Project)) {
+		if (!(obj instanceof final Project project)) {
 			return false;
 		}
-		final Project project = (Project) obj;
 		return id == project.id && lastBuildSize == project.lastBuildSize && Objects.equals(name, project.name) &&
 				Objects.equals(projectPath, project.projectPath) && game == project.game &&
 				Objects.equals(lastBuildDateTime, project.lastBuildDateTime) &&

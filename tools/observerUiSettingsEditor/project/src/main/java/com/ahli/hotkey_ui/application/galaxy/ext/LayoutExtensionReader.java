@@ -55,7 +55,7 @@ public class LayoutExtensionReader {
 	private static final String VAL = "val";
 	private static final String ERROR_PARSING_FILE = "Error parsing file.";
 	private static final Logger logger = LogManager.getLogger(LayoutExtensionReader.class);
-	private static final Pattern HOTKEY_SETTING_REGEX_PATTERN = Pattern.compile("(?=@hotkey|@setting)/i");
+	private static final Pattern HOTKEY_SETTING_REGEX_PATTERN = Pattern.compile("(?<=@hotkey|@setting)/i");
 	private static final Pattern ATTRIBUTES_REGEX_PATTERN =
 			Pattern.compile("(?i)(?=(?:constant|default|description|values|type)[\\s]*=)");
 	private List<ValueDef> hotkeys = new ArrayList<>(10);

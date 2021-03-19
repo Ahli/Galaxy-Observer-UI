@@ -287,8 +287,7 @@ public class BrowseController implements Updateable {
 		} else {
 			// CASE: recycled Tab -> only do the workload
 			for (final var controller : controllers) {
-				if (controller instanceof BaseUiExtractionController) {
-					final BaseUiExtractionController extractCtrl = (BaseUiExtractionController) controller;
+				if (controller instanceof final BaseUiExtractionController extractCtrl) {
 					final ErrorTabController errorTabCtrl = extractCtrl.getErrorTabController();
 					if (errorTabCtrl != null) {
 						newTab = errorTabCtrl.getTab();

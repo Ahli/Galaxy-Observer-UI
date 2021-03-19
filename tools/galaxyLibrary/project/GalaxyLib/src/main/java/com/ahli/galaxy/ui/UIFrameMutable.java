@@ -313,13 +313,12 @@ public class UIFrameMutable extends UIElementAbstract implements UIFrame {
 		if (this == obj) {
 			return true;
 		}
-		if (!(obj instanceof UIFrameMutable)) {
+		if (!(obj instanceof final UIFrameMutable uiFrame)) {
 			return false;
 		}
 		if (!super.equals(obj)) {
 			return false;
 		}
-		final UIFrameMutable uiFrame = (UIFrameMutable) obj;
 		return uiFrame.canEqual(this) && Arrays.deepEquals(pos, uiFrame.pos) &&
 				Arrays.deepEquals(offset, uiFrame.offset) && Arrays.deepEquals(relative, uiFrame.relative) &&
 				Objects.equals(attributes, uiFrame.attributes) && Objects.equals(type, uiFrame.type) &&

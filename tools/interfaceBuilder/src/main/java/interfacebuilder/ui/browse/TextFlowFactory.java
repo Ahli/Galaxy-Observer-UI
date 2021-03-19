@@ -31,30 +31,25 @@ public class TextFlowFactory {
 	public TextFlow getFlow(final UIElement item) {
 		final TextFlow flow = new TextFlow();
 		
-		if (item instanceof UIFrame) {
-			final var frame = (UIFrame) item;
+		if (item instanceof final UIFrame frame) {
 			append(flow, textUnimportant("<Frame type=\""));
 			append(flow, textQueried(frame.getType()));
 			append(flow, textUnimportant("\" name=\""));
 			append(flow, textQueried(frame.getName()));
 			append(flow, textUnimportant("\">"));
-		} else if (item instanceof UIAnimation) {
-			final var anim = (UIAnimation) item;
+		} else if (item instanceof final UIAnimation anim) {
 			append(flow, textUnimportant("<Animation name=\""));
 			append(flow, textQueried(anim.getName()));
 			append(flow, textUnimportant("\">"));
-		} else if (item instanceof UIState) {
-			final var state = (UIState) item;
+		} else if (item instanceof final UIState state) {
 			append(flow, textUnimportant("<State name=\""));
 			append(flow, textQueried(state.getName()));
 			append(flow, textUnimportant("\">"));
-		} else if (item instanceof UIController) {
-			final var ctrl = (UIController) item;
+		} else if (item instanceof final UIController ctrl) {
 			append(flow, textUnimportant("<Controller name=\""));
 			append(flow, textQueried(ctrl.getName()));
 			append(flow, textUnimportant("\">"));
-		} else if (item instanceof UIStateGroup) {
-			final var stateGroup = (UIStateGroup) item;
+		} else if (item instanceof final UIStateGroup stateGroup) {
 			append(flow, textUnimportant("<StateGroup name=\""));
 			append(flow, textQueried(stateGroup.getName()));
 			append(flow, textUnimportant("\">"));

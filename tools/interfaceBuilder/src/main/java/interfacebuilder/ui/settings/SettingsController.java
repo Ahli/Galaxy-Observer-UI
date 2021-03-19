@@ -104,8 +104,8 @@ public class SettingsController implements Updateable {
 				}
 			}
 			controller = loader.getController();
-			if (controller instanceof Updateable) {
-				((Updateable) controller).update();
+			if (controller instanceof Updateable updateable) {
+				updateable.update();
 			}
 			settingsController.contentContainer.setContent(content);
 		}

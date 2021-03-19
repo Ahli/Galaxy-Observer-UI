@@ -79,8 +79,7 @@ public class FilterableTreeItem<T> extends TreeItem<T> {
 		
 		private boolean test(final TreeItem<T> child) {
 			// Set the predicate of child items to force filtering
-			if (child instanceof FilterableTreeItem) {
-				final FilterableTreeItem<T> filterableChild = (FilterableTreeItem<T>) child;
+			if (child instanceof final FilterableTreeItem<T> filterableChild) {
 				filterableChild.setPredicate(predicate.get());
 			}
 			// If there is no predicate or if there are children, keep this tree item

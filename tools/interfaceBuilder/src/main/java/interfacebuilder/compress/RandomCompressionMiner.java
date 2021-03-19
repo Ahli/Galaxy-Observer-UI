@@ -184,8 +184,8 @@ public class RandomCompressionMiner {
 		final List<MpqEditorCompressionRule> clean = new ArrayList<>(10);
 		String mask;
 		for (final MpqEditorCompressionRule rule : dirty) {
-			if (rule instanceof MpqEditorCompressionRuleMask) {
-				mask = ((MpqEditorCompressionRuleMask) rule).getMask();
+			if (rule instanceof final MpqEditorCompressionRuleMask ruleMask) {
+				mask = ruleMask.getMask();
 				if (isValidFileSpecificMask(mask, cacheDir)) {
 					clean.add(rule);
 				} else {
@@ -209,8 +209,8 @@ public class RandomCompressionMiner {
 	private void fillFileSizeMap(final MpqEditorCompressionRule[] rules, final Path cache) {
 		fileSizeMap = new ObjectLongHashMap<>();
 		for (final MpqEditorCompressionRule rule : rules) {
-			if (rule instanceof MpqEditorCompressionRuleMask) {
-				final String mask = ((MpqEditorCompressionRuleMask) rule).getMask();
+			if (rule instanceof final MpqEditorCompressionRuleMask ruleMask) {
+				final String mask = ruleMask.getMask();
 				fileSizeMap.put(mask, getFileSize(mask, cache));
 			}
 		}
@@ -227,10 +227,9 @@ public class RandomCompressionMiner {
 				}
 			} else {
 				// Size-rule 0-0 is forced to use compression NONE
-				if (rule instanceof MpqEditorCompressionRuleSize &&
-						((MpqEditorCompressionRuleSize) rule).getMaxSize() == 0 &&
+				if (rule instanceof final MpqEditorCompressionRuleSize ruleSize && ruleSize.getMaxSize() == 0 &&
 						rule.getCompressionMethod() != MpqEditorCompressionRuleMethod.NONE) {
-					((MpqEditorCompressionRuleSize) rule).setMinSize(0);
+					ruleSize.setMinSize(0);
 					rule.setCompressionMethod(MpqEditorCompressionRuleMethod.NONE);
 				}
 			}
@@ -299,11 +298,8 @@ public class RandomCompressionMiner {
 	 */
 	private static boolean containsFile(final MpqEditorCompressionRule[] rules, final Path p) {
 		for (final MpqEditorCompressionRule rule : rules) {
-			if (rule instanceof MpqEditorCompressionRuleMask) {
-				@SuppressWarnings("ObjectAllocationInLoop")
-				final String cleanedMask =
-						File.separator + ((MpqEditorCompressionRuleMask) rule).getMask().replace(WILDCARD, "");
-				if (p.toString().endsWith(cleanedMask)) {
+			if (rule instanceof MpqEditorCompressionRuleMask ruleMask) {
+				if (p.toString().endsWith(cleanMask(ruleMask))) {
 					return true;
 				}
 			}
@@ -381,6 +377,10 @@ public class RandomCompressionMiner {
 		return rule;
 	}
 	
+	private static String cleanMask(final MpqEditorCompressionRuleMask ruleMask) {
+		return File.separator + ruleMask.getMask().replace(WILDCARD, "");
+	}
+	
 	/**
 	 * Builds the archive with the compression rules.
 	 *
@@ -405,8 +405,8 @@ public class RandomCompressionMiner {
 		// fine for all: NONE, BZIP2, ZLIB, PKWARE, SPARSE, SPARSE_BZIP2, SPARSE_ZLIB
 		// not fine: LZMA (crash during load)
 		for (final MpqEditorCompressionRule rule : rules) {
-			if (rule instanceof MpqEditorCompressionRuleMask) {
-				rule.setCompressionMethod(getRandomCompressionMethod(((MpqEditorCompressionRuleMask) rule).getMask()));
+			if (rule instanceof MpqEditorCompressionRuleMask ruleMask) {
+				rule.setCompressionMethod(getRandomCompressionMethod(ruleMask.getMask()));
 				rule.setSingleUnit(random.nextBoolean());
 			}
 		}

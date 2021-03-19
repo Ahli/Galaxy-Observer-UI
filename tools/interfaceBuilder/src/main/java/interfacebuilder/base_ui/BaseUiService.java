@@ -229,7 +229,6 @@ public class BaseUiService {
 		};
 	}
 	
-	
 	private void writeToMetaFile(final Path directory, final String gameName, final int[] version, final boolean isPtr)
 			throws IOException {
 		final Path path = directory.resolve(META_FILE_NAME);
@@ -277,7 +276,6 @@ public class BaseUiService {
 				logger.info("Loading baseUI for {}", gameName);
 				boolean needToParseAgain = true;
 				
-				/*!(game.getNewGameDef() instanceof SC2GameDef) &&*/
 				final Path baseUiPath = configService.getBaseUiPath(gameData.getGameDef());
 				boolean isPtr = false;
 				try {

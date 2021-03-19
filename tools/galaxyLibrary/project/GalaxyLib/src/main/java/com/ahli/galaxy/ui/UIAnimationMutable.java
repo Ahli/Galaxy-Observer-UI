@@ -173,13 +173,12 @@ public class UIAnimationMutable extends UIElementAbstract implements UIAnimation
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof UIAnimationMutable)) {
+		if (!(o instanceof final UIAnimationMutable that)) {
 			return false;
 		}
 		if (!super.equals(o)) {
 			return false;
 		}
-		final UIAnimationMutable that = (UIAnimationMutable) o;
 		return that.canEqual(this) && nextEventsAdditionShouldOverride == that.nextEventsAdditionShouldOverride &&
 				Objects.equals(controllers, that.controllers) && Objects.equals(events, that.events) &&
 				Objects.equals(driver, that.driver);

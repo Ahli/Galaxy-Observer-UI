@@ -100,10 +100,9 @@ public class UITemplate implements DeepCopyable {
 		if (this == obj) {
 			return true;
 		}
-		if (!(obj instanceof UITemplate)) {
+		if (!(obj instanceof final UITemplate that)) {
 			return false;
 		}
-		final UITemplate that = (UITemplate) obj;
 		return isLocked == that.isLocked && Objects.equals(fileName, that.fileName) &&
 				Objects.equals(element, that.element);
 	}

@@ -463,10 +463,9 @@ public class UICatalogImpl implements UICatalog {
 		if (this == obj) {
 			return true;
 		}
-		if (!(obj instanceof UICatalogImpl)) {
+		if (!(obj instanceof final UICatalogImpl uiCatalog)) {
 			return false;
 		}
-		final UICatalogImpl uiCatalog = (UICatalogImpl) obj;
 		return Objects.equals(parser, uiCatalog.parser) && Objects.equals(templates, uiCatalog.templates) &&
 				Objects.equals(blizzOnlyTemplates, uiCatalog.blizzOnlyTemplates) &&
 				Objects.equals(constants, uiCatalog.constants) &&

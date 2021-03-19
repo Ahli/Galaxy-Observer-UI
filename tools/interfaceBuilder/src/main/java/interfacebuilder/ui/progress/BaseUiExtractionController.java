@@ -81,10 +81,11 @@ public class BaseUiExtractionController implements Updateable {
 		this.navigationController = navigationController;
 		this.executor = executor;
 		this.appController = appController;
+		final String threadName = "extractThread_";
 		threadNames = new String[3];
-		threadNames[0] = "extractThread_" + ++threadCount;
-		threadNames[1] = "extractThread_" + ++threadCount;
-		threadNames[2] = "extractThread_" + ++threadCount;
+		threadNames[0] = threadName + ++threadCount;
+		threadNames[1] = threadName + ++threadCount;
+		threadNames[2] = threadName + ++threadCount;
 	}
 	
 	public VBox getLoggingArea() {
@@ -184,8 +185,7 @@ public class BaseUiExtractionController implements Updateable {
 				final ObservableList<Node> children = txtArea.getChildren();
 				if (children != null && !children.isEmpty()) {
 					for (final Node child : children) {
-						if (child instanceof Text) {
-							final Text text = (Text) child;
+						if (child instanceof final Text text) {
 							if (text.getText().contains(ERROR)) {
 								isError = true;
 								break;

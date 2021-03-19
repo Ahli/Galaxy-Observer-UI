@@ -113,11 +113,10 @@ public class CompressionMiningController implements Updateable {
 				.isSingleUnit()).asString());
 		columnMaskSize.setCellValueFactory(cellData -> {
 			final MpqEditorCompressionRule rule = cellData.getValue();
-			if (rule instanceof MpqEditorCompressionRuleMask) {
-				return new SimpleStringProperty(((MpqEditorCompressionRuleMask) rule).getMask());
-			} else if (rule instanceof MpqEditorCompressionRuleSize) {
-				return new SimpleStringProperty(((MpqEditorCompressionRuleSize) rule).getMinSize() + " - " +
-						((MpqEditorCompressionRuleSize) rule).getMaxSize());
+			if (rule instanceof MpqEditorCompressionRuleMask ruleMask) {
+				return new SimpleStringProperty(ruleMask.getMask());
+			} else if (rule instanceof MpqEditorCompressionRuleSize ruleSize) {
+				return new SimpleStringProperty(ruleSize.getMinSize() + " - " + ruleSize.getMaxSize());
 			} else {
 				return new SimpleStringProperty("");
 			}

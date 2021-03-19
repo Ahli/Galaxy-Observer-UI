@@ -187,13 +187,12 @@ public class UIControllerMutable extends UIElementAbstract implements UIControll
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof UIControllerMutable)) {
+		if (!(o instanceof final UIControllerMutable that)) {
 			return false;
 		}
 		if (!super.equals(o)) {
 			return false;
 		}
-		final UIControllerMutable that = (UIControllerMutable) o;
 		return that.canEqual(this) && nextAdditionShouldOverride == that.nextAdditionShouldOverride &&
 				nameIsImplicit == that.nameIsImplicit &&
 				Objects.equals(attributesKeyValueList, that.attributesKeyValueList) && Objects.equals(keys, that.keys);

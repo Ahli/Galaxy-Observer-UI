@@ -166,13 +166,12 @@ public class UIStateMutable extends UIElementAbstract implements UIState {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof UIStateMutable)) {
+		if (!(o instanceof final UIStateMutable uiState)) {
 			return false;
 		}
 		if (!super.equals(o)) {
 			return false;
 		}
-		final UIStateMutable uiState = (UIStateMutable) o;
 		return uiState.canEqual(this) && nextAdditionShouldOverrideWhens == uiState.nextAdditionShouldOverrideWhens &&
 				nextAdditionShouldOverrideActions == uiState.nextAdditionShouldOverrideActions &&
 				Objects.equals(whens, uiState.whens) && Objects.equals(actions, uiState.actions);

@@ -14,7 +14,7 @@ public class PrimaryStageReadyEvent extends ApplicationEvent {
 	}
 	
 	public Stage getStage() {
-		return getSource() instanceof Stage ? (Stage) getSource() : null;
+		return getSource() instanceof final Stage stage ? stage : null;
 	}
 	
 	public CommandLineParams getStartingParams() {

@@ -40,10 +40,9 @@ public class ModData {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof ModData)) {
+		if (!(o instanceof final ModData modData)) {
 			return false;
 		}
-		final ModData modData = (ModData) o;
 		return Objects.equals(gameData, modData.gameData) && Objects.equals(sourceDirectory, modData.sourceDirectory) &&
 				Objects.equals(mpqCacheDirectory, modData.mpqCacheDirectory) &&
 				Objects.equals(targetFile, modData.targetFile) &&

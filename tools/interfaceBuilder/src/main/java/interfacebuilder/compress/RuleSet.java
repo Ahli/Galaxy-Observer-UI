@@ -94,10 +94,9 @@ public class RuleSet implements Serializable {
 		if (this == obj) {
 			return true;
 		}
-		if (!(obj instanceof RuleSet)) {
+		if (!(obj instanceof final RuleSet ruleSet)) {
 			return false;
 		}
-		final RuleSet ruleSet = (RuleSet) obj;
 		return Objects.equals(compressionRulesString, ruleSet.compressionRulesString);
 	}
 	

@@ -106,13 +106,12 @@ public class UIAttributeImmutable extends UIElementAbstract implements UIAttribu
 		if (this == obj) {
 			return true;
 		}
-		if (!(obj instanceof UIAttributeImmutable)) {
+		if (!(obj instanceof final UIAttributeImmutable that)) {
 			return false;
 		}
 		if (!super.equals(obj)) {
 			return false;
 		}
-		final UIAttributeImmutable that = (UIAttributeImmutable) obj;
 		return that.canEqual(this) && Objects.equals(keyValueList, that.keyValueList);
 	}
 	
