@@ -151,7 +151,7 @@ public class MpqBuilderService {
 		if (game.getUiCatalog() == null && verifyLayout) {
 			// parse default UI
 			throw new IllegalStateException(String.format("Base UI of game '%s' has not been parsed.",
-					game.getGameDef().getName()));
+					game.getGameDef().name()));
 		}
 		
 		// create tasks for the worker pool
@@ -249,8 +249,8 @@ public class MpqBuilderService {
 		final GameDef gameDef = game.getGameDef();
 		
 		final Path targetFile =
-				Path.of(configService.getDocumentsPath() + File.separator + gameDef.getDocumentsGameDirectoryName() +
-						File.separator + gameDef.getDocumentsInterfaceSubdirectoryName());
+				Path.of(configService.getDocumentsPath() + File.separator + gameDef.documentsGameDirectoryName() +
+						File.separator + gameDef.documentsInterfaceSubdirectoryName());
 		
 		// init mod data
 		final ModData mod = new ModData(game);

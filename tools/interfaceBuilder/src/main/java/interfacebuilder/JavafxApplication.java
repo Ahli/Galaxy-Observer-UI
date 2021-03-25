@@ -47,8 +47,9 @@ public class JavafxApplication extends Application {
 				
 				// getAllStackTraces() is not optimal as it creates a lot of waste :(
 				for (final Thread thread : Thread.getAllStackTraces().keySet()) {
-					if (thread.getId() == idLong && thread instanceof InterProcessCommunication.IpcServerThread) {
-						return (InterProcessCommunication.IpcServerThread) thread;
+					if (thread.getId() == idLong &&
+							thread instanceof final InterProcessCommunication.IpcServerThread serverThread) {
+						return serverThread;
 					}
 				}
 			}

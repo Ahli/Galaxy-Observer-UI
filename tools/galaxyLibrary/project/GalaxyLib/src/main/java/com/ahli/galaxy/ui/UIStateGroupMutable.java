@@ -117,13 +117,12 @@ public class UIStateGroupMutable extends UIElementAbstract implements UIStateGro
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof UIStateGroupMutable)) {
+		if (!(o instanceof final UIStateGroupMutable that)) {
 			return false;
 		}
 		if (!super.equals(o)) {
 			return false;
 		}
-		final UIStateGroupMutable that = (UIStateGroupMutable) o;
 		return that.canEqual(this) && Objects.equals(defaultState, that.defaultState) &&
 				Objects.equals(states, that.states);
 	}

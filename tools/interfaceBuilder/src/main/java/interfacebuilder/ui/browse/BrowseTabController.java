@@ -227,8 +227,7 @@ public class BrowseTabController implements Updateable {
 		} else {
 			final UIElement el = selected.getValue();
 			final Map<String, String> map = new UnifiedMap<>();
-			if (el instanceof UIFrameMutable) {
-				final UIFrame elem = (UIFrame) el;
+			if (el instanceof final UIFrameMutable elem) {
 				UIAnchorSide side = UIAnchorSide.TOP;
 				map.put(ANCHOR_TOP,
 						elem.getAnchorRelative(side) + SPACE_HIVEN_SPACE + elem.getAnchorPos(side) + SPACE_HIVEN_SPACE +
@@ -250,8 +249,7 @@ public class BrowseTabController implements Updateable {
 						map.put(attr.getName(), prettyPrint(attr));
 					}
 				}
-			} else if (el instanceof UIStateGroup) {
-				final UIStateGroup elem = (UIStateGroup) el;
+			} else if (el instanceof final UIStateGroup elem) {
 				final String dfltState = elem.getDefaultState();
 				if (dfltState != null) {
 					map.put(DEFAULT_STATE, dfltState);
@@ -261,8 +259,7 @@ public class BrowseTabController implements Updateable {
 					++i;
 					map.put(STATE_PREFIX + i, state.getName());
 				}
-			} else if (el instanceof UIAnimation) {
-				final UIAnimation elem = (UIAnimation) el;
+			} else if (el instanceof final UIAnimation elem) {
 				final UIAttribute driver = elem.getDriver();
 				if (driver != null) {
 					map.put(DRIVER, prettyPrint(driver));
@@ -272,8 +269,7 @@ public class BrowseTabController implements Updateable {
 					++i;
 					map.put(EVENT_PREFIX + i, prettyPrint(event));
 				}
-			} else if (el instanceof UIController) {
-				final UIController elem = (UIController) el;
+			} else if (el instanceof final UIController elem) {
 				int i = 0;
 				for (final UIAttribute attr : elem.getKeys()) {
 					++i;
@@ -281,8 +277,7 @@ public class BrowseTabController implements Updateable {
 				}
 				// TODO keyValueList, e.g. in a new panel where it would show template, file and type, too?
 				
-			} else if (el instanceof UIState) {
-				final UIState elem = (UIState) el;
+			} else if (el instanceof final UIState elem) {
 				int i = 0;
 				for (final UIAttribute attr : elem.getWhens()) {
 					++i;
@@ -450,9 +445,8 @@ public class BrowseTabController implements Updateable {
 						faster) */
 				return queryString.getValue().isEmpty() || (element.getName() != null &&
 						AutoCompleteComboBox.containsIgnoreCase(element.getName(), queryString.getValue())) ||
-						(element instanceof UIFrame &&
-								AutoCompleteComboBox.containsIgnoreCase(((UIFrame) element).getType(),
-										queryString.getValue()));
+						(element instanceof UIFrame frame &&
+								AutoCompleteComboBox.containsIgnoreCase(frame.getType(), queryString.getValue()));
 			}
 		}
 	}

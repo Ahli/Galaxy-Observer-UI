@@ -39,10 +39,9 @@ public class KryoGameInfo {
 		if (this == obj) {
 			return true;
 		}
-		if (!(obj instanceof KryoGameInfo)) {
+		if (!(obj instanceof final KryoGameInfo that)) {
 			return false;
 		}
-		final KryoGameInfo that = (KryoGameInfo) obj;
 		return isPtr == that.isPtr && Arrays.equals(version, that.version) && Objects.equals(gameName, that.gameName);
 	}
 	

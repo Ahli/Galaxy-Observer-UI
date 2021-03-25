@@ -112,7 +112,7 @@ public class NavigationController {
 			final FXMLSpringLoader loader = new FXMLSpringLoader(appContext);
 			contentPages[index] = loader.load(path);
 			final Object controller = loader.getController();
-			controllers[index] = (controller instanceof Updateable) ? (Updateable) controller : null;
+			controllers[index] = (controller instanceof final Updateable updateable) ? updateable : null;
 		} catch (final IOException e) {
 			logger.error(String.format("failed to load FXML: %s.", path), e);
 			contentPages[index] = null;

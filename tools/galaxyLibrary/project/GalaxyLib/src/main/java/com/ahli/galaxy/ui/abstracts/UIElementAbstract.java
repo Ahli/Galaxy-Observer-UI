@@ -38,10 +38,9 @@ public abstract class UIElementAbstract implements UIElement {
 		if (obj == this) {
 			return true;
 		}
-		if (!(obj instanceof UIElementAbstract)) {
+		if (!(obj instanceof final UIElementAbstract other)) {
 			return false;
 		}
-		final UIElementAbstract other = (UIElementAbstract) obj;
 		if (!other.canEqual(this)) {
 			return false;
 		}

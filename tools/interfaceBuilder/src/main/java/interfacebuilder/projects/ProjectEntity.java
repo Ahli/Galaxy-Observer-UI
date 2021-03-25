@@ -107,10 +107,9 @@ public class ProjectEntity implements Serializable {
 		if (this == obj) {
 			return true;
 		}
-		if (!(obj instanceof ProjectEntity)) {
+		if (!(obj instanceof final ProjectEntity that)) {
 			return false;
 		}
-		final ProjectEntity that = (ProjectEntity) obj;
 		return Objects.equals(name, that.name) && Objects.equals(projectPath, that.projectPath) && game == that.game &&
 				Objects.equals(lastBuildDateTime, that.lastBuildDateTime) &&
 				Objects.equals(lastBuildSize, that.lastBuildSize) &&

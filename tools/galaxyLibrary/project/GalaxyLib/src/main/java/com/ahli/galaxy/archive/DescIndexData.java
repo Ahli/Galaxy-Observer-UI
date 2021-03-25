@@ -5,9 +5,10 @@ package com.ahli.galaxy.archive;
 
 import com.ahli.mpq.MpqException;
 import com.ahli.mpq.MpqInterface;
-import com.ahli.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.collections.api.tuple.Pair;
+import org.eclipse.collections.impl.tuple.Tuples;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -77,7 +78,7 @@ public class DescIndexData {
 	 * @return
 	 */
 	public String getLayoutIntPath(final int i) {
-		return fileIntPathList.get(i).getValue();
+		return fileIntPathList.get(i).getTwo();
 	}
 	
 	/**
@@ -87,7 +88,7 @@ public class DescIndexData {
 	public boolean removeLayoutIntPath(final String intPath) {
 		for (int i = 0, len = fileIntPathList.size(); i < len; ++i) {
 			final Pair<Path, String> p = fileIntPathList.get(i);
-			if (p.getValue().equals(intPath)) {
+			if (p.getTwo().equals(intPath)) {
 				fileIntPathList.remove(i);
 				return true;
 			}
@@ -135,7 +136,7 @@ public class DescIndexData {
 				return;
 			}
 		}
-		fileIntPathList.add(new Pair<>(p, intPath2));
+		fileIntPathList.add(Tuples.pair(p, intPath2));
 		
 		logger.trace("added Layout path: {}\nadded File path: {}", intPath2, p);
 	}
@@ -153,8 +154,8 @@ public class DescIndexData {
 	 */
 	public Path getLayoutFilePath(final String intPath) {
 		for (final Pair<Path, String> p : fileIntPathList) {
-			if (p.getValue().equals(intPath)) {
-				return p.getKey();
+			if (p.getTwo().equals(intPath)) {
+				return p.getOne();
 			}
 		}
 		return null;
@@ -170,7 +171,7 @@ public class DescIndexData {
 			
 			for (final Pair<Path, String> curPair : fileIntPathList) {
 				bw.write(INCLUDE_PATH);
-				bw.write(curPair.getValue());
+				bw.write(curPair.getTwo());
 				bw.write(STRING);
 			}
 			
@@ -196,7 +197,7 @@ public class DescIndexData {
 		List<String> layoutDeps;
 		List<String> curConstants;
 		for (final Pair<Path, String> pair : fileIntPathList) {
-			final File f = pair.getKey().toFile();
+			final File f = pair.getOne().toFile();
 			curConstants = LayoutReaderDom.getLayoutsConstantDefinitions(f);
 			
 			// add calculated list of dependencies from layout file
@@ -248,7 +249,7 @@ public class DescIndexData {
 							y:
 							for (int i2 = i + 1, len3 = dependencies.size(); i2 < len3; ++i2) {
 								final Pair<Path, String> otherPair = fileIntPathList.get(i2);
-								String fileName = otherPair.getKey().getFileName().toString();
+								String fileName = otherPair.getOne().getFileName().toString();
 								final int dotIndex = fileName.lastIndexOf('.');
 								if (dotIndex > 0) {
 									fileName = fileName.substring(0, dotIndex);
@@ -258,7 +259,7 @@ public class DescIndexData {
 										if (logger.isTraceEnabled()) {
 											logger.trace(
 													CHECKED_WITH_DEPENDENCY_AND_I_J_I2,
-													fileIntPathList.get(i).getKey().getFileName(),
+													fileIntPathList.get(i).getOne().getFileName(),
 													curDependencyTo,
 													constant,
 													i,
@@ -276,7 +277,7 @@ public class DescIndexData {
 										if (logger.isTraceEnabled()) {
 											logger.trace(
 													"inserted {} after {}",
-													fileIntPathList.get(i).getKey().getFileName(),
+													fileIntPathList.get(i).getOne().getFileName(),
 													fileName);
 											logger.trace(FILE_INT_PATH_LIST, fileIntPathList);
 										}
@@ -285,7 +286,7 @@ public class DescIndexData {
 										if (logger.isTraceEnabled()) {
 											logger.trace(
 													CHECKED_WITH_DEPENDENCY_AND_I_J_I2,
-													fileIntPathList.get(i).getKey().getFileName(),
+													fileIntPathList.get(i).getOne().getFileName(),
 													curDependencyTo,
 													constant,
 													i,
@@ -324,7 +325,7 @@ public class DescIndexData {
 						// check if it appears after the template
 						for (int i2 = i + 1; i2 < dependencies.size(); ++i2) {
 							final Pair<Path, String> otherPair = fileIntPathList.get(i2);
-							String fileName = otherPair.getKey().getFileName().toString();
+							String fileName = otherPair.getOne().getFileName().toString();
 							final int dotIndex = fileName.lastIndexOf('.');
 							if (dotIndex >= 0) {
 								fileName = fileName.substring(0, dotIndex);
@@ -334,7 +335,7 @@ public class DescIndexData {
 								if (logger.isTraceEnabled()) {
 									logger.trace(
 											CHECKED_WITH_DEPENDENCY_AND_I_J_I2,
-											fileIntPathList.get(i).getKey().getFileName(),
+											fileIntPathList.get(i).getOne().getFileName(),
 											curDependencyTo,
 											fileName,
 											i,
@@ -352,7 +353,7 @@ public class DescIndexData {
 								if (logger.isTraceEnabled()) {
 									logger.trace(
 											"inserted {} after {}",
-											fileIntPathList.get(i).getKey().getFileName(),
+											fileIntPathList.get(i).getOne().getFileName(),
 											fileName);
 									logger.trace(FILE_INT_PATH_LIST, fileIntPathList);
 								}
@@ -361,7 +362,7 @@ public class DescIndexData {
 								if (logger.isTraceEnabled()) {
 									logger.trace(
 											CHECKED_WITH_DEPENDENCY_AND_I_J_I2,
-											fileIntPathList.get(i).getKey().getFileName(),
+											fileIntPathList.get(i).getOne().getFileName(),
 											curDependencyTo,
 											fileName,
 											i,

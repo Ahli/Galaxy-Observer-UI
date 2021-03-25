@@ -83,13 +83,12 @@ public class UIConstantImmutable extends UIElementAbstract implements UIConstant
 		if (this == obj) {
 			return true;
 		}
-		if (!(obj instanceof UIConstantImmutable)) {
+		if (!(obj instanceof final UIConstantImmutable that)) {
 			return false;
 		}
 		if (!super.equals(obj)) {
 			return false;
 		}
-		final UIConstantImmutable that = (UIConstantImmutable) obj;
 		return that.canEqual(this) && Objects.equals(value, that.value);
 	}
 	

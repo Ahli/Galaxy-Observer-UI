@@ -287,8 +287,7 @@ public class BrowseController implements Updateable {
 		} else {
 			// CASE: recycled Tab -> only do the workload
 			for (final var controller : controllers) {
-				if (controller instanceof BaseUiExtractionController) {
-					final BaseUiExtractionController extractCtrl = (BaseUiExtractionController) controller;
+				if (controller instanceof final BaseUiExtractionController extractCtrl) {
 					final ErrorTabController errorTabCtrl = extractCtrl.getErrorTabController();
 					if (errorTabCtrl != null) {
 						newTab = errorTabCtrl.getTab();
@@ -329,7 +328,7 @@ public class BrowseController implements Updateable {
 	
 	private void browseBaseUi(final Game game) {
 		final GameData gameData = mpqBuilderService.getGameData(game);
-		final Updateable controller = createTab(gameData.getGameDef().getName());
+		final Updateable controller = createTab(gameData.getGameDef().name());
 		if (controller != null) {
 			final BrowseLoadBaseUiTask task =
 					new BrowseLoadBaseUiTask(appController, gameData, (BrowseTabController) controller, baseUiService);

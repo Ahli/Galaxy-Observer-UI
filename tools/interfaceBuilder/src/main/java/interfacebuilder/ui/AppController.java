@@ -379,8 +379,8 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 				isHeroes = true;
 				gameDef = gameService.getGameDef(Game.HEROES);
 				final boolean isPtr = baseUiService.isHeroesPtrActive();
-				final String supportDir = gameDef.getSupportDirectoryX64();
-				final String swicherExe = gameDef.getSwitcherExeNameX64();
+				final String supportDir = gameDef.supportDirectoryX64();
+				final String swicherExe = gameDef.switcherExeNameX64();
 				gamePath =
 						(isPtr ? settings.getHeroesPtrPath() : settings.getHeroesPath()) + File.separator + supportDir +
 								File.separator + swicherExe;
@@ -389,8 +389,8 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 				isHeroes = false;
 				gameDef = gameService.getGameDef(Game.SC2);
 				final boolean is64bit = settings.isSc64bit();
-				final String supportDir = is64bit ? gameDef.getSupportDirectoryX64() : gameDef.getSupportDirectoryX32();
-				final String swicherExe = is64bit ? gameDef.getSwitcherExeNameX64() : gameDef.getSwitcherExeNameX32();
+				final String supportDir = is64bit ? gameDef.supportDirectoryX64() : gameDef.supportDirectoryX32();
+				final String swicherExe = is64bit ? gameDef.switcherExeNameX64() : gameDef.switcherExeNameX32();
 				gamePath = settings.getSc2Path() + File.separator + supportDir + File.separator + swicherExe;
 			}
 		}

@@ -99,7 +99,7 @@ public class ProjectService {
 	public boolean pathContainsCompileableForGame(final String path, final GameData game) {
 		// detection via layout file ending as defined in the GameData's GameDef
 		final String[] extensions = new String[1];
-		extensions[0] = game.getGameDef().getLayoutFileEnding();
+		extensions[0] = game.getGameDef().layoutFileEnding();
 		final IOFileFilter filter = new SuffixFileFilter(extensions, IOCase.INSENSITIVE);
 		final Iterator<File> iter = FileUtils.iterateFiles(new File(path), filter, TrueFileFilter.INSTANCE);
 		

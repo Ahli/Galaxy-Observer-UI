@@ -254,11 +254,9 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		
 		final List<UIElement> templateChildren;
 		
-		if (templateElem instanceof UIFrame) {
-			final UIFrame frame = (UIFrame) templateElem;
+		if (templateElem instanceof final UIFrame frame) {
 			templateChildren = frame.getChildrenRaw();
-			if (targetElem instanceof UIFrame) {
-				final UIFrame target = (UIFrame) targetElem;
+			if (targetElem instanceof final UIFrame target) {
 				// TODO do not set the undefined anchors (-> track if a side was defined or is on the initial value)
 				target.setAnchor(UIAnchorSide.TOP,
 						frame.getAnchorRelative(UIAnchorSide.TOP),
@@ -287,21 +285,17 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			//		} else if (templateElem instanceof UIAttribute) {
 			//			final UIAttribute attr = (UIAttribute) templateElem;
 			//			templateChildren = attr.getChildrenRaw();
-		} else if (templateElem instanceof UIStateGroup) {
-			final UIStateGroup stateGroup = (UIStateGroup) templateElem;
+		} else if (templateElem instanceof final UIStateGroup stateGroup) {
 			templateChildren = stateGroup.getChildrenRaw();
-			if (targetElem instanceof UIStateGroup) {
-				final UIStateGroup target = (UIStateGroup) targetElem;
+			if (targetElem instanceof final UIStateGroup target) {
 				target.setDefaultState(stateGroup.getDefaultState());
 				// states are the children
 			} else {
 				logger.error("Attempting to apply a template of type StateGroup to a different type.");
 			}
-		} else if (templateElem instanceof UIController) {
-			final UIController uiController = (UIController) templateElem;
+		} else if (templateElem instanceof final UIController uiController) {
 			templateChildren = uiController.getChildrenRaw();
-			if (targetElem instanceof UIController) {
-				final UIController target = (UIController) targetElem;
+			if (targetElem instanceof final UIController target) {
 				copyAttributes(uiController.getKeys(), target.getKeys());
 				// TODO attributesKeyValueList
 				// TODO isNameImplicit?
@@ -309,8 +303,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			} else {
 				logger.error("Attempting to apply a template of type UIController to a different type.");
 			}
-		} else if (templateElem instanceof UIAnimation) {
-			final UIAnimation uiAnimation = (UIAnimation) templateElem;
+		} else if (templateElem instanceof final UIAnimation uiAnimation) {
 			templateChildren = uiAnimation.getChildrenRaw();
 			if (targetElem instanceof UIAnimation) {
 				// final UIAnimation target = (UIAnimation) targetElem;
@@ -320,11 +313,9 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			} else {
 				logger.error("Attempting to apply a template of type UIAnimation to a different type.");
 			}
-		} else if (templateElem instanceof UIState) {
-			final UIState uiState = (UIState) templateElem;
+		} else if (templateElem instanceof final UIState uiState) {
 			templateChildren = uiState.getChildrenRaw();
-			if (targetElem instanceof UIState) {
-				final UIState target = (UIState) targetElem;
+			if (targetElem instanceof final UIState target) {
 				// TODO nextAdditionShouldOverrideActions
 				copyAttributes(uiState.getActions(), target.getActions());
 				// TODO nextAdditionShouldOverrideWhens
@@ -606,15 +597,15 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					newElem = new UIControllerMutable(name);
 					// add to parent
 					if (curElement != null) {
-						if (curElement instanceof UIAnimation) {
-							((UIAnimation) curElement).getControllers().add(newElem);
+						if (curElement instanceof final UIAnimation anim) {
+							anim.getControllers().add(newElem);
 							final var newElemUiController = (UIController) newElem;
 							for (int j = 0, len = attrValues.size(); j < len; ++j) {
 								newElemUiController.addValue(attrTypes.get(j), attrValues.get(j));
 							}
 							
 							if (name == null) {
-								setImplicitControllerNames((UIAnimation) curElement);
+								setImplicitControllerNames(anim);
 							}
 						} else {
 							logger.error("Controller appearing in unexpected parent element: {}", curElement);
@@ -645,7 +636,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					// add to parent
 					if (curElement != null) {
 						if (curElement instanceof UIFrame) {
-							(curElement).getChildren().add(newElem);
+							curElement.getChildren().add(newElem);
 						} else {
 							logger.error("StateGroup appearing in unexpected parent element: {}", curElement);
 						}
@@ -722,13 +713,14 @@ public class UICatalogParser implements ParsedXmlConsumer {
 								curIsDevLayout,
 								consoleSkinId));
 					}
-					final UIAttribute newElemUiAttr = new UIAttributeImmutable(tagName, attributeKeyValueList);
+					UIAttribute newElemUiAttr = new UIAttributeImmutable(tagName, attributeKeyValueList);
 					newElem = newElemUiAttr;
 					
 					if (deduplicateDuringParsing) {
 						final UIElement refToDuplicate = addedFinalElements.get(newElem);
 						if (refToDuplicate != null) {
 							newElem = refToDuplicate;
+							newElemUiAttr = (UIAttribute) newElem;
 							++attributeDeduplications;
 						} else {
 							addedFinalElements.put(newElem, newElem);
@@ -736,34 +728,34 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					}
 					
 					// add to parent
-					if (curElement instanceof UIFrame) {
+					if (curElement instanceof final UIFrame frame) {
 						// Frame's attributes
-						((UIFrame) curElement).addAttribute((UIAttribute) newElem);
+						frame.addAttribute(newElemUiAttr);
 						// register handle
 						if (HANDLE.equals(tagName)) {
-							catalog.getHandles().put(newElemUiAttr.getValue(VAL), (UIFrame) curElement);
+							catalog.getHandles().put(newElemUiAttr.getValue(VAL), frame);
 						}
-					} else if (curElement instanceof UIAnimation) {
+					} else if (curElement instanceof final UIAnimation anim) {
 						// Animation's events
 						if (tagName.equals(EVENT)) {
-							((UIAnimation) curElement).addEvent((UIAttribute) newElem);
+							anim.addEvent(newElemUiAttr);
 						} else if (tagName.equals(DRIVER)) {
-							((UIAnimation) curElement).setDriver((UIAttribute) newElem);
+							anim.setDriver(newElemUiAttr);
 						} else {
 							logger.error("found an attribute that cannot be added to UIAnimation: {}", newElem);
 						}
-					} else if (curElement instanceof UIController) {
+					} else if (curElement instanceof final UIController controller) {
 						// Controller's keys
 						if (tagName.equals(KEY)) {
-							((UIController) curElement).getKeys().add((UIAttribute) newElem);
+							controller.getKeys().add(newElemUiAttr);
 						} else {
 							logger.error("found an attribute that cannot be added to UIController: {}", newElem);
 						}
-					} else if (curElement instanceof UIStateGroup) {
+					} else if (curElement instanceof final UIStateGroup stateGroup) {
 						if (tagName.equals(DEFAULTSTATE)) {
-							final String stateVal = ((UIAttribute) newElem).getValue(VAL);
+							final String stateVal = newElemUiAttr.getValue(VAL);
 							if (stateVal != null) {
-								((UIStateGroup) curElement).setDefaultState(stateVal);
+								stateGroup.setDefaultState(stateVal);
 							} else {
 								logger.error("found <DefaultState> in <StateGroup '{}'> without val",
 										curElement.getName());
@@ -771,11 +763,11 @@ public class UICatalogParser implements ParsedXmlConsumer {
 						} else {
 							logger.error("found an attribute that cannot be added to UIController: {}", newElem);
 						}
-					} else if (curElement instanceof UIState) {
+					} else if (curElement instanceof final UIState state) {
 						if (tagName.equals(WHEN)) {
-							((UIState) curElement).getWhens().add((UIAttribute) newElem);
+							state.getWhens().add(newElemUiAttr);
 						} else if (tagName.equals(ACTION)) {
-							((UIState) curElement).getActions().add((UIAttribute) newElem);
+							state.getActions().add(newElemUiAttr);
 						} else {
 							logger.error("found an attribute that cannot be added to UIState: {}", newElem);
 						}
@@ -903,8 +895,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		final String offset = ((i = attrTypes.indexOf(OFFSET)) != -1) ?
 				catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout, consoleSkinId) : null;
 		
-		if (curElement instanceof UIFrame) {
-			final UIFrame frame = (UIFrame) curElement;
+		if (curElement instanceof final UIFrame frame) {
 			if (side == null) {
 				logger.trace("relative={}, offset={}", relative, offset);
 				if (relative == null) {
@@ -1008,14 +999,14 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	}
 	
 	private void deduplicate(final Object obj) {
-		if (obj instanceof UIFrame) {
-			deduplicate((UIFrame) obj);
-		} else if (obj instanceof UIAnimation) {
-			deduplicate((UIAnimation) obj);
-		} else if (obj instanceof UIStateGroup) {
-			deduplicate((UIStateGroup) obj);
-		} else if (obj instanceof UITemplate) {
-			deduplicate((UITemplate) obj);
+		if (obj instanceof final UIFrame frame) {
+			deduplicate(frame);
+		} else if (obj instanceof final UIAnimation anim) {
+			deduplicate(anim);
+		} else if (obj instanceof final UIStateGroup stateGroup) {
+			deduplicate(stateGroup);
+		} else if (obj instanceof final UITemplate template) {
+			deduplicate(template);
 		} else if (!(obj instanceof UIAttribute || obj instanceof UIConstant || obj instanceof UIController ||
 				obj instanceof UIState)) {
 			// attributes, constants, controllers do not contain any deduplicated objects

@@ -140,8 +140,8 @@ public class BaseUiService {
 	public int[] getVersion(final GameDef gameDef, final boolean isPtr) {
 		final int[] versions = new int[4];
 		final Path path = Path.of(gameService.getGameDirPath(gameDef, isPtr),
-				gameDef.getSupportDirectoryX64(),
-				gameDef.getSwitcherExeNameX64());
+				gameDef.supportDirectoryX64(),
+				gameDef.switcherExeNameX64());
 		try {
 			final PE pe = PEParser.parse(path.toFile());
 			final ResourceDirectory rd = pe.getImageData().getResourceTable();
@@ -195,7 +195,7 @@ public class BaseUiService {
 				Files.createDirectories(destination);
 			}
 			fileService.cleanDirectory(destination);
-			discCacheService.remove(gameDef.getName(), usePtr);
+			discCacheService.remove(gameDef.name(), usePtr);
 		} catch (final IOException e) {
 			logger.error(String.format("Directory %s could not be cleaned.", destination), e);
 			return Collections.emptyList();
@@ -228,7 +228,6 @@ public class BaseUiService {
 			case HEROES -> new String[] { "*.StormLayout", "*Assets.txt", "*.StormStyle" };
 		};
 	}
-	
 	
 	private void writeToMetaFile(final Path directory, final String gameName, final int[] version, final boolean isPtr)
 			throws IOException {
@@ -267,7 +266,7 @@ public class BaseUiService {
 	 */
 	public void parseBaseUI(final GameData gameData) {
 		// lock per game
-		final String gameName = gameData.getGameDef().getName();
+		final String gameName = gameData.getGameDef().name();
 		synchronized (gameName) {
 			UICatalog uiCatalog = gameData.getUiCatalog();
 			if (uiCatalog != null) {
@@ -277,7 +276,6 @@ public class BaseUiService {
 				logger.info("Loading baseUI for {}", gameName);
 				boolean needToParseAgain = true;
 				
-				/*!(game.getNewGameDef() instanceof SC2GameDef) &&*/
 				final Path baseUiPath = configService.getBaseUiPath(gameData.getGameDef());
 				boolean isPtr = false;
 				try {
@@ -305,14 +303,14 @@ public class BaseUiService {
 							DeduplicationIntensity.FULL));
 					appController.printInfoLogMessageToGeneral("Starting to parse base " + gameName + " UI.");
 					appController.addThreadLoggerTab(Thread.currentThread().getName(),
-							gameData.getGameDef().getNameHandle() + "UI",
+							gameData.getGameDef().nameHandle() + "UI",
 							false);
 					final String gameDir = configService.getBaseUiPath(gameData.getGameDef()) + File.separator +
-							gameData.getGameDef().getModsSubDirectory();
+							gameData.getGameDef().modsSubDirectory();
 					try {
 						final WildcardFileFilter fileFilter =
 								new WildcardFileFilter("descindex.*layout", IOCase.INSENSITIVE);
-						for (final String modOrDir : gameData.getGameDef().getCoreModsOrDirectories()) {
+						for (final String modOrDir : gameData.getGameDef().coreModsOrDirectories()) {
 							
 							@SuppressWarnings("ObjectAllocationInLoop")
 							final File directory = new File(gameDir + File.separator + modOrDir);
@@ -328,8 +326,8 @@ public class BaseUiService {
 							for (final File descIndexFile : descIndexFiles) {
 								logger.info("parsing descIndexFile '{}'", descIndexFile.getPath());
 								uiCatalog.processDescIndex(descIndexFile,
-										gameData.getGameDef().getDefaultRaceId(),
-										gameData.getGameDef().getDefaultConsoleSkinId());
+										gameData.getGameDef().defaultRaceId(),
+										gameData.getGameDef().defaultConsoleSkinId());
 							}
 						}
 						uiCatalog.postProcessParsing();
@@ -377,16 +375,16 @@ public class BaseUiService {
 		try {
 			return cacheIsUpToDate(gameDef, usePtr);
 		} catch (final NoSuchFileException e) {
-			logger.trace(String.format("No cache exists for %s", gameDef.getName()), e);
+			logger.trace(String.format("No cache exists for %s", gameDef.name()), e);
 		} catch (final IOException e) {
-			logger.info(String.format("Failed to check cache status of %s:", gameDef.getName()), e);
+			logger.info(String.format("Failed to check cache status of %s:", gameDef.name()), e);
 		}
 		return false;
 	}
 	
 	public boolean cacheIsUpToDate(final GameDef gameDef, final boolean usePtr) throws IOException {
 		final Path baseUiMetaFileDir = configService.getBaseUiPath(gameDef);
-		final Path cacheFilePath = discCacheService.getCacheFilePath(gameDef.getName(), usePtr);
+		final Path cacheFilePath = discCacheService.getCacheFilePath(gameDef.name(), usePtr);
 		return cacheIsUpToDate(cacheFilePath, baseUiMetaFileDir);
 	}
 	
@@ -540,7 +538,7 @@ public class BaseUiService {
 		protected void compute() {
 			final int[] version = baseUiService.getVersion(gameDef, usePtr);
 			try {
-				baseUiService.writeToMetaFile(destination, gameDef.getName(), version, usePtr);
+				baseUiService.writeToMetaFile(destination, gameDef.name(), version, usePtr);
 			} catch (final IOException e) {
 				logger.error("Failed to write metafile: ", e);
 			}
