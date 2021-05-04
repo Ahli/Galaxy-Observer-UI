@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Reads a a Desc Index File.
+ * Reads a Desc Index File.
  *
  * @author Ahli
  */

@@ -127,16 +127,12 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 	public void applyCompression() throws IOException {
 		switch (compression) {
 			// custom, blizz & none use custom ruleset
-			case CUSTOM:
-			case BLIZZARD_SC2_HEROES:
-			case NONE:
+			case CUSTOM, BLIZZARD_SC2_HEROES, NONE:
 				backUpOriginalSettingsFiles();
 				applyChangesToFiles();
 				break;
-			
 			case SYSTEM_DEFAULT:
 				break;
-			
 			default:
 				throw new IOException("unknown compression setting");
 		}
@@ -276,8 +272,7 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 			case NONE:
 				section.addProperty(DEFAULT, NO_COMPRESSION_CUSTOM_RULE);
 				break;
-			case SYSTEM_DEFAULT:
-			case BLIZZARD_SC2_HEROES:
+			case SYSTEM_DEFAULT, BLIZZARD_SC2_HEROES:
 			default:
 				break;
 		}

@@ -508,8 +508,14 @@ public class SettingsEditorApplication extends Application {
 				openedDocPath = null;
 				updateAppTitle();
 				showErrorAlert(e);
+			} catch (final InterruptedException e){
+				logger.error("Opening File was interrupted.", e);
+				Thread.currentThread().interrupt();
+				openedDocPath = null;
+				updateAppTitle();
+				showExceptionAlert(e);
 			} catch (final Exception e) {
-				logger.error("File could not be opened", e);
+				logger.error("File could not be opened.", e);
 				openedDocPath = null;
 				updateAppTitle();
 				showExceptionAlert(e);

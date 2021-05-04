@@ -195,9 +195,9 @@ public class ConcurrentWeakWeakHashMap<K> implements ConcurrentMap<K, K> {
 		@Override
 		public boolean equals(final Object obj) {
 			return obj != null && obj.getClass() == getClass() &&
-					((this == obj || get() == ((WeakReferenceWithHash<?>) obj).get()) ||
+					((this == obj || super.get() == ((WeakReferenceWithHash<?>) obj).get()) ||
 							(hashCode == ((WeakReferenceWithHash<?>) obj).hashCode &&
-									Objects.equals(get(), ((WeakReferenceWithHash<?>) obj).get())));
+									Objects.equals(super.get(), ((WeakReferenceWithHash<?>) obj).get())));
 		}
 		
 		@Override

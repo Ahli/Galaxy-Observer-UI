@@ -69,9 +69,8 @@ public class XmlParserVtd extends XmlParserAbstract {
 	public void parseFile(final Path p) throws IOException {
 		logger.trace("parsing layout file: {}", p::getFileName);
 		try {
-			final byte[] bytes = Files.readAllBytes(p);
-			// setdoc causes a nullpointer error due to an internal bug
-			vtd.setDoc_BR(bytes);
+			// setdoc causes a nullpointer error due to an internal bug => use byte array
+			vtd.setDoc_BR(Files.readAllBytes(p));
 			vtd.parse(false);
 			final VTDNav nav = vtd.getNav();
 			final AutoPilot ap = new AutoPilot(nav);

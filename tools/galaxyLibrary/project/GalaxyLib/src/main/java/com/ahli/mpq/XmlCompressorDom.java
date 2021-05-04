@@ -54,16 +54,14 @@ public final class XmlCompressorDom {
 	 * @param cachePath
 	 * @param ignoreCommentCountPerFile
 	 * @throws ParserConfigurationException
-	 * @throws SAXException
 	 * @throws TransformerConfigurationException
+	 * @throws IOException
 	 */
 	public static void processCache(final Path cachePath, final int ignoreCommentCountPerFile)
 			throws ParserConfigurationException, TransformerConfigurationException, IOException {
 		
 		logger.info("Compressing XML files...");
 		logger.trace("cachePath: {}", cachePath);
-		
-		//		final Collection<File> filesOfCache = FileUtils.listFiles(new File(cachePath), null, true);
 		
 		final DocumentBuilderFactory dbFac = DocumentBuilderFactory.newInstance();
 		dbFac.setNamespaceAware(false);
@@ -81,6 +79,7 @@ public final class XmlCompressorDom {
 		
 		final TransformerFactory factory = TransformerFactory.newInstance();
 		factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+		
 		final Transformer transformer = factory.newTransformer();
 		
 		final FileVisitor<Path> visitor = new FileProcessor(dBuilder, transformer, ignoreCommentCountPerFile);
