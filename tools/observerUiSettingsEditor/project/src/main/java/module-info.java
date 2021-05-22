@@ -8,6 +8,7 @@ module ObserverUiSettingsEditor {
 	requires org.apache.commons.io;
 	requires org.apache.commons.lang3;
 	requires org.apache.logging.log4j;
+	requires org.apache.logging.log4j.slf4j;
 	requires GalaxyLib;
 	exports com.ahli.hotkey_ui.application to javafx.graphics;
 	exports com.ahli.hotkey_ui.application.controller to javafx.fxml;
