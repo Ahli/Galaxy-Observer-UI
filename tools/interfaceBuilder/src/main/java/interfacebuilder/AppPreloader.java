@@ -13,7 +13,9 @@ import javafx.stage.StageStyle;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.net.URL;
 
 public class AppPreloader extends Preloader {
 	private static final Logger logger = LogManager.getLogger(AppPreloader.class);
@@ -27,13 +29,23 @@ public class AppPreloader extends Preloader {
 		primaryStage.initStyle(StageStyle.TRANSPARENT);
 		scene.setFill(Color.TRANSPARENT);
 		try {
-			scene.getStylesheets().add(getClass().getResource("/view/preload.css").toURI().toString());
+			final URL cssFile = getClass().getResource("/view/preload.css");
+			if (cssFile != null) {
+				scene.getStylesheets().add(cssFile.toURI().toString());
+			} else {
+				logger.warn("preloader stylesheet not found");
+			}
 		} catch (final URISyntaxException e) {
 			logger.error("preloader stylesheet loading error", e);
 		}
 		primaryStage.setScene(scene);
 		primaryStage.setTitle("Interface Builder");
-		primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/res/ahli.png")));
+		final InputStream iconStream = getClass().getResourceAsStream("/res/ahli.png");
+		if (iconStream != null) {
+			primaryStage.getIcons().add(new Image(iconStream));
+		} else {
+			logger.warn("preloader icon not found");
+		}
 		primaryStage.show();
 	}
 	
