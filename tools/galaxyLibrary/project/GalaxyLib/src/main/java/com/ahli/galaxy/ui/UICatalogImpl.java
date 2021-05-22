@@ -14,9 +14,9 @@ import com.ahli.galaxy.ui.interfaces.UICatalog;
 import com.ahli.galaxy.ui.interfaces.UIConstant;
 import com.ahli.galaxy.ui.interfaces.UIElement;
 import com.ahli.galaxy.ui.interfaces.UIFrame;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -37,7 +37,7 @@ import java.util.Objects;
 public class UICatalogImpl implements UICatalog {
 	
 	private static final String UNDERSCORE = "_";
-	private static final Logger logger = LogManager.getLogger(UICatalogImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(UICatalogImpl.class);
 	// members
 	private final List<UITemplate> templates;
 	private final List<UITemplate> blizzOnlyTemplates;

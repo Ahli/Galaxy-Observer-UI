@@ -14,8 +14,8 @@ import com.ximpleware.XMLModifier;
 import com.ximpleware.XPathEvalException;
 import com.ximpleware.XPathParseException;
 import org.apache.commons.io.FileUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -34,7 +34,7 @@ public final class XmlCompressorVtd {
 	private static final String COMMENT_XPATH = "//comment()";
 	private static final String AHLI_SETTING = "@setting";
 	private static final String AHLI_HOTKEY = "@hotkey";
-	private static final Logger logger = LogManager.getLogger(XmlCompressorVtd.class);
+	private static final Logger logger = LoggerFactory.getLogger(XmlCompressorVtd.class);
 	private static final String TEXT_XPATH = "//text()";
 	
 	/**
@@ -64,7 +64,7 @@ public final class XmlCompressorVtd {
 		
 		for (final File curFile : filesOfCache) {
 			//noinspection ObjectAllocationInLoop
-			logger.trace("compression - processing file: {}", curFile::getPath);
+			logger.trace("compression - processing file: {}", curFile.getPath());
 			
 			try {
 				// setdoc causes a nullpointer error due to an internal bug

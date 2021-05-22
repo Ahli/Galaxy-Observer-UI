@@ -5,10 +5,10 @@ package com.ahli.galaxy.archive;
 
 import com.ahli.mpq.MpqException;
 import com.ahli.mpq.MpqInterface;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.tuple.Tuples;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -39,7 +39,7 @@ public class DescIndexData {
 	private static final String XML_VERSION_1_0_ENCODING_UTF_8_STANDALONE_YES_DESC =
 			"<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\r\n<Desc>\r\n";
 	
-	private static final Logger logger = LogManager.getLogger(DescIndexData.class);
+	private static final Logger logger = LoggerFactory.getLogger(DescIndexData.class);
 	private static final String CHECKED_WITH_DEPENDENCY_AND_I_J_I2 =
 			"checked {} with dependency {} and {} i={} j={} i2={}";
 	private static final String FILE_INT_PATH_LIST = "fileIntPathList: {}";

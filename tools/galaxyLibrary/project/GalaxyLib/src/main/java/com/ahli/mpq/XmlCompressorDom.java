@@ -4,8 +4,8 @@
 package com.ahli.mpq;
 
 import com.ahli.util.SilentXmlSaxErrorHandler;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -42,7 +42,7 @@ public final class XmlCompressorDom {
 	private static final String AHLI_SETTING = "@setting";
 	private static final String AHLI_HOTKEY = "@hotkey";
 	private static final String ANY_TAGNAME = "*";
-	private static final Logger logger = LogManager.getLogger(XmlCompressorDom.class);
+	private static final Logger logger = LoggerFactory.getLogger(XmlCompressorDom.class);
 	
 	/**
 	 *

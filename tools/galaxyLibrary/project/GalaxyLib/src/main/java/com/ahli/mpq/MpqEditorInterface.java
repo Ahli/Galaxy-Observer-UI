@@ -8,8 +8,8 @@ import com.ahli.mpq.mpqeditor.MpqEditorCompression;
 import com.ahli.mpq.mpqeditor.MpqEditorCompressionRule;
 import com.ahli.mpq.mpqeditor.MpqEditorSettingsInterface;
 import com.ahli.util.DeepCopyable;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
@@ -29,7 +29,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	private static final String EXECUTING = "executing: {}";
 	private static final String EXECUTION_FINISHED = "execution finished";
 	private static final char QUOTE = '\"';
-	private static final Logger logger = LogManager.getLogger(MpqEditorInterface.class);
+	private static final Logger logger = LoggerFactory.getLogger(MpqEditorInterface.class);
 	private static final String MPQ_INTERFACE_MPQ_EDITOR_NOT_FOUND = "MpqInterface.MpqEditorNotFound";
 	private static final String CMD_C = "cmd /C ";
 	private static final Object classWideLock = new Object();

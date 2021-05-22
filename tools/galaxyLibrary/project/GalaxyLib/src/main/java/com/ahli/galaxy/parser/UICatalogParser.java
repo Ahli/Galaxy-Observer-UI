@@ -24,9 +24,9 @@ import com.ahli.galaxy.ui.interfaces.UIElement;
 import com.ahli.galaxy.ui.interfaces.UIFrame;
 import com.ahli.galaxy.ui.interfaces.UIState;
 import com.ahli.galaxy.ui.interfaces.UIStateGroup;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -69,7 +69,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	private static final String RIGHT = "right";
 	private static final String TOP = "top";
 	private static final String TYPE = "type";
-	private static final Logger logger = LogManager.getLogger(UICatalogParser.class);
+	private static final Logger logger = LoggerFactory.getLogger(UICatalogParser.class);
 	private static final String HANDLE = "handle";
 	private final UICatalog catalog;
 	private final XmlParser parser;

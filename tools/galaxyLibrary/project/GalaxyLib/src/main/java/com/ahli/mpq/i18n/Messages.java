@@ -3,8 +3,8 @@
 
 package com.ahli.mpq.i18n;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Locale;
 import java.util.MissingResourceException;
@@ -18,7 +18,7 @@ import java.util.ResourceBundle;
  */
 public final class Messages {
 	private static final String BUNDLE_NAME = "galaxylib_i18n.galaxyLibMessages";
-	private static final Logger logger = LogManager.getLogger(Messages.class);
+	private static final Logger logger = LoggerFactory.getLogger(Messages.class);
 	private static ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE_NAME);
 	
 	private static Locale usedLocale = Locale.getDefault();

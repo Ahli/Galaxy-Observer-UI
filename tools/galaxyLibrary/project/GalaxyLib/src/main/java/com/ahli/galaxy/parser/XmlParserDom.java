@@ -6,8 +6,8 @@ package com.ahli.galaxy.parser;
 import com.ahli.galaxy.parser.abstracts.XmlParserAbstract;
 import com.ahli.galaxy.parser.interfaces.ParsedXmlConsumer;
 import com.ahli.galaxy.ui.exception.UIException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -25,7 +25,7 @@ import java.util.Locale;
 
 public class XmlParserDom extends XmlParserAbstract {
 	private static final String ANY_TAG = "*";
-	private static final Logger logger = LogManager.getLogger(XmlParserDom.class);
+	private static final Logger logger = LoggerFactory.getLogger(XmlParserDom.class);
 	private DocumentBuilder dBuilder;
 	
 	private List<String> attrTypes;
@@ -62,7 +62,7 @@ public class XmlParserDom extends XmlParserAbstract {
 				dBuilder = dbFac.newDocumentBuilder();
 			}
 		} catch (final ParserConfigurationException e) {
-			logger.error(e);
+			logger.error("Parser configuration error: ", e);
 		}
 		attrTypes = new ArrayList<>(3);
 		attrValues = new ArrayList<>(3);
@@ -84,7 +84,9 @@ public class XmlParserDom extends XmlParserAbstract {
 	
 	@Override
 	public void parseFile(final Path p) throws IOException {
-		logger.trace("parsing layout file: {}", p::getFileName);
+		if (logger.isTraceEnabled()) {
+			logger.trace("parsing layout file: {}", p.getFileName());
+		}
 		try {
 			final NodeList elements = dBuilder.parse(p.toFile()).getElementsByTagName(ANY_TAG);
 			Node node;

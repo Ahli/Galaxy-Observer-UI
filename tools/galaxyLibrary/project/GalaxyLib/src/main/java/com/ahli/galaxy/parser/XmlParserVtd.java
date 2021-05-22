@@ -11,8 +11,8 @@ import com.ximpleware.NavException;
 import com.ximpleware.ParseException;
 import com.ximpleware.VTDGen;
 import com.ximpleware.VTDNav;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -22,7 +22,7 @@ import java.util.List;
 
 public class XmlParserVtd extends XmlParserAbstract {
 	private static final String ANY_TAG = "*";
-	private static final Logger logger = LogManager.getLogger(XmlParserVtd.class);
+	private static final Logger logger = LoggerFactory.getLogger(XmlParserVtd.class);
 	private VTDGen vtd;
 	
 	private List<String> attrTypes;
@@ -67,7 +67,9 @@ public class XmlParserVtd extends XmlParserAbstract {
 	
 	@Override
 	public void parseFile(final Path p) throws IOException {
-		logger.trace("parsing layout file: {}", p::getFileName);
+		if (logger.isTraceEnabled()) {
+			logger.trace("parsing layout file: {}", p.getFileName());
+		}
 		try {
 			// setdoc causes a nullpointer error due to an internal bug => use byte array
 			vtd.setDoc_BR(Files.readAllBytes(p));
