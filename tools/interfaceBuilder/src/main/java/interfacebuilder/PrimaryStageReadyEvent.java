@@ -7,9 +7,14 @@ import interfacebuilder.integration.CommandLineParams;
 import javafx.stage.Stage;
 import org.springframework.context.ApplicationEvent;
 
+import java.io.Serial;
+
 public class PrimaryStageReadyEvent extends ApplicationEvent {
 	
 	private final CommandLineParams startingParams;
+	
+	@Serial
+	private static final long serialVersionUID = -4177428667031979303L;
 	
 	public PrimaryStageReadyEvent(final Object source, final CommandLineParams startingParams) {
 		super(source);

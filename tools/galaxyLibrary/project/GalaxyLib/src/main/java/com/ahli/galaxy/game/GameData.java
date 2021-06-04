@@ -17,4 +17,8 @@ public class GameData {
 	private final GameDef gameDef;
 	private UICatalog uiCatalog;
 	
+	public GameData(final GameDef gameDef) {
+		this.gameDef = gameDef;
+	}
+	
 }

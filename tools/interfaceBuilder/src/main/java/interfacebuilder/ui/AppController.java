@@ -49,6 +49,7 @@ import org.springframework.context.event.EventListener;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ForkJoinPool;
@@ -601,6 +602,10 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 	
 	
 	private static final class AppControllerException extends RuntimeException {
+		
+		@Serial
+		private static final long serialVersionUID = -4067724426665591353L;
+		
 		private AppControllerException(final Exception e) {
 			super(e);
 		}

@@ -7,12 +7,17 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serial;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.stream.Stream;
 
 public class FileService {
+	
+	public FileService() {
+		// explicit default constructor
+	}
 	
 	/**
 	 * Copies a file or directory.
@@ -148,6 +153,10 @@ public class FileService {
 	}
 	
 	private static class FileServiceException extends RuntimeException {
+		
+		@Serial
+		private static final long serialVersionUID = -5030478360016607662L;
+		
 		public FileServiceException(final String message, final IOException e) {
 			super(message, e);
 		}

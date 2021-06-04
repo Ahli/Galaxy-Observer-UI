@@ -24,6 +24,10 @@ import java.util.Collection;
 public class ReplayService {
 	private static final Logger logger = LogManager.getLogger(ReplayService.class);
 	
+	public ReplayService() {
+		// explicit default constructor
+	}
+	
 	/**
 	 * Gets the last or newest replay.
 	 *

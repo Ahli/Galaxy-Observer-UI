@@ -37,6 +37,10 @@ import java.nio.file.attribute.BasicFileAttributes;
 public class CompileService {
 	private static final Logger logger = LogManager.getLogger(CompileService.class);
 	
+	public CompileService() {
+		// explicit default constructor
+	}
+	
 	/**
 	 * Compiles and updates the data in the cache.
 	 *

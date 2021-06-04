@@ -44,6 +44,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serial;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -430,6 +431,9 @@ public class BaseUiService {
 	}
 	
 	private static final class CascFileExtractionTask extends RecursiveAction {
+		@Serial
+		private static final long serialVersionUID = -775938058915435006L;
+		
 		private final File extractorExe;
 		private final String gamePath;
 		private final String mask;
@@ -517,6 +521,9 @@ public class BaseUiService {
 	}
 	
 	private static final class ExtractVersionTask extends RecursiveAction {
+		
+		@Serial
+		private static final long serialVersionUID = 3071926102876787289L;
 		
 		private final GameDef gameDef;
 		private final boolean usePtr;

@@ -17,6 +17,10 @@ import java.util.Map;
 public class WrappingTextTableCell extends TableCell<Map.Entry<String, String>, String> {
 	private static final Logger logger = LogManager.getLogger(WrappingTextTableCell.class);
 	
+	public WrappingTextTableCell() {
+		super();
+	}
+	
 	@Override
 	protected void updateItem(final String item, final boolean empty) {
 		if (empty || item == null) {

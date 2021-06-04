@@ -46,7 +46,7 @@ module interfacex.builder {
 	requires org.apache.commons.lang3;
 	
 	// own projects
-	requires GalaxyLib;
+	requires transitive GalaxyLib;
 	
 	// log4j export is a test to fix stylized text area appender
 	exports interfacebuilder to javafx.graphics, javafx.fxml, spring.context;
@@ -56,7 +56,7 @@ module interfacex.builder {
 	opens interfacebuilder.compress;
 	// open to unnamed for unit test
 	opens interfacebuilder.projects; // to org.hibernate.orm.core, spring.core, spring.beans;
-	exports interfacebuilder.config to spring.beans, spring.context;
+	exports interfacebuilder.config; //to spring.beans, spring.context;
 	opens interfacebuilder.build to spring.core;
 	opens interfacebuilder.base_ui to spring.core, com.esotericsoftware.kryo;
 	// open to unnamed for unit test

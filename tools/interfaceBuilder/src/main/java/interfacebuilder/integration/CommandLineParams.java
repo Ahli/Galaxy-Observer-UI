@@ -6,6 +6,7 @@ package interfacebuilder.integration;
 import javafx.application.Application;
 
 import java.io.File;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
@@ -17,6 +18,10 @@ public class CommandLineParams implements Serializable {
 	private static final String COMPILE_RUN = "compileRun";
 	private static final String COMPILE = "compile";
 	private static final String RUN = "run";
+	
+	@Serial
+	private static final long serialVersionUID = -1392167025965886051L;
+	
 	private final String paramRunPath;
 	private final boolean compileAndRun;
 	private final boolean hasParamCompilePath;

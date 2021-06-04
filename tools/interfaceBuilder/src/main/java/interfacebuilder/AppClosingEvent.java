@@ -5,7 +5,13 @@ package interfacebuilder;
 
 import org.springframework.context.ApplicationEvent;
 
+import java.io.Serial;
+
 public class AppClosingEvent extends ApplicationEvent {
+	
+	@Serial
+	private static final long serialVersionUID = -7023381733913412190L;
+	
 	public AppClosingEvent(final Object source) {
 		super(source);
 	}
