@@ -3,6 +3,7 @@
 
 package com.ahli.galaxy.archive;
 
+import com.ahli.util.XmlDomHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -11,9 +12,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
@@ -55,17 +54,7 @@ public final class LayoutReaderDom {
 		final String nameWOfileEnding =
 				nameWithFileEnding.substring(0, Math.max(0, nameWithFileEnding.lastIndexOf('.')));
 		
-		final DocumentBuilderFactory dbFac = DocumentBuilderFactory.newInstance();
-		dbFac.setNamespaceAware(false);
-		dbFac.setValidating(false);
-		dbFac.setAttribute("http://xml.org/sax/features/external-general-entities", false);
-		dbFac.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-		dbFac.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-		dbFac.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-		dbFac.setXIncludeAware(false);
-		dbFac.setExpandEntityReferences(false);
-		dbFac.setAttribute(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-		final DocumentBuilder dBuilder = dbFac.newDocumentBuilder();
+		final DocumentBuilder dBuilder = XmlDomHelper.buildSecureDocumentBuilder();
 		final Document doc = dBuilder.parse(f);
 		
 		final ArrayList<String> list = new ArrayList<>(10);
@@ -265,19 +254,8 @@ public final class LayoutReaderDom {
 	 */
 	public static List<String> getLayoutsConstantDefinitions(final File f)
 			throws ParserConfigurationException, SAXException, IOException {
-		final DocumentBuilderFactory dbFac = DocumentBuilderFactory.newInstance();
-		dbFac.setNamespaceAware(false);
-		dbFac.setValidating(false);
-		dbFac.setAttribute("http://xml.org/sax/features/external-general-entities", false);
-		dbFac.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-		dbFac.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-		dbFac.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-		dbFac.setXIncludeAware(false);
-		dbFac.setExpandEntityReferences(false);
-		dbFac.setAttribute(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-		final DocumentBuilder dBuilder = dbFac.newDocumentBuilder();
-		final Document doc = dBuilder.parse(f);
 		
+		final Document doc = XmlDomHelper.buildSecureDocumentBuilder().parse(f);
 		return getLayoutsConstantDefinitions(doc);
 	}
 }

@@ -15,6 +15,8 @@ import javafx.scene.input.KeyCombination;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.net.URL;
+
 /**
  * @author Ahli
  */
@@ -112,11 +114,13 @@ public class MenuBarController {
 						"\n" + "\n" + Messages.getString("MenuBarController.AboutText2");
 		final String title = Messages.getString("MenuBarController.About");
 		final String header = Messages.getString("MenuBarController.ObserverUISettingsEditor");
-		String imgUrl;
-		try {
-			imgUrl = SettingsEditorApplication.class.getResource("/res/ahliLogo.png").toString();
-		} catch (final NullPointerException e) {
-			logger.error("Error loading resource", e);
+		
+		final String imgUrl;
+		final URL resource = SettingsEditorApplication.class.getResource("/res/ahliLogo.png");
+		if (resource != null) {
+			imgUrl = resource.toString();
+		} else {
+			logger.error("Error loading resource. Resource not found");
 			imgUrl = "/ahliLogo.png";
 		}
 		

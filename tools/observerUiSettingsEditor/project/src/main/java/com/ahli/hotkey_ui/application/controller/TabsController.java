@@ -8,7 +8,6 @@ import com.ahli.hotkey_ui.application.model.ValueDef;
 import com.ahli.hotkey_ui.application.ui.DynamicValueDefEditingTableCell;
 import com.ahli.hotkey_ui.application.ui.ResetDefaultButtonTableCell;
 import com.ahli.hotkey_ui.application.ui.WrappingTextTableCell;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -28,13 +27,10 @@ import org.apache.logging.log4j.Logger;
 public class TabsController {
 	private static final Logger logger = LogManager.getLogger(TabsController.class);
 	
-	private static final Callback<CellDataFeatures<ValueDef, Boolean>, ObservableValue<Boolean>>
-			ActionColumnCellValueFactory =
-			tableColCellDataFeatures -> new SimpleBooleanProperty(tableColCellDataFeatures.getValue() != null);
-	
 	private static final Callback<TableColumn<ValueDef, Boolean>, TableCell<ValueDef, Boolean>>
 			ActionColumnCellFactoryReset =
-			tableColumn -> new ResetDefaultButtonTableCell(Messages.getString("TabsController.Reset"));
+			tableColumn -> new ResetDefaultButtonTableCell(Messages.getString("TabsController.ResetDefault"),
+					Messages.getString("TabsController.ResetOldValue"));
 	
 	private static final Callback<TableColumn<ValueDef, String>, TableCell<ValueDef, String>> WRAPPING_CELL_FACTORY =
 			tableColumn -> new WrappingTextTableCell();
@@ -76,26 +72,37 @@ public class TabsController {
 	public void initialize() {
 		logger.trace("initializing");
 		
-		hotkeysNameCol.setCellValueFactory(new PropertyValueFactory<>("id"));
-		hotkeysDescriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));
+		final Callback<CellDataFeatures<ValueDef, String>, ObservableValue<String>> idFac =
+				new PropertyValueFactory<>("id");
+		final Callback<CellDataFeatures<ValueDef, String>, ObservableValue<String>> descFac =
+				new PropertyValueFactory<>("description");
+		final Callback<CellDataFeatures<ValueDef, String>, ObservableValue<String>> defaultValueFac =
+				new PropertyValueFactory<>("defaultValue");
+		final Callback<CellDataFeatures<ValueDef, String>, ObservableValue<String>> valueFac =
+				new PropertyValueFactory<>("value");
+		final Callback<CellDataFeatures<ValueDef, Boolean>, ObservableValue<Boolean>> hasChangedFac =
+				new PropertyValueFactory<>("hasChanged");
+		
+		hotkeysNameCol.setCellValueFactory(idFac);
+		hotkeysDescriptionCol.setCellValueFactory(descFac);
 		hotkeysDescriptionCol.setCellFactory(WRAPPING_CELL_FACTORY);
-		hotkeysDefaultCol.setCellValueFactory(new PropertyValueFactory<>("defaultValue"));
-		hotkeysKeyCol.setCellValueFactory(new PropertyValueFactory<>("value"));
+		hotkeysDefaultCol.setCellValueFactory(defaultValueFac);
+		hotkeysKeyCol.setCellValueFactory(valueFac);
 		hotkeysKeyCol.setCellFactory(VALUEDEF_EDIT_CELL_FACTORY);
 		hotkeysKeyCol.setSortable(false);
 		hotkeysActionsCol.setSortable(false);
-		hotkeysActionsCol.setCellValueFactory(ActionColumnCellValueFactory);
+		hotkeysActionsCol.setCellValueFactory(hasChangedFac);
 		hotkeysActionsCol.setCellFactory(ActionColumnCellFactoryReset);
 		
-		settingsNameCol.setCellValueFactory(new PropertyValueFactory<>("id"));
-		settingsDescriptionCol.setCellValueFactory(new PropertyValueFactory<>("description"));
+		settingsNameCol.setCellValueFactory(idFac);
+		settingsDescriptionCol.setCellValueFactory(descFac);
 		settingsDescriptionCol.setCellFactory(WRAPPING_CELL_FACTORY);
-		settingsDefaultCol.setCellValueFactory(new PropertyValueFactory<>("defaultValue"));
-		settingsValueCol.setCellValueFactory(new PropertyValueFactory<>("value"));
+		settingsDefaultCol.setCellValueFactory(defaultValueFac);
+		settingsValueCol.setCellValueFactory(valueFac);
 		settingsValueCol.setCellFactory(VALUEDEF_EDIT_CELL_FACTORY);
 		settingsValueCol.setSortable(false);
 		settingsActionsCol.setSortable(false);
-		settingsActionsCol.setCellValueFactory(ActionColumnCellValueFactory);
+		settingsActionsCol.setCellValueFactory(hasChangedFac);
 		settingsActionsCol.setCellFactory(ActionColumnCellFactoryReset);
 		
 		hotkeysTable.setItems(hotkeysData);

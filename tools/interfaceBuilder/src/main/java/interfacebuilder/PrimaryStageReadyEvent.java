@@ -11,10 +11,9 @@ import java.io.Serial;
 
 public class PrimaryStageReadyEvent extends ApplicationEvent {
 	
-	private final CommandLineParams startingParams;
-	
 	@Serial
 	private static final long serialVersionUID = -4177428667031979303L;
+	private final CommandLineParams startingParams;
 	
 	public PrimaryStageReadyEvent(final Object source, final CommandLineParams startingParams) {
 		super(source);

@@ -94,10 +94,9 @@ public class AppConfiguration {
 	}
 	
 	@Bean
-	protected CompileService compileService() {
-		
+	protected CompileService compileService(final GameService gameService) {
 		logger.debug("init bean: compileService");
-		return new CompileService();
+		return new CompileService(gameService);
 	}
 	
 	@Bean

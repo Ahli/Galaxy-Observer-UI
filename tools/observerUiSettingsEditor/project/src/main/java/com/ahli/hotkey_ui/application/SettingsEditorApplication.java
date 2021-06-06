@@ -36,12 +36,11 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerConfigurationException;
 import java.awt.SplashScreen;
 import java.io.File;
 import java.io.IOException;
@@ -62,7 +61,9 @@ public class SettingsEditorApplication extends Application {
 	public static final String VERSION = "alpha";
 	public static final String STORM_INTERFACE_FILE_FILTER = "*.StormInterface";
 	public static final String SC2_INTERFACE_FILE_FILTER = "*.SC2Interface";
+	
 	private static final Logger logger = LogManager.getLogger(SettingsEditorApplication.class);
+	
 	private final long appStartTime = System.nanoTime();
 	private Stage primaryStage;
 	private BorderPane rootLayout;
@@ -321,14 +322,15 @@ public class SettingsEditorApplication extends Application {
 		}
 		
 		try {
-			compile();
-			mpqi.buildMpq(openedDocPath, false, MpqEditorCompression.BLIZZARD_SC2_HEROES, false);
+			if (compile()) {
+				mpqi.buildMpq(openedDocPath, false, MpqEditorCompression.BLIZZARD_SC2_HEROES, false);
+			}
 			hasUnsavedFileChanges = false;
 			updateAppTitle();
 		} catch (final InterruptedException e) {
 			Thread.currentThread().interrupt();
-		} catch (final IOException | ParserConfigurationException | MpqException e) {
-			logger.error(ExceptionUtils.getStackTrace(e), e);
+		} catch (final IOException | ParserConfigurationException | TransformerConfigurationException | MpqException e) {
+			logger.error("Failed to save MPQ.", e);
 			showErrorAlert(e);
 		}
 		logger.trace("opened mpq within {}ms.", () -> (System.nanoTime() - time) / 1_000_000);
@@ -354,12 +356,13 @@ public class SettingsEditorApplication extends Application {
 	/**
 	 * Compiles and updates the data in the cache.
 	 *
-	 * @throws IOException
-	 * @throws SAXException
+	 * @return true if changes were present
 	 * @throws ParserConfigurationException
+	 * @throws TransformerConfigurationException
 	 */
-	public void compile() throws ParserConfigurationException {
-		layoutExtReader.updateLayoutFiles(mpqi.getCache());
+	public boolean compile() throws ParserConfigurationException, TransformerConfigurationException {
+		final boolean changed = layoutExtReader.updateLayoutFiles(mpqi.getCache());
+		return layoutExtReader.updateGameStrings(mpqi.getCache()) || changed;
 	}
 	
 	/**
@@ -378,7 +381,6 @@ public class SettingsEditorApplication extends Application {
 			}
 			getPrimaryStage().setTitle(sb.toString());
 		});
-		
 	}
 	
 	/**
@@ -508,7 +510,7 @@ public class SettingsEditorApplication extends Application {
 				openedDocPath = null;
 				updateAppTitle();
 				showErrorAlert(e);
-			} catch (final InterruptedException e){
+			} catch (final InterruptedException e) {
 				logger.error("Opening File was interrupted.", e);
 				Thread.currentThread().interrupt();
 				openedDocPath = null;
@@ -546,8 +548,10 @@ public class SettingsEditorApplication extends Application {
 	 *
 	 */
 	public void notifyFileDataWasChanged() {
-		if (!hasUnsavedFileChanges) {
-			hasUnsavedFileChanges = true;
+		final boolean oldState = hasUnsavedFileChanges;
+		hasUnsavedFileChanges = layoutExtReader.hasChanges();
+		
+		if (oldState != hasUnsavedFileChanges) {
 			updateAppTitle();
 		}
 	}
@@ -636,7 +640,7 @@ public class SettingsEditorApplication extends Application {
 				updateAppTitle();
 			} catch (final InterruptedException e) {
 				Thread.currentThread().interrupt();
-			} catch (final IOException | ParserConfigurationException | MpqException e) {
+			} catch (final IOException | ParserConfigurationException | TransformerConfigurationException | MpqException e) {
 				logger.error("Error while saving", e);
 				showErrorAlert(e);
 			}

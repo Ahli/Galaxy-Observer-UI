@@ -5,18 +5,19 @@ package interfacebuilder.compile;
 
 import com.ahli.galaxy.ModData;
 import com.ahli.galaxy.archive.DescIndexData;
+import com.ahli.galaxy.game.GameDef;
 import com.ahli.galaxy.parser.DeduplicationIntensity;
 import com.ahli.galaxy.parser.UICatalogParser;
 import com.ahli.galaxy.parser.XmlParserVtd;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
-import com.ahli.util.SilentXmlSaxErrorHandler;
+import com.ahli.util.XmlDomHelper;
+import interfacebuilder.compress.GameService;
+import interfacebuilder.projects.enums.Game;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
 
-import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -37,8 +38,10 @@ import java.nio.file.attribute.BasicFileAttributes;
 public class CompileService {
 	private static final Logger logger = LogManager.getLogger(CompileService.class);
 	
-	public CompileService() {
-		// explicit default constructor
+	private final GameService gameService;
+	
+	public CompileService(final GameService gameService) {
+		this.gameService = gameService;
 	}
 	
 	/**
@@ -104,22 +107,15 @@ public class CompileService {
 			} else {
 				if (!repairLayoutOrder && verifyXml) {
 					// only verify XML and nothing else
-					final DocumentBuilderFactory dbFac = DocumentBuilderFactory.newInstance();
-					dbFac.setNamespaceAware(false);
-					dbFac.setValidating(false);
-					dbFac.setAttribute("http://xml.org/sax/features/external-general-entities", false);
-					dbFac.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-					dbFac.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-					dbFac.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-					dbFac.setXIncludeAware(false);
-					dbFac.setExpandEntityReferences(false);
-					dbFac.setAttribute(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-					final DocumentBuilder dBuilder = dbFac.newDocumentBuilder();
-					dBuilder.setErrorHandler(new SilentXmlSaxErrorHandler());
+					final DocumentBuilder dBuilder = XmlDomHelper.buildSecureDocumentBuilder(true, false);
 					
-					final String[] extensions =
-							{ "stormlayout", "SC2Layout", "stormcomponents", "SC2Components", "stormcutscene",
-									"SC2Cutscene", "stormstyle", "SC2Style", "xml" };
+					final GameDef sc2GameDef = gameService.getGameDef(Game.SC2);
+					final GameDef heroesGameDef = gameService.getGameDef(Game.HEROES);
+					
+					final String[] extensions = { heroesGameDef.layoutFileEnding(), sc2GameDef.layoutFileEnding(),
+							heroesGameDef.componentsFileEnding(), sc2GameDef.componentsFileEnding(),
+							heroesGameDef.cutsceneFileEnding(), sc2GameDef.cutsceneFileEnding(),
+							heroesGameDef.styleFileEnding(), sc2GameDef.styleFileEnding(), "xml" };
 					
 					final FileVisitor<Path> visitor = new XmlVerifier(dBuilder, extensions);
 					Files.walkFileTree(mod.getMpqCacheDirectory(), visitor);

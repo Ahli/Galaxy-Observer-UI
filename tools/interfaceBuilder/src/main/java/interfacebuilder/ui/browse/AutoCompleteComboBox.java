@@ -5,6 +5,8 @@ package interfacebuilder.ui.browse;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Side;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
@@ -89,10 +91,7 @@ public class AutoCompleteComboBox extends ComboBox<String> {
 						@SuppressWarnings("ObjectAllocationInLoop")
 						final CustomMenuItem menuItem = new CustomMenuItem(entryLabel, true);
 						//noinspection ObjectAllocationInLoop
-						menuItem.setOnAction(event -> {
-							getSelectionModel().select(item);
-							entriesPopup.hide();
-						});
+						menuItem.setOnAction(new MenuItemEventHandler(AutoCompleteComboBox.this, item, entriesPopup));
 						menuItems.add(menuItem);
 						
 						++curEntries;
@@ -109,6 +108,27 @@ public class AutoCompleteComboBox extends ComboBox<String> {
 					entriesPopup.hide();
 					entriesPopup.getItems().clear();
 				}
+			}
+		}
+		
+		private static class MenuItemEventHandler implements EventHandler<ActionEvent> {
+			private final AutoCompleteComboBox autoCompleteComboBox;
+			private final String item;
+			private final ContextMenu entriesPopup;
+			
+			public MenuItemEventHandler(
+					final AutoCompleteComboBox autoCompleteComboBox,
+					final String item,
+					final ContextMenu entriesPopup) {
+				this.autoCompleteComboBox = autoCompleteComboBox;
+				this.item = item;
+				this.entriesPopup = entriesPopup;
+			}
+			
+			@Override
+			public void handle(final ActionEvent event) {
+				autoCompleteComboBox.getSelectionModel().select(item);
+				entriesPopup.hide();
 			}
 		}
 	}

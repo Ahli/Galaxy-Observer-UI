@@ -6,6 +6,14 @@ package com.ahli.util;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerFactory;
+
 /**
  * Helper methods for handling XML content.
  *
@@ -54,5 +62,49 @@ public final class XmlDomHelper {
 			}
 		}
 		return node;
+	}
+	
+	public static DocumentBuilder buildSecureDocumentBuilder() throws ParserConfigurationException {
+		return buildSecureDocumentBuilder(false, false);
+	}
+	
+	/**
+	 * Builds an instance of a secure DocumentBuilder for safe XML processing.
+	 *
+	 * @param useSilentErrorHandler
+	 * 		uses a silent error handler to avoid printing errors like incompatible files into console
+	 * @param ignoreComments
+	 * 		ignore comments
+	 * @return secure DocumentBuilder instance
+	 * @throws ParserConfigurationException
+	 * 		if the safe configuration is invalid
+	 */
+	public static DocumentBuilder buildSecureDocumentBuilder(
+			final boolean useSilentErrorHandler, final boolean ignoreComments) throws ParserConfigurationException {
+		final DocumentBuilderFactory dbFac = DocumentBuilderFactory.newInstance();
+		dbFac.setNamespaceAware(false);
+		dbFac.setValidating(false);
+		dbFac.setAttribute("http://xml.org/sax/features/external-general-entities", false);
+		dbFac.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+		dbFac.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+		dbFac.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+		dbFac.setXIncludeAware(false);
+		dbFac.setExpandEntityReferences(false);
+		dbFac.setAttribute(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+		if (ignoreComments) {
+			dbFac.setIgnoringComments(true);
+		}
+		final DocumentBuilder dBuilder = dbFac.newDocumentBuilder();
+		if (useSilentErrorHandler) {
+			// provide error handler that does not print incompatible files into console
+			dBuilder.setErrorHandler(new SilentXmlSaxErrorHandler());
+		}
+		return dBuilder;
+	}
+	
+	public static Transformer buildSecureTransformer() throws TransformerConfigurationException {
+		final TransformerFactory factory = TransformerFactory.newInstance();
+		factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+		return factory.newTransformer();
 	}
 }

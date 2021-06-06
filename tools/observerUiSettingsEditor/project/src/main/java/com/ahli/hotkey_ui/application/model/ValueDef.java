@@ -3,6 +3,7 @@
 
 package com.ahli.hotkey_ui.application.model;
 
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 import java.util.Locale;
@@ -17,58 +18,91 @@ public class ValueDef {
 	private final SimpleStringProperty value;
 	private final SimpleStringProperty description;
 	private final SimpleStringProperty defaultValue;
+	private final SimpleStringProperty oldValue;
+	private final SimpleBooleanProperty hasChanged;
 	private final String[] allowedValues;
 	private final ValueType type;
+	private final String gamestringsAdd;
 	
 	/**
 	 * Constructor.
 	 *
 	 * @param id
-	 * @param value
 	 * @param description
 	 * @param defaultValue
 	 */
-	public ValueDef(final String id, final String value, final String description, final String defaultValue) {
+	public ValueDef(final String id, final String description, final String defaultValue) {
 		this.id = new SimpleStringProperty(id);
-		this.value = new SimpleStringProperty(value);
+		value = new SimpleStringProperty("");
 		this.description = new SimpleStringProperty(description);
 		this.defaultValue = new SimpleStringProperty(defaultValue);
 		allowedValues = null;
+		gamestringsAdd = "";
 		type = ValueType.TEXT;
+		oldValue = new SimpleStringProperty("");
+		hasChanged = new SimpleBooleanProperty(false);
+		initHasChangedBinding();
+	}
+	
+	private void initHasChangedBinding() {
+		hasChanged.bind(value.isNotEqualTo(oldValue));
 	}
 	
 	/**
-	 * Constructor.
-	 *
 	 * @param id
-	 * @param value
 	 * @param description
 	 * @param defaultValue
+	 * @param type
+	 * @param allowedValues
+	 * @param gamestringsAdd
 	 */
 	public ValueDef(
 			final String id,
-			final String value,
 			final String description,
 			final String defaultValue,
 			final String type,
-			final String[] allowedValues) {
+			final String[] allowedValues,
+			final String gamestringsAdd) {
 		this.id = new SimpleStringProperty(id);
-		this.value = new SimpleStringProperty(value);
+		value = new SimpleStringProperty("");
 		this.description = new SimpleStringProperty(description);
 		this.defaultValue = new SimpleStringProperty(defaultValue);
 		this.allowedValues = allowedValues;
-		
-		ValueType resultType;
+		this.gamestringsAdd = gamestringsAdd;
+		this.type = determineType(type);
+		oldValue = new SimpleStringProperty("");
+		hasChanged = new SimpleBooleanProperty(false);
+		initHasChangedBinding();
+		initDefaultValue(defaultValue);
+	}
+	
+	private ValueType determineType(final String typeStr) {
 		try {
-			resultType = ValueType.valueOf(type.toUpperCase(Locale.ROOT));
-		} catch (final IllegalArgumentException e) {
-			resultType = ValueType.TEXT;
+			return ValueType.valueOf(typeStr.toUpperCase(Locale.ROOT));
+		} catch (final IllegalArgumentException ignored) {
+			return ValueType.TEXT;
 		}
-		this.type = resultType;
-		
-		if (resultType == ValueType.BOOLEAN && defaultValue.isEmpty()) {
-			setDefaultValue("false");
+	}
+	
+	private void initDefaultValue(final String defaultValue) {
+		if (type == ValueType.BOOLEAN && defaultValue.isEmpty()) {
+			setDefaultValue(Constants.FALSE);
 		}
+	}
+	
+	public String getOldValue() {
+		return oldValue.get();
+	}
+	
+	public void setOldValue(final String oldValue) {
+		this.oldValue.set(oldValue);
+	}
+	
+	/**
+	 * @return
+	 */
+	public String getGamestringsAdd() {
+		return gamestringsAdd;
 	}
 	
 	/**
@@ -159,12 +193,42 @@ public class ValueDef {
 		return id;
 	}
 	
+	/**
+	 * @return
+	 */
+	// required to make UI track changes
+	public SimpleBooleanProperty hasChangedProperty() {
+		return hasChanged;
+	}
+	
+	/**
+	 * @return
+	 */
+	// required to make UI track changes
+	public SimpleStringProperty oldValueProperty() {
+		return oldValue;
+	}
+	
+	/**
+	 * @return
+	 */
 	public ValueType getType() {
 		return type;
 	}
 	
+	/**
+	 * @return
+	 */
 	public String[] getAllowedValues() {
 		return allowedValues;
 	}
 	
+	/**
+	 * Returns whether the value has changed.
+	 *
+	 * @return true if the value changed; false if the old value is still current
+	 */
+	public boolean hasChanged() {
+		return hasChanged.get();
+	}
 }

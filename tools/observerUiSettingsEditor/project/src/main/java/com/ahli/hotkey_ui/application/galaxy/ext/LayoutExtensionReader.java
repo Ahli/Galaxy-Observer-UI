@@ -3,81 +3,49 @@
 
 package com.ahli.hotkey_ui.application.galaxy.ext;
 
+import com.ahli.galaxy.game.GameDef;
 import com.ahli.hotkey_ui.application.model.ValueDef;
-import com.ahli.util.SilentXmlSaxErrorHandler;
+import com.ahli.util.XmlDomHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.regex.Pattern;
 
 public class LayoutExtensionReader {
-	private static final String CONSTANT = "constant";
 	private static final String ATTRIBUTE_CONSTANT = "constant";
 	private static final String ATTRIBUTE_DEFAULT = "default";
 	private static final String ATTRIBUTE_DESCRIPTION = "description";
 	private static final String ATTRIBUTE_VALUES = "values";
 	private static final String ATTRIBUTE_TYPE = "type";
+	private static final String ATTRIBUTE_GAMESTRINGS_ADD = "gamestrings_add";
 	private static final String HOTKEY = "@hotkey";
 	private static final String SETTING = "@setting";
-	private static final String NAME = "name";
-	private static final String VAL = "val";
-	private static final String ERROR_PARSING_FILE = "Error parsing file.";
 	private static final Logger logger = LogManager.getLogger(LayoutExtensionReader.class);
 	private static final Pattern HOTKEY_SETTING_REGEX_PATTERN = Pattern.compile("(?<=@hotkey|@setting)/i");
 	private static final Pattern ATTRIBUTES_REGEX_PATTERN =
-			Pattern.compile("(?i)(?=(?:constant|default|description|values|type)[\\s]*=)");
+			Pattern.compile("(?i)(?=(?:constant|default|description|values|type|gamestrings_add)[\\s]*=)");
 	private List<ValueDef> hotkeys = new ArrayList<>(10);
 	private List<ValueDef> settings = new ArrayList<>(10);
 	
-	/**
-	 * @param nodes
-	 * @param name
-	 * @return
-	 */
-	private static Node getNamedItemIgnoreCase(final NamedNodeMap nodes, final String name) {
-		final Node node = nodes.getNamedItem(name);
-		if (node == null) {
-			for (int i = 0, len = nodes.getLength(); i < len; ++i) {
-				final Node curNode = nodes.item(i);
-				if (name.equalsIgnoreCase(curNode.getNodeName())) {
-					return curNode;
-				}
-			}
-		}
-		return node;
-	}
 	
 	private static String getValueAfterEqualsChar(final String part) {
 		return part.substring(1 + part.indexOf('=')).trim();
@@ -92,69 +60,6 @@ public class LayoutExtensionReader {
 		return part.substring(quoteStart + 1, quoteEnd);
 	}
 	
-	/**
-	 * Processes the Constants in the given Nodes.
-	 *
-	 * @param childNodes
-	 */
-	private static void readConstants(
-			final NodeList childNodes, final List<ValueDef> hotkeys, final List<ValueDef> settings) {
-		for (int i = 0, len = childNodes.getLength(); i < len; ++i) {
-			final Node curNode = childNodes.item(i);
-			
-			if (curNode.getNodeType() == Node.ELEMENT_NODE) {
-				
-				final String nodeName = curNode.getNodeName().toLowerCase(Locale.ROOT);
-				if (nodeName.equals(CONSTANT)) {
-					processConstant(curNode, hotkeys, settings);
-				}
-				
-			} else {
-				readConstants(curNode.getChildNodes(), hotkeys, settings);
-			}
-		}
-	}
-	
-	/**
-	 * @param node
-	 */
-	private static void processConstant(final Node node, final List<ValueDef> hotkeys, final List<ValueDef> settings) {
-		final Node nameAttrNode = getNamedItemIgnoreCase(node.getAttributes(), NAME);
-		if (nameAttrNode != null) {
-			final String name = nameAttrNode.getNodeValue();
-			final Node valAttrNode = getNamedItemIgnoreCase(node.getAttributes(), VAL);
-			if (valAttrNode != null) {
-				final String val = valAttrNode.getNodeValue();
-				logger.debug("Constant: name = {}, val = {}", name, val);
-				setValueDefCurValue(name, val, hotkeys, settings);
-			} else {
-				logger.warn("Constant '{}' has no 'val' attribute defined.", name);
-			}
-		} else {
-			logger.warn("Constant has no 'name' attribute defined.");
-		}
-	}
-	
-	/**
-	 * @param name
-	 * @param val
-	 */
-	private static void setValueDefCurValue(
-			final String name, final String val, final List<ValueDef> hotkeys, final List<ValueDef> settings) {
-		for (final ValueDef item : hotkeys) {
-			if (item.getId().equalsIgnoreCase(name)) {
-				item.setValue(val);
-				return;
-			}
-		}
-		for (final ValueDef item : settings) {
-			if (item.getId().equalsIgnoreCase(name)) {
-				item.setValue(val);
-				return;
-			}
-		}
-		logger.debug("no ValueDef found with name: {}", name);
-	}
 	
 	/**
 	 * @return the hotkeys
@@ -190,34 +95,23 @@ public class LayoutExtensionReader {
 	 * Processes the specified Layout files. It finds hotkeys and setting definitions.
 	 *
 	 * @param layoutFiles
+	 * 		the layout files
 	 * @throws ParserConfigurationException
+	 * 		if the XML parser configuration was invalid
 	 * @throws SAXException
+	 * 		if there was a parse error
 	 */
 	public void processLayoutFiles(final Iterable<File> layoutFiles) throws ParserConfigurationException, SAXException {
 		logger.info("Scanning for XML file...");
 		
-		final DocumentBuilderFactory dbFac = DocumentBuilderFactory.newInstance();
-		dbFac.setNamespaceAware(false);
-		dbFac.setValidating(false);
-		dbFac.setAttribute("http://xml.org/sax/features/external-general-entities", false);
-		dbFac.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-		dbFac.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-		dbFac.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-		dbFac.setXIncludeAware(false);
-		dbFac.setExpandEntityReferences(false);
-		dbFac.setAttribute(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-		final DocumentBuilder dBuilder = dbFac.newDocumentBuilder();
-		
-		// provide error handler that does not print incompatible files into
-		// console
-		dBuilder.setErrorHandler(new SilentXmlSaxErrorHandler());
+		final DocumentBuilder dBuilder = XmlDomHelper.buildSecureDocumentBuilder(true, false);
 		
 		Document doc;
 		for (final File curFile : layoutFiles) {
 			try {
 				doc = dBuilder.parse(curFile);
 			} catch (final SAXParseException | IOException e) {
-				logger.trace(ERROR_PARSING_FILE, e);
+				logger.trace(LayoutFileUpdater.ERROR_PARSING_FILE, e);
 				// couldn't parse, most likely no XML file
 				continue;
 			}
@@ -235,7 +129,7 @@ public class LayoutExtensionReader {
 				// parse XML file
 				doc = dBuilder.parse(curFile);
 			} catch (final SAXParseException | IOException e) {
-				logger.trace(ERROR_PARSING_FILE, e);
+				logger.trace(LayoutFileUpdater.ERROR_PARSING_FILE, e);
 				// couldn't parse, most likely no XML file
 				continue;
 			}
@@ -245,7 +139,7 @@ public class LayoutExtensionReader {
 			// read constants
 			final Element elem = doc.getDocumentElement();
 			final NodeList childNodes = elem.getChildNodes();
-			readConstants(childNodes, hotkeys, settings);
+			LayoutFileUpdater.readConstants(childNodes, hotkeys, settings);
 		}
 	}
 	
@@ -292,6 +186,7 @@ public class LayoutExtensionReader {
 					String description = "";
 					String defaultValue = "";
 					String type = "";
+					String gamestringsAdd = "";
 					String[] allowedValues = null;
 					
 					// move behind keyword
@@ -325,15 +220,21 @@ public class LayoutExtensionReader {
 						} else if (partLower.startsWith(ATTRIBUTE_TYPE)) {
 							type = getValueWithinQuotes(part).trim();
 							logger.trace("type = {}", part);
+						} else if (partLower.startsWith(ATTRIBUTE_GAMESTRINGS_ADD)) {
+							gamestringsAdd = getValueWithinQuotes(part).trim();
+							logger.trace("gamestrings_add = {}", part);
 						}
 					}
 					
-					if (!constant.isEmpty()) {
-						if (isHotkey) {
-							addHotkeyValueDef(constant, description, defaultValue, "");
-						} else {
-							addSettingValueDef(constant, description, defaultValue, "", type, allowedValues);
-						}
+					if (isHotkey) {
+						addHotkeyValueDef(constant, description, defaultValue);
+					} else {
+						settings.add(new ValueDef(constant,
+								description,
+								defaultValue,
+								type,
+								allowedValues,
+								gamestringsAdd));
 					}
 				}
 			}
@@ -344,59 +245,42 @@ public class LayoutExtensionReader {
 		}
 	}
 	
-	public void addHotkeyValueDef(
-			final String constant, final String description, final String defaultValue, final String curValue) {
-		final ValueDef def = new ValueDef(constant, curValue, description, defaultValue);
-		hotkeys.add(def);
-	}
-	
-	public void addSettingValueDef(
-			final String constant,
-			final String description,
-			final String defaultValue,
-			final String curValue,
-			final String type,
-			final String[] allowedValues) {
-		final ValueDef def = new ValueDef(constant, curValue, description, defaultValue, type, allowedValues);
-		settings.add(def);
+	private void addHotkeyValueDef(final String constant, final String description, final String defaultValue) {
+		hotkeys.add(new ValueDef(constant, description, defaultValue));
 	}
 	
 	/**
 	 * @param projectInCache
+	 * @return true if changes were present
 	 * @throws ParserConfigurationException
-	 * @throws IOException
-	 * @throws SAXException
+	 * @throws TransformerConfigurationException
 	 */
-	public void updateLayoutFiles(final Path projectInCache) throws ParserConfigurationException {
-		logger.info("Scanning for XML file...");
-		final DocumentBuilderFactory dbFac = DocumentBuilderFactory.newInstance();
-		dbFac.setNamespaceAware(false);
-		dbFac.setValidating(false);
-		dbFac.setAttribute("http://xml.org/sax/features/external-general-entities", false);
-		dbFac.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-		dbFac.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-		dbFac.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-		dbFac.setXIncludeAware(false);
-		dbFac.setExpandEntityReferences(false);
-		dbFac.setAttribute(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-		final DocumentBuilder dBuilder = dbFac.newDocumentBuilder();
-		// provide error handler that does not print incompatible files into console
-		dBuilder.setErrorHandler(new SilentXmlSaxErrorHandler());
+	public boolean updateLayoutFiles(final Path projectInCache)
+			throws ParserConfigurationException, TransformerConfigurationException {
 		
-		try {
-			final TransformerFactory factory = TransformerFactory.newInstance();
-			factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-			final Transformer transformer = factory.newTransformer();
+		final List<ValueDef> changedHotkeys = hotkeys.stream().filter(ValueDef::hasChanged).toList();
+		final List<ValueDef> changedSettings = settings.stream().filter(ValueDef::hasChanged).toList();
+		
+		if (!changedHotkeys.isEmpty() || !changedSettings.isEmpty()) {
 			
-			final String[] extensions = new String[] { "stormlayout", "SC2Layout" };
+			logger.info("Scanning for XML files...");
+			final DocumentBuilder dBuilder = XmlDomHelper.buildSecureDocumentBuilder(true, false);
+			final Transformer transformer = XmlDomHelper.buildSecureTransformer();
 			
-			final FileVisitor<Path> visitor =
-					new LayoutFileUpdater(dBuilder, transformer, extensions, hotkeys, settings);
-			
-			Files.walkFileTree(projectInCache, visitor);
-		} catch (final TransformerConfigurationException | IOException e) {
-			logger.error("Transforming to generate XML file failed.", e);
+			try {
+				final String[] extensions = new String[] { GameDef.buildSc2GameDef().layoutFileEnding(),
+						GameDef.buildHeroesGameDef().layoutFileEnding() };
+				
+				final FileVisitor<Path> visitor =
+						new LayoutFileUpdater(dBuilder, transformer, extensions, changedHotkeys, changedSettings);
+				
+				Files.walkFileTree(projectInCache, visitor);
+			} catch (final IOException e) {
+				logger.error("Transforming to generate XML file failed.", e);
+			}
+			return true;
 		}
+		return false;
 	}
 	
 	/**
@@ -407,137 +291,45 @@ public class LayoutExtensionReader {
 		settings.clear();
 	}
 	
-	private static final class LayoutFileUpdater extends SimpleFileVisitor<Path> {
-		private final DocumentBuilder dBuilder;
-		private final Transformer transformer;
-		private final String[] extensions;
-		private final List<ValueDef> hotkeys;
-		private final List<ValueDef> settings;
-		
-		private LayoutFileUpdater(
-				final DocumentBuilder dBuilder,
-				final Transformer transformer,
-				final String[] extensions,
-				final List<ValueDef> hotkeys,
-				final List<ValueDef> settings) {
-			this.dBuilder = dBuilder;
-			this.transformer = transformer;
-			this.extensions = extensions;
-			this.hotkeys = hotkeys;
-			this.settings = settings;
-		}
-		
-		@Override
-		public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
-			final String fileName = file.getFileName().toString();
-			final int i = fileName.lastIndexOf('.');
-			if (i >= 0) {
-				final String curExt = fileName.substring(i + 1);
-				boolean found = false;
-				for (final String ext : extensions) {
-					if (ext.equalsIgnoreCase(curExt)) {
-						found = true;
-						break;
-					}
-				}
-				if (found) {
-					final Document doc;
-					try (final InputStream is = new BufferedInputStream(Files.newInputStream(file))) {
-						doc = dBuilder.parse(is);
-					} catch (final SAXException e) {
-						logger.trace(ERROR_PARSING_FILE, e);
-						throw new IOException(ERROR_PARSING_FILE, e);
-					}
-					
-					logger.debug("processing file: {}", file);
-					
-					// process files
-					final Element elem = doc.getDocumentElement();
-					final NodeList childNodes = elem.getChildNodes();
-					modifyConstants(childNodes, hotkeys, settings);
-					
-					// write DOM back to XML
-					try {
-						transformer.transform(new DOMSource(doc), new StreamResult(file.toFile()));
-					} catch (final TransformerException e) {
-						logger.error("Transforming to generate XML file failed.", e);
-					}
-				}
+	/**
+	 * @param projectInCache
+	 * @return true if changes were present
+	 */
+	public boolean updateGameStrings(final Path projectInCache) {
+		final List<ValueDef> gamestringsAddSettings = new ArrayList<>(10);
+		for (final ValueDef setting : settings) {
+			if (setting.hasChanged() && !setting.getGamestringsAdd().isEmpty()) {
+				gamestringsAddSettings.add(setting);
 			}
-			return FileVisitResult.CONTINUE;
 		}
-		
-		private static void modifyConstants(
-				final NodeList childNodes, final List<ValueDef> hotkeys, final List<ValueDef> settings) {
-			for (int i = 0, len = childNodes.getLength(); i < len; ++i) {
-				final Node curNode = childNodes.item(i);
+		if (!gamestringsAddSettings.isEmpty()) {
+			logger.info("Scanning for GameStrings.txt files...");
+			try {
+				final FileVisitor<Path> visitor = new GameStringsUpdater(gamestringsAddSettings);
 				
-				if (curNode.getNodeType() == Node.ELEMENT_NODE) {
-					
-					final String nodeName = curNode.getNodeName().toLowerCase(Locale.ROOT);
-					if (nodeName.equals(CONSTANT)) {
-						modifyConstant(curNode, hotkeys, settings);
-					}
-					
-				} else {
-					readConstants(curNode.getChildNodes(), hotkeys, settings);
-				}
+				Files.walkFileTree(projectInCache, visitor);
+			} catch (final IOException e) {
+				logger.error("Editing GameStrings.txt files failed..", e);
 			}
+			return true;
 		}
-		
-		/**
-		 * Modify a Constant node from XML with data's current value.
-		 *
-		 * @param node
-		 */
-		private static void modifyConstant(
-				final Node node, final List<ValueDef> hotkeys, final List<ValueDef> settings) {
-			final Node nameAttrNode = getNamedItemIgnoreCase(node.getAttributes(), NAME);
-			if (nameAttrNode != null) {
-				final String name = nameAttrNode.getNodeValue();
-				final Node valAttrNode = getNamedItemIgnoreCase(node.getAttributes(), VAL);
-				if (valAttrNode != null) {
-					final String val = valAttrNode.getNodeValue();
-					
-					for (final ValueDef item : hotkeys) {
-						if (item.getId().equalsIgnoreCase(name)) {
-							final String itemVal = item.getValue();
-							if (!Objects.equals(itemVal, val)) {
-								logger.debug("updating hotkey constant: '{}' with val: '{}' from '{}'",
-										name,
-										itemVal,
-										val);
-								valAttrNode.setNodeValue(itemVal);
-							}
-							return;
-						}
-					}
-					for (final ValueDef item : settings) {
-						if (item.getId().equalsIgnoreCase(name)) {
-							if (!Objects.equals(item.getValue(), val)) {
-								final String itemVal = item.getValue();
-								logger.debug("updating setting constant: '{}' with val: '{}' from '{}'",
-										name,
-										itemVal,
-										val);
-								valAttrNode.setNodeValue(itemVal);
-							}
-							return;
-						}
-					}
-				} else {
-					logger.warn("Constant has no 'val' attribute defined.");
-				}
-			} else {
-				logger.warn("Constant has no 'name' attribute defined.");
-			}
-		}
-		
-		@Override
-		public FileVisitResult visitFileFailed(final Path file, final IOException exc) throws IOException {
-			logger.error("Failed to access file: {}", file);
-			throw exc;
-		}
+		return false;
 	}
 	
+	/**
+	 * @return true if there are value changes compared to the last loading/saving
+	 */
+	public boolean hasChanges() {
+		for (final ValueDef setting : settings) {
+			if (setting.hasChanged()) {
+				return true;
+			}
+		}
+		for (final ValueDef hotkey : hotkeys) {
+			if (hotkey.hasChanged()) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

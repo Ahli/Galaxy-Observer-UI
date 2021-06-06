@@ -3,6 +3,7 @@
 
 package com.ahli.hotkey_ui.application.ui;
 
+import com.ahli.hotkey_ui.application.model.Constants;
 import com.ahli.hotkey_ui.application.model.ValueDef;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.collections.FXCollections;
@@ -17,7 +18,7 @@ import java.util.regex.Pattern;
 
 public class DynamicValueDefEditingTableCell extends TableCell<ValueDef, String> {
 	private static final Logger logger = LogManager.getLogger(DynamicValueDefEditingTableCell.class);
-	private static final Pattern NUMBER_INPUT_REGEX_PATTERN = Pattern.compile("(?:[-])?\\d{0,7}(?:[.]\\d{0,4})?");
+	private static final Pattern NUMBER_INPUT_REGEX_PATTERN = Pattern.compile("[-]?\\d{0,7}(?:[.]\\d{0,4})?");
 	
 	@Override
 	protected void updateItem(final String item, final boolean empty) {
@@ -57,7 +58,7 @@ public class DynamicValueDefEditingTableCell extends TableCell<ValueDef, String>
 	}
 	
 	private void createBooleanEditor(final ValueDef data) {
-		final ObservableList<String> items = FXCollections.observableArrayList("false", "true");
+		final ObservableList<String> items = FXCollections.observableArrayList(Constants.FALSE, Constants.TRUE);
 		final ComboBox<String> comboBox = new ComboBox<>(items);
 		comboBox.valueProperty().addListener((observable, oldItem, newItem) -> {
 			final String newVal = newItem != null ? newItem : "";

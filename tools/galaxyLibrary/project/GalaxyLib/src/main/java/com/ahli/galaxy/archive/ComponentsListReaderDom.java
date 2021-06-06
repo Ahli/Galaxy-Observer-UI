@@ -4,6 +4,7 @@
 package com.ahli.galaxy.archive;
 
 import com.ahli.galaxy.game.GameDef;
+import com.ahli.util.XmlDomHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -11,9 +12,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
@@ -67,19 +66,8 @@ public final class ComponentsListReaderDom {
 	 */
 	public static String getComponentsListValue(final Path compListFile, final String typeVal)
 			throws ParserConfigurationException, SAXException, IOException {
-		// find the type in the xml
-		final DocumentBuilderFactory dbFac = DocumentBuilderFactory.newInstance();
-		dbFac.setNamespaceAware(false);
-		dbFac.setValidating(false);
-		dbFac.setAttribute("http://xml.org/sax/features/external-general-entities", false);
-		dbFac.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-		dbFac.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-		dbFac.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-		dbFac.setXIncludeAware(false);
-		dbFac.setExpandEntityReferences(false);
-		dbFac.setAttribute(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-		dbFac.setIgnoringComments(true);
-		final DocumentBuilder dBuilder = dbFac.newDocumentBuilder();
+		
+		final DocumentBuilder dBuilder = XmlDomHelper.buildSecureDocumentBuilder(false, true);
 		final Document doc = dBuilder.parse(compListFile.toString());
 		
 		// must be in a DataComponent node

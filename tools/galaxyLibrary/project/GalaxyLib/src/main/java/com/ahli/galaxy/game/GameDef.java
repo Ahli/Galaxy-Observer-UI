@@ -13,7 +13,8 @@ public record GameDef(String name, String nameHandle, String modFileEnding, Stri
                       String defaultRaceId, String defaultConsoleSkinId, String documentsGameDirectoryName,
                       String layoutFileEnding, String baseDataFolderName, String rootExeName, String switcherExeNameX32,
                       String switcherExeNameX64, String supportDirectoryX32, String supportDirectoryX64,
-                      String documentsInterfaceSubdirectoryName, String modsSubDirectory, String ptrRootExeName) {
+                      String documentsInterfaceSubdirectoryName, String modsSubDirectory, String ptrRootExeName,
+                      String componentsFileEnding, String styleFileEnding, String cutsceneFileEnding) {
 	
 	public static GameDef buildSc2GameDef() {
 		return new GameDef(
@@ -33,7 +34,10 @@ public record GameDef(String name, String nameHandle, String modFileEnding, Stri
 				"Support64",
 				"Interfaces",
 				"mods",
-				null);
+				null,
+				"SC2Components",
+				"SC2Style",
+				"SC2Cutscene");
 	}
 	
 	public static GameDef buildHeroesGameDef() {
@@ -54,7 +58,10 @@ public record GameDef(String name, String nameHandle, String modFileEnding, Stri
 				"Support64",
 				"Interfaces",
 				"mods",
-				"Heroes of the Storm Public Test.exe");
+				"Heroes of the Storm Public Test.exe",
+				"stormcomponents",
+				"stormstyle",
+				"stormcutscene");
 	}
 	
 	/**
@@ -100,7 +107,10 @@ public record GameDef(String name, String nameHandle, String modFileEnding, Stri
 				Objects.equals(supportDirectoryX64, gameDef.supportDirectoryX64) &&
 				Objects.equals(documentsInterfaceSubdirectoryName, gameDef.documentsInterfaceSubdirectoryName) &&
 				Objects.equals(modsSubDirectory, gameDef.modsSubDirectory) &&
-				Objects.equals(ptrRootExeName, gameDef.ptrRootExeName);
+				Objects.equals(ptrRootExeName, gameDef.ptrRootExeName) &&
+				Objects.equals(componentsFileEnding, gameDef.componentsFileEnding) &&
+				Objects.equals(styleFileEnding, gameDef.styleFileEnding) &&
+				Objects.equals(cutsceneFileEnding, gameDef.cutsceneFileEnding);
 	}
 	
 	@Override
@@ -121,7 +131,10 @@ public record GameDef(String name, String nameHandle, String modFileEnding, Stri
 				supportDirectoryX64,
 				documentsInterfaceSubdirectoryName,
 				modsSubDirectory,
-				ptrRootExeName);
+				ptrRootExeName,
+				componentsFileEnding,
+				styleFileEnding,
+				cutsceneFileEnding);
 		result = 31 * result + Arrays.hashCode(coreModsOrDirectories);
 		return result;
 	}

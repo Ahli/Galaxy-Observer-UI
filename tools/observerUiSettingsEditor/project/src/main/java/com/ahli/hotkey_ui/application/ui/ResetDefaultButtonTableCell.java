@@ -4,38 +4,46 @@
 package com.ahli.hotkey_ui.application.ui;
 
 import com.ahli.hotkey_ui.application.model.ValueDef;
+import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableCell;
+import javafx.scene.layout.HBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * A table cell for ValueDef model data to reset its value to the default value.
+ * A table cell for ValueDef model data to reset its value to the default or the old value.
  *
  * @author Ahli
  */
 public class ResetDefaultButtonTableCell extends TableCell<ValueDef, Boolean> {
 	private static final Logger logger = LogManager.getLogger(ResetDefaultButtonTableCell.class);
 	
-	private final Button cellButton = new Button();
+	private final Button resetToDefaultButton = new Button();
+	private final Button resetToOldValueButton = new Button();
 	
 	/**
-	 * @param text
+	 * @param resetToDefaultText
+	 * @param resetToOldValueText
 	 */
-	public ResetDefaultButtonTableCell(final String text) {
-		this();
-		cellButton.setText(text);
+	public ResetDefaultButtonTableCell(final String resetToDefaultText, final String resetToOldValueText) {
+		resetToDefaultButton.setText(resetToDefaultText);
+		resetToOldValueButton.setText(resetToOldValueText);
+		
+		resetToDefaultButton.setOnAction(this::resetToDefault);
+		resetToOldValueButton.setOnAction(this::resetToOldValue);
 	}
 	
-	/**
-	 * Constructor.
-	 */
-	public ResetDefaultButtonTableCell() {
-		cellButton.setOnAction(event -> {
-			logger.trace("reset table item clicked");
-			final ValueDef data = getTableRow().getItem();
-			data.setValue(data.getDefaultValue());
-		});
+	private void resetToDefault(final ActionEvent event) {
+		logger.trace("reset value to default value button clicked");
+		final ValueDef data = getTableRow().getItem();
+		data.setValue(data.getDefaultValue());
+	}
+	
+	private void resetToOldValue(final ActionEvent event) {
+		logger.trace("reset value to old value button clicked");
+		final ValueDef data = getTableRow().getItem();
+		data.setValue(data.getOldValue());
 	}
 	
 	// Display button if the row is not empty
@@ -43,7 +51,7 @@ public class ResetDefaultButtonTableCell extends TableCell<ValueDef, Boolean> {
 	protected void updateItem(final Boolean t, final boolean empty) {
 		super.updateItem(t, empty);
 		if (!empty) {
-			setGraphic(cellButton);
+			setGraphic(new HBox(resetToDefaultButton, resetToOldValueButton));
 		} else {
 			setGraphic(null);
 		}

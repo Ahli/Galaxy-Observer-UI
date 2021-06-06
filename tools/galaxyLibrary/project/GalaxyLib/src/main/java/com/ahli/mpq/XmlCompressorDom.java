@@ -3,7 +3,7 @@
 
 package com.ahli.mpq;
 
-import com.ahli.util.SilentXmlSaxErrorHandler;
+import com.ahli.util.XmlDomHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Comment;
@@ -14,14 +14,11 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.BufferedInputStream;
@@ -63,24 +60,8 @@ public final class XmlCompressorDom {
 		logger.info("Compressing XML files...");
 		logger.trace("cachePath: {}", cachePath);
 		
-		final DocumentBuilderFactory dbFac = DocumentBuilderFactory.newInstance();
-		dbFac.setNamespaceAware(false);
-		dbFac.setValidating(false);
-		dbFac.setAttribute("http://xml.org/sax/features/external-general-entities", false);
-		dbFac.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-		dbFac.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-		dbFac.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-		dbFac.setXIncludeAware(false);
-		dbFac.setExpandEntityReferences(false);
-		dbFac.setAttribute(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-		final DocumentBuilder dBuilder = dbFac.newDocumentBuilder();
-		// provide error handler that does not print incompatible files into console
-		dBuilder.setErrorHandler(new SilentXmlSaxErrorHandler());
-		
-		final TransformerFactory factory = TransformerFactory.newInstance();
-		factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-		
-		final Transformer transformer = factory.newTransformer();
+		final DocumentBuilder dBuilder = XmlDomHelper.buildSecureDocumentBuilder(true, false);
+		final Transformer transformer = XmlDomHelper.buildSecureTransformer();
 		
 		final FileVisitor<Path> visitor = new FileProcessor(dBuilder, transformer, ignoreCommentCountPerFile);
 		Files.walkFileTree(cachePath, visitor);
