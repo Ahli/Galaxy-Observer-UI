@@ -434,8 +434,9 @@ public class SettingsEditorApplication extends Application {
 				new ExtensionFilter(Messages.getString("Main.heroesInterfaceFilter"), STORM_INTERFACE_FILE_FILTER));
 		fileChooser.setSelectedExtensionFilter(genExtFilter);
 		final File f = fileChooser.showOpenDialog(primaryStage);
-		
-		openMpqFileThreaded(f.toPath());
+		if (f != null) {
+			openMpqFileThreaded(f.toPath());
+		}
 	}
 	
 	/**
@@ -589,6 +590,8 @@ public class SettingsEditorApplication extends Application {
 	 * Saves the currently opened document.
 	 */
 	public void saveUiMpqThreaded() {
+		// steal focus to finish validating input before saving
+		primaryStage.getScene().getRoot().requestFocus();
 		new Thread(() -> {
 			final Thread curThread = Thread.currentThread();
 			curThread.setPriority(Thread.NORM_PRIORITY);

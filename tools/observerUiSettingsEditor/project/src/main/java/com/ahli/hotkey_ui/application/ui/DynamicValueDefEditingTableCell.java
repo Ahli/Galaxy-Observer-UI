@@ -44,15 +44,17 @@ public class DynamicValueDefEditingTableCell extends TableCell<ValueDef, String>
 	}
 	
 	private void updateItemNotEquals(final String item) {
-		logger.trace("update valuedef-edit table cell - newLabel {}", item);
 		final ValueDef data = getTableRow().getItem();
 		if (data != null) {
+			logger.trace("update valuedef-edit table cell - newLabel {} - type: {}", item, data.getType());
 			switch (data.getType()) {
 				case BOOLEAN -> createBooleanEditor(data);
 				case NUMBER -> createNumberEditor(data, item);
 				default -> createChoiceOrTextEditor(data, item);
 			}
 		} else {
+			// TODO the first entry is updated again with null for some reason
+			logger.trace("update valuedef-edit table cell - newLabel {} - null ValueDef", item);
 			setGraphic(null);
 		}
 	}
@@ -75,12 +77,12 @@ public class DynamicValueDefEditingTableCell extends TableCell<ValueDef, String>
 		setGraphic(comboBox);
 	}
 	
-	@SuppressWarnings("java:S5411") // Use the primitive boolean expression here
 	private void createNumberEditor(final ValueDef data, final String item) {
 		final TextField textField = new TextField(item);
 		
 		textField.focusedProperty().addListener((obs, wasFocussed, isFocussed) -> {
-			if (!isFocussed) {
+			logger.debug("createNumberEditor: {}", isFocussed);
+			if (isFocussed != null && !isFocussed) {
 				final TextField control = (TextField) ((ReadOnlyBooleanProperty) obs).getBean();
 				final String input = control.getText().trim();
 				if (NUMBER_INPUT_REGEX_PATTERN.matcher(input).matches()) {
@@ -124,12 +126,12 @@ public class DynamicValueDefEditingTableCell extends TableCell<ValueDef, String>
 		setGraphic(comboBox);
 	}
 	
-	@SuppressWarnings("java:S5411") // Use the primitive boolean expression here
 	private void createTextEditor(final ValueDef data, final String item) {
 		final TextField textField = new TextField(item);
 		
 		textField.focusedProperty().addListener((obs, wasFocussed, isFocussed) -> {
-			if (!isFocussed) {
+			logger.debug("createTextEditor: {}", isFocussed);
+			if (isFocussed != null && !isFocussed) {
 				final TextField control = (TextField) ((ReadOnlyBooleanProperty) obs).getBean();
 				data.valueProperty().set(control.getText());
 			}

@@ -48,10 +48,22 @@ public class ResetDefaultButtonTableCell extends TableCell<ValueDef, Boolean> {
 	
 	// Display button if the row is not empty
 	@Override
-	protected void updateItem(final Boolean t, final boolean empty) {
-		super.updateItem(t, empty);
-		if (!empty) {
-			setGraphic(new HBox(resetToDefaultButton, resetToOldValueButton));
+	protected void updateItem(final Boolean value, final boolean empty) {
+		super.updateItem(value, empty);
+		if (!empty && getTableRow().getItem() != null) {
+			if (value != null && value) {
+				if (getTableRow().getItem().isDefaultValue()) {
+					setGraphic(resetToOldValueButton);
+				} else {
+					setGraphic(new HBox(resetToDefaultButton, resetToOldValueButton));
+				}
+			} else {
+				if (getTableRow().getItem().isDefaultValue()) {
+					setGraphic(null);
+				} else {
+					setGraphic(resetToDefaultButton);
+				}
+			}
 		} else {
 			setGraphic(null);
 		}

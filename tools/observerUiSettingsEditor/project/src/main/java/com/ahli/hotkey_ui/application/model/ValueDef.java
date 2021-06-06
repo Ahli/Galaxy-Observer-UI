@@ -7,6 +7,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * Class that defines a Hotkey or Settings value to be used in UI.
@@ -155,13 +156,6 @@ public class ValueDef {
 	}
 	
 	/**
-	 * @param defaultValue
-	 */
-	public void setDefaultValue(final String defaultValue) {
-		this.defaultValue.set(defaultValue);
-	}
-	
-	/**
 	 * @return
 	 */
 	// required to make UI track changes
@@ -230,5 +224,21 @@ public class ValueDef {
 	 */
 	public boolean hasChanged() {
 		return hasChanged.get();
+	}
+	
+	/**
+	 * Returns whether the value is the default value.
+	 *
+	 * @return true if the value is the default value
+	 */
+	public boolean isDefaultValue() {
+		return Objects.equals(defaultValue.get(), value.get());
+	}
+	
+	/**
+	 * @param defaultValue
+	 */
+	public void setDefaultValue(final String defaultValue) {
+		this.defaultValue.set(defaultValue);
 	}
 }
