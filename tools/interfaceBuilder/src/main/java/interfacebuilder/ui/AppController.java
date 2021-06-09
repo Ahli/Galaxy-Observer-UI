@@ -137,7 +137,9 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 				StringInterner.cleanUpGarbage();
 				logger.trace("string interner size after cleaning: {}", StringInterner::size);
 				// TODO not all Strings are removed for some reason
-				//logger.trace("interner content: \n{}", StringInterner.print());
+				//				if (StringInterner.size() < 10) {
+				//					logger.trace("interner content: \n{}", StringInterner.print());
+				//				}
 			}
 		}).start();
 	}

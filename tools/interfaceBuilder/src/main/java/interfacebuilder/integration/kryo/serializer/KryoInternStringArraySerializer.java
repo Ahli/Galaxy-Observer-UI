@@ -8,25 +8,15 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.serializers.DefaultArraySerializers;
 
-import static com.esotericsoftware.kryo.Kryo.NULL;
-
 public class KryoInternStringArraySerializer extends DefaultArraySerializers.StringArraySerializer {
 	
 	@Override
 	public String[] read(final Kryo kryo, final Input input, final Class type) {
-		int length = input.readVarInt(true);
-		if (length == NULL) {
-			return null;
-		}
-		final String[] array = new String[--length];
-		if (kryo.getReferences() && kryo.getReferenceResolver().useReferences(String.class)) {
-			final var serializer = kryo.getSerializer(String.class);
-			for (int i = 0; i < length; ++i) {
-				array[i] = kryo.readObjectOrNull(input, String.class, serializer);
-			}
-		} else {
-			for (int i = 0; i < length; ++i) {
-				array[i] = StringInterner.intern(input.readString());
+		final String[] array = super.read(kryo, input, type);
+		
+		for (int i = array.length - 1; i >= 0; --i) {
+			if (array[i] != null) {
+				array[i] = StringInterner.intern(array[i]);
 			}
 		}
 		return array;
