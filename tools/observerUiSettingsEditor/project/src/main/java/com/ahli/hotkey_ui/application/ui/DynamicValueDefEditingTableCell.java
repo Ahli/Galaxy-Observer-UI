@@ -22,39 +22,32 @@ public class DynamicValueDefEditingTableCell extends TableCell<ValueDef, String>
 	
 	@Override
 	protected void updateItem(final String item, final boolean empty) {
+		super.updateItem(item, empty);
+		
 		if (empty || item == null) {
-			updateItemNull(item, empty);
+			updateItemNull();
 		} else {
-			// check if old value equals new value
-			final boolean notEquals = !item.equals(getItem());
-			super.updateItem(item, false);
-			if (notEquals) {
-				updateItemNotEquals(item);
-			} else {
-				logger.trace("update valuedef-edit table cell - equal");
-			}
+			updateItem(item);
 		}
 	}
 	
-	private void updateItemNull(final String item, final boolean empty) {
+	private void updateItemNull() {
 		logger.trace("update valuedef-edit table cell - null");
-		super.updateItem(item, empty);
 		setGraphic(null);
 		setText(null);
 	}
 	
-	private void updateItemNotEquals(final String item) {
+	private void updateItem(final String item) {
 		final ValueDef data = getTableRow().getItem();
 		if (data != null) {
-			logger.trace("update valuedef-edit table cell - newLabel {} - type: {}", item, data.getType());
+			logger.trace("update valuedef-edit table cell - label {} - type: {}", item, data.getType());
 			switch (data.getType()) {
 				case BOOLEAN -> createBooleanEditor(data);
 				case NUMBER -> createNumberEditor(data, item);
 				default -> createChoiceOrTextEditor(data, item);
 			}
 		} else {
-			// TODO the first entry is updated again with null for some reason
-			logger.trace("update valuedef-edit table cell - newLabel {} - null ValueDef", item);
+			logger.trace("update valuedef-edit table cell - label {} - null ValueDef", item);
 			setGraphic(null);
 		}
 	}
