@@ -40,16 +40,16 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
-      
 
-    - name: Install Toolchain JDK
-      if: matrix.language == 'java' 
+    - if: matrix.language == 'java' 
+      name: Install Toolchain JDK
       uses: battila7/jdk-via-jabba@v1
       with:
         jdk: adopt@~1.16.0-1
         javaHomeEnvironmentVariable: TOOLCHAIN_JDK
-    - name: Set up Toolchain
-      if: matrix.language == 'java' 
+
+    - if: matrix.language == 'java' 
+      name: Set up Toolchain
       shell: cmd
         #cd ~
         #mkdir .m2
@@ -70,9 +70,9 @@ jobs:
           echo   ^</toolchain^> >> %USERPROFILE%\.m2\toolchains.xml
           echo ^</toolchains^> >> %USERPROFILE%\.m2\toolchains.xml
           echo userprofile: %USERPROFILE%
-      
-    - name: Set up JDK
-      if: matrix.language == 'java' 
+
+    - if: matrix.language == 'java' 
+      name: Set up JDK
       uses: actions/setup-java@v2
       with:
         java-version: '16'
@@ -100,10 +100,6 @@ jobs:
     #    and modify them (or add more) to build your code if your project
     #    uses a compiled language
 
-    - if: matrix.language == 'cpp' || matrix.language == 'csharp' 
-      name: Autobuild
-      uses: github/codeql-action/autobuild@v1
-
     - if: matrix.language == 'java' 
       name: Build GalaxyLib
       shell: cmd
@@ -124,6 +120,14 @@ jobs:
       run: |
         cd tools\observerUiSettingsEditor\project
         mvn clean verify --batch-mode
+
+    - if: matrix.language == 'cpp'
+      name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild
+      
+    - if: matrix.language == 'cpp'
+      name: Run MSBuild
+      run: msbuild.exe tools\CascExtractor\CascExtractor
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
