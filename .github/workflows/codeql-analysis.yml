@@ -40,6 +40,35 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
+      
+
+    - name: Install Toolchain JDK
+      if: matrix.language == 'java' 
+      uses: battila7/jdk-via-jabba@v1
+      with:
+        jdk: adopt@~1.16.0.1-9
+        javaHomeEnvironmentVariable: TOOLCHAIN_JDK
+    - name: Set up Toolchain
+      if: matrix.language == 'java' 
+      shell: bash
+      run: |
+        (
+          echo ^<?xml version="1.0" encoding="UTF8"?^>
+          echo ^<toolchains^>
+          echo   ^<toolchain^>
+          echo     ^<type^>jdk^</type^>
+          echo     ^<provides^>
+          echo       ^<version^>16^</version^>
+          echo         ^<vendor^>openjdk^</vendor^>
+          echo         ^<platform^>windows-x64^</platform^>
+          echo       ^</provides^>
+          echo       ^<configuration^>
+          echo         ^<jdkHome^>${{ env.TOOLCHAIN_JDK }}^</jdkHome^>
+          echo       ^</configuration^>
+          echo   ^</toolchain^>
+          echo ^</toolchains^>
+        ) > %HOMEPATH%/.m2/toolchains.xml
+      
     - name: Set up JDK
       uses: actions/setup-java@v2
       with:
@@ -77,21 +106,21 @@ jobs:
       shell: cmd
       run: |
         cd tools\galaxyLibrary\project\GalaxyLib
-        mvn clean install
+        mvn clean install --batch-mode -V
 
     - if: matrix.language == 'java' 
       name: Build InterfaceBuilder
       shell: cmd
       run: |
         cd tools\interfaceBuilder
-        mvn clean install
+        mvn clean verify --batch-mode
 
     - if: matrix.language == 'java' 
       name: Build SettingsEditor
       shell: cmd
       run: |
         cd tools\observerUiSettingsEditor\project
-        mvn clean install
+        mvn clean verify --batch-mode
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
