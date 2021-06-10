@@ -404,7 +404,8 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 			logger.info("Starting game with replay: {}", replay.getName());
 			try {
 				printInfoLogMessageToGeneral("The game starts with a replay now...");
-				final String cmd = "cmd /C start \"\" \"" + gamePath + "\" \"" + replay.getAbsolutePath() + "\"";
+				final String[] cmd = new String[] { "cmd", "/C", "start",
+						"\"\" \"" + gamePath + "\" \"" + replay.getAbsolutePath() + "\"" };
 				Runtime.getRuntime().exec(cmd);
 				return true;
 			} catch (final IOException e) {

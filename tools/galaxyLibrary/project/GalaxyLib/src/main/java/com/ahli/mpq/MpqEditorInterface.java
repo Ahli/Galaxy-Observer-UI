@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.stream.Stream;
 
@@ -29,9 +30,11 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	private static final String EXECUTING = "executing: {}";
 	private static final String EXECUTION_FINISHED = "execution finished";
 	private static final char QUOTE = '\"';
+	private static final String QUOTESTR = "\"";
 	private static final Logger logger = LoggerFactory.getLogger(MpqEditorInterface.class);
 	private static final String MPQ_INTERFACE_MPQ_EDITOR_NOT_FOUND = "MpqInterface.MpqEditorNotFound";
-	private static final String CMD_C = "cmd /C ";
+	private static final String CMD = "cmd";
+	private static final String SLASH_C = "/C";
 	private static final Object classWideLock = new Object();
 	private MpqEditorSettingsInterface settings;
 	private Path mpqEditorPath;
@@ -245,12 +248,12 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 			throw new MpqException(String.format(Messages.getString(MPQ_INTERFACE_MPQ_EDITOR_NOT_FOUND),
 					mpqEditorPath));
 		}
-		
-		final String cmd =
-				CMD_C + QUOTE + QUOTE + mpqEditorPath + QUOTE + " n " + QUOTE + mpqPath + QUOTE + " " + maxFileCount +
-						QUOTE;
-		
-		logger.trace(EXECUTING, cmd);
+		final String[] cmd = new String[] { CMD, SLASH_C,
+				QUOTESTR + QUOTE + mpqEditorPath + QUOTE + " n " + QUOTE + mpqPath + QUOTE + " " + maxFileCount +
+						QUOTE };
+		if (logger.isTraceEnabled()) {
+			logger.trace(EXECUTING, Arrays.toString(cmd));
+		}
 		Runtime.getRuntime().exec(cmd).waitFor();
 		logger.trace(EXECUTION_FINISHED);
 	}
@@ -269,10 +272,12 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 			throw new MpqException(String.format(Messages.getString(MPQ_INTERFACE_MPQ_EDITOR_NOT_FOUND),
 					mpqEditorPath));
 		}
-		final String cmd =
-				CMD_C + QUOTE + QUOTE + mpqEditorPath + QUOTE + " a " + QUOTE + mpqPath + QUOTE + " " + QUOTE +
-						sourceFilePath + QUOTE + " " + QUOTE + targetName + QUOTE + " /r" + QUOTE;
-		logger.trace(EXECUTING, cmd);
+		final String[] cmd = new String[] { CMD, SLASH_C,
+				QUOTESTR + QUOTE + mpqEditorPath + QUOTE + " a " + QUOTE + mpqPath + QUOTE + " " + QUOTE +
+						sourceFilePath + QUOTE + " " + QUOTE + targetName + QUOTE + " /r" + QUOTE };
+		if (logger.isTraceEnabled()) {
+			logger.trace(EXECUTING, Arrays.toString(cmd));
+		}
 		Runtime.getRuntime().exec(cmd).waitFor();
 		logger.trace(EXECUTION_FINISHED);
 	}
@@ -288,12 +293,13 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 			throw new MpqException(String.format(Messages.getString(MPQ_INTERFACE_MPQ_EDITOR_NOT_FOUND),
 					mpqEditorPath));
 		}
-		final String cmd =
-				CMD_C + QUOTE + QUOTE + mpqEditorPath + QUOTE + " compact " + QUOTE + mpqPath + QUOTE + QUOTE;
-		logger.trace(EXECUTING, cmd);
+		final String[] cmd = new String[] { CMD, SLASH_C,
+				QUOTESTR + QUOTE + mpqEditorPath + QUOTE + " compact " + QUOTE + mpqPath + QUOTE + QUOTE };
+		if (logger.isTraceEnabled()) {
+			logger.trace(EXECUTING, Arrays.toString(cmd));
+		}
 		Runtime.getRuntime().exec(cmd).waitFor();
 		logger.trace(EXECUTION_FINISHED);
-		
 	}
 	
 	/**
@@ -358,10 +364,12 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 			throw new MpqException(String.format(Messages.getString(MPQ_INTERFACE_MPQ_EDITOR_NOT_FOUND),
 					mpqEditorPath));
 		}
-		final String cmd =
-				CMD_C + QUOTE + QUOTE + mpqEditorPath + QUOTE + " e " + QUOTE + mpqPath + QUOTE + " " + QUOTE +
-						fileName + QUOTE + " " + QUOTE + targetPath + QUOTE + (inclSubFolders ? " /fp" : "") + QUOTE;
-		logger.trace(EXECUTING, cmd);
+		final String[] cmd = new String[] { CMD, SLASH_C,
+				QUOTESTR + QUOTE + mpqEditorPath + QUOTE + " e " + QUOTE + mpqPath + QUOTE + " " + QUOTE + fileName +
+						QUOTE + " " + QUOTE + targetPath + QUOTE + (inclSubFolders ? " /fp" : "") + QUOTE };
+		if (logger.isTraceEnabled()) {
+			logger.trace(EXECUTING, Arrays.toString(cmd));
+		}
 		Runtime.getRuntime().exec(cmd).waitFor();
 		logger.trace(EXECUTION_FINISHED);
 	}
@@ -414,10 +422,12 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 			throw new MpqException(String.format(Messages.getString(MPQ_INTERFACE_MPQ_EDITOR_NOT_FOUND),
 					mpqEditorPath));
 		}
-		final String cmd =
-				CMD_C + QUOTE + QUOTE + mpqEditorPath + QUOTE + " s " + QUOTE + mpqPath + QUOTE + " " + QUOTE +
-						scriptPath + QUOTE + QUOTE;
-		logger.trace(EXECUTING, cmd);
+		final String[] cmd = new String[] { CMD, SLASH_C,
+				QUOTESTR + QUOTE + mpqEditorPath + QUOTE + " s " + QUOTE + mpqPath + QUOTE + " " + QUOTE + scriptPath +
+						QUOTE + QUOTE };
+		if (logger.isTraceEnabled()) {
+			logger.trace(EXECUTING, Arrays.toString(cmd));
+		}
 		Runtime.getRuntime().exec(cmd).waitFor();
 		logger.trace(EXECUTION_FINISHED);
 	}
@@ -435,10 +445,12 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 			throw new MpqException(String.format(Messages.getString(MPQ_INTERFACE_MPQ_EDITOR_NOT_FOUND),
 					mpqEditorPath));
 		}
-		final String cmd =
-				CMD_C + QUOTE + QUOTE + mpqEditorPath + QUOTE + " d " + QUOTE + mpqPath + QUOTE + " " + QUOTE +
-						filePath + QUOTE + QUOTE;
-		logger.trace(EXECUTING, cmd);
+		final String[] cmd = new String[] { CMD, SLASH_C,
+				QUOTESTR + QUOTE + mpqEditorPath + QUOTE + " d " + QUOTE + mpqPath + QUOTE + " " + QUOTE + filePath +
+						QUOTE + QUOTE };
+		if (logger.isTraceEnabled()) {
+			logger.trace(EXECUTING, Arrays.toString(cmd));
+		}
 		Runtime.getRuntime().exec(cmd).waitFor();
 		logger.trace(EXECUTION_FINISHED);
 	}
@@ -457,10 +469,12 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 			throw new MpqException(String.format(Messages.getString(MPQ_INTERFACE_MPQ_EDITOR_NOT_FOUND),
 					mpqEditorPath));
 		}
-		final String cmd =
-				CMD_C + QUOTE + QUOTE + mpqEditorPath + QUOTE + " r " + QUOTE + mpqPath + QUOTE + " " + QUOTE +
-						oldfilePath + QUOTE + " " + QUOTE + newFilePath + QUOTE + QUOTE;
-		logger.trace(EXECUTING, cmd);
+		final String[] cmd = new String[] { CMD, SLASH_C,
+				QUOTESTR + QUOTE + mpqEditorPath + QUOTE + " r " + QUOTE + mpqPath + QUOTE + " " + QUOTE + oldfilePath +
+						QUOTE + " " + QUOTE + newFilePath + QUOTE + QUOTE };
+		if (logger.isTraceEnabled()) {
+			logger.trace(EXECUTING, Arrays.toString(cmd));
+		}
 		Runtime.getRuntime().exec(cmd).waitFor();
 		logger.trace(EXECUTION_FINISHED);
 	}
