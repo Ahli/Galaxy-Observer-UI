@@ -23,7 +23,7 @@ on:
 jobs:
   analyze:
     name: Analyze
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     permissions:
       actions: read
       contents: read
@@ -32,7 +32,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [ 'cpp', 'java' ]
+        language: [ 'java', 'cpp' ]
         # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python' ]
         # Learn more:
         # https://docs.github.com/en/free-pro-team@latest/github/finding-security-vulnerabilities-and-errors-in-your-code/configuring-code-scanning#changing-the-languages-that-are-analyzed
@@ -40,6 +40,43 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
+
+    - if: matrix.language == 'java' 
+      name: Install Toolchain JDK
+      uses: battila7/jdk-via-jabba@v1
+      with:
+        jdk: adopt@~1.16.0-1
+        javaHomeEnvironmentVariable: TOOLCHAIN_JDK
+
+    - if: matrix.language == 'java' 
+      name: Set up Toolchain
+      shell: cmd
+        #cd ~
+        #mkdir .m2
+      run: |
+          mkdir %USERPROFILE%\.m2
+          echo ^<?xml version="1.0" encoding="UTF8"?^> > %USERPROFILE%\.m2\toolchains.xml
+          echo ^<toolchains^> >> %USERPROFILE%\.m2\toolchains.xml
+          echo   ^<toolchain^> >> %USERPROFILE%\.m2\toolchains.xml
+          echo     ^<type^>jdk^</type^> >> %USERPROFILE%\.m2\toolchains.xml
+          echo     ^<provides^> >> %USERPROFILE%\.m2\toolchains.xml
+          echo       ^<version^>16^</version^> >> %USERPROFILE%\.m2\toolchains.xml
+          echo       ^<vendor^>openjdk^</vendor^> >> %USERPROFILE%\.m2\toolchains.xml
+          echo       ^<platform^>windows-x64^</platform^> >> %USERPROFILE%\.m2\toolchains.xml
+          echo     ^</provides^> >> %USERPROFILE%\.m2\toolchains.xml
+          echo     ^<configuration^> >> %USERPROFILE%\.m2\toolchains.xml
+          echo       ^<jdkHome^>${{ env.TOOLCHAIN_JDK }}^</jdkHome^> >> %USERPROFILE%\.m2\toolchains.xml
+          echo     ^</configuration^> >> %USERPROFILE%\.m2\toolchains.xml
+          echo   ^</toolchain^> >> %USERPROFILE%\.m2\toolchains.xml
+          echo ^</toolchains^> >> %USERPROFILE%\.m2\toolchains.xml
+          echo userprofile: %USERPROFILE%
+
+    - if: matrix.language == 'java' 
+      name: Set up JDK
+      uses: actions/setup-java@v2
+      with:
+        java-version: '16'
+        distribution: 'adopt'
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
@@ -53,8 +90,8 @@ jobs:
 
     # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
     # If this step fails, then you should remove it and run the build manually (see below)
-    - name: Autobuild
-      uses: github/codeql-action/autobuild@v1
+#    - name: Autobuild
+#      uses: github/codeql-action/autobuild@v1
 
     # ℹ️ Command-line programs to run using the OS shell.
     # 📚 https://git.io/JvXDl
@@ -63,9 +100,34 @@ jobs:
     #    and modify them (or add more) to build your code if your project
     #    uses a compiled language
 
-    #- run: |
-    #   make bootstrap
-    #   make release
+    - if: matrix.language == 'java' 
+      name: Build GalaxyLib
+      shell: cmd
+      run: |
+        cd tools\galaxyLibrary\project\GalaxyLib
+        mvn clean install --batch-mode -V
+
+    - if: matrix.language == 'java' 
+      name: Build InterfaceBuilder
+      shell: cmd
+      run: |
+        cd tools\interfaceBuilder
+        mvn clean verify --batch-mode
+
+    - if: matrix.language == 'java' 
+      name: Build SettingsEditor
+      shell: cmd
+      run: |
+        cd tools\observerUiSettingsEditor\project
+        mvn clean verify --batch-mode
+
+    - if: matrix.language == 'cpp'
+      name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1.0.2
+
+    - if: matrix.language == 'cpp'
+      name: Run MSBuild
+      run: msbuild.exe tools\CascExtractor\CascExtractor
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
