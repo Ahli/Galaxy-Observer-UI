@@ -22,7 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 
 /**
@@ -41,8 +41,6 @@ public class RandomCompressionMiner {
 	private static final Logger logger = LogManager.getLogger(RandomCompressionMiner.class);
 	private final ModData mod;
 	private final MpqEditorInterface mpqInterface;
-	@SuppressWarnings("UnsecureRandomNumberGeneration")
-	private final Random random = new Random();
 	private final MpqEditorCompressionRuleMethod[] compressionSetting = MpqEditorCompressionRuleMethod.values();
 	private ObjectLongHashMap<String> fileSizeMap;
 	private MpqEditorCompressionRule[] rules;
@@ -255,9 +253,12 @@ public class RandomCompressionMiner {
 	 * Build the mpq with the specified ruleset. CompressXml should only be enabled for the first build.
 	 *
 	 * @param rules
+	 * 		compression rules to use
 	 * @param compressXml
-	 * @return
+	 * 		compresses the XML file content if true
+	 * @return returns the size of the built artifact
 	 * @throws InterruptedException
+	 * 		when build was interrupted
 	 * @throws MpqException
 	 * @throws IOException
 	 */
@@ -384,9 +385,11 @@ public class RandomCompressionMiner {
 	/**
 	 * Builds the archive with the compression rules.
 	 *
-	 * @return
+	 * @return size of the built artifact
 	 * @throws InterruptedException
+	 * 		when build was interrupted
 	 * @throws IOException
+	 * 		when
 	 * @throws MpqException
 	 */
 	public long build() throws InterruptedException, IOException, MpqException {
@@ -407,7 +410,7 @@ public class RandomCompressionMiner {
 		for (final MpqEditorCompressionRule rule : rules) {
 			if (rule instanceof MpqEditorCompressionRuleMask ruleMask) {
 				rule.setCompressionMethod(getRandomCompressionMethod(ruleMask.getMask()));
-				rule.setSingleUnit(random.nextBoolean());
+				rule.setSingleUnit(ThreadLocalRandom.current().nextBoolean());
 			}
 		}
 	}
@@ -415,11 +418,12 @@ public class RandomCompressionMiner {
 	/**
 	 * Returns a random compression method.
 	 *
-	 * @return
+	 * @return randomly selected compression method
 	 */
 	private MpqEditorCompressionRuleMethod getRandomCompressionMethod(final String mask) {
 		// exclude LZMA -> crash
 		MpqEditorCompressionRuleMethod method;
+		final ThreadLocalRandom random = ThreadLocalRandom.current();
 		if (fileSizeMap.get(mask) > 0) {
 			method = random.nextFloat() > 0.95f ? MpqEditorCompressionRuleMethod.ZLIB :
 					MpqEditorCompressionRuleMethod.BZIP2;
