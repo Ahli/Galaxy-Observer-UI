@@ -116,6 +116,8 @@ void libNtve_InitVariables () {
         }
     }
     libNtve_gv_visibleFilter = UnitFilter((1 << c_targetFilterVisible), 0, 0, 0);
+	// AHLI CUSTOM CODE
+	UIDisplayMessage(PlayerGroupAll(), 1, StringToText("Hello Ahli!"));
 }
 
 // Presets
@@ -6326,11 +6328,154 @@ void libNtve_gt__BB_BossHPChanged_Init () {
     TriggerAddEventUnitProperty(libNtve_gt__BB_BossHPChanged, null, c_unitPropShields);
 }
 
+
+
+// AHLI CUSTOM CODE
+int[16] Ahli_workersKilled;
+int[16] Ahli_slotLabel;
+int[16] Ahli_slotPanel;
+int[16] Ahli_workerIcon;
+int[16] Ahli_workerColor;
+int[16] Ahli_slotBackground;
+int[16] Ahli_slotStatus;
+timer[16] Ahli_workersKilledTimer;
+trigger Ahli_WorkersKilledNotificationsWorkerKilled;
+trigger Ahli_WorkersKilledNotificationsTimerRunsOut;
+trigger auto_Ahli_DelayedInit_Trigger;
+bool auto_Ahli_DelayedInitThread_TriggerFunc (bool testConds, bool runActions) {
+	int i;
+    string slotStr;
+	playergroup activePlayers = PlayerGroupActive();
+	int playerCount = PlayerGroupCount(activePlayers);
+	int curPlayerIndex;
+    int[4] lv_panel;
+    int[4] lv_label;
+    int[4] lv_icon;
+    int[4] lv_workerColor;
+    int[4] lv_background;
+	for (i = 0; i < playerCount; i += 1) {
+		slotStr = IntToString(i);
+		DialogControlHookupStandard(c_triggerControlTypeLabel, ("UIContainer/FullscreenUpperContainer/WorkerNotificationPanel/ToggledContent/WorkerFrame" + (slotStr + "/WorkerCount")));
+		lv_label[i] = DialogControlLastCreated();
+		DialogControlSetVisible(DialogControlLastCreated(), PlayerGroupAll(), true);
+		DialogControlSetObservedType(DialogControlLastCreated(), c_triggerObservedTypeDefaultObservedPlayerId);
+		DialogControlHookupStandard(c_triggerControlTypePanel, ("UIContainer/FullscreenUpperContainer/WorkerNotificationPanel/ToggledContent/WorkerFrame" + slotStr));
+		lv_panel[i] = DialogControlLastCreated();
+		DialogControlSetVisible(DialogControlLastCreated(), PlayerGroupAll(), true);
+		DialogControlSetObservedType(DialogControlLastCreated(), c_triggerObservedTypeDefaultObservedPlayerId);
+		//libNtve_gf_SetDialogItemColor(Ahli_slotPanel[i], Color(100,100,100), PlayerGroupAll());
+		DialogControlHookupStandard(c_triggerControlTypeImage, ("UIContainer/FullscreenUpperContainer/WorkerNotificationPanel/ToggledContent/WorkerFrame" + (slotStr + "/WorkerType")));
+		lv_icon[i] = DialogControlLastCreated();
+		DialogControlSetVisible(DialogControlLastCreated(), PlayerGroupAll(), true);
+		DialogControlSetObservedType(DialogControlLastCreated(), c_triggerObservedTypeDefaultObservedPlayerId);
+		DialogControlHookupStandard(c_triggerControlTypeImage, ("UIContainer/FullscreenUpperContainer/WorkerNotificationPanel/ToggledContent/WorkerFrame" + (slotStr + "/WorkerColor")));
+		lv_workerColor[i] = DialogControlLastCreated();
+		DialogControlSetVisible(DialogControlLastCreated(), PlayerGroupAll(), true);
+		DialogControlSetObservedType(DialogControlLastCreated(), c_triggerObservedTypeDefaultObservedPlayerId);
+		DialogControlHookupStandard(c_triggerControlTypeImage, ("UIContainer/FullscreenUpperContainer/WorkerNotificationPanel/ToggledContent/WorkerFrame" + (slotStr + "/WorkerBackground")));
+		lv_background[i] = DialogControlLastCreated();
+		DialogControlSetVisible(DialogControlLastCreated(), PlayerGroupAll(), true);
+		DialogControlSetObservedType(DialogControlLastCreated(), c_triggerObservedTypeDefaultObservedPlayerId);
+	}
+	i = 0;
+	curPlayerIndex = -1;
+	while (true) {
+		curPlayerIndex = PlayerGroupNextPlayer(activePlayers, curPlayerIndex);
+		if (curPlayerIndex < 0) { break; }
+		Ahli_slotPanel[curPlayerIndex] = lv_panel[i];
+		Ahli_slotLabel[curPlayerIndex] = lv_label[i];
+		Ahli_workerIcon[curPlayerIndex] = lv_icon[i];
+		Ahli_workerColor[curPlayerIndex] = lv_workerColor[i];
+		Ahli_slotBackground[curPlayerIndex] = lv_background[i];
+		Ahli_workersKilledTimer[curPlayerIndex] = TimerCreate();
+		i += 1;
+	}
+	DialogControlHookupStandard(c_triggerControlTypePanel, "UIContainer/FullscreenUpperContainer/WorkerNotificationPanel");
+	DialogControlSetVisible(DialogControlLastCreated(), PlayerGroupAll(), true);
+	DialogControlSetObservedType(DialogControlLastCreated(), c_triggerObservedTypeDefaultObservedPlayerId);
+	UIDisplayMessage(PlayerGroupAll(), 1, StringToText("Code initialized!"));
+	return true;
+}
+bool Ahli_WorkersKilledNotificationsWorkerKilled_Func (bool testConds, bool runActions) {
+    int lv_deadUnitOwner;
+    unit lv_deadUnit;
+    unit lv_killingUnit;
+    string lv_unitType;
+    if (EventUnitDamageDeathCheck(c_deathTypeRemove) == false) {
+        lv_deadUnit = EventUnit();
+        if (UnitTestState(lv_deadUnit, c_unitStateHallucination) == false) {
+            lv_unitType = UnitGetType(lv_deadUnit);
+            lv_deadUnitOwner = UnitGetOwner(lv_deadUnit);
+
+			if (((lv_unitType == "Drone") || (lv_unitType == "Probe") || (lv_unitType == "SCV") || (lv_unitType == "DroneBurrowed"))
+				&& (Ahli_slotLabel[lv_deadUnitOwner] != c_invalidDialogControlId)
+			) {
+				lv_killingUnit = libNtve_gf_KillingUnit();
+                if (Ahli_slotStatus[lv_deadUnitOwner] == 1) {
+                    Ahli_workersKilled[lv_deadUnitOwner] += 1;
+                }
+                else {
+                    Ahli_workersKilled[lv_deadUnitOwner] = 1;
+                }
+				UIDisplayMessage(PlayerGroupAll(), 1, StringToText("Worker died: " + IntToString(Ahli_workersKilled[lv_deadUnitOwner])));
+                libNtve_gf_SetDialogItemText(Ahli_slotLabel[lv_deadUnitOwner], IntToText(Ahli_workersKilled[lv_deadUnitOwner]), PlayerGroupAll());
+                libNtve_gf_SetDialogItemImage(Ahli_workerIcon[lv_deadUnitOwner], (CatalogFieldValueGet(c_gameCatalogActor, lv_unitType, "UnitIcon", c_playerAny)), PlayerGroupAll());
+                if (UnitIsValid(lv_killingUnit) == true) {
+                    libNtve_gf_SetDialogItemColor(Ahli_slotBackground[lv_deadUnitOwner], libNtve_gf_ConvertPlayerColorToColor(PlayerGetColorIndex(UnitGetOwner(lv_killingUnit), false)), PlayerGroupAll());
+                }
+
+                libNtve_gf_SetDialogItemColor(Ahli_workerColor[lv_deadUnitOwner], libNtve_gf_ConvertPlayerColorToColor(PlayerGetColorIndex(lv_deadUnitOwner, false)), PlayerGroupAll());
+                Ahli_slotStatus[lv_deadUnitOwner] = 1;
+                if (Ahli_workersKilled[lv_deadUnitOwner] > 1) {
+                    DialogControlSetVisible(Ahli_slotPanel[lv_deadUnitOwner], PlayerGroupAll(), true);
+                    DialogControlSendAnimationEvent(Ahli_slotLabel[lv_deadUnitOwner], PlayerGroupAll(), "textUpdated");
+					UIDisplayMessage(PlayerGroupAll(), 1, StringToText("Started!"));
+                }
+				TimerStart(Ahli_workersKilledTimer[lv_deadUnitOwner], 20.0, false, c_timeReal);
+                return true;
+			}
+		}
+	}
+	return false;
+}
+void Ahli_WorkersKilledNotificationsWorkerKilled_Init () {
+    Ahli_WorkersKilledNotificationsWorkerKilled = TriggerCreate("Ahli_WorkersKilledNotificationsWorkerKilled_Func");
+	TriggerAddEventUnitDied(Ahli_WorkersKilledNotificationsWorkerKilled, UnitRefFromUnit(null));
+}
+bool Ahli_WorkersKilledNotificationsTimerRunsOut_Func (bool testConds, bool runActions) {
+    timer lv_timer = EventTimer();
+    int lv_slot = 0;
+	for ( ; lv_slot <= 4 ; lv_slot += 1 ) {
+		if (lv_timer == Ahli_workersKilledTimer[lv_slot]) {
+			Ahli_slotStatus[lv_slot] = 0;
+			DialogControlSetVisible(Ahli_slotPanel[lv_slot], PlayerGroupAll(), false);
+			return true;
+		}
+	}
+    return false;
+}
+void Ahli_WorkersKilledNotificationsTimerRunsOut_Init () {
+    Ahli_WorkersKilledNotificationsTimerRunsOut = TriggerCreate("Ahli_WorkersKilledNotificationsTimerRunsOut_Func");
+}
+
+
+
+
+
+
 void libNtve_InitTriggers () {
     libNtve_gt_ScreenButtonClicked_Init();
     libNtve_gt_FlashScreenButton_Init();
     libNtve_gt_PulseScreenImage_Init();
     libNtve_gt__BB_BossHPChanged_Init();
+	// AHLI CUSTOM CODE
+	//CatalogFieldValueSet(c_gameCatalogGameUI, "Dflt", "DefaultObservedPlayerId", 0, "14");
+	if(PlayerGroupCount(PlayerGroupActive()) <= 4) {
+		Ahli_WorkersKilledNotificationsWorkerKilled_Init();
+		Ahli_WorkersKilledNotificationsTimerRunsOut_Init();
+		auto_Ahli_DelayedInit_Trigger = TriggerCreate("auto_Ahli_DelayedInitThread_TriggerFunc");
+		TriggerExecute(auto_Ahli_DelayedInit_Trigger, false, false);
+	}
 }
 
 //--------------------------------------------------------------------------------------------------
