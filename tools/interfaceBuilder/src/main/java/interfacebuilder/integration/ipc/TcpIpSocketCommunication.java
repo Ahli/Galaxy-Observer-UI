@@ -1,8 +1,9 @@
 // This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-package interfacebuilder.integration;
+package interfacebuilder.integration.ipc;
 
+import interfacebuilder.integration.CommandLineParams;
 import interfacebuilder.integration.log4j.InterProcessCommunicationAppender;
 import interfacebuilder.ui.AppController;
 import org.apache.logging.log4j.LogManager;
@@ -20,8 +21,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
-public class InterProcessCommunication implements AutoCloseable {
-	private static final Logger logger = LogManager.getLogger(InterProcessCommunication.class);
+public class TcpIpSocketCommunication implements AutoCloseable {
+	private static final Logger logger = LogManager.getLogger(TcpIpSocketCommunication.class);
 	private ServerSocket serverSocket;
 	
 	public static boolean isPortFree(final int port) {
@@ -100,18 +101,18 @@ public class InterProcessCommunication implements AutoCloseable {
 			return null;
 		}
 		
-		final IpcServerThread serverThread = new IpcServerThread("IPCserver", serverSocket);
+		final IpcServerThread serverThread = new TcpIpSocketServerThread("IpcServer", serverSocket);
 		serverThread.start();
 		return serverThread;
 	}
 	
-	public static final class IpcServerThread extends Thread {
+	public static final class TcpIpSocketServerThread extends Thread implements IpcServerThread {
 		
 		private static final Pattern COMMA_SEPARATED_REGEX_PATTERN = Pattern.compile(", ");
 		private final ServerSocket serverSocket;
 		private AppController appController;
 		
-		private IpcServerThread(final String name, final ServerSocket serverSocket) {
+		private TcpIpSocketServerThread(final String name, final ServerSocket serverSocket) {
 			super(name);
 			setDaemon(true);
 			setPriority(Thread.MIN_PRIORITY);
@@ -180,6 +181,7 @@ public class InterProcessCommunication implements AutoCloseable {
 			}
 		}
 		
+		@Override
 		public void setAppController(final AppController appController) {
 			this.appController = appController;
 		}

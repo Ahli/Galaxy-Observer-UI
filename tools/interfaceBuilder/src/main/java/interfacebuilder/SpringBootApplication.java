@@ -6,14 +6,17 @@ package interfacebuilder;
 import interfacebuilder.config.AppConfiguration;
 import interfacebuilder.config.FxmlConfiguration;
 import interfacebuilder.integration.CommandLineParams;
-import interfacebuilder.integration.InterProcessCommunication;
+import interfacebuilder.integration.ipc.IpcServerThread;
+import interfacebuilder.integration.ipc.UnixDomainSocketCommunication;
 import javafx.application.Application;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Import;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Arrays;
 
 import static interfacebuilder.ui.AppController.FATAL_ERROR;
@@ -39,14 +42,13 @@ import static interfacebuilder.ui.AppController.FATAL_ERROR;
 @Import({ AppConfiguration.class, FxmlConfiguration.class })
 public final class SpringBootApplication {
 	
-	public static final int INTER_PROCESS_COMMUNICATION_PORT = 12317;
+	//	public static final int INTER_PROCESS_COMMUNICATION_PORT = 12317;
 	
 	private static final Logger logger = LogManager.getLogger(SpringBootApplication.class);
 	
 	public static void main(final String[] args) {
 		try {
-			// TODO app mode without GUI
-			if (InterProcessCommunication.isPortFree(INTER_PROCESS_COMMUNICATION_PORT)) {
+			if (UnixDomainSocketCommunication.isAvailable(getIpcPath())) {
 				if (!actAsServer(args)) {
 					logger.warn("Failed to create Server Thread. Starting App without it...");
 					launch(args, null);
@@ -61,30 +63,43 @@ public final class SpringBootApplication {
 	}
 	
 	private static boolean actAsClient(final String[] args) {
-		if (InterProcessCommunication.sendToServer(args, INTER_PROCESS_COMMUNICATION_PORT)) {
-			return true;
-		} else {
-			logger.error("InterProcessCommunication as Client failed. The port might not be free anymore.");
+		//		if (TcpIpSocketCommunication.sendToServer(args, INTER_PROCESS_COMMUNICATION_PORT)) {
+		//			return true;
+		//		} else {
+		//			logger.error("InterProcessCommunication as Client failed. The port might not be free anymore.");
+		//		}
+		
+		try (final UnixDomainSocketCommunication interProcessCommunication = new UnixDomainSocketCommunication(
+				getIpcPath())) {
+			if (interProcessCommunication.sendToServer(args)) {
+				return true;
+			} else {
+				logger.error("InterProcessCommunication as Client failed.");
+			}
+		} catch (final IOException e) {
+			logger.error("ClosingInterProcessCommunication as Client failed.", e);
 		}
 		return false;
 	}
 	
 	private static boolean actAsServer(final String[] args) {
-		try (final InterProcessCommunication interProcessCommunication = new InterProcessCommunication()) {
-			final Thread serverThread = interProcessCommunication.actAsServer(INTER_PROCESS_COMMUNICATION_PORT);
-			if (serverThread != null) {
-				launch(args, serverThread);
-				return true;
-			} else {
-				logger.error("InterProcessCommunication failed");
-			}
+		try (final UnixDomainSocketCommunication interProcessCommunication = new UnixDomainSocketCommunication(
+				getIpcPath())) {
+			final IpcServerThread serverThread = interProcessCommunication.actAsServer();
+			launch(args, serverThread);
+			return true;
 		} catch (final IOException e) {
 			logger.error("Closing InterProcessCommunication failed", e);
 		}
 		return false;
 	}
 	
-	private static void launch(final String[] args, final Thread serverThread) {
+	private static Path getIpcPath() {
+		return Path.of(
+				System.getProperty("user.home") + File.separator + ".GalaxyObsUI" + File.separator + "ipc.socket");
+	}
+	
+	private static void launch(final String[] args, final IpcServerThread serverThread) {
 		logger.trace("System's Log4j2 Configuration File: {}", () -> System.getProperty("log4j.configurationFile"));
 		logger.info(
 				"Launch arguments: {}\nMax Heap Space: {}mb.",
@@ -105,12 +120,11 @@ public final class SpringBootApplication {
 		}
 	}
 	
-	private static void launchNoGui(final String[] args, final Thread serverThread) {
-		final NoGuiApplication app = new NoGuiApplication(args, serverThread);
-		app.start();
+	private static void launchNoGui(final String[] args, final IpcServerThread serverThread) {
+		new NoGuiApplication(args, serverThread).start();
 	}
 	
-	private static void launchGui(final String[] args, final Thread serverThread) {
+	private static void launchGui(final String[] args, final IpcServerThread serverThread) {
 		setJavaFxPreloader(AppPreloader.class.getCanonicalName());
 		Application.launch(JavafxApplication.class, argsWithServerThread(args, serverThread));
 	}
@@ -119,7 +133,7 @@ public final class SpringBootApplication {
 		System.setProperty("javafx.preloader", canonicalPath);
 	}
 	
-	private static String[] argsWithServerThread(final String[] args, final Thread serverThread) {
+	private static String[] argsWithServerThread(final String[] args, final IpcServerThread serverThread) {
 		if (serverThread != null) {
 			final String[] destArray = Arrays.copyOf(args, args.length + 1);
 			destArray[destArray.length - 1] =

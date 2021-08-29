@@ -4,7 +4,7 @@
 package interfacebuilder;
 
 import interfacebuilder.integration.CommandLineParams;
-import interfacebuilder.integration.InterProcessCommunication;
+import interfacebuilder.integration.ipc.IpcServerThread;
 import interfacebuilder.ui.AppController;
 import javafx.application.Application;
 import javafx.application.HostServices;
@@ -18,7 +18,7 @@ import org.springframework.context.support.GenericApplicationContext;
 
 public class JavafxApplication extends Application {
 	
-	private InterProcessCommunication.IpcServerThread serverThread;
+	private IpcServerThread serverThread;
 	private ConfigurableApplicationContext context;
 	
 	@Override
@@ -40,15 +40,14 @@ public class JavafxApplication extends Application {
 		}
 	}
 	
-	private static InterProcessCommunication.IpcServerThread findServerThread(final String id) {
+	private static IpcServerThread findServerThread(final String id) {
 		try {
 			if (id != null && !id.isEmpty()) {
 				final long idLong = Long.parseLong(id);
 				
 				// getAllStackTraces() is not optimal as it creates a lot of waste :(
 				for (final Thread thread : Thread.getAllStackTraces().keySet()) {
-					if (thread.getId() == idLong &&
-							thread instanceof final InterProcessCommunication.IpcServerThread serverThread) {
+					if (thread.getId() == idLong && thread instanceof final IpcServerThread serverThread) {
 						return serverThread;
 					}
 				}
