@@ -38,11 +38,11 @@ public class TcpIpSocketCommunication implements AutoCloseable {
 	 * <p>
 	 * This is a blocking instruction!
 	 *
-	 * @param args
 	 * @param port
+	 * @param args
 	 * @return true, if a connection with a server was established and stopped; else false
 	 */
-	public static boolean sendToServer(final String[] args, final int port) {
+	public static boolean sendToServer(final int port, final String... args) {
 		
 		try (final Socket socket = new Socket(InetAddress.getByAddress(new byte[] { 127, 0, 0, 1 }), port)) {
 			try (final PrintWriter out = new PrintWriter(socket.getOutputStream(), true, StandardCharsets.UTF_8);
@@ -141,7 +141,7 @@ public class TcpIpSocketCommunication implements AutoCloseable {
 			     final PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true, StandardCharsets.UTF_8);
 			     final BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(),
 					     StandardCharsets.UTF_8))) {
-				InterProcessCommunicationAppender.setPrintWriter(out);
+				InterProcessCommunicationAppender.setWriter(new TcpIpSocketMessageWriter(out));
 				String inputLine;
 				while ((inputLine = in.readLine()) != null) {
 					logger.info("received message from client: {}", inputLine);
@@ -155,7 +155,7 @@ public class TcpIpSocketCommunication implements AutoCloseable {
 			} catch (final Exception e) {
 				logger.fatal("FATAL ERROR: ", e);
 			} finally {
-				InterProcessCommunicationAppender.setPrintWriter(null);
+				InterProcessCommunicationAppender.setWriter(null);
 			}
 		}
 		

@@ -13,15 +13,16 @@ import java.io.IOException;
 import java.net.StandardProtocolFamily;
 import java.net.UnixDomainSocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.nio.channels.AlreadyBoundException;
 import java.nio.channels.AsynchronousCloseException;
-import java.nio.channels.FileChannel;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CoderResult;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -35,25 +36,6 @@ public class UnixDomainSocketCommunication implements AutoCloseable {
 		address = UnixDomainSocketAddress.of(socketFileAddress);
 	}
 	
-	public static boolean isAvailable(final Path path) {
-		if (Files.exists(path)) {
-			try (final FileChannel channelLock = FileChannel.open(path, StandardOpenOption.APPEND)) {
-				logger.trace("socket file exists and can be locked => orphaned file");
-			} catch (final IOException e) {
-				logger.trace("channelLock test error", e);
-				return false;
-			}
-			try {
-				Files.delete(path);
-				return true;
-			} catch (final IOException e) {
-				logger.error("Failed to clear socket file: {}", path, e);
-			}
-			return false;
-		}
-		return true;
-	}
-	
 	/**
 	 * Sends the arguments to the server. Received answers are logged.
 	 * <p>
@@ -62,42 +44,43 @@ public class UnixDomainSocketCommunication implements AutoCloseable {
 	 * @param args
 	 * @return true, if a connection with a server was established and stopped; else false
 	 */
-	public boolean sendToServer(final String[] args) {
+	public boolean sendToServer(final String... args) {
 		
-		try (final var clientChannel = SocketChannel.open(address)) {
+		try (final SocketChannel clientChannel = SocketChannel.open(address)) {
 			// sending parameters
 			final String command = Arrays.toString(args);
 			logger.info("Sending: {}", command);
-			clientChannel.write(ByteBuffer.wrap(command.getBytes(StandardCharsets.UTF_8)));
 			
-			// TODO wait for answers
+			sendMessage(clientChannel, command);
+			
+			final ByteBuffer buffer = ByteBuffer.allocate(1024);
+			//int bytesRead;
+			while ((/*bytesRead =*/ clientChannel.read(buffer)) != -1) {
+				//				byte[] bytes = new byte[bytesRead];
+				//				buffer.flip();
+				//				buffer.get(bytes);
+				//				String message = new String(bytes);
+				final String message = StandardCharsets.UTF_8.decode(buffer).toString();
+				message.lines().forEach(this::handleServerAnswer);
+			}
+			return true;
 		} catch (final IOException e) {
 			logger.error("Exception while sending parameters to primary instance.", e);
 		}
-		
-		//		try (final Socket socket = new Socket(InetAddress.getByAddress(new byte[] { 127, 0, 0, 1 }), port)) {
-		//			try (final PrintWriter out = new PrintWriter(socket.getOutputStream(), true, StandardCharsets.UTF_8);
-		//			     final BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream(),
-		//					     StandardCharsets.UTF_8))) {
-		//				// sending parameters
-		//				final String command = Arrays.toString(args);
-		//				logger.info("Sending: {}", command);
-		//				out.println(command);
-		//
-		//				// receive answers
-		//				String inputLine;
-		//				while ((inputLine = in.readLine()) != null) {
-		//					if ("#BYE".equals(inputLine)) {
-		//						return true;
-		//					} else {
-		//						logger.info(inputLine);
-		//					}
-		//				}
-		//			}
-		//		} catch (final IOException e1) {
-		//			logger.error("Exception while sending parameters to primary instance.", e1);
-		//		}
 		return false;
+	}
+	
+	private void sendMessage(final SocketChannel channel, final String message) throws IOException {
+		final ByteBuffer buf = ByteBuffer.wrap(message.getBytes(StandardCharsets.UTF_8));
+		while (buf.hasRemaining()) {
+			channel.write(buf);
+		}
+	}
+	
+	private void handleServerAnswer(final String line) {
+		if (!line.startsWith("#BYE")) {
+			logger.info(line);
+		}
 	}
 	
 	/**
@@ -135,6 +118,8 @@ public class UnixDomainSocketCommunication implements AutoCloseable {
 			}
 			newServer = ServerSocketChannel.open(StandardProtocolFamily.UNIX);
 			newServer.configureBlocking(true);
+			// clears orphaned files
+			isAvailable(address.getPath());
 			newServer.bind(address);
 			server = newServer;
 			newServer = null;
@@ -151,6 +136,33 @@ public class UnixDomainSocketCommunication implements AutoCloseable {
 		final IpcServerThread serverThread = new UnixDomainSocketServerThread("IpcServer", server);
 		serverThread.start();
 		return serverThread;
+	}
+	
+	public static boolean isAvailable(final Path path) {
+		if (Files.exists(path)) {
+			
+			//			try (final FileChannel channelLock = FileChannel.open(path, StandardOpenOption.APPEND)) {
+			//				logger.info("socket file exists and can be locked => orphaned file");
+			//			} catch (final IOException e) {
+			//				logger.info("channelLock test error", e);
+			//				return false;
+			//			}
+			try (final SocketChannel clientChannel = SocketChannel.open(UnixDomainSocketAddress.of(path))) {
+				logger.info("socket can be connected to => not orphaned socket file");
+				return false;
+			} catch (final IOException e) {
+				logger.info("channelLock test error means that it is orphaned?", e);
+			}
+			
+			try {
+				Files.delete(path);
+				return true;
+			} catch (final IOException e) {
+				logger.error("Failed to clear socket file: {}", path, e);
+			}
+			return false;
+		}
+		return true;
 	}
 	
 	public static final class UnixDomainSocketServerThread extends Thread implements IpcServerThread {
@@ -181,25 +193,63 @@ public class UnixDomainSocketCommunication implements AutoCloseable {
 		
 		private void handleConnectionAsServer(final SocketChannel channel) {
 			try {
+				InterProcessCommunicationAppender.setWriter(new UnixDomainSocketMessageWriter(channel));
 				readMessageFromSocket(channel).ifPresent(this::handleReceivedMessage);
 			} catch (final Exception e) {
 				logger.error("Error while handling socket's message.", e);
 			} finally {
-				InterProcessCommunicationAppender.setPrintWriter(null);
+				InterProcessCommunicationAppender.setWriter(null);
 			}
 		}
 		
 		private static Optional<String> readMessageFromSocket(final SocketChannel channel) throws IOException {
-			final ByteBuffer buffer = ByteBuffer.allocate(1024);
-			final int bytesRead = channel.read(buffer);
-			if (bytesRead < 0) {
-				return Optional.empty();
-			}
+			//			final ByteBuffer buffer = ByteBuffer.allocate(1024);
+			//			final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			//			int bytesRead;
 			
-			final byte[] bytes = new byte[bytesRead];
-			buffer.flip();
-			buffer.get(bytes);
-			return Optional.of(new String(bytes));
+			//			while ((bytesRead = channel.read(buffer)) != -1) {
+			//				//				byte[] bytes = new byte[bytesRead];
+			//				//				buffer.flip();
+			//				//				buffer.get(bytes);
+			//				//				String message = new String(bytes);
+			//				// use StringBuffer?
+			//				baos.write(buffer.array(), 0, bytesRead);
+			//				buffer.clear();
+			//				//				String message = StandardCharsets.UTF_8.decode(buffer).toString();
+			//			}
+			//			final String message = baos.toString(StandardCharsets.UTF_8);
+			//			return Optional.of(message);
+			
+			
+			//			ByteBuffer buffer = ByteBuffer.allocate(2);
+			//			int bytesRead;
+			//			while ((bytesRead = channel.read(buffer)) != -1) {
+			//				if(bytesRead == buffer.capacity()) {
+			//					buffer = ByteBuffer.allocate(buffer.capacity() + 1024);
+			//				}
+			//			}
+			//			String message = StandardCharsets.UTF_8.decode(buffer).toString();
+			//			return Optional.of(message);
+			
+			
+			final ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
+			final boolean eof = channel.read(byteBuffer) == -1;
+			byteBuffer.flip();
+			logger.info("Read {} bytes from socket", byteBuffer.limit());
+			
+			final CharBuffer charBuffer = CharBuffer.allocate(1024);
+			final CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder();
+			final StringBuilder stringBuilder = new StringBuilder(byteBuffer.limit());
+			CoderResult decodeResult;
+			do {
+				charBuffer.clear();
+				decodeResult = decoder.decode(byteBuffer, charBuffer, false);
+				charBuffer.flip();
+				logger.info("decoded {} chars from byte buffer", charBuffer.length());
+				stringBuilder.append(charBuffer);
+			} while (decodeResult == CoderResult.OVERFLOW);
+			
+			return Optional.of(stringBuilder.toString());
 		}
 		
 		private void handleReceivedMessage(final String message) {
