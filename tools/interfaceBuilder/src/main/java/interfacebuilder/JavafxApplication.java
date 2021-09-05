@@ -42,6 +42,8 @@ public class JavafxApplication extends Application {
 		if (serverThread != null && serverThread.isAlive()) {
 			serverThread.setAppController(context.getBean(AppController.class));
 		}
+		
+		logAllBeans();
 	}
 	
 	@SuppressWarnings("java:S3014") // ThreadGroup is ok to be used here
@@ -51,8 +53,8 @@ public class JavafxApplication extends Application {
 				final long idLong = Long.parseLong(id);
 				
 				final ThreadGroup threadGroup = Thread.currentThread().getThreadGroup();
-				// HACK: the server thread is always on index 3
-				final Thread[] threads = new Thread[3];
+				// HACK: the server thread is always on index 3 (2 while debugging); shaves off like 100ms during startup
+				final Thread[] threads = new Thread[4];
 				//final Thread[] threads = new Thread[threadGroup.activeCount()];
 				threadGroup.enumerate(threads, false);
 				for (int i = threads.length - 1; i > 0; --i) {
@@ -70,6 +72,11 @@ public class JavafxApplication extends Application {
 	
 	private static String[] toArray(final Parameters param) {
 		return param != null ? param.getRaw().toArray(new String[0]) : new String[0];
+	}
+	
+	private void logAllBeans() {
+		final String[] allBeanNames = context.getBeanDefinitionNames();
+		logger.trace("Spring Beans created: {}", (Object) allBeanNames);
 	}
 	
 	@Override
