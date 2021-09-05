@@ -21,11 +21,17 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
-public class TcpIpSocketCommunication implements AutoCloseable {
+public class TcpIpSocketCommunication implements IpcCommunication {
 	private static final Logger logger = LogManager.getLogger(TcpIpSocketCommunication.class);
+	private final int port;
 	private ServerSocket serverSocket;
 	
-	public static boolean isPortFree(final int port) {
+	public TcpIpSocketCommunication(final int port) {
+		this.port = port;
+	}
+	
+	@Override
+	public boolean isAvailable() {
 		try (final var ignored1 = new ServerSocket(port, 4, InetAddress.getByAddress(new byte[] { 127, 0, 0, 1 }))) {
 			return true;
 		} catch (final IOException ignored) {
@@ -33,16 +39,8 @@ public class TcpIpSocketCommunication implements AutoCloseable {
 		}
 	}
 	
-	/**
-	 * Sends the arguments to the specified port. Received answers are logged.
-	 * <p>
-	 * This is a blocking instruction!
-	 *
-	 * @param port
-	 * @param args
-	 * @return true, if a connection with a server was established and stopped; else false
-	 */
-	public static boolean sendToServer(final int port, final String... args) {
+	@Override
+	public boolean sendToServer(final String... args) {
 		
 		try (final Socket socket = new Socket(InetAddress.getByAddress(new byte[] { 127, 0, 0, 1 }), port)) {
 			try (final PrintWriter out = new PrintWriter(socket.getOutputStream(), true, StandardCharsets.UTF_8);
@@ -69,9 +67,6 @@ public class TcpIpSocketCommunication implements AutoCloseable {
 		return false;
 	}
 	
-	/**
-	 * @throws IOException
-	 */
 	@Override
 	public void close() throws IOException {
 		if (serverSocket != null) {
@@ -80,13 +75,8 @@ public class TcpIpSocketCommunication implements AutoCloseable {
 		}
 	}
 	
-	/**
-	 * Create a server daemon thread and listen to the specified port.
-	 *
-	 * @param port
-	 * @return a running IpcServerThread listening to the specified socket; else null
-	 */
-	public IpcServerThread actAsServer(final int port) {
+	@Override
+	public IpcServerThread actAsServer() {
 		try {
 			if (serverSocket != null) {
 				serverSocket.close();
@@ -163,6 +153,7 @@ public class TcpIpSocketCommunication implements AutoCloseable {
 		 * Executes the specified command line arguments.
 		 *
 		 * @param parameters
+		 * 		parameters as String[]
 		 */
 		private void executeCommand(final String[] parameters) {
 			final CommandLineParams params = new CommandLineParams(true, parameters);

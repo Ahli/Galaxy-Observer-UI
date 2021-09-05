@@ -6,7 +6,9 @@ package interfacebuilder;
 import interfacebuilder.config.AppConfiguration;
 import interfacebuilder.config.FxmlConfiguration;
 import interfacebuilder.integration.CommandLineParams;
+import interfacebuilder.integration.ipc.IpcCommunication;
 import interfacebuilder.integration.ipc.IpcServerThread;
+import interfacebuilder.integration.ipc.TcpIpSocketCommunication;
 import interfacebuilder.integration.ipc.UnixDomainSocketCommunication;
 import javafx.application.Application;
 import org.apache.logging.log4j.LogManager;
@@ -15,7 +17,6 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Import;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
 
@@ -42,13 +43,14 @@ import static interfacebuilder.ui.AppController.FATAL_ERROR;
 @Import({ AppConfiguration.class, FxmlConfiguration.class })
 public final class SpringBootApplication {
 	
-	//	public static final int INTER_PROCESS_COMMUNICATION_PORT = 12317;
-	
+	public static final int INTER_PROCESS_COMMUNICATION_PORT = 12317;
+	private static final boolean USE_DOMAIN_SOCKET = false;
 	private static final Logger logger = LogManager.getLogger(SpringBootApplication.class);
 	
+	@SuppressWarnings("java:S2095") //
 	public static void main(final String[] args) {
 		try {
-			if (UnixDomainSocketCommunication.isAvailable(getIpcPath())) {
+			if (getIpc().isAvailable()) {
 				if (!actAsServer(args)) {
 					logger.warn("Failed to create Server Thread. Starting App without it...");
 					launch(args, null);
@@ -62,33 +64,27 @@ public final class SpringBootApplication {
 		}
 	}
 	
-	private static boolean actAsClient(final String[] args) {
-		//		if (TcpIpSocketCommunication.sendToServer(args, INTER_PROCESS_COMMUNICATION_PORT)) {
-		//			return true;
-		//		} else {
-		//			logger.error("InterProcessCommunication as Client failed. The port might not be free anymore.");
-		//		}
-		
-		try (final UnixDomainSocketCommunication interProcessCommunication = new UnixDomainSocketCommunication(
-				getIpcPath())) {
-			if (interProcessCommunication.sendToServer(args)) {
-				return true;
-			} else {
+	private static void actAsClient(final String[] args) {
+		try (final IpcCommunication interProcessCommunication = getIpc()) {
+			if (!interProcessCommunication.sendToServer(args)) {
 				logger.error("InterProcessCommunication as Client failed.");
 			}
-		} catch (final IOException e) {
+		} catch (final Exception e) {
 			logger.error("ClosingInterProcessCommunication as Client failed.", e);
 		}
-		return false;
+	}
+	
+	private static IpcCommunication getIpc() {
+		return USE_DOMAIN_SOCKET ? new UnixDomainSocketCommunication(getIpcPath()) :
+				new TcpIpSocketCommunication(INTER_PROCESS_COMMUNICATION_PORT);
 	}
 	
 	private static boolean actAsServer(final String[] args) {
-		try (final UnixDomainSocketCommunication interProcessCommunication = new UnixDomainSocketCommunication(
-				getIpcPath())) {
+		try (final IpcCommunication interProcessCommunication = getIpc()) {
 			final IpcServerThread serverThread = interProcessCommunication.actAsServer();
 			launch(args, serverThread);
 			return true;
-		} catch (final IOException e) {
+		} catch (final Exception e) {
 			logger.error("Closing InterProcessCommunication failed", e);
 		}
 		return false;

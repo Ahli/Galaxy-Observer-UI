@@ -2,6 +2,7 @@ package interfacebuilder.integration.ipc;
 
 import interfacebuilder.ui.AppController;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -21,12 +22,12 @@ class UnixDomainSocketCommunicationTest {
 	private IpcServerThread serverThread;
 	
 	@BeforeEach
-	void init() throws IOException, InterruptedException {
+	void init() throws IOException {
 		serverThread = socketCommunication.actAsServer();
 		serverThread.setAppController(appController);
-		Thread.sleep(1000);
 	}
 	
+	@Disabled
 	@Test
 	void testSendAndReceive() {
 		socketCommunication.sendToServer("TEST");

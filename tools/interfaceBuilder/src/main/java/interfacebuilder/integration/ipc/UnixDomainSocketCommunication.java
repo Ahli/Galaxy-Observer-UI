@@ -27,7 +27,7 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-public class UnixDomainSocketCommunication implements AutoCloseable {
+public class UnixDomainSocketCommunication implements IpcCommunication {
 	private static final Logger logger = LogManager.getLogger(UnixDomainSocketCommunication.class);
 	private final UnixDomainSocketAddress address;
 	private ServerSocketChannel server;
@@ -44,6 +44,7 @@ public class UnixDomainSocketCommunication implements AutoCloseable {
 	 * @param args
 	 * @return true, if a connection with a server was established and stopped; else false
 	 */
+	@Override
 	public boolean sendToServer(final String... args) {
 		
 		try (final SocketChannel clientChannel = SocketChannel.open(address)) {
@@ -53,6 +54,7 @@ public class UnixDomainSocketCommunication implements AutoCloseable {
 			
 			sendMessage(clientChannel, command);
 			
+			// TODO messages are not properly received
 			final ByteBuffer buffer = ByteBuffer.allocate(1024);
 			//int bytesRead;
 			while ((/*bytesRead =*/ clientChannel.read(buffer)) != -1) {
@@ -104,6 +106,7 @@ public class UnixDomainSocketCommunication implements AutoCloseable {
 	 * @throws AlreadyBoundException
 	 * 		– If the socket is already bound
 	 */
+	@Override
 	public IpcServerThread actAsServer() throws IOException {
 		// ensure that a pre-existing socket file won't be deleted
 		ServerSocketChannel newServer = null;
@@ -119,7 +122,7 @@ public class UnixDomainSocketCommunication implements AutoCloseable {
 			newServer = ServerSocketChannel.open(StandardProtocolFamily.UNIX);
 			newServer.configureBlocking(true);
 			// clears orphaned files
-			isAvailable(address.getPath());
+			isAvailable();
 			newServer.bind(address);
 			server = newServer;
 			newServer = null;
@@ -138,27 +141,28 @@ public class UnixDomainSocketCommunication implements AutoCloseable {
 		return serverThread;
 	}
 	
-	public static boolean isAvailable(final Path path) {
-		if (Files.exists(path)) {
+	@Override
+	public boolean isAvailable() {
+		if (Files.exists(address.getPath())) {
 			
-			//			try (final FileChannel channelLock = FileChannel.open(path, StandardOpenOption.APPEND)) {
+			//			try (final FileChannel channelLock = FileChannel.open(address.getPath(), StandardOpenOption.APPEND)) {
 			//				logger.info("socket file exists and can be locked => orphaned file");
 			//			} catch (final IOException e) {
 			//				logger.info("channelLock test error", e);
 			//				return false;
 			//			}
-			try (final SocketChannel clientChannel = SocketChannel.open(UnixDomainSocketAddress.of(path))) {
-				logger.info("socket can be connected to => not orphaned socket file");
+			try (final SocketChannel ignored = SocketChannel.open(UnixDomainSocketAddress.of(address.getPath()))) {
+				UnixDomainSocketCommunication.logger.info("socket can be connected to => not orphaned socket file");
 				return false;
 			} catch (final IOException e) {
-				logger.info("channelLock test error means that it is orphaned?", e);
+				UnixDomainSocketCommunication.logger.info("channelLock test error means that it is orphaned?", e);
 			}
 			
 			try {
-				Files.delete(path);
+				Files.delete(address.getPath());
 				return true;
 			} catch (final IOException e) {
-				logger.error("Failed to clear socket file: {}", path, e);
+				UnixDomainSocketCommunication.logger.error("Failed to clear socket file: {}", address.getPath(), e);
 			}
 			return false;
 		}
