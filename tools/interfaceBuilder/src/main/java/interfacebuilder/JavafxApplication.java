@@ -4,13 +4,15 @@
 package interfacebuilder;
 
 import interfacebuilder.integration.CommandLineParams;
-import interfacebuilder.integration.InterProcessCommunication;
+import interfacebuilder.integration.ipc.IpcServerThread;
 import interfacebuilder.ui.AppController;
 import javafx.application.Application;
 import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.application.Preloader;
 import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -18,7 +20,9 @@ import org.springframework.context.support.GenericApplicationContext;
 
 public class JavafxApplication extends Application {
 	
-	private InterProcessCommunication.IpcServerThread serverThread;
+	private static final Logger logger = LoggerFactory.getLogger(JavafxApplication.class);
+	
+	private IpcServerThread serverThread;
 	private ConfigurableApplicationContext context;
 	
 	@Override
@@ -40,15 +44,19 @@ public class JavafxApplication extends Application {
 		}
 	}
 	
-	private static InterProcessCommunication.IpcServerThread findServerThread(final String id) {
+	@SuppressWarnings("java:S3014") // ThreadGroup is ok to be used here
+	private static IpcServerThread findServerThread(final String id) {
 		try {
 			if (id != null && !id.isEmpty()) {
 				final long idLong = Long.parseLong(id);
 				
-				// getAllStackTraces() is not optimal as it creates a lot of waste :(
-				for (final Thread thread : Thread.getAllStackTraces().keySet()) {
-					if (thread.getId() == idLong &&
-							thread instanceof final InterProcessCommunication.IpcServerThread serverThread) {
+				final ThreadGroup threadGroup = Thread.currentThread().getThreadGroup();
+				// HACK: the server thread is always on index 3
+				final Thread[] threads = new Thread[3];
+				//final Thread[] threads = new Thread[threadGroup.activeCount()];
+				threadGroup.enumerate(threads, false);
+				for (int i = threads.length - 1; i > 0; --i) {
+					if (threads[i].getId() == idLong && threads[i] instanceof final IpcServerThread serverThread) {
 						return serverThread;
 					}
 				}
@@ -56,6 +64,7 @@ public class JavafxApplication extends Application {
 		} catch (final NumberFormatException ignored) {
 			// ignored
 		}
+		logger.error("Failed to find IpcServerThread of id: {}", id);
 		return null;
 	}
 	

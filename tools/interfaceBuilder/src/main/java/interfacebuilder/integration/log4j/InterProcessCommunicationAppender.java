@@ -3,6 +3,7 @@
 
 package interfacebuilder.integration.log4j;
 
+import interfacebuilder.integration.ipc.IpcMessageWriter;
 import javafx.application.Platform;
 import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.Core;
@@ -17,7 +18,6 @@ import org.apache.logging.log4j.core.config.plugins.PluginElement;
 import org.apache.logging.log4j.core.config.plugins.PluginFactory;
 import org.apache.logging.log4j.core.layout.PatternLayout;
 
-import java.io.PrintWriter;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.locks.Lock;
@@ -30,7 +30,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 @Plugin(name = "InterProcessCommunicationAppender", category = Core.CATEGORY_NAME, elementType = Appender.ELEMENT_TYPE,
         printObject = true)
 public final class InterProcessCommunicationAppender extends AbstractAppender {
-	private static PrintWriter printWriter;
+	private static IpcMessageWriter messageWriter;
 	private static InterProcessCommunicationAppender instance;
 	private final ReadWriteLock rwLock = new ReentrantReadWriteLock();
 	private final Lock readLock = rwLock.readLock();
@@ -80,13 +80,13 @@ public final class InterProcessCommunicationAppender extends AbstractAppender {
 		return new InterProcessCommunicationAppender(name, filter, resultLayout, true, Property.EMPTY_ARRAY);
 	}
 	
-	public static void setPrintWriter(final PrintWriter printWriter) {
-		InterProcessCommunicationAppender.printWriter = printWriter;
+	public static void setWriter(final IpcMessageWriter messageWriter) {
+		InterProcessCommunicationAppender.messageWriter = messageWriter;
 	}
 	
 	public static void sendTerminationSignal() {
-		if (printWriter != null && instance != null) {
-			printWriter.println("#BYE");
+		if (messageWriter != null && instance != null) {
+			messageWriter.sendTerminationSignal();
 		}
 	}
 	
@@ -98,7 +98,7 @@ public final class InterProcessCommunicationAppender extends AbstractAppender {
 	 */
 	@Override
 	public void append(final LogEvent event) {
-		if (printWriter != null) {
+		if (messageWriter != null) {
 			readLock.lock();
 			
 			// send message to client
@@ -107,9 +107,8 @@ public final class InterProcessCommunicationAppender extends AbstractAppender {
 				final String message = new String(getLayout().toByteArray(event), StandardCharsets.UTF_8);
 				Platform.runLater(() -> {
 					try {
-						if (printWriter != null) {
-							printWriter.print(message);
-							printWriter.flush();
+						if (messageWriter != null) {
+							messageWriter.send(message);
 						}
 					} catch (final Exception e) {
 						System.err.println("Error while sending message to IPC client: " + e.getMessage());

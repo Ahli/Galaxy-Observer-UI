@@ -4,19 +4,19 @@
 package interfacebuilder;
 
 import interfacebuilder.integration.CommandLineParams;
-import interfacebuilder.integration.InterProcessCommunication;
+import interfacebuilder.integration.ipc.IpcServerThread;
 import interfacebuilder.ui.AppController;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 
 public class NoGuiApplication {
 	
-	private final InterProcessCommunication.IpcServerThread serverThread;
+	private final IpcServerThread serverThread;
 	private final ConfigurableApplicationContext context;
 	private final CommandLineParams startingParams;
 	
-	public NoGuiApplication(final String[] args, final Thread serverThread) {
-		this.serverThread = (InterProcessCommunication.IpcServerThread) serverThread;
+	public NoGuiApplication(final String[] args, final IpcServerThread serverThread) {
+		this.serverThread = serverThread;
 		
 		context = new SpringApplicationBuilder(SpringBootApplication.class).build().run(args);
 		
@@ -28,6 +28,7 @@ public class NoGuiApplication {
 	
 	public void start() {
 		context.publishEvent(new PrimaryStageReadyEvent(this, startingParams));
+		// TODO add mechanic so in the end close is called
 	}
 	
 	public void stop() {
