@@ -108,7 +108,7 @@ public final class SpringBootApplication {
 	}
 	
 	private static void launchNoGui(final String[] args, final IpcServerThread serverThread) {
-		new NoGuiApplication(args, serverThread).start();
+		new NoGuiApplication(args, serverThread);
 	}
 	
 	private static void launchGui(final String[] args, final IpcServerThread serverThread) {

@@ -7,35 +7,38 @@ import interfacebuilder.integration.CommandLineParams;
 import interfacebuilder.integration.ipc.IpcServerThread;
 import interfacebuilder.ui.AppController;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.ApplicationListener;
 
 public class NoGuiApplication {
 	
 	private final IpcServerThread serverThread;
-	private final ConfigurableApplicationContext context;
 	private final CommandLineParams startingParams;
 	
 	public NoGuiApplication(final String[] args, final IpcServerThread serverThread) {
 		this.serverThread = serverThread;
-		
-		context = new SpringApplicationBuilder(SpringBootApplication.class).build().run(args);
-		
-		if (serverThread != null && serverThread.isAlive()) {
-			this.serverThread.setAppController(context.getBean(AppController.class));
-		}
 		startingParams = new CommandLineParams(false, args);
+		
+		new SpringApplicationBuilder(SpringBootApplication.class).listeners(new OnStartupEvent()).build().run(args);
 	}
 	
-	public void start() {
-		context.publishEvent(new PrimaryStageReadyEvent(this, startingParams));
-		// TODO add mechanic so in the end close is called
-	}
+	//	public void stop(final ConfigurableApplicationContext context) {
+	//		if (serverThread != null && serverThread.isAlive()) {
+	//			serverThread.interrupt();
+	//		}
+	//		context.publishEvent(new AppClosingEvent(this));
+	//		context.close();
+	//	}
 	
-	public void stop() {
-		if (serverThread != null && serverThread.isAlive()) {
-			serverThread.interrupt();
+	private final class OnStartupEvent implements ApplicationListener<ApplicationReadyEvent> {
+		@Override
+		public void onApplicationEvent(final ApplicationReadyEvent event) {
+			
+			if (serverThread != null && serverThread.isAlive()) {
+				serverThread.setAppController(event.getApplicationContext().getBean(AppController.class));
+			}
+			
+			event.getApplicationContext().publishEvent(new PrimaryStageReadyEvent(this, startingParams));
 		}
-		context.publishEvent(new AppClosingEvent(this));
-		context.close();
 	}
 }
