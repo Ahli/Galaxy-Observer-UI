@@ -82,12 +82,12 @@ public class MpqEditorCompressionRuleSize extends MpqEditorCompressionRule {
 		final Object[] signatureFields = getSignatureFields();
 		final Object[] thatSignatureFields = ((MpqEditorCompressionRuleSize) obj).getSignatureFields();
 		for (int i = 0; i < signatureFields.length; ++i) {
-			if (!(signatureFields[i] instanceof Object[])) {
-				if (!Objects.equals(signatureFields[i], thatSignatureFields[i])) {
+			if (signatureFields[i] instanceof Object[] signatureFieldObjArray) {
+				if (!Arrays.deepEquals(signatureFieldObjArray, (Object[]) thatSignatureFields[i])) {
 					return false;
 				}
 			} else {
-				if (!Arrays.deepEquals((Object[]) signatureFields[i], (Object[]) thatSignatureFields[i])) {
+				if (!Objects.equals(signatureFields[i], thatSignatureFields[i])) {
 					return false;
 				}
 			}

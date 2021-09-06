@@ -6,16 +6,7 @@ package interfacebuilder.ui.navigation;
 /**
  * Notifications used by the NavigationController.
  */
-public class Notification {
-	private final String id;
-	private final String text;
-	private final int navPageIndex;
-	
-	public Notification(final String text, final int navPageIndex, final String id) {
-		this.text = text;
-		this.navPageIndex = navPageIndex;
-		this.id = id;
-	}
+public record Notification(String text, int navPageIndex, String id) {
 	
 	public String getId() {
 		return id;

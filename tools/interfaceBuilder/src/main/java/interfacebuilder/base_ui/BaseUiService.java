@@ -213,7 +213,7 @@ public class BaseUiService {
 			tasks.add(new CascFileExtractionTask(extractorExe, gamePath, mask, destination, outputAppender));
 		}
 		
-		final ForkJoinTask<Void> task = new ExtractVersionTask(gameDef, usePtr, destination, this);
+		final ForkJoinTask<Void> task = new ExtractVersionTask(gameDef, usePtr, destination, this, kryoService);
 		tasks.add(task);
 		
 		return tasks;
@@ -228,16 +228,6 @@ public class BaseUiService {
 			case SC2 -> new String[] { "*.SC2Layout", "*Assets.txt", "*.SC2Style" };
 			case HEROES -> new String[] { "*.StormLayout", "*Assets.txt", "*.StormStyle" };
 		};
-	}
-	
-	private void writeToMetaFile(final Path directory, final String gameName, final int[] version, final boolean isPtr)
-			throws IOException {
-		final Path path = directory.resolve(META_FILE_NAME);
-		final KryoGameInfo metaInfo = new KryoGameInfo(version, gameName, isPtr);
-		final List<Object> payload = new ArrayList<>(1);
-		payload.add(metaInfo);
-		final Kryo kryo = kryoService.getKryoForBaseUiMetaFile();
-		kryoService.put(path, payload, kryo);
 	}
 	
 	/**
@@ -529,26 +519,42 @@ public class BaseUiService {
 		private final boolean usePtr;
 		private final Path destination;
 		private final BaseUiService baseUiService;
+		private final KryoService kryoService;
 		
 		private ExtractVersionTask(
 				final GameDef gameDef,
 				final boolean usePtr,
 				final Path destination,
-				final BaseUiService baseUiService) {
+				final BaseUiService baseUiService,
+				final KryoService kryoService) {
 			this.gameDef = gameDef;
 			this.usePtr = usePtr;
 			this.destination = destination;
 			this.baseUiService = baseUiService;
+			this.kryoService = kryoService;
 		}
 		
 		@Override
 		protected void compute() {
 			final int[] version = baseUiService.getVersion(gameDef, usePtr);
 			try {
-				baseUiService.writeToMetaFile(destination, gameDef.name(), version, usePtr);
+				writeToMetaFile(destination, gameDef.name(), version, usePtr);
 			} catch (final IOException e) {
 				logger.error("Failed to write metafile: ", e);
 			}
+		}
+		
+		private void writeToMetaFile(
+				final Path directory,
+				final String gameName,
+				final int[] version,
+				final boolean isPtr) throws IOException {
+			final Path path = directory.resolve(META_FILE_NAME);
+			final KryoGameInfo metaInfo = new KryoGameInfo(version, gameName, isPtr);
+			final List<Object> payload = new ArrayList<>(1);
+			payload.add(metaInfo);
+			final Kryo kryo = kryoService.getKryoForBaseUiMetaFile();
+			kryoService.put(path, payload, kryo);
 		}
 	}
 }

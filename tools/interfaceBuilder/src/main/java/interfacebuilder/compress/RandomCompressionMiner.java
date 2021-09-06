@@ -299,10 +299,8 @@ public class RandomCompressionMiner {
 	 */
 	private static boolean containsFile(final MpqEditorCompressionRule[] rules, final Path p) {
 		for (final MpqEditorCompressionRule rule : rules) {
-			if (rule instanceof MpqEditorCompressionRuleMask ruleMask) {
-				if (p.toString().endsWith(cleanMask(ruleMask))) {
-					return true;
-				}
+			if (rule instanceof MpqEditorCompressionRuleMask ruleMask && p.toString().endsWith(cleanMask(ruleMask))) {
+				return true;
 			}
 		}
 		return false;

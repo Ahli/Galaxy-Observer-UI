@@ -72,12 +72,12 @@ public class BaseUiExtractionController implements Updateable {
 	
 	public BaseUiExtractionController(
 			final BaseUiService baseUiService,
-			final GameService gameServic,
+			final GameService gameService,
 			final NavigationController navigationController,
 			final ForkJoinPool executor,
 			final AppController appController) {
 		this.baseUiService = baseUiService;
-		gameService = gameServic;
+		this.gameService = gameService;
 		this.navigationController = navigationController;
 		this.executor = executor;
 		this.appController = appController;

@@ -153,9 +153,7 @@ public class UICatalogImpl implements UICatalog {
 			throws SAXException, IOException, ParserConfigurationException, InterruptedException {
 		
 		// TODO inefficient code, parses twice
-		List<String> blizzLayouts = DescIndexReader.getLayoutPathList(f, DescIndexReader.Mode.ONLY_UNLOADABLE);
-		blizzOnlyLayouts.addAll(blizzLayouts);
-		blizzLayouts = null;
+		blizzOnlyLayouts.addAll(DescIndexReader.getLayoutPathList(f, DescIndexReader.Mode.ONLY_UNLOADABLE));
 		
 		final String descIndexPath = f.getAbsolutePath();
 		final String basePath = descIndexPath.substring(0, descIndexPath.length() - f.getName().length());

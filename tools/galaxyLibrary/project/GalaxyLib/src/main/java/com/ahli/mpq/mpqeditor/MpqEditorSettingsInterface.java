@@ -20,7 +20,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -287,8 +286,7 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 		if (compression == MpqEditorCompression.CUSTOM) {
 			final List<String> editedLines;
 			try (final Stream<String> lineStream = Files.lines(rulesetFile)) {
-				editedLines =
-						lineStream.map(line -> line.replace(SPACESPACEEQUALSSPACE, "")).collect(Collectors.toList());
+				editedLines = lineStream.map(line -> line.replace(SPACESPACEEQUALSSPACE, "")).toList();
 			}
 			try (final BufferedWriter bw = Files.newBufferedWriter(rulesetFile)) {
 				final String separator = System.lineSeparator();

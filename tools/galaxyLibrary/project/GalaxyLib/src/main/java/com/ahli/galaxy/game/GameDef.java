@@ -138,4 +138,20 @@ public record GameDef(String name, String nameHandle, String modFileEnding, Stri
 		result = 31 * result + Arrays.hashCode(coreModsOrDirectories);
 		return result;
 	}
+	
+	@Override
+	public String toString() {
+		return "GameDef{" + "name='" + name + '\'' + ", nameHandle='" + nameHandle + '\'' + ", modFileEnding='" +
+				modFileEnding + '\'' + ", coreModsOrDirectories=" + Arrays.toString(coreModsOrDirectories) +
+				", defaultRaceId='" + defaultRaceId + '\'' + ", defaultConsoleSkinId='" + defaultConsoleSkinId + '\'' +
+				", documentsGameDirectoryName='" + documentsGameDirectoryName + '\'' + ", layoutFileEnding='" +
+				layoutFileEnding + '\'' + ", baseDataFolderName='" + baseDataFolderName + '\'' + ", rootExeName='" +
+				rootExeName + '\'' + ", switcherExeNameX32='" + switcherExeNameX32 + '\'' + ", switcherExeNameX64='" +
+				switcherExeNameX64 + '\'' + ", supportDirectoryX32='" + supportDirectoryX32 + '\'' +
+				", supportDirectoryX64='" + supportDirectoryX64 + '\'' + ", documentsInterfaceSubdirectoryName='" +
+				documentsInterfaceSubdirectoryName + '\'' + ", modsSubDirectory='" + modsSubDirectory + '\'' +
+				", ptrRootExeName='" + ptrRootExeName + '\'' + ", componentsFileEnding='" + componentsFileEnding +
+				'\'' + ", styleFileEnding='" + styleFileEnding + '\'' + ", cutsceneFileEnding='" + cutsceneFileEnding +
+				'\'' + '}';
+	}
 }
