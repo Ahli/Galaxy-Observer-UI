@@ -13,7 +13,12 @@ import interfacebuilder.integration.ipc.UnixDomainSocketCommunication;
 import javafx.application.Application;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.context.ConfigurationPropertiesAutoConfiguration;
+import org.springframework.boot.autoconfigure.context.MessageSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+import org.springframework.boot.autoconfigure.transaction.TransactionAutoConfiguration;
 import org.springframework.context.annotation.Import;
 
 import java.io.File;
@@ -24,26 +29,9 @@ import static interfacebuilder.ui.AppController.FATAL_ERROR;
 
 // start with VM parameter if java modules are used: -add-opens=javafx.controls/javafx.scene.control=interfacex.builder
 
-@EnableAutoConfiguration(excludeName = { // exclude based on beans in context at runtime
-		//"org.springframework.boot.autoconfigure.context.ConfigurationPropertiesAutoConfiguration", // required for Resources
-		//"org.springframework.boot.autoconfigure.context.MessageSourceAutoConfiguration", // req for Resources
-		//"org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration", // required for JPA Repository
-		//"org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration", // req
-		//"org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration", // req
-		//"org.springframework.boot.autoconfigure.transaction.TransactionAutoConfiguration", // req
-		"org.springframework.boot.autoconfigure.aop.AopAutoConfiguration",
-		"org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoConfiguration",
-		"org.springframework.boot.autoconfigure.dao.PersistenceExceptionTranslationAutoConfiguration",
-		"org.springframework.boot.autoconfigure.info.ProjectInfoAutoConfiguration",
-		"org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration",
-		"org.springframework.boot.autoconfigure.jdbc.JdbcTemplateAutoConfiguration",
-		"org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration",
-		"org.springframework.boot.autoconfigure.task.TaskSchedulingAutoConfiguration",
-		"org.springframework.boot.autoconfigure.transaction.jta.JtaAutoConfiguration",
-		"org.springframework.boot.autoconfigure.availability.ApplicationAvailabilityAutoConfiguration",
-		"org.springframework.boot.autoconfigure.sql.init.SqlInitializationAutoConfiguration",
-		"org.springframework.boot.autoconfigure.context.LifecycleAutoConfiguration" })
-@Import({ AppConfiguration.class, FxmlConfiguration.class })
+@Import({ AppConfiguration.class, FxmlConfiguration.class, ConfigurationPropertiesAutoConfiguration.class,
+		MessageSourceAutoConfiguration.class, JpaRepositoriesAutoConfiguration.class, DataSourceAutoConfiguration.class,
+		HibernateJpaAutoConfiguration.class, TransactionAutoConfiguration.class })
 public final class SpringBootApplication {
 	
 	public static final int INTER_PROCESS_COMMUNICATION_PORT = 12317;
