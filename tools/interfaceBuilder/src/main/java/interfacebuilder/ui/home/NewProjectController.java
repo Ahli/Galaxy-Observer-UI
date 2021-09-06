@@ -26,6 +26,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 public class NewProjectController {
 	private static final Logger logger = LogManager.getLogger(NewProjectController.class);
@@ -122,7 +123,7 @@ public class NewProjectController {
 		
 		// try creating the project
 		final String name = projectNameLabel.getText();
-		project = new Project(name, path, game);
+		project = new Project(name, Path.of(path), game);
 		try {
 			project = projectService.saveProject(project);
 		} catch (final Exception e) {

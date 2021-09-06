@@ -16,6 +16,7 @@ import org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 
+import java.nio.file.Path;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -49,7 +50,7 @@ final class ProjectServiceTest {
 	
 	@Test
 	void testSaveProject() {
-		final Project project = Project.builder().id(1).name("name").projectPath("path").game(Game.SC2).build();
+		final Project project = Project.builder().id(1).name("name").projectPath(Path.of("/test/")).game(Game.SC2).build();
 		final ProjectEntity projectEntity = ProjectEntity.fromProject(project);
 		when(projectRepoMock.save(projectEntity)).thenReturn(projectEntity);
 		

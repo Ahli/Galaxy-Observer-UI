@@ -9,8 +9,6 @@ import interfacebuilder.projects.Project;
 import interfacebuilder.threads.CleaningForkJoinTask;
 import interfacebuilder.threads.CleaningForkJoinTaskCleaner;
 
-import java.nio.file.Path;
-
 public class BuildTask extends CleaningForkJoinTask {
 	
 	private final Project project;
@@ -36,8 +34,7 @@ public class BuildTask extends CleaningForkJoinTask {
 		final GameData gameData = mpqBuilderService.getGameData(project.getGame());
 		baseUiService.parseBaseUiIfNecessary(gameData, useCmdLineSettings);
 		
-		final Path interfaceDirectory = Path.of(project.getProjectPath());
-		mpqBuilderService.buildSpecificUI(interfaceDirectory, gameData, useCmdLineSettings, project);
+		mpqBuilderService.buildSpecificUI(gameData, useCmdLineSettings, project);
 		
 		return true;
 	}

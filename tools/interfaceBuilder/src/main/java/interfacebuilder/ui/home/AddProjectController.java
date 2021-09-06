@@ -23,6 +23,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
+import java.nio.file.Path;
 
 public class AddProjectController {
 	private static final Logger logger = LogManager.getLogger(AddProjectController.class);
@@ -68,7 +69,7 @@ public class AddProjectController {
 		this.project = project;
 		dialog.setTitle("Edit Observer Interface Project...");
 		projectNameLabel.setText(project.getName());
-		projectPathLabel.setText(project.getProjectPath());
+		projectPathLabel.setText(project.getProjectPath().toString());
 		gameDropdown.getSelectionModel().select(project.getGame());
 	}
 	
@@ -108,7 +109,7 @@ public class AddProjectController {
 			return;
 		}
 		final String name = projectNameLabel.getText();
-		final String path = projectPathLabel.getText();
+		final Path path = Path.of(projectPathLabel.getText());
 		if (project == null) {
 			project = new Project(name, path, game);
 		} else {

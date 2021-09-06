@@ -50,6 +50,7 @@ import org.springframework.context.event.EventListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serial;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ForkJoinPool;
@@ -240,7 +241,7 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 					});
 				}
 				
-				mpqBuilderService.build(params.getParamCompilePath());
+				mpqBuilderService.build(Path.of(params.getParamCompilePath()));
 				
 				final var executorTmp = getExecutor();
 				if (executorTmp != null && executorTmp.awaitQuiescence(15, TimeUnit.MINUTES)) {

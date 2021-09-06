@@ -22,6 +22,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.io.Serial;
 import java.io.Serializable;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -82,7 +83,7 @@ public class ProjectEntity implements Serializable {
 	public static Project toProject(final ProjectEntity entity) {
 		return new Project.ProjectBuilder().id(entity.getId())
 				.name(entity.getName())
-				.projectPath(entity.getProjectPath())
+				.projectPath(Path.of(entity.getProjectPath()))
 				.game(entity.getGame())
 				.lastBuildDateTime(entity.getLastBuildDateTime())
 				.lastBuildSize(entity.getLastBuildSize() != null ? entity.getLastBuildSize() : 0)
@@ -94,7 +95,7 @@ public class ProjectEntity implements Serializable {
 		return ProjectEntity.builder()
 				.id(project.getId())
 				.name(project.getName())
-				.projectPath(project.getProjectPath())
+				.projectPath(project.getProjectPath().toString())
 				.game(project.getGame())
 				.lastBuildDateTime(project.getLastBuildDateTime())
 				.lastBuildSize(project.getLastBuildSize())

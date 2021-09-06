@@ -197,7 +197,7 @@ public class CompressionMiningController implements Updateable {
 				long bestSize;
 				final ModData mod = gameService.getModData(project.getGame());
 				{
-					final Path projectSource = Path.of(project.getProjectPath());
+					final Path projectSource = project.getProjectPath();
 					
 					modTargetFile = configService.getMiningTempPath().resolve(projectSource.getFileName());
 					mod.setTargetFile(modTargetFile);

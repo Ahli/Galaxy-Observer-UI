@@ -10,6 +10,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;
 
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -20,13 +21,13 @@ import java.util.Objects;
 public class Project {
 	private final int id;
 	private String name;
-	private String projectPath;
+	private Path projectPath;
 	private Game game;
 	private LocalDateTime lastBuildDateTime;
 	private long lastBuildSize;
 	private RuleSet bestCompressionRuleSet;
 	
-	public Project(final String name, final String projectPath, final Game game) {
+	public Project(final String name, final Path projectPath, final Game game) {
 		this.name = name;
 		this.projectPath = projectPath;
 		this.game = game;

@@ -163,7 +163,7 @@ public class HomeController implements Updateable {
 			selectedBuildSize.setText(
 					p.getLastBuildSize() == 0 ? "-" : (String.format("%,d", p.getLastBuildSize() / 1024) + " kb"));
 			try {
-				final Path path = Path.of(p.getProjectPath());
+				final Path path = p.getProjectPath();
 				selectedDirFiles.setText(String.format("%,d", fileService.getFileCountOfDirectory(path)) + " files");
 				selectedDirSize.setText(String.format("%,d", fileService.getDirectorySize(path) / 1024) + " kb");
 			} catch (final IOException e) {
@@ -171,7 +171,7 @@ public class HomeController implements Updateable {
 				selectedDirFiles.setText("-");
 				logger.trace("Error updating selected details panel.", e);
 			}
-			selectedPath.setText(p.getProjectPath());
+			selectedPath.setText(p.getProjectPath().toString());
 			try {
 				selectedImage.setImage(new Image(getResourceAsUrl(gameService.getGameItemPath(p.getGame())).toString()));
 			} catch (final IOException e) {

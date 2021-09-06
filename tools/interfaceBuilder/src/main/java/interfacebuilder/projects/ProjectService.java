@@ -8,11 +8,6 @@ import interfacebuilder.build.MpqBuilderService;
 import interfacebuilder.compress.RuleSet;
 import interfacebuilder.projects.enums.Game;
 import interfacebuilder.ui.navigation.NavigationController;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOCase;
-import org.apache.commons.io.filefilter.IOFileFilter;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
-import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Hibernate;
@@ -25,14 +20,14 @@ import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.BufferedInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
+import java.util.stream.Stream;
 
 /**
  * ProjectService manages Observer Interface project related tasks.
@@ -65,7 +60,7 @@ public class ProjectService {
 			jarIntPath = "templates/heroes/interface/";
 		}
 		
-		final Path projPath = Path.of(project.getProjectPath());
+		final Path projPath = project.getProjectPath();
 		final var resolver = new PathMatchingResourcePatternResolver();
 		logger.trace("creating template");
 		final int jarIntPathLen = jarIntPath.length();
@@ -96,19 +91,14 @@ public class ProjectService {
 	 * @param game
 	 * @return
 	 */
-	public boolean pathContainsCompileableForGame(final String path, final GameData game) {
-		// detection via layout file ending as defined in the GameData's GameDef
-		final String[] extensions = new String[1];
-		extensions[0] = game.getGameDef().layoutFileEnding();
-		final IOFileFilter filter = new SuffixFileFilter(extensions, IOCase.INSENSITIVE);
-		final Iterator<File> iter = FileUtils.iterateFiles(new File(path), filter, TrueFileFilter.INSTANCE);
-		
-		while (iter.hasNext()) {
-			if (iter.next().isFile()) {
-				return true;
-			}
+	public boolean pathContainsCompileableForGame(final Path path, final GameData game) throws IOException {
+		final String extension = game.getGameDef().layoutFileEnding().toLowerCase(Locale.ROOT);
+		try (final Stream<Path> walk = Files.walk(path)) {
+			return walk.anyMatch(curPath -> curPath.getFileName()
+					.toString()
+					.toLowerCase(Locale.ROOT)
+					.endsWith(extension));
 		}
-		return false;
 	}
 	
 	/**

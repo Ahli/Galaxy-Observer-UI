@@ -75,11 +75,10 @@ public class MpqBuilderService {
 	 *
 	 * @param path
 	 */
-	public void build(final String path) {
-		final File f = new File(path);
+	public void build(final Path path) throws IOException {
 		final Project project;
 		
-		final List<Project> projectsOfPath = projectService.getProjectsOfPath(path);
+		final List<Project> projectsOfPath = projectService.getProjectsOfPath(path.toString());
 		if (projectsOfPath.isEmpty()) {
 			final Game game;
 			if (projectService.pathContainsCompileableForGame(path, heroesBaseGameData)) {
@@ -89,7 +88,7 @@ public class MpqBuilderService {
 			} else {
 				throw new IllegalArgumentException("Specified path '" + path + "' did not contain any project.");
 			}
-			project = new Project(f.getName(), f.getAbsolutePath(), game);
+			project = new Project(path.getFileName().toString(), path, game);
 		} else {
 			project = projectsOfPath.get(0);
 		}
@@ -123,31 +122,27 @@ public class MpqBuilderService {
 	/**
 	 * Builds a specific Interface in a Build Thread.
 	 *
-	 * @param interfaceDirectory
-	 * 		folder of the interface file to be built
 	 * @param game
 	 * @param useCmdLineSettings
+	 * @param project
 	 */
 	void buildSpecificUI(
-			final Path interfaceDirectory,
-			final GameData game,
-			final boolean useCmdLineSettings,
-			final Project project) {
+			final GameData game, final boolean useCmdLineSettings, final Project project) {
 		if (executor.isShutdown()) {
 			logger.error("ERROR: Executor shut down. Skipping building a UI...");
 			return;
 		}
+		
+		final Path interfaceDirectory = project.getProjectPath();
+		
 		if (!Files.exists(interfaceDirectory) || !Files.isDirectory(interfaceDirectory)) {
 			logger.error("ERROR: Can't build UI from file '{}', expected an existing directory.", interfaceDirectory);
 			return;
 		}
-		final boolean verifyLayout;
 		final SettingsIniInterface settings = configService.getIniSettings();
-		if (useCmdLineSettings) {
-			verifyLayout = settings.isCmdLineVerifyLayout();
-		} else {
-			verifyLayout = settings.isGuiVerifyLayout();
-		}
+		final boolean verifyLayout =
+				useCmdLineSettings ? settings.isCmdLineVerifyLayout() : settings.isGuiVerifyLayout();
+		
 		if (game.getUiCatalog() == null && verifyLayout) {
 			// parse default UI
 			throw new IllegalStateException(String.format("Base UI of game '%s' has not been parsed.",

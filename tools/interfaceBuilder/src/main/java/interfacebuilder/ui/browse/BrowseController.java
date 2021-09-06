@@ -383,7 +383,7 @@ public class BrowseController implements Updateable {
 			final Updateable controller = createTab(project.getName());
 			if (controller != null) {
 				final ModData mod = gameService.getModData(project.getGame());
-				mod.setSourceDirectory(Path.of(project.getProjectPath()));
+				mod.setSourceDirectory(project.getProjectPath());
 				final Path cachePath =
 						Path.of(configService.getMpqCachePath().toString(), "browseCache", project.getName());
 				try {
@@ -401,7 +401,7 @@ public class BrowseController implements Updateable {
 					continue;
 				}
 				try {
-					fileService.copyFileOrDirectory(Path.of(project.getProjectPath()), cachePath);
+					fileService.copyFileOrDirectory(project.getProjectPath(), cachePath);
 				} catch (final IOException e) {
 					logger.error("ERROR: could not copy project files.", e);
 					continue;
