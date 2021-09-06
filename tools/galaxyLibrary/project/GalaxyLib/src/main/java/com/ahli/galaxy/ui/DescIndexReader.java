@@ -43,7 +43,7 @@ public final class DescIndexReader {
 	 * @throws SAXException
 	 * @throws ParserConfigurationException
 	 */
-	public static List<String> getLayoutPathList(final File f, final Mode mode)
+	public static LayoutPathData getLayoutPathList(final File f)
 			throws SAXException, IOException, ParserConfigurationException {
 		final DocumentBuilder dBuilder = XmlDomHelper.buildSecureDocumentBuilder();
 		logger.trace("reading layouts from descIndexFile: {}", f);
@@ -51,27 +51,23 @@ public final class DescIndexReader {
 		
 		// must be in a DataComponent node
 		final NodeList nodeList = doc.getElementsByTagName("*");
-		final ArrayList<String> list = new ArrayList<>(nodeList.getLength());
-		for (int i = 0, len = nodeList.getLength(); i < len; ++i) {
+		final int nodeListLength = nodeList.getLength();
+		final LayoutPathData result = new LayoutPathData(new ArrayList<>(nodeListLength),
+				new ArrayList<>(nodeListLength),
+				new ArrayList<>(nodeListLength));
+		for (int i = 0; i < nodeListLength; ++i) {
 			final Node node = nodeList.item(i);
 			if ("Include".equalsIgnoreCase(node.getNodeName())) {
 				final NamedNodeMap attributes = node.getAttributes();
 				
-				// ignore requiredtoload if desired
-				if ((mode == Mode.ONLY_LOADABLE && XmlDomHelper.isFailingRequiredToLoad(attributes)) ||
-						(mode == Mode.ONLY_UNLOADABLE && !XmlDomHelper.isFailingRequiredToLoad(attributes))) {
-					continue;
-				}
-				
+				final List<String> list =
+						XmlDomHelper.isFailingRequiredToLoad(attributes) ? result.notLoaded() : result.loaded();
 				final String path = attributes.item(0).getNodeValue();
 				list.add(path);
+				result.combined().add(path);
 				logger.trace("Adding layout path to layoutPathList: {}", path);
 			}
 		}
-		return list;
-	}
-	
-	public enum Mode {
-		ONLY_LOADABLE, ONLY_UNLOADABLE, ALL
+		return result;
 	}
 }

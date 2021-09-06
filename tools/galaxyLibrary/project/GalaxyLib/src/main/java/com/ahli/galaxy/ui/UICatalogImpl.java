@@ -152,15 +152,14 @@ public class UICatalogImpl implements UICatalog {
 	public void processDescIndex(final File f, final String raceId, final String consoleSkinId)
 			throws SAXException, IOException, ParserConfigurationException, InterruptedException {
 		
-		// TODO inefficient code, parses twice
-		blizzOnlyLayouts.addAll(DescIndexReader.getLayoutPathList(f, DescIndexReader.Mode.ONLY_UNLOADABLE));
+		final LayoutPathData layoutPathData = DescIndexReader.getLayoutPathList(f);
+		blizzOnlyLayouts.addAll(layoutPathData.notLoaded());
 		
 		final String descIndexPath = f.getAbsolutePath();
 		final String basePath = descIndexPath.substring(0, descIndexPath.length() - f.getName().length());
 		logger.trace("descIndexPath={}\nbasePath={}", descIndexPath, basePath);
 		
-		final List<String> combinedList = DescIndexReader.getLayoutPathList(f, DescIndexReader.Mode.ALL);
-		processLayouts(combinedList, basePath, raceId, consoleSkinId);
+		processLayouts(layoutPathData.combined(), basePath, raceId, consoleSkinId);
 		
 		logger.trace(
 				"UICatalogSizes: templates={}, blizzTemplates={}, constants={}, blizzConstants={}, blizzLayouts={}",
