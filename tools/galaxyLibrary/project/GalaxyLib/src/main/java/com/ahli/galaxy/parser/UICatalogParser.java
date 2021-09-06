@@ -24,6 +24,7 @@ import com.ahli.galaxy.ui.interfaces.UIElement;
 import com.ahli.galaxy.ui.interfaces.UIFrame;
 import com.ahli.galaxy.ui.interfaces.UIState;
 import com.ahli.galaxy.ui.interfaces.UIStateGroup;
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,7 +76,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	private final XmlParser parser;
 	private final List<UIElement> curPath;
 	private final List<UIState> statesToClose;
-	private final List<Integer> statesToCloseLevel;
+	private final IntArrayList statesToCloseLevel;
 	private final List<UITemplate> newTemplatesOfCurFile;
 	private final Map<UIElement, UIElement> addedFinalElements;
 	private final DeduplicationIntensity deduplicationIntensity;
@@ -101,7 +102,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		this.catalog = catalog;
 		this.parser = parser;
 		statesToClose = new ArrayList<>(10);
-		statesToCloseLevel = new ArrayList<>(10);
+		statesToCloseLevel = new IntArrayList();
 		curPath = new ArrayList<>(10);
 		newTemplatesOfCurFile = new ArrayList<>(250);
 		this.deduplicationIntensity = deduplicationIntensity;
