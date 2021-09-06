@@ -127,6 +127,9 @@ public final class XmlCompressorDom {
 		
 		@Override
 		public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) {
+			
+			logger.trace("compression - processing file: {}", file);
+			
 			final Document doc;
 			try (final InputStream is = new BufferedInputStream(Files.newInputStream(file))) {
 				
@@ -138,8 +141,6 @@ public final class XmlCompressorDom {
 				logger.trace("Error while compressing xml.", e);
 				return FileVisitResult.CONTINUE;
 			}
-			
-			logger.trace("compression - processing file: {}", file);
 			
 			// process all nodes
 			final NodeList nodes = doc.getElementsByTagName(ANY_TAGNAME);

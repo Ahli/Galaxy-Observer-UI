@@ -3,7 +3,7 @@
 
 package interfacebuilder.integration;
 
-import org.apache.commons.io.FileUtils;
+import org.springframework.util.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -104,8 +104,8 @@ public class FileService {
 	public void cleanDirectory(final Path directory) throws IOException {
 		for (int i = 500; i > 0; --i) {
 			try {
-				// TODO check if it can be rewritten using nio streams
-				FileUtils.cleanDirectory(directory.toFile());
+				FileSystemUtils.deleteRecursively(directory);
+				Files.createDirectories(directory);
 				return;
 			} catch (final IOException e) {
 				if (i <= 1) {

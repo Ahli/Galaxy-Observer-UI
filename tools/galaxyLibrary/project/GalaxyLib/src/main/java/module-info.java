@@ -3,7 +3,6 @@ module GalaxyLib {
 	
 	requires java.xml;
 	requires org.apache.commons.configuration2;
-	requires org.apache.commons.io;
 	//requires org.apache.commons.lang3; // redundant... not required?
 	requires org.slf4j;
 	requires vtd.xml;

@@ -137,7 +137,8 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 			// extra file compression
 			try {
 				XmlCompressorDom.processCache(mpqCachePath, 1);
-			} catch (final ParserConfigurationException | TransformerConfigurationException e) {
+				//				XmlCompressorVtd.processCache(mpqCachePath, 1);
+			} catch (final ParserConfigurationException | TransformerConfigurationException | IOException e) {
 				logger.error("Error while compressing files in the cache", e);
 			}
 			

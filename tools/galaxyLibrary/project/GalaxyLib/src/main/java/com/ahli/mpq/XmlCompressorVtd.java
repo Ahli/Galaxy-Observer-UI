@@ -13,16 +13,17 @@ import com.ximpleware.VTDNav;
 import com.ximpleware.XMLModifier;
 import com.ximpleware.XPathEvalException;
 import com.ximpleware.XPathParseException;
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.FileVisitResult;
+import java.nio.file.FileVisitor;
 import java.nio.file.Files;
-import java.util.Collection;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 
 /**
  * TODO improve, it is bad at compressing
@@ -46,33 +47,47 @@ public final class XmlCompressorVtd {
 	/**
 	 * @param cachePath
 	 * @param ignoreCommentCountPerFile
-	 * @throws ParserConfigurationException
-	 * @throws SAXException
 	 * @throws IOException
 	 */
-	public static void processCache(final String cachePath, final int ignoreCommentCountPerFile) {
+	public static void processCache(final Path cachePath, final int ignoreCommentCountPerFile) throws IOException {
 		
 		logger.info("Compressing XML files...");
 		logger.trace("cachePath: {}", cachePath);
-		
-		// TODO rewrite with nio walker
-		final Collection<File> filesOfCache = FileUtils.listFiles(new File(cachePath), null, true);
 		
 		final VTDGen vtd = new VTDGen();
 		final AutoPilot ap = new AutoPilot();
 		final XMLModifier xm = new XMLModifier();
 		
-		for (final File curFile : filesOfCache) {
-			//noinspection ObjectAllocationInLoop
-			logger.trace("compression - processing file: {}", curFile.getPath());
+		final FileVisitor<Path> visitor = new XmlCompressorVtd.FileProcessor(vtd, ap, xm, ignoreCommentCountPerFile);
+		Files.walkFileTree(cachePath, visitor);
+	}
+	
+	private static final class FileProcessor extends SimpleFileVisitor<Path> {
+		private final VTDGen vtd;
+		private final AutoPilot ap;
+		private final XMLModifier xm;
+		private final int ignoreCommentCountPerFile;
+		
+		public FileProcessor(
+				final VTDGen vtd, final AutoPilot ap, final XMLModifier xm, final int ignoreCommentCountPerFile) {
+			this.vtd = vtd;
+			this.ap = ap;
+			this.xm = xm;
+			this.ignoreCommentCountPerFile = ignoreCommentCountPerFile;
+		}
+		
+		@Override
+		public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) {
+			
+			logger.trace("compression - processing file: {}", file);
 			
 			try {
-				// setdoc causes a nullpointer error due to an internal bug
-				vtd.setDoc_BR(Files.readAllBytes(curFile.toPath()));
+				// setDoc causes a nullpointer error due to an internal bug
+				vtd.setDoc_BR(Files.readAllBytes(file));
 				vtd.parse(false);
 			} catch (final IOException | ParseException e) {
 				logger.trace("Error while compressing xml.", e);
-				continue;
+				return FileVisitResult.CONTINUE;
 			}
 			
 			try {
@@ -85,9 +100,8 @@ public final class XmlCompressorVtd {
 					ap.evalXPath();
 				}
 				int i;
-				String comment;
 				while ((i = ap.evalXPath()) != -1) {
-					comment = nav.toRawStringLowerCase(i);
+					final String comment = nav.toRawStringLowerCase(i);
 					if (!comment.contains(AHLI_HOTKEY) && !comment.contains(AHLI_SETTING)) {
 						xm.remove();
 					}
@@ -107,15 +121,24 @@ public final class XmlCompressorVtd {
 					final int len = nav.getTokenLength(i);
 					final long l = nav.trimWhiteSpaces((((long) len) << 32) | offset, VTDNav.WS_BOTH);
 					final int nlen = (int) (l >> 32);
-					final int nos = Math.toIntExact(l);
+					final int nos = (int) l; // overflowing is desired behavior here
 					xm.updateToken(i, nav, nos, nlen);
 				}
 				
-				xm.output(curFile.getAbsolutePath());
+				try (final OutputStream outputStream = Files.newOutputStream(file)) {
+					xm.output(outputStream);
+				}
 			} catch (final ModifyException | XPathParseException | XPathEvalException | NavException | IOException | TranscodeException e) {
-				logger.error(String.format("ERROR: while compressing xml file %s", curFile.getAbsolutePath()), e);
+				logger.error("ERROR: while compressing xml file {}", file, e);
 			}
+			
+			return FileVisitResult.CONTINUE;
+		}
+		
+		@Override
+		public FileVisitResult visitFileFailed(final Path file, final IOException exc) throws IOException {
+			logger.error("Failed to access file: {}", file);
+			throw exc;
 		}
 	}
-	
 }

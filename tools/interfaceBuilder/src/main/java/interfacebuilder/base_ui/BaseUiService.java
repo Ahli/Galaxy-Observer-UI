@@ -194,8 +194,9 @@ public class BaseUiService {
 		try {
 			if (!Files.exists(destination)) {
 				Files.createDirectories(destination);
+			} else {
+				fileService.cleanDirectory(destination);
 			}
-			fileService.cleanDirectory(destination);
 			discCacheService.remove(gameDef.name(), usePtr);
 		} catch (final IOException e) {
 			logger.error(String.format("Directory %s could not be cleaned.", destination), e);
