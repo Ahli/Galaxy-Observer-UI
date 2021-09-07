@@ -53,7 +53,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveAction;
 
@@ -68,6 +70,8 @@ public class BaseUiService {
 	private final KryoService kryoService;
 	private final AppController appController;
 	
+	private final Map<String, Object> baseUiParsingLock;
+	
 	public BaseUiService(
 			final ConfigService configService,
 			final GameService gameService,
@@ -81,6 +85,7 @@ public class BaseUiService {
 		this.discCacheService = discCacheService;
 		this.kryoService = kryoService;
 		this.appController = appController;
+		baseUiParsingLock = new HashMap<>(2, 1.0f);
 	}
 	
 	/**
@@ -258,8 +263,10 @@ public class BaseUiService {
 	 */
 	public void parseBaseUI(final GameData gameData) {
 		// lock per game
-		final String gameName = gameData.getGameDef().name();
-		synchronized (gameName) {
+		final String gameBaseUiDir = configService.getBaseUiPath(gameData.getGameDef()) + File.separator +
+				gameData.getGameDef().modsSubDirectory();
+		synchronized (getLock(gameBaseUiDir)) {
+			final String gameName = gameData.getGameDef().name();
 			UICatalog uiCatalog = gameData.getUiCatalog();
 			if (uiCatalog != null) {
 				logger.trace("Aborting parsing baseUI for '{}' as was already parsed.", gameName);
@@ -268,10 +275,9 @@ public class BaseUiService {
 				logger.info("Loading baseUI for {}", gameName);
 				boolean needToParseAgain = true;
 				
-				final Path baseUiPath = configService.getBaseUiPath(gameData.getGameDef());
 				boolean isPtr = false;
 				try {
-					isPtr = isPtr(baseUiPath);
+					isPtr = isPtr(configService.getBaseUiPath(gameData.getGameDef()));
 				} catch (final IOException e) {
 					// do nothing
 					logger.trace("Ignoring error in isPtr() check on baseUiPath.", e);
@@ -297,15 +303,13 @@ public class BaseUiService {
 					appController.addThreadLoggerTab(Thread.currentThread().getName(),
 							gameData.getGameDef().nameHandle() + "UI",
 							false);
-					final String gameDir = configService.getBaseUiPath(gameData.getGameDef()) + File.separator +
-							gameData.getGameDef().modsSubDirectory();
 					try {
 						final WildcardFileFilter fileFilter =
 								new WildcardFileFilter("descindex.*layout", IOCase.INSENSITIVE);
 						for (final String modOrDir : gameData.getGameDef().coreModsOrDirectories()) {
 							
 							@SuppressWarnings("ObjectAllocationInLoop")
-							final File directory = new File(gameDir + File.separator + modOrDir);
+							final File directory = new File(gameBaseUiDir + File.separator + modOrDir);
 							if (!directory.exists() || !directory.isDirectory()) {
 								throw new IOException("BaseUI does not exist.");
 							}
@@ -348,6 +352,12 @@ public class BaseUiService {
 					StylizedTextAreaAppender.finishedWork(Thread.currentThread().getName(), true, 50);
 				}
 			}
+		}
+	}
+	
+	private Object getLock(final String gameName) {
+		synchronized (BaseUiService.class) {
+			return baseUiParsingLock.computeIfAbsent(gameName, k -> new Object());
 		}
 	}
 	
@@ -428,8 +438,8 @@ public class BaseUiService {
 		private final File extractorExe;
 		private final String gamePath;
 		private final String mask;
-		private final Path destination;
-		private final Appender outputAppender;
+		private final transient Path destination;
+		private final transient Appender outputAppender;
 		
 		private CascFileExtractionTask(
 				final File extractorExe,
@@ -546,10 +556,8 @@ public class BaseUiService {
 		}
 		
 		private void writeToMetaFile(
-				final Path directory,
-				final String gameName,
-				final int[] version,
-				final boolean isPtr) throws IOException {
+				final Path directory, final String gameName, final int[] version, final boolean isPtr)
+				throws IOException {
 			final Path path = directory.resolve(META_FILE_NAME);
 			final KryoGameInfo metaInfo = new KryoGameInfo(version, gameName, isPtr);
 			final List<Object> payload = new ArrayList<>(1);

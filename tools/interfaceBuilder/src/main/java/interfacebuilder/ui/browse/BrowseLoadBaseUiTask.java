@@ -8,11 +8,16 @@ import interfacebuilder.base_ui.BaseUiService;
 import interfacebuilder.threads.CleaningForkJoinTask;
 import interfacebuilder.threads.CleaningForkJoinTaskCleaner;
 
+import java.io.Serial;
+
 public class BrowseLoadBaseUiTask extends CleaningForkJoinTask {
 	
-	private final GameData gameData;
-	private final BrowseTabController controller;
-	private final BaseUiService baseUiService;
+	@Serial
+	private static final long serialVersionUID = -2905917491106111107L;
+	
+	private final transient GameData gameData;
+	private final transient BrowseTabController controller;
+	private final transient BaseUiService baseUiService;
 	
 	public BrowseLoadBaseUiTask(
 			final CleaningForkJoinTaskCleaner cleaner,

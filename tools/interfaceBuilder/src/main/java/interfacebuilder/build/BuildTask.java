@@ -9,12 +9,17 @@ import interfacebuilder.projects.Project;
 import interfacebuilder.threads.CleaningForkJoinTask;
 import interfacebuilder.threads.CleaningForkJoinTaskCleaner;
 
+import java.io.Serial;
+
 public class BuildTask extends CleaningForkJoinTask {
 	
-	private final Project project;
+	@Serial
+	private static final long serialVersionUID = 1114165634840947017L;
+	
+	private final transient Project project;
 	private final boolean useCmdLineSettings;
-	private final MpqBuilderService mpqBuilderService;
-	private final BaseUiService baseUiService;
+	private final transient MpqBuilderService mpqBuilderService;
+	private final transient BaseUiService baseUiService;
 	
 	public BuildTask(
 			final CleaningForkJoinTaskCleaner cleaner,

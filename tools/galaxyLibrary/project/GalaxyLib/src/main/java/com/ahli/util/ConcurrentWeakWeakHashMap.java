@@ -76,7 +76,7 @@ public class ConcurrentWeakWeakHashMap<K> implements ConcurrentMap<K, K> {
 	@Override
 	public boolean remove(final Object key, final Object value) {
 		purgeKeys();
-		return map.remove(new WeakReferenceWithHash<>(key, null), key);
+		return map.remove(new WeakReferenceWithHash<>(key), key);
 	}
 	
 	@Override
@@ -110,18 +110,19 @@ public class ConcurrentWeakWeakHashMap<K> implements ConcurrentMap<K, K> {
 	@Override
 	public boolean containsValue(final Object value) {
 		purgeKeys();
-		return map.containsValue(newKeyByObj(value));
-	}
-	
-	private WeakReferenceWithHash<?> newKeyByObj(final Object obj) {
-		//noinspection rawtypes,unchecked
-		return new WeakReferenceWithHash(obj, queue);
+		// there is no good way to check if Object is instance of K => just try casting
+		try {
+			//noinspection unchecked
+			return map.containsValue(new WeakReferenceWithHash<>((K) value, queue));
+		} catch (final ClassCastException ignored) {
+			return false;
+		}
 	}
 	
 	@Override
 	public K get(final Object key) {
 		purgeKeys();
-		final var result = map.get(new WeakReferenceWithHash<>(key, null));
+		final var result = map.get(new WeakReferenceWithHash<>(key));
 		return result == null ? null : result.get();
 	}
 	
@@ -136,7 +137,7 @@ public class ConcurrentWeakWeakHashMap<K> implements ConcurrentMap<K, K> {
 	@Override
 	public K remove(final Object key) {
 		purgeKeys();
-		final var result = map.remove(new WeakReferenceWithHash<>(key, null));
+		final var result = map.remove(new WeakReferenceWithHash<>(key));
 		return result == null ? null : result.get();
 	}
 	
@@ -164,7 +165,7 @@ public class ConcurrentWeakWeakHashMap<K> implements ConcurrentMap<K, K> {
 	@Override
 	public boolean containsKey(final Object key) {
 		purgeKeys();
-		return map.containsKey(new WeakReferenceWithHash<>(key, null));
+		return map.containsKey(new WeakReferenceWithHash<>(key));
 	}
 	
 	@Override
@@ -186,6 +187,10 @@ public class ConcurrentWeakWeakHashMap<K> implements ConcurrentMap<K, K> {
 	private static final class WeakReferenceWithHash<T> extends WeakReference<T> {
 		
 		private final int hashCode;
+		
+		private WeakReferenceWithHash(final T referent) {
+			this(referent, null);
+		}
 		
 		private WeakReferenceWithHash(final T referent, final ReferenceQueue<? super T> q) {
 			super(referent, q);

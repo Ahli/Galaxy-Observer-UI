@@ -11,13 +11,18 @@ import interfacebuilder.threads.CleaningForkJoinTask;
 import interfacebuilder.threads.CleaningForkJoinTaskCleaner;
 import interfacebuilder.ui.browse.BrowseTabController;
 
+import java.io.Serial;
+
 public class BrowseCompileTask extends CleaningForkJoinTask {
 	
-	private final ModData mod;
-	private final BrowseTabController controller;
-	private final CompileService compileService;
-	private final BaseUiService baseUiService;
-	private final ConfigService configService;
+	@Serial
+	private static final long serialVersionUID = 5971938125363486608L;
+	
+	private final transient ModData mod;
+	private final transient BrowseTabController controller;
+	private final transient CompileService compileService;
+	private final transient BaseUiService baseUiService;
+	private final transient ConfigService configService;
 	
 	public BrowseCompileTask(
 			final CleaningForkJoinTaskCleaner cleaner,

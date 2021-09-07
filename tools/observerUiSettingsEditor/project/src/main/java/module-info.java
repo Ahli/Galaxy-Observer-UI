@@ -1,16 +1,17 @@
 module ObserverUiSettingsEditor {
+	// automatic modules :(
+	requires org.apache.commons.io;
+	requires org.apache.commons.lang3;
+	requires org.apache.logging.log4j.slf4j;
+	requires org.apache.logging.log4j.core;
+	
 	requires java.desktop;
 	requires java.xml;
 	requires javafx.base;
 	requires javafx.controls;
 	requires javafx.fxml;
 	requires javafx.graphics;
-	requires org.apache.commons.io;
-	requires org.apache.commons.lang3;
 	requires org.apache.logging.log4j;
-	
-	requires org.apache.logging.log4j.slf4j;
-	requires org.apache.logging.log4j.core;
 	requires org.slf4j;
 	
 	requires GalaxyLib;

@@ -3,6 +3,7 @@
 
 package interfacebuilder.threads;
 
+import java.io.Serial;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
@@ -52,7 +53,11 @@ public class CleaningForkJoinPool extends ForkJoinPool {
 	}
 	
 	private static final class TaskStarter extends CleaningForkJoinTask {
-		private final Runnable task;
+		
+		@Serial
+		private static final long serialVersionUID = 5128277301331174458L;
+		
+		private final transient Runnable task;
 		
 		private TaskStarter(final CleaningForkJoinTaskCleaner cleaner, final Runnable task) {
 			super(cleaner);

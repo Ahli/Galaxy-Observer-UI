@@ -89,7 +89,7 @@ public class TextFlowFactory {
 		}
 		final Text[] text = new Text[count];
 		
-		if (count > 2) {
+		if (count > 2 && query != null) {
 			text[0] = new Text(label.substring(0, index));
 			text[1] = new Text(label.substring(index, index + query.length()));
 			text[2] = new Text(label.substring(index + query.length()));
@@ -97,7 +97,7 @@ public class TextFlowFactory {
 			text[1].setStyle(STYLE_HIGHLIGHTED);
 			text[2].setStyle(STYLE_DFLT);
 			applyVisualHighlight(text[1]);
-		} else if (count > 1) {
+		} else if (count > 1 && query != null) {
 			text[0] = new Text(label.substring(0, index + query.length()));
 			text[1] = new Text(label.substring(index + query.length()));
 			text[0].setStyle(STYLE_HIGHLIGHTED);

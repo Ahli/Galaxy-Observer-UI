@@ -3,10 +3,15 @@
 
 package com.ahli.mpq.mpqeditor;
 
+import java.io.Serial;
 import java.util.Arrays;
 import java.util.Objects;
 
 public class MpqEditorCompressionRuleSize extends MpqEditorCompressionRule {
+	
+	@Serial
+	private static final long serialVersionUID = -3164363488174206663L;
+	
 	private int minSize;
 	private int maxSize;
 	

@@ -11,17 +11,21 @@ import interfacebuilder.ui.progress.ErrorTabController;
 import interfacebuilder.ui.progress.appender.Appender;
 import javafx.application.Platform;
 
+import java.io.Serial;
 import java.util.List;
 import java.util.concurrent.ForkJoinTask;
 
 public class ExtractBaseUiTask extends CleaningForkJoinTask {
 	
+	@Serial
+	private static final long serialVersionUID = 4718440389513483542L;
+	
 	private final Game game;
 	private final boolean usePtr;
-	private final Appender[] output;
-	private final BaseUiService baseUiService;
-	private final ErrorTabController errorTabController;
-	private final NavigationController navigationController;
+	private final transient Appender[] output;
+	private final transient BaseUiService baseUiService;
+	private final transient ErrorTabController errorTabController;
+	private final transient NavigationController navigationController;
 	
 	public ExtractBaseUiTask(
 			final CleaningForkJoinTaskCleaner cleaner,

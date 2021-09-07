@@ -7,6 +7,7 @@ import interfacebuilder.integration.log4j.StylizedTextAreaAppender;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.Serial;
 import java.util.concurrent.ForkJoinTask;
 
 /**
@@ -18,7 +19,10 @@ import java.util.concurrent.ForkJoinTask;
 public abstract class CleaningForkJoinTask extends ForkJoinTask<Void> {
 	private static final Logger logger = LogManager.getLogger(CleaningForkJoinTask.class);
 	
-	private final CleaningForkJoinTaskCleaner cleaner;
+	@Serial
+	private static final long serialVersionUID = 8118692371922973864L;
+	
+	private final transient CleaningForkJoinTaskCleaner cleaner;
 	
 	protected CleaningForkJoinTask(final CleaningForkJoinTaskCleaner cleaner) {
 		this.cleaner = cleaner;

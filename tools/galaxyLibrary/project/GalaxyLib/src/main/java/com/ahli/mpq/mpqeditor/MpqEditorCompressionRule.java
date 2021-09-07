@@ -5,10 +5,16 @@ package com.ahli.mpq.mpqeditor;
 
 import com.ahli.util.DeepCopyable;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
 
-public abstract class MpqEditorCompressionRule implements DeepCopyable {
+public abstract class MpqEditorCompressionRule implements DeepCopyable, Serializable {
+	
+	@Serial
+	private static final long serialVersionUID = -8266828245771802518L;
+	
 	private boolean singleUnit;
 	private boolean compress;
 	private boolean encrypt;
