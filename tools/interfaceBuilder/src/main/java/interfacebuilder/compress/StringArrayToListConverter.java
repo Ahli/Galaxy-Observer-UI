@@ -18,7 +18,7 @@ public class StringArrayToListConverter implements AttributeConverter<String[], 
 	@Override
 	public List<String> convertToDatabaseColumn(final String[] attribute) {
 		if (attribute == null || attribute.length <= 0) {
-			return new ArrayList<>(10);
+			return new ArrayList<>();
 		}
 		return Arrays.asList(attribute);
 	}

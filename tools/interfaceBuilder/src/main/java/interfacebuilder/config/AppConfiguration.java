@@ -88,9 +88,9 @@ public class AppConfiguration {
 	}
 	
 	@Bean
-	protected ReplayService replayService() {
+	protected ReplayService replayService(final FileService fileService) {
 		logger.debug("init bean replayService");
-		return new ReplayService();
+		return new ReplayService(fileService);
 	}
 	
 	@Bean

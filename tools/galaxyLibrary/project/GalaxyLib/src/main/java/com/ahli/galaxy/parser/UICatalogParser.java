@@ -101,9 +101,9 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			final UICatalog catalog, final XmlParser parser, final DeduplicationIntensity deduplicationIntensity) {
 		this.catalog = catalog;
 		this.parser = parser;
-		statesToClose = new ArrayList<>(10);
+		statesToClose = new ArrayList<>();
 		statesToCloseLevel = new IntArrayList();
-		curPath = new ArrayList<>(10);
+		curPath = new ArrayList<>();
 		newTemplatesOfCurFile = new ArrayList<>(250);
 		this.deduplicationIntensity = deduplicationIntensity;
 		logger.trace("deduplication intensity: {}", deduplicationIntensity);

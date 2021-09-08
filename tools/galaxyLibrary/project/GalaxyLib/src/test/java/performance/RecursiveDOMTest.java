@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Locale;
 
 final class RecursiveDOMTest {
-	private static final List<Object> list = new ArrayList<>(10);
+	private static final List<Object> list = new ArrayList<>();
 	private static final String TAG = "*";
 	
 	private RecursiveDOMTest() {

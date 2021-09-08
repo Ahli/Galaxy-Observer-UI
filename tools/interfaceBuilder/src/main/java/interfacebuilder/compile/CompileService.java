@@ -96,8 +96,8 @@ public class CompileService {
 						DeduplicationIntensity.SIMPLE));
 				
 				// apply mod's UI
-				final File descIndexFile = new File(
-						mod.getMpqCacheDirectory() + File.separator + mod.getDescIndexData().getDescIndexIntPath());
+				final Path descIndexFile = Path.of(mod.getMpqCacheDirectory() + File.separator +
+						mod.getDescIndexData().getDescIndexIntPath());
 				catalogClone.processDescIndex(descIndexFile, raceId, consoleSkinId);
 				catalogClone.postProcessParsing();
 				catalogClone.setParser(null);

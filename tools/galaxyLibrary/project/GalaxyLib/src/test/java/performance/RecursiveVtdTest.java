@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 final class RecursiveVtdTest {
-	private static final List<Object> list = new ArrayList<>(10);
+	private static final List<Object> list = new ArrayList<>();
 	private static final String TAG = "*";
 	
 	private RecursiveVtdTest() {

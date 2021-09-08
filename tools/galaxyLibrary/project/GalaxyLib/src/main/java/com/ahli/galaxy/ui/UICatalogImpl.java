@@ -51,9 +51,9 @@ public class UICatalogImpl implements UICatalog {
 	
 	public UICatalogImpl() {
 		templates = new ArrayList<>(2500);
-		blizzOnlyTemplates = new ArrayList<>(10);
+		blizzOnlyTemplates = new ArrayList<>();
 		constants = new ArrayList<>(800);
-		blizzOnlyConstants = new ArrayList<>(10);
+		blizzOnlyConstants = new ArrayList<>();
 		blizzOnlyLayouts = new ArrayList<>(25);
 		handles = new UnifiedMap<>(650 * 5 / 4);
 	}
@@ -79,9 +79,9 @@ public class UICatalogImpl implements UICatalog {
 			}
 		}
 		templates = new ArrayList<>(2500);
-		blizzOnlyTemplates = new ArrayList<>(10);
+		blizzOnlyTemplates = new ArrayList<>();
 		constants = new ArrayList<>(800);
-		blizzOnlyConstants = new ArrayList<>(10);
+		blizzOnlyConstants = new ArrayList<>();
 		blizzOnlyLayouts = new ArrayList<>(25);
 		handles = new UnifiedMap<>(650 * 5 / 4);
 	}
@@ -149,14 +149,15 @@ public class UICatalogImpl implements UICatalog {
 	}
 	
 	@Override
-	public void processDescIndex(final File f, final String raceId, final String consoleSkinId)
+	public void processDescIndex(final Path descIndexFile, final String raceId, final String consoleSkinId)
 			throws SAXException, IOException, ParserConfigurationException, InterruptedException {
 		
-		final LayoutPathData layoutPathData = DescIndexReader.getLayoutPathList(f);
+		final LayoutPathData layoutPathData = DescIndexReader.getLayoutPathList(descIndexFile);
 		blizzOnlyLayouts.addAll(layoutPathData.notLoaded());
 		
-		final String descIndexPath = f.getAbsolutePath();
-		final String basePath = descIndexPath.substring(0, descIndexPath.length() - f.getName().length());
+		final String descIndexPath = descIndexFile.toAbsolutePath().toString();
+		final String basePath =
+				descIndexPath.substring(0, descIndexPath.length() - descIndexFile.getFileName().toString().length());
 		logger.trace("descIndexPath={}\nbasePath={}", descIndexPath, basePath);
 		
 		processLayouts(layoutPathData.combined(), basePath, raceId, consoleSkinId);

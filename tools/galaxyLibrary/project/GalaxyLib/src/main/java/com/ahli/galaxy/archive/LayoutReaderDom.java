@@ -57,7 +57,7 @@ public final class LayoutReaderDom {
 		final DocumentBuilder dBuilder = XmlDomHelper.buildSecureDocumentBuilder();
 		final Document doc = dBuilder.parse(f);
 		
-		final ArrayList<String> list = new ArrayList<>(10);
+		final ArrayList<String> list = new ArrayList<>();
 		
 		// check TEMPLATES
 		final NodeList nodes = doc.getElementsByTagName(ANY_TAG);
@@ -110,7 +110,7 @@ public final class LayoutReaderDom {
 		
 		// constantUsage
 		// nodes = doc.getElementsByTagName("*");
-		final ArrayList<String> usedConstants = new ArrayList<>(10);
+		final ArrayList<String> usedConstants = new ArrayList<>();
 		for (int i = 0, len = nodes.getLength(); i < len; ++i) {
 			final Node node = nodes.item(i);
 			
@@ -195,7 +195,7 @@ public final class LayoutReaderDom {
 	 */
 	public static List<String> getLayoutsConstantDefinitions(final Document doc) {
 		// create list of own constant definitions
-		final ArrayList<String> ownConstants = new ArrayList<>(10);
+		final ArrayList<String> ownConstants = new ArrayList<>();
 		final NodeList constants = doc.getElementsByTagName(CONSTANT);
 		for (int i = 0, len = constants.getLength(); i < len; ++i) {
 			final Node constant = constants.item(i);

@@ -3,9 +3,6 @@
 
 package interfacebuilder.integration;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -14,7 +11,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * Class that finds replays.
@@ -24,8 +22,10 @@ import java.util.Collection;
 public class ReplayService {
 	private static final Logger logger = LogManager.getLogger(ReplayService.class);
 	
-	public ReplayService() {
-		// explicit default constructor
+	private final FileService fileService;
+	
+	public ReplayService(final FileService fileService) {
+		this.fileService = fileService;
 	}
 	
 	/**
@@ -36,15 +36,16 @@ public class ReplayService {
 	 * @param documentsPath
 	 * 		the documents path
 	 * @return the last or newest replay
+	 * @throws IOException
 	 */
-	public File getLastUsedOrNewestReplay(final boolean isHeroes, final Path documentsPath) {
-		File replay = null;
+	public Path getLastUsedOrNewestReplay(final boolean isHeroes, final Path documentsPath) throws IOException {
+		Path replay = null;
 		try {
 			replay = getLastUsedReplay(isHeroes, documentsPath);
 		} catch (final IOException e) {
 			logger.error("Failed to receive last used replay.", e);
 		}
-		if (replay == null || !replay.exists() || !replay.isFile()) {
+		if (replay == null || !Files.exists(replay) || !Files.isRegularFile(replay)) {
 			logger.trace("Last used replay is invalid, getting newest replay instead.");
 			
 			replay = getNewestReplay(isHeroes, documentsPath);
@@ -62,7 +63,7 @@ public class ReplayService {
 	 * @throws IOException
 	 * 		Signals that an I/O exception has occurred.
 	 */
-	public static File getLastUsedReplay(final boolean isHeroes, final Path documentsPath) throws IOException {
+	public static Path getLastUsedReplay(final boolean isHeroes, final Path documentsPath) throws IOException {
 		final Path basePath = documentsPath.resolve(
 				(isHeroes ? "Heroes of the Storm" : "StarCraft II") + File.separator + "Variables.txt");
 		logger.trace(basePath);
@@ -82,7 +83,7 @@ public class ReplayService {
 		if (replayPath == null) {
 			return null;
 		}
-		return new File(replayPath);
+		return Path.of(replayPath);
 	}
 	
 	/**
@@ -92,36 +93,33 @@ public class ReplayService {
 	 * @param documentsPath
 	 * 		the documents path
 	 * @return the newest replay
+	 * @throws IOException
 	 */
-	public File getNewestReplay(final boolean isHeroes, final Path documentsPath) {
+	public Path getNewestReplay(final boolean isHeroes, final Path documentsPath) throws IOException {
 		final Path basePath;
-		final String[] extensions;
+		final String extensions;
 		if (isHeroes) {
 			basePath = documentsPath.resolve("Heroes of the Storm" + File.separator + "Accounts");
-			extensions = new String[] { "StormReplay" };
+			extensions = ".StormReplay";
 		} else {
 			basePath = documentsPath.resolve("StarCraft II" + File.separator + "Accounts");
-			extensions = new String[] { "SC2Replay" };
+			extensions = ".SC2Replay";
 		}
 		logger.trace(basePath);
 		
-		// TODO rewrite using nio
-		final Collection<File> allReplays =
-				FileUtils.listFiles(basePath.toFile(), TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
+		final List<Path> allReplays = fileService.getFilesOfDirectory(basePath);
 		
 		logger.trace("# Replays found: {}", allReplays.size());
 		
 		long newestDate = Long.MIN_VALUE;
-		File newestReplay = null;
-		for (final File curReplay : allReplays) {
+		Path newestReplay = null;
+		for (final Path curReplay : allReplays) {
 			// check extension of file
-			final String curReplayName = curReplay.getName();
+			final String curReplayName = curReplay.getFileName().toString();
 			logger.trace("curReplay name: {}", curReplayName);
-			final String extension = FilenameUtils.getExtension(curReplayName);
-			logger.trace("extension: {}", extension);
-			if (curReplay.isFile() && extension.equalsIgnoreCase(extensions[0])) {
+			if (curReplayName.toLowerCase(Locale.ROOT).endsWith(extensions)) {
 				// check date
-				final long curDate = curReplay.lastModified();
+				final long curDate = Files.getLastModifiedTime(curReplay).toMillis();
 				logger.trace("curDate: {}", curDate);
 				if (curDate > newestDate) {
 					newestDate = curDate;
@@ -130,7 +128,7 @@ public class ReplayService {
 			}
 		}
 		if (newestReplay != null) {
-			logger.info("newest Replay: {}", newestReplay.getName());
+			logger.info("newest Replay: {}", newestReplay);
 		}
 		return newestReplay;
 	}

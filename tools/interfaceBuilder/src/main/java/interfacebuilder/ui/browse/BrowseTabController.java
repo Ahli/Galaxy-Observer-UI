@@ -492,7 +492,7 @@ public class BrowseTabController implements Updateable {
 		private void updateTemplateDropdown(final String fileName) {
 			if (browseTabController.uiCatalog != null) {
 				browseTabController.templateMap.clear();
-				final List<String> templatesOfFile = new ArrayList<>(10);
+				final List<String> templatesOfFile = new ArrayList<>();
 				String firstSelection = null;
 				String name;
 				logger.trace("filling templatemap");

@@ -321,7 +321,7 @@ public class MpqBuilderService {
 			throw new IOException(msg, e);
 		}
 		
-		final File descIndexFile = mpqi.getFilePathFromMpq(descIndexData.getDescIndexIntPath()).toFile();
+		final Path descIndexFile = mpqi.getFilePathFromMpq(descIndexData.getDescIndexIntPath());
 		try {
 			descIndexData.addLayoutIntPath(DescIndexReader.getLayoutPathList(descIndexFile).combined());
 		} catch (final SAXException | ParserConfigurationException | IOException | MpqException e) {

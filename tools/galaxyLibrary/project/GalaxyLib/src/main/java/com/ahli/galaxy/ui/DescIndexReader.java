@@ -14,8 +14,8 @@ import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,18 +36,18 @@ public final class DescIndexReader {
 	/**
 	 * Grabs all layout file paths from a given descIndex file.
 	 *
-	 * @param f
+	 * @param descIndexFile
 	 * 		descIndex file
 	 * @return
 	 * @throws IOException
 	 * @throws SAXException
 	 * @throws ParserConfigurationException
 	 */
-	public static LayoutPathData getLayoutPathList(final File f)
+	public static LayoutPathData getLayoutPathList(final Path descIndexFile)
 			throws SAXException, IOException, ParserConfigurationException {
 		final DocumentBuilder dBuilder = XmlDomHelper.buildSecureDocumentBuilder();
-		logger.trace("reading layouts from descIndexFile: {}", f);
-		final Document doc = dBuilder.parse(f);
+		logger.trace("reading layouts from descIndexFile: {}", descIndexFile);
+		final Document doc = dBuilder.parse(descIndexFile.toFile());
 		
 		// must be in a DataComponent node
 		final NodeList nodeList = doc.getElementsByTagName("*");

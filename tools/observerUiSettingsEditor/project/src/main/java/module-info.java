@@ -1,6 +1,5 @@
 module ObserverUiSettingsEditor {
 	// automatic modules :(
-	requires org.apache.commons.io;
 	requires org.apache.commons.lang3;
 	requires org.apache.logging.log4j.slf4j;
 	requires org.apache.logging.log4j.core;

@@ -3,14 +3,20 @@
 
 package interfacebuilder.integration;
 
+import com.ahli.util.FileCountingVisitor;
 import org.springframework.util.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.Serial;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
 
 public class FileService {
@@ -141,15 +147,24 @@ public class FileService {
 	 * @return count of files in directory and subdirectories
 	 * @throws IOException
 	 */
-	public long getFileCountOfDirectory(final Path path) throws IOException {
+	public int getFileCountOfDirectory(final Path path) throws IOException {
 		if (!Files.exists(path)) {
 			return 0;
 		}
-		final long count;
-		try (final Stream<Path> walk = Files.walk(path)) {
-			count = walk.filter(p -> p.toFile().isFile()).count();
-		}
-		return count;
+		final FileCountingVisitor fileVisitor = new FileCountingVisitor();
+		Files.walkFileTree(path, fileVisitor);
+		return fileVisitor.getCount();
+	}
+	
+	/**
+	 * @param path
+	 * @return
+	 * @throws IOException
+	 */
+	public List<Path> getFilesOfDirectory(final Path path) throws IOException {
+		final FileListingVisitor fileVisitor = new FileListingVisitor();
+		Files.walkFileTree(path, fileVisitor);
+		return fileVisitor.getFilePaths();
 	}
 	
 	private static class FileServiceException extends RuntimeException {
@@ -159,6 +174,24 @@ public class FileService {
 		
 		public FileServiceException(final String message, final IOException e) {
 			super(message, e);
+		}
+	}
+	
+	private static final class FileListingVisitor extends SimpleFileVisitor<Path> {
+		private List<Path> paths = new ArrayList<>();
+		
+		@Override
+		public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) {
+			paths.add(file);
+			return FileVisitResult.CONTINUE;
+		}
+		
+		public List<Path> getFilePaths() {
+			return paths;
+		}
+		
+		public void resetFiles() {
+			paths = new ArrayList<>();
 		}
 	}
 }

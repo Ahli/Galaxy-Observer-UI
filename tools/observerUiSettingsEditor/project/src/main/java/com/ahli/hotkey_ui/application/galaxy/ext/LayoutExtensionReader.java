@@ -20,7 +20,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileVisitor;
 import java.nio.file.Files;
@@ -43,8 +42,8 @@ public class LayoutExtensionReader {
 	private static final Pattern HOTKEY_SETTING_REGEX_PATTERN = Pattern.compile("(?<=@hotkey|@setting)/i");
 	private static final Pattern ATTRIBUTES_REGEX_PATTERN =
 			Pattern.compile("(?i)(?=(?:constant|default|description|values|type|gamestrings_add)[\\s]*=)");
-	private List<ValueDef> hotkeys = new ArrayList<>(10);
-	private List<ValueDef> settings = new ArrayList<>(10);
+	private List<ValueDef> hotkeys = new ArrayList<>();
+	private List<ValueDef> settings = new ArrayList<>();
 	
 	
 	private static String getValueAfterEqualsChar(final String part) {
@@ -101,22 +100,22 @@ public class LayoutExtensionReader {
 	 * @throws SAXException
 	 * 		if there was a parse error
 	 */
-	public void processLayoutFiles(final Iterable<File> layoutFiles) throws ParserConfigurationException, SAXException {
+	public void processLayoutFiles(final List<Path> layoutFiles) throws ParserConfigurationException, SAXException {
 		logger.info("Scanning for XML file...");
 		
 		final DocumentBuilder dBuilder = XmlDomHelper.buildSecureDocumentBuilder(true, false);
 		
 		Document doc;
-		for (final File curFile : layoutFiles) {
+		for (final Path path : layoutFiles) {
 			try {
-				doc = dBuilder.parse(curFile);
+				doc = dBuilder.parse(path.toString());
 			} catch (final SAXParseException | IOException e) {
 				logger.trace(LayoutFileUpdater.ERROR_PARSING_FILE, e);
 				// couldn't parse, most likely no XML file
 				continue;
 			}
 			
-			logger.debug("comments - processing file: {}", curFile.getPath());
+			logger.debug("comments - processing file: {}", path);
 			
 			// read comments
 			final Element elem = doc.getDocumentElement();
@@ -124,17 +123,17 @@ public class LayoutExtensionReader {
 			readComments(childNodes);
 		}
 		
-		for (final File curFile : layoutFiles) {
+		for (final Path path : layoutFiles) {
 			try {
 				// parse XML file
-				doc = dBuilder.parse(curFile);
+				doc = dBuilder.parse(path.toString());
 			} catch (final SAXParseException | IOException e) {
 				logger.trace(LayoutFileUpdater.ERROR_PARSING_FILE, e);
 				// couldn't parse, most likely no XML file
 				continue;
 			}
 			
-			logger.debug("constants - processing file: {}", curFile.getPath());
+			logger.debug("constants - processing file: {}", path);
 			
 			// read constants
 			final Element elem = doc.getDocumentElement();
@@ -296,7 +295,7 @@ public class LayoutExtensionReader {
 	 * @return true if changes were present
 	 */
 	public boolean updateGameStrings(final Path projectInCache) {
-		final List<ValueDef> gamestringsAddSettings = new ArrayList<>(10);
+		final List<ValueDef> gamestringsAddSettings = new ArrayList<>();
 		for (final ValueDef setting : settings) {
 			if (setting.hasChanged() && !setting.getGamestringsAdd().isEmpty()) {
 				gamestringsAddSettings.add(setting);

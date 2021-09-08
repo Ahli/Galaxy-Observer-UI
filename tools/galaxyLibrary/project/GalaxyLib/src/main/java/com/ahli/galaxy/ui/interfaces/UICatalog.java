@@ -11,7 +11,6 @@ import com.ahli.util.DeepCopyable;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
@@ -31,7 +30,7 @@ public interface UICatalog extends DeepCopyable {
 	void setParser(ParsedXmlConsumer parser);
 	
 	/**
-	 * @param f
+	 * @param file
 	 * 		descIndex file to process
 	 * @param raceId
 	 * 		to use to check constants starting with ##
@@ -42,7 +41,7 @@ public interface UICatalog extends DeepCopyable {
 	 * @throws InterruptedException
 	 * 		if the current Thread was interrupted
 	 */
-	void processDescIndex(File f, String raceId, String consoleSkinId)
+	void processDescIndex(Path file, String raceId, String consoleSkinId)
 			throws SAXException, IOException, ParserConfigurationException, InterruptedException;
 	
 	/**

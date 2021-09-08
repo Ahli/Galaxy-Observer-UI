@@ -8,6 +8,7 @@ import com.ahli.mpq.mpqeditor.MpqEditorCompression;
 import com.ahli.mpq.mpqeditor.MpqEditorCompressionRule;
 import com.ahli.mpq.mpqeditor.MpqEditorSettingsInterface;
 import com.ahli.util.DeepCopyable;
+import com.ahli.util.FileCountingVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -157,11 +158,12 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	 *
 	 * @param path
 	 * @return
+	 * @throws IOException
 	 */
-	public static long getFileCountInFolder(final Path path) throws IOException {
-		try (final Stream<Path> walk = Files.walk(path)) {
-			return walk.parallel().map(Path::toFile).filter(p -> !p.isDirectory()).count();
-		}
+	public static int getFileCountInFolder(final Path path) throws IOException {
+		final FileCountingVisitor fileVisitor = new FileCountingVisitor();
+		Files.walkFileTree(path, fileVisitor);
+		return fileVisitor.getCount();
 	}
 	
 	/**

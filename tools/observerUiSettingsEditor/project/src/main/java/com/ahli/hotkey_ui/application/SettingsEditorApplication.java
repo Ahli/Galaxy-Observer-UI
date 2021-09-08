@@ -11,6 +11,7 @@ import com.ahli.hotkey_ui.application.controller.MenuBarController;
 import com.ahli.hotkey_ui.application.controller.TabsController;
 import com.ahli.hotkey_ui.application.galaxy.ext.LayoutExtensionReader;
 import com.ahli.hotkey_ui.application.i18n.Messages;
+import com.ahli.hotkey_ui.application.integration.FileListingVisitor;
 import com.ahli.hotkey_ui.application.integration.JarHelper;
 import com.ahli.hotkey_ui.application.model.ValueDef;
 import com.ahli.hotkey_ui.application.ui.Alerts;
@@ -35,7 +36,6 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
-import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -47,7 +47,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -423,12 +422,13 @@ public class SettingsEditorApplication extends Application {
 		final FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle(Messages.getString("Main.openObserverInterfaceTitle"));
 		
-		final ExtensionFilter genExtFilter =
-				new ExtensionFilter(Messages.getString("Main.sc2HeroesObserverInterfaceExtFilter"),
+		final ExtensionFilter genExtFilter = new ExtensionFilter(
+				Messages.getString("Main.sc2HeroesObserverInterfaceExtFilter"),
 				SC2_INTERFACE_FILE_FILTER,
 				STORM_INTERFACE_FILE_FILTER);
 		
-		fileChooser.getExtensionFilters().addAll(new ExtensionFilter(Messages.getString("Main.allFilesFilter"), "*.*"),
+		fileChooser.getExtensionFilters().addAll(
+				new ExtensionFilter(Messages.getString("Main.allFilesFilter"), "*.*"),
 				genExtFilter,
 				new ExtensionFilter(Messages.getString("Main.sc2InterfaceFilter"), SC2_INTERFACE_FILE_FILTER),
 				new ExtensionFilter(Messages.getString("Main.heroesInterfaceFilter"), STORM_INTERFACE_FILE_FILTER));
@@ -476,15 +476,14 @@ public class SettingsEditorApplication extends Application {
 				// load desc index from mpq
 				descIndex.setDescIndexPathAndClear(ComponentsListReaderDom.getDescIndexPath(componentListFile, game));
 				
-				final File descIndexFile = mpqi.getFilePathFromMpq(descIndex.getDescIndexIntPath()).toFile();
+				final Path descIndexFile = mpqi.getFilePathFromMpq(descIndex.getDescIndexIntPath());
 				descIndex.addLayoutIntPath(DescIndexReader.getLayoutPathList(descIndexFile).loaded());
 				
 				tabsCtrl.clearData();
 				hasUnsavedFileChanges = false;
 				
 				// TODO rewrite with nio stream
-				final File cache = mpqi.getCache().toFile();
-				final Collection<File> layoutFiles = FileUtils.listFiles(cache, null, true);
+				final List<Path> layoutFiles = listFiles(mpqi.getCache());
 				
 				layoutExtReader = new LayoutExtensionReader();
 				layoutExtReader.processLayoutFiles(layoutFiles);
@@ -542,6 +541,12 @@ public class SettingsEditorApplication extends Application {
 			// special case to show readable error to user
 			throw new ShowToUserException(Messages.getString("Main.OpenedFileNoComponentList"));
 		}
+	}
+	
+	private List<Path> listFiles(final Path path) throws IOException {
+		final FileListingVisitor fileVisitor = new FileListingVisitor();
+		Files.walkFileTree(path, fileVisitor);
+		return fileVisitor.getFilePaths();
 	}
 	
 	/**
@@ -612,12 +617,13 @@ public class SettingsEditorApplication extends Application {
 		final FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle(Messages.getString("Main.saveUiTitle"));
 		
-		final ExtensionFilter genExtFilter =
-				new ExtensionFilter(Messages.getString("Main.sc2HeroesObserverInterfaceExtFilter"),
+		final ExtensionFilter genExtFilter = new ExtensionFilter(
+				Messages.getString("Main.sc2HeroesObserverInterfaceExtFilter"),
 				SC2_INTERFACE_FILE_FILTER,
 				STORM_INTERFACE_FILE_FILTER);
 		
-		fileChooser.getExtensionFilters().addAll(new ExtensionFilter(Messages.getString("Main.allFilesFilter"), "*.*"),
+		fileChooser.getExtensionFilters().addAll(
+				new ExtensionFilter(Messages.getString("Main.allFilesFilter"), "*.*"),
 				genExtFilter,
 				new ExtensionFilter(Messages.getString("Main.sc2InterfaceFilter"), SC2_INTERFACE_FILE_FILTER),
 				new ExtensionFilter(Messages.getString("Main.heroesInterfaceFilter"), STORM_INTERFACE_FILE_FILTER));

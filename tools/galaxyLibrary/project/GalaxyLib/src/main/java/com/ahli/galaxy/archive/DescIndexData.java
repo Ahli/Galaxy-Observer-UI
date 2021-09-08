@@ -56,7 +56,7 @@ public class DescIndexData {
 	 */
 	public DescIndexData(final MpqInterface mpqi) {
 		this.mpqi = mpqi;
-		fileIntPathList = new ArrayList<>(10);
+		fileIntPathList = new ArrayList<>();
 	}
 	
 	/**
@@ -190,8 +190,8 @@ public class DescIndexData {
 	 * @throws ParserConfigurationException
 	 */
 	public void orderLayoutFiles() throws ParserConfigurationException, SAXException, IOException {
-		final List<List<String>> dependencies = new ArrayList<>(10);
-		final List<List<String>> ownConstants = new ArrayList<>(10);
+		final List<List<String>> dependencies = new ArrayList<>();
+		final List<List<String>> ownConstants = new ArrayList<>();
 		
 		// grab dependencies and constant definitions for every layout file
 		List<String> layoutDeps;

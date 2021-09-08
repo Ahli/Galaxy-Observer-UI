@@ -50,6 +50,7 @@ import org.springframework.context.event.EventListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serial;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -399,21 +400,24 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 			}
 		}
 		logger.info("Game location: {}", gamePath);
-		
-		final File replay = replayService.getLastUsedOrNewestReplay(isHeroes, configService.getDocumentsPath());
-		if (replay != null && replay.exists() && replay.isFile()) {
-			logger.info("Starting game with replay: {}", replay.getName());
-			try {
-				printInfoLogMessageToGeneral("The game starts with a replay now...");
-				final String[] cmd = new String[] { "cmd", "/C", "start",
-						"\"\" \"" + gamePath + "\" \"" + replay.getAbsolutePath() + "\"" };
-				Runtime.getRuntime().exec(cmd);
-				return true;
-			} catch (final IOException e) {
-				logger.error("Failed to execute the game launch command.", e);
+		try {
+			final Path replay = replayService.getLastUsedOrNewestReplay(isHeroes, configService.getDocumentsPath());
+			if (replay != null && Files.exists(replay) && Files.isRegularFile(replay)) {
+				logger.info("Starting game with replay: {}", replay);
+				try {
+					printInfoLogMessageToGeneral("The game starts with a replay now...");
+					final String[] cmd = new String[] { "cmd", "/C", "start",
+							"\"\" \"" + gamePath + "\" \"" + replay.toAbsolutePath() + "\"" };
+					Runtime.getRuntime().exec(cmd);
+					return true;
+				} catch (final IOException e) {
+					logger.error("Failed to execute the game launch command.", e);
+				}
+			} else {
+				logger.error("Failed to find any replay.");
 			}
-		} else {
-			logger.error("Failed to find any replay.");
+		} catch (final IOException e) {
+			logger.error("Error while finding replay.", e);
 		}
 		return false;
 	}

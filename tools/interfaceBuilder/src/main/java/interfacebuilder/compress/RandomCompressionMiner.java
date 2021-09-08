@@ -135,7 +135,7 @@ public class RandomCompressionMiner {
 	 */
 	public static List<File> getUntrackedFiles(final MpqEditorCompressionRule[] rules, final Path cacheModDirectory)
 			throws IOException {
-		final List<File> untrackedFiles = new ArrayList<>(10);
+		final List<File> untrackedFiles = new ArrayList<>();
 		try (final Stream<Path> ps = Files.walk(cacheModDirectory)) {
 			ps.filter(Files::isRegularFile).forEach(p -> {
 				if (!containsFile(rules, p)) {
@@ -179,7 +179,7 @@ public class RandomCompressionMiner {
 	 */
 	private static MpqEditorCompressionRule[] removeUnusedMaskEnries(
 			final MpqEditorCompressionRule[] dirty, final Path cacheDir) {
-		final List<MpqEditorCompressionRule> clean = new ArrayList<>(10);
+		final List<MpqEditorCompressionRule> clean = new ArrayList<>();
 		String mask;
 		for (final MpqEditorCompressionRule rule : dirty) {
 			if (rule instanceof final MpqEditorCompressionRuleMask ruleMask) {

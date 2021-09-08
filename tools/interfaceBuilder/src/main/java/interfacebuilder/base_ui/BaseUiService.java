@@ -31,31 +31,27 @@ import interfacebuilder.integration.log4j.StylizedTextAreaAppender;
 import interfacebuilder.projects.enums.Game;
 import interfacebuilder.ui.AppController;
 import interfacebuilder.ui.progress.appender.Appender;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOCase;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.filefilter.TrueFileFilter;
-import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serial;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveAction;
 
@@ -242,7 +238,7 @@ public class BaseUiService {
 	 * @param gameData
 	 * @param useCmdLineSettings
 	 */
-	public void parseBaseUiIfNecessary(final GameData gameData, final boolean useCmdLineSettings) {
+	public void parseBaseUiIfNecessary(final GameData gameData, final boolean useCmdLineSettings) throws Exception {
 		final boolean verifyLayout;
 		final SettingsIniInterface settings = configService.getIniSettings();
 		if (useCmdLineSettings) {
@@ -261,7 +257,7 @@ public class BaseUiService {
 	 * @param gameData
 	 * 		game whose default UI is parsed
 	 */
-	public void parseBaseUI(final GameData gameData) {
+	public void parseBaseUI(final GameData gameData) throws Exception {
 		// lock per game
 		final String gameBaseUiDir = configService.getBaseUiPath(gameData.getGameDef()) + File.separator +
 				gameData.getGameDef().modsSubDirectory();
@@ -304,35 +300,25 @@ public class BaseUiService {
 							gameData.getGameDef().nameHandle() + "UI",
 							false);
 					try {
-						final WildcardFileFilter fileFilter =
-								new WildcardFileFilter("descindex.*layout", IOCase.INSENSITIVE);
 						for (final String modOrDir : gameData.getGameDef().coreModsOrDirectories()) {
 							
-							@SuppressWarnings("ObjectAllocationInLoop")
-							final File directory = new File(gameBaseUiDir + File.separator + modOrDir);
-							if (!directory.exists() || !directory.isDirectory()) {
+							
+							final Path directory = Path.of(gameBaseUiDir + File.separator + modOrDir);
+							if (!Files.exists(directory) || !Files.isDirectory(directory)) {
 								throw new IOException("BaseUI does not exist.");
 							}
 							
-							@SuppressWarnings("ObjectAllocationInLoop")
-							final Collection<File> descIndexFiles =
-									FileUtils.listFiles(directory, fileFilter, TrueFileFilter.INSTANCE);
-							logger.info("number of descIndexFiles found: {}", descIndexFiles.size());
-							
-							for (final File descIndexFile : descIndexFiles) {
-								logger.info("parsing descIndexFile '{}'", descIndexFile.getPath());
-								uiCatalog.processDescIndex(descIndexFile,
-										gameData.getGameDef().defaultRaceId(),
-										gameData.getGameDef().defaultConsoleSkinId());
+							final BaseUiDescIndexFileParsingVisitor fileVisitor =
+									new BaseUiDescIndexFileParsingVisitor(gameData.getGameDef(), uiCatalog);
+							Files.walkFileTree(directory, fileVisitor);
+							final Optional<Exception> exception = fileVisitor.getException();
+							if (exception.isPresent()) {
+								throw exception.get();
 							}
 						}
 						uiCatalog.postProcessParsing();
 						gameData.setUiCatalog(uiCatalog);
 						logger.trace("Parsed BaseUI for {}", gameName);
-					} catch (final SAXException | IOException | ParserConfigurationException e) {
-						logger.error(String.format("ERROR parsing base UI catalog for '%s'.", gameName), e);
-					} catch (final InterruptedException e) {
-						Thread.currentThread().interrupt();
 					} finally {
 						uiCatalog.setParser(null);
 					}
@@ -431,6 +417,43 @@ public class BaseUiService {
 		return false;
 	}
 	
+	private static final class BaseUiDescIndexFileParsingVisitor extends SimpleFileVisitor<Path> {
+		private final String descIndexFileName;
+		private final UICatalog uiCatalog;
+		private final GameDef gameDef;
+		private Exception exception;
+		
+		private BaseUiDescIndexFileParsingVisitor(final GameDef gameDef, final UICatalog uiCatalog) {
+			this.uiCatalog = uiCatalog;
+			this.gameDef = gameDef;
+			descIndexFileName = "descindex." + gameDef.layoutFileEnding();
+		}
+		
+		@Override
+		public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) {
+			if (descIndexFileName.equalsIgnoreCase(file.getFileName().toString())) {
+				logger.info("parsing descIndexFile '{}'", file);
+				try {
+					uiCatalog.processDescIndex(file, gameDef.defaultRaceId(), gameDef.defaultConsoleSkinId());
+				} catch (final InterruptedException e) {
+					logger.error("Interrupted while processing DescIndex {}", file, e);
+					Thread.currentThread().interrupt();
+					exception = e;
+					return FileVisitResult.TERMINATE;
+				} catch (final Exception e) {
+					logger.error("Exception while processing DescIndex {}", file, e);
+					exception = e;
+					return FileVisitResult.TERMINATE;
+				}
+			}
+			return FileVisitResult.CONTINUE;
+		}
+		
+		public Optional<Exception> getException() {
+			return Optional.ofNullable(exception);
+		}
+	}
+	
 	private static final class CascFileExtractionTask extends RecursiveAction {
 		@Serial
 		private static final long serialVersionUID = -775938058915435006L;
@@ -505,7 +528,7 @@ public class BaseUiService {
 				do {
 					//noinspection BusyWait
 					Thread.sleep(50);
-					final String log = IOUtils.toString(is, Charset.defaultCharset());
+					final String log = new String(is.readAllBytes(), StandardCharsets.UTF_8);
 					if (log.contains("Unhandled Exception: System.IO.IOException: The process cannot access the file")) {
 						retry = true;
 					} else {

@@ -50,7 +50,8 @@ final class ProjectServiceTest {
 	
 	@Test
 	void testSaveProject() {
-		final Project project = Project.builder().id(1).name("name").projectPath(Path.of("/test/")).game(Game.SC2).build();
+		final Project project =
+				Project.builder().id(1).name("name").projectPath(Path.of("/test/")).game(Game.SC2).build();
 		final ProjectEntity projectEntity = ProjectEntity.fromProject(project);
 		when(projectRepoMock.save(projectEntity)).thenReturn(projectEntity);
 		
