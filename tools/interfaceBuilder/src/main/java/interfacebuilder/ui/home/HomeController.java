@@ -361,7 +361,7 @@ public class HomeController implements Updateable {
 				final ContextMenu contextMenu = new ContextMenu();
 				final MenuItem closeItem = new MenuItem(Messages.getString("contextmenu.close"));
 				closeItem.setOnAction(new CloseMiningTabAction(newTab, controller));
-				contextMenu.getItems().addAll(closeItem);
+				contextMenu.getItems().add(closeItem);
 				newTab.setContextMenu(contextMenu);
 				
 				tabs.add(newTab);

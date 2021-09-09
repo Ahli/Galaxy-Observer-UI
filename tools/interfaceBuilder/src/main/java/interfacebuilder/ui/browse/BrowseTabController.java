@@ -335,6 +335,7 @@ public class BrowseTabController implements Updateable {
 			frameTree.setCellFactory(null);
 			columnAttributes.setCellValueFactory(null);
 			columnValues.setCellValueFactory(null);
+			templateMap = null;
 		}
 	}
 	

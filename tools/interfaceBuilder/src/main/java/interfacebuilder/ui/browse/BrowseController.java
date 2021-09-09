@@ -268,7 +268,7 @@ public class BrowseController implements Updateable {
 			final ContextMenu contextMenu = new ContextMenu();
 			final MenuItem closeItem = new MenuItem(Messages.getString("contextmenu.close"));
 			closeItem.setOnAction(new ExtractBaseUiCloseAction(newTab, extractionController, controllers));
-			contextMenu.getItems().addAll(closeItem);
+			contextMenu.getItems().add(closeItem);
 			newTab.setContextMenu(contextMenu);
 			
 			// runlater needs to appear below the edits above, else it might be added before
@@ -360,7 +360,7 @@ public class BrowseController implements Updateable {
 					(BrowseTabController) controller,
 					controllers,
 					appController));
-			contextMenu.getItems().addAll(closeItem);
+			contextMenu.getItems().add(closeItem);
 			newTab.setContextMenu(contextMenu);
 			
 			tabPane.getSelectionModel().select(newTab);
@@ -454,6 +454,7 @@ public class BrowseController implements Updateable {
 		@Override
 		public void handle(final ActionEvent event) {
 			tab.getTabPane().getTabs().remove(tab);
+			final ContextMenu contextMenu = tab.getContextMenu();
 			tab.setContextMenu(null);
 			controllers.remove(controller);
 			// TODO BrowseTabController is not garbage collected => remove heavy data
@@ -461,6 +462,11 @@ public class BrowseController implements Updateable {
 			
 			// TODO Tab is not garbage collected due to Scene's mouseHandler
 			appController.tryCleanUp();
+			
+			// context menu is not properly cleaned up
+			if (contextMenu != null) {
+				contextMenu.setOnAction(null);
+			}
 		}
 	}
 	

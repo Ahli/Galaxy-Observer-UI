@@ -513,7 +513,7 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 				final ContextMenu contextMenu = new ContextMenu();
 				final MenuItem closeItem = new MenuItem(Messages.getString("contextmenu.close"));
 				closeItem.setOnAction(new CloseThreadLoggerTabAction(newTab, errorTabCtrl, errorTabControllers));
-				contextMenu.getItems().addAll(closeItem);
+				contextMenu.getItems().add(closeItem);
 				newTab.setContextMenu(contextMenu);
 				
 				// runlater needs to appear below the edits above, else it might be added before

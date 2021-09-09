@@ -117,7 +117,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				deduplicateDuringParsing = true;
 				deduplicatePostProcessing = false;
 				// parse obs interface
-				addedFinalElements = new UnifiedMap<>(90_000 * 5 / 4); // TODO optimize memory
+				addedFinalElements = new UnifiedMap<>(60_000 * 5 / 4);
 			}
 			// FULL
 			default -> {
@@ -125,7 +125,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				deduplicatePostProcessing = true;
 				if (catalog.getTemplates().isEmpty()) {
 					// parse a baseUI
-					addedFinalElements = new UnifiedMap<>(61_000 * 5 / 4);
+					addedFinalElements = new UnifiedMap<>(60_000 * 5 / 4);
 				} else {
 					// parse obs interface
 					addedFinalElements = new UnifiedMap<>(90_000 * 5 / 4);
@@ -435,7 +435,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				catalog.getConstantValue(attrValues.get(i), raceId, curIsDevLayout, consoleSkinId) : null;
 		
 		UIElement newElem = null;
-		
+		boolean editingExistingElem = false;
 		
 		// editing a frame in another template?
 		if (potentiallyEditedTemplates != null) {
@@ -450,6 +450,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				if (editedElem != null) {
 					newElem = editedElem;
 					curExtTemplate = template; // entering that template
+					editingExistingElem = true;
 					break;
 				}
 			}
@@ -475,6 +476,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					if (template.getElement().getName().equals(name)) {
 						newElem = template.getElement();
 						curElement = null;
+						editingExistingElem = true;
 						break;
 					}
 				}
@@ -488,6 +490,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 							// TODO what if the type is different, but name is identical?
 							if (name.equals(child.getName())) {
 								newElem = child;
+								editingExistingElem = true;
 								break;
 							}
 						}
@@ -559,7 +562,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					//				}
 					newElemUiFrame.setType(type);
 					// add to parent
-					if (curElement != null) {
+					if (curElement != null && !editingExistingElem) {
 						if (curElement instanceof UIFrame) {
 							curElement.getChildren().add(newElem);
 						} else {
@@ -582,29 +585,30 @@ public class UICatalogParser implements ParsedXmlConsumer {
 						catalog.addTemplate(curFileName, newElem, curIsDevLayout);
 					} else {
 						// add to parent
-						if (curElement instanceof UIStateGroup) {
-							curElement.getChildren().add(newElem);
-							
-							// set flags to override on edit after parsing children
-							statesToClose.add((UIState) newElem);
-							statesToCloseLevel.add(level);
-						} else {
-							logger.error("State appearing outside a stategroup.");
+						if (!editingExistingElem) {
+							if (curElement instanceof UIStateGroup) {
+								curElement.getChildren().add(newElem);
+								
+								// set flags to override on edit after parsing children
+								statesToClose.add((UIState) newElem);
+								statesToCloseLevel.add(level);
+							} else {
+								logger.error("State appearing outside a stategroup.");
+							}
 						}
 					}
 					break;
 				case CONTROLLER:
 					// name is allowed to be null here => receives an implicit name
 					newElem = new UIControllerMutable(name);
+					final var newElemUiController = (UIController) newElem;
+					for (int j = 0, len = attrValues.size(); j < len; ++j) {
+						newElemUiController.addValue(attrTypes.get(j), attrValues.get(j));
+					}
 					// add to parent
-					if (curElement != null) {
+					if (curElement != null && !editingExistingElem) {
 						if (curElement instanceof final UIAnimation anim) {
 							anim.getControllers().add(newElem);
-							final var newElemUiController = (UIController) newElem;
-							for (int j = 0, len = attrValues.size(); j < len; ++j) {
-								newElemUiController.addValue(attrTypes.get(j), attrValues.get(j));
-							}
-							
 							if (name == null) {
 								setImplicitControllerNames(anim);
 							}
@@ -620,7 +624,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					}
 					newElem = new UIAnimationMutable(name);
 					// add to parent
-					if (curElement != null) {
+					if (curElement != null && !editingExistingElem) {
 						if (curElement instanceof UIFrame) {
 							curElement.getChildren().add(newElem);
 						} else {
@@ -635,7 +639,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					}
 					newElem = new UIStateGroupMutable(name);
 					// add to parent
-					if (curElement != null) {
+					if (curElement != null && !editingExistingElem) {
 						if (curElement instanceof UIFrame) {
 							curElement.getChildren().add(newElem);
 						} else {
