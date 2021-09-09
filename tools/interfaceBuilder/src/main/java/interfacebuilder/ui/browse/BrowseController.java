@@ -3,10 +3,10 @@
 
 package interfacebuilder.ui.browse;
 
-import com.ahli.galaxy.ModData;
+import com.ahli.galaxy.ModD;
 import com.ahli.galaxy.archive.ComponentsListReaderDom;
-import com.ahli.galaxy.archive.DescIndexData;
-import com.ahli.galaxy.game.GameData;
+import com.ahli.galaxy.archive.DescIndex;
+import com.ahli.galaxy.game.Game;
 import com.ahli.mpq.MpqEditorInterface;
 import interfacebuilder.base_ui.BaseUiService;
 import interfacebuilder.build.MpqBuilderService;
@@ -19,7 +19,7 @@ import interfacebuilder.integration.FileService;
 import interfacebuilder.integration.log4j.StylizedTextAreaAppender;
 import interfacebuilder.projects.Project;
 import interfacebuilder.projects.ProjectService;
-import interfacebuilder.projects.enums.Game;
+import interfacebuilder.projects.enums.GameType;
 import interfacebuilder.ui.Alerts;
 import interfacebuilder.ui.AppController;
 import interfacebuilder.ui.FXMLSpringLoader;
@@ -162,7 +162,7 @@ public class BrowseController implements Updateable {
 	 * @throws IOException
 	 */
 	ImageView getListItemGameImage(final Project project) throws IOException {
-		final ImageView iv = new ImageView(getResourceAsUrl(gameService.getGameItemPath(project.getGame())).toString());
+		final ImageView iv = new ImageView(getResourceAsUrl(gameService.getGameItemPath(project.getGameType())).toString());
 		iv.setFitHeight(32);
 		iv.setFitWidth(32);
 		return iv;
@@ -186,13 +186,13 @@ public class BrowseController implements Updateable {
 	}
 	
 	private void updateBaseUiDetails() {
-		sc2BaseUiDetailsLabel.setText(buildBaseUiDetailsString(Game.SC2, false));
-		heroesBaseUiDetailsLabel.setText(buildBaseUiDetailsString(Game.HEROES, baseUiService.isHeroesPtrActive()));
+		sc2BaseUiDetailsLabel.setText(buildBaseUiDetailsString(GameType.SC2, false));
+		heroesBaseUiDetailsLabel.setText(buildBaseUiDetailsString(GameType.HEROES, baseUiService.isHeroesPtrActive()));
 	}
 	
-	private String buildBaseUiDetailsString(final Game game, final boolean isPtr) {
+	private String buildBaseUiDetailsString(final GameType gameType, final boolean isPtr) {
 		final StringBuilder sb = new StringBuilder(25); // big enough for default case
-		final int[] version = baseUiService.getVersion(gameService.getGameDef(game), isPtr);
+		final int[] version = baseUiService.getVersion(gameService.getGameDef(gameType), isPtr);
 		for (final int v : version) {
 			sb.append(v).append('.');
 		}
@@ -201,7 +201,7 @@ public class BrowseController implements Updateable {
 			sb.append(" - PTR");
 		}
 		try {
-			if (baseUiService.isOutdated(game, isPtr)) {
+			if (baseUiService.isOutdated(gameType, isPtr)) {
 				sb.append(" - requires update");
 			} else {
 				sb.append(" - up to date");
@@ -215,16 +215,16 @@ public class BrowseController implements Updateable {
 	
 	public void extractBaseUiSc2() {
 		try {
-			extractBaseUi(Game.SC2, false);
+			extractBaseUi(GameType.SC2, false);
 		} catch (final IOException e) {
 			logger.error("Error extracting Heroes Base UI.", e);
 			Alerts.buildExceptionAlert(appController.getPrimaryStage(), e).showAndWait();
 		}
 	}
 	
-	private void extractBaseUi(final Game game, final boolean usePtr) throws IOException {
+	private void extractBaseUi(final GameType gameType, final boolean usePtr) throws IOException {
 		final ObservableList<Tab> tabs = appController.getTabPane().getTabs();
-		final String tabName = "Extract " + game.name();
+		final String tabName = "Extract " + gameType.name();
 		Tab newTab = null;
 		BaseUiExtractionController extractionController = null;
 		
@@ -307,13 +307,13 @@ public class BrowseController implements Updateable {
 		appController.getTabPane().getSelectionModel().select(newTab);
 		navigationController.clickProgress();
 		
-		extractionController.start(game, usePtr);
+		extractionController.start(gameType, usePtr);
 	}
 	
 	public void extractBaseUiHeroes() {
 		try {
 			final boolean usePtr = heroesChoiceBox.getSelectionModel().getSelectedIndex() != 0;
-			extractBaseUi(Game.HEROES, usePtr);
+			extractBaseUi(GameType.HEROES, usePtr);
 			updatePtrStatusLabel(usePtr);
 		} catch (final IOException e) {
 			logger.error("Error extracting Heroes Base UI.", e);
@@ -323,11 +323,11 @@ public class BrowseController implements Updateable {
 	
 	@FXML
 	public void browseUiSc2() {
-		browseBaseUi(Game.SC2);
+		browseBaseUi(GameType.SC2);
 	}
 	
-	private void browseBaseUi(final Game game) {
-		final GameData gameData = mpqBuilderService.getGameData(game);
+	private void browseBaseUi(final GameType gameType) {
+		final Game gameData = mpqBuilderService.getGameData(gameType);
 		final Updateable controller = createTab(gameData.getGameDef().name());
 		if (controller != null) {
 			final BrowseLoadBaseUiTask task =
@@ -373,7 +373,7 @@ public class BrowseController implements Updateable {
 	
 	@FXML
 	public void browseUiHeroes() {
-		browseBaseUi(Game.HEROES);
+		browseBaseUi(GameType.HEROES);
 	}
 	
 	@FXML
@@ -382,7 +382,7 @@ public class BrowseController implements Updateable {
 		for (final Project project : selectedItems) {
 			final Updateable controller = createTab(project.getName());
 			if (controller != null) {
-				final ModData mod = gameService.getModData(project.getGame());
+				final ModD mod = gameService.getModData(project.getGameType());
 				mod.setSourceDirectory(project.getProjectPath());
 				final Path cachePath =
 						Path.of(configService.getMpqCachePath().toString(), "browseCache", project.getName());
@@ -408,15 +408,15 @@ public class BrowseController implements Updateable {
 				}
 				
 				@SuppressWarnings("ObjectAllocationInLoop")
-				final DescIndexData descIndexData = new DescIndexData(mpqi);
-				mod.setDescIndexData(descIndexData);
+				final DescIndex descIndex = new DescIndex(mpqi);
+				mod.setDescIndex(descIndex);
 				
 				final Path componentListFile = mpqi.getComponentListFile();
 				mod.setComponentListFile(componentListFile);
 				
 				try {
-					descIndexData.setDescIndexPathAndClear(ComponentsListReaderDom.getDescIndexPath(componentListFile,
-							mod.getGameData().getGameDef()));
+					descIndex.setDescIndexPathAndClear(ComponentsListReaderDom.getDescIndexPath(componentListFile,
+							mod.getGame().getGameDef()));
 				} catch (final ParserConfigurationException | SAXException | IOException e) {
 					logger.error("ERROR: unable to read DescIndex path.", e);
 					continue;

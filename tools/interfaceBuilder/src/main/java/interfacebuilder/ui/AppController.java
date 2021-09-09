@@ -17,7 +17,7 @@ import interfacebuilder.integration.ReplayService;
 import interfacebuilder.integration.SettingsIniInterface;
 import interfacebuilder.integration.log4j.InterProcessCommunicationAppender;
 import interfacebuilder.integration.log4j.StylizedTextAreaAppender;
-import interfacebuilder.projects.enums.Game;
+import interfacebuilder.projects.enums.GameType;
 import interfacebuilder.threads.CleaningForkJoinTaskCleaner;
 import interfacebuilder.ui.navigation.NavigationController;
 import interfacebuilder.ui.navigation.Notification;
@@ -125,8 +125,8 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 			// free space of baseUI
 			if (executor != null && executor.isQuiescent() && mpqBuilderService != null) {
 				logger.debug("Freeing up resources");
-				mpqBuilderService.getGameData(Game.SC2).setUiCatalog(null);
-				mpqBuilderService.getGameData(Game.HEROES).setUiCatalog(null);
+				mpqBuilderService.getGameData(GameType.SC2).setUiCatalog(null);
+				mpqBuilderService.getGameData(GameType.HEROES).setUiCatalog(null);
 				// GC1 is the default GC and can now release RAM -> actually good to do after a task because we use a
 				// lot of RAM for the UIs
 				// Weak References survive 3 garbage collections by default
@@ -268,7 +268,7 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 	
 	public void checkBaseUiUpdate() {
 		try {
-			if (baseUiService.isOutdated(Game.SC2, false)) {
+			if (baseUiService.isOutdated(GameType.SC2, false)) {
 				navigationController.appendNotification(new Notification(Messages.getString(
 						"browse.notification.sc2OutOfDate"), NavigationController.BROWSE_TAB, "sc2OutOfDate"));
 			}
@@ -276,7 +276,7 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 			logger.error("Error during SC2 baseUI update check.", e);
 		}
 		try {
-			if (baseUiService.isOutdated(Game.HEROES, false)) {
+			if (baseUiService.isOutdated(GameType.HEROES, false)) {
 				navigationController.appendNotification(new Notification(Messages.getString(
 						"browse.notification.heroesOutOfDate"), NavigationController.BROWSE_TAB, "heroesOutOfDate"));
 			}
@@ -284,7 +284,7 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 			logger.error("Error during Heroes baseUI update check.", e);
 		}
 		try {
-			if (baseUiService.isOutdated(Game.HEROES, true)) {
+			if (baseUiService.isOutdated(GameType.HEROES, true)) {
 				navigationController.appendNotification(new Notification(Messages.getString(
 						"browse.notification.heroesPtrOutOfDate"),
 						NavigationController.BROWSE_TAB,
@@ -382,7 +382,7 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 			if (params.getParamCompilePath().contains(File.separator + "heroes" + File.separator)) {
 				// Heroes
 				isHeroes = true;
-				gameDef = gameService.getGameDef(Game.HEROES);
+				gameDef = gameService.getGameDef(GameType.HEROES);
 				final boolean isPtr = baseUiService.isHeroesPtrActive();
 				final String supportDir = gameDef.supportDirectoryX64();
 				final String swicherExe = gameDef.switcherExeNameX64();
@@ -392,7 +392,7 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 			} else {
 				// SC2
 				isHeroes = false;
-				gameDef = gameService.getGameDef(Game.SC2);
+				gameDef = gameService.getGameDef(GameType.SC2);
 				final boolean is64bit = settings.isSc64bit();
 				final String supportDir = is64bit ? gameDef.supportDirectoryX64() : gameDef.supportDirectoryX32();
 				final String swicherExe = is64bit ? gameDef.switcherExeNameX64() : gameDef.switcherExeNameX32();

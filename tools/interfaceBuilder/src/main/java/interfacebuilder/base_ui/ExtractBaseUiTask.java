@@ -3,7 +3,7 @@
 
 package interfacebuilder.base_ui;
 
-import interfacebuilder.projects.enums.Game;
+import interfacebuilder.projects.enums.GameType;
 import interfacebuilder.threads.CleaningForkJoinTask;
 import interfacebuilder.threads.CleaningForkJoinTaskCleaner;
 import interfacebuilder.ui.navigation.NavigationController;
@@ -20,7 +20,7 @@ public class ExtractBaseUiTask extends CleaningForkJoinTask {
 	@Serial
 	private static final long serialVersionUID = 4718440389513483542L;
 	
-	private final Game game;
+	private final GameType gameType;
 	private final boolean usePtr;
 	private final transient Appender[] output;
 	private final transient BaseUiService baseUiService;
@@ -30,14 +30,14 @@ public class ExtractBaseUiTask extends CleaningForkJoinTask {
 	public ExtractBaseUiTask(
 			final CleaningForkJoinTaskCleaner cleaner,
 			final BaseUiService baseUiService,
-			final Game game,
+			final GameType gameType,
 			final boolean usePtr,
 			final Appender[] output,
 			final ErrorTabController errorTabController,
 			final NavigationController navigationController) {
 		super(cleaner);
 		this.baseUiService = baseUiService;
-		this.game = game;
+		this.gameType = gameType;
 		this.usePtr = usePtr;
 		this.output = output;
 		this.errorTabController = errorTabController;
@@ -46,15 +46,15 @@ public class ExtractBaseUiTask extends CleaningForkJoinTask {
 	
 	@Override
 	protected boolean work() {
-		final List<ForkJoinTask<Void>> tasks = baseUiService.createExtractionTasks(game, usePtr, output);
+		final List<ForkJoinTask<Void>> tasks = baseUiService.createExtractionTasks(gameType, usePtr, output);
 		
 		Platform.runLater(() -> {
 			final String notificationId;
-			if (game == Game.SC2) {
+			if (gameType == GameType.SC2) {
 				notificationId = "sc2OutOfDate";
-			} else if (usePtr && game == Game.HEROES) {
+			} else if (usePtr && gameType == GameType.HEROES) {
 				notificationId = "heroesPtrOutOfDate";
-			} else if (game == Game.HEROES) {
+			} else if (gameType == GameType.HEROES) {
 				notificationId = "heroesOutOfDate";
 			} else {
 				return;

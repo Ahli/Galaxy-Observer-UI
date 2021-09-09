@@ -30,9 +30,6 @@ public class XmlParserDom extends XmlParserAbstract {
 	private List<String> attrTypes;
 	private List<String> attrValues;
 	
-	/**
-	 *
-	 */
 	public XmlParserDom() {
 		super(null);
 	}

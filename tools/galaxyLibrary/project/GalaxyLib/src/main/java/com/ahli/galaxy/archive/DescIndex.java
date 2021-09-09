@@ -27,7 +27,7 @@ import java.util.List;
  */
 // TODO rebuild to use the UI object model instead of parsing all layout files
 // another time
-public class DescIndexData {
+public class DescIndex {
 	private static final String STRING2 = "#";
 	
 	private static final String DESC = "</Desc>\r\n";
@@ -39,7 +39,7 @@ public class DescIndexData {
 	private static final String XML_VERSION_1_0_ENCODING_UTF_8_STANDALONE_YES_DESC =
 			"<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\r\n<Desc>\r\n";
 	
-	private static final Logger logger = LoggerFactory.getLogger(DescIndexData.class);
+	private static final Logger logger = LoggerFactory.getLogger(DescIndex.class);
 	private static final String CHECKED_WITH_DEPENDENCY_AND_I_J_I2 =
 			"checked {} with dependency {} and {} i={} j={} i2={}";
 	private static final String FILE_INT_PATH_LIST = "fileIntPathList: {}";
@@ -54,7 +54,7 @@ public class DescIndexData {
 	 * @param mpqi
 	 * 		MpqInterface
 	 */
-	public DescIndexData(final MpqInterface mpqi) {
+	public DescIndex(final MpqInterface mpqi) {
 		this.mpqi = mpqi;
 		fileIntPathList = new ArrayList<>();
 	}

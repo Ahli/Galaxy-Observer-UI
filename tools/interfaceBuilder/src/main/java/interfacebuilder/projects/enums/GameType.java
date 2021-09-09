@@ -3,6 +3,6 @@
 
 package interfacebuilder.projects.enums;
 
-public enum Game {
+public enum GameType {
 	SC2, HEROES
 }

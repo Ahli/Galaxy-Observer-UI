@@ -3,8 +3,8 @@
 
 package com.ahli.galaxy;
 
-import com.ahli.galaxy.archive.DescIndexData;
-import com.ahli.galaxy.game.GameData;
+import com.ahli.galaxy.archive.DescIndex;
+import com.ahli.galaxy.game.Game;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
 import lombok.Data;
 
@@ -15,24 +15,22 @@ import java.util.Objects;
  * @author Ahli
  */
 @Data
-public class ModData {
+public class ModD {
 	
-	private GameData gameData;
+	private Game game;
 	private Path sourceDirectory;
 	private Path mpqCacheDirectory;
 	private Path targetFile;
-	private DescIndexData descIndexData;
+	private DescIndex descIndex;
 	private Path componentListFile;
 	private UICatalog uiCatalog;
 	
 	/**
-	 * Constructor.
-	 *
 	 * @param game
 	 * 		GameData of this Mod
 	 */
-	public ModData(final GameData game) {
-		gameData = game;
+	public ModD(final Game game) {
+		this.game = game;
 	}
 	
 	@Override
@@ -40,24 +38,24 @@ public class ModData {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof final ModData modData)) {
+		if (!(o instanceof final ModD modD)) {
 			return false;
 		}
-		return Objects.equals(gameData, modData.gameData) && Objects.equals(sourceDirectory, modData.sourceDirectory) &&
-				Objects.equals(mpqCacheDirectory, modData.mpqCacheDirectory) &&
-				Objects.equals(targetFile, modData.targetFile) &&
-				Objects.equals(descIndexData, modData.descIndexData) &&
-				Objects.equals(componentListFile, modData.componentListFile) &&
-				Objects.equals(uiCatalog, modData.uiCatalog);
+		return Objects.equals(game, modD.game) && Objects.equals(sourceDirectory, modD.sourceDirectory) &&
+				Objects.equals(mpqCacheDirectory, modD.mpqCacheDirectory) &&
+				Objects.equals(targetFile, modD.targetFile) &&
+				Objects.equals(descIndex, modD.descIndex) &&
+				Objects.equals(componentListFile, modD.componentListFile) &&
+				Objects.equals(uiCatalog, modD.uiCatalog);
 	}
 	
 	@Override
 	public final int hashCode() {
-		return Objects.hash(gameData,
+		return Objects.hash(
+				game,
 				sourceDirectory,
 				mpqCacheDirectory,
-				targetFile,
-				descIndexData,
+				targetFile, descIndex,
 				componentListFile,
 				uiCatalog);
 	}

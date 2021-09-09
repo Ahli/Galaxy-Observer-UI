@@ -6,7 +6,7 @@ package interfacebuilder.ui.home;
 import interfacebuilder.integration.FileService;
 import interfacebuilder.projects.Project;
 import interfacebuilder.projects.ProjectService;
-import interfacebuilder.projects.enums.Game;
+import interfacebuilder.projects.enums.GameType;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -30,7 +30,7 @@ public class AddProjectController {
 	private final ProjectService projectService;
 	private final FileService fileService;
 	@FXML
-	private ChoiceBox<Game> gameDropdown;
+	private ChoiceBox<GameType> gameDropdown;
 	@FXML
 	private TextField projectPathLabel;
 	@FXML
@@ -70,7 +70,7 @@ public class AddProjectController {
 		dialog.setTitle("Edit Observer Interface Project...");
 		projectNameLabel.setText(project.getName());
 		projectPathLabel.setText(project.getProjectPath().toString());
-		gameDropdown.getSelectionModel().select(project.getGame());
+		gameDropdown.getSelectionModel().select(project.getGameType());
 	}
 	
 	/**
@@ -95,15 +95,15 @@ public class AddProjectController {
 			okBttn.addEventFilter(ActionEvent.ACTION, this::addProjectAction);
 			dialog.setResultConverter(param -> project);
 			
-			gameDropdown.setItems(FXCollections.observableArrayList(Game.SC2, Game.HEROES));
+			gameDropdown.setItems(FXCollections.observableArrayList(GameType.SC2, GameType.HEROES));
 			gameDropdown.getSelectionModel().select(0);
 		}
 	}
 	
 	public void addProjectAction(final Event event) {
 		logger.trace("add project action event fired");
-		final Game game = gameDropdown.getValue();
-		if (game == null) {
+		final GameType gameType = gameDropdown.getValue();
+		if (gameType == null) {
 			// eat event before it reaches the resultConverter
 			event.consume();
 			return;
@@ -111,9 +111,9 @@ public class AddProjectController {
 		final String name = projectNameLabel.getText();
 		final Path path = Path.of(projectPathLabel.getText());
 		if (project == null) {
-			project = new Project(name, path, game);
+			project = new Project(name, path, gameType);
 		} else {
-			project.setGame(game);
+			project.setGameType(gameType);
 			project.setName(name);
 			project.setProjectPath(path);
 		}

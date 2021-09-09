@@ -4,7 +4,7 @@
 package com.ahli.hotkey_ui.application;
 
 import com.ahli.galaxy.archive.ComponentsListReaderDom;
-import com.ahli.galaxy.archive.DescIndexData;
+import com.ahli.galaxy.archive.DescIndex;
 import com.ahli.galaxy.game.GameDef;
 import com.ahli.galaxy.ui.DescIndexReader;
 import com.ahli.hotkey_ui.application.controller.MenuBarController;
@@ -70,7 +70,7 @@ public class SettingsEditorApplication extends Application {
 	private TabsController tabsCtrl;
 	private Path openedDocPath;
 	private MpqEditorInterface mpqi;
-	private DescIndexData descIndex;
+	private DescIndex descIndex;
 	private Path basePath;
 	private boolean hasUnsavedFileChanges;
 	private LayoutExtensionReader layoutExtReader;
@@ -282,7 +282,7 @@ public class SettingsEditorApplication extends Application {
 			final Alert alert = Alerts.buildWarningAlert(primaryStage, title, title, content);
 			alert.showAndWait();
 		}
-		descIndex = new DescIndexData(mpqi);
+		descIndex = new DescIndex(mpqi);
 	}
 	
 	/**

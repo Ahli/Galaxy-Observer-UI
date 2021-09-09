@@ -3,7 +3,7 @@
 
 package interfacebuilder.ui.browse;
 
-import com.ahli.galaxy.game.GameData;
+import com.ahli.galaxy.game.Game;
 import interfacebuilder.base_ui.BaseUiService;
 import interfacebuilder.threads.CleaningForkJoinTask;
 import interfacebuilder.threads.CleaningForkJoinTaskCleaner;
@@ -18,17 +18,17 @@ public class BrowseLoadBaseUiTask extends CleaningForkJoinTask {
 	@Serial
 	private static final long serialVersionUID = -2905917491106111107L;
 	
-	private final transient GameData gameData;
+	private final transient Game game;
 	private final transient BrowseTabController controller;
 	private final transient BaseUiService baseUiService;
 	
 	public BrowseLoadBaseUiTask(
 			final CleaningForkJoinTaskCleaner cleaner,
-			final GameData gameData,
+			final Game game,
 			final BrowseTabController controller,
 			final BaseUiService baseUiService) {
 		super(cleaner);
-		this.gameData = gameData;
+		this.game = game;
 		this.controller = controller;
 		this.baseUiService = baseUiService;
 	}
@@ -36,12 +36,12 @@ public class BrowseLoadBaseUiTask extends CleaningForkJoinTask {
 	@Override
 	protected boolean work() {
 		try {
-			baseUiService.parseBaseUI(gameData);
+			baseUiService.parseBaseUI(game);
 		} catch (final Exception e) {
 			logger.error("Error while parsing Base UI.", e);
 			return false;
 		}
-		controller.setData(gameData.getUiCatalog());
+		controller.setData(game.getUiCatalog());
 		return true;
 	}
 	

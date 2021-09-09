@@ -23,9 +23,6 @@ public final class Messages {
 	
 	private static Locale usedLocale = Locale.getDefault();
 	
-	/**
-	 * The Default Constructor.
-	 */
 	private Messages() {
 		// no instances alllowed
 	}

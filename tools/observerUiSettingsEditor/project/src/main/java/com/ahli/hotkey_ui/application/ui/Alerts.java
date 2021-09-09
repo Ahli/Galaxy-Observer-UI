@@ -25,7 +25,7 @@ public final class Alerts {
 	private static final Logger logger = LogManager.getLogger(Alerts.class);
 	
 	private Alerts() {
-		// disallow class instances
+		// no instances allowed
 	}
 	
 	/**

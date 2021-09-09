@@ -12,12 +12,12 @@ import lombok.Data;
  * @author Ahli
  */
 @Data
-public class GameData {
+public class Game {
 	
 	private final GameDef gameDef;
 	private UICatalog uiCatalog;
 	
-	public GameData(final GameDef gameDef) {
+	public Game(final GameDef gameDef) {
 		this.gameDef = gameDef;
 	}
 	

@@ -28,9 +28,6 @@ public class XmlParserVtd extends XmlParserAbstract {
 	private List<String> attrTypes;
 	private List<String> attrValues;
 	
-	/**
-	 *
-	 */
 	public XmlParserVtd() {
 		super(null);
 	}

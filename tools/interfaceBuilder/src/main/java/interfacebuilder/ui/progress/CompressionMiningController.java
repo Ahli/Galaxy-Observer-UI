@@ -3,7 +3,7 @@
 
 package interfacebuilder.ui.progress;
 
-import com.ahli.galaxy.ModData;
+import com.ahli.galaxy.ModD;
 import com.ahli.mpq.MpqEditorInterface;
 import com.ahli.mpq.MpqException;
 import com.ahli.mpq.mpqeditor.MpqEditorCompressionRule;
@@ -195,7 +195,7 @@ public class CompressionMiningController implements Updateable {
 			Path modTargetFile = null;
 			try {
 				long bestSize;
-				final ModData mod = gameService.getModData(project.getGame());
+				final ModD mod = gameService.getModData(project.getGameType());
 				{
 					final Path projectSource = project.getProjectPath();
 					
@@ -340,7 +340,7 @@ public class CompressionMiningController implements Updateable {
 	 * @param mpqInterface
 	 * @return
 	 */
-	private static boolean validateTargetFile(final ModData mod, final MpqEditorInterface mpqInterface) {
+	private static boolean validateTargetFile(final ModD mod, final MpqEditorInterface mpqInterface) {
 		final Path targetFile = mod.getTargetFile();
 		if (targetFile == null) {
 			return false;

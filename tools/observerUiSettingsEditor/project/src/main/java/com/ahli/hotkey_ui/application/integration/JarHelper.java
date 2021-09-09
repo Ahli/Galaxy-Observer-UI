@@ -21,7 +21,7 @@ public final class JarHelper {
 	private static final Logger logger = LogManager.getLogger(JarHelper.class);
 	
 	private JarHelper() {
-		// no instances
+		// no instances allowed
 	}
 	
 	/**

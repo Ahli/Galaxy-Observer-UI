@@ -3,7 +3,7 @@
 
 package interfacebuilder.compile;
 
-import com.ahli.galaxy.ModData;
+import com.ahli.galaxy.ModD;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
 import interfacebuilder.base_ui.BaseUiService;
 import interfacebuilder.config.ConfigService;
@@ -21,7 +21,7 @@ public class BrowseCompileTask extends CleaningForkJoinTask {
 	@Serial
 	private static final long serialVersionUID = 5971938125363486608L;
 	
-	private final transient ModData mod;
+	private final transient ModD mod;
 	private final transient BrowseTabController controller;
 	private final transient CompileService compileService;
 	private final transient BaseUiService baseUiService;
@@ -29,7 +29,7 @@ public class BrowseCompileTask extends CleaningForkJoinTask {
 	
 	public BrowseCompileTask(
 			final CleaningForkJoinTaskCleaner cleaner,
-			final ModData mod,
+			final ModD mod,
 			final BrowseTabController controller,
 			final CompileService compileService,
 			final BaseUiService baseUiService,
@@ -46,7 +46,7 @@ public class BrowseCompileTask extends CleaningForkJoinTask {
 	protected boolean work() {
 		try {
 			// TODO cache compiled uicatalogs
-			baseUiService.parseBaseUI(mod.getGameData());
+			baseUiService.parseBaseUI(mod.getGame());
 			final String raceId = configService.getRaceId();
 			final String consoleSkinId = configService.getConsoleSkinId();
 			final UICatalog uiCatalog = compileService.compile(mod, raceId, false, true, true, consoleSkinId);

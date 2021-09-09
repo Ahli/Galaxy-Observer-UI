@@ -4,7 +4,7 @@
 package interfacebuilder.projects;
 
 import interfacebuilder.compress.RuleSet;
-import interfacebuilder.projects.enums.Game;
+import interfacebuilder.projects.enums.GameType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,18 +19,18 @@ import java.util.Objects;
 @Builder
 @AllArgsConstructor
 public class Project {
-	private final int id;
+	private final long id;
 	private String name;
 	private Path projectPath;
-	private Game game;
+	private GameType gameType;
 	private LocalDateTime lastBuildDateTime;
 	private long lastBuildSize;
 	private RuleSet bestCompressionRuleSet;
 	
-	public Project(final String name, final Path projectPath, final Game game) {
+	public Project(final String name, final Path projectPath, final GameType gameType) {
 		this.name = name;
 		this.projectPath = projectPath;
-		this.game = game;
+		this.gameType = gameType;
 		id = 0;
 	}
 	
@@ -43,13 +43,13 @@ public class Project {
 			return false;
 		}
 		return id == project.id && lastBuildSize == project.lastBuildSize && Objects.equals(name, project.name) &&
-				Objects.equals(projectPath, project.projectPath) && game == project.game &&
+				Objects.equals(projectPath, project.projectPath) && gameType == project.gameType &&
 				Objects.equals(lastBuildDateTime, project.lastBuildDateTime) &&
 				Objects.equals(bestCompressionRuleSet, project.bestCompressionRuleSet);
 	}
 	
 	@Override
 	public final int hashCode() {
-		return Objects.hash(id, name, projectPath, game, lastBuildDateTime, lastBuildSize, bestCompressionRuleSet);
+		return Objects.hash(id, name, projectPath, gameType, lastBuildDateTime, lastBuildSize, bestCompressionRuleSet);
 	}
 }

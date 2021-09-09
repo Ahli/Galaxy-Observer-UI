@@ -19,7 +19,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 public final class Alerts {
 	
 	private Alerts() {
-		// disallow class instances
+		// no instances allowed
 	}
 	
 	/**

@@ -3,12 +3,12 @@
 
 package interfacebuilder.compress;
 
-import com.ahli.galaxy.ModData;
-import com.ahli.galaxy.game.GameData;
+import com.ahli.galaxy.ModD;
+import com.ahli.galaxy.game.Game;
 import com.ahli.galaxy.game.GameDef;
 import interfacebuilder.config.ConfigService;
 import interfacebuilder.integration.SettingsIniInterface;
-import interfacebuilder.projects.enums.Game;
+import interfacebuilder.projects.enums.GameType;
 
 public class GameService {
 	private final ConfigService configService;
@@ -20,21 +20,21 @@ public class GameService {
 	/**
 	 * Returns a ModData instance containing the specified game definition.
 	 *
-	 * @param game
+	 * @param gameType
 	 * @return
 	 */
-	public ModData getModData(final Game game) {
-		return new ModData(new GameData(getGameDef(game)));
+	public ModD getModData(final GameType gameType) {
+		return new ModD(new Game(getGameDef(gameType)));
 	}
 	
 	/**
 	 * Returns a GameDef instance containing the specified game definition.
 	 *
-	 * @param game
+	 * @param gameType
 	 * @return
 	 */
-	public GameDef getGameDef(final Game game) {
-		return switch (game) {
+	public GameDef getGameDef(final GameType gameType) {
+		return switch (gameType) {
 			case SC2 -> GameDef.buildSc2GameDef();
 			case HEROES -> GameDef.buildHeroesGameDef();
 		};
@@ -44,11 +44,11 @@ public class GameService {
 	/**
 	 * Returns the path of the image that reflects the specified game.
 	 *
-	 * @param game
+	 * @param gameType
 	 * @return
 	 */
-	public String getGameItemPath(final Game game) {
-		return switch (game) {
+	public String getGameItemPath(final GameType gameType) {
+		return switch (gameType) {
 			case SC2 -> "classpath:res/sc2.png";
 			case HEROES -> "classpath:res/heroes.png";
 		};

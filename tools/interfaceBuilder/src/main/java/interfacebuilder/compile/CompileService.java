@@ -3,8 +3,8 @@
 
 package interfacebuilder.compile;
 
-import com.ahli.galaxy.ModData;
-import com.ahli.galaxy.archive.DescIndexData;
+import com.ahli.galaxy.ModD;
+import com.ahli.galaxy.archive.DescIndex;
 import com.ahli.galaxy.game.GameDef;
 import com.ahli.galaxy.parser.DeduplicationIntensity;
 import com.ahli.galaxy.parser.UICatalogParser;
@@ -12,7 +12,7 @@ import com.ahli.galaxy.parser.XmlParserVtd;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
 import com.ahli.util.XmlDomHelper;
 import interfacebuilder.compress.GameService;
-import interfacebuilder.projects.enums.Game;
+import interfacebuilder.projects.enums.GameType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
@@ -58,7 +58,7 @@ public class CompileService {
 	 * @throws InterruptedException
 	 */
 	public UICatalog compile(
-			final ModData mod,
+			final ModD mod,
 			final String raceId,
 			final boolean repairLayoutOrder,
 			final boolean verifyLayout,
@@ -70,7 +70,7 @@ public class CompileService {
 			long executionTime;
 			
 			// manage descIndexData
-			final DescIndexData descIndex = mod.getDescIndexData();
+			final DescIndex descIndex = mod.getDescIndex();
 			if (repairLayoutOrder) {
 				startTime = System.currentTimeMillis();
 				manageOrderOfLayoutFiles(descIndex);
@@ -81,7 +81,7 @@ public class CompileService {
 				startTime = System.currentTimeMillis();
 				
 				// validate catalog
-				catalogClone = getClonedUICatalog(mod.getGameData().getUiCatalog());
+				catalogClone = getClonedUICatalog(mod.getGame().getUiCatalog());
 				
 				executionTime = (System.currentTimeMillis() - startTime);
 				logger.info("BaseUI Cloning took {}ms.", executionTime);
@@ -97,7 +97,7 @@ public class CompileService {
 				
 				// apply mod's UI
 				final Path descIndexFile = Path.of(mod.getMpqCacheDirectory() + File.separator +
-						mod.getDescIndexData().getDescIndexIntPath());
+						mod.getDescIndex().getDescIndexIntPath());
 				catalogClone.processDescIndex(descIndexFile, raceId, consoleSkinId);
 				catalogClone.postProcessParsing();
 				catalogClone.setParser(null);
@@ -109,8 +109,8 @@ public class CompileService {
 					// only verify XML and nothing else
 					final DocumentBuilder dBuilder = XmlDomHelper.buildSecureDocumentBuilder(true, false);
 					
-					final GameDef sc2GameDef = gameService.getGameDef(Game.SC2);
-					final GameDef heroesGameDef = gameService.getGameDef(Game.HEROES);
+					final GameDef sc2GameDef = gameService.getGameDef(GameType.SC2);
+					final GameDef heroesGameDef = gameService.getGameDef(GameType.HEROES);
 					
 					final String[] extensions = { heroesGameDef.layoutFileEnding(), sc2GameDef.layoutFileEnding(),
 							heroesGameDef.componentsFileEnding(), sc2GameDef.componentsFileEnding(),
@@ -136,7 +136,7 @@ public class CompileService {
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	private static void manageOrderOfLayoutFiles(final DescIndexData descIndex)
+	private static void manageOrderOfLayoutFiles(final DescIndex descIndex)
 			throws ParserConfigurationException, SAXException, IOException {
 		// manage order of layout files in DescIndex
 		descIndex.orderLayoutFiles();

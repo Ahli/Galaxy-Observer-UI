@@ -23,10 +23,8 @@ public final class Messages {
 	
 	private static Locale usedLocale = Locale.getDefault();
 	
-	/**
-	 * Disabled Constructor.
-	 */
 	private Messages() {
+		// no instances allowed
 	}
 	
 	/**

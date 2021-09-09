@@ -17,10 +17,6 @@ public class NewProjectDialogController {
 	@FXML
 	private Dialog<Project> dialog;
 	
-	public NewProjectDialogController() {
-		// explicit default constructor
-	}
-	
 	public NewProjectController getContentController() {
 		return contentPaneController;
 	}

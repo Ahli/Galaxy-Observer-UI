@@ -29,8 +29,6 @@ public final class ErrorTabController {
 	private boolean errorPreventsExit;
 	
 	/**
-	 * Constructor
-	 *
 	 * @param tab
 	 * @param textArea
 	 * @param colorizeTitle

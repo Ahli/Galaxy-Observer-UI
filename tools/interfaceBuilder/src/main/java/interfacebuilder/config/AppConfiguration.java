@@ -3,7 +3,7 @@
 
 package interfacebuilder.config;
 
-import com.ahli.galaxy.game.GameData;
+import com.ahli.galaxy.game.Game;
 import com.ahli.galaxy.game.GameDef;
 import com.ahli.mpq.MpqEditorInterface;
 import interfacebuilder.SpringBootApplication;
@@ -51,16 +51,15 @@ public class AppConfiguration {
 	}
 	
 	@Bean
-	protected GameData sc2BaseGameData() {
-		logger.debug("init bean: sc2BaseGameData");
-		return new GameData(GameDef.buildSc2GameDef());
+	protected Game sc2Game() {
+		logger.debug("init bean: sc2BaseGame");
+		return new Game(GameDef.buildSc2GameDef());
 	}
 	
 	@Bean
-	protected GameData heroesBaseGameData() {
-		
-		logger.debug("init bean: heroesBaseGameData");
-		return new GameData(GameDef.buildHeroesGameDef());
+	protected Game heroesGame() {
+		logger.debug("init bean: heroesBaseGame");
+		return new Game(GameDef.buildHeroesGameDef());
 	}
 	
 	@Bean
@@ -115,8 +114,9 @@ public class AppConfiguration {
 			final FileService fileService,
 			final ProjectService projectService,
 			final BaseUiService baseUiService,
-			final GameData sc2BaseGameData,
-			final GameData heroesBaseGameData,
+			// Spring uses the parameter name as a qualifier
+			final Game sc2Game,
+			final Game heroesGame,
 			final ForkJoinPool forkJoinPool,
 			final AppController appController) {
 		logger.debug("init bean: mpqBuilderService");
@@ -126,8 +126,8 @@ public class AppConfiguration {
 				fileService,
 				projectService,
 				baseUiService,
-				sc2BaseGameData,
-				heroesBaseGameData,
+				sc2Game,
+				heroesGame,
 				forkJoinPool,
 				appController);
 	}

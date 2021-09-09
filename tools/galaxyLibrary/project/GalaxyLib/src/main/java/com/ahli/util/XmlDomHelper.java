@@ -25,10 +25,8 @@ public final class XmlDomHelper {
 	
 	private static final String NEG_PREFIX = "!";
 	
-	/**
-	 * Disabled Constructor.
-	 */
 	private XmlDomHelper() {
+		// no instances allowed
 	}
 	
 	/**

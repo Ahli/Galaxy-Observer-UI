@@ -6,7 +6,7 @@ package interfacebuilder.ui.home;
 import interfacebuilder.integration.FileService;
 import interfacebuilder.projects.Project;
 import interfacebuilder.projects.ProjectService;
-import interfacebuilder.projects.enums.Game;
+import interfacebuilder.projects.enums.GameType;
 import interfacebuilder.ui.Alerts;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -33,7 +33,7 @@ public class NewProjectController {
 	private final ProjectService projectService;
 	private final FileService fileService;
 	@FXML
-	private ChoiceBox<Game> gameDropdown;
+	private ChoiceBox<GameType> gameDropdown;
 	@FXML
 	private TextField projectPathLabel;
 	@FXML
@@ -85,7 +85,7 @@ public class NewProjectController {
 			okBttn.addEventFilter(ActionEvent.ACTION, this::newProjectAction);
 			dialog.setResultConverter(param -> project);
 			
-			gameDropdown.setItems(FXCollections.observableArrayList(Game.SC2, Game.HEROES));
+			gameDropdown.setItems(FXCollections.observableArrayList(GameType.SC2, GameType.HEROES));
 			gameDropdown.getSelectionModel().select(0);
 		}
 	}
@@ -99,8 +99,8 @@ public class NewProjectController {
 	 */
 	public void newProjectAction(final Event event) {
 		logger.trace("new project action event fired");
-		final Game game = gameDropdown.getValue();
-		if (game == null) {
+		final GameType gameType = gameDropdown.getValue();
+		if (gameType == null) {
 			// eat event before it reaches the resultConverter
 			event.consume();
 			return;
@@ -123,7 +123,7 @@ public class NewProjectController {
 		
 		// try creating the project
 		final String name = projectNameLabel.getText();
-		project = new Project(name, Path.of(path), game);
+		project = new Project(name, Path.of(path), gameType);
 		try {
 			project = projectService.saveProject(project);
 		} catch (final Exception e) {

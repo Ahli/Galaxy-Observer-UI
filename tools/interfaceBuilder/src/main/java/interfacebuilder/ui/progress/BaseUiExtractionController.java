@@ -9,7 +9,7 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import interfacebuilder.base_ui.BaseUiService;
 import interfacebuilder.base_ui.ExtractBaseUiTask;
 import interfacebuilder.compress.GameService;
-import interfacebuilder.projects.enums.Game;
+import interfacebuilder.projects.enums.GameType;
 import interfacebuilder.ui.AppController;
 import interfacebuilder.ui.Updateable;
 import interfacebuilder.ui.navigation.NavigationController;
@@ -110,9 +110,9 @@ public class BaseUiExtractionController implements Updateable {
 		// nothing to do
 	}
 	
-	public void start(final Game game, final boolean usePtr) {
+	public void start(final GameType gameType, final boolean usePtr) {
 		errorTabController.setRunning(true);
-		final GameDef exportedGameDef = gameService.getGameDef(game);
+		final GameDef exportedGameDef = gameService.getGameDef(gameType);
 		final String ptrString = usePtr ? " PTR" : "";
 		titleLabel.setText(String.format("Extract %s's Base UI", exportedGameDef.name() + ptrString));
 		txtArea1.getChildren().clear();
@@ -126,7 +126,7 @@ public class BaseUiExtractionController implements Updateable {
 		appenders[1].endedProperty().addListener(new EndedListener(stateImage2, txtArea2));
 		appenders[2].endedProperty().addListener(new EndedListener(stateImage3, txtArea3));
 		
-		final String[] queryMasks = BaseUiService.getQueryMasks(game);
+		final String[] queryMasks = BaseUiService.getQueryMasks(gameType);
 		final String msg = "Extracting %s files";
 		areaLabel1.setText(String.format(msg, queryMasks[0]));
 		areaLabel2.setText(String.format(msg, queryMasks[1]));
@@ -143,8 +143,7 @@ public class BaseUiExtractionController implements Updateable {
 		stateImage3.setVisible(true);
 		
 		final ExtractBaseUiTask task = new ExtractBaseUiTask(appController,
-				baseUiService,
-				game,
+				baseUiService, gameType,
 				usePtr,
 				appenders,
 				errorTabController,

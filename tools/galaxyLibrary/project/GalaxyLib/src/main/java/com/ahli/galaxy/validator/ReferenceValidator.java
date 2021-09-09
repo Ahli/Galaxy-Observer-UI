@@ -3,7 +3,7 @@
 
 package com.ahli.galaxy.validator;
 
-import com.ahli.galaxy.ModData;
+import com.ahli.galaxy.ModD;
 import com.ahli.galaxy.ui.UIAnchorSide;
 import com.ahli.galaxy.ui.UITemplate;
 import com.ahli.galaxy.ui.interfaces.UIAnimation;
@@ -24,7 +24,7 @@ public class ReferenceValidator {
 	
 	private final UICatalog uiCatalog;
 	
-	public ReferenceValidator(final ModData mod) {
+	public ReferenceValidator(final ModD mod) {
 		uiCatalog = mod.getUiCatalog();
 	}
 	

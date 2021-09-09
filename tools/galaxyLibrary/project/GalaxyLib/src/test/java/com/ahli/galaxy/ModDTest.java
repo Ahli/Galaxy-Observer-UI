@@ -7,10 +7,10 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import org.junit.jupiter.api.Test;
 
-class ModDataTest {
+class ModDTest {
 	@Test
 	@SuppressWarnings("JUnitTestMethodWithNoAssertions")
 	void equalsContract() {
-		EqualsVerifier.forClass(ModData.class).suppress(Warning.NONFINAL_FIELDS).verify();
+		EqualsVerifier.forClass(ModD.class).suppress(Warning.NONFINAL_FIELDS).verify();
 	}
 }

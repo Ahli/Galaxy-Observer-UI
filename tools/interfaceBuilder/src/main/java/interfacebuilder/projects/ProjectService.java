@@ -3,10 +3,10 @@
 
 package interfacebuilder.projects;
 
-import com.ahli.galaxy.game.GameData;
+import com.ahli.galaxy.game.Game;
 import interfacebuilder.build.MpqBuilderService;
 import interfacebuilder.compress.RuleSet;
-import interfacebuilder.projects.enums.Game;
+import interfacebuilder.projects.enums.GameType;
 import interfacebuilder.ui.navigation.NavigationController;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -54,7 +54,7 @@ public class ProjectService {
 	 */
 	public void createTemplateProjectFiles(final Project project) throws IOException {
 		final String jarIntPath;
-		if (project.getGame() == Game.SC2) {
+		if (project.getGameType() == GameType.SC2) {
 			jarIntPath = "templates/sc2/interface/";
 		} else {
 			jarIntPath = "templates/heroes/interface/";
@@ -91,7 +91,7 @@ public class ProjectService {
 	 * @param game
 	 * @return
 	 */
-	public boolean pathContainsCompileableForGame(final Path path, final GameData game) throws IOException {
+	public boolean pathContainsCompileableForGame(final Path path, final Game game) throws IOException {
 		final String extension = game.getGameDef().layoutFileEnding().toLowerCase(Locale.ROOT);
 		try (final Stream<Path> walk = Files.walk(path)) {
 			return walk.anyMatch(curPath -> curPath.getFileName()

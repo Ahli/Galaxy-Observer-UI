@@ -24,10 +24,6 @@ public class TextFlowFactory {
 	public static final String STYLE_HIGHLIGHTED = "-fx-fill: orange; -fx-font-smoothing-type: lcd;";
 	private String query;
 	
-	public TextFlowFactory() {
-		// explicit default constructor
-	}
-	
 	public void setHighlight(final String query) {
 		this.query = query;
 	}

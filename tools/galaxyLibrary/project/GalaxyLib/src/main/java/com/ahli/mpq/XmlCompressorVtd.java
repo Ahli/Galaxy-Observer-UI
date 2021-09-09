@@ -38,10 +38,8 @@ public final class XmlCompressorVtd {
 	private static final Logger logger = LoggerFactory.getLogger(XmlCompressorVtd.class);
 	private static final String TEXT_XPATH = "//text()";
 	
-	/**
-	 *
-	 */
 	private XmlCompressorVtd() {
+		// no instances allowed
 	}
 	
 	/**

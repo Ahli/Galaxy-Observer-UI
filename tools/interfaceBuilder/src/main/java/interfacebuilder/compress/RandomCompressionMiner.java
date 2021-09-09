@@ -3,7 +3,7 @@
 
 package interfacebuilder.compress;
 
-import com.ahli.galaxy.ModData;
+import com.ahli.galaxy.ModD;
 import com.ahli.mpq.MpqEditorInterface;
 import com.ahli.mpq.MpqException;
 import com.ahli.mpq.mpqeditor.MpqEditorCompression;
@@ -39,7 +39,7 @@ public class RandomCompressionMiner {
 	private static final String OTF = ".otf";
 	private static final String M_3 = ".m3";
 	private static final Logger logger = LogManager.getLogger(RandomCompressionMiner.class);
-	private final ModData mod;
+	private final ModD mod;
 	private final MpqEditorInterface mpqInterface;
 	private final MpqEditorCompressionRuleMethod[] compressionSetting = MpqEditorCompressionRuleMethod.values();
 	private ObjectLongHashMap<String> fileSizeMap;
@@ -60,7 +60,7 @@ public class RandomCompressionMiner {
 	 * @throws InterruptedException
 	 */
 	public RandomCompressionMiner(
-			final ModData mod, final Path mpqCachePath, final Path mpqEditorPath, final FileService fileService)
+			final ModD mod, final Path mpqCachePath, final Path mpqEditorPath, final FileService fileService)
 			throws IOException, MpqException, InterruptedException {
 		this(mod, mpqCachePath, mpqEditorPath, new MpqEditorCompressionRule[0], fileService);
 	}
@@ -78,7 +78,7 @@ public class RandomCompressionMiner {
 	 * @throws InterruptedException
 	 */
 	public RandomCompressionMiner(
-			final ModData mod,
+			final ModD mod,
 			final Path mpqCachePath,
 			final Path mpqEditorPath,
 			final MpqEditorCompressionRule[] oldBestRuleset,

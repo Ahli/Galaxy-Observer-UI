@@ -27,10 +27,8 @@ import java.util.List;
 public final class DescIndexReader {
 	private static final Logger logger = LoggerFactory.getLogger(DescIndexReader.class);
 	
-	/**
-	 *
-	 */
 	private DescIndexReader() {
+		// no instances allowed
 	}
 	
 	/**

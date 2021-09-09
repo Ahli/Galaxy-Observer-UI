@@ -3,10 +3,10 @@
 
 package interfacebuilder.build;
 
-import com.ahli.galaxy.ModData;
+import com.ahli.galaxy.ModD;
 import com.ahli.galaxy.archive.ComponentsListReaderDom;
-import com.ahli.galaxy.archive.DescIndexData;
-import com.ahli.galaxy.game.GameData;
+import com.ahli.galaxy.archive.DescIndex;
+import com.ahli.galaxy.game.Game;
 import com.ahli.galaxy.game.GameDef;
 import com.ahli.galaxy.ui.DescIndexReader;
 import com.ahli.mpq.MpqEditorInterface;
@@ -20,7 +20,7 @@ import interfacebuilder.integration.FileService;
 import interfacebuilder.integration.SettingsIniInterface;
 import interfacebuilder.projects.Project;
 import interfacebuilder.projects.ProjectService;
-import interfacebuilder.projects.enums.Game;
+import interfacebuilder.projects.enums.GameType;
 import interfacebuilder.ui.AppController;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -44,8 +44,8 @@ public class MpqBuilderService {
 	private final FileService fileService;
 	private final ProjectService projectService;
 	private final BaseUiService baseUiService;
-	private final GameData sc2BaseGameData;
-	private final GameData heroesBaseGameData;
+	private final Game sc2BaseGame;
+	private final Game heroesBaseGame;
 	private final ForkJoinPool executor;
 	private final AppController appController;
 	
@@ -55,8 +55,8 @@ public class MpqBuilderService {
 			final FileService fileService,
 			final ProjectService projectService,
 			final BaseUiService baseUiService,
-			final GameData sc2BaseGameData,
-			final GameData heroesBaseGameData,
+			final Game sc2BaseGame,
+			final Game heroesBaseGame,
 			final ForkJoinPool executor,
 			final AppController appController) {
 		this.configService = configService;
@@ -64,8 +64,8 @@ public class MpqBuilderService {
 		this.fileService = fileService;
 		this.projectService = projectService;
 		this.baseUiService = baseUiService;
-		this.sc2BaseGameData = sc2BaseGameData;
-		this.heroesBaseGameData = heroesBaseGameData;
+		this.sc2BaseGame = sc2BaseGame;
+		this.heroesBaseGame = heroesBaseGame;
 		this.executor = executor;
 		this.appController = appController;
 	}
@@ -80,15 +80,15 @@ public class MpqBuilderService {
 		
 		final List<Project> projectsOfPath = projectService.getProjectsOfPath(path.toString());
 		if (projectsOfPath.isEmpty()) {
-			final Game game;
-			if (projectService.pathContainsCompileableForGame(path, heroesBaseGameData)) {
-				game = Game.HEROES;
-			} else if (projectService.pathContainsCompileableForGame(path, sc2BaseGameData)) {
-				game = Game.SC2;
+			final GameType gameType;
+			if (projectService.pathContainsCompileableForGame(path, heroesBaseGame)) {
+				gameType = GameType.HEROES;
+			} else if (projectService.pathContainsCompileableForGame(path, sc2BaseGame)) {
+				gameType = GameType.SC2;
 			} else {
 				throw new IllegalArgumentException("Specified path '" + path + "' did not contain any project.");
 			}
-			project = new Project(path.getFileName().toString(), path, game);
+			project = new Project(path.getFileName().toString(), path, gameType);
 		} else {
 			project = projectsOfPath.get(0);
 		}
@@ -109,13 +109,13 @@ public class MpqBuilderService {
 	/**
 	 * Returns the GameData definition for the specified game.
 	 *
-	 * @param game
+	 * @param gameType
 	 * @return
 	 */
-	public GameData getGameData(final Game game) {
-		return switch (game) {
-			case SC2 -> sc2BaseGameData;
-			case HEROES -> heroesBaseGameData;
+	public Game getGameData(final GameType gameType) {
+		return switch (gameType) {
+			case SC2 -> sc2BaseGame;
+			case HEROES -> heroesBaseGame;
 		};
 	}
 	
@@ -127,7 +127,7 @@ public class MpqBuilderService {
 	 * @param project
 	 */
 	void buildSpecificUI(
-			final GameData game, final boolean useCmdLineSettings, final Project project) {
+			final Game game, final boolean useCmdLineSettings, final Project project) {
 		if (executor.isShutdown()) {
 			logger.error("ERROR: Executor shut down. Skipping building a UI...");
 			return;
@@ -230,7 +230,7 @@ public class MpqBuilderService {
 	 */
 	private void buildFile(
 			final Path sourceFile,
-			final GameData game,
+			final Game game,
 			final MpqEditorInterface mpqi,
 			final boolean compressXml,
 			final int compressMpq,
@@ -248,7 +248,7 @@ public class MpqBuilderService {
 						File.separator + gameDef.documentsInterfaceSubdirectoryName());
 		
 		// init mod data
-		final ModData mod = new ModData(game);
+		final ModD mod = new ModD(game);
 		mod.setSourceDirectory(sourceFile);
 		mod.setTargetFile(targetFile);
 		
@@ -309,11 +309,11 @@ public class MpqBuilderService {
 		}
 		mod.setComponentListFile(componentListFile);
 		
-		final DescIndexData descIndexData = new DescIndexData(mpqi);
-		mod.setDescIndexData(descIndexData);
+		final DescIndex descIndex = new DescIndex(mpqi);
+		mod.setDescIndex(descIndex);
 		
 		try {
-			descIndexData.setDescIndexPathAndClear(ComponentsListReaderDom.getDescIndexPath(componentListFile,
+			descIndex.setDescIndexPathAndClear(ComponentsListReaderDom.getDescIndexPath(componentListFile,
 					gameDef));
 		} catch (final ParserConfigurationException | SAXException | IOException e) {
 			final String msg = "ERROR: unable to read DescIndex path.";
@@ -321,9 +321,9 @@ public class MpqBuilderService {
 			throw new IOException(msg, e);
 		}
 		
-		final Path descIndexFile = mpqi.getFilePathFromMpq(descIndexData.getDescIndexIntPath());
+		final Path descIndexFile = mpqi.getFilePathFromMpq(descIndex.getDescIndexIntPath());
 		try {
-			descIndexData.addLayoutIntPath(DescIndexReader.getLayoutPathList(descIndexFile).combined());
+			descIndex.addLayoutIntPath(DescIndexReader.getLayoutPathList(descIndexFile).combined());
 		} catch (final SAXException | ParserConfigurationException | IOException | MpqException e) {
 			logger.error("unable to read Layout paths", e);
 		}

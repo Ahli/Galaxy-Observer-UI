@@ -3,7 +3,7 @@
 
 package interfacebuilder.base_ui;
 
-import com.ahli.galaxy.game.GameData;
+import com.ahli.galaxy.game.Game;
 import com.ahli.galaxy.game.GameDef;
 import com.ahli.galaxy.parser.DeduplicationIntensity;
 import com.ahli.galaxy.parser.UICatalogParser;
@@ -28,7 +28,7 @@ import interfacebuilder.integration.SettingsIniInterface;
 import interfacebuilder.integration.kryo.KryoGameInfo;
 import interfacebuilder.integration.kryo.KryoService;
 import interfacebuilder.integration.log4j.StylizedTextAreaAppender;
-import interfacebuilder.projects.enums.Game;
+import interfacebuilder.projects.enums.GameType;
 import interfacebuilder.ui.AppController;
 import interfacebuilder.ui.progress.appender.Appender;
 import org.apache.logging.log4j.LogManager;
@@ -87,12 +87,12 @@ public class BaseUiService {
 	/**
 	 * Checks if the specified game's baseUI is older than the game files.
 	 *
-	 * @param game
+	 * @param gameType
 	 * @param usePtr
 	 * @return true, if outdated
 	 */
-	public boolean isOutdated(final Game game, final boolean usePtr) throws IOException {
-		final GameDef gameDef = gameService.getGameDef(game);
+	public boolean isOutdated(final GameType gameType, final boolean usePtr) throws IOException {
+		final GameDef gameDef = gameService.getGameDef(gameType);
 		final Path gameBaseUI = configService.getBaseUiPath(gameDef);
 		
 		if (!Files.exists(gameBaseUI) || fileService.isEmptyDirectory(gameBaseUI)) {
@@ -180,16 +180,16 @@ public class BaseUiService {
 	/**
 	 * Creates Tasks that will extract the base UI for a specified game.
 	 *
-	 * @param game
+	 * @param gameType
 	 * @param usePtr
 	 * @param outputs
 	 * @return list of executable tasks
 	 */
 	public List<ForkJoinTask<Void>> createExtractionTasks(
-			final Game game, final boolean usePtr, final Appender[] outputs) {
-		logger.info("Extracting baseUI for {}", game);
+			final GameType gameType, final boolean usePtr, final Appender[] outputs) {
+		logger.info("Extracting baseUI for {}", gameType);
 		
-		final GameDef gameDef = gameService.getGameDef(game);
+		final GameDef gameDef = gameService.getGameDef(gameType);
 		final Path destination = configService.getBaseUiPath(gameDef);
 		
 		try {
@@ -207,7 +207,7 @@ public class BaseUiService {
 		final List<ForkJoinTask<Void>> tasks = new ArrayList<>(4);
 		final File extractorExe = configService.getCascExtractorExeFile();
 		final String gamePath = gameService.getGameDirPath(gameDef, usePtr);
-		final String[] queryMasks = getQueryMasks(game);
+		final String[] queryMasks = getQueryMasks(gameType);
 		int i = 0;
 		for (final String mask : queryMasks) {
 			final Appender outputAppender = outputs[i++];
@@ -222,11 +222,11 @@ public class BaseUiService {
 	}
 	
 	/**
-	 * @param game
+	 * @param gameType
 	 * @return
 	 */
-	public static String[] getQueryMasks(final Game game) {
-		return switch (game) {
+	public static String[] getQueryMasks(final GameType gameType) {
+		return switch (gameType) {
 			case SC2 -> new String[] { "*.SC2Layout", "*Assets.txt", "*.SC2Style" };
 			case HEROES -> new String[] { "*.StormLayout", "*Assets.txt", "*.StormStyle" };
 		};
@@ -235,10 +235,10 @@ public class BaseUiService {
 	/**
 	 * Parses the baseUI of the GameData, if that is required for the settings.
 	 *
-	 * @param gameData
+	 * @param game
 	 * @param useCmdLineSettings
 	 */
-	public void parseBaseUiIfNecessary(final GameData gameData, final boolean useCmdLineSettings) throws Exception {
+	public void parseBaseUiIfNecessary(final Game game, final boolean useCmdLineSettings) throws Exception {
 		final boolean verifyLayout;
 		final SettingsIniInterface settings = configService.getIniSettings();
 		if (useCmdLineSettings) {
@@ -246,24 +246,24 @@ public class BaseUiService {
 		} else {
 			verifyLayout = settings.isGuiVerifyLayout();
 		}
-		if (gameData.getUiCatalog() == null && verifyLayout) {
-			parseBaseUI(gameData);
+		if (game.getUiCatalog() == null && verifyLayout) {
+			parseBaseUI(game);
 		}
 	}
 	
 	/**
 	 * Parses the baseUI of the specified game. The parsing of the baseUI is synchronized.
 	 *
-	 * @param gameData
+	 * @param game
 	 * 		game whose default UI is parsed
 	 */
-	public void parseBaseUI(final GameData gameData) throws Exception {
+	public void parseBaseUI(final Game game) throws Exception {
 		// lock per game
-		final String gameBaseUiDir = configService.getBaseUiPath(gameData.getGameDef()) + File.separator +
-				gameData.getGameDef().modsSubDirectory();
+		final String gameBaseUiDir = configService.getBaseUiPath(game.getGameDef()) + File.separator +
+				game.getGameDef().modsSubDirectory();
 		synchronized (getLock(gameBaseUiDir)) {
-			final String gameName = gameData.getGameDef().name();
-			UICatalog uiCatalog = gameData.getUiCatalog();
+			final String gameName = game.getGameDef().name();
+			UICatalog uiCatalog = game.getUiCatalog();
 			if (uiCatalog != null) {
 				logger.trace("Aborting parsing baseUI for '{}' as was already parsed.", gameName);
 			} else {
@@ -273,16 +273,16 @@ public class BaseUiService {
 				
 				boolean isPtr = false;
 				try {
-					isPtr = isPtr(configService.getBaseUiPath(gameData.getGameDef()));
+					isPtr = isPtr(configService.getBaseUiPath(game.getGameDef()));
 				} catch (final IOException e) {
 					// do nothing
 					logger.trace("Ignoring error in isPtr() check on baseUiPath.", e);
 				}
 				try {
-					if (cacheIsUpToDateCheckException(gameData.getGameDef(), isPtr)) {
+					if (cacheIsUpToDateCheckException(game.getGameDef(), isPtr)) {
 						// load from cache
 						uiCatalog = discCacheService.getCachedBaseUi(gameName, isPtr);
-						gameData.setUiCatalog(uiCatalog);
+						game.setUiCatalog(uiCatalog);
 						needToParseAgain = false;
 						logger.trace("Loaded baseUI for '{}' from cache", gameName);
 					}
@@ -291,16 +291,16 @@ public class BaseUiService {
 				}
 				if (needToParseAgain) {
 					// parse baseUI
-					uiCatalog = new UICatalogImpl(gameData.getGameDef());
+					uiCatalog = new UICatalogImpl(game.getGameDef());
 					uiCatalog.setParser(new UICatalogParser(uiCatalog,
 							new XmlParserVtd(),
 							DeduplicationIntensity.FULL));
 					appController.printInfoLogMessageToGeneral("Starting to parse base " + gameName + " UI.");
 					appController.addThreadLoggerTab(Thread.currentThread().getName(),
-							gameData.getGameDef().nameHandle() + "UI",
+							game.getGameDef().nameHandle() + "UI",
 							false);
 					try {
-						for (final String modOrDir : gameData.getGameDef().coreModsOrDirectories()) {
+						for (final String modOrDir : game.getGameDef().coreModsOrDirectories()) {
 							
 							
 							final Path directory = Path.of(gameBaseUiDir + File.separator + modOrDir);
@@ -309,7 +309,7 @@ public class BaseUiService {
 							}
 							
 							final BaseUiDescIndexFileParsingVisitor fileVisitor =
-									new BaseUiDescIndexFileParsingVisitor(gameData.getGameDef(), uiCatalog);
+									new BaseUiDescIndexFileParsingVisitor(game.getGameDef(), uiCatalog);
 							Files.walkFileTree(directory, fileVisitor);
 							final Optional<Exception> exception = fileVisitor.getException();
 							if (exception.isPresent()) {
@@ -317,7 +317,7 @@ public class BaseUiService {
 							}
 						}
 						uiCatalog.postProcessParsing();
-						gameData.setUiCatalog(uiCatalog);
+						game.setUiCatalog(uiCatalog);
 						logger.trace("Parsed BaseUI for {}", gameName);
 					} finally {
 						uiCatalog.setParser(null);
@@ -326,7 +326,7 @@ public class BaseUiService {
 					logger.info(msg);
 					appController.printInfoLogMessageToGeneral(msg);
 					try {
-						discCacheService.put(uiCatalog, gameName, isPtr, getVersion(gameData.getGameDef(), isPtr));
+						discCacheService.put(uiCatalog, gameName, isPtr, getVersion(game.getGameDef(), isPtr));
 					} catch (final IOException e) {
 						logger.error("ERROR when creating cache file of UI", e);
 					}
@@ -405,7 +405,7 @@ public class BaseUiService {
 	}
 	
 	public boolean isHeroesPtrActive() {
-		final Path baseUiMetaFileDir = configService.getBaseUiPath(gameService.getGameDef(Game.HEROES));
+		final Path baseUiMetaFileDir = configService.getBaseUiPath(gameService.getGameDef(GameType.HEROES));
 		try {
 			final KryoGameInfo baseUiInfo = readMetaFile(baseUiMetaFileDir);
 			if (baseUiInfo != null) {

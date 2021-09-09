@@ -41,10 +41,8 @@ public final class XmlCompressorDom {
 	private static final String ANY_TAGNAME = "*";
 	private static final Logger logger = LoggerFactory.getLogger(XmlCompressorDom.class);
 	
-	/**
-	 *
-	 */
 	private XmlCompressorDom() {
+		// no instances allowed
 	}
 	
 	/**

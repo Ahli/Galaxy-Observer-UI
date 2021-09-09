@@ -8,7 +8,7 @@ import java.io.IOException;
 public final class MpqEditorCompressionRuleParser {
 	
 	private MpqEditorCompressionRuleParser() {
-		// no instances
+		// no instances allowed
 	}
 	
 	public static MpqEditorCompressionRule parse(final String ruleString) throws IOException {

@@ -19,7 +19,7 @@ public class UIConstantImmutable extends UIElementAbstract implements UIConstant
 	private final String value;
 	
 	/**
-	 * Constructor for Kryo?
+	 * Constructor for Kryo
 	 */
 	private UIConstantImmutable() {
 		super(null);

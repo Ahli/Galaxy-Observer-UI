@@ -4,7 +4,7 @@
 package interfacebuilder.projects;
 
 import interfacebuilder.SpringBootApplication;
-import interfacebuilder.projects.enums.Game;
+import interfacebuilder.projects.enums.GameType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -39,9 +39,9 @@ final class ProjectServiceTest {
 	@Test
 	void testGetAllProjects() {
 		final ProjectEntity project1 =
-				ProjectEntity.builder().id(1).name("name1").projectPath("path1").game(Game.SC2).build();
+				ProjectEntity.builder().id(1L).name("name1").projectPath("path1").gameType(GameType.SC2).build();
 		final ProjectEntity project2 =
-				ProjectEntity.builder().id(2).name("name2").projectPath("path2").game(Game.HEROES).build();
+				ProjectEntity.builder().id(2L).name("name2").projectPath("path2").gameType(GameType.HEROES).build();
 		when(projectRepoMock.findAll()).thenReturn(Arrays.asList(project1, project2));
 		
 		final int numberOfProjects = projectService.getAllProjects().size();
@@ -51,7 +51,7 @@ final class ProjectServiceTest {
 	@Test
 	void testSaveProject() {
 		final Project project =
-				Project.builder().id(1).name("name").projectPath(Path.of("/test/")).game(Game.SC2).build();
+				Project.builder().id(1).name("name").projectPath(Path.of("/test/")).gameType(GameType.SC2).build();
 		final ProjectEntity projectEntity = ProjectEntity.fromProject(project);
 		when(projectRepoMock.save(projectEntity)).thenReturn(projectEntity);
 		

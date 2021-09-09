@@ -5,6 +5,7 @@ package interfacebuilder.compress;
 
 import com.ahli.mpq.mpqeditor.MpqEditorCompressionRule;
 import com.ahli.mpq.mpqeditor.MpqEditorCompressionRuleParser;
+import org.hibernate.Hibernate;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
@@ -36,8 +37,8 @@ public class RuleSet implements Serializable {
 	@ElementCollection(fetch = FetchType.EAGER)
 	private List<String> compressionRulesString;
 	
-	public RuleSet() {
-		// required
+	protected RuleSet() {
+		// required for hibernate
 	}
 	
 	public RuleSet(final MpqEditorCompressionRule... compressionRules) {
@@ -90,18 +91,21 @@ public class RuleSet implements Serializable {
 	}
 	
 	@Override
-	public final boolean equals(final Object obj) {
-		if (this == obj) {
+	public boolean equals(final Object o) {
+		if (this == o) {
 			return true;
 		}
-		if (!(obj instanceof final RuleSet ruleSet)) {
+		if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) {
 			return false;
 		}
-		return Objects.equals(compressionRulesString, ruleSet.compressionRulesString);
+		final RuleSet ruleSet = (RuleSet) o;
+		// only compare primary keys
+		return Objects.equals(id, ruleSet.id);
 	}
 	
 	@Override
-	public final int hashCode() {
-		return Objects.hash(compressionRulesString);
+	public int hashCode() {
+		// for generated primary keys, the hashcode must be constant before and after
+		return 0;
 	}
 }

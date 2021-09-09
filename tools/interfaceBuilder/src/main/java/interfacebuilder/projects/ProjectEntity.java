@@ -4,10 +4,13 @@
 package interfacebuilder.projects;
 
 import interfacebuilder.compress.RuleSet;
-import interfacebuilder.projects.enums.Game;
+import interfacebuilder.projects.enums.GameType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import org.hibernate.Hibernate;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -31,7 +34,9 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "project")
-@Data
+@Getter
+@Setter
+@ToString
 @Builder
 @AllArgsConstructor
 public class ProjectEntity implements Serializable {
@@ -41,7 +46,7 @@ public class ProjectEntity implements Serializable {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Integer id;
+	private Long id;
 	
 	@Column(/*unique = false,*/ nullable = false, length = 30)
 	private String name;
@@ -50,8 +55,8 @@ public class ProjectEntity implements Serializable {
 	private String projectPath;
 	
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = false, length = 8)
-	private Game game;
+	@Column(name = "GAME", nullable = false, length = 8)
+	private GameType gameType;
 	
 	@Column(name = "lastBuildDate")
 	private LocalDateTime lastBuildDateTime;
@@ -60,16 +65,17 @@ public class ProjectEntity implements Serializable {
 	private Long lastBuildSize;
 	
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+	@ToString.Exclude
 	private RuleSet bestCompressionRuleSet;
 	
-	public ProjectEntity() {
-		// required
+	protected ProjectEntity() {
+		// required for hibernate
 	}
 	
-	public ProjectEntity(final String name, final String projectPath, final Game game) {
+	public ProjectEntity(final String name, final String projectPath, final GameType gameType) {
 		this.name = name;
 		this.projectPath = projectPath;
-		this.game = game;
+		this.gameType = gameType;
 	}
 	
 	public static List<Project> toProjects(final Collection<ProjectEntity> projectEntities) {
@@ -84,7 +90,7 @@ public class ProjectEntity implements Serializable {
 		return new Project.ProjectBuilder().id(entity.getId())
 				.name(entity.getName())
 				.projectPath(Path.of(entity.getProjectPath()))
-				.game(entity.getGame())
+				.gameType(entity.getGameType())
 				.lastBuildDateTime(entity.getLastBuildDateTime())
 				.lastBuildSize(entity.getLastBuildSize() != null ? entity.getLastBuildSize() : 0)
 				.bestCompressionRuleSet(entity.getBestCompressionRuleSet())
@@ -96,7 +102,7 @@ public class ProjectEntity implements Serializable {
 				.id(project.getId())
 				.name(project.getName())
 				.projectPath(project.getProjectPath().toString())
-				.game(project.getGame())
+				.gameType(project.getGameType())
 				.lastBuildDateTime(project.getLastBuildDateTime())
 				.lastBuildSize(project.getLastBuildSize())
 				.bestCompressionRuleSet(project.getBestCompressionRuleSet())
@@ -104,21 +110,22 @@ public class ProjectEntity implements Serializable {
 	}
 	
 	@Override
-	public boolean equals(final Object obj) {
-		if (this == obj) {
+	public boolean equals(final Object o) {
+		if (this == o) {
 			return true;
 		}
-		if (!(obj instanceof final ProjectEntity that)) {
+		if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) {
 			return false;
 		}
-		return Objects.equals(name, that.name) && Objects.equals(projectPath, that.projectPath) && game == that.game &&
-				Objects.equals(lastBuildDateTime, that.lastBuildDateTime) &&
-				Objects.equals(lastBuildSize, that.lastBuildSize) &&
-				Objects.equals(bestCompressionRuleSet, that.bestCompressionRuleSet);
+		final ProjectEntity that = (ProjectEntity) o;
+		// only compare primary keys
+		return Objects.equals(id, that.id);
 	}
 	
 	@Override
 	public int hashCode() {
-		return Objects.hash(name, projectPath, game, lastBuildDateTime, lastBuildSize, bestCompressionRuleSet);
+		// for generated primary keys, the hashcode must be constant before and after
+		return 0;
 	}
+	
 }

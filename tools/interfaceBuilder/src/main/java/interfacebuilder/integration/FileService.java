@@ -21,10 +21,6 @@ import java.util.stream.Stream;
 
 public class FileService {
 	
-	public FileService() {
-		// explicit default constructor
-	}
-	
 	/**
 	 * Copies a file or directory.
 	 *

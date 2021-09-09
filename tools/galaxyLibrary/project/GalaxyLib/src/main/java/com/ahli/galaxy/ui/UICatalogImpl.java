@@ -38,7 +38,6 @@ public class UICatalogImpl implements UICatalog {
 	
 	private static final String UNDERSCORE = "_";
 	private static final Logger logger = LoggerFactory.getLogger(UICatalogImpl.class);
-	// members
 	private final List<UITemplate> templates;
 	private final List<UITemplate> blizzOnlyTemplates;
 	private final List<UIConstant> constants;

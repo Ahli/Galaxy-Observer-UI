@@ -3,7 +3,7 @@
 
 package interfacebuilder.build;
 
-import com.ahli.galaxy.game.GameData;
+import com.ahli.galaxy.game.Game;
 import interfacebuilder.base_ui.BaseUiService;
 import interfacebuilder.projects.Project;
 import interfacebuilder.threads.CleaningForkJoinTask;
@@ -41,9 +41,9 @@ public class BuildTask extends CleaningForkJoinTask {
 	@Override
 	protected boolean work() {
 		try {
-			final GameData gameData = mpqBuilderService.getGameData(project.getGame());
-			baseUiService.parseBaseUiIfNecessary(gameData, useCmdLineSettings);
-			mpqBuilderService.buildSpecificUI(gameData, useCmdLineSettings, project);
+			final Game game = mpqBuilderService.getGameData(project.getGameType());
+			baseUiService.parseBaseUiIfNecessary(game, useCmdLineSettings);
+			mpqBuilderService.buildSpecificUI(game, useCmdLineSettings, project);
 		} catch (final Exception e) {
 			logger.error("Error while building.", e);
 			return false;

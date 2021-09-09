@@ -142,7 +142,7 @@ public class HomeController implements Updateable {
 	 * @throws IOException
 	 */
 	private ImageView getListItemGameImage(final Project project) throws IOException {
-		final ImageView iv = new ImageView(getResourceAsUrl(gameService.getGameItemPath(project.getGame())).toString());
+		final ImageView iv = new ImageView(getResourceAsUrl(gameService.getGameItemPath(project.getGameType())).toString());
 		iv.setFitHeight(32);
 		iv.setFitWidth(32);
 		return iv;
@@ -173,7 +173,7 @@ public class HomeController implements Updateable {
 			}
 			selectedPath.setText(p.getProjectPath().toString());
 			try {
-				selectedImage.setImage(new Image(getResourceAsUrl(gameService.getGameItemPath(p.getGame())).toString()));
+				selectedImage.setImage(new Image(getResourceAsUrl(gameService.getGameItemPath(p.getGameType())).toString()));
 			} catch (final IOException e) {
 				logger.error("Failed to load image from project's game setting.", e);
 			}

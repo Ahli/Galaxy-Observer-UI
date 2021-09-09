@@ -33,10 +33,6 @@ import java.util.zip.InflaterInputStream;
 
 public class KryoService {
 	
-	public KryoService() {
-		// explicit default constructor
-	}
-	
 	public Kryo getKryoForUICatalog() {
 		// Kryo logging
 		//		Log.ERROR = true;

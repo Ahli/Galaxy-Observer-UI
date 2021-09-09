@@ -34,10 +34,8 @@ public final class LayoutReaderDom {
 	private static final String CONSTANT_MARKER = "#";
 	private static final Logger logger = LoggerFactory.getLogger(LayoutReaderDom.class);
 	
-	/**
-	 * Disabled Constructor.
-	 */
 	private LayoutReaderDom() {
+		// no instances allowed
 	}
 	
 	/**
