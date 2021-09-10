@@ -73,7 +73,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	 * @param compressXml
 	 * @param compressMpq
 	 * @param buildUnprotectedToo
-	 * 		if protectMPQ, then this controls if an unprotected version is build, too
+	 * 		if buildUnprotectedToo, then this controls if an unprotected version is build, too
 	 * @throws IOException
 	 * @throws InterruptedException
 	 * @throws MpqException
@@ -219,21 +219,21 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	private void buildMpqWithCompression(
 			final MpqEditorCompression compressMpq, final String absolutePath, final long fileCount)
 			throws IOException, MpqException, InterruptedException {
-		// mpq compression
-		settings.setCompression(compressMpq);
 		/* MpqEditor reads its settings from ini files in a specific location.
 		   Multiple different compression settings would cause race conditions and problems. */
-		final MpqEditorSettingsInterface settingsInterface = settings;
+		final MpqEditorSettingsInterface settingsFinal = settings;
+		// mpq compression
+		settingsFinal.setCompression(compressMpq);
 		final String cachePath = mpqCachePath.toString();
 		synchronized (classWideLock) {
-			settingsInterface.applyCompression();
+			settingsFinal.applyCompression();
 			try {
 				// build protected file
 				newMpq(absolutePath, fileCount);
 				addToMpq(absolutePath, cachePath, "");
 				compactMpq(absolutePath);
 			} finally {
-				settingsInterface.restoreOriginalSettingFiles();
+				settingsFinal.restoreOriginalSettingFiles();
 			}
 		}
 	}

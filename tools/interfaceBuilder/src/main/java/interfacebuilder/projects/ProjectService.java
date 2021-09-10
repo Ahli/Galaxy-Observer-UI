@@ -175,11 +175,11 @@ public class ProjectService {
 			// grab from DB wire compression rules to old instance
 			final ProjectEntity project2 = projectRepo.getById(project.getId());
 			try {
-				Hibernate.initialize(project2.getBestCompressionRuleSet());
+				final RuleSet ruleSet = Hibernate.unproxy(project2.getBestCompressionRuleSet(), RuleSet.class);
+				project.setBestCompressionRuleSet(ruleSet);
 			} catch (final HibernateException e) {
 				logger.error("Error while fetching compression rule set from DB.", e);
 			}
-			project.setBestCompressionRuleSet(project2.getBestCompressionRuleSet());
 		}
 		return project.getBestCompressionRuleSet();
 	}
