@@ -280,7 +280,7 @@ public class HomeController implements Updateable {
 	public void removeSelectedAction() {
 		final List<Project> selectedItems = selectionList.getSelectionModel().getSelectedItems();
 		if (!selectedItems.isEmpty()) {
-			final Project[] items = selectedItems.toArray(new Project[selectedItems.size()]);
+			final Project[] items = selectedItems.toArray(new Project[0]);
 			final Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
 			alert.initOwner(getWindow());
 			if (selectedItems.size() > 1) {

@@ -286,7 +286,7 @@ public class UICatalogImpl implements UICatalog {
 		if (foundTemplates.isEmpty()) {
 			logger.warn("WARN: cannot find Layout file: {}", file);
 		}
-		return foundTemplates.toArray(new UITemplate[foundTemplates.size()]);
+		return foundTemplates.toArray(new UITemplate[0]);
 	}
 	
 	@Override

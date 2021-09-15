@@ -4,12 +4,16 @@
 package interfacebuilder.projects;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 import org.junit.jupiter.api.Test;
 
 class ProjectEntityTest {
 	@Test
 	@SuppressWarnings("JUnitTestMethodWithNoAssertions")
 	void equalsContract() {
-		EqualsVerifier.forClass(ProjectEntity.class).verify();
+		EqualsVerifier.forClass(ProjectEntity.class)
+				.suppress(Warning.STRICT_HASHCODE)
+				.suppress(Warning.SURROGATE_KEY)
+				.verify();
 	}
 }

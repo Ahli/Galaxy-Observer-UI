@@ -30,7 +30,7 @@ public class StringArrayToListConverter implements AttributeConverter<String[], 
 			return new String[0];
 		}
 		
-		return dbData.toArray(new String[dbData.size()]);
+		return dbData.toArray(new String[0]);
 	}
 	
 }

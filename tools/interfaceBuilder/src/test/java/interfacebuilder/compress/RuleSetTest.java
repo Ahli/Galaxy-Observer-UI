@@ -4,12 +4,16 @@
 package interfacebuilder.compress;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 import org.junit.jupiter.api.Test;
 
 class RuleSetTest {
 	@Test
 	@SuppressWarnings("JUnitTestMethodWithNoAssertions")
 	void equalsContract() {
-		EqualsVerifier.forClass(RuleSet.class).verify();
+		EqualsVerifier.forClass(RuleSet.class)
+				.suppress(Warning.STRICT_HASHCODE)
+				.suppress(Warning.SURROGATE_KEY)
+				.verify();
 	}
 }

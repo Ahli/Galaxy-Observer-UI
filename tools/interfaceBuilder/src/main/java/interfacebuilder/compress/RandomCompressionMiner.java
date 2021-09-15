@@ -197,7 +197,7 @@ public class RandomCompressionMiner {
 				}
 			}
 		}
-		return clean.toArray(new MpqEditorCompressionRule[clean.size()]);
+		return clean.toArray(new MpqEditorCompressionRule[0]);
 	}
 	
 	/**
@@ -289,7 +289,7 @@ public class RandomCompressionMiner {
 				fileSizeMap.put(compressionRule.getMask(), getFileSize(compressionRule.getMask(), cacheModDirectory));
 			});
 		}
-		return initRules.toArray(new MpqEditorCompressionRule[initRules.size()]);
+		return initRules.toArray(new MpqEditorCompressionRule[0]);
 	}
 	
 	/**

@@ -39,36 +39,37 @@ import java.util.Objects;
 @ToString
 @Builder
 @AllArgsConstructor
-public class ProjectEntity implements Serializable {
+public final class ProjectEntity implements Serializable {
 	
 	@Serial
 	private static final long serialVersionUID = -7732465886025160494L;
 	
 	@Id
+	@Column(name = "ID", nullable = false)
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	
-	@Column(/*unique = false,*/ nullable = false, length = 30)
+	@Column(name = "NAME", nullable = false, length = 30)
 	private String name;
 	
-	@Column(unique = true, nullable = false/*, length = 255*/)
+	@Column(name = "PROJECT_PATH", unique = true, nullable = false, length = 255)
 	private String projectPath;
 	
 	@Enumerated(EnumType.STRING)
 	@Column(name = "GAME", nullable = false, length = 8)
 	private GameType gameType;
 	
-	@Column(name = "lastBuildDate")
+	@Column(name = "LAST_BUILD_DATE")
 	private LocalDateTime lastBuildDateTime;
 	
-	@Column
+	@Column(name = "LAST_BUILD_SIZE")
 	private Long lastBuildSize;
 	
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
 	@ToString.Exclude
 	private RuleSet bestCompressionRuleSet;
 	
-	protected ProjectEntity() {
+	private ProjectEntity() {
 		// required for hibernate
 	}
 	

@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
-public class RuleSet implements Serializable {
+public final class RuleSet implements Serializable {
 	
 	@Serial
 	private static final long serialVersionUID = -8442665535029507145L;
