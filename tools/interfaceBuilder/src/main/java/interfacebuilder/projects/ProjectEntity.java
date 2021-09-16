@@ -21,6 +21,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.io.Serial;
@@ -45,27 +46,28 @@ public final class ProjectEntity implements Serializable {
 	private static final long serialVersionUID = -7732465886025160494L;
 	
 	@Id
-	@Column(name = "ID", nullable = false)
 	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(name = "id", nullable = false)
 	private Long id;
 	
-	@Column(name = "NAME", nullable = false, length = 30)
+	@Column(name = "name", nullable = false, length = 30)
 	private String name;
 	
-	@Column(name = "PROJECT_PATH", unique = true, nullable = false, length = 255)
+	@Column(name = "project_path", unique = true, nullable = false, length = 255)
 	private String projectPath;
 	
 	@Enumerated(EnumType.STRING)
-	@Column(name = "GAME", nullable = false, length = 8)
+	@Column(name = "game", nullable = false, length = 8)
 	private GameType gameType;
 	
-	@Column(name = "LAST_BUILD_DATE")
+	@Column(name = "last_build_date")
 	private LocalDateTime lastBuildDateTime;
 	
-	@Column(name = "LAST_BUILD_SIZE")
+	@Column(name = "last_build_size")
 	private Long lastBuildSize;
 	
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+	@JoinColumn(name = "best_compression_rule_set_id", nullable = false)
 	@ToString.Exclude
 	private RuleSet bestCompressionRuleSet;
 	

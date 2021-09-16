@@ -7,21 +7,26 @@ import com.ahli.mpq.mpqeditor.MpqEditorCompressionRule;
 import com.ahli.mpq.mpqeditor.MpqEditorCompressionRuleParser;
 import org.hibernate.Hibernate;
 
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.Table;
 import javax.persistence.Transient;
 import java.io.IOException;
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 @Entity
+@Table(name = "rule_set")
 public final class RuleSet implements Serializable {
 	
 	@Serial
@@ -29,12 +34,15 @@ public final class RuleSet implements Serializable {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(name = "id", nullable = false)
 	private Long id;
 	
 	@Transient
 	private MpqEditorCompressionRule[] compressionRules;
 	
 	@ElementCollection(fetch = FetchType.EAGER)
+	@CollectionTable(name = "rule_set_compression_rules_string", joinColumns = { @JoinColumn(name = "rule_set_id") })
+	@Column(name = "compression_rules_string")
 	private List<String> compressionRulesString;
 	
 	protected RuleSet() {
@@ -50,11 +58,11 @@ public final class RuleSet implements Serializable {
 		this.compressionRules = compressionRules;
 		
 		// update string representation in DB
-		final String[] rulesStrings = new String[compressionRules.length];
-		for (int i = 0; i < compressionRules.length; ++i) {
-			rulesStrings[i] = compressionRules[i].toString();
+		final List<String> rulesStrings = new ArrayList<>(compressionRules.length);
+		for (final MpqEditorCompressionRule compressionRule : compressionRules) {
+			rulesStrings.add(compressionRule.toString());
 		}
-		compressionRulesString = Arrays.asList(rulesStrings);
+		compressionRulesString = rulesStrings;
 	}
 	
 	public Long getId() {
