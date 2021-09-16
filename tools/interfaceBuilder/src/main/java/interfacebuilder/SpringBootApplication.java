@@ -16,6 +16,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.boot.autoconfigure.context.ConfigurationPropertiesAutoConfiguration;
 import org.springframework.boot.autoconfigure.context.MessageSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration;
+import org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.autoconfigure.transaction.TransactionAutoConfiguration;
@@ -31,7 +32,7 @@ import static interfacebuilder.ui.AppController.FATAL_ERROR;
 
 @Import({ AppConfiguration.class, FxmlConfiguration.class, ConfigurationPropertiesAutoConfiguration.class,
 		MessageSourceAutoConfiguration.class, JpaRepositoriesAutoConfiguration.class, DataSourceAutoConfiguration.class,
-		HibernateJpaAutoConfiguration.class, TransactionAutoConfiguration.class })
+		HibernateJpaAutoConfiguration.class, TransactionAutoConfiguration.class, FlywayAutoConfiguration.class })
 public final class SpringBootApplication {
 	
 	public static final int INTER_PROCESS_COMMUNICATION_PORT = 12317;
