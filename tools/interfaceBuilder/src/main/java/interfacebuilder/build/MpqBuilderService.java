@@ -313,8 +313,7 @@ public class MpqBuilderService {
 		mod.setDescIndex(descIndex);
 		
 		try {
-			descIndex.setDescIndexPathAndClear(ComponentsListReaderDom.getDescIndexPath(componentListFile,
-					gameDef));
+			descIndex.setDescIndexPathAndClear(ComponentsListReaderDom.getDescIndexPath(componentListFile, gameDef));
 		} catch (final ParserConfigurationException | SAXException | IOException e) {
 			final String msg = "ERROR: unable to read DescIndex path.";
 			logger.error(msg, e);

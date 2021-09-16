@@ -43,19 +43,17 @@ public class ModD {
 		}
 		return Objects.equals(game, modD.game) && Objects.equals(sourceDirectory, modD.sourceDirectory) &&
 				Objects.equals(mpqCacheDirectory, modD.mpqCacheDirectory) &&
-				Objects.equals(targetFile, modD.targetFile) &&
-				Objects.equals(descIndex, modD.descIndex) &&
-				Objects.equals(componentListFile, modD.componentListFile) &&
-				Objects.equals(uiCatalog, modD.uiCatalog);
+				Objects.equals(targetFile, modD.targetFile) && Objects.equals(descIndex, modD.descIndex) &&
+				Objects.equals(componentListFile, modD.componentListFile) && Objects.equals(uiCatalog, modD.uiCatalog);
 	}
 	
 	@Override
 	public final int hashCode() {
-		return Objects.hash(
-				game,
+		return Objects.hash(game,
 				sourceDirectory,
 				mpqCacheDirectory,
-				targetFile, descIndex,
+				targetFile,
+				descIndex,
 				componentListFile,
 				uiCatalog);
 	}

@@ -143,7 +143,8 @@ public class BaseUiExtractionController implements Updateable {
 		stateImage3.setVisible(true);
 		
 		final ExtractBaseUiTask task = new ExtractBaseUiTask(appController,
-				baseUiService, gameType,
+				baseUiService,
+				gameType,
 				usePtr,
 				appenders,
 				errorTabController,

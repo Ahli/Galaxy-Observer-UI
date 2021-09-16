@@ -259,8 +259,8 @@ public class BaseUiService {
 	 */
 	public void parseBaseUI(final Game game) throws Exception {
 		// lock per game
-		final String gameBaseUiDir = configService.getBaseUiPath(game.getGameDef()) + File.separator +
-				game.getGameDef().modsSubDirectory();
+		final String gameBaseUiDir =
+				configService.getBaseUiPath(game.getGameDef()) + File.separator + game.getGameDef().modsSubDirectory();
 		synchronized (getLock(gameBaseUiDir)) {
 			final String gameName = game.getGameDef().name();
 			UICatalog uiCatalog = game.getUiCatalog();

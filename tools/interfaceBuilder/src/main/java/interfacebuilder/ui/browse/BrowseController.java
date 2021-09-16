@@ -162,7 +162,8 @@ public class BrowseController implements Updateable {
 	 * @throws IOException
 	 */
 	ImageView getListItemGameImage(final Project project) throws IOException {
-		final ImageView iv = new ImageView(getResourceAsUrl(gameService.getGameItemPath(project.getGameType())).toString());
+		final ImageView iv =
+				new ImageView(getResourceAsUrl(gameService.getGameItemPath(project.getGameType())).toString());
 		iv.setFitHeight(32);
 		iv.setFitWidth(32);
 		return iv;
