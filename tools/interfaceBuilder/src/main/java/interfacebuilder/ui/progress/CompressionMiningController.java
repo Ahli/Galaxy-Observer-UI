@@ -33,7 +33,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.ForkJoinPool;
 
@@ -246,8 +245,6 @@ public class CompressionMiningController implements Updateable {
 					}
 					if (Thread.currentThread().isInterrupted() || task == null) {
 						logger.info("Stopping the mining task.");
-						comprMiner.cleanUp();
-						expCompMiner = null;
 						return;
 					}
 				}
@@ -255,13 +252,11 @@ public class CompressionMiningController implements Updateable {
 				logger.error("Experimental Compression Miner experienced a problem.", e);
 			} catch (final InterruptedException e) {
 				Thread.currentThread().interrupt();
+				logger.error("Interrupted while compression mining");
 			} finally {
-				if (modTargetFile != null) {
-					try {
-						Files.deleteIfExists(modTargetFile);
-					} catch (final IOException e) {
-						logger.error("Experimental Compression Miner failed to clear the temporary target file", e);
-					}
+				final RandomCompressionMiner comprMiner = expCompMiner;
+				if (comprMiner != null) {
+					comprMiner.cleanUp();
 				}
 			}
 		};

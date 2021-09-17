@@ -450,7 +450,40 @@ public class RandomCompressionMiner {
 	 * Removes files that were used during the compression mining.
 	 */
 	public void cleanUp() {
-		mpqInterface.clearCacheExtractedMpq();
+		// clean up cache
+		int i;
+		for (i = 100; i > 0; --i) {
+			if (mpqInterface.clearCacheExtractedMpq()) {
+				break;
+			} else {
+				try {
+					Thread.sleep(50);
+				} catch (final InterruptedException ignored) {
+					Thread.currentThread().interrupt();
+					logger.trace("Interrupted while waiting to clean up");
+				}
+			}
+		}
+		if (i == 0) {
+			logger.error("Failed to clean up compression mining cache");
+		}
+		// clean up target file
+		final Path targetFile = mod.getTargetFile();
+		for (i = 100; i > 0; --i) {
+			try {
+				Files.deleteIfExists(targetFile);
+				return;
+			} catch (final IOException e) {
+				logger.trace("Error while cleaning up compression mining target file {}", targetFile, e);
+				try {
+					Thread.sleep(50);
+				} catch (final InterruptedException ignored) {
+					Thread.currentThread().interrupt();
+					logger.trace("Interrupted while waiting to clean up");
+				}
+			}
+		}
+		logger.error("Failed to clean up compression mining target file");
 	}
 	
 	public MpqEditorInterface getMpqInterface() {

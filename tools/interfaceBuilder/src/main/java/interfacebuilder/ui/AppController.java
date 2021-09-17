@@ -42,6 +42,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.BeanCreationNotAllowedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Lazy;
@@ -125,8 +126,13 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 			// free space of baseUI
 			if (executor != null && executor.isQuiescent() && mpqBuilderService != null) {
 				logger.debug("Freeing up resources");
-				mpqBuilderService.getGameData(GameType.SC2).setUiCatalog(null);
-				mpqBuilderService.getGameData(GameType.HEROES).setUiCatalog(null);
+				// TODO try to get red if lazy beans to avoid this exception
+				try {
+					mpqBuilderService.getGameData(GameType.SC2).setUiCatalog(null);
+					mpqBuilderService.getGameData(GameType.HEROES).setUiCatalog(null);
+				} catch (final BeanCreationNotAllowedException e) {
+					logger.trace("Failed to instantiate lazy beans.", e);
+				}
 				// GC1 is the default GC and can now release RAM -> actually good to do after a task because we use a
 				// lot of RAM for the UIs
 				// Weak References survive 3 garbage collections by default
