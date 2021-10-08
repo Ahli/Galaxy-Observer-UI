@@ -14,6 +14,10 @@ import org.xml.sax.SAXParseException;
  */
 public class SilentXmlSaxErrorHandler implements ErrorHandler {
 	
+	public SilentXmlSaxErrorHandler() {
+		// explicit definition to avoid compiler warning of exposing default constructor
+	}
+	
 	@Override
 	public void warning(final SAXParseException exception) {
 		// do nothing to be silent

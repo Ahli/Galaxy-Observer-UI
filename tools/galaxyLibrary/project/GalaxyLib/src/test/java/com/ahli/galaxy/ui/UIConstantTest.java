@@ -3,14 +3,14 @@
 
 package com.ahli.galaxy.ui;
 
+import com.ahli.galaxy.ui.interfaces.UIConstant;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import org.junit.jupiter.api.Test;
+
 class UIConstantTest {
-	//	@Test
-	//	@SuppressWarnings("JUnitTestMethodWithNoAssertions")
-	//	void equalsContract() {
-	//		EqualsVerifier.forClass(UIConstant.class)
-	//				.withRedefinedSuperclass()
-	//				.withIgnoredFields("hash", "hashIsZero", "hashIsDirty")
-	//				.suppress(Warning.NONFINAL_FIELDS)
-	//				.verify();
-	//	}
+	@Test
+	@SuppressWarnings("JUnitTestMethodWithNoAssertions")
+	void equalsContract() {
+		EqualsVerifier.forClass(UIConstant.class).verify();
+	}
 }

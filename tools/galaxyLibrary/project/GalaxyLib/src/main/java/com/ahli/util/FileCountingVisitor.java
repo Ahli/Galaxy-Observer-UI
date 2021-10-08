@@ -8,6 +8,10 @@ import java.nio.file.attribute.BasicFileAttributes;
 public class FileCountingVisitor extends SimpleFileVisitor<Path> {
 	private int count = 0;
 	
+	public FileCountingVisitor() {
+		// explicit definition to avoid compiler warning of exposing default constructor
+	}
+	
 	@Override
 	public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) {
 		++count;

@@ -3,15 +3,14 @@
 
 package com.ahli.galaxy.ui;
 
+import com.ahli.galaxy.ui.interfaces.UIAttribute;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import org.junit.jupiter.api.Test;
+
 class UIAttributeTest {
-	//	@Test
-	//	@SuppressWarnings("JUnitTestMethodWithNoAssertions")
-	//	void equalsContract() {
-	//		EqualsVerifier.forClass(UIAttribute.class)
-	//				.withRedefinedSuperclass()
-	//				.withIgnoredFields("hash", "hashIsZero", "hashIsDirty")
-	//				.withCachedHashCode("hash", "calcHashCode", new UIAttribute())
-	//				.suppress(Warning.NONFINAL_FIELDS)
-	//				.verify();
-	//	}
+	@Test
+	@SuppressWarnings("JUnitTestMethodWithNoAssertions")
+	void equalsContract() {
+		EqualsVerifier.forClass(UIAttribute.class).verify();
+	}
 }

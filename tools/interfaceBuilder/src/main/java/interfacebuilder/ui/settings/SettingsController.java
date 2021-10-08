@@ -93,7 +93,6 @@ public class SettingsController implements Updateable {
 		private void loadSettingsContent(final TreeItem<String> category) {
 			final Parent content;
 			final FXMLSpringLoader loader = new FXMLSpringLoader(settingsController.appContext);
-			final Object controller;
 			switch (getCategoryIndex(category)) {
 				case 0 -> content = initFXML(loader, "classpath:view/Settings_GamesPaths.fxml");
 				case 1 -> content = initFXML(loader, "classpath:view/Settings_GuiTool.fxml");
@@ -103,7 +102,7 @@ public class SettingsController implements Updateable {
 					return;
 				}
 			}
-			controller = loader.getController();
+			final Object controller = loader.getController();
 			if (controller instanceof Updateable updateable) {
 				updateable.update();
 			}
