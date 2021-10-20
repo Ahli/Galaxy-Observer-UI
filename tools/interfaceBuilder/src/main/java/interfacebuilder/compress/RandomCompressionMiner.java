@@ -344,6 +344,7 @@ public class RandomCompressionMiner {
 			try {
 				return Files.size(path);
 			} catch (final IOException e) {
+				logger.error("Failed to determine size of file.", e);
 				return 0;
 			}
 		}

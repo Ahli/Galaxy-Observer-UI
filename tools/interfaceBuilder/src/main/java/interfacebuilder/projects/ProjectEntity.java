@@ -67,7 +67,7 @@ public final class ProjectEntity implements Serializable {
 	private Long lastBuildSize;
 	
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-	@JoinColumn(name = "best_compression_rule_set_id", nullable = false)
+	@JoinColumn(name = "best_compression_rule_set_id", nullable = true)
 	@ToString.Exclude
 	private RuleSet bestCompressionRuleSet;
 	
