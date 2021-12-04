@@ -54,7 +54,7 @@ public class UICatalogImpl implements UICatalog {
 		constants = new ArrayList<>(800);
 		blizzOnlyConstants = new ArrayList<>();
 		blizzOnlyLayouts = new ArrayList<>(25);
-		handles = new UnifiedMap<>(650 * 5 / 4);
+		handles = new UnifiedMap<>(650);
 	}
 	
 	public UICatalogImpl(final GameDef gameDef) {
@@ -65,15 +65,15 @@ public class UICatalogImpl implements UICatalog {
 				constants = new ArrayList<>(1241);
 				blizzOnlyConstants = new ArrayList<>(0);
 				blizzOnlyLayouts = new ArrayList<>(14);
-				handles = new UnifiedMap<>(242 * 5 / 4);
+				handles = new UnifiedMap<>(242);
 				return;
 			} else if ("heroes".equals(gameDef.nameHandle())) {
-				templates = new ArrayList<>(2088);
+				templates = new ArrayList<>(2093);
 				blizzOnlyTemplates = new ArrayList<>(6);
 				constants = new ArrayList<>(449);
 				blizzOnlyConstants = new ArrayList<>(0);
 				blizzOnlyLayouts = new ArrayList<>(11);
-				handles = new UnifiedMap<>(367 * 5 / 4);
+				handles = new UnifiedMap<>(367);
 				return;
 			}
 		}
@@ -81,8 +81,8 @@ public class UICatalogImpl implements UICatalog {
 		blizzOnlyTemplates = new ArrayList<>();
 		constants = new ArrayList<>(800);
 		blizzOnlyConstants = new ArrayList<>();
-		blizzOnlyLayouts = new ArrayList<>(25);
-		handles = new UnifiedMap<>(650 * 5 / 4);
+		blizzOnlyLayouts = new ArrayList<>(16);
+		handles = new UnifiedMap<>(650);
 	}
 	
 	/**
@@ -133,9 +133,7 @@ public class UICatalogImpl implements UICatalog {
 			clone.blizzOnlyConstants.add((UIConstant) blizzOnlyConstants.get(i).deepCopy());
 		}
 		clone.blizzOnlyLayouts = blizzOnlyLayouts;
-		for (final var handleEntry : handles.entrySet()) {
-			clone.handles.put(handleEntry.getKey(), handleEntry.getValue());
-		}
+		clone.handles.putAll(handles);
 		
 		clone.curBasePath = curBasePath;
 		
@@ -162,12 +160,13 @@ public class UICatalogImpl implements UICatalog {
 		processLayouts(layoutPathData.combined(), basePath, raceId, consoleSkinId);
 		
 		logger.trace(
-				"UICatalogSizes: templates={}, blizzTemplates={}, constants={}, blizzConstants={}, blizzLayouts={}",
+				"UICatalogSizes: templates={}, blizzTemplates={}, constants={}, blizzConstants={}, blizzLayouts={}, handles={}",
 				templates.size(),
 				blizzOnlyTemplates.size(),
 				constants.size(),
 				blizzOnlyConstants.size(),
-				blizzOnlyLayouts.size());
+				blizzOnlyLayouts.size(),
+				handles.size());
 	}
 	
 	/**

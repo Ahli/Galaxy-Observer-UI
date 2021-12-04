@@ -46,13 +46,14 @@ public class DiscCacheService {
 		final Kryo kryo = kryoService.getKryoForUICatalog();
 		kryoService.put(p, payload, kryo);
 		logger.info(
-				"Cached UI for {} - templates={}, blizzOnlyTemplates={}, constants={}, blizzOnlyConstants={}, devLayouts={}",
+				"Cached UI for {} - templates={}, blizzOnlyTemplates={}, constants={}, blizzOnlyConstants={}, devLayouts={}, handles={}",
 				gameDefName,
 				catalog.getTemplates().size(),
 				catalog.getBlizzOnlyTemplates().size(),
 				catalog.getConstants().size(),
 				catalog.getBlizzOnlyConstants().size(),
-				catalog.getDevLayouts().size());
+				catalog.getDevLayouts().size(),
+				catalog.getHandles().size());
 	}
 	
 	/**

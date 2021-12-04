@@ -117,7 +117,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				deduplicateDuringParsing = true;
 				deduplicatePostProcessing = false;
 				// parse obs interface
-				addedFinalElements = new UnifiedMap<>(60_000 * 5 / 4);
+				addedFinalElements = new UnifiedMap<>(60_000);
 			}
 			// FULL
 			default -> {
@@ -125,10 +125,10 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				deduplicatePostProcessing = true;
 				if (catalog.getTemplates().isEmpty()) {
 					// parse a baseUI
-					addedFinalElements = new UnifiedMap<>(60_000 * 5 / 4);
+					addedFinalElements = new UnifiedMap<>(58_690);
 				} else {
 					// parse obs interface
-					addedFinalElements = new UnifiedMap<>(90_000 * 5 / 4);
+					addedFinalElements = new UnifiedMap<>(90_000);
 				}
 			}
 		}
