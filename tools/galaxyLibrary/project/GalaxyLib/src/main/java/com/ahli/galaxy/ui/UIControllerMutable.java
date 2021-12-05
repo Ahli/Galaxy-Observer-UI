@@ -23,7 +23,10 @@ public class UIControllerMutable extends UIElementAbstract implements UIControll
 	private boolean nextAdditionShouldOverride;
 	private boolean nameIsImplicit = true;
 	
-	public UIControllerMutable() {
+	/**
+	 * Constructor for Kryo
+	 */
+	private UIControllerMutable() {
 		super(null);
 		attributesKeyValueList = new ArrayList<>(0);
 		keys = new ArrayList<>(0);

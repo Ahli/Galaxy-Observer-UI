@@ -38,7 +38,10 @@ public class UIFrameMutable extends UIElementAbstract implements UIFrame {
 	private String type;
 	private List<UIElement> children;
 	
-	public UIFrameMutable() {
+	/**
+	 * Constructor for Kryo
+	 */
+	private UIFrameMutable() {
 		super(null);
 		init();
 		attributes = null;

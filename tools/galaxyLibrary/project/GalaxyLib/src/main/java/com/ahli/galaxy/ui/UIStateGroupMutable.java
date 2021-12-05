@@ -20,7 +20,10 @@ public class UIStateGroupMutable extends UIElementAbstract implements UIStateGro
 	private final List<UIElement> states;
 	private String defaultState;
 	
-	public UIStateGroupMutable() {
+	/**
+	 * Constructor for Kryo
+	 */
+	private UIStateGroupMutable() {
 		super(null);
 		states = new ArrayList<>(0);
 	}

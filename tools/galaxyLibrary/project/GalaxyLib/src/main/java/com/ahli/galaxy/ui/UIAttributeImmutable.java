@@ -21,7 +21,7 @@ public class UIAttributeImmutable extends UIElementAbstract implements UIAttribu
 	private final List<String> keyValueList;
 	
 	/**
-	 * Constructor for Kryo?
+	 * Constructor for Kryo
 	 */
 	private UIAttributeImmutable() {
 		super(null);

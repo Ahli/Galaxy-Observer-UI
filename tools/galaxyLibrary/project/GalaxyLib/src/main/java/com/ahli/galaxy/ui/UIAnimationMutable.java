@@ -22,7 +22,10 @@ public class UIAnimationMutable extends UIElementAbstract implements UIAnimation
 	private boolean nextEventsAdditionShouldOverride;
 	private UIAttribute driver;
 	
-	public UIAnimationMutable() {
+	/**
+	 * Constructor for Kryo
+	 */
+	private UIAnimationMutable() {
 		super(null);
 		events = new ArrayList<>(0);
 		controllers = new ArrayList<>(0);
