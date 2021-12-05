@@ -30,7 +30,7 @@ import interfacebuilder.integration.kryo.KryoService;
 import interfacebuilder.integration.log4j.StylizedTextAreaAppender;
 import interfacebuilder.projects.enums.GameType;
 import interfacebuilder.ui.AppController;
-import interfacebuilder.ui.progress.appender.Appender;
+import interfacebuilder.ui.progress.appenders.Appender;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

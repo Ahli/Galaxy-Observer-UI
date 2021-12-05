@@ -8,7 +8,7 @@ import interfacebuilder.threads.CleaningForkJoinTask;
 import interfacebuilder.threads.CleaningForkJoinTaskCleaner;
 import interfacebuilder.ui.navigation.NavigationController;
 import interfacebuilder.ui.progress.ErrorTabController;
-import interfacebuilder.ui.progress.appender.Appender;
+import interfacebuilder.ui.progress.appenders.Appender;
 import javafx.application.Platform;
 
 import java.io.Serial;

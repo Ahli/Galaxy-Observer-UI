@@ -6,7 +6,7 @@ package interfacebuilder.integration.kryo;
 import com.ahli.galaxy.ui.UICatalogImpl;
 import com.ahli.galaxy.ui.UIConstantImmutable;
 import com.ahli.galaxy.ui.UIFrameMutable;
-import com.ahli.galaxy.ui.exception.UIException;
+import com.ahli.galaxy.ui.exceptions.UIException;
 import com.esotericsoftware.kryo.Kryo;
 import org.junit.jupiter.api.Test;
 

@@ -5,7 +5,7 @@ package com.ahli.galaxy.parser;
 
 import com.ahli.galaxy.parser.abstracts.XmlParserAbstract;
 import com.ahli.galaxy.parser.interfaces.ParsedXmlConsumer;
-import com.ahli.galaxy.ui.exception.UIException;
+import com.ahli.galaxy.ui.exceptions.UIException;
 import com.ahli.util.XmlDomHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

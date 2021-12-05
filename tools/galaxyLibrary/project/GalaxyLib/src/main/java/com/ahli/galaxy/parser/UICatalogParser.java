@@ -14,7 +14,7 @@ import com.ahli.galaxy.ui.UIFrameMutable;
 import com.ahli.galaxy.ui.UIStateGroupMutable;
 import com.ahli.galaxy.ui.UIStateMutable;
 import com.ahli.galaxy.ui.UITemplate;
-import com.ahli.galaxy.ui.exception.UIException;
+import com.ahli.galaxy.ui.exceptions.UIException;
 import com.ahli.galaxy.ui.interfaces.UIAnimation;
 import com.ahli.galaxy.ui.interfaces.UIAttribute;
 import com.ahli.galaxy.ui.interfaces.UICatalog;

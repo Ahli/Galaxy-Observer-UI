@@ -20,7 +20,7 @@ module GalaxyLib {
 	exports com.ahli.galaxy.parser.interfaces;
 	exports com.ahli.galaxy.ui;
 	exports com.ahli.galaxy.ui.abstracts;
-	exports com.ahli.galaxy.ui.exception;
+	exports com.ahli.galaxy.ui.exceptions;
 	exports com.ahli.galaxy.ui.interfaces;
 	exports com.ahli.mpq;
 	exports com.ahli.mpq.i18n;

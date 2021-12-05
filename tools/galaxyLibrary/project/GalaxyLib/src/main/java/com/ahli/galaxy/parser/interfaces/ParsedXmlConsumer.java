@@ -3,7 +3,7 @@
 
 package com.ahli.galaxy.parser.interfaces;
 
-import com.ahli.galaxy.ui.exception.UIException;
+import com.ahli.galaxy.ui.exceptions.UIException;
 
 import java.io.IOException;
 import java.nio.file.Path;

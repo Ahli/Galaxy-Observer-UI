@@ -1,7 +1,7 @@
 // This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-package com.ahli.hotkey_ui.application.controller;
+package com.ahli.hotkey_ui.application.controllers;
 
 import com.ahli.hotkey_ui.application.i18n.Messages;
 import com.ahli.hotkey_ui.application.model.ValueDef;

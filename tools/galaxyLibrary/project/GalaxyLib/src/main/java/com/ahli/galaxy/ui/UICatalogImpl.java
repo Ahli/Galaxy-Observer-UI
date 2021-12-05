@@ -9,7 +9,7 @@ import com.ahli.galaxy.parser.UICatalogParser;
 import com.ahli.galaxy.parser.XmlParserVtd;
 import com.ahli.galaxy.parser.interfaces.ParsedXmlConsumer;
 import com.ahli.galaxy.parser.interfaces.XmlParser;
-import com.ahli.galaxy.ui.exception.UIException;
+import com.ahli.galaxy.ui.exceptions.UIException;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
 import com.ahli.galaxy.ui.interfaces.UIConstant;
 import com.ahli.galaxy.ui.interfaces.UIElement;

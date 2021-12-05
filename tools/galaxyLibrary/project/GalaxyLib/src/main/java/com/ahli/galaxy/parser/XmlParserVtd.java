@@ -5,7 +5,7 @@ package com.ahli.galaxy.parser;
 
 import com.ahli.galaxy.parser.abstracts.XmlParserAbstract;
 import com.ahli.galaxy.parser.interfaces.ParsedXmlConsumer;
-import com.ahli.galaxy.ui.exception.UIException;
+import com.ahli.galaxy.ui.exceptions.UIException;
 import com.ximpleware.AutoPilot;
 import com.ximpleware.NavException;
 import com.ximpleware.ParseException;
