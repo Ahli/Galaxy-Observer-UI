@@ -22,6 +22,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.FileVisitResult;
@@ -55,6 +56,8 @@ public final class XmlCompressorDom {
 	public static void processCache(final Path cachePath, final int ignoreCommentCountPerFile)
 			throws ParserConfigurationException, TransformerConfigurationException, IOException {
 		
+		long startTime = System.currentTimeMillis();
+		
 		logger.info("Compressing XML files...");
 		logger.trace("cachePath: {}", cachePath);
 		
@@ -63,6 +66,9 @@ public final class XmlCompressorDom {
 		
 		final FileVisitor<Path> visitor = new FileProcessor(dBuilder, transformer, ignoreCommentCountPerFile);
 		Files.walkFileTree(cachePath, visitor);
+		
+		long executionTime = (System.currentTimeMillis() - startTime);
+		logger.info("Compressing XML files took {}ms.", executionTime);
 	}
 	
 	/**
@@ -75,7 +81,7 @@ public final class XmlCompressorDom {
 			// curNode can be null because items might have been removed while looping; getLength checks every loop are too costly
 			if (curNode != null) {
 				if (curNode.getNodeType() == Node.COMMENT_NODE) {
-					if (ignoreCount == 0) {
+					if (ignoreCount <= 0) {
 						
 						// keep hotkeys/settings definition alive
 						final Comment comment = (Comment) curNode;
@@ -125,6 +131,14 @@ public final class XmlCompressorDom {
 		
 		@Override
 		public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) {
+			
+			String fileStr =
+					file.toString().substring(file.toString().lastIndexOf(File.separatorChar) + 1).toLowerCase();
+			if (fileStr.endsWith(".dds") || fileStr.endsWith(".txt") || fileStr.endsWith("documentheader") ||
+					fileStr.endsWith(".m3") || fileStr.endsWith(".swf") || fileStr.endsWith(".otf") ||
+					fileStr.endsWith(".ttf")) {
+				return FileVisitResult.CONTINUE;
+			}
 			
 			logger.trace("compression - processing file: {}", file);
 			
