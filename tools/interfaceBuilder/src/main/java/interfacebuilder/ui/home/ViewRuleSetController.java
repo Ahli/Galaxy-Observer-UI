@@ -115,10 +115,7 @@ public class ViewRuleSetController {
 		final ObservableList<MpqEditorCompressionRule> ruleSetObservableItems = FXCollections.observableArrayList();
 		final RuleSet bestCompressionRuleSet = projectService.fetchBestCompressionRuleSet(project);
 		if (bestCompressionRuleSet != null) {
-			final MpqEditorCompressionRule[] rules = bestCompressionRuleSet.getCompressionRules();
-			if (rules != null) {
-				ruleSetObservableItems.setAll(rules);
-			}
+			ruleSetObservableItems.setAll(bestCompressionRuleSet.getCompressionRules());
 		}
 		ruleSetTable.setItems(ruleSetObservableItems);
 		ruleSetTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);

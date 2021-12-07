@@ -100,10 +100,10 @@ public class ReplayService {
 		final String extensions;
 		if (isHeroes) {
 			basePath = documentsPath.resolve("Heroes of the Storm" + File.separator + "Accounts");
-			extensions = ".StormReplay";
+			extensions = ".stormreplay";
 		} else {
 			basePath = documentsPath.resolve("StarCraft II" + File.separator + "Accounts");
-			extensions = ".SC2Replay";
+			extensions = ".sc2replay";
 		}
 		logger.trace(basePath);
 		
