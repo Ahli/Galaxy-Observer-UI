@@ -3,13 +3,13 @@
 
 package com.ahli.interfacebuilder;
 
-import com.ahli.interfacebuilder.integration.ipc.TcpIpSocketCommunication;
-import com.ahli.interfacebuilder.integration.ipc.UnixDomainSocketCommunication;
 import com.ahli.interfacebuilder.config.AppConfiguration;
 import com.ahli.interfacebuilder.config.FxmlConfiguration;
 import com.ahli.interfacebuilder.integration.CommandLineParams;
 import com.ahli.interfacebuilder.integration.ipc.IpcCommunication;
 import com.ahli.interfacebuilder.integration.ipc.IpcServerThread;
+import com.ahli.interfacebuilder.integration.ipc.TcpIpSocketCommunication;
+import com.ahli.interfacebuilder.integration.ipc.UnixDomainSocketCommunication;
 import javafx.application.Application;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

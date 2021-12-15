@@ -5,11 +5,11 @@ package com.ahli.interfacebuilder.compile;
 
 import com.ahli.galaxy.ModD;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
+import com.ahli.interfacebuilder.base_ui.BaseUiService;
+import com.ahli.interfacebuilder.config.ConfigService;
 import com.ahli.interfacebuilder.threads.CleaningForkJoinTask;
 import com.ahli.interfacebuilder.threads.CleaningForkJoinTaskCleaner;
 import com.ahli.interfacebuilder.ui.browse.BrowseTabController;
-import com.ahli.interfacebuilder.base_ui.BaseUiService;
-import com.ahli.interfacebuilder.config.ConfigService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

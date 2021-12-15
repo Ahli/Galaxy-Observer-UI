@@ -4,9 +4,9 @@
 package com.ahli.interfacebuilder.ui.navigation;
 
 import com.ahli.interfacebuilder.ui.FXMLSpringLoader;
+import com.ahli.interfacebuilder.ui.Updateable;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
-import com.ahli.interfacebuilder.ui.Updateable;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;

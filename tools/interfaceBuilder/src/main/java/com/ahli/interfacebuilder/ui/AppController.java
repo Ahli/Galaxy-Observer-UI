@@ -4,6 +4,8 @@
 package com.ahli.interfacebuilder.ui;
 
 import com.ahli.galaxy.game.GameDef;
+import com.ahli.interfacebuilder.AppClosingEvent;
+import com.ahli.interfacebuilder.PrimaryStageReadyEvent;
 import com.ahli.interfacebuilder.base_ui.BaseUiService;
 import com.ahli.interfacebuilder.build.MpqBuilderService;
 import com.ahli.interfacebuilder.compress.GameService;
@@ -14,15 +16,13 @@ import com.ahli.interfacebuilder.integration.ReplayService;
 import com.ahli.interfacebuilder.integration.SettingsIniInterface;
 import com.ahli.interfacebuilder.integration.log4j.InterProcessCommunicationAppender;
 import com.ahli.interfacebuilder.integration.log4j.StylizedTextAreaAppender;
+import com.ahli.interfacebuilder.projects.enums.GameType;
 import com.ahli.interfacebuilder.threads.CleaningForkJoinTaskCleaner;
+import com.ahli.interfacebuilder.ui.navigation.NavigationController;
+import com.ahli.interfacebuilder.ui.navigation.Notification;
 import com.ahli.interfacebuilder.ui.progress.ErrorTabController;
 import com.ahli.interfacebuilder.ui.progress.TabPaneController;
 import com.ahli.util.StringInterner;
-import com.ahli.interfacebuilder.AppClosingEvent;
-import com.ahli.interfacebuilder.PrimaryStageReadyEvent;
-import com.ahli.interfacebuilder.projects.enums.GameType;
-import com.ahli.interfacebuilder.ui.navigation.NavigationController;
-import com.ahli.interfacebuilder.ui.navigation.Notification;
 import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;

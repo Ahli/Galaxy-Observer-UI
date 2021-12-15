@@ -3,8 +3,8 @@
 
 package com.ahli.interfacebuilder.integration.ipc;
 
-import com.ahli.interfacebuilder.integration.log4j.InterProcessCommunicationAppender;
 import com.ahli.interfacebuilder.integration.CommandLineParams;
+import com.ahli.interfacebuilder.integration.log4j.InterProcessCommunicationAppender;
 import com.ahli.interfacebuilder.ui.AppController;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

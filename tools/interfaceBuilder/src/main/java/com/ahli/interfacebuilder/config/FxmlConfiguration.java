@@ -4,15 +4,14 @@
 package com.ahli.interfacebuilder.config;
 
 import com.ahli.interfacebuilder.base_ui.BaseUiService;
+import com.ahli.interfacebuilder.build.MpqBuilderService;
 import com.ahli.interfacebuilder.compile.CompileService;
 import com.ahli.interfacebuilder.compress.GameService;
 import com.ahli.interfacebuilder.integration.FileService;
-import com.ahli.interfacebuilder.ui.browse.BrowseController;
-import com.ahli.interfacebuilder.ui.browse.BrowseTabController;
-import com.ahli.interfacebuilder.ui.progress.TabPaneController;
-import com.ahli.interfacebuilder.build.MpqBuilderService;
 import com.ahli.interfacebuilder.projects.ProjectService;
 import com.ahli.interfacebuilder.ui.AppController;
+import com.ahli.interfacebuilder.ui.browse.BrowseController;
+import com.ahli.interfacebuilder.ui.browse.BrowseTabController;
 import com.ahli.interfacebuilder.ui.home.AddProjectController;
 import com.ahli.interfacebuilder.ui.home.AddProjectDialogController;
 import com.ahli.interfacebuilder.ui.home.HomeController;
@@ -22,6 +21,7 @@ import com.ahli.interfacebuilder.ui.home.ViewRuleSetController;
 import com.ahli.interfacebuilder.ui.navigation.NavigationController;
 import com.ahli.interfacebuilder.ui.progress.BaseUiExtractionController;
 import com.ahli.interfacebuilder.ui.progress.CompressionMiningController;
+import com.ahli.interfacebuilder.ui.progress.TabPaneController;
 import com.ahli.interfacebuilder.ui.settings.SettingsCommandLineToolController;
 import com.ahli.interfacebuilder.ui.settings.SettingsController;
 import com.ahli.interfacebuilder.ui.settings.SettingsGamesPathsController;

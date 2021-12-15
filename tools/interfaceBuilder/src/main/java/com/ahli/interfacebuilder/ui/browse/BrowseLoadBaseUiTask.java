@@ -4,9 +4,9 @@
 package com.ahli.interfacebuilder.ui.browse;
 
 import com.ahli.galaxy.game.Game;
+import com.ahli.interfacebuilder.base_ui.BaseUiService;
 import com.ahli.interfacebuilder.threads.CleaningForkJoinTask;
 import com.ahli.interfacebuilder.threads.CleaningForkJoinTaskCleaner;
-import com.ahli.interfacebuilder.base_ui.BaseUiService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

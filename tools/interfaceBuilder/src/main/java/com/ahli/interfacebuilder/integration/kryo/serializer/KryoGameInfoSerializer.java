@@ -3,11 +3,11 @@
 
 package com.ahli.interfacebuilder.integration.kryo.serializer;
 
+import com.ahli.interfacebuilder.integration.kryo.KryoGameInfo;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.Serializer;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-import com.ahli.interfacebuilder.integration.kryo.KryoGameInfo;
 
 public class KryoGameInfoSerializer extends Serializer<KryoGameInfo> {
 	

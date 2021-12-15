@@ -4,11 +4,11 @@
 package com.ahli.interfacebuilder.ui.home;
 
 import com.ahli.interfacebuilder.compress.RuleSet;
+import com.ahli.interfacebuilder.projects.Project;
+import com.ahli.interfacebuilder.projects.ProjectService;
 import com.ahli.mpq.mpqeditor.MpqEditorCompressionRule;
 import com.ahli.mpq.mpqeditor.MpqEditorCompressionRuleMask;
 import com.ahli.mpq.mpqeditor.MpqEditorCompressionRuleSize;
-import com.ahli.interfacebuilder.projects.Project;
-import com.ahli.interfacebuilder.projects.ProjectService;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;

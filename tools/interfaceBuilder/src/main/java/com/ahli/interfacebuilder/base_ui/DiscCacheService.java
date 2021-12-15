@@ -5,10 +5,10 @@ package com.ahli.interfacebuilder.base_ui;
 
 import com.ahli.galaxy.ui.UICatalogImpl;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
+import com.ahli.interfacebuilder.config.ConfigService;
 import com.ahli.interfacebuilder.integration.kryo.KryoGameInfo;
 import com.ahli.interfacebuilder.integration.kryo.KryoService;
 import com.esotericsoftware.kryo.Kryo;
-import com.ahli.interfacebuilder.config.ConfigService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

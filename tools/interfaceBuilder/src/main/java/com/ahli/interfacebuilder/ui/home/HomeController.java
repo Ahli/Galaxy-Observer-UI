@@ -4,15 +4,15 @@
 package com.ahli.interfacebuilder.ui.home;
 
 import com.ahli.interfacebuilder.compress.GameService;
-import com.ahli.interfacebuilder.integration.FileService;
-import com.ahli.interfacebuilder.ui.progress.TabPaneController;
 import com.ahli.interfacebuilder.i18n.Messages;
+import com.ahli.interfacebuilder.integration.FileService;
 import com.ahli.interfacebuilder.projects.Project;
 import com.ahli.interfacebuilder.projects.ProjectService;
 import com.ahli.interfacebuilder.ui.FXMLSpringLoader;
 import com.ahli.interfacebuilder.ui.Updateable;
 import com.ahli.interfacebuilder.ui.navigation.NavigationController;
 import com.ahli.interfacebuilder.ui.progress.CompressionMiningController;
+import com.ahli.interfacebuilder.ui.progress.TabPaneController;
 import javafx.beans.InvalidationListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

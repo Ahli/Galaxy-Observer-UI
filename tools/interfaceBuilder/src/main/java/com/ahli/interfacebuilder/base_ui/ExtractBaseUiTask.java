@@ -3,12 +3,12 @@
 
 package com.ahli.interfacebuilder.base_ui;
 
+import com.ahli.interfacebuilder.projects.enums.GameType;
 import com.ahli.interfacebuilder.threads.CleaningForkJoinTask;
 import com.ahli.interfacebuilder.threads.CleaningForkJoinTaskCleaner;
+import com.ahli.interfacebuilder.ui.navigation.NavigationController;
 import com.ahli.interfacebuilder.ui.progress.ErrorTabController;
 import com.ahli.interfacebuilder.ui.progress.appenders.Appender;
-import com.ahli.interfacebuilder.projects.enums.GameType;
-import com.ahli.interfacebuilder.ui.navigation.NavigationController;
 import javafx.application.Platform;
 
 import java.io.Serial;
