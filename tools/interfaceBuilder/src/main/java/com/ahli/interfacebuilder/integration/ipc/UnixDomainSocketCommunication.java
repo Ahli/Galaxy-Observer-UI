@@ -55,7 +55,7 @@ public class UnixDomainSocketCommunication implements IpcCommunication {
 			sendMessage(clientChannel, command);
 			
 			final ByteBuffer byteBuffer = ByteBuffer.allocate(16194);
-			while (true) {
+			while (clientChannel.isConnected()) {
 				final int bytesRead = clientChannel.read(byteBuffer);
 				if (bytesRead > 0) {
 					byteBuffer.flip();
@@ -80,10 +80,15 @@ public class UnixDomainSocketCommunication implements IpcCommunication {
 					}
 					
 					byteBuffer.clear();
+				} else {
+					Thread.sleep(50);
 				}
 			}
 		} catch (final IOException e) {
-			logger.error("Exception while sending parameters to primary instance.", e);
+			logger.error("Exception while sending parameters to server instance.", e);
+		} catch (final InterruptedException e) {
+			logger.error("Interrupted while sending parameters to server instance");
+			Thread.currentThread().interrupt();
 		}
 		return false;
 	}
@@ -156,17 +161,17 @@ public class UnixDomainSocketCommunication implements IpcCommunication {
 		if (Files.exists(address.getPath())) {
 			
 			try (final SocketChannel ignored = SocketChannel.open(UnixDomainSocketAddress.of(address.getPath()))) {
-				UnixDomainSocketCommunication.logger.info("socket can be connected to => not orphaned socket file");
+				logger.trace("socket can be connected to => not orphaned socket file");
 				return false;
 			} catch (final IOException e) {
-				UnixDomainSocketCommunication.logger.info("channelLock test error means that it is orphaned?", e);
+				logger.trace("channelLock test error means that it is orphaned?", e);
 			}
 			
 			try {
 				Files.delete(address.getPath());
 				return true;
 			} catch (final IOException e) {
-				UnixDomainSocketCommunication.logger.error("Failed to clear socket file: {}", address.getPath(), e);
+				logger.error("Failed to clear socket file: {}", address.getPath(), e);
 			}
 			return false;
 		}
