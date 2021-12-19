@@ -48,6 +48,8 @@ public class UnixDomainSocketCommunication implements IpcCommunication {
 	public boolean sendToServer(final String... args) {
 		
 		try (final SocketChannel clientChannel = SocketChannel.open(address)) {
+			clientChannel.configureBlocking(true);
+			
 			// sending parameters
 			final String command = Arrays.toString(args);
 			logger.info("Sending: {}", command);
@@ -80,15 +82,10 @@ public class UnixDomainSocketCommunication implements IpcCommunication {
 					}
 					
 					byteBuffer.clear();
-				} else {
-					Thread.sleep(50);
 				}
 			}
 		} catch (final IOException e) {
 			logger.error("Exception while sending parameters to server instance.", e);
-		} catch (final InterruptedException e) {
-			logger.error("Interrupted while sending parameters to server instance");
-			Thread.currentThread().interrupt();
 		}
 		return false;
 	}
