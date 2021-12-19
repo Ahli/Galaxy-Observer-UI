@@ -165,7 +165,7 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 			
 			if (startingParams.isHasParamCompilePath()) {
 				// command line tool build
-				buildStartReplayExit(startingParams);
+				new Thread(() -> buildStartReplayExit(startingParams)).start();
 			} else {
 				checkBaseUiUpdate();
 			}
@@ -233,43 +233,39 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 	}
 	
 	public void buildStartReplayExit(final CommandLineParams params) {
-		new Thread(() -> {
-			try {
-				Thread.currentThread().setName("Supervisor");
-				Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-				
-				if (primaryStage != null) {
-					Platform.runLater(() -> {
-						try {
-							navigationController.lockNavToProgress();
-						} catch (final Exception e) {
-							logger.fatal(FATAL_ERROR, e);
-						}
-					});
-				}
-				
-				mpqBuilderService.build(Path.of(params.getParamCompilePath()));
-				
-				final var executorTmp = getExecutor();
-				if (executorTmp != null && executorTmp.awaitQuiescence(15, TimeUnit.MINUTES)) {
-					startReplayOrQuitOrShowError(params);
-				}
-				
-				if (primaryStage != null) {
-					Platform.runLater(() -> {
-						try {
-							navigationController.unlockNav();
-						} catch (final Exception e) {
-							logger.fatal(FATAL_ERROR, e);
-						}
-					});
-				}
-			} catch (final Exception e) {
-				logger.fatal(FATAL_ERROR, e);
-			} finally {
-				InterProcessCommunicationAppender.sendTerminationSignal();
+		try {
+			Thread.currentThread().setName("Supervisor");
+			Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+			
+			if (primaryStage != null) {
+				Platform.runLater(() -> {
+					try {
+						navigationController.lockNavToProgress();
+					} catch (final Exception e) {
+						logger.fatal(FATAL_ERROR, e);
+					}
+				});
 			}
-		}).start();
+			
+			mpqBuilderService.build(Path.of(params.getParamCompilePath()));
+			
+			final var executorTmp = getExecutor();
+			if (executorTmp != null && executorTmp.awaitQuiescence(15, TimeUnit.MINUTES)) {
+				startReplayOrQuitOrShowError(params);
+			}
+			
+			if (primaryStage != null) {
+				Platform.runLater(() -> {
+					try {
+						navigationController.unlockNav();
+					} catch (final Exception e) {
+						logger.fatal(FATAL_ERROR, e);
+					}
+				});
+			}
+		} catch (final Exception e) {
+			logger.fatal(FATAL_ERROR, e);
+		}
 	}
 	
 	public void checkBaseUiUpdate() {

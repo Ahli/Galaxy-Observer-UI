@@ -54,18 +54,34 @@ public class UnixDomainSocketCommunication implements IpcCommunication {
 			
 			sendMessage(clientChannel, command);
 			
-			// TODO messages are not properly received
-			final ByteBuffer buffer = ByteBuffer.allocate(1024);
-			//int bytesRead;
-			while ((/*bytesRead =*/ clientChannel.read(buffer)) != -1) {
-				//				byte[] bytes = new byte[bytesRead];
-				//				buffer.flip();
-				//				buffer.get(bytes);
-				//				String message = new String(bytes);
-				final String message = StandardCharsets.UTF_8.decode(buffer).toString();
-				message.lines().forEach(this::handleServerAnswer);
+			final ByteBuffer byteBuffer = ByteBuffer.allocate(16194);
+			while (true) {
+				final int bytesRead = clientChannel.read(byteBuffer);
+				if (bytesRead > 0) {
+					byteBuffer.flip();
+					
+					final CharBuffer charBuffer = CharBuffer.allocate(1024);
+					final CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder();
+					final StringBuilder stringBuilder = new StringBuilder(byteBuffer.limit());
+					CoderResult decodeResult;
+					do {
+						charBuffer.clear();
+						decodeResult = decoder.decode(byteBuffer, charBuffer, false);
+						charBuffer.flip();
+						stringBuilder.append(charBuffer);
+					} while (decodeResult == CoderResult.OVERFLOW);
+					
+					for (final String line : stringBuilder.toString().lines().toList()) {
+						if (!line.startsWith("#BYE")) {
+							logger.info(line);
+						} else {
+							return true;
+						}
+					}
+					
+					byteBuffer.clear();
+				}
 			}
-			return true;
 		} catch (final IOException e) {
 			logger.error("Exception while sending parameters to primary instance.", e);
 		}
@@ -76,12 +92,6 @@ public class UnixDomainSocketCommunication implements IpcCommunication {
 		final ByteBuffer buf = ByteBuffer.wrap(message.getBytes(StandardCharsets.UTF_8));
 		while (buf.hasRemaining()) {
 			channel.write(buf);
-		}
-	}
-	
-	private void handleServerAnswer(final String line) {
-		if (!line.startsWith("#BYE")) {
-			logger.info(line);
 		}
 	}
 	
@@ -145,12 +155,6 @@ public class UnixDomainSocketCommunication implements IpcCommunication {
 	public boolean isAvailable() {
 		if (Files.exists(address.getPath())) {
 			
-			//			try (final FileChannel channelLock = FileChannel.open(address.getPath(), StandardOpenOption.APPEND)) {
-			//				logger.info("socket file exists and can be locked => orphaned file");
-			//			} catch (final IOException e) {
-			//				logger.info("channelLock test error", e);
-			//				return false;
-			//			}
 			try (final SocketChannel ignored = SocketChannel.open(UnixDomainSocketAddress.of(address.getPath()))) {
 				UnixDomainSocketCommunication.logger.info("socket can be connected to => not orphaned socket file");
 				return false;
@@ -207,39 +211,12 @@ public class UnixDomainSocketCommunication implements IpcCommunication {
 		}
 		
 		private static Optional<String> readMessageFromSocket(final SocketChannel channel) throws IOException {
-			//			final ByteBuffer buffer = ByteBuffer.allocate(1024);
-			//			final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			//			int bytesRead;
-			
-			//			while ((bytesRead = channel.read(buffer)) != -1) {
-			//				//				byte[] bytes = new byte[bytesRead];
-			//				//				buffer.flip();
-			//				//				buffer.get(bytes);
-			//				//				String message = new String(bytes);
-			//				// use StringBuffer?
-			//				baos.write(buffer.array(), 0, bytesRead);
-			//				buffer.clear();
-			//				//				String message = StandardCharsets.UTF_8.decode(buffer).toString();
-			//			}
-			//			final String message = baos.toString(StandardCharsets.UTF_8);
-			//			return Optional.of(message);
-			
-			
-			//			ByteBuffer buffer = ByteBuffer.allocate(2);
-			//			int bytesRead;
-			//			while ((bytesRead = channel.read(buffer)) != -1) {
-			//				if(bytesRead == buffer.capacity()) {
-			//					buffer = ByteBuffer.allocate(buffer.capacity() + 1024);
-			//				}
-			//			}
-			//			String message = StandardCharsets.UTF_8.decode(buffer).toString();
-			//			return Optional.of(message);
-			
-			
 			final ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
 			final boolean eof = channel.read(byteBuffer) == -1;
+			if (eof) {
+				return Optional.empty();
+			}
 			byteBuffer.flip();
-			logger.info("Read {} bytes from socket", byteBuffer.limit());
 			
 			final CharBuffer charBuffer = CharBuffer.allocate(1024);
 			final CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder();
@@ -249,7 +226,6 @@ public class UnixDomainSocketCommunication implements IpcCommunication {
 				charBuffer.clear();
 				decodeResult = decoder.decode(byteBuffer, charBuffer, false);
 				charBuffer.flip();
-				logger.info("decoded {} chars from byte buffer", charBuffer.length());
 				stringBuilder.append(charBuffer);
 			} while (decodeResult == CoderResult.OVERFLOW);
 			
@@ -279,9 +255,8 @@ public class UnixDomainSocketCommunication implements IpcCommunication {
 				if (appController == null) {
 					logger.error("Server is not ready to process commands, yet.");
 				}
-				// end communication as no task was given
-				InterProcessCommunicationAppender.sendTerminationSignal();
 			}
+			InterProcessCommunicationAppender.sendTerminationSignal();
 		}
 		
 		@Override

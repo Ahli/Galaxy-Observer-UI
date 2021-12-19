@@ -20,19 +20,15 @@ public class UnixDomainSocketMessageWriter implements IpcMessageWriter {
 	}
 	
 	@Override
-	public void sendTerminationSignal() {
+	public void sendTerminationSignal() throws IOException {
 		send("#BYE");
 	}
 	
 	@Override
-	public void send(final String message) {
+	public void send(final String message) throws IOException {
 		final ByteBuffer buf = ByteBuffer.wrap(message.getBytes(StandardCharsets.UTF_8));
 		while (buf.hasRemaining()) {
-			try {
-				channel.write(buf);
-			} catch (final IOException e) {
-				logger.error("Error while sending message to client.", e);
-			}
+			channel.write(buf);
 		}
 	}
 }

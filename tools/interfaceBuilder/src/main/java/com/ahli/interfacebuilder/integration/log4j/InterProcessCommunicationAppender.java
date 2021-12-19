@@ -80,14 +80,21 @@ public final class InterProcessCommunicationAppender extends AbstractAppender {
 		return new InterProcessCommunicationAppender(name, filter, resultLayout, true, Property.EMPTY_ARRAY);
 	}
 	
-	public static void setWriter(final IpcMessageWriter messageWriter) {
-		InterProcessCommunicationAppender.messageWriter = messageWriter;
-	}
-	
 	public static void sendTerminationSignal() {
 		if (messageWriter != null && instance != null) {
-			messageWriter.sendTerminationSignal();
+			try {
+				messageWriter.sendTerminationSignal();
+			} catch (final Exception e) {
+				System.err.println("Error while sending termination signal to IPC client: " + e.getMessage());
+				setWriter(null);
+			} finally {
+				setWriter(null);
+			}
 		}
+	}
+	
+	public static void setWriter(final IpcMessageWriter messageWriter) {
+		InterProcessCommunicationAppender.messageWriter = messageWriter;
 	}
 	
 	/**
@@ -112,6 +119,7 @@ public final class InterProcessCommunicationAppender extends AbstractAppender {
 						}
 					} catch (final Exception e) {
 						System.err.println("Error while sending message to IPC client: " + e.getMessage());
+						setWriter(null);
 					}
 				});
 				//}

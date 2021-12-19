@@ -44,7 +44,7 @@ import static com.ahli.interfacebuilder.ui.AppController.FATAL_ERROR;
 public final class SpringBootApplication {
 	
 	public static final int INTER_PROCESS_COMMUNICATION_PORT = 12317;
-	private static final boolean USE_DOMAIN_SOCKET = false;
+	private static final boolean USE_DOMAIN_SOCKET = true;
 	private static final Logger logger = LogManager.getLogger(SpringBootApplication.class);
 	
 	@SuppressWarnings("java:S2095") //
