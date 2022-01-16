@@ -65,7 +65,7 @@ public final class Alerts {
 		alert.initOwner(owner);
 		alert.setTitle(title);
 		alert.setHeaderText(header);
-		logger.trace("created errorAlert within {}", (System.nanoTime() - time) / 1_000_000);
+		logger.trace("created errorAlert within {}ms", (System.nanoTime() - time) / 1_000_000);
 		return alert;
 	}
 	

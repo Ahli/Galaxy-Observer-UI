@@ -152,12 +152,12 @@ public class SettingsEditorApplication extends Application {
 			final long time3 = System.nanoTime();
 			primaryStage.show();
 			primaryStage.setOpacity(1);
-			logger.trace("executed root layout stage.show() within {}", (System.nanoTime() - time3) / 1_000_000);
+			logger.trace("executed root layout stage.show() within {}ms", (System.nanoTime() - time3) / 1_000_000);
 			
 			// hide apps splash screen image
 			Platform.runLater(new SplashScreenHider());
 			
-			logger.trace("finished app initialization after {}", (System.nanoTime() - appStartTime) / 1_000_000);
+			logger.trace("finished app initialization after {}ms", (System.nanoTime() - appStartTime) / 1_000_000);
 			
 			initMpqInterface();
 			

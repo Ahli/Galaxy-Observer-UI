@@ -105,13 +105,19 @@ public class LayoutExtensionReader {
 		
 		final DocumentBuilder dBuilder = XmlDomHelper.buildSecureDocumentBuilder(true, false);
 		
-		Document doc;
-		for (final Path path : layoutFiles) {
+		for (int i = 0, len = layoutFiles.size(); i < len; ++i) {
+			final Path path = layoutFiles.get(i);
+			Document doc = null;
 			try {
 				doc = dBuilder.parse(path.toString());
-			} catch (final SAXParseException | IOException e) {
-				logger.trace(LayoutFileUpdater.ERROR_PARSING_FILE, e);
-				// couldn't parse, most likely no XML file
+			} catch (final SAXParseException e) {
+				logParseException(e, path);
+				layoutFiles.remove(i);
+				--i;
+				--len;
+				continue;
+			} catch (final IOException e) {
+				logParseException(e, path);
 				continue;
 			}
 			
@@ -124,12 +130,13 @@ public class LayoutExtensionReader {
 		}
 		
 		for (final Path path : layoutFiles) {
+			final Document doc;
 			try {
 				// parse XML file
 				doc = dBuilder.parse(path.toString());
 			} catch (final SAXParseException | IOException e) {
-				logger.trace(LayoutFileUpdater.ERROR_PARSING_FILE, e);
-				// couldn't parse, most likely no XML file
+				// should be an IOException now since layoutFiles was filtered
+				logParseException(e, path);
 				continue;
 			}
 			
@@ -139,6 +146,14 @@ public class LayoutExtensionReader {
 			final Element elem = doc.getDocumentElement();
 			final NodeList childNodes = elem.getChildNodes();
 			LayoutFileUpdater.readConstants(childNodes, hotkeys, settings);
+		}
+	}
+	
+	private void logParseException(final Exception e, final Path path) {
+		if (!"Content is not allowed in prolog.".equals(e.getMessage())) {
+			logger.trace("Error parsing file {}.", path, e);
+		} else {
+			logger.trace("Error parsing file {}.", path);
 		}
 	}
 	

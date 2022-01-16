@@ -6,7 +6,7 @@ Unicode True
 !define DESCRIPTION "App to edit Observer Interface files for StarCraft II and Heroes of the Storm."
 
 ; This is the size (in kB) of all the files copied into "Program Files"
-!define INSTALLSIZE 60770
+!define INSTALLSIZE 62718
 
 ; The name of the installer
 Name "${COMPANYNAME} - ${APPNAME}"

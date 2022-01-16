@@ -28,7 +28,6 @@ import java.util.Locale;
 import java.util.Objects;
 
 final class LayoutFileUpdater extends SimpleFileVisitor<Path> {
-	public static final String ERROR_PARSING_FILE = "Error parsing file.";
 	private static final String NAME = "name";
 	private static final String VAL = "val";
 	private static final String CONSTANT = "constant";
@@ -225,8 +224,9 @@ final class LayoutFileUpdater extends SimpleFileVisitor<Path> {
 				try (final InputStream is = new BufferedInputStream(Files.newInputStream(file))) {
 					doc = dBuilder.parse(is);
 				} catch (final SAXException e) {
-					logger.trace(ERROR_PARSING_FILE, e);
-					throw new IOException(ERROR_PARSING_FILE, e);
+					final String msg = "Error parsing file.";
+					logger.trace(msg, e);
+					throw new IOException(msg, e);
 				}
 				
 				logger.debug("processing file: {}", file);
