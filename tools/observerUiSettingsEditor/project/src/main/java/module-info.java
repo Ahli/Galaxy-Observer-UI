@@ -1,8 +1,6 @@
 module ObserverUiSettingsEditor {
 	// automatic modules :(
 	requires org.apache.commons.lang3;
-	requires org.apache.logging.log4j.slf4j;
-	requires org.apache.logging.log4j.core;
 	
 	requires java.desktop;
 	requires java.xml;
@@ -10,8 +8,10 @@ module ObserverUiSettingsEditor {
 	requires javafx.controls;
 	requires javafx.fxml;
 	requires javafx.graphics;
-	requires org.apache.logging.log4j;
 	requires org.slf4j;
+	requires ch.qos.logback.classic;
+	requires ch.qos.logback.core;
+	requires java.naming; // required for logback classic
 	
 	requires GalaxyLib;
 	exports com.ahli.hotkey_ui.application to javafx.graphics;

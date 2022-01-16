@@ -8,13 +8,13 @@ import javafx.application.Platform;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.layout.VBox;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // based on:
 // http://jluger.de/blog/20160731_javafx_text_rendering_in_tableview.html
 public class WrappingTextTableCell extends TableCell<ValueDef, String> {
-	private static final Logger logger = LogManager.getLogger(WrappingTextTableCell.class);
+	private static final Logger logger = LoggerFactory.getLogger(WrappingTextTableCell.class);
 	
 	@Override
 	protected void updateItem(final String item, final boolean empty) {

@@ -2,8 +2,8 @@ package com.ahli.hotkey_ui.application.galaxy.ext;
 
 import com.ahli.hotkey_ui.application.model.Constants;
 import com.ahli.hotkey_ui.application.model.ValueDef;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -17,7 +17,7 @@ import java.util.Objects;
 
 public class GameStringsUpdater extends SimpleFileVisitor<Path> {
 	
-	private static final Logger logger = LogManager.getLogger(GameStringsUpdater.class);
+	private static final Logger logger = LoggerFactory.getLogger(GameStringsUpdater.class);
 	
 	private final List<ValueDef> gamestringsAddSettings;
 	

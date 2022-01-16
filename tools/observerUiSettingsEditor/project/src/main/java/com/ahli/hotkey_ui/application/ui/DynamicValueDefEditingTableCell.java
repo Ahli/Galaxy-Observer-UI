@@ -11,13 +11,13 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TextField;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.regex.Pattern;
 
 public class DynamicValueDefEditingTableCell extends TableCell<ValueDef, String> {
-	private static final Logger logger = LogManager.getLogger(DynamicValueDefEditingTableCell.class);
+	private static final Logger logger = LoggerFactory.getLogger(DynamicValueDefEditingTableCell.class);
 	private static final Pattern NUMBER_INPUT_REGEX_PATTERN = Pattern.compile("[-]?\\d{0,7}(?:[.]\\d{0,4})?");
 	
 	@Override

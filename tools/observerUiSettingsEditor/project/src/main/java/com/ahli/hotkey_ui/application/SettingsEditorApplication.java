@@ -36,8 +36,8 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
@@ -61,7 +61,7 @@ public class SettingsEditorApplication extends Application {
 	public static final String STORM_INTERFACE_FILE_FILTER = "*.StormInterface";
 	public static final String SC2_INTERFACE_FILE_FILTER = "*.SC2Interface";
 	
-	private static final Logger logger = LogManager.getLogger(SettingsEditorApplication.class);
+	private static final Logger logger = LoggerFactory.getLogger(SettingsEditorApplication.class);
 	
 	private final long appStartTime = System.nanoTime();
 	private Stage primaryStage;
@@ -87,9 +87,8 @@ public class SettingsEditorApplication extends Application {
 		logger.info("info log visible");
 		logger.warn("warn log visible");
 		logger.error("error log visible");
-		logger.fatal("fatal log visible");
 		
-		logger.trace("Configuration File of System: {}", () -> System.getProperty("log4j.configurationFile"));
+		logger.trace("Configuration File of System: {}", System.getProperty("log4j.configurationFile"));
 		
 		// TEST Locale
 		//		Messages.setBundle(Locale.CHINA);
@@ -105,7 +104,7 @@ public class SettingsEditorApplication extends Application {
 	public void start(final Stage primaryStage) {
 		try {
 			Thread.currentThread().setName("UI");
-			logger.trace("start function called after {}ms.", () -> (System.nanoTime() - appStartTime) / 1_000_000);
+			logger.trace("start function called after {}ms.", (System.nanoTime() - appStartTime) / 1_000_000);
 			Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 			this.primaryStage = primaryStage;
 			primaryStage.setMaximized(true);
@@ -117,7 +116,7 @@ public class SettingsEditorApplication extends Application {
 			
 			final long time = System.nanoTime();
 			initRootLayout();
-			logger.trace("initialized root layout within {}ms.", () -> (System.nanoTime() - time) / 1_000_000);
+			logger.trace("initialized root layout within {}ms.", (System.nanoTime() - time) / 1_000_000);
 			
 			// Load Tab layout from fxml file
 			final long time2 = System.nanoTime();
@@ -129,7 +128,7 @@ public class SettingsEditorApplication extends Application {
 				tabPane = loader.load(is);
 			}
 			
-			logger.trace("initialized tab layout within {}ms.", () -> (System.nanoTime() - time2) / 1_000_000);
+			logger.trace("initialized tab layout within {}ms.", (System.nanoTime() - time2) / 1_000_000);
 			rootLayout.setCenter(tabPane);
 			tabsCtrl = loader.getController();
 			
@@ -153,12 +152,12 @@ public class SettingsEditorApplication extends Application {
 			final long time3 = System.nanoTime();
 			primaryStage.show();
 			primaryStage.setOpacity(1);
-			logger.trace("executed root layout stage.show() within {}", () -> (System.nanoTime() - time3) / 1_000_000);
+			logger.trace("executed root layout stage.show() within {}", (System.nanoTime() - time3) / 1_000_000);
 			
 			// hide apps splash screen image
 			Platform.runLater(new SplashScreenHider());
 			
-			logger.trace("finished app initialization after {}", () -> (System.nanoTime() - appStartTime) / 1_000_000);
+			logger.trace("finished app initialization after {}", (System.nanoTime() - appStartTime) / 1_000_000);
 			
 			initMpqInterface();
 			
@@ -195,13 +194,13 @@ public class SettingsEditorApplication extends Application {
 		try (final InputStream is = SettingsEditorApplication.class.getResourceAsStream("/view/RootLayout.fxml")) {
 			rootLayout = loader.load(is);
 		}
-		logger.trace("initialized root layout fxml within {}ms.", () -> (System.nanoTime() - time) / 1_000_000);
+		logger.trace("initialized root layout fxml within {}ms.", (System.nanoTime() - time) / 1_000_000);
 		
 		// get Controller
 		final long time2 = System.nanoTime();
 		mbarCtrl = loader.getController();
 		mbarCtrl.setMainApp(this);
-		logger.trace("received root layout controller within {}ms.", () -> (System.nanoTime() - time2) / 1_000_000);
+		logger.trace("received root layout controller within {}ms.", (System.nanoTime() - time2) / 1_000_000);
 		
 		// Show the scene containing the root layout.
 		final Scene scene = new Scene(rootLayout);
@@ -221,16 +220,16 @@ public class SettingsEditorApplication extends Application {
 			logger.trace("apply Chinese css");
 			scene.getStylesheets().add(SettingsEditorApplication.class.getResource("/i18n/china.css").toExternalForm());
 		}
-		logger.trace("initialized root layout css within {}ms.", () -> (System.nanoTime() - time3) / 1_000_000);
+		logger.trace("initialized root layout css within {}ms.", (System.nanoTime() - time3) / 1_000_000);
 		
 		final long time4 = System.nanoTime();
 		primaryStage.setTitle(Messages.getString("Main.observerUiSettingsEditorTitle"));
 		primaryStage.setScene(scene);
-		logger.trace("executed root layout setScene+title within {}ms.", () -> (System.nanoTime() - time4) / 1_000_000);
+		logger.trace("executed root layout setScene+title within {}ms.", (System.nanoTime() - time4) / 1_000_000);
 		
 		final long time5 = System.nanoTime();
 		updateMenuBar();
-		logger.trace("updateMenuBar within {}ms.", () -> (System.nanoTime() - time5) / 1_000_000);
+		logger.trace("updateMenuBar within {}ms.", (System.nanoTime() - time5) / 1_000_000);
 	}
 	
 	/**
@@ -332,7 +331,7 @@ public class SettingsEditorApplication extends Application {
 			logger.error("Failed to save MPQ.", e);
 			showErrorAlert(e);
 		}
-		logger.trace("opened mpq within {}ms.", () -> (System.nanoTime() - time) / 1_000_000);
+		logger.trace("opened mpq within {}ms.", (System.nanoTime() - time) / 1_000_000);
 	}
 	
 	/**
@@ -525,7 +524,7 @@ public class SettingsEditorApplication extends Application {
 		} else {
 			logger.trace("File to open was null, most likely due to 'cancel'.");
 		}
-		logger.trace("opened mpq within {}ms.", () -> (System.nanoTime() - time) / 1_000_000);
+		logger.trace("opened mpq within {}ms.", (System.nanoTime() - time) / 1_000_000);
 	}
 	
 	/**

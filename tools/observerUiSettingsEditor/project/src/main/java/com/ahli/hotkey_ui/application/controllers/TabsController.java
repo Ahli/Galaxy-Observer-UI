@@ -18,14 +18,14 @@ import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Ahli
  */
 public class TabsController {
-	private static final Logger logger = LogManager.getLogger(TabsController.class);
+	private static final Logger logger = LoggerFactory.getLogger(TabsController.class);
 	
 	private static final Callback<TableColumn<ValueDef, Boolean>, TableCell<ValueDef, Boolean>>
 			ActionColumnCellFactoryReset =

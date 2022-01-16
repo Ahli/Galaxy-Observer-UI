@@ -3,8 +3,8 @@
 
 package com.ahli.hotkey_ui.application.integration;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.nio.file.Files;
@@ -18,7 +18,7 @@ import java.security.ProtectionDomain;
  * @author Ahli
  */
 public final class JarHelper {
-	private static final Logger logger = LogManager.getLogger(JarHelper.class);
+	private static final Logger logger = LoggerFactory.getLogger(JarHelper.class);
 	
 	private JarHelper() {
 		// no instances allowed

@@ -6,8 +6,8 @@ package com.ahli.hotkey_ui.application.galaxy.ext;
 import com.ahli.galaxy.game.GameDef;
 import com.ahli.hotkey_ui.application.model.ValueDef;
 import com.ahli.util.XmlDomHelper;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -38,7 +38,7 @@ public class LayoutExtensionReader {
 	private static final String ATTRIBUTE_GAMESTRINGS_ADD = "gamestrings_add";
 	private static final String HOTKEY = "@hotkey";
 	private static final String SETTING = "@setting";
-	private static final Logger logger = LogManager.getLogger(LayoutExtensionReader.class);
+	private static final Logger logger = LoggerFactory.getLogger(LayoutExtensionReader.class);
 	private static final Pattern HOTKEY_SETTING_REGEX_PATTERN = Pattern.compile("(?<=@hotkey|@setting)/i");
 	private static final Pattern ATTRIBUTES_REGEX_PATTERN =
 			Pattern.compile("(?i)(?=(?:constant|default|description|values|type|gamestrings_add)[\\s]*=)");

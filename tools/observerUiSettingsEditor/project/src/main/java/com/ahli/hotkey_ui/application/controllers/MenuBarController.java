@@ -12,8 +12,8 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 
@@ -21,7 +21,7 @@ import java.net.URL;
  * @author Ahli
  */
 public class MenuBarController {
-	private static final Logger logger = LogManager.getLogger(MenuBarController.class);
+	private static final Logger logger = LoggerFactory.getLogger(MenuBarController.class);
 	
 	private SettingsEditorApplication main;
 	

@@ -1,8 +1,8 @@
 package com.ahli.hotkey_ui.application.galaxy.ext;
 
 import com.ahli.hotkey_ui.application.model.ValueDef;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -32,7 +32,7 @@ final class LayoutFileUpdater extends SimpleFileVisitor<Path> {
 	private static final String NAME = "name";
 	private static final String VAL = "val";
 	private static final String CONSTANT = "constant";
-	private static final Logger logger = LogManager.getLogger(LayoutFileUpdater.class);
+	private static final Logger logger = LoggerFactory.getLogger(LayoutFileUpdater.class);
 	private final DocumentBuilder dBuilder;
 	private final Transformer transformer;
 	private final String[] fileExtensions;

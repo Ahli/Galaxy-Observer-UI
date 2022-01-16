@@ -15,14 +15,14 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.stage.Window;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Ahli
  */
 public final class Alerts {
-	private static final Logger logger = LogManager.getLogger(Alerts.class);
+	private static final Logger logger = LoggerFactory.getLogger(Alerts.class);
 	
 	private Alerts() {
 		// no instances allowed
@@ -46,7 +46,7 @@ public final class Alerts {
 		alert.initOwner(owner);
 		alert.setTitle(title);
 		alert.setHeaderText(header);
-		logger.trace("created yesNoCancelAlert within {}ms.", () -> (System.nanoTime() - time) / 1_000_000);
+		logger.trace("created yesNoCancelAlert within {}ms.", (System.nanoTime() - time) / 1_000_000);
 		return alert;
 	}
 	
@@ -65,7 +65,7 @@ public final class Alerts {
 		alert.initOwner(owner);
 		alert.setTitle(title);
 		alert.setHeaderText(header);
-		logger.trace("created errorAlert within {}", () -> (System.nanoTime() - time) / 1_000_000);
+		logger.trace("created errorAlert within {}", (System.nanoTime() - time) / 1_000_000);
 		return alert;
 	}
 	
@@ -88,7 +88,7 @@ public final class Alerts {
 		alert.initOwner(owner);
 		alert.setTitle(title);
 		alert.setHeaderText(header);
-		logger.trace("created warningAlert within {}ms.", () -> (System.nanoTime() - time) / 1_000_000);
+		logger.trace("created warningAlert within {}ms.", (System.nanoTime() - time) / 1_000_000);
 		return alert;
 	}
 	
@@ -112,7 +112,7 @@ public final class Alerts {
 			alert.setGraphic(new ImageView(imageUrl));
 		}
 		alert.getDialogPane().setPrefSize(480, 360);
-		logger.trace("initialized about-alert within {}ms.", () -> (System.nanoTime() - time) / 1_000_000);
+		logger.trace("initialized about-alert within {}ms.", (System.nanoTime() - time) / 1_000_000);
 		return alert;
 	}
 	
@@ -147,7 +147,7 @@ public final class Alerts {
 		
 		// Set expandable Exception into the dialog pane.
 		alert.getDialogPane().setExpandableContent(expContent);
-		logger.trace("created exceptionAlert within {}ms.", () -> (System.nanoTime() - time) / 1_000_000);
+		logger.trace("created exceptionAlert within {}ms.", (System.nanoTime() - time) / 1_000_000);
 		
 		return alert;
 	}
