@@ -127,6 +127,12 @@ public final class SpringBootApplication {
 		}
 	}
 	
+	/**
+	 * Writes exportMigrate.zip and deletes the database files. The zip archive should be loaded by the DB migration.
+	 *
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
 	private static void migrateH2Db() throws IOException, InterruptedException {
 		final Path dbDir = getDbDir();
 		if (oldH2DbFilePresent()) {
