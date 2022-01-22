@@ -8,10 +8,10 @@ import com.ahli.interfacebuilder.build.MpqBuilderService;
 import com.ahli.interfacebuilder.compress.RuleSet;
 import com.ahli.interfacebuilder.projects.enums.GameType;
 import com.ahli.interfacebuilder.ui.navigation.NavigationController;
+import jakarta.persistence.PersistenceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Hibernate;
-import org.hibernate.HibernateException;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.dao.DataAccessException;
@@ -177,7 +177,7 @@ public class ProjectService {
 			try {
 				final RuleSet ruleSet = Hibernate.unproxy(project2.getBestCompressionRuleSet(), RuleSet.class);
 				project.setBestCompressionRuleSet(ruleSet);
-			} catch (final HibernateException e) {
+			} catch (final PersistenceException e) {
 				logger.error("Error while fetching compression rule set from DB.", e);
 			}
 		}
