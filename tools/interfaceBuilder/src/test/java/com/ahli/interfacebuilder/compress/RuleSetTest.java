@@ -14,6 +14,8 @@ class RuleSetTest {
 		EqualsVerifier.forClass(RuleSet.class)
 				.suppress(Warning.STRICT_HASHCODE)
 				.suppress(Warning.SURROGATE_KEY)
+				.suppress(Warning.NONFINAL_FIELDS) // TODO remove once equalsverifier supports jakarta annotations
+				.suppress(Warning.ALL_FIELDS_SHOULD_BE_USED) // TODO remove once equalsverifier supports jakarta annotations
 				.verify();
 	}
 }
