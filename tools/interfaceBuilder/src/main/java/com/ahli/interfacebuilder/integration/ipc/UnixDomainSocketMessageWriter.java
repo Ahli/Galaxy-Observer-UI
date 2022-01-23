@@ -2,17 +2,12 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 package com.ahli.interfacebuilder.integration.ipc;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
 
 public class UnixDomainSocketMessageWriter implements IpcMessageWriter {
-	private static final Logger logger = LogManager.getLogger(UnixDomainSocketMessageWriter.class);
-	
 	private final SocketChannel channel;
 	
 	public UnixDomainSocketMessageWriter(final SocketChannel channel) {

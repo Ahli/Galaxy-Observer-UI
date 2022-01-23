@@ -173,7 +173,7 @@ public class ProjectService {
 	public RuleSet fetchBestCompressionRuleSet(final Project project) {
 		if (!Hibernate.isInitialized(project.getBestCompressionRuleSet())) {
 			// grab from DB wire compression rules to old instance
-			final ProjectEntity project2 = projectRepo.getById(project.getId());
+			final ProjectEntity project2 = projectRepo.getReferenceById(project.getId());
 			try {
 				final RuleSet ruleSet = Hibernate.unproxy(project2.getBestCompressionRuleSet(), RuleSet.class);
 				project.setBestCompressionRuleSet(ruleSet);
