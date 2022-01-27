@@ -3,6 +3,7 @@
 
 package com.ahli.interfacebuilder.ui.home;
 
+import com.ahli.interfacebuilder.i18n.Messages;
 import com.ahli.interfacebuilder.integration.FileService;
 import com.ahli.interfacebuilder.projects.Project;
 import com.ahli.interfacebuilder.projects.ProjectService;
@@ -49,11 +50,11 @@ public class NewProjectController {
 	public void browsePathAction() {
 		final DirectoryChooser directoryChooser = new DirectoryChooser();
 		directoryChooser.setTitle("Select a directory to create a template Project in");
-		File f = fileService.cutTillValidDirectory(projectPathLabel.getText());
-		if (f != null) {
-			directoryChooser.setInitialDirectory(f);
+		final Path path = fileService.cutTillValidDirectory(Path.of(projectPathLabel.getText()));
+		if (path != null) {
+			directoryChooser.setInitialDirectory(path.toFile());
 		}
-		f = directoryChooser.showDialog(getWindow());
+		final File f = directoryChooser.showDialog(getWindow());
 		if (f != null) {
 			projectPathLabel.setText(f.getAbsolutePath());
 		}
@@ -83,6 +84,7 @@ public class NewProjectController {
 			dialogPane.getButtonTypes().addAll(ButtonType.APPLY, ButtonType.CANCEL);
 			final Button okBttn = (Button) dialogPane.lookupButton(ButtonType.APPLY);
 			okBttn.addEventFilter(ActionEvent.ACTION, this::newProjectAction);
+			okBttn.setText(Messages.getString("general.createButton"));
 			dialog.setResultConverter(param -> project);
 			
 			gameDropdown.setItems(FXCollections.observableArrayList(GameType.SC2, GameType.HEROES));
@@ -107,9 +109,8 @@ public class NewProjectController {
 		}
 		
 		// ensure that the project's path is not used in another project
-		final String path = projectPathLabel.getText();
-		final var existingProjects = projectService.getProjectsOfPath(path);
-		if (!existingProjects.isEmpty()) {
+		final Path path = Path.of(projectPathLabel.getText());
+		if (!projectService.getProjectsOfPath(path).isEmpty()) {
 			final Alert alert = Alerts.buildErrorAlert(
 					dialog.getOwner(),
 					"An Error occurred",
@@ -123,7 +124,7 @@ public class NewProjectController {
 		
 		// try creating the project
 		final String name = projectNameLabel.getText();
-		project = new Project(name, Path.of(path), gameType);
+		project = new Project(name, path, gameType);
 		try {
 			project = projectService.saveProject(project);
 		} catch (final Exception e) {

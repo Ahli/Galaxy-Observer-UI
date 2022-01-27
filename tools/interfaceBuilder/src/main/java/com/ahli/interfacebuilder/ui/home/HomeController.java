@@ -3,6 +3,7 @@
 
 package com.ahli.interfacebuilder.ui.home;
 
+import com.ahli.interfacebuilder.build.MpqBuilderService;
 import com.ahli.interfacebuilder.compress.GameService;
 import com.ahli.interfacebuilder.i18n.Messages;
 import com.ahli.interfacebuilder.integration.FileService;
@@ -57,6 +58,7 @@ public class HomeController implements Updateable {
 	private final GameService gameService;
 	private final TabPaneController tabPaneController;
 	private final NavigationController navigationController;
+	private final MpqBuilderService mpqBuilderService;
 	@FXML
 	private Pane selectedPanel;
 	@FXML
@@ -93,13 +95,15 @@ public class HomeController implements Updateable {
 			final FileService fileService,
 			final GameService gameService,
 			final TabPaneController tabPaneController,
-			final NavigationController navigationController) {
+			final NavigationController navigationController,
+			final MpqBuilderService mpqBuilderService) {
 		this.appContext = appContext;
 		this.projectService = projectService;
 		this.fileService = fileService;
 		this.gameService = gameService;
 		this.tabPaneController = tabPaneController;
 		this.navigationController = navigationController;
+		this.mpqBuilderService = mpqBuilderService;
 	}
 	
 	/**
@@ -271,7 +275,7 @@ public class HomeController implements Updateable {
 		final List<Project> selectedItems = selectionList.getSelectionModel().getSelectedItems();
 		if (!selectedItems.isEmpty()) {
 			navigationController.clickProgress();
-			projectService.build(selectedItems, false);
+			mpqBuilderService.build(selectedItems, false);
 		}
 	}
 	
@@ -279,14 +283,13 @@ public class HomeController implements Updateable {
 	 * Removes the selected projects.
 	 */
 	public void removeSelectedAction() {
-		final List<Project> selectedItems = selectionList.getSelectionModel().getSelectedItems();
-		if (!selectedItems.isEmpty()) {
-			final Project[] items = selectedItems.toArray(new Project[0]);
+		final Project[] selectedItems = selectionList.getSelectionModel().getSelectedItems().toArray(new Project[0]);
+		if (selectedItems.length > 0) {
 			final Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
 			alert.initOwner(getWindow());
-			if (selectedItems.size() > 1) {
+			if (selectedItems.length > 1) {
 				alert.setTitle(String.format("Remove selected Projects from list? - %s items selected",
-						selectedItems.size()));
+						selectedItems.length));
 			} else {
 				alert.setTitle("Remove selected Project from list? - 1 item selected");
 			}
@@ -294,9 +297,9 @@ public class HomeController implements Updateable {
 			                       Are you sure you want to remove the selected projects?
 			                       This will not remove any files from the project.
 			                    """);
-			final Optional<ButtonType> result = alert.showAndWait();
-			if (result.isPresent() && result.get() == ButtonType.OK) {
-				for (final Project p : items) {
+			final ButtonType result = alert.showAndWait().orElse(null);
+			if (result == ButtonType.OK) {
+				for (final Project p : selectedItems) {
 					projectService.deleteProject(p);
 					projectsObservable.remove(p);
 				}

@@ -6,12 +6,9 @@ package com.ahli.interfacebuilder.ui.home;
 import com.ahli.interfacebuilder.projects.Project;
 import javafx.fxml.FXML;
 import javafx.scene.control.Dialog;
-import javafx.scene.layout.Pane;
 
 public class NewProjectDialogController {
 	
-	@FXML
-	private Pane contentPane;
 	@FXML
 	private NewProjectController contentPaneController;
 	@FXML

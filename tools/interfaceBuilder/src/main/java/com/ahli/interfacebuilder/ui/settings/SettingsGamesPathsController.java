@@ -15,13 +15,16 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 import javafx.stage.DirectoryChooser;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
+import java.nio.file.Path;
 
 public class SettingsGamesPathsController extends SettingsAutoSaveController {
 	public static final String HEROES_SWITCHER_EXE = "HeroesSwitcher.exe";
 	public static final String SC2_SWITCHER_EXE = "SC2Switcher.exe";
+	
+	private final FileService fileService;
+	
 	@FXML
 	private TextField sc2Path;
 	@FXML
@@ -36,11 +39,10 @@ public class SettingsGamesPathsController extends SettingsAutoSaveController {
 	private Label heroesPathLabel;
 	@FXML
 	private Label heroesPtrPathLabel;
-	@Autowired
-	private FileService fileService;
 	
-	public SettingsGamesPathsController(final ConfigService configService) {
+	public SettingsGamesPathsController(final ConfigService configService, final FileService fileService) {
 		super(configService);
+		this.fileService = fileService;
 	}
 	
 	/**
@@ -106,7 +108,7 @@ public class SettingsGamesPathsController extends SettingsAutoSaveController {
 	@FXML
 	public void onSc2PathButtonClick() {
 		final File selectedFile =
-				showDirectoryChooser("Select StarCraft II's installation directory", sc2Path.getText());
+				showDirectoryChooser("Select StarCraft II's installation directory", Path.of(sc2Path.getText()));
 		if (selectedFile != null) {
 			setSc2Path(selectedFile.getAbsolutePath());
 		}
@@ -122,12 +124,12 @@ public class SettingsGamesPathsController extends SettingsAutoSaveController {
 	 * @param initialPath
 	 * @return the selected directory or null if no directory has been selected
 	 */
-	private File showDirectoryChooser(final String title, final String initialPath) {
+	private File showDirectoryChooser(final String title, final Path initialPath) {
 		final DirectoryChooser directoryChooser = new DirectoryChooser();
 		directoryChooser.setTitle(title);
-		final File f = fileService.cutTillValidDirectory(initialPath);
-		if (f != null) {
-			directoryChooser.setInitialDirectory(f);
+		final Path path = fileService.cutTillValidDirectory(initialPath);
+		if (path != null) {
+			directoryChooser.setInitialDirectory(path.toFile());
 		}
 		return directoryChooser.showDialog(getWindow());
 	}
@@ -175,8 +177,8 @@ public class SettingsGamesPathsController extends SettingsAutoSaveController {
 	
 	@FXML
 	public void onHeroesPathButtonClick() {
-		final File selectedFile =
-				showDirectoryChooser("Select Heroes of the Storm's installation directory", heroesPath.getText());
+		final File selectedFile = showDirectoryChooser("Select Heroes of the Storm's installation directory",
+				Path.of(heroesPath.getText()));
 		if (selectedFile != null) {
 			setHeroesPath(selectedFile.getAbsolutePath());
 		}
@@ -192,7 +194,7 @@ public class SettingsGamesPathsController extends SettingsAutoSaveController {
 	@FXML
 	public void onHeroesPtrPathButtonClick() {
 		final File selectedFile = showDirectoryChooser("Select Heroes of the Storm's PTR installation directory",
-				heroesPtrPath.getText());
+				Path.of(heroesPtrPath.getText()));
 		if (selectedFile != null) {
 			setHeroesPtrPath(selectedFile.getAbsolutePath());
 		}

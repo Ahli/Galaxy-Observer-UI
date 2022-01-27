@@ -55,15 +55,17 @@ public class FxmlConfiguration {
 			final ProjectService projectService,
 			final FileService fileService,
 			final GameService gameService,
-			final AppController appController,
-			final NavigationController navigationController) {
+			final TabPaneController tabPaneController,
+			final NavigationController navigationController,
+			final MpqBuilderService mpqBuilderService) {
 		return new HomeController(
 				appContext,
 				projectService,
 				fileService,
 				gameService,
-				tabPaneController(appController),
-				navigationController);
+				tabPaneController,
+				navigationController,
+				mpqBuilderService);
 	}
 	
 	@Bean
@@ -90,8 +92,9 @@ public class FxmlConfiguration {
 	
 	@Bean
 	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-	protected SettingsGamesPathsController settingsGamesPathsController(final ConfigService configService) {
-		return new SettingsGamesPathsController(configService);
+	protected SettingsGamesPathsController settingsGamesPathsController(
+			final ConfigService configService, final FileService fileService) {
+		return new SettingsGamesPathsController(configService, fileService);
 	}
 	
 	@Bean

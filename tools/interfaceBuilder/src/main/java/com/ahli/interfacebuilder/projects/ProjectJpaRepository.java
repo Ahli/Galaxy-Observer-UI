@@ -4,9 +4,14 @@
 package com.ahli.interfacebuilder.projects;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public interface ProjectJpaRepository extends JpaRepository<ProjectEntity, Long> {
-	// automatically implements common methods
+	
+	List<ProjectEntity> findAllByProjectPath(@NonNull final String projectPath);
+	
 }

@@ -19,6 +19,7 @@ import com.ahli.interfacebuilder.projects.Project;
 import com.ahli.interfacebuilder.projects.ProjectService;
 import com.ahli.interfacebuilder.projects.enums.GameType;
 import com.ahli.interfacebuilder.ui.AppController;
+import com.ahli.interfacebuilder.ui.navigation.NavigationController;
 import com.ahli.mpq.MpqEditorInterface;
 import com.ahli.mpq.MpqException;
 import com.ahli.mpq.mpqeditor.MpqEditorCompression;
@@ -34,7 +35,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ForkJoinPool;
+import java.util.stream.Stream;
 
 public class MpqBuilderService {
 	private static final Logger logger = LogManager.getLogger(MpqBuilderService.class);
@@ -48,6 +51,7 @@ public class MpqBuilderService {
 	private final Game heroesBaseGame;
 	private final ForkJoinPool executor;
 	private final AppController appController;
+	private final NavigationController navigationController;
 	
 	public MpqBuilderService(
 			final ConfigService configService,
@@ -58,7 +62,8 @@ public class MpqBuilderService {
 			final Game sc2BaseGame,
 			final Game heroesBaseGame,
 			final ForkJoinPool executor,
-			final AppController appController) {
+			final AppController appController,
+			final NavigationController navigationController) {
 		this.configService = configService;
 		this.compileService = compileService;
 		this.fileService = fileService;
@@ -68,6 +73,7 @@ public class MpqBuilderService {
 		this.heroesBaseGame = heroesBaseGame;
 		this.executor = executor;
 		this.appController = appController;
+		this.navigationController = navigationController;
 	}
 	
 	/**
@@ -78,12 +84,12 @@ public class MpqBuilderService {
 	public void build(final Path path) throws IOException {
 		final Project project;
 		
-		final List<Project> projectsOfPath = projectService.getProjectsOfPath(path.toString());
+		final List<Project> projectsOfPath = projectService.getProjectsOfPath(path);
 		if (projectsOfPath.isEmpty()) {
 			final GameType gameType;
-			if (projectService.pathContainsCompileableForGame(path, heroesBaseGame)) {
+			if (pathContainsCompileableForGame(path, heroesBaseGame)) {
 				gameType = GameType.HEROES;
-			} else if (projectService.pathContainsCompileableForGame(path, sc2BaseGame)) {
+			} else if (pathContainsCompileableForGame(path, sc2BaseGame)) {
 				gameType = GameType.SC2;
 			} else {
 				throw new IllegalArgumentException("Specified path '" + path + "' did not contain any project.");
@@ -94,6 +100,23 @@ public class MpqBuilderService {
 		}
 		
 		build(project, true);
+	}
+	
+	/**
+	 * Returns whether the specified path contains a compilable file for the specified game.
+	 *
+	 * @param path
+	 * @param game
+	 * @return
+	 */
+	public boolean pathContainsCompileableForGame(final Path path, final Game game) throws IOException {
+		final String extension = game.getGameDef().layoutFileEnding().toLowerCase(Locale.ROOT);
+		try (final Stream<Path> walk = Files.walk(path)) {
+			return walk.anyMatch(curPath -> curPath.getFileName()
+					.toString()
+					.toLowerCase(Locale.ROOT)
+					.endsWith(extension));
+		}
 	}
 	
 	/**
@@ -372,4 +395,23 @@ public class MpqBuilderService {
 			default -> throw new IllegalArgumentException("Unsupported mpq compression mode.");
 		};
 	}
+	
+	/**
+	 * Builds the specified projects.
+	 *
+	 * @param projects
+	 * @param useCmdLineSettings
+	 */
+	public void build(@NonNull final Iterable<Project> projects, final boolean useCmdLineSettings) {
+		boolean building = false;
+		for (final Project project : projects) {
+			building = true;
+			build(project, useCmdLineSettings);
+		}
+		if (building) {
+			// switch to progress
+			navigationController.clickProgress();
+		}
+	}
+	
 }

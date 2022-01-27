@@ -3,11 +3,8 @@
 
 package com.ahli.interfacebuilder.projects;
 
-import com.ahli.galaxy.game.Game;
-import com.ahli.interfacebuilder.build.MpqBuilderService;
 import com.ahli.interfacebuilder.compress.RuleSet;
 import com.ahli.interfacebuilder.projects.enums.GameType;
-import com.ahli.interfacebuilder.ui.navigation.NavigationController;
 import jakarta.persistence.PersistenceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,8 +12,7 @@ import org.hibernate.Hibernate;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.BufferedInputStream;
@@ -26,8 +22,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
-import java.util.Locale;
-import java.util.stream.Stream;
 
 /**
  * ProjectService manages Observer Interface project related tasks.
@@ -36,16 +30,9 @@ public class ProjectService {
 	private static final String DIRECTORY_SYMBOL = "/";
 	private static final Logger logger = LogManager.getLogger(ProjectService.class);
 	private final ProjectJpaRepository projectRepo;
-	private final MpqBuilderService mpqBuilderService;
-	private final NavigationController navigationController;
 	
-	public ProjectService(
-			final ProjectJpaRepository projectRepo,
-			final MpqBuilderService mpqBuilderService,
-			final NavigationController navigationController) {
+	public ProjectService(final ProjectJpaRepository projectRepo) {
 		this.projectRepo = projectRepo;
-		this.mpqBuilderService = mpqBuilderService;
-		this.navigationController = navigationController;
 	}
 	
 	/**
@@ -85,23 +72,6 @@ public class ProjectService {
 	}
 	
 	/**
-	 * Returns whether the specified path contains a compilable file for the specified game.
-	 *
-	 * @param path
-	 * @param game
-	 * @return
-	 */
-	public boolean pathContainsCompileableForGame(final Path path, final Game game) throws IOException {
-		final String extension = game.getGameDef().layoutFileEnding().toLowerCase(Locale.ROOT);
-		try (final Stream<Path> walk = Files.walk(path)) {
-			return walk.anyMatch(curPath -> curPath.getFileName()
-					.toString()
-					.toLowerCase(Locale.ROOT)
-					.endsWith(extension));
-		}
-	}
-	
-	/**
 	 * Returns all Projects.
 	 *
 	 * @return
@@ -127,29 +97,11 @@ public class ProjectService {
 	}
 	
 	/**
-	 * Builds the specified projects.
-	 *
-	 * @param projects
-	 * @param useCmdLineSettings
-	 */
-	public void build(final Iterable<Project> projects, final boolean useCmdLineSettings) {
-		boolean building = false;
-		for (final Project project : projects) {
-			building = true;
-			mpqBuilderService.build(project, useCmdLineSettings);
-		}
-		if (building) {
-			// switch to progress
-			navigationController.clickProgress();
-		}
-	}
-	
-	/**
 	 * Removes the specified Project from the database.
 	 *
 	 * @param project
 	 */
-	public void deleteProject(final Project project) {
+	public void deleteProject(@NonNull final Project project) {
 		projectRepo.delete(ProjectEntity.fromProject(project));
 	}
 	
@@ -159,8 +111,8 @@ public class ProjectService {
 	 * @param path
 	 * @return list of Projects with matching path
 	 */
-	public List<Project> getProjectsOfPath(final String path) {
-		return ProjectEntity.toProjects(projectRepo.findAll(new ProjectsPathMatcher(path)));
+	public List<Project> getProjectsOfPath(@NonNull final Path path) {
+		return ProjectEntity.toProjects(projectRepo.findAllByProjectPath(path.toString()));
 	}
 	
 	/**
@@ -184,21 +136,4 @@ public class ProjectService {
 		return project.getBestCompressionRuleSet();
 	}
 	
-	private static final class ProjectsPathMatcher implements Example<ProjectEntity> {
-		private final String path;
-		
-		private ProjectsPathMatcher(final String path) {
-			this.path = path;
-		}
-		
-		@Override
-		public ProjectEntity getProbe() {
-			return new ProjectEntity(null, path, null);
-		}
-		
-		@Override
-		public ExampleMatcher getMatcher() {
-			return ExampleMatcher.matchingAll().withIgnoreNullValues();
-		}
-	}
 }

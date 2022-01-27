@@ -3,6 +3,7 @@
 
 package com.ahli.interfacebuilder.ui.home;
 
+import com.ahli.interfacebuilder.i18n.Messages;
 import com.ahli.interfacebuilder.integration.FileService;
 import com.ahli.interfacebuilder.projects.Project;
 import com.ahli.interfacebuilder.projects.ProjectService;
@@ -46,11 +47,11 @@ public class AddProjectController {
 	public void browsePathAction() {
 		final DirectoryChooser directoryChooser = new DirectoryChooser();
 		directoryChooser.setTitle("Select an existing Observer UI's directory.");
-		File f = fileService.cutTillValidDirectory(projectPathLabel.getText());
-		if (f != null) {
-			directoryChooser.setInitialDirectory(f);
+		final Path path = fileService.cutTillValidDirectory(Path.of(projectPathLabel.getText()));
+		if (path != null) {
+			directoryChooser.setInitialDirectory(path.toFile());
 		}
-		f = directoryChooser.showDialog(getWindow());
+		final File f = directoryChooser.showDialog(getWindow());
 		if (f != null) {
 			projectPathLabel.setText(f.getAbsolutePath());
 		}
@@ -93,6 +94,7 @@ public class AddProjectController {
 			dialogPane.getButtonTypes().addAll(ButtonType.APPLY, ButtonType.CANCEL);
 			final Button okBttn = (Button) dialogPane.lookupButton(ButtonType.APPLY);
 			okBttn.addEventFilter(ActionEvent.ACTION, this::addProjectAction);
+			okBttn.setText(Messages.getString("general.addButton"));
 			dialog.setResultConverter(param -> project);
 			
 			gameDropdown.setItems(FXCollections.observableArrayList(GameType.SC2, GameType.HEROES));

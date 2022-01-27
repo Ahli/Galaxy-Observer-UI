@@ -31,7 +31,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import javax.swing.filechooser.FileSystemView;
@@ -99,12 +98,9 @@ public class AppConfiguration {
 	}
 	
 	@Bean
-	protected ProjectService projectService(
-			final ProjectJpaRepository projectJpaRepository,
-			@Lazy final MpqBuilderService mpqBuilderService,
-			final NavigationController navigationController) {
+	protected ProjectService projectService(final ProjectJpaRepository projectJpaRepository) {
 		logger.debug("init bean: projectService");
-		return new ProjectService(projectJpaRepository, mpqBuilderService, navigationController);
+		return new ProjectService(projectJpaRepository);
 	}
 	
 	@Bean
@@ -118,7 +114,8 @@ public class AppConfiguration {
 			final Game sc2Game,
 			final Game heroesGame,
 			final ForkJoinPool forkJoinPool,
-			final AppController appController) {
+			final AppController appController,
+			final NavigationController navigationController) {
 		logger.debug("init bean: mpqBuilderService");
 		return new MpqBuilderService(
 				configService,
@@ -129,7 +126,8 @@ public class AppConfiguration {
 				sc2Game,
 				heroesGame,
 				forkJoinPool,
-				appController);
+				appController,
+				navigationController);
 	}
 	
 	@Bean
