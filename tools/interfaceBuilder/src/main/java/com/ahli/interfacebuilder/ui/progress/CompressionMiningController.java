@@ -12,6 +12,7 @@ import com.ahli.interfacebuilder.i18n.Messages;
 import com.ahli.interfacebuilder.integration.FileService;
 import com.ahli.interfacebuilder.projects.Project;
 import com.ahli.interfacebuilder.projects.ProjectService;
+import com.ahli.interfacebuilder.ui.FxmlController;
 import com.ahli.interfacebuilder.ui.Updateable;
 import com.ahli.mpq.MpqEditorInterface;
 import com.ahli.mpq.MpqException;
@@ -29,8 +30,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -38,9 +38,8 @@ import java.util.concurrent.ForkJoinPool;
 
 import static com.ahli.interfacebuilder.ui.AppController.FATAL_ERROR;
 
-
-public class CompressionMiningController implements Updateable {
-	private static final Logger logger = LogManager.getLogger(CompressionMiningController.class);
+@Log4j2
+public class CompressionMiningController implements Updateable, FxmlController {
 	private final GameService gameService;
 	private final ProjectService projectService;
 	private final ConfigService configService;
@@ -97,6 +96,7 @@ public class CompressionMiningController implements Updateable {
 	/**
 	 * Automatically called by FxmlLoader
 	 */
+	@Override
 	public void initialize() {
 		columnCompress.setCellValueFactory(cellData -> new SimpleBooleanProperty(cellData.getValue()
 				.isCompress()).asString());
@@ -188,7 +188,7 @@ public class CompressionMiningController implements Updateable {
 		}
 		keepTaskRunning = true;
 		task = () -> {
-			Path modTargetFile = null;
+			final Path modTargetFile;
 			try {
 				long bestSize;
 				final ModD mod = gameService.getModData(project.getGameType());
@@ -218,7 +218,7 @@ public class CompressionMiningController implements Updateable {
 						projectService.saveProject(project);
 					}
 				}
-				logger.info("Best size before mining: {} kb.", bestSize / 1024);
+				log.info("Best size before mining: {} kb.", bestSize / 1024);
 				updateUiRules(expCompMiner.getBestCompressionRules());
 				updateUiSizeToBeat(bestSize);
 				long lastSize;
@@ -230,26 +230,26 @@ public class CompressionMiningController implements Updateable {
 					if (lastSize < bestSize) {
 						if (validateTargetFile(mod, expCompMiner.getMpqInterface())) {
 							bestSize = lastSize;
-							logger.info("Mined better compression of size {} kb.", lastSize / 1024);
+							log.info("Mined better compression of size {} kb.", lastSize / 1024);
 							//noinspection ObjectAllocationInLoop
 							project.setBestCompressionRuleSet(new RuleSet(comprMiner.getBestCompressionRules()));
 							projectService.saveProject(project);
 							updateUiSizeToBeat(lastSize);
 							updateUiRules(comprMiner.getBestCompressionRules());
 						} else {
-							logger.warn("Invalid file encountered: {} kb.", lastSize / 1024);
+							log.warn("Invalid file encountered: {} kb.", lastSize / 1024);
 						}
 					}
 					if (Thread.currentThread().isInterrupted() || task == null) {
-						logger.info("Stopping the mining task.");
+						log.info("Stopping the mining task.");
 						return;
 					}
 				}
 			} catch (final IOException | MpqException e) {
-				logger.error("Experimental Compression Miner experienced a problem.", e);
+				log.error("Experimental Compression Miner experienced a problem.", e);
 			} catch (final InterruptedException e) {
 				Thread.currentThread().interrupt();
-				logger.error("Interrupted while compression mining");
+				log.error("Interrupted while compression mining");
 			} finally {
 				final RandomCompressionMiner comprMiner = expCompMiner;
 				if (comprMiner != null) {
@@ -274,7 +274,7 @@ public class CompressionMiningController implements Updateable {
 		if (expCompMiner != null) {
 			final long newBest = expCompMiner.getBestSize();
 			expCompMiner = null;
-			logger.info("Currently best Compression produces archives of size: {} kb", newBest / 1024);
+			log.info("Currently best Compression produces archives of size: {} kb", newBest / 1024);
 		}
 		miningButton.setText(Messages.getString("progress.compressionMining.startMining"));
 	}
@@ -290,7 +290,7 @@ public class CompressionMiningController implements Updateable {
 				ruleSetObservableItems.setAll(rules);
 				ruleSetTable.setItems(ruleSetObservableItems);
 			} catch (final Exception e) {
-				logger.fatal(FATAL_ERROR, e);
+				log.fatal(FATAL_ERROR, e);
 			}
 		});
 	}
@@ -305,7 +305,7 @@ public class CompressionMiningController implements Updateable {
 			try {
 				sizeToBeatLabel.setText(bestSize / 1024 + " kb");
 			} catch (final Exception e) {
-				logger.fatal(FATAL_ERROR, e);
+				log.fatal(FATAL_ERROR, e);
 			}
 		});
 	}
@@ -322,7 +322,7 @@ public class CompressionMiningController implements Updateable {
 				lastSizeLabel.setText(lastSize / 1024 + " kb");
 				attemptCounterLabel.setText(String.valueOf(attempts));
 			} catch (final Exception e) {
-				logger.fatal(FATAL_ERROR, e);
+				log.fatal(FATAL_ERROR, e);
 			}
 		});
 	}

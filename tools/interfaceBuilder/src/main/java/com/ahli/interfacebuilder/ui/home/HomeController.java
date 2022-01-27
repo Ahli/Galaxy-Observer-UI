@@ -10,6 +10,7 @@ import com.ahli.interfacebuilder.integration.FileService;
 import com.ahli.interfacebuilder.projects.Project;
 import com.ahli.interfacebuilder.projects.ProjectService;
 import com.ahli.interfacebuilder.ui.FXMLSpringLoader;
+import com.ahli.interfacebuilder.ui.FxmlController;
 import com.ahli.interfacebuilder.ui.Updateable;
 import com.ahli.interfacebuilder.ui.navigation.NavigationController;
 import com.ahli.interfacebuilder.ui.progress.CompressionMiningController;
@@ -38,8 +39,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.stage.Window;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.context.ApplicationContext;
 
 import java.io.IOException;
@@ -50,8 +50,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
-public class HomeController implements Updateable {
-	private static final Logger logger = LogManager.getLogger(HomeController.class);
+@Log4j2
+public class HomeController implements Updateable, FxmlController {
 	private final ApplicationContext appContext;
 	private final ProjectService projectService;
 	private final FileService fileService;
@@ -81,12 +81,6 @@ public class HomeController implements Updateable {
 	private Button addProject;
 	@FXML
 	private ListView<Project> selectionList;
-	@FXML
-	private Button removeProject;
-	@FXML
-	private Button editProject;
-	@FXML
-	private Button buildSelection;
 	private ObservableList<Project> projectsObservable;
 	
 	public HomeController(
@@ -109,6 +103,7 @@ public class HomeController implements Updateable {
 	/**
 	 * Automatically called by FxmlLoader
 	 */
+	@Override
 	@SuppressWarnings("java:S1905") // unnecessary cast warning (cast is necessary here)
 	public void initialize() {
 		// grab list of projects per game
@@ -127,7 +122,7 @@ public class HomeController implements Updateable {
 					try {
 						setGraphic(getListItemGameImage(project));
 					} catch (final IOException e) {
-						logger.error("Failed to find image resource.", e);
+						log.error("Failed to find image resource.", e);
 					}
 				}
 			}
@@ -174,13 +169,13 @@ public class HomeController implements Updateable {
 			} catch (final IOException e) {
 				selectedDirSize.setText("-");
 				selectedDirFiles.setText("-");
-				logger.trace("Error updating selected details panel.", e);
+				log.trace("Error updating selected details panel.", e);
 			}
 			selectedPath.setText(p.getProjectPath().toString());
 			try {
 				selectedImage.setImage(new Image(getResourceAsUrl(gameService.getGameItemPath(p.getGameType())).toString()));
 			} catch (final IOException e) {
-				logger.error("Failed to load image from project's game setting.", e);
+				log.error("Failed to load image from project's game setting.", e);
 			}
 		} else {
 			selectedPanel.setVisible(false);
@@ -214,7 +209,7 @@ public class HomeController implements Updateable {
 		dialog.initOwner(addProject.getScene().getWindow());
 		final Optional<Project> result = dialog.showAndWait();
 		if (result.isPresent()) {
-			logger.trace("dialog 'add project' result: {}", result::get);
+			log.trace("dialog 'add project' result: {}", result::get);
 			projectsObservable.add(result.get());
 		}
 	}
@@ -230,7 +225,7 @@ public class HomeController implements Updateable {
 		dialog.initOwner(newProject.getScene().getWindow());
 		final Optional<Project> result = dialog.showAndWait();
 		if (result.isPresent()) {
-			logger.trace("dialog 'new project' result: {}", result::get);
+			log.trace("dialog 'new project' result: {}", result::get);
 			projectsObservable.add(result.get());
 		}
 	}
@@ -250,7 +245,7 @@ public class HomeController implements Updateable {
 			((AddProjectDialogController) loader.getController()).getContentController().setProjectToEdit(project);
 			final Optional<Project> result = dialog.showAndWait();
 			if (result.isPresent()) {
-				logger.trace("dialog 'edit project' result: {}", result::get);
+				log.trace("dialog 'edit project' result: {}", result::get);
 				updateProjectList();
 			}
 		}

@@ -19,20 +19,19 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.context.ApplicationContext;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Log4j2
 public class NavigationController {
 	public static final int HOME_TAB = 0;
 	public static final int PROGRESS_TAB = 1;
 	public static final int BROWSE_TAB = 2;
 	public static final int SETTINGS_TAB = 3;
-	private static final Logger logger = LogManager.getLogger(NavigationController.class);
 	/* ContentPages:
 	 * 0: taskChoice
 	 * 1: tabPane
@@ -114,7 +113,7 @@ public class NavigationController {
 			final Object controller = loader.getController();
 			controllers[index] = (controller instanceof final Updateable updateable) ? updateable : null;
 		} catch (final IOException e) {
-			logger.error(String.format("failed to load FXML: %s.", path), e);
+			log.error(String.format("failed to load FXML: %s.", path), e);
 			contentPages[index] = null;
 			controllers[index] = null;
 		}

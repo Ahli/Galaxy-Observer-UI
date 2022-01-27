@@ -13,7 +13,6 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import lombok.extern.log4j.Log4j2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +22,6 @@ import java.util.List;
  * <p>
  * This implementation is based on Caleb Brinkman's AutoCompleteTextField.
  */
-@Log4j2
 public class AutoCompleteComboBox extends ComboBox<String> {
 	/** The popup used to select an entry. */
 	private final ContextMenu entriesPopup;

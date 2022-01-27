@@ -40,13 +40,13 @@ import javafx.scene.image.Image;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.BeanCreationNotAllowedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.event.EventListener;
+import org.springframework.lang.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,9 +58,9 @@ import java.util.List;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 
+@Log4j2
 public class AppController implements CleaningForkJoinTaskCleaner {
 	public static final String FATAL_ERROR = "FATAL ERROR: ";
-	private static final Logger logger = LogManager.getLogger(AppController.class);
 	private final List<ErrorTabController> errorTabControllers;
 	private ForkJoinPool executor;
 	private TabPaneController tabPaneController;
@@ -69,6 +69,7 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 	private GameService gameService;
 	private ConfigService configService;
 	private ConfigurableApplicationContext appContext;
+	@Nullable
 	private Stage primaryStage;
 	private NavigationController navigationController;
 	private ReplayService replayService;
@@ -86,9 +87,9 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 	public static void printErrorLogMessageToGeneral(final String msg) {
 		Platform.runLater(() -> {
 			try {
-				logger.error(msg);
+				log.error(msg);
 			} catch (final Exception e) {
-				logger.fatal(FATAL_ERROR, e);
+				log.fatal(FATAL_ERROR, e);
 			}
 		});
 	}
@@ -125,13 +126,13 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 		new Thread(() -> {
 			// free space of baseUI
 			if (executor != null && executor.isQuiescent() && mpqBuilderService != null) {
-				logger.debug("Freeing up resources");
+				log.debug("Freeing up resources");
 				// TODO try to get red if lazy beans to avoid this exception
 				try {
 					mpqBuilderService.getGameData(GameType.SC2).setUiCatalog(null);
 					mpqBuilderService.getGameData(GameType.HEROES).setUiCatalog(null);
 				} catch (final BeanCreationNotAllowedException e) {
-					logger.trace("Failed to instantiate lazy beans.", e);
+					log.trace("Failed to instantiate lazy beans.", e);
 				}
 				// GC1 is the default GC and can now release RAM -> actually good to do after a task because we use a
 				// lot of RAM for the UIs
@@ -141,12 +142,12 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 				System.gc();
 				System.runFinalization();
 				// clean up StringInterner's weak references that the GC removed
-				logger.trace("string interner size before cleaning: {}", StringInterner.size()); // instant calc!
+				log.trace("string interner size before cleaning: {}", StringInterner.size()); // instant calc!
 				StringInterner.cleanUpGarbage();
-				logger.trace("string interner size after cleaning: {}", StringInterner::size);
+				log.trace("string interner size after cleaning: {}", StringInterner::size);
 				// TODO not all Strings are removed for some reason
 				//				if (StringInterner.size() < 10) {
-				//					logger.trace("interner content: \n{}", StringInterner.print());
+				//					log.trace("interner content: \n{}", StringInterner.print());
 				//				}
 			}
 		}).start();
@@ -182,7 +183,7 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 			root = loader.load("classpath:view/Navigation.fxml");
 			navigationController = loader.getController();
 		} catch (final IOException e) {
-			logger.error("Failed to load Navigation.fxml:", e);
+			log.error("Failed to load Navigation.fxml:", e);
 			throw new IOException("Failed to load Navigation.fxml.", e);
 		}
 		final Scene scene = new Scene(root, 1200, 600);
@@ -195,8 +196,8 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 			primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/res/ahli.png")));
 		} catch (final Exception e) {
 			final String msg = "Failed to load ahli.png";
-			logger.error(msg);
-			logger.trace(msg, e);
+			log.error(msg);
+			log.trace(msg, e);
 		}
 		primaryStage.setMaximized(true);
 		primaryStage.setScene(scene);
@@ -217,18 +218,18 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 	 * Prints variables into console.
 	 */
 	private void printVariables(final CommandLineParams params) {
-		logger.info("basePath: {}", configService.getBasePath());
-		logger.info("documentsPath: {}", configService.getDocumentsPath());
+		log.info("basePath: {}", configService.getBasePath());
+		log.info("documentsPath: {}", configService.getDocumentsPath());
 		final String paramCompilePath = params.getParamCompilePath();
 		if (paramCompilePath != null) {
-			logger.info("compile param path: {}", paramCompilePath);
+			log.info("compile param path: {}", paramCompilePath);
 			if (params.isCompileAndRun()) {
-				logger.info("run after compile: true");
+				log.info("run after compile: true");
 			}
 		}
 		final String paramRunPath = params.getParamRunPath();
 		if (paramRunPath != null) {
-			logger.info("run param path: {}", paramRunPath);
+			log.info("run param path: {}", paramRunPath);
 		}
 	}
 	
@@ -242,7 +243,7 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 					try {
 						navigationController.lockNavToProgress();
 					} catch (final Exception e) {
-						logger.fatal(FATAL_ERROR, e);
+						log.fatal(FATAL_ERROR, e);
 					}
 				});
 			}
@@ -259,12 +260,12 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 					try {
 						navigationController.unlockNav();
 					} catch (final Exception e) {
-						logger.fatal(FATAL_ERROR, e);
+						log.fatal(FATAL_ERROR, e);
 					}
 				});
 			}
 		} catch (final Exception e) {
-			logger.fatal(FATAL_ERROR, e);
+			log.fatal(FATAL_ERROR, e);
 		}
 	}
 	
@@ -275,11 +276,11 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 					navigationController.appendNotification(new Notification(Messages.getString(
 							"browse.notification.sc2OutOfDate"), NavigationController.BROWSE_TAB, "sc2OutOfDate"));
 				} else {
-					logger.warn(Messages.getString("browse.notification.sc2OutOfDate"));
+					log.warn(Messages.getString("browse.notification.sc2OutOfDate"));
 				}
 			}
 		} catch (final IOException e) {
-			logger.error("Error during SC2 baseUI update check.", e);
+			log.error("Error during SC2 baseUI update check.", e);
 		}
 		try {
 			if (baseUiService.isOutdated(GameType.HEROES, false)) {
@@ -289,11 +290,11 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 							NavigationController.BROWSE_TAB,
 							"heroesOutOfDate"));
 				} else {
-					logger.warn(Messages.getString("browse.notification.heroesOutOfDate"));
+					log.warn(Messages.getString("browse.notification.heroesOutOfDate"));
 				}
 			}
 		} catch (final IOException e) {
-			logger.error("Error during Heroes baseUI update check.", e);
+			log.error("Error during Heroes baseUI update check.", e);
 		}
 		try {
 			if (baseUiService.isOutdated(GameType.HEROES, true)) {
@@ -303,11 +304,11 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 							NavigationController.BROWSE_TAB,
 							"heroesPtrOutOfDate"));
 				} else {
-					logger.warn(Messages.getString("browse.notification.heroesPtrOutOfDate"));
+					log.warn(Messages.getString("browse.notification.heroesPtrOutOfDate"));
 				}
 			}
 		} catch (final IOException e) {
-			logger.error("Error during Heroes PTR baseUI update check.", e);
+			log.error("Error during Heroes PTR baseUI update check.", e);
 		}
 	}
 	
@@ -340,7 +341,7 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 								delay.setOnFinished(event -> primaryStage.close());
 								delay.play();
 							} catch (final Exception e) {
-								logger.fatal(FATAL_ERROR, e);
+								log.fatal(FATAL_ERROR, e);
 							}
 						});
 					} else {
@@ -349,7 +350,7 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 							try {
 								primaryStage.close();
 							} catch (final Exception e) {
-								logger.fatal(FATAL_ERROR, e);
+								log.fatal(FATAL_ERROR, e);
 							}
 						});
 					}
@@ -415,11 +416,11 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 				gamePath = settings.getSc2Path() + File.separator + supportDir + File.separator + swicherExe;
 			}
 		}
-		logger.info("Game location: {}", gamePath);
+		log.info("Game location: {}", gamePath);
 		try {
 			final Path replay = replayService.getLastUsedOrNewestReplay(isHeroes, configService.getDocumentsPath());
 			if (replay != null && Files.exists(replay) && Files.isRegularFile(replay)) {
-				logger.info("Starting game with replay: {}", replay);
+				log.info("Starting game with replay: {}", replay);
 				try {
 					printInfoLogMessageToGeneral("The game starts with a replay now...");
 					final String[] cmd = new String[] { "cmd", "/C", "start",
@@ -427,13 +428,13 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 					Runtime.getRuntime().exec(cmd);
 					return true;
 				} catch (final IOException e) {
-					logger.error("Failed to execute the game launch command.", e);
+					log.error("Failed to execute the game launch command.", e);
 				}
 			} else {
-				logger.error("Failed to find any replay.");
+				log.error("Failed to find any replay.");
 			}
 		} catch (final IOException e) {
-			logger.error("Error while finding replay.", e);
+			log.error("Error while finding replay.", e);
 		}
 		return false;
 	}
@@ -459,33 +460,33 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 		if (primaryStage != null) {
 			Platform.runLater(() -> {
 				try {
-					logger.info(msg);
+					log.info(msg);
 				} catch (final Exception e) {
-					logger.fatal(FATAL_ERROR, e);
+					log.fatal(FATAL_ERROR, e);
 				}
 			});
 		} else {
-			logger.info(msg);
+			log.info(msg);
 		}
 	}
 	
 	@EventListener
 	public void onAppClosingEvent(final AppClosingEvent appCLosingEvent) {
-		logger.info("App is about to shut down.");
+		log.info("App is about to shut down.");
 		if (!executor.isShutdown()) {
 			executor.shutdownNow();
 		} else {
-			logger.info("Executor was already shut down.");
+			log.info("Executor was already shut down.");
 		}
 		try {
 			//noinspection ResultOfMethodCallIgnored
 			executor.awaitTermination(120L, TimeUnit.SECONDS);
 		} catch (final InterruptedException e) {
-			logger.error("ERROR: Executor timed out waiting for Worker Theads to terminate. A Thread might run rampage.",
+			log.error("ERROR: Executor timed out waiting for Worker Theads to terminate. A Thread might run rampage.",
 					e);
 			Thread.currentThread().interrupt();
 		}
-		logger.info("App waves Goodbye!");
+		log.info("App waves Goodbye!");
 	}
 	
 	/**
@@ -494,7 +495,7 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 	 * @param threadName
 	 * @param tabName
 	 */
-	public void addThreadLoggerTab(
+	public void addThreadlogTab(
 			final String threadName, final String tabName, final boolean errorPreventsExit) {
 		if (primaryStage != null) {
 			final ObservableList<Tab> tabs = getTabPane().getTabs();
@@ -528,7 +529,7 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 				// context menu with close option
 				final ContextMenu contextMenu = new ContextMenu();
 				final MenuItem closeItem = new MenuItem(Messages.getString("contextmenu.close"));
-				closeItem.setOnAction(new CloseThreadLoggerTabAction(newTab, errorTabCtrl, errorTabControllers));
+				closeItem.setOnAction(new CloseThreadlogTabAction(newTab, errorTabCtrl, errorTabControllers));
 				contextMenu.getItems().add(closeItem);
 				newTab.setContextMenu(contextMenu);
 				
@@ -539,7 +540,7 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 					try {
 						getTabPane().getTabs().add(newTabFinal);
 					} catch (final Exception e) {
-						logger.fatal(FATAL_ERROR, e);
+						log.fatal(FATAL_ERROR, e);
 					}
 				});
 			} else {
@@ -554,7 +555,7 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 							errorTabCtrl.clearWarning(false);
 							errorTabCtrl.setRunning(true);
 						} catch (final Exception e) {
-							logger.fatal(FATAL_ERROR, e);
+							log.fatal(FATAL_ERROR, e);
 						}
 					});
 				}
@@ -600,16 +601,17 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 	 *
 	 * @return
 	 */
+	@Nullable
 	public Stage getPrimaryStage() {
 		return primaryStage;
 	}
 	
-	private static final class CloseThreadLoggerTabAction implements EventHandler<ActionEvent> {
+	private static final class CloseThreadlogTabAction implements EventHandler<ActionEvent> {
 		private final Tab tab;
 		private final ErrorTabController controller;
 		private final List<ErrorTabController> controllers;
 		
-		private CloseThreadLoggerTabAction(
+		private CloseThreadlogTabAction(
 				final Tab tab, final ErrorTabController controller, final List<ErrorTabController> controllers) {
 			this.tab = tab;
 			this.controller = controller;

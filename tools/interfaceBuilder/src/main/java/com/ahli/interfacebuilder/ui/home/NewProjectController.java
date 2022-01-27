@@ -22,15 +22,14 @@ import javafx.scene.control.DialogPane;
 import javafx.scene.control.TextField;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Window;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 
+@Log4j2
 public class NewProjectController {
-	private static final Logger logger = LogManager.getLogger(NewProjectController.class);
 	private final ProjectService projectService;
 	private final FileService fileService;
 	@FXML
@@ -100,7 +99,7 @@ public class NewProjectController {
 	 * 		button click event
 	 */
 	public void newProjectAction(final Event event) {
-		logger.trace("new project action event fired");
+		log.trace("new project action event fired");
 		final GameType gameType = gameDropdown.getValue();
 		if (gameType == null) {
 			// eat event before it reaches the resultConverter
@@ -128,7 +127,7 @@ public class NewProjectController {
 		try {
 			project = projectService.saveProject(project);
 		} catch (final Exception e) {
-			logger.error("ERROR: Could not create project.", e);
+			log.error("ERROR: Could not create project.", e);
 			final Alert alert = Alerts.buildErrorAlert(
 					dialog.getOwner(),
 					"An Error occurred",
@@ -141,9 +140,9 @@ public class NewProjectController {
 		// try creating the template & clean up the project if it fails
 		try {
 			projectService.createTemplateProjectFiles(project);
-			logger.trace("new project template created");
+			log.trace("new project template created");
 		} catch (final IOException e) {
-			logger.error("ERROR: Could not create template for project.", e);
+			log.error("ERROR: Could not create template for project.", e);
 			projectService.deleteProject(project);
 			final Alert alert = Alerts.buildErrorAlert(
 					dialog.getOwner(),

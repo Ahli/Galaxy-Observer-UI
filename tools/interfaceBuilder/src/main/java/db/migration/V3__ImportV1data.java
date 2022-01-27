@@ -1,7 +1,6 @@
 package db.migration;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.flywaydb.core.internal.jdbc.JdbcTemplate;
@@ -12,9 +11,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
 
+@Log4j2
 @SuppressWarnings("java:S101")
 public class V3__ImportV1data extends BaseJavaMigration {
-	private static final Logger logger = LogManager.getLogger(V3__ImportV1data.class);
 	
 	@Override
 	public void migrate(final Context context) throws SQLException {
@@ -28,7 +27,7 @@ public class V3__ImportV1data extends BaseJavaMigration {
 			try {
 				Files.delete(migrationScriptPath);
 			} catch (final IOException e) {
-				logger.error("Failed to clear H2DB V1 migration script.", e);
+				log.error("Failed to clear H2DB V1 migration script.", e);
 			}
 		}
 	}

@@ -10,14 +10,13 @@ import javafx.scene.Node;
 import javafx.scene.text.FontSmoothingType;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 
 import static com.ahli.interfacebuilder.ui.AppController.FATAL_ERROR;
 
+@Log4j2
 public class TextFlowAppender implements Appender {
 	private static final String STYLE = "INFO";
-	private static final Logger logger = LogManager.getLogger(TextFlowAppender.class);
 	private final TextFlow textFlow;
 	private SimpleBooleanProperty endedProp;
 	
@@ -35,7 +34,7 @@ public class TextFlowAppender implements Appender {
 			try {
 				children.add(text);
 			} catch (final Exception e) {
-				logger.fatal(FATAL_ERROR, e);
+				log.fatal(FATAL_ERROR, e);
 			}
 		});
 	}

@@ -31,8 +31,9 @@ import com.kichik.pecoff4j.resources.StringFileInfo;
 import com.kichik.pecoff4j.resources.StringTable;
 import com.kichik.pecoff4j.resources.VersionInfo;
 import com.kichik.pecoff4j.util.ResourceHelper;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -55,8 +56,8 @@ import java.util.Optional;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveAction;
 
+@Log4j2
 public class BaseUiService {
-	private static final Logger logger = LogManager.getLogger(BaseUiService.class);
 	private static final String META_FILE_NAME = ".meta";
 	
 	private final ConfigService configService;
@@ -108,8 +109,8 @@ public class BaseUiService {
 			}
 		} catch (final IOException e) {
 			final String msg = "Failed to read Game Info from extracted base UI.";
-			logger.warn(msg);
-			logger.trace(msg, e);
+			log.warn(msg);
+			log.trace(msg, e);
 			return true;
 		}
 		final int[] versionBaseUi = baseUiInfo.getVersion();
@@ -118,8 +119,8 @@ public class BaseUiService {
 		for (int i = 0; i < versionExe.length && isUpToDate; ++i) {
 			isUpToDate = versionExe[i] <= versionBaseUi[i];
 		}
-		if (logger.isTraceEnabled()) {
-			logger.trace("Exe version check - exe={} - {} - upToDate={}",
+		if (log.isTraceEnabled()) {
+			log.trace("Exe version check - exe={} - {} - upToDate={}",
 					Arrays.toString(versionExe),
 					Arrays.toString(versionBaseUi),
 					isUpToDate);
@@ -157,14 +158,14 @@ public class BaseUiService {
 				
 				final StringFileInfo strings = version.getStringFileInfo();
 				final StringTable table = strings.getTable(0);
-				for (int j = 0; j < table.getCount(); j++) {
+				for (int j = 0; j < table.getCount(); ++j) {
 					final String key = table.getString(j).getKey();
 					if ("FileVersion".equals(key)) {
 						final String value = table.getString(j).getValue();
-						logger.trace("found FileVersion={}", value);
+						log.trace("found FileVersion={}", value);
 						
 						final String[] parts = value.split("\\.");
-						for (int k = 0; k < 4; k++) {
+						for (int k = 0; k < 4; ++k) {
 							versions[k] = Integer.parseInt(parts[k]);
 						}
 						return versions;
@@ -172,7 +173,7 @@ public class BaseUiService {
 				}
 			}
 		} catch (final IOException e) {
-			logger.error("Error attempting to parse FileVersion from game's exe: ", e);
+			log.error("Error attempting to parse FileVersion from game's exe: ", e);
 		}
 		return versions;
 	}
@@ -185,9 +186,10 @@ public class BaseUiService {
 	 * @param outputs
 	 * @return list of executable tasks
 	 */
+	@NonNull
 	public List<ForkJoinTask<Void>> createExtractionTasks(
 			final GameType gameType, final boolean usePtr, final Appender[] outputs) {
-		logger.info("Extracting baseUI for {}", gameType);
+		log.info("Extracting baseUI for {}", gameType);
 		
 		final GameDef gameDef = gameService.getGameDef(gameType);
 		final Path destination = configService.getBaseUiPath(gameDef);
@@ -200,7 +202,7 @@ public class BaseUiService {
 			}
 			discCacheService.remove(gameDef.name(), usePtr);
 		} catch (final IOException e) {
-			logger.error(String.format("Directory %s could not be cleaned.", destination), e);
+			log.error(String.format("Directory %s could not be cleaned.", destination), e);
 			return Collections.emptyList();
 		}
 		
@@ -256,6 +258,7 @@ public class BaseUiService {
 	 *
 	 * @param game
 	 * 		game whose default UI is parsed
+	 * @throws Exception
 	 */
 	public void parseBaseUI(final Game game) throws Exception {
 		// lock per game
@@ -265,10 +268,10 @@ public class BaseUiService {
 			final String gameName = game.getGameDef().name();
 			UICatalog uiCatalog = game.getUiCatalog();
 			if (uiCatalog != null) {
-				logger.trace("Aborting parsing baseUI for '{}' as was already parsed.", gameName);
+				log.trace("Aborting parsing baseUI for '{}' as was already parsed.", gameName);
 			} else {
 				final long startTime = System.currentTimeMillis();
-				logger.info("Loading baseUI for {}", gameName);
+				log.info("Loading baseUI for {}", gameName);
 				boolean needToParseAgain = true;
 				
 				boolean isPtr = false;
@@ -276,7 +279,7 @@ public class BaseUiService {
 					isPtr = isPtr(configService.getBaseUiPath(game.getGameDef()));
 				} catch (final IOException e) {
 					// do nothing
-					logger.trace("Ignoring error in isPtr() check on baseUiPath.", e);
+					log.trace("Ignoring error in isPtr() check on baseUiPath.", e);
 				}
 				try {
 					if (cacheIsUpToDateCheckException(game.getGameDef(), isPtr)) {
@@ -284,10 +287,10 @@ public class BaseUiService {
 						uiCatalog = discCacheService.getCachedBaseUi(gameName, isPtr);
 						game.setUiCatalog(uiCatalog);
 						needToParseAgain = false;
-						logger.trace("Loaded baseUI for '{}' from cache", gameName);
+						log.trace("Loaded baseUI for '{}' from cache", gameName);
 					}
 				} catch (final IOException e) {
-					logger.warn("ERROR: loading cached base UI failed.", e);
+					log.warn("ERROR: loading cached base UI failed.", e);
 				}
 				if (needToParseAgain) {
 					// parse baseUI
@@ -296,7 +299,7 @@ public class BaseUiService {
 							new XmlParserVtd(),
 							DeduplicationIntensity.FULL));
 					appController.printInfoLogMessageToGeneral("Starting to parse base " + gameName + " UI.");
-					appController.addThreadLoggerTab(Thread.currentThread().getName(),
+					appController.addThreadlogTab(Thread.currentThread().getName(),
 							game.getGameDef().nameHandle() + "UI",
 							false);
 					try {
@@ -318,21 +321,21 @@ public class BaseUiService {
 						}
 						uiCatalog.postProcessParsing();
 						game.setUiCatalog(uiCatalog);
-						logger.trace("Parsed BaseUI for {}", gameName);
+						log.trace("Parsed BaseUI for {}", gameName);
 					} finally {
 						uiCatalog.setParser(null);
 					}
 					final String msg = "Finished parsing base UI for " + gameName + ".";
-					logger.info(msg);
+					log.info(msg);
 					appController.printInfoLogMessageToGeneral(msg);
 					try {
 						discCacheService.put(uiCatalog, gameName, isPtr, getVersion(game.getGameDef(), isPtr));
 					} catch (final IOException e) {
-						logger.error("ERROR when creating cache file of UI", e);
+						log.error("ERROR when creating cache file of UI", e);
 					}
 				}
 				final long executionTime = (System.currentTimeMillis() - startTime);
-				logger.info("Loading BaseUI for {} took {}ms.", gameName, executionTime);
+				log.info("Loading BaseUI for {} took {}ms.", gameName, executionTime);
 				if (needToParseAgain) {
 					// set result in UI
 					StylizedTextAreaAppender.finishedWork(Thread.currentThread().getName(), true, 50);
@@ -340,6 +343,7 @@ public class BaseUiService {
 			}
 		}
 	}
+	
 	
 	private Object getLock(final String gameName) {
 		synchronized (BaseUiService.class) {
@@ -363,9 +367,9 @@ public class BaseUiService {
 		try {
 			return cacheIsUpToDate(gameDef, usePtr);
 		} catch (final NoSuchFileException e) {
-			logger.trace(String.format("No cache exists for %s", gameDef.name()), e);
+			log.trace(String.format("No cache exists for %s", gameDef.name()), e);
 		} catch (final IOException e) {
-			logger.info(String.format("Failed to check cache status of %s:", gameDef.name()), e);
+			log.info(String.format("Failed to check cache status of %s:", gameDef.name()), e);
 		}
 		return false;
 	}
@@ -400,10 +404,13 @@ public class BaseUiService {
 		for (int i = 0; i < versionCache.length && isUpToDate; ++i) {
 			isUpToDate = versionCache[i] == versionBaseUi[i];
 		}
-		logger.trace("Cache and baseUI versions match: {}", isUpToDate);
+		log.trace("Cache and baseUI versions match: {}", isUpToDate);
 		return isUpToDate;
 	}
 	
+	/**
+	 * @return
+	 */
 	public boolean isHeroesPtrActive() {
 		final Path baseUiMetaFileDir = configService.getBaseUiPath(gameService.getGameDef(GameType.HEROES));
 		try {
@@ -412,7 +419,7 @@ public class BaseUiService {
 				return baseUiInfo.isPtr();
 			}
 		} catch (final IOException e) {
-			logger.error("ERROR while checking if ptr is active via baseUI cache file", e);
+			log.error("ERROR while checking if ptr is active via baseUI cache file", e);
 		}
 		return false;
 	}
@@ -432,22 +439,23 @@ public class BaseUiService {
 		@Override
 		public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) {
 			if (descIndexFileName.equalsIgnoreCase(file.getFileName().toString())) {
-				logger.info("parsing descIndexFile '{}'", file);
+				log.info("parsing descIndexFile '{}'", file);
 				try {
 					uiCatalog.processDescIndex(file, gameDef.defaultRaceId(), gameDef.defaultConsoleSkinId());
 				} catch (final InterruptedException e) {
-					logger.error("Interrupted while processing DescIndex {}", file, e);
+					log.error("Interrupted while processing DescIndex {}", file, e);
 					Thread.currentThread().interrupt();
 					exception = e;
 					return FileVisitResult.TERMINATE;
 				} catch (final Exception e) {
-					logger.error("Exception while processing DescIndex {}", file, e);
+					log.error("Exception while processing DescIndex {}", file, e);
 					exception = e;
 					return FileVisitResult.TERMINATE;
 				}
 			}
 			return FileVisitResult.CONTINUE;
 		}
+		
 		
 		public Optional<Exception> getException() {
 			return Optional.ofNullable(exception);
@@ -483,12 +491,12 @@ public class BaseUiService {
 				if (extract(extractorExe, gamePath, mask, destination, outputAppender)) {
 					Thread.sleep(50);
 					if (extract(extractorExe, gamePath, mask, destination, outputAppender)) {
-						logger.warn(
+						log.warn(
 								"Extraction failed due to a file access. Try closing the Battle.net App, if it is running and this fails to extract all files.");
 					}
 				}
 			} catch (final IOException e) {
-				logger.error("Extracting files from CASC via CascExtractor failed.", e);
+				log.error("Extracting files from CASC via CascExtractor failed.", e);
 			} catch (final InterruptedException e) {
 				Thread.currentThread().interrupt();
 			} finally {
@@ -513,7 +521,7 @@ public class BaseUiService {
 				final String gamePath,
 				final String mask,
 				final Path destination,
-				final Appender out) throws IOException, InterruptedException {
+				@Nullable final Appender out) throws IOException, InterruptedException {
 			final ProcessBuilder pb = new ProcessBuilder(extractorExe.getAbsolutePath(),
 					gamePath + File.separator,
 					mask,
@@ -528,14 +536,15 @@ public class BaseUiService {
 				do {
 					//noinspection BusyWait
 					Thread.sleep(50);
-					final String log = new String(is.readAllBytes(), StandardCharsets.UTF_8);
-					if (log.contains("Unhandled Exception: System.IO.IOException: The process cannot access the file")) {
+					final String processLog = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+					if (processLog.contains(
+							"Unhandled Exception: System.IO.IOException: The process cannot access the file")) {
 						retry = true;
 					} else {
 						if (out != null) {
-							out.append(log);
+							out.append(processLog);
 						} else {
-							logger.info(log);
+							log.info(processLog);
 						}
 					}
 				} while (process.isAlive());
@@ -549,11 +558,11 @@ public class BaseUiService {
 		@Serial
 		private static final long serialVersionUID = 3071926102876787289L;
 		
-		private final GameDef gameDef;
+		private final transient GameDef gameDef;
 		private final boolean usePtr;
-		private final Path destination;
-		private final BaseUiService baseUiService;
-		private final KryoService kryoService;
+		private final transient Path destination;
+		private final transient BaseUiService baseUiService;
+		private final transient KryoService kryoService;
 		
 		private ExtractVersionTask(
 				final GameDef gameDef,
@@ -574,7 +583,7 @@ public class BaseUiService {
 			try {
 				writeToMetaFile(destination, gameDef.name(), version, usePtr);
 			} catch (final IOException e) {
-				logger.error("Failed to write metafile: ", e);
+				log.error("Failed to write metafile: ", e);
 			}
 		}
 		

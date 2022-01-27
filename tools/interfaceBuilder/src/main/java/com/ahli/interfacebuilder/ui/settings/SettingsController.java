@@ -4,6 +4,7 @@
 package com.ahli.interfacebuilder.ui.settings;
 
 import com.ahli.interfacebuilder.ui.FXMLSpringLoader;
+import com.ahli.interfacebuilder.ui.FxmlController;
 import com.ahli.interfacebuilder.ui.Updateable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -13,19 +14,17 @@ import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.context.ApplicationContext;
 
 import java.io.IOException;
+import java.util.EnumMap;
+import java.util.Map;
 
-public class SettingsController implements Updateable {
-	private static final Logger logger = LogManager.getLogger(SettingsController.class);
-	/*
-	categories: 0=GamePaths, 1=GuiMmode, 2=CommandLineMode
-	 */
-	@SuppressWarnings("unchecked")
-	private final TreeItem<String>[] categories = new TreeItem[3];
+@Log4j2
+public class SettingsController implements Updateable, FxmlController {
+	
+	private final Map<SettingsView, TreeItem<String>> categories;
 	private final ApplicationContext appContext;
 	@FXML
 	private TreeView<String> categoryTree;
@@ -34,16 +33,19 @@ public class SettingsController implements Updateable {
 	
 	public SettingsController(final ApplicationContext appContext) {
 		this.appContext = appContext;
+		categories = new EnumMap<>(SettingsView.class);
 	}
 	
 	/**
 	 * Automatically called by FxmlLoader
 	 */
+	@Override
 	public void initialize() {
 		categoryTree.setRoot(new TreeItem<>());
-		addCategoryItem(new TreeItem<>("Games & Paths"), 0);
-		addCategoryItem(new TreeItem<>("GUI Mode"), 1);
-		addCategoryItem(new TreeItem<>("Command Line Mode"), 2);
+		categories.clear();
+		addCategoryItem(new TreeItem<>("Games & Paths"), SettingsView.GAMEPATHS);
+		addCategoryItem(new TreeItem<>("GUI Mode"), SettingsView.GUITOOL);
+		addCategoryItem(new TreeItem<>("Command Line Mode"), SettingsView.CMDLINETOOL);
 		
 		// load page for selected setting
 		categoryTree.getSelectionModel().selectedItemProperty().addListener(new PageSelectionListener(this));
@@ -53,11 +55,10 @@ public class SettingsController implements Updateable {
 	 * Adds a category to the first level of the tree.
 	 *
 	 * @param item
-	 * @param index
 	 */
-	private void addCategoryItem(final TreeItem<String> item, final int index) {
+	private void addCategoryItem(final TreeItem<String> item, final SettingsView type) {
 		categoryTree.getRoot().getChildren().add(item);
-		categories[index] = item;
+		categories.put(type, item);
 	}
 	
 	@Override
@@ -65,8 +66,12 @@ public class SettingsController implements Updateable {
 		final MultipleSelectionModel<?> selectionModel = categoryTree.getSelectionModel();
 		// select first category if nothing is selected
 		if (selectionModel.getSelectedItem() == null) {
-			selectionModel.select(categoryTree.getRow(categories[0]));
+			selectionModel.select(0);
 		}
+	}
+	
+	private enum SettingsView {
+		GAMEPATHS, GUITOOL, CMDLINETOOL
 	}
 	
 	private static final class PageSelectionListener implements ChangeListener<TreeItem<String>> {
@@ -91,17 +96,13 @@ public class SettingsController implements Updateable {
 		 * @param category
 		 */
 		private void loadSettingsContent(final TreeItem<String> category) {
-			final Parent content;
+			final String fxmlPath = switch (getCategoryIndex(category)) {
+				case GAMEPATHS -> "classpath:view/Settings_GamesPaths.fxml";
+				case GUITOOL -> "classpath:view/Settings_GuiTool.fxml";
+				case CMDLINETOOL -> "classpath:view/Settings_CommandLineTool.fxml";
+			};
 			final FXMLSpringLoader loader = new FXMLSpringLoader(settingsController.appContext);
-			switch (getCategoryIndex(category)) {
-				case 0 -> content = initFXML(loader, "classpath:view/Settings_GamesPaths.fxml");
-				case 1 -> content = initFXML(loader, "classpath:view/Settings_GuiTool.fxml");
-				case 2 -> content = initFXML(loader, "classpath:view/Settings_CommandLineTool.fxml");
-				default -> {
-					logger.error("Attempted to load a settings category that does not exist");
-					return;
-				}
-			}
+			final Parent content = initFXML(loader, fxmlPath);
 			final Object controller = loader.getController();
 			if (controller instanceof Updateable updateable) {
 				updateable.update();
@@ -110,18 +111,18 @@ public class SettingsController implements Updateable {
 		}
 		
 		/**
-		 * Returns the index of the category within the array that stores all categories.
+		 * Returns the SettingsView of the category within the array that stores all categories.
 		 *
 		 * @param category
 		 * @return
 		 */
-		private int getCategoryIndex(final TreeItem<String> category) {
-			for (int i = 0, len = settingsController.categories.length; i < len; ++i) {
-				if (category == settingsController.categories[i]) {
-					return i;
-				}
-			}
-			return -1;
+		private SettingsView getCategoryIndex(final TreeItem<String> category) {
+			return settingsController.categories.entrySet()
+					.stream()
+					.filter(e -> category.equals(e.getValue()))
+					.findFirst()
+					.orElseThrow()
+					.getKey();
 		}
 		
 		/**
@@ -135,7 +136,7 @@ public class SettingsController implements Updateable {
 			try {
 				return loader.load(path);
 			} catch (final IOException e) {
-				logger.error(String.format("failed to load FXML: %s.", path), e);
+				log.error(String.format("failed to load FXML: %s.", path), e);
 			}
 			return null;
 		}

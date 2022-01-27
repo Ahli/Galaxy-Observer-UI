@@ -14,10 +14,6 @@ public class NewProjectDialogController {
 	@FXML
 	private Dialog<Project> dialog;
 	
-	public NewProjectController getContentController() {
-		return contentPaneController;
-	}
-	
 	/**
 	 * Automatically called by FxmlLoader
 	 */

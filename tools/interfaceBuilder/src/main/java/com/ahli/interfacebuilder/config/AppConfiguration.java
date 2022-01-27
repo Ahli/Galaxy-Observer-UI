@@ -26,8 +26,7 @@ import com.ahli.interfacebuilder.threads.SpringForkJoinWorkerThreadFactory;
 import com.ahli.interfacebuilder.ui.AppController;
 import com.ahli.interfacebuilder.ui.navigation.NavigationController;
 import com.ahli.mpq.MpqEditorInterface;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -42,28 +41,27 @@ import java.util.concurrent.TimeUnit;
 @Configuration
 @EntityScan(basePackageClasses = { ProjectEntity.class, RuleSet.class })
 @EnableJpaRepositories(basePackageClasses = ProjectJpaRepository.class)
+@Log4j2
 public class AppConfiguration {
-	
-	private static final Logger logger = LogManager.getLogger(AppConfiguration.class);
 	
 	protected AppConfiguration() {
 	}
 	
 	@Bean
 	protected Game sc2Game() {
-		logger.debug("init bean: sc2BaseGame");
+		log.debug("init bean: sc2BaseGame");
 		return new Game(GameDef.buildSc2GameDef());
 	}
 	
 	@Bean
 	protected Game heroesGame() {
-		logger.debug("init bean: heroesBaseGame");
+		log.debug("init bean: heroesBaseGame");
 		return new Game(GameDef.buildHeroesGameDef());
 	}
 	
 	@Bean
 	protected MpqEditorInterface mpqEditorInterface() {
-		logger.debug("init bean: mpqEditorInterface");
+		log.debug("init bean: mpqEditorInterface");
 		return new MpqEditorInterface(mpqCachePath(tempDirectory()), mpqEditorPath(basePath()));
 	}
 	
@@ -87,19 +85,19 @@ public class AppConfiguration {
 	
 	@Bean
 	protected ReplayService replayService(final FileService fileService) {
-		logger.debug("init bean replayService");
+		log.debug("init bean replayService");
 		return new ReplayService(fileService);
 	}
 	
 	@Bean
 	protected CompileService compileService(final GameService gameService) {
-		logger.debug("init bean: compileService");
+		log.debug("init bean: compileService");
 		return new CompileService(gameService);
 	}
 	
 	@Bean
 	protected ProjectService projectService(final ProjectJpaRepository projectJpaRepository) {
-		logger.debug("init bean: projectService");
+		log.debug("init bean: projectService");
 		return new ProjectService(projectJpaRepository);
 	}
 	
@@ -116,7 +114,7 @@ public class AppConfiguration {
 			final ForkJoinPool forkJoinPool,
 			final AppController appController,
 			final NavigationController navigationController) {
-		logger.debug("init bean: mpqBuilderService");
+		log.debug("init bean: mpqBuilderService");
 		return new MpqBuilderService(
 				configService,
 				compileService,
@@ -132,7 +130,7 @@ public class AppConfiguration {
 	
 	@Bean
 	protected ForkJoinPool forkJoinPool(final CleaningForkJoinTaskCleaner cleaner) {
-		logger.debug("init bean: forkJoinPool");
+		log.debug("init bean: forkJoinPool");
 		final int maxThreads = Math.max(1, Runtime.getRuntime().availableProcessors() / 2);
 		return new CleaningForkJoinPool(
 				maxThreads,
@@ -150,7 +148,7 @@ public class AppConfiguration {
 	
 	@Bean
 	protected AppController appController() {
-		logger.debug("init bean: appController");
+		log.debug("init bean: appController");
 		return new AppController();
 	}
 	
@@ -162,14 +160,14 @@ public class AppConfiguration {
 			final KryoService kryoService,
 			final AppController appController,
 			final GameService gameService) {
-		logger.debug("init bean: baseUiService");
+		log.debug("init bean: baseUiService");
 		return new BaseUiService(configService, gameService, fileService, discCacheService, kryoService, appController);
 	}
 	
 	@Bean
 	protected GameService gameService(final ConfigService configService) {
 		
-		logger.debug("init bean: gameService");
+		log.debug("init bean: gameService");
 		return new GameService(configService);
 	}
 	
@@ -177,27 +175,27 @@ public class AppConfiguration {
 	protected FileService fileService() {
 		
 		
-		logger.debug("init bean: fileService");
+		log.debug("init bean: fileService");
 		return new FileService();
 	}
 	
 	@Bean
 	protected DiscCacheService discCacheService(final ConfigService configService, final KryoService kryoService) {
-		logger.debug("init bean: discCacheService");
+		log.debug("init bean: discCacheService");
 		return new DiscCacheService(configService, kryoService);
 	}
 	
 	@Bean
 	protected KryoService kryoService() {
 		
-		logger.debug("init bean: kryoService");
+		log.debug("init bean: kryoService");
 		return new KryoService();
 	}
 	
 	@Bean
 	protected ConfigService configService(
 			final SettingsIniInterface settingsIniInterface) {
-		logger.debug("init bean: configService");
+		log.debug("init bean: configService");
 		final Path tmpPath = tempDirectory();
 		final Path basePath = basePath();
 		return new ConfigService(
@@ -247,7 +245,7 @@ public class AppConfiguration {
 	@Bean
 	protected SettingsIniInterface settingsIniInterface() {
 		
-		logger.debug("init bean: settingsIniInterface");
+		log.debug("init bean: settingsIniInterface");
 		return new SettingsIniInterface(iniSettingsPath(basePath()));
 	}
 	

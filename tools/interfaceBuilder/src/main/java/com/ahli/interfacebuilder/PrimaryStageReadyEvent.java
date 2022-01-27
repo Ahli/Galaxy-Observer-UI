@@ -6,6 +6,7 @@ package com.ahli.interfacebuilder;
 import com.ahli.interfacebuilder.integration.CommandLineParams;
 import javafx.stage.Stage;
 import org.springframework.context.ApplicationEvent;
+import org.springframework.lang.Nullable;
 
 import java.io.Serial;
 
@@ -20,6 +21,7 @@ public class PrimaryStageReadyEvent extends ApplicationEvent {
 		this.startingParams = startingParams;
 	}
 	
+	@Nullable
 	public Stage getStage() {
 		return getSource() instanceof final Stage stage ? stage : null;
 	}

@@ -4,8 +4,7 @@
 package com.ahli.interfacebuilder.threads;
 
 import com.ahli.interfacebuilder.integration.log4j.StylizedTextAreaAppender;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.Serial;
 import java.util.concurrent.ForkJoinTask;
@@ -16,8 +15,8 @@ import java.util.concurrent.ForkJoinTask;
  * <p>
  * exec() should still be overridden with the actual workload.
  */
+@Log4j2
 public abstract class CleaningForkJoinTask extends ForkJoinTask<Void> {
-	private static final Logger logger = LogManager.getLogger(CleaningForkJoinTask.class);
 	
 	@Serial
 	private static final long serialVersionUID = 8118692371922973864L;
@@ -47,7 +46,7 @@ public abstract class CleaningForkJoinTask extends ForkJoinTask<Void> {
 		try {
 			return work();
 		} catch (final Exception e) {
-			logger.error("Error in Task:", e);
+			log.error("Error in Task:", e);
 			return false;
 		} finally {
 			StylizedTextAreaAppender.finishedWork(Thread.currentThread().getName(), true, 50);

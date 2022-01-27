@@ -9,8 +9,7 @@ import com.ahli.interfacebuilder.config.ConfigService;
 import com.ahli.interfacebuilder.integration.kryo.KryoGameInfo;
 import com.ahli.interfacebuilder.integration.kryo.KryoService;
 import com.esotericsoftware.kryo.Kryo;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -18,8 +17,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+@Log4j2
 public class DiscCacheService {
-	private static final Logger logger = LogManager.getLogger(DiscCacheService.class);
 	private final ConfigService configService;
 	private final KryoService kryoService;
 	
@@ -45,7 +44,7 @@ public class DiscCacheService {
 		
 		final Kryo kryo = kryoService.getKryoForUICatalog();
 		kryoService.put(p, payload, kryo);
-		logger.info(
+		log.info(
 				"Cached UI for {} - templates={}, blizzOnlyTemplates={}, constants={}, blizzOnlyConstants={}, devLayouts={}, handles={}",
 				gameDefName,
 				catalog.getTemplates().size(),
@@ -99,9 +98,9 @@ public class DiscCacheService {
 		final Path p = getCacheFilePath(gameDefName, isPtr);
 		if (Files.exists(p)) {
 			Files.delete(p);
-			logger.trace("Cleaning cache of {} in {}", () -> gameDefName, p::toAbsolutePath);
+			log.trace("Cleaning cache of {} in {}", () -> gameDefName, p::toAbsolutePath);
 		} else {
-			logger.trace("Could not find cache of {} in {} to clean it", () -> gameDefName, p::toAbsolutePath);
+			log.trace("Could not find cache of {} in {} to clean it", () -> gameDefName, p::toAbsolutePath);
 		}
 	}
 	

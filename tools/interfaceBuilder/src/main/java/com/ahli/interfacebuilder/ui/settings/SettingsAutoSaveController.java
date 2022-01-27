@@ -4,6 +4,7 @@
 package com.ahli.interfacebuilder.ui.settings;
 
 import com.ahli.interfacebuilder.config.ConfigService;
+import com.ahli.interfacebuilder.ui.FxmlController;
 import com.ahli.interfacebuilder.ui.Updateable;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
@@ -13,13 +14,12 @@ import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 import javafx.stage.Window;
 import javafx.util.Duration;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
 
-public abstract class SettingsAutoSaveController implements Updateable {
-	private static final Logger logger = LogManager.getLogger(SettingsAutoSaveController.class);
+@Log4j2
+public abstract class SettingsAutoSaveController implements Updateable, FxmlController {
 	
 	protected final ConfigService configService;
 	@FXML
@@ -33,6 +33,7 @@ public abstract class SettingsAutoSaveController implements Updateable {
 	/**
 	 * Automatically called by FxmlLoader
 	 */
+	@Override
 	public void initialize() {
 		initSavingLabel();
 	}
@@ -73,7 +74,7 @@ public abstract class SettingsAutoSaveController implements Updateable {
 				initSavingLabel();
 			}
 		} catch (final IOException e) {
-			logger.error("Saving settings failed.", e);
+			log.error("Saving settings failed.", e);
 			savedAnimLabel.setText("Saving failed!");
 			final FontAwesomeIconView icon = new FontAwesomeIconView(FontAwesomeIcon.EXCLAMATION_TRIANGLE);
 			icon.setFill(Color.RED);

@@ -3,8 +3,7 @@
 
 package com.ahli.interfacebuilder.i18n;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 
 import java.util.Locale;
 import java.util.MissingResourceException;
@@ -16,9 +15,9 @@ import java.util.ResourceBundle;
  *
  * @author Ahli
  */
+@Log4j2
 public final class Messages {
 	private static final String BUNDLE_NAME = "i18n.messages";
-	private static final Logger logger = LogManager.getLogger(Messages.class);
 	private static ResourceBundle resourceBundle = ResourceBundle.getBundle(BUNDLE_NAME);
 	
 	private static Locale usedLocale = Locale.getDefault();
@@ -38,7 +37,7 @@ public final class Messages {
 		try {
 			return resourceBundle.getString(key);
 		} catch (final MissingResourceException e) {
-			logger.error(String.format("ERROR: failed to receive String for %s", key), e);
+			log.error(String.format("ERROR: failed to receive String for %s", key), e);
 			return '!' + key + '!';
 		}
 	}
@@ -81,7 +80,7 @@ public final class Messages {
 	 */
 	public static boolean checkIfTargetResourceIsUsed(final Locale locale) {
 		final boolean result = resourceBundle.equals(ResourceBundle.getBundle(BUNDLE_NAME, locale));
-		logger.trace("compare used locale's resource '{}' with one for locale '{}', result: {}",
+		log.trace("compare used locale's resource '{}' with one for locale '{}', result: {}",
 				usedLocale,
 				locale,
 				result);

@@ -45,7 +45,7 @@ public final class RuleSet implements Serializable {
 	@Column(name = "compression_rules_string")
 	private List<String> compressionRulesString;
 	
-	protected RuleSet() {
+	private RuleSet() {
 		// required for hibernate
 	}
 	

@@ -3,8 +3,7 @@
 
 package com.ahli.interfacebuilder.integration;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.system.ApplicationHome;
 
 import java.io.File;
@@ -17,8 +16,8 @@ import java.nio.file.Path;
  *
  * @author Ahli
  */
+@Log4j2
 public final class JarHelper {
-	private static final Logger logger = LogManager.getLogger(JarHelper.class);
 	
 	/**
 	 * Disabled Constructor.
@@ -34,18 +33,18 @@ public final class JarHelper {
 	 * @return File at base path
 	 */
 	public static Path getJarDir(final Class<?> aclass) {
-		logger.trace("_FINDING JAR'S PATH");
+		log.trace("_FINDING JAR'S PATH");
 		
 		// ATTEMPT #1
 		final File dir = new ApplicationHome(aclass).getDir();
 		String str = dir.toString();
-		logger.trace("Attempt#1 java.class.path: {}", dir::toString);
+		log.trace("Attempt#1 java.class.path: {}", dir::toString);
 		
 		// check if started in eclipse
 		final int i = str.indexOf(File.separator + "target" + File.separator + "classes");
 		if (i > 0) {
 			final String check = str.substring(0, i);
-			logger.trace("target/classes location: {}", check);
+			log.trace("target/classes location: {}", check);
 			if (check.indexOf(';') < 0) {
 				final Path p = Path.of(check).getParent().getParent();
 				if (Files.exists(p)) {
@@ -60,7 +59,7 @@ public final class JarHelper {
 			// notepad++'s directory...
 			
 			str = uri.getPath();
-			logger.trace("_URI path: {}", uri::getPath);
+			log.trace("_URI path: {}", uri::getPath);
 			
 			// fix for intellij
 			if (str.endsWith("/tools/./")) {
@@ -86,7 +85,7 @@ public final class JarHelper {
 		} else {
 			if (str.contains(".jar;")) {
 				str = str.substring(0, str.indexOf(".jar"));
-				logger.trace("path before .jar: {}", str);
+				log.trace("path before .jar: {}", str);
 				final int lastFileSepIndex = str.lastIndexOf(File.separator);
 				if (lastFileSepIndex >= 0) {
 					str = str.substring(0, lastFileSepIndex);
@@ -94,7 +93,7 @@ public final class JarHelper {
 			}
 			
 		}
-		logger.trace("_RESULT PATH: {}", str);
+		log.trace("_RESULT PATH: {}", str);
 		
 		return Path.of(str);
 	}

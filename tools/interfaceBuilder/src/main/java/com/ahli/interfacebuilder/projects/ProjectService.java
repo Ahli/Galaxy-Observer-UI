@@ -6,13 +6,11 @@ package com.ahli.interfacebuilder.projects;
 import com.ahli.interfacebuilder.compress.RuleSet;
 import com.ahli.interfacebuilder.projects.enums.GameType;
 import jakarta.persistence.PersistenceException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.hibernate.Hibernate;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.dao.DataAccessException;
-import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.BufferedInputStream;
@@ -26,9 +24,9 @@ import java.util.List;
 /**
  * ProjectService manages Observer Interface project related tasks.
  */
+@Log4j2
 public class ProjectService {
 	private static final String DIRECTORY_SYMBOL = "/";
-	private static final Logger logger = LogManager.getLogger(ProjectService.class);
 	private final ProjectJpaRepository projectRepo;
 	
 	public ProjectService(final ProjectJpaRepository projectRepo) {
@@ -49,15 +47,15 @@ public class ProjectService {
 		
 		final Path projPath = project.getProjectPath();
 		final var resolver = new PathMatchingResourcePatternResolver();
-		logger.trace("creating template");
+		log.trace("creating template");
 		final int jarIntPathLen = jarIntPath.length();
 		for (final Resource res : resolver.getResources("classpath*:" + jarIntPath + "**")) {
 			final String uri = res.getURI().toString();
-			logger.trace("extracting file {}", uri);
+			log.trace("extracting file {}", uri);
 			final int i = uri.indexOf(jarIntPath);
 			final String intPath = uri.substring(i + jarIntPathLen);
 			final Path path = projPath.resolve(intPath);
-			logger.trace("writing file {}", path);
+			log.trace("writing file {}", path);
 			if (!uri.endsWith(DIRECTORY_SYMBOL)) {
 				Files.createDirectories(path.getParent());
 				//noinspection ObjectAllocationInLoop
@@ -68,7 +66,7 @@ public class ProjectService {
 				Files.createDirectories(path);
 			}
 		}
-		logger.trace("create template finished");
+		log.trace("create template finished");
 	}
 	
 	/**
@@ -91,7 +89,7 @@ public class ProjectService {
 		try {
 			return ProjectEntity.toProject(projectRepo.save(ProjectEntity.fromProject(project)));
 		} catch (final DataAccessException e) {
-			logger.error("Saving project failed", e);
+			log.error("Saving project failed", e);
 			throw e;
 		}
 	}
@@ -101,7 +99,7 @@ public class ProjectService {
 	 *
 	 * @param project
 	 */
-	public void deleteProject(@NonNull final Project project) {
+	public void deleteProject(final Project project) {
 		projectRepo.delete(ProjectEntity.fromProject(project));
 	}
 	
@@ -111,7 +109,7 @@ public class ProjectService {
 	 * @param path
 	 * @return list of Projects with matching path
 	 */
-	public List<Project> getProjectsOfPath(@NonNull final Path path) {
+	public List<Project> getProjectsOfPath(final Path path) {
 		return ProjectEntity.toProjects(projectRepo.findAllByProjectPath(path.toString()));
 	}
 	
@@ -130,7 +128,7 @@ public class ProjectService {
 				final RuleSet ruleSet = Hibernate.unproxy(project2.getBestCompressionRuleSet(), RuleSet.class);
 				project.setBestCompressionRuleSet(ruleSet);
 			} catch (final PersistenceException e) {
-				logger.error("Error while fetching compression rule set from DB.", e);
+				log.error("Error while fetching compression rule set from DB.", e);
 			}
 		}
 		return project.getBestCompressionRuleSet();

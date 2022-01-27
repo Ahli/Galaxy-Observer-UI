@@ -9,13 +9,15 @@ import com.ahli.interfacebuilder.ui.AppController;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.lang.Nullable;
 
 public class NoGuiApplication {
 	
+	@Nullable
 	private final IpcServerThread serverThread;
 	private final CommandLineParams startingParams;
 	
-	public NoGuiApplication(final String[] args, final IpcServerThread serverThread) {
+	public NoGuiApplication(final String[] args, @Nullable final IpcServerThread serverThread) {
 		this.serverThread = serverThread;
 		startingParams = new CommandLineParams(false, args);
 		

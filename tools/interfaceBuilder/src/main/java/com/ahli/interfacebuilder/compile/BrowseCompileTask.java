@@ -10,13 +10,12 @@ import com.ahli.interfacebuilder.config.ConfigService;
 import com.ahli.interfacebuilder.threads.CleaningForkJoinTask;
 import com.ahli.interfacebuilder.threads.CleaningForkJoinTaskCleaner;
 import com.ahli.interfacebuilder.ui.browse.BrowseTabController;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.Serial;
 
+@Log4j2
 public class BrowseCompileTask extends CleaningForkJoinTask {
-	private static final Logger logger = LogManager.getLogger(BrowseCompileTask.class);
 	
 	@Serial
 	private static final long serialVersionUID = 5971938125363486608L;
@@ -53,11 +52,11 @@ public class BrowseCompileTask extends CleaningForkJoinTask {
 			mod.setUiCatalog(uiCatalog);
 			controller.setData(mod.getUiCatalog());
 		} catch (final InterruptedException e) {
-			logger.error("Interrupted while compiling.", e);
+			log.error("Interrupted while compiling.", e);
 			Thread.currentThread().interrupt();
 			return false;
 		} catch (final Exception e) {
-			logger.error("Error while compiling.", e);
+			log.error("Error while compiling.", e);
 			return false;
 		}
 		return true;

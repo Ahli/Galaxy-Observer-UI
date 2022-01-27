@@ -6,8 +6,7 @@ package com.ahli.interfacebuilder.integration.ipc;
 import com.ahli.interfacebuilder.integration.CommandLineParams;
 import com.ahli.interfacebuilder.integration.log4j.InterProcessCommunicationAppender;
 import com.ahli.interfacebuilder.ui.AppController;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
 import java.net.StandardProtocolFamily;
@@ -27,8 +26,8 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+@Log4j2
 public class UnixDomainSocketCommunication implements IpcCommunication {
-	private static final Logger logger = LogManager.getLogger(UnixDomainSocketCommunication.class);
 	private final UnixDomainSocketAddress address;
 	private ServerSocketChannel server;
 	
@@ -52,7 +51,7 @@ public class UnixDomainSocketCommunication implements IpcCommunication {
 			
 			// sending parameters
 			final String command = Arrays.toString(args);
-			logger.info("Sending: {}", command);
+			log.info("Sending: {}", command);
 			
 			sendMessage(clientChannel, command);
 			
@@ -75,7 +74,7 @@ public class UnixDomainSocketCommunication implements IpcCommunication {
 					
 					for (final String line : stringBuilder.toString().lines().toList()) {
 						if (!line.startsWith("#BYE")) {
-							logger.info(line);
+							log.info(line);
 						} else {
 							return true;
 						}
@@ -85,7 +84,7 @@ public class UnixDomainSocketCommunication implements IpcCommunication {
 				}
 			}
 		} catch (final IOException e) {
-			logger.error("Exception while sending parameters to server instance.", e);
+			log.error("Exception while sending parameters to server instance.", e);
 		}
 		return false;
 	}
@@ -127,7 +126,7 @@ public class UnixDomainSocketCommunication implements IpcCommunication {
 				try {
 					server.close();
 				} catch (final IOException e) {
-					logger.error("Closing the old server failed.", e);
+					log.error("Closing the old server failed.", e);
 				}
 				server = null;
 			}
@@ -143,7 +142,7 @@ public class UnixDomainSocketCommunication implements IpcCommunication {
 				try {
 					newServer.close();
 				} catch (final IOException e) {
-					logger.error("Closing the new server failed.", e);
+					log.error("Closing the new server failed.", e);
 				}
 			}
 		}
@@ -158,17 +157,17 @@ public class UnixDomainSocketCommunication implements IpcCommunication {
 		if (Files.exists(address.getPath())) {
 			
 			try (final SocketChannel ignored = SocketChannel.open(UnixDomainSocketAddress.of(address.getPath()))) {
-				logger.trace("socket can be connected to => not orphaned socket file");
+				log.trace("socket can be connected to => not orphaned socket file");
 				return false;
 			} catch (final IOException e) {
-				logger.trace("channelLock test error means that it is orphaned?", e);
+				log.trace("channelLock test error means that it is orphaned?", e);
 			}
 			
 			try {
 				Files.delete(address.getPath());
 				return true;
 			} catch (final IOException e) {
-				logger.error("Failed to clear socket file: {}", address.getPath(), e);
+				log.error("Failed to clear socket file: {}", address.getPath(), e);
 			}
 			return false;
 		}
@@ -194,9 +193,9 @@ public class UnixDomainSocketCommunication implements IpcCommunication {
 				try (final SocketChannel channel = server.accept()) {
 					handleConnectionAsServer(channel);
 				} catch (final AsynchronousCloseException ignored) {
-					logger.info("Server Socket shut down.");
+					log.info("Server Socket shut down.");
 				} catch (final IOException e) {
-					logger.error("I/O Exception while waiting for client connections.", e);
+					log.error("I/O Exception while waiting for client connections.", e);
 				}
 			}
 		}
@@ -206,7 +205,7 @@ public class UnixDomainSocketCommunication implements IpcCommunication {
 				InterProcessCommunicationAppender.setWriter(new UnixDomainSocketMessageWriter(channel));
 				readMessageFromSocket(channel).ifPresent(this::handleReceivedMessage);
 			} catch (final Exception e) {
-				logger.error("Error while handling socket's message.", e);
+				log.error("Error while handling socket's message.", e);
 			} finally {
 				InterProcessCommunicationAppender.setWriter(null);
 			}
@@ -235,7 +234,7 @@ public class UnixDomainSocketCommunication implements IpcCommunication {
 		}
 		
 		private void handleReceivedMessage(final String message) {
-			logger.info("received message from client: {}", message);
+			log.info("received message from client: {}", message);
 			final String[] params = COMMA_SEPARATED_REGEX_PATTERN.split(message.substring(1, message.length() - 1));
 			executeCommand(params);
 		}
@@ -255,7 +254,7 @@ public class UnixDomainSocketCommunication implements IpcCommunication {
 				appController.runGameWithReplay(params);
 			} else {
 				if (appController == null) {
-					logger.error("Server is not ready to process commands, yet.");
+					log.error("Server is not ready to process commands, yet.");
 				}
 			}
 			InterProcessCommunicationAppender.sendTerminationSignal();

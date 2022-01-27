@@ -5,6 +5,7 @@ package com.ahli.interfacebuilder.ui.progress;
 
 import com.ahli.interfacebuilder.integration.log4j.StylizedTextAreaAppender;
 import com.ahli.interfacebuilder.ui.AppController;
+import com.ahli.interfacebuilder.ui.FxmlController;
 import com.ahli.interfacebuilder.ui.Updateable;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -13,7 +14,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.text.TextFlow;
 
-public class TabPaneController implements Updateable {
+public class TabPaneController implements Updateable, FxmlController {
 	
 	private final AppController appController;
 	@FXML
@@ -26,6 +27,7 @@ public class TabPaneController implements Updateable {
 	/**
 	 * Automatically called by FxmlLoader
 	 */
+	@Override
 	public void initialize() {
 		
 		// log4j2 prints into txtArea

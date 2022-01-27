@@ -8,14 +8,12 @@ import com.ahli.interfacebuilder.base_ui.BaseUiService;
 import com.ahli.interfacebuilder.projects.Project;
 import com.ahli.interfacebuilder.threads.CleaningForkJoinTask;
 import com.ahli.interfacebuilder.threads.CleaningForkJoinTaskCleaner;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.Serial;
 
+@Log4j2
 public class BuildTask extends CleaningForkJoinTask {
-	
-	private static final Logger logger = LogManager.getLogger(BuildTask.class);
 	
 	@Serial
 	private static final long serialVersionUID = 1114165634840947017L;
@@ -45,7 +43,7 @@ public class BuildTask extends CleaningForkJoinTask {
 			baseUiService.parseBaseUiIfNecessary(game, useCmdLineSettings);
 			mpqBuilderService.buildSpecificUI(game, useCmdLineSettings, project);
 		} catch (final Exception e) {
-			logger.error("Error while building.", e);
+			log.error("Error while building.", e);
 			return false;
 		}
 		return true;

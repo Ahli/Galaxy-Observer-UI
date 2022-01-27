@@ -12,8 +12,7 @@ import com.ahli.mpq.mpqeditor.MpqEditorCompressionRule;
 import com.ahli.mpq.mpqeditor.MpqEditorCompressionRuleMask;
 import com.ahli.mpq.mpqeditor.MpqEditorCompressionRuleMethod;
 import com.ahli.mpq.mpqeditor.MpqEditorCompressionRuleSize;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectLongHashMap;
 
 import java.io.File;
@@ -28,6 +27,7 @@ import java.util.stream.Stream;
 /**
  * This miner searches for a better compression via randomized rules.
  */
+@Log4j2
 public class RandomCompressionMiner {
 	private static final String WILDCARD = "*";
 	private static final String OGG = ".ogg";
@@ -38,7 +38,6 @@ public class RandomCompressionMiner {
 	private static final String TTF = ".ttf";
 	private static final String OTF = ".otf";
 	private static final String M_3 = ".m3";
-	private static final Logger logger = LogManager.getLogger(RandomCompressionMiner.class);
 	private final ModD mod;
 	private final MpqEditorInterface mpqInterface;
 	private final MpqEditorCompressionRuleMethod[] compressionSetting = MpqEditorCompressionRuleMethod.values();
@@ -47,23 +46,6 @@ public class RandomCompressionMiner {
 	private long bestSize;
 	private MpqEditorCompressionRule[] bestRuleSet;
 	private boolean oldRulesetHadMissingFiles;
-	
-	/**
-	 * Creates a Miner with a ruleset whose entries all refer to exactly a single file within the source location.
-	 *
-	 * @param mod
-	 * @param mpqCachePath
-	 * @param mpqEditorPath
-	 * @param fileService
-	 * @throws IOException
-	 * @throws MpqException
-	 * @throws InterruptedException
-	 */
-	public RandomCompressionMiner(
-			final ModD mod, final Path mpqCachePath, final Path mpqEditorPath, final FileService fileService)
-			throws IOException, MpqException, InterruptedException {
-		this(mod, mpqCachePath, mpqEditorPath, new MpqEditorCompressionRule[0], fileService);
-	}
 	
 	/**
 	 * Creates a Miner with a ruleset whose entries all refer to exactly a single file based on the specified ruleset.
@@ -187,13 +169,13 @@ public class RandomCompressionMiner {
 				if (isValidFileSpecificMask(mask, cacheDir)) {
 					clean.add(rule);
 				} else {
-					logger.trace("removing rule from ruleset due to invalid mask: {}", mask);
+					log.trace("removing rule from ruleset due to invalid mask: {}", mask);
 				}
 			} else {
 				if (rule != null) {
 					clean.add(rule);
 				} else {
-					logger.trace("removing null entry from ruleset");
+					log.trace("removing null entry from ruleset");
 				}
 			}
 		}
@@ -344,7 +326,7 @@ public class RandomCompressionMiner {
 			try {
 				return Files.size(path);
 			} catch (final IOException e) {
-				logger.error("Failed to determine size of file.", e);
+				log.error("Failed to determine size of file.", e);
 				return 0;
 			}
 		}
@@ -461,12 +443,12 @@ public class RandomCompressionMiner {
 					Thread.sleep(50);
 				} catch (final InterruptedException ignored) {
 					Thread.currentThread().interrupt();
-					logger.trace("Interrupted while waiting to clean up");
+					log.trace("Interrupted while waiting to clean up");
 				}
 			}
 		}
 		if (i == 0) {
-			logger.error("Failed to clean up compression mining cache");
+			log.error("Failed to clean up compression mining cache");
 		}
 		// clean up target file
 		final Path targetFile = mod.getTargetFile();
@@ -475,16 +457,16 @@ public class RandomCompressionMiner {
 				Files.deleteIfExists(targetFile);
 				return;
 			} catch (final IOException e) {
-				logger.trace("Error while cleaning up compression mining target file {}", targetFile, e);
+				log.trace("Error while cleaning up compression mining target file {}", targetFile, e);
 				try {
 					Thread.sleep(50);
 				} catch (final InterruptedException ignored) {
 					Thread.currentThread().interrupt();
-					logger.trace("Interrupted while waiting to clean up");
+					log.trace("Interrupted while waiting to clean up");
 				}
 			}
 		}
-		logger.error("Failed to clean up compression mining target file");
+		log.error("Failed to clean up compression mining target file");
 	}
 	
 	public MpqEditorInterface getMpqInterface() {

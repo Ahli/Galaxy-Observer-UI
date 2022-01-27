@@ -22,6 +22,7 @@ import com.ahli.interfacebuilder.projects.enums.GameType;
 import com.ahli.interfacebuilder.ui.Alerts;
 import com.ahli.interfacebuilder.ui.AppController;
 import com.ahli.interfacebuilder.ui.FXMLSpringLoader;
+import com.ahli.interfacebuilder.ui.FxmlController;
 import com.ahli.interfacebuilder.ui.Updateable;
 import com.ahli.interfacebuilder.ui.navigation.NavigationController;
 import com.ahli.interfacebuilder.ui.progress.BaseUiExtractionController;
@@ -48,8 +49,7 @@ import javafx.scene.control.TabPane;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.TextFlow;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.context.ApplicationContext;
 import org.xml.sax.SAXException;
 
@@ -64,8 +64,8 @@ import java.util.concurrent.ForkJoinPool;
 
 import static com.ahli.interfacebuilder.ui.AppController.FATAL_ERROR;
 
-public class BrowseController implements Updateable {
-	private static final Logger logger = LogManager.getLogger(BrowseController.class);
+@Log4j2
+public class BrowseController implements Updateable, FxmlController {
 	private final ApplicationContext appContext;
 	private final BaseUiService baseUiService;
 	private final ConfigService configService;
@@ -119,6 +119,7 @@ public class BrowseController implements Updateable {
 	/**
 	 * Automatically called by FxmlLoader
 	 */
+	@Override
 	public void initialize() {
 		controllers = new ArrayList<>(0);
 		heroesChoiceBox.setItems(FXCollections.observableArrayList(Messages.getString("browse.live"),
@@ -143,7 +144,7 @@ public class BrowseController implements Updateable {
 					try {
 						setGraphic(getListItemGameImage(project));
 					} catch (final IOException e) {
-						logger.error("Failed to find image resource.", e);
+						log.error("Failed to find image resource.", e);
 					}
 				}
 			}
@@ -209,7 +210,7 @@ public class BrowseController implements Updateable {
 			}
 		} catch (final IOException e) {
 			sb.append(" - could not check game version");
-			logger.trace("Error: could not check game version", e);
+			log.trace("Error: could not check game version", e);
 		}
 		return sb.toString();
 	}
@@ -218,7 +219,7 @@ public class BrowseController implements Updateable {
 		try {
 			extractBaseUi(GameType.SC2, false);
 		} catch (final IOException e) {
-			logger.error("Error extracting Heroes Base UI.", e);
+			log.error("Error extracting Heroes Base UI.", e);
 			Alerts.buildExceptionAlert(appController.getPrimaryStage(), e).showAndWait();
 		}
 	}
@@ -282,7 +283,7 @@ public class BrowseController implements Updateable {
 					controllerLoggingAreaChildren.add(scrollPane);
 					appController.getTabPane().getTabs().add(newTabFinal);
 				} catch (final Exception e) {
-					logger.fatal(FATAL_ERROR, e);
+					log.fatal(FATAL_ERROR, e);
 				}
 			});
 		} else {
@@ -317,7 +318,7 @@ public class BrowseController implements Updateable {
 			extractBaseUi(GameType.HEROES, usePtr);
 			updatePtrStatusLabel(usePtr);
 		} catch (final IOException e) {
-			logger.error("Error extracting Heroes Base UI.", e);
+			log.error("Error extracting Heroes Base UI.", e);
 			Alerts.buildExceptionAlert(appController.getPrimaryStage(), e).showAndWait();
 		}
 	}
@@ -367,7 +368,7 @@ public class BrowseController implements Updateable {
 			tabPane.getSelectionModel().select(newTab);
 			
 		} catch (final IOException e) {
-			logger.error("failed to load BrowseTab FXML", e);
+			log.error("failed to load BrowseTab FXML", e);
 		}
 		return controller;
 	}
@@ -390,7 +391,7 @@ public class BrowseController implements Updateable {
 				try {
 					Files.createDirectories(cachePath);
 				} catch (final IOException e) {
-					logger.error("ERROR: could not create directories.", e);
+					log.error("ERROR: could not create directories.", e);
 					continue;
 				}
 				mod.setMpqCacheDirectory(cachePath);
@@ -398,13 +399,13 @@ public class BrowseController implements Updateable {
 				@SuppressWarnings("ObjectAllocationInLoop")
 				final MpqEditorInterface mpqi = new MpqEditorInterface(cachePath, configService.getMpqEditorPath());
 				if (!mpqi.clearCacheExtractedMpq()) {
-					logger.error("ERROR: could not clear cache directory.");
+					log.error("ERROR: could not clear cache directory.");
 					continue;
 				}
 				try {
 					fileService.copyFileOrDirectory(project.getProjectPath(), cachePath);
 				} catch (final IOException e) {
-					logger.error("ERROR: could not copy project files.", e);
+					log.error("ERROR: could not copy project files.", e);
 					continue;
 				}
 				
@@ -419,7 +420,7 @@ public class BrowseController implements Updateable {
 					descIndex.setDescIndexPathAndClear(ComponentsListReaderDom.getDescIndexPath(componentListFile,
 							mod.getGame().getGameDef()));
 				} catch (final ParserConfigurationException | SAXException | IOException e) {
-					logger.error("ERROR: unable to read DescIndex path.", e);
+					log.error("ERROR: unable to read DescIndex path.", e);
 					continue;
 				}
 				

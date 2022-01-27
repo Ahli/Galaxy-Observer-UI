@@ -11,16 +11,15 @@ import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.application.Preloader;
 import javafx.stage.Stage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.lang.Nullable;
 
+@Log4j2
 public class JavafxApplication extends Application {
-	
-	private static final Logger logger = LoggerFactory.getLogger(JavafxApplication.class);
 	
 	private IpcServerThread serverThread;
 	private ConfigurableApplicationContext context;
@@ -47,9 +46,10 @@ public class JavafxApplication extends Application {
 	}
 	
 	@SuppressWarnings("java:S3014") // ThreadGroup is ok to be used here
+	@Nullable
 	private static IpcServerThread findServerThread(final String id) {
 		try {
-			if (id != null && !id.isEmpty()) {
+			if (!id.isEmpty()) {
 				final long idLong = Long.parseLong(id);
 				
 				final ThreadGroup threadGroup = Thread.currentThread().getThreadGroup();
@@ -66,17 +66,17 @@ public class JavafxApplication extends Application {
 		} catch (final NumberFormatException ignored) {
 			// ignored
 		}
-		logger.error("Failed to find IpcServerThread of id: {}", id);
+		log.error("Failed to find IpcServerThread of id: {}", id);
 		return null;
 	}
 	
-	private static String[] toArray(final Parameters param) {
+	private static String[] toArray(@Nullable final Parameters param) {
 		return param != null ? param.getRaw().toArray(new String[0]) : new String[0];
 	}
 	
 	private void logAllBeans() {
 		final String[] allBeanNames = context.getBeanDefinitionNames();
-		logger.trace("Spring Beans created: {}", (Object) allBeanNames);
+		log.trace("Spring Beans created: {}", (Object) allBeanNames);
 	}
 	
 	@Override

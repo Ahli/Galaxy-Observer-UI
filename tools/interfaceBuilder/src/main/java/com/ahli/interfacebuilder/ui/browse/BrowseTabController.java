@@ -14,6 +14,7 @@ import com.ahli.galaxy.ui.interfaces.UIElement;
 import com.ahli.galaxy.ui.interfaces.UIFrame;
 import com.ahli.galaxy.ui.interfaces.UIState;
 import com.ahli.galaxy.ui.interfaces.UIStateGroup;
+import com.ahli.interfacebuilder.ui.FxmlController;
 import com.ahli.interfacebuilder.ui.Updateable;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -38,8 +39,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.util.Callback;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 
@@ -53,7 +53,8 @@ import java.util.function.Predicate;
 
 import static com.ahli.interfacebuilder.ui.AppController.FATAL_ERROR;
 
-public class BrowseTabController implements Updateable {
+@Log4j2
+public class BrowseTabController implements Updateable, FxmlController {
 	private static final String PATH_SEPARATOR = " > ";
 	private static final String ANCHOR_RIGHT = "Anchor-Right";
 	private static final String DEFAULT_STATE = "DefaultState";
@@ -68,7 +69,6 @@ public class BrowseTabController implements Updateable {
 	private static final String ACTION_PREFIX = "Action ";
 	private static final String VAL = "val";
 	private static final String ATTRIBUTE_SEPARATOR = ", ";
-	private static final Logger logger = LogManager.getLogger(BrowseTabController.class);
 	private static final String GAME_UI = "GameUI";
 	private static final String SPACE_HIVEN_SPACE = " - ";
 	private final StringProperty queryString;
@@ -149,6 +149,7 @@ public class BrowseTabController implements Updateable {
 	/**
 	 * Automatically called by FxmlLoader
 	 */
+	@Override
 	public void initialize() {
 		AnchorPane.setTopAnchor(fileSelector, 5.0d);
 		AnchorPane.setLeftAnchor(fileSelector, 5.0d);
@@ -316,7 +317,7 @@ public class BrowseTabController implements Updateable {
 		
 		// clean up memory leaks
 		if (uiCatalog == null) {
-			logger.trace("Cleaning up BrowseTabController");
+			log.trace("Cleaning up BrowseTabController");
 			fileSelector.setOnAction(null);
 			fileSelector = null;
 			templateSelector.setOnAction(null);
@@ -351,16 +352,16 @@ public class BrowseTabController implements Updateable {
 			final ObservableList<String> fileNames = FXCollections.observableList(new ArrayList<>(fileNamesSet));
 			fileNames.sort(null);
 			final String firstSelection = fileNamesSet.contains(GAME_UI) ? GAME_UI : fileNames.get(0);
-			logger.trace("updating dropdown - fileNames: {}, firstSelection: {}", fileNamesSet.size(), firstSelection);
+			log.trace("updating dropdown - fileNames: {}, firstSelection: {}", fileNamesSet.size(), firstSelection);
 			Platform.runLater(() -> {
 				try {
-					logger.trace("updating file dropdown items");
+					log.trace("updating file dropdown items");
 					fileSelector.setItems(fileNames);
-					logger.trace("updating file dropdown value");
+					log.trace("updating file dropdown value");
 					fileSelector.setValue(firstSelection);
-					logger.trace("finished updating file dropdown");
+					log.trace("finished updating file dropdown");
 				} catch (final Exception e) {
-					logger.fatal(FATAL_ERROR, e);
+					log.fatal(FATAL_ERROR, e);
 				}
 			});
 		}
@@ -413,7 +414,7 @@ public class BrowseTabController implements Updateable {
 				final ObservableValue<? extends TreeItem<UIElement>> observable,
 				final TreeItem<UIElement> oldValue,
 				final TreeItem<UIElement> newValue) {
-			logger.trace("selection in tree changed: {}", newValue);
+			log.trace("selection in tree changed: {}", newValue);
 			controller.showInTableView(newValue);
 		}
 	}
@@ -477,13 +478,13 @@ public class BrowseTabController implements Updateable {
 		
 		@Override
 		public void handle(final ActionEvent event) {
-			logger.trace("selection of file changed: {}",
+			log.trace("selection of file changed: {}",
 					() -> browseTabController.fileSelector.getSelectionModel().getSelectedItem());
 			try {
 				final String selectedFileName = browseTabController.fileSelector.getSelectionModel().getSelectedItem();
 				updateTemplateDropdown(selectedFileName);
 			} catch (final Exception e) {
-				logger.fatal(FATAL_ERROR, e);
+				log.fatal(FATAL_ERROR, e);
 			}
 		}
 		
@@ -496,7 +497,7 @@ public class BrowseTabController implements Updateable {
 				final List<String> templatesOfFile = new ArrayList<>();
 				String firstSelection = null;
 				String name;
-				logger.trace("filling templatemap");
+				log.trace("filling templatemap");
 				for (final UITemplate template : browseTabController.uiCatalog.getTemplates()) {
 					if (template.getFileName().equals(fileName)) {
 						name = template.getElement().getName();
@@ -507,17 +508,17 @@ public class BrowseTabController implements Updateable {
 						}
 					}
 				}
-				logger.trace("templates of file: {}", templatesOfFile.size());
+				log.trace("templates of file: {}", templatesOfFile.size());
 				final ObservableList<String> elementNames =
 						FXCollections.observableList(new ArrayList<>(templatesOfFile));
 				browseTabController.templateSelector.setItems(elementNames);
 				if (firstSelection != null) {
-					logger.trace("first selection: {}", firstSelection);
+					log.trace("first selection: {}", firstSelection);
 					browseTabController.templateSelector.setValue(firstSelection);
 				} else {
 					browseTabController.templateSelector.selectionModelProperty().get().selectFirst();
 				}
-				logger.trace("template dropdown updated");
+				log.trace("template dropdown updated");
 			}
 		}
 	}
@@ -536,14 +537,14 @@ public class BrowseTabController implements Updateable {
 				if (browseTabController.templateMap != null) {
 					final String selectedTemplateRootElem =
 							browseTabController.templateSelector.getSelectionModel().getSelectedItem();
-					logger.trace("selection of template changed: {}", selectedTemplateRootElem);
+					log.trace("selection of template changed: {}", selectedTemplateRootElem);
 					final UITemplate template = browseTabController.templateMap.get(selectedTemplateRootElem);
 					if (template != curTreeTemplate) {
 						createTree(template);
 					}
 				}
 			} catch (final Exception e) {
-				logger.fatal(FATAL_ERROR, e);
+				log.fatal(FATAL_ERROR, e);
 			}
 		}
 		
@@ -551,7 +552,7 @@ public class BrowseTabController implements Updateable {
 		 * @param template
 		 */
 		private void createTree(final UITemplate template) {
-			logger.trace("creating Tree");
+			log.trace("creating Tree");
 			final long start = System.currentTimeMillis();
 			curTreeTemplate = template;
 			browseTabController.framesTotal = 0;
@@ -571,12 +572,12 @@ public class BrowseTabController implements Updateable {
 							.bind(Bindings.createObjectBinding(browseTabController.searchCallable,
 									browseTabController.queryString));
 					Platform.runLater(() -> {
-						logger.trace("setting root");
+						log.trace("setting root");
 						browseTabController.frameTree.setRoot(rootItem);
-						logger.trace("selecting first entry");
+						log.trace("selecting first entry");
 						browseTabController.frameTree.getSelectionModel().select(0);
-						if (logger.isTraceEnabled()) {
-							logger.trace("Tree creation: {}ms , {} frames",
+						if (log.isTraceEnabled()) {
+							log.trace("Tree creation: {}ms , {} frames",
 									(System.currentTimeMillis() - start),
 									browseTabController.framesTotal);
 						}
@@ -584,8 +585,8 @@ public class BrowseTabController implements Updateable {
 				}).start();
 			} else {
 				browseTabController.frameTree.setRoot(null);
-				if (logger.isTraceEnabled()) {
-					logger.trace("Tree creation: {}ms , {} frames",
+				if (log.isTraceEnabled()) {
+					log.trace("Tree creation: {}ms , {} frames",
 							(System.currentTimeMillis() - start),
 							browseTabController.framesTotal);
 				}
@@ -639,7 +640,7 @@ public class BrowseTabController implements Updateable {
 				str = browseTabController.queriedFilter;
 				browseTabController.flowFactory.setHighlight(str);
 				browseTabController.queryString.set(str.toUpperCase(Locale.getDefault()));
-				logger.trace("filter apply: {}ms - {}", (System.currentTimeMillis() - startTime), str);
+				log.trace("filter apply: {}ms - {}", (System.currentTimeMillis() - startTime), str);
 			}
 			Platform.runLater(new TreeFilteringUiRunnable(str,
 					filter,
@@ -688,12 +689,12 @@ public class BrowseTabController implements Updateable {
 						browseTabController.queryIdling = true;
 						if (!browseTabController.queryIdling && !browseTabController.queriedFilter.equals(curFilter)) {
 							//Query set, but Filter Thread is dead. -> try again
-							logger.error("Query set, but Filter Thread is dead. -> try again. Does this work?");
+							log.error("Query set, but Filter Thread is dead. -> try again. Does this work?");
 							browseTabController.filterTree(filter);
 						}
 					}
 				} catch (final Exception e) {
-					logger.fatal(FATAL_ERROR, e);
+					log.fatal(FATAL_ERROR, e);
 				}
 			}
 		}

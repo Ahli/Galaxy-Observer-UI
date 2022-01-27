@@ -4,7 +4,6 @@
 package com.ahli.interfacebuilder.integration;
 
 import com.ahli.util.FileCountingVisitor;
-import org.springframework.lang.NonNull;
 import org.springframework.util.FileSystemUtils;
 
 import java.io.IOException;
@@ -31,7 +30,7 @@ public class FileService {
 	 * @throws IOException
 	 * 		when something goes wrong
 	 */
-	public void copyFileOrDirectory(@NonNull final Path source, @NonNull final Path target) throws IOException {
+	public void copyFileOrDirectory(final Path source, final Path target) throws IOException {
 		if (Files.isDirectory(source)) {
 			// create folder if not existing
 			if (!Files.exists(target)) {
@@ -61,7 +60,7 @@ public class FileService {
 	 * @param path
 	 * @return
 	 */
-	public Path cutTillValidDirectory(@NonNull final Path path) {
+	public Path cutTillValidDirectory(final Path path) {
 		Path cur = path.toAbsolutePath();
 		while (cur != null && !Files.isDirectory(cur)) {
 			cur = path.getParent();
@@ -76,7 +75,7 @@ public class FileService {
 	 * @return size of all contained files in bytes
 	 * @throws IOException
 	 */
-	public long getDirectorySize(@NonNull final Path path) throws IOException {
+	public long getDirectorySize(final Path path) throws IOException {
 		final long size;
 		try (final Stream<Path> walk = Files.walk(path)) {
 			size = walk.filter(p -> p.toFile().isFile()).mapToLong(p -> p.toFile().length()).sum();
@@ -90,7 +89,7 @@ public class FileService {
 	 * @param directory
 	 * @throws IOException
 	 */
-	public void cleanDirectory(@NonNull final Path directory) throws IOException {
+	public void cleanDirectory(final Path directory) throws IOException {
 		for (int i = 500; i > 0; --i) {
 			try {
 				FileSystemUtils.deleteRecursively(directory);
@@ -119,7 +118,7 @@ public class FileService {
 	 * @throws IOException
 	 * 		if it is not a directory or another problem occurred
 	 */
-	public boolean isEmptyDirectory(@NonNull final Path directory) throws IOException {
+	public boolean isEmptyDirectory(final Path directory) throws IOException {
 		return getFileCountOfDirectory(directory) <= 0;
 	}
 	
@@ -130,7 +129,7 @@ public class FileService {
 	 * @return count of files in directory and subdirectories
 	 * @throws IOException
 	 */
-	public int getFileCountOfDirectory(@NonNull final Path path) throws IOException {
+	public int getFileCountOfDirectory(final Path path) throws IOException {
 		if (!Files.exists(path)) {
 			return 0;
 		}
@@ -144,8 +143,8 @@ public class FileService {
 	 * @return
 	 * @throws IOException
 	 */
-	@NonNull
-	public List<Path> getFilesOfDirectory(@NonNull final Path path) throws IOException {
+	
+	public List<Path> getFilesOfDirectory(final Path path) throws IOException {
 		final FileListingVisitor fileVisitor = new FileListingVisitor();
 		Files.walkFileTree(path, fileVisitor);
 		return fileVisitor.getFilePaths();
@@ -170,7 +169,6 @@ public class FileService {
 			return FileVisitResult.CONTINUE;
 		}
 		
-		@NonNull
 		public List<Path> getFilePaths() {
 			return paths;
 		}

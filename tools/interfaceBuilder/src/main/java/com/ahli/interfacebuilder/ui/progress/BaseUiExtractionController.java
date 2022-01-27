@@ -9,6 +9,7 @@ import com.ahli.interfacebuilder.base_ui.ExtractBaseUiTask;
 import com.ahli.interfacebuilder.compress.GameService;
 import com.ahli.interfacebuilder.projects.enums.GameType;
 import com.ahli.interfacebuilder.ui.AppController;
+import com.ahli.interfacebuilder.ui.FxmlController;
 import com.ahli.interfacebuilder.ui.Updateable;
 import com.ahli.interfacebuilder.ui.navigation.NavigationController;
 import com.ahli.interfacebuilder.ui.progress.appenders.Appender;
@@ -27,10 +28,11 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import org.springframework.lang.NonNull;
 
 import java.util.concurrent.ForkJoinPool;
 
-public class BaseUiExtractionController implements Updateable {
+public class BaseUiExtractionController implements Updateable, FxmlController {
 	
 	private static int threadCount;
 	private final String[] threadNames;
@@ -110,7 +112,7 @@ public class BaseUiExtractionController implements Updateable {
 		// nothing to do
 	}
 	
-	public void start(final GameType gameType, final boolean usePtr) {
+	public void start(@NonNull final GameType gameType, final boolean usePtr) {
 		errorTabController.setRunning(true);
 		final GameDef exportedGameDef = gameService.getGameDef(gameType);
 		final String ptrString = usePtr ? " PTR" : "";

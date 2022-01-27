@@ -23,8 +23,7 @@ import com.ahli.interfacebuilder.ui.navigation.NavigationController;
 import com.ahli.mpq.MpqEditorInterface;
 import com.ahli.mpq.MpqException;
 import com.ahli.mpq.mpqeditor.MpqEditorCompression;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -39,8 +38,8 @@ import java.util.Locale;
 import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Stream;
 
+@Log4j2
 public class MpqBuilderService {
-	private static final Logger logger = LogManager.getLogger(MpqBuilderService.class);
 	
 	private final ConfigService configService;
 	private final CompileService compileService;
@@ -152,14 +151,14 @@ public class MpqBuilderService {
 	void buildSpecificUI(
 			final Game game, final boolean useCmdLineSettings, final Project project) {
 		if (executor.isShutdown()) {
-			logger.error("ERROR: Executor shut down. Skipping building a UI...");
+			log.error("ERROR: Executor shut down. Skipping building a UI...");
 			return;
 		}
 		
 		final Path interfaceDirectory = project.getProjectPath();
 		
 		if (!Files.exists(interfaceDirectory) || !Files.isDirectory(interfaceDirectory)) {
-			logger.error("ERROR: Can't build UI from file '{}', expected an existing directory.", interfaceDirectory);
+			log.error("ERROR: Can't build UI from file '{}', expected an existing directory.", interfaceDirectory);
 			return;
 		}
 		final SettingsIniInterface settings = configService.getIniSettings();
@@ -174,7 +173,7 @@ public class MpqBuilderService {
 		
 		// create tasks for the worker pool
 		try {
-			appController.addThreadLoggerTab(Thread.currentThread().getName(),
+			appController.addThreadlogTab(Thread.currentThread().getName(),
 					interfaceDirectory.getFileName().toString(),
 					true);
 			// create unique cache path
@@ -224,9 +223,9 @@ public class MpqBuilderService {
 		} catch (final InterruptedException e) {
 			Thread.currentThread().interrupt();
 		} catch (final IOException e) {
-			logger.error("ERROR: Exception while building UIs.", e);
+			log.error("ERROR: Exception while building UIs.", e);
 		} catch (final Exception e) {
-			logger.fatal("FATAL ERROR: ", e);
+			log.fatal("FATAL ERROR: ", e);
 		}
 	}
 	
@@ -292,7 +291,7 @@ public class MpqBuilderService {
 		}
 		if (cacheClearAttempts > 100) {
 			final String msg = "ERROR: Cache could not be cleared";
-			logger.error(msg);
+			log.error(msg);
 			return;
 		}
 		mod.setMpqCacheDirectory(cache);
@@ -304,30 +303,30 @@ public class MpqBuilderService {
 				break;
 			} catch (final FileSystemException e) {
 				if (copyAttempts == 0) {
-					logger.warn("Attempt to copy directory failed.", e);
+					log.warn("Attempt to copy directory failed.", e);
 				} else if (copyAttempts >= 100) {
 					final String msg = "Unable to copy directory after 100 copy attempts: " + e.getMessage();
-					logger.error(msg, e);
+					log.error(msg, e);
 					throw new FileSystemException(msg);
 				}
 				// sleep and hope the file gets released soon
 				Thread.sleep(500);
 			} catch (final IOException e) {
 				final String msg = "Unable to copy directory";
-				logger.error(msg, e);
+				log.error(msg, e);
 			}
 		}
 		if (copyAttempts > 100) {
 			// copy keeps failing -> abort
 			final String msg = "Failed to copy files to: " + cache;
-			logger.error(msg);
+			log.error(msg);
 			throw new IOException(msg);
 		}
 		
 		final Path componentListFile = mpqi.getComponentListFile();
 		if (componentListFile == null) {
 			final String msg = "ERROR: did not find the ComponentList file.";
-			logger.error(msg);
+			log.error(msg);
 			throw new IOException(msg);
 		}
 		mod.setComponentListFile(componentListFile);
@@ -339,7 +338,7 @@ public class MpqBuilderService {
 			descIndex.setDescIndexPathAndClear(ComponentsListReaderDom.getDescIndexPath(componentListFile, gameDef));
 		} catch (final ParserConfigurationException | SAXException | IOException e) {
 			final String msg = "ERROR: unable to read DescIndex path.";
-			logger.error(msg, e);
+			log.error(msg, e);
 			throw new IOException(msg, e);
 		}
 		
@@ -347,10 +346,10 @@ public class MpqBuilderService {
 		try {
 			descIndex.addLayoutIntPath(DescIndexReader.getLayoutPathList(descIndexFile).combined());
 		} catch (final SAXException | ParserConfigurationException | IOException | MpqException e) {
-			logger.error("unable to read Layout paths", e);
+			log.error("unable to read Layout paths", e);
 		}
 		
-		logger.info("Compiling... {}", sourceFile.getFileName());
+		log.info("Compiling... {}", sourceFile.getFileName());
 		
 		// perform checks/improvements on code
 		compileService.compile(mod,
@@ -360,7 +359,7 @@ public class MpqBuilderService {
 				verifyXml,
 				configService.getConsoleSkinId());
 		
-		logger.info("Building... {}", sourceFile.getFileName());
+		log.info("Building... {}", sourceFile.getFileName());
 		
 		final String sourceFileName = sourceFile.getFileName().toString();
 		try {
@@ -373,11 +372,11 @@ public class MpqBuilderService {
 			project.setLastBuildDateTime(LocalDateTime.now());
 			final long size = Files.size(targetFile.resolve(sourceFileName));
 			project.setLastBuildSize(size);
-			logger.info("Finished building... {}. Size: {}kb", sourceFileName, size / 1024);
+			log.info("Finished building... {}. Size: {}kb", sourceFileName, size / 1024);
 			projectService.saveProject(project);
 			appController.printInfoLogMessageToGeneral(sourceFileName + " finished construction.");
 		} catch (final IOException | MpqException e) {
-			logger.error("ERROR: unable to construct final Interface file.", e);
+			log.error("ERROR: unable to construct final Interface file.", e);
 			AppController.printErrorLogMessageToGeneral(sourceFileName + " could not be created.");
 		}
 	}
@@ -402,7 +401,7 @@ public class MpqBuilderService {
 	 * @param projects
 	 * @param useCmdLineSettings
 	 */
-	public void build(@NonNull final Iterable<Project> projects, final boolean useCmdLineSettings) {
+	public void build(final Iterable<Project> projects, final boolean useCmdLineSettings) {
 		boolean building = false;
 		for (final Project project : projects) {
 			building = true;

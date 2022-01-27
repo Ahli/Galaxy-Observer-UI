@@ -10,15 +10,16 @@ import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.lang.Nullable;
 
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+@Log4j2
 public class AppPreloader extends Preloader {
-	private static final Logger logger = LogManager.getLogger(AppPreloader.class);
+	@Nullable
 	private Stage stage;
 	
 	@Override
@@ -33,10 +34,10 @@ public class AppPreloader extends Preloader {
 			if (cssFile != null) {
 				scene.getStylesheets().add(cssFile.toURI().toString());
 			} else {
-				logger.warn("preloader stylesheet not found");
+				log.warn("preloader stylesheet not found");
 			}
 		} catch (final URISyntaxException e) {
-			logger.error("preloader stylesheet loading error", e);
+			log.error("preloader stylesheet loading error", e);
 		}
 		primaryStage.setScene(scene);
 		primaryStage.setTitle("Interface Builder");
@@ -44,14 +45,14 @@ public class AppPreloader extends Preloader {
 		if (iconStream != null) {
 			primaryStage.getIcons().add(new Image(iconStream));
 		} else {
-			logger.warn("preloader icon not found");
+			log.warn("preloader icon not found");
 		}
 		primaryStage.show();
 	}
 	
 	@Override
 	public void handleStateChangeNotification(final StateChangeNotification info) {
-		if (info.getType() == StateChangeNotification.Type.BEFORE_START) {
+		if (stage != null && info.getType() == StateChangeNotification.Type.BEFORE_START) {
 			stage.hide();
 		}
 	}

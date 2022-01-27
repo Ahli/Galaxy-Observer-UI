@@ -6,8 +6,7 @@ package com.ahli.interfacebuilder.integration.ipc;
 import com.ahli.interfacebuilder.integration.CommandLineParams;
 import com.ahli.interfacebuilder.integration.log4j.InterProcessCommunicationAppender;
 import com.ahli.interfacebuilder.ui.AppController;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,8 +20,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
+@Log4j2
 public class TcpIpSocketCommunication implements IpcCommunication {
-	private static final Logger logger = LogManager.getLogger(TcpIpSocketCommunication.class);
 	private final int port;
 	private ServerSocket serverSocket;
 	
@@ -48,7 +47,7 @@ public class TcpIpSocketCommunication implements IpcCommunication {
 					     StandardCharsets.UTF_8))) {
 				// sending parameters
 				final String command = Arrays.toString(args);
-				logger.info("Sending: {}", command);
+				log.info("Sending: {}", command);
 				out.println(command);
 				
 				// receive answers
@@ -57,12 +56,12 @@ public class TcpIpSocketCommunication implements IpcCommunication {
 					if ("#BYE".equals(inputLine)) {
 						return true;
 					} else {
-						logger.info(inputLine);
+						log.info(inputLine);
 					}
 				}
 			}
 		} catch (final IOException e1) {
-			logger.fatal("Exception while sending parameters to primary instance.", e1);
+			log.fatal("Exception while sending parameters to primary instance.", e1);
 		}
 		return false;
 	}
@@ -83,10 +82,10 @@ public class TcpIpSocketCommunication implements IpcCommunication {
 			}
 			serverSocket = new ServerSocket(port, 4, InetAddress.getByAddress(new byte[] { 127, 0, 0, 1 }));
 		} catch (final UnknownHostException e) {
-			logger.fatal("Could not retrieve localhost address.", e);
+			log.fatal("Could not retrieve localhost address.", e);
 			return null;
 		} catch (final IOException e) {
-			logger.trace("Server socket error.", e);
+			log.trace("Server socket error.", e);
 			// port taken, so app is already running
 			return null;
 		}
@@ -121,7 +120,7 @@ public class TcpIpSocketCommunication implements IpcCommunication {
 						// close thread, socket was closed ("socket closed" ignores case for JDK 13+)
 						return;
 					}
-					logger.error("I/O Exception while waiting for client connections.", e);
+					log.error("I/O Exception while waiting for client connections.", e);
 				}
 			}
 		}
@@ -134,16 +133,16 @@ public class TcpIpSocketCommunication implements IpcCommunication {
 				InterProcessCommunicationAppender.setWriter(new TcpIpSocketMessageWriter(out));
 				String inputLine;
 				while ((inputLine = in.readLine()) != null) {
-					logger.info("received message from client: {}", inputLine);
+					log.info("received message from client: {}", inputLine);
 					final String[] params =
 							COMMA_SEPARATED_REGEX_PATTERN.split(inputLine.substring(1, inputLine.length() - 1));
 					executeCommand(params);
 				}
 			} catch (final IOException e) {
 				// client closed connection
-				logger.trace("client closed connection.", e);
+				log.trace("client closed connection.", e);
 			} catch (final Exception e) {
-				logger.fatal("FATAL ERROR: ", e);
+				log.fatal("FATAL ERROR: ", e);
 			} finally {
 				InterProcessCommunicationAppender.setWriter(null);
 			}
@@ -165,7 +164,7 @@ public class TcpIpSocketCommunication implements IpcCommunication {
 				appController.runGameWithReplay(params);
 			} else {
 				if (appController == null) {
-					logger.error("Server is not ready to process commands, yet.");
+					log.error("Server is not ready to process commands, yet.");
 				}
 				// end communication as no task was given
 				InterProcessCommunicationAppender.sendTerminationSignal();

@@ -13,8 +13,7 @@ import com.ahli.galaxy.ui.interfaces.UICatalog;
 import com.ahli.interfacebuilder.compress.GameService;
 import com.ahli.interfacebuilder.projects.enums.GameType;
 import com.ahli.util.XmlDomHelper;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -35,8 +34,8 @@ import java.nio.file.attribute.BasicFileAttributes;
  *
  * @author Ahli
  */
+@Log4j2
 public class CompileService {
-	private static final Logger logger = LogManager.getLogger(CompileService.class);
 	
 	private final GameService gameService;
 	
@@ -75,7 +74,7 @@ public class CompileService {
 				startTime = System.currentTimeMillis();
 				manageOrderOfLayoutFiles(descIndex);
 				executionTime = (System.currentTimeMillis() - startTime);
-				logger.info("Checking and repairing the Layout order took {}ms.", executionTime);
+				log.info("Checking and repairing the Layout order took {}ms.", executionTime);
 			}
 			if (verifyLayout) {
 				startTime = System.currentTimeMillis();
@@ -84,7 +83,7 @@ public class CompileService {
 				catalogClone = getClonedUICatalog(mod.getGame().getUiCatalog());
 				
 				executionTime = (System.currentTimeMillis() - startTime);
-				logger.info("BaseUI Cloning took {}ms.", executionTime);
+				log.info("BaseUI Cloning took {}ms.", executionTime);
 				startTime = System.currentTimeMillis();
 				
 				if (catalogClone == null) {
@@ -103,7 +102,7 @@ public class CompileService {
 				catalogClone.setParser(null);
 				
 				executionTime = (System.currentTimeMillis() - startTime);
-				logger.info("Validating Layouts took {}ms.", executionTime);
+				log.info("Validating Layouts took {}ms.", executionTime);
 			} else {
 				if (!repairLayoutOrder && verifyXml) {
 					// only verify XML and nothing else
@@ -122,7 +121,7 @@ public class CompileService {
 				}
 			}
 		} catch (final ParserConfigurationException | SAXException | IOException e) {
-			logger.error("ERROR: encountered error while compiling.", e);
+			log.error("ERROR: encountered error while compiling.", e);
 		}
 		
 		return catalogClone;
@@ -182,7 +181,7 @@ public class CompileService {
 						dBuilder.parse(is);
 						
 					} catch (final SAXException e) {
-						logger.trace("Error while verifying XML.", e);
+						log.trace("Error while verifying XML.", e);
 						throw new IOException("XML verification failed.", e);
 					}
 				}
@@ -192,7 +191,7 @@ public class CompileService {
 		
 		@Override
 		public FileVisitResult visitFileFailed(final Path file, final IOException exc) throws IOException {
-			logger.error("Failed to access file: {}", file);
+			log.error("Failed to access file: {}", file);
 			throw exc;
 		}
 	}

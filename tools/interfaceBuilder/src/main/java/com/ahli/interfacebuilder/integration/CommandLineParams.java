@@ -4,6 +4,7 @@
 package com.ahli.interfacebuilder.integration;
 
 import javafx.application.Application;
+import org.springframework.lang.Nullable;
 
 import java.io.File;
 import java.io.Serial;
@@ -88,7 +89,7 @@ public class CommandLineParams implements Serializable {
 		return str;
 	}
 	
-	public CommandLineParams(final Application.Parameters params) {
+	public CommandLineParams(@Nullable final Application.Parameters params) {
 		paramsOriginateFromExternalSource = false;
 		final Map<String, String> namedParams = params != null ? params.getNamed() : Collections.emptyMap();
 		// named params
@@ -112,11 +113,12 @@ public class CommandLineParams implements Serializable {
 		paramRunPath = namedParams.get(RUN);
 	}
 	
+	@Nullable
 	public static String getServerThreadId(final String... params) {
 		return getParamsValue(params, PARAM_PREFIX + SERVER + EQUAL);
 	}
 	
-	public static String getServerThreadId(final Application.Parameters params) {
+	public static String getServerThreadId(@Nullable final Application.Parameters params) {
 		return params != null ? params.getNamed().get(SERVER) : "";
 	}
 	

@@ -20,14 +20,13 @@ import javafx.scene.control.DialogPane;
 import javafx.scene.control.TextField;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Window;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.File;
 import java.nio.file.Path;
 
+@Log4j2
 public class AddProjectController {
-	private static final Logger logger = LogManager.getLogger(AddProjectController.class);
 	private final ProjectService projectService;
 	private final FileService fileService;
 	@FXML
@@ -103,7 +102,7 @@ public class AddProjectController {
 	}
 	
 	public void addProjectAction(final Event event) {
-		logger.trace("add project action event fired");
+		log.trace("add project action event fired");
 		final GameType gameType = gameDropdown.getValue();
 		if (gameType == null) {
 			// eat event before it reaches the resultConverter

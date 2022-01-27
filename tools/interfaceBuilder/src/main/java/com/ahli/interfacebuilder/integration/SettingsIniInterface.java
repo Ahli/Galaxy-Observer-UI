@@ -3,14 +3,13 @@
 
 package com.ahli.interfacebuilder.integration;
 
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.configuration2.INIConfiguration;
 import org.apache.commons.configuration2.SubnodeConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.INIBuilderParameters;
 import org.apache.commons.configuration2.builder.fluent.Parameters;
 import org.apache.commons.configuration2.ex.ConfigurationException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -23,8 +22,8 @@ import java.nio.file.Path;
  *
  * @author Ahli
  */
+@Log4j2
 public class SettingsIniInterface {
-	private static final Logger logger = LogManager.getLogger(SettingsIniInterface.class);
 	
 	private static final String CATEGORY_GAME_PATHS = "GamePaths";
 	private static final String HEROES_PATH = "Heroes_Path";
@@ -40,7 +39,7 @@ public class SettingsIniInterface {
 	private static final String COMPRESS_MPQ = "compressMPQ";
 	private static final String BUILD_UNPROTECTED_TOO = "buildUnprotectedToo";
 	private static final String UTF_8 = "UTF-8";
-	private Path settingsFilePath;
+	private final Path settingsFilePath;
 	private String sc2Path = "";
 	private String heroesPath = "";
 	private String heroesPtrPath = "";
@@ -70,8 +69,9 @@ public class SettingsIniInterface {
 		try {
 			readSettingsFromFilePrivate();
 		} catch (final IOException e) {
-			logger.error(String.format("Failed to load settings from ini at construction. Filepath=%s",
-					settingsFilePath), e);
+			log.error(
+					String.format("Failed to load settings from ini at construction. Filepath=%s", settingsFilePath),
+					e);
 		}
 	}
 	
@@ -84,7 +84,7 @@ public class SettingsIniInterface {
 	private void readSettingsFromFilePrivate() throws IOException {
 		if (Files.exists(settingsFilePath)) {
 			try {
-				logger.info("Loading settings from: {}", settingsFilePath);
+				log.info("Loading settings from: {}", settingsFilePath);
 				final INIBuilderParameters params =
 						new Parameters().ini().setFile(settingsFilePath.toFile()).setEncoding(UTF_8);
 				final FileBasedConfigurationBuilder<INIConfiguration> b =
@@ -142,7 +142,7 @@ public class SettingsIniInterface {
 			// load current file
 			ini = b.getConfiguration();
 		} catch (final ConfigurationException e) {
-			logger.trace("Failed to load ini file.", e);
+			log.trace("Failed to load ini file.", e);
 			// create new one if not present
 			ini = new INIConfiguration();
 		}
@@ -181,15 +181,15 @@ public class SettingsIniInterface {
 		section.setProperty(BUILD_UNPROTECTED_TOO, guiBuildUnprotectedToo);
 	}
 	
-	/**
-	 * Read all Settings from the Settings file. If that file does not exist, it will be created.
-	 *
-	 * @throws IOException
-	 * 		when there is an error reading the file
-	 */
-	public void readSettingsFromFile() throws IOException {
-		readSettingsFromFilePrivate();
-	}
+	//	/**
+	//	 * Read all Settings from the Settings file. If that file does not exist, it will be created.
+	//	 *
+	//	 * @throws IOException
+	//	 * 		when there is an error reading the file
+	//	 */
+	//	public void readSettingsFromFile() throws IOException {
+	//		readSettingsFromFilePrivate();
+	//	}
 	
 	/**
 	 * @return
@@ -275,23 +275,23 @@ public class SettingsIniInterface {
 		this.guiBuildUnprotectedToo = guiBuildUnprotectedToo;
 	}
 	
-	/**
-	 * Returns path to settings file.
-	 *
-	 * @return path of the settings file
-	 */
-	public Path getSettingsFilePath() {
-		return settingsFilePath;
-	}
+	//	/**
+	//	 * Returns path to settings file.
+	//	 *
+	//	 * @return path of the settings file
+	//	 */
+	//	public Path getSettingsFilePath() {
+	//		return settingsFilePath;
+	//	}
 	
-	/**
-	 * Constructor.
-	 *
-	 * @param path
-	 */
-	public void setSettingsFilePath(final Path path) {
-		settingsFilePath = path;
-	}
+	//	/**
+	//	 * Constructor.
+	//	 *
+	//	 * @param path
+	//	 */
+	//	public void setSettingsFilePath(final Path path) {
+	//		settingsFilePath = path;
+	//	}
 	
 	/**
 	 * @return
@@ -356,12 +356,12 @@ public class SettingsIniInterface {
 		return cmdLineCompressMpq;
 	}
 	
-	/**
-	 * @param cmdLineCompressMpq
-	 */
-	public void setCmdLineCompressMpq(final int cmdLineCompressMpq) {
-		this.cmdLineCompressMpq = cmdLineCompressMpq;
-	}
+	//	/**
+	//	 * @param cmdLineCompressMpq
+	//	 */
+	//	public void setCmdLineCompressMpq(final int cmdLineCompressMpq) {
+	//		this.cmdLineCompressMpq = cmdLineCompressMpq;
+	//	}
 	
 	/**
 	 * @return

@@ -8,6 +8,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.MessageSource;
 import org.springframework.context.support.MessageSourceResourceBundle;
+import org.springframework.lang.NonNull;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,7 +34,7 @@ public class FXMLSpringLoader extends FXMLLoader implements ApplicationContextAw
 	}
 	
 	@Override
-	public void setApplicationContext(final ApplicationContext applicationContext) {
+	public void setApplicationContext(@NonNull final ApplicationContext applicationContext) {
 		setApplicationContextPrivate(applicationContext);
 	}
 	

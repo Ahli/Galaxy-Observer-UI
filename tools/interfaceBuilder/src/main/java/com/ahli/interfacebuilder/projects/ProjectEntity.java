@@ -23,6 +23,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.Hibernate;
+import org.springframework.lang.NonNull;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -75,12 +76,6 @@ public final class ProjectEntity implements Serializable {
 		// required for hibernate
 	}
 	
-	public ProjectEntity(final String name, final String projectPath, final GameType gameType) {
-		this.name = name;
-		this.projectPath = projectPath;
-		this.gameType = gameType;
-	}
-	
 	public static List<Project> toProjects(final Collection<ProjectEntity> projectEntities) {
 		final List<Project> list = new ArrayList<>(projectEntities.size());
 		for (final ProjectEntity entity : projectEntities) {
@@ -100,7 +95,7 @@ public final class ProjectEntity implements Serializable {
 				.build();
 	}
 	
-	public static ProjectEntity fromProject(final Project project) {
+	public static ProjectEntity fromProject(@NonNull final Project project) {
 		return ProjectEntity.builder()
 				.id(project.getId())
 				.name(project.getName())
