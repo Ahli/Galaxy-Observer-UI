@@ -125,7 +125,7 @@ public class NavigationController {
 	 * @param contentIndex
 	 */
 	private void showPanelContent(final int contentIndex) {
-		if (contentIndex != activeContent) {
+		if (contentIndex != activeContent && contentPages[contentIndex] != null) {
 			activeContent = contentIndex;
 			final ObservableList<Node> activeNodes = contentContainer.getChildren();
 			activeNodes.clear();
