@@ -17,12 +17,10 @@ import com.ahli.interfacebuilder.integration.SettingsIniInterface;
 import com.ahli.interfacebuilder.integration.log4j.InterProcessCommunicationAppender;
 import com.ahli.interfacebuilder.integration.log4j.StylizedTextAreaAppender;
 import com.ahli.interfacebuilder.projects.enums.GameType;
-import com.ahli.interfacebuilder.threads.CleaningForkJoinTaskCleaner;
 import com.ahli.interfacebuilder.ui.navigation.NavigationController;
 import com.ahli.interfacebuilder.ui.navigation.Notification;
 import com.ahli.interfacebuilder.ui.progress.ErrorTabController;
 import com.ahli.interfacebuilder.ui.progress.TabPaneController;
-import com.ahli.util.StringInterner;
 import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
@@ -41,7 +39,6 @@ import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.BeanCreationNotAllowedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Lazy;
@@ -59,7 +56,7 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 
 @Log4j2
-public class AppController implements CleaningForkJoinTaskCleaner {
+public class AppController {
 	public static final String FATAL_ERROR = "FATAL ERROR: ";
 	private final List<ErrorTabController> errorTabControllers;
 	private ForkJoinPool executor;
@@ -116,42 +113,6 @@ public class AppController implements CleaningForkJoinTaskCleaner {
 		this.appContext = appContext;
 	}
 	
-	/**
-	 * After a short delay, the app attempts to clean up its resources,
-	 */
-	@Override
-	@SuppressWarnings("java:S1215")
-	public void tryCleanUp() {
-		// new delayed thread is required, else the ForkJoinPool is not finished
-		new Thread(() -> {
-			// free space of baseUI
-			if (executor != null && executor.isQuiescent() && mpqBuilderService != null) {
-				log.debug("Freeing up resources");
-				// TODO try to get red if lazy beans to avoid this exception
-				try {
-					mpqBuilderService.getGameData(GameType.SC2).setUiCatalog(null);
-					mpqBuilderService.getGameData(GameType.HEROES).setUiCatalog(null);
-				} catch (final BeanCreationNotAllowedException e) {
-					log.trace("Failed to instantiate lazy beans.", e);
-				}
-				// GC1 is the default GC and can now release RAM -> actually good to do after a task because we use a
-				// lot of RAM for the UIs
-				// Weak References survive 3 garbage collections by default
-				System.gc();
-				System.gc();
-				System.gc();
-				System.runFinalization();
-				// clean up StringInterner's weak references that the GC removed
-				log.trace("string interner size before cleaning: {}", StringInterner.size()); // instant calc!
-				StringInterner.cleanUpGarbage();
-				log.trace("string interner size after cleaning: {}", StringInterner::size);
-				// TODO not all Strings are removed for some reason
-				//				if (StringInterner.size() < 10) {
-				//					log.trace("interner content: \n{}", StringInterner.print());
-				//				}
-			}
-		}).start();
-	}
 	
 	@EventListener
 	public void onPrimaryStageReadyEvent(final PrimaryStageReadyEvent stageReadyEvent) {

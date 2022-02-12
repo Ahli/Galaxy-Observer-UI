@@ -8,7 +8,7 @@ import com.ahli.interfacebuilder.base_ui.BaseUiService;
 import com.ahli.interfacebuilder.base_ui.ExtractBaseUiTask;
 import com.ahli.interfacebuilder.compress.GameService;
 import com.ahli.interfacebuilder.projects.enums.GameType;
-import com.ahli.interfacebuilder.ui.AppController;
+import com.ahli.interfacebuilder.threads.CleaningForkJoinPool;
 import com.ahli.interfacebuilder.ui.FxmlController;
 import com.ahli.interfacebuilder.ui.Updateable;
 import com.ahli.interfacebuilder.ui.navigation.NavigationController;
@@ -30,8 +30,6 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import org.springframework.lang.NonNull;
 
-import java.util.concurrent.ForkJoinPool;
-
 public class BaseUiExtractionController implements Updateable, FxmlController {
 	
 	private static int threadCount;
@@ -39,8 +37,7 @@ public class BaseUiExtractionController implements Updateable, FxmlController {
 	private final BaseUiService baseUiService;
 	private final GameService gameService;
 	private final NavigationController navigationController;
-	private final ForkJoinPool executor;
-	private final AppController appController;
+	private final CleaningForkJoinPool executor;
 	
 	@FXML
 	private FontAwesomeIconView stateImage1;
@@ -70,19 +67,18 @@ public class BaseUiExtractionController implements Updateable, FxmlController {
 	private TextFlow txtArea3;
 	@FXML
 	private Label areaLabel3;
+	
 	private ErrorTabController errorTabController;
 	
 	public BaseUiExtractionController(
 			final BaseUiService baseUiService,
 			final GameService gameService,
 			final NavigationController navigationController,
-			final ForkJoinPool executor,
-			final AppController appController) {
+			final CleaningForkJoinPool executor) {
 		this.baseUiService = baseUiService;
 		this.gameService = gameService;
 		this.navigationController = navigationController;
 		this.executor = executor;
-		this.appController = appController;
 		final String threadName = "extractThread_";
 		threadNames = new String[3];
 		threadNames[0] = threadName + ++threadCount;
@@ -97,6 +93,7 @@ public class BaseUiExtractionController implements Updateable, FxmlController {
 	/**
 	 * Automatically called by FxmlLoader
 	 */
+	@Override
 	public void initialize() {
 		// auto-downscrolling
 		scrollPane1.vvalueProperty().bind(txtArea1.heightProperty());
@@ -144,7 +141,7 @@ public class BaseUiExtractionController implements Updateable, FxmlController {
 		stateImage2.setVisible(true);
 		stateImage3.setVisible(true);
 		
-		final ExtractBaseUiTask task = new ExtractBaseUiTask(appController,
+		final ExtractBaseUiTask task = new ExtractBaseUiTask(executor,
 				baseUiService,
 				gameType,
 				usePtr,

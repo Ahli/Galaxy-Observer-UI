@@ -70,7 +70,7 @@ public class MenuBarController {
 	}
 	
 	/**
-	 * Called when the user clicks on the save as button.
+	 * Called when the user clicks on the save-as button.
 	 */
 	@FXML
 	public void saveAs() {
@@ -78,7 +78,7 @@ public class MenuBarController {
 	}
 	
 	/**
-	 * Called when the user clicks on the save as button.
+	 * Called when the user clicks on the save button.
 	 */
 	@FXML
 	public void saveCurrent() {
@@ -86,7 +86,7 @@ public class MenuBarController {
 	}
 	
 	/**
-	 * Called when the user clicks on the save as button.
+	 * Called when the user clicks on the exit button.
 	 */
 	@FXML
 	public void exit() {

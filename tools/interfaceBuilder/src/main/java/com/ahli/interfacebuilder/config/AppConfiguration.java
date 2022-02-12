@@ -23,6 +23,7 @@ import com.ahli.interfacebuilder.projects.ProjectService;
 import com.ahli.interfacebuilder.threads.CleaningForkJoinPool;
 import com.ahli.interfacebuilder.threads.CleaningForkJoinTaskCleaner;
 import com.ahli.interfacebuilder.threads.SpringForkJoinWorkerThreadFactory;
+import com.ahli.interfacebuilder.threads.TaskCleaner;
 import com.ahli.interfacebuilder.ui.AppController;
 import com.ahli.interfacebuilder.ui.navigation.NavigationController;
 import com.ahli.mpq.MpqEditorInterface;
@@ -102,6 +103,12 @@ public class AppConfiguration {
 	}
 	
 	@Bean
+	protected CleaningForkJoinTaskCleaner taskCleaner(final Game sc2Game, final Game heroesGame) {
+		log.debug("init bean: taskCleaner");
+		return new TaskCleaner(sc2Game, heroesGame);
+	}
+	
+	@Bean
 	protected MpqBuilderService mpqBuilderService(
 			final ConfigService configService,
 			final CompileService compileService,
@@ -111,7 +118,7 @@ public class AppConfiguration {
 			// Spring uses the parameter name as a qualifier
 			final Game sc2Game,
 			final Game heroesGame,
-			final ForkJoinPool forkJoinPool,
+			final CleaningForkJoinPool executor,
 			final AppController appController,
 			final NavigationController navigationController) {
 		log.debug("init bean: mpqBuilderService");
@@ -123,7 +130,7 @@ public class AppConfiguration {
 				baseUiService,
 				sc2Game,
 				heroesGame,
-				forkJoinPool,
+				executor,
 				appController,
 				navigationController);
 	}

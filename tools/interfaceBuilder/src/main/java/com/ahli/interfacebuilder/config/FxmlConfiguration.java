@@ -9,6 +9,7 @@ import com.ahli.interfacebuilder.compile.CompileService;
 import com.ahli.interfacebuilder.compress.GameService;
 import com.ahli.interfacebuilder.integration.FileService;
 import com.ahli.interfacebuilder.projects.ProjectService;
+import com.ahli.interfacebuilder.threads.CleaningForkJoinPool;
 import com.ahli.interfacebuilder.ui.AppController;
 import com.ahli.interfacebuilder.ui.browse.BrowseController;
 import com.ahli.interfacebuilder.ui.browse.BrowseTabController;
@@ -153,7 +154,7 @@ public class FxmlConfiguration {
 			final FileService fileService,
 			final NavigationController navigationController,
 			final AppController appController,
-			final ForkJoinPool executor) {
+			final CleaningForkJoinPool executor) {
 		return new BrowseController(
 				appContext,
 				baseUiService,
@@ -180,8 +181,7 @@ public class FxmlConfiguration {
 			final BaseUiService baseUiService,
 			final GameService gameServic,
 			final NavigationController navigationController,
-			final ForkJoinPool executor,
-			final AppController appController) {
-		return new BaseUiExtractionController(baseUiService, gameServic, navigationController, executor, appController);
+			final CleaningForkJoinPool executor) {
+		return new BaseUiExtractionController(baseUiService, gameServic, navigationController, executor);
 	}
 }

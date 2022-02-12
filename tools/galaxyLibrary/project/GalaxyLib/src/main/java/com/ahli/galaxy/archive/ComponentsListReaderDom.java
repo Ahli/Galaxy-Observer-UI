@@ -5,6 +5,8 @@ package com.ahli.galaxy.archive;
 
 import com.ahli.galaxy.game.GameDef;
 import com.ahli.util.XmlDomHelper;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -45,7 +47,8 @@ public final class ComponentsListReaderDom {
 	 * @throws SAXException
 	 * @throws ParserConfigurationException
 	 */
-	public static String getDescIndexPath(final Path compListFile, final GameDef game)
+	@NotNull
+	public static String getDescIndexPath(@NotNull final Path compListFile, @NotNull final GameDef game)
 			throws ParserConfigurationException, SAXException, IOException {
 		final String str = game.baseDataFolderName() + File.separator + getComponentsListValue(compListFile, UIUI);
 		logger.trace("DescIndexPath: {}", str);
@@ -64,7 +67,8 @@ public final class ComponentsListReaderDom {
 	 * @throws IOException
 	 * @throws SAXException
 	 */
-	public static String getComponentsListValue(final Path compListFile, final String typeVal)
+	@Nullable
+	public static String getComponentsListValue(@NotNull final Path compListFile, @NotNull final String typeVal)
 			throws ParserConfigurationException, SAXException, IOException {
 		
 		final DocumentBuilder dBuilder = XmlDomHelper.buildSecureDocumentBuilder(false, true);

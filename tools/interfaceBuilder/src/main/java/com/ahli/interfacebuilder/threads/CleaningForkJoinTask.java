@@ -5,6 +5,7 @@ package com.ahli.interfacebuilder.threads;
 
 import com.ahli.interfacebuilder.integration.log4j.StylizedTextAreaAppender;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.lang.NonNull;
 
 import java.io.Serial;
 import java.util.concurrent.ForkJoinTask;
@@ -21,10 +22,10 @@ public abstract class CleaningForkJoinTask extends ForkJoinTask<Void> {
 	@Serial
 	private static final long serialVersionUID = 8118692371922973864L;
 	
-	private final transient CleaningForkJoinTaskCleaner cleaner;
+	private final transient CleaningForkJoinPool executor;
 	
-	protected CleaningForkJoinTask(final CleaningForkJoinTaskCleaner cleaner) {
-		this.cleaner = cleaner;
+	protected CleaningForkJoinTask(@NonNull final CleaningForkJoinPool executor) {
+		this.executor = executor;
 	}
 	
 	@Override
@@ -50,7 +51,7 @@ public abstract class CleaningForkJoinTask extends ForkJoinTask<Void> {
 			return false;
 		} finally {
 			StylizedTextAreaAppender.finishedWork(Thread.currentThread().getName(), true, 50);
-			cleaner.tryCleanUp();
+			executor.tryCleanUp();
 		}
 	}
 	

@@ -7,10 +7,11 @@ import com.ahli.galaxy.ModD;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
 import com.ahli.interfacebuilder.base_ui.BaseUiService;
 import com.ahli.interfacebuilder.config.ConfigService;
+import com.ahli.interfacebuilder.threads.CleaningForkJoinPool;
 import com.ahli.interfacebuilder.threads.CleaningForkJoinTask;
-import com.ahli.interfacebuilder.threads.CleaningForkJoinTaskCleaner;
 import com.ahli.interfacebuilder.ui.browse.BrowseTabController;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.lang.NonNull;
 
 import java.io.Serial;
 
@@ -27,13 +28,13 @@ public class BrowseCompileTask extends CleaningForkJoinTask {
 	private final transient ConfigService configService;
 	
 	public BrowseCompileTask(
-			final CleaningForkJoinTaskCleaner cleaner,
-			final ModD mod,
-			final BrowseTabController controller,
-			final CompileService compileService,
-			final BaseUiService baseUiService,
-			final ConfigService configService) {
-		super(cleaner);
+			@NonNull final CleaningForkJoinPool executor,
+			@NonNull final ModD mod,
+			@NonNull final BrowseTabController controller,
+			@NonNull final CompileService compileService,
+			@NonNull final BaseUiService baseUiService,
+			@NonNull final ConfigService configService) {
+		super(executor);
 		this.mod = mod;
 		this.controller = controller;
 		this.compileService = compileService;

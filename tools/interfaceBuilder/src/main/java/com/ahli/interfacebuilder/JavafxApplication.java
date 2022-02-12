@@ -16,12 +16,15 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
 @Log4j2
 public class JavafxApplication extends Application {
 	
+	@Nullable
 	private IpcServerThread serverThread;
+	@Nullable
 	private ConfigurableApplicationContext context;
 	
 	@Override
@@ -38,7 +41,7 @@ public class JavafxApplication extends Application {
 				.build()
 				.run(toArray(getParameters()));
 		
-		if (serverThread != null && serverThread.isAlive()) {
+		if (serverThread != null && serverThread.isAlive() && context != null) {
 			serverThread.setAppController(context.getBean(AppController.class));
 		}
 		
@@ -47,7 +50,7 @@ public class JavafxApplication extends Application {
 	
 	@SuppressWarnings("java:S3014") // ThreadGroup is ok to be used here
 	@Nullable
-	private static IpcServerThread findServerThread(final String id) {
+	private static IpcServerThread findServerThread(@NonNull final String id) {
 		try {
 			if (!id.isEmpty()) {
 				final long idLong = Long.parseLong(id);
@@ -75,8 +78,10 @@ public class JavafxApplication extends Application {
 	}
 	
 	private void logAllBeans() {
-		final String[] allBeanNames = context.getBeanDefinitionNames();
-		log.trace("Spring Beans created: {}", (Object) allBeanNames);
+		if (context != null) {
+			final String[] allBeanNames = context.getBeanDefinitionNames();
+			log.trace("Spring Beans created: {}", (Object) allBeanNames);
+		}
 	}
 	
 	@Override
@@ -85,7 +90,9 @@ public class JavafxApplication extends Application {
 		Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 		final CommandLineParams startingParams = new CommandLineParams(getParameters());
 		hidePreloader();
-		context.publishEvent(new PrimaryStageReadyEvent(primaryStage, startingParams));
+		if (context != null) {
+			context.publishEvent(new PrimaryStageReadyEvent(primaryStage, startingParams));
+		}
 	}
 	
 	private void hidePreloader() {
@@ -97,8 +104,10 @@ public class JavafxApplication extends Application {
 		if (serverThread != null && serverThread.isAlive()) {
 			serverThread.interrupt();
 		}
-		context.publishEvent(new AppClosingEvent(this));
-		context.close();
+		if (context != null) {
+			context.publishEvent(new AppClosingEvent(this));
+			context.close();
+		}
 		Platform.exit();
 	}
 	

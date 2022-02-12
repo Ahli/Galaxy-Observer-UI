@@ -70,12 +70,12 @@ public class BaseUiService {
 	private final Map<String, Object> baseUiParsingLock;
 	
 	public BaseUiService(
-			final ConfigService configService,
-			final GameService gameService,
-			final FileService fileService,
-			final DiscCacheService discCacheService,
-			final KryoService kryoService,
-			final AppController appController) {
+			@NonNull final ConfigService configService,
+			@NonNull final GameService gameService,
+			@NonNull final FileService fileService,
+			@NonNull final DiscCacheService discCacheService,
+			@NonNull final KryoService kryoService,
+			@NonNull final AppController appController) {
 		this.configService = configService;
 		this.gameService = gameService;
 		this.fileService = fileService;
@@ -92,7 +92,7 @@ public class BaseUiService {
 	 * @param usePtr
 	 * @return true, if outdated
 	 */
-	public boolean isOutdated(final GameType gameType, final boolean usePtr) throws IOException {
+	public boolean isOutdated(@NonNull final GameType gameType, final boolean usePtr) throws IOException {
 		final GameDef gameDef = gameService.getGameDef(gameType);
 		final Path gameBaseUI = configService.getBaseUiPath(gameDef);
 		
@@ -129,7 +129,8 @@ public class BaseUiService {
 		return !isUpToDate;
 	}
 	
-	private KryoGameInfo readMetaFile(final Path directory) throws IOException {
+	@Nullable
+	private KryoGameInfo readMetaFile(@NonNull final Path directory) throws IOException {
 		final Path path = directory.resolve(META_FILE_NAME);
 		if (Files.exists(path)) {
 			final Kryo kryo = kryoService.getKryoForBaseUiMetaFile();
@@ -140,7 +141,8 @@ public class BaseUiService {
 		return null;
 	}
 	
-	public int[] getVersion(final GameDef gameDef, final boolean isPtr) {
+	@NonNull
+	public int[] getVersion(@NonNull final GameDef gameDef, final boolean isPtr) {
 		final int[] versions = new int[4];
 		final Path path = Path.of(gameService.getGameDirPath(gameDef, isPtr),
 				gameDef.supportDirectoryX64(),
@@ -188,7 +190,7 @@ public class BaseUiService {
 	 */
 	@NonNull
 	public List<ForkJoinTask<Void>> createExtractionTasks(
-			final GameType gameType, final boolean usePtr, final Appender[] outputs) {
+			@NonNull final GameType gameType, final boolean usePtr, @NonNull final Appender[] outputs) {
 		log.info("Extracting baseUI for {}", gameType);
 		
 		final GameDef gameDef = gameService.getGameDef(gameType);
@@ -227,7 +229,8 @@ public class BaseUiService {
 	 * @param gameType
 	 * @return
 	 */
-	public static String[] getQueryMasks(final GameType gameType) {
+	@NonNull
+	public static String[] getQueryMasks(@NonNull final GameType gameType) {
 		return switch (gameType) {
 			case SC2 -> new String[] { "*.SC2Layout", "*Assets.txt", "*.SC2Style" };
 			case HEROES -> new String[] { "*.StormLayout", "*Assets.txt", "*.StormStyle" };
@@ -240,7 +243,7 @@ public class BaseUiService {
 	 * @param game
 	 * @param useCmdLineSettings
 	 */
-	public void parseBaseUiIfNecessary(final Game game, final boolean useCmdLineSettings) throws Exception {
+	public void parseBaseUiIfNecessary(@NonNull final Game game, final boolean useCmdLineSettings) throws Exception {
 		final boolean verifyLayout;
 		final SettingsIniInterface settings = configService.getIniSettings();
 		if (useCmdLineSettings) {
@@ -260,7 +263,7 @@ public class BaseUiService {
 	 * 		game whose default UI is parsed
 	 * @throws Exception
 	 */
-	public void parseBaseUI(final Game game) throws Exception {
+	public void parseBaseUI(@NonNull final Game game) throws Exception {
 		// lock per game
 		final String gameBaseUiDir =
 				configService.getBaseUiPath(game.getGameDef()) + File.separator + game.getGameDef().modsSubDirectory();
@@ -344,8 +347,8 @@ public class BaseUiService {
 		}
 	}
 	
-	
-	private Object getLock(final String gameName) {
+	@NonNull
+	private Object getLock(@NonNull final String gameName) {
 		synchronized (BaseUiService.class) {
 			return baseUiParsingLock.computeIfAbsent(gameName, k -> new Object());
 		}
@@ -358,12 +361,12 @@ public class BaseUiService {
 	 * @return true if PTR; false if not or no file is existing
 	 * @throws IOException
 	 */
-	public boolean isPtr(final Path baseUiDirectory) throws IOException {
+	public boolean isPtr(@NonNull final Path baseUiDirectory) throws IOException {
 		final KryoGameInfo kryoGameInfo = readMetaFile(baseUiDirectory);
 		return kryoGameInfo != null && kryoGameInfo.isPtr();
 	}
 	
-	public boolean cacheIsUpToDateCheckException(final GameDef gameDef, final boolean usePtr) {
+	public boolean cacheIsUpToDateCheckException(@NonNull final GameDef gameDef, final boolean usePtr) {
 		try {
 			return cacheIsUpToDate(gameDef, usePtr);
 		} catch (final NoSuchFileException e) {
@@ -374,7 +377,7 @@ public class BaseUiService {
 		return false;
 	}
 	
-	public boolean cacheIsUpToDate(final GameDef gameDef, final boolean usePtr) throws IOException {
+	public boolean cacheIsUpToDate(@NonNull final GameDef gameDef, final boolean usePtr) throws IOException {
 		final Path baseUiMetaFileDir = configService.getBaseUiPath(gameDef);
 		final Path cacheFilePath = discCacheService.getCacheFilePath(gameDef.name(), usePtr);
 		return cacheIsUpToDate(cacheFilePath, baseUiMetaFileDir);
@@ -385,7 +388,7 @@ public class BaseUiService {
 	 * @param metaFileDir
 	 * @return
 	 */
-	public boolean cacheIsUpToDate(final Path cacheFile, final Path metaFileDir) throws IOException {
+	public boolean cacheIsUpToDate(@NonNull final Path cacheFile, @NonNull final Path metaFileDir) throws IOException {
 		// no cache -> not up to date
 		if (!Files.exists(cacheFile)) {
 			return false;
@@ -430,7 +433,7 @@ public class BaseUiService {
 		private final GameDef gameDef;
 		private Exception exception;
 		
-		private BaseUiDescIndexFileParsingVisitor(final GameDef gameDef, final UICatalog uiCatalog) {
+		private BaseUiDescIndexFileParsingVisitor(@NonNull final GameDef gameDef, @NonNull final UICatalog uiCatalog) {
 			this.uiCatalog = uiCatalog;
 			this.gameDef = gameDef;
 			descIndexFileName = "descindex." + gameDef.layoutFileEnding();
@@ -456,7 +459,7 @@ public class BaseUiService {
 			return FileVisitResult.CONTINUE;
 		}
 		
-		
+		@NonNull
 		public Optional<Exception> getException() {
 			return Optional.ofNullable(exception);
 		}
@@ -473,11 +476,11 @@ public class BaseUiService {
 		private final transient Appender outputAppender;
 		
 		private CascFileExtractionTask(
-				final File extractorExe,
-				final String gamePath,
-				final String mask,
-				final Path destination,
-				final Appender outputAppender) {
+				@NonNull final File extractorExe,
+				@NonNull final String gamePath,
+				@NonNull final String mask,
+				@NonNull final Path destination,
+				@Nullable final Appender outputAppender) {
 			this.extractorExe = extractorExe;
 			this.gamePath = gamePath;
 			this.mask = mask;
@@ -517,10 +520,10 @@ public class BaseUiService {
 		 * @throws InterruptedException
 		 */
 		private static boolean extract(
-				final File extractorExe,
-				final String gamePath,
-				final String mask,
-				final Path destination,
+				@NonNull final File extractorExe,
+				@NonNull final String gamePath,
+				@NonNull final String mask,
+				@NonNull final Path destination,
 				@Nullable final Appender out) throws IOException, InterruptedException {
 			final ProcessBuilder pb = new ProcessBuilder(extractorExe.getAbsolutePath(),
 					gamePath + File.separator,
@@ -565,11 +568,11 @@ public class BaseUiService {
 		private final transient KryoService kryoService;
 		
 		private ExtractVersionTask(
-				final GameDef gameDef,
+				@NonNull final GameDef gameDef,
 				final boolean usePtr,
-				final Path destination,
-				final BaseUiService baseUiService,
-				final KryoService kryoService) {
+				@NonNull final Path destination,
+				@NonNull final BaseUiService baseUiService,
+				@NonNull final KryoService kryoService) {
 			this.gameDef = gameDef;
 			this.usePtr = usePtr;
 			this.destination = destination;
@@ -588,8 +591,10 @@ public class BaseUiService {
 		}
 		
 		private void writeToMetaFile(
-				final Path directory, final String gameName, final int[] version, final boolean isPtr)
-				throws IOException {
+				@NonNull final Path directory,
+				@NonNull final String gameName,
+				@NonNull final int[] version,
+				final boolean isPtr) throws IOException {
 			final Path path = directory.resolve(META_FILE_NAME);
 			final KryoGameInfo metaInfo = new KryoGameInfo(version, gameName, isPtr);
 			final List<Object> payload = new ArrayList<>(1);

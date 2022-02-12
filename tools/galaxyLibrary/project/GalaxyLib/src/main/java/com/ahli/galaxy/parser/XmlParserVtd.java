@@ -11,8 +11,9 @@ import com.ximpleware.NavException;
 import com.ximpleware.ParseException;
 import com.ximpleware.VTDGen;
 import com.ximpleware.VTDNav;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -20,12 +21,14 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public class XmlParserVtd extends XmlParserAbstract {
 	private static final String ANY_TAG = "*";
-	private static final Logger logger = LoggerFactory.getLogger(XmlParserVtd.class);
+	@Nullable
 	private VTDGen vtd;
-	
+	@Nullable
 	private List<String> attrTypes;
+	@Nullable
 	private List<String> attrValues;
 	
 	public XmlParserVtd() {
@@ -35,7 +38,7 @@ public class XmlParserVtd extends XmlParserAbstract {
 	/**
 	 * @param consumer
 	 */
-	public XmlParserVtd(final ParsedXmlConsumer consumer) {
+	public XmlParserVtd(@Nullable final ParsedXmlConsumer consumer) {
 		super(consumer);
 		init();
 	}
@@ -49,7 +52,7 @@ public class XmlParserVtd extends XmlParserAbstract {
 	}
 	
 	@Override
-	public void setConsumer(final ParsedXmlConsumer consumer) {
+	public void setConsumer(@Nullable final ParsedXmlConsumer consumer) {
 		this.consumer = consumer;
 		init();
 	}
@@ -63,9 +66,12 @@ public class XmlParserVtd extends XmlParserAbstract {
 	}
 	
 	@Override
-	public void parseFile(final Path p) throws IOException {
-		if (logger.isTraceEnabled()) {
-			logger.trace("parsing layout file: {}", p.getFileName());
+	public void parseFile(@NotNull final Path p) throws IOException {
+		if (consumer == null || vtd == null || attrTypes == null || attrValues == null) {
+			throw new IllegalStateException("No consumer set");
+		}
+		if (log.isTraceEnabled()) {
+			log.trace("parsing layout file: {}", p.getFileName());
 		}
 		try {
 			// setdoc causes a nullpointer error due to an internal bug => use byte array

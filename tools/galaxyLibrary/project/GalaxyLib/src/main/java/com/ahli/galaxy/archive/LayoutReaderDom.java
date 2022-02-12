@@ -4,6 +4,7 @@
 package com.ahli.galaxy.archive;
 
 import com.ahli.util.XmlDomHelper;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -46,7 +47,7 @@ public final class LayoutReaderDom {
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	public static List<String> getDependencyLayouts(final File f, List<String> ownConstants)
+	public static List<String> getDependencyLayouts(@NotNull final File f, List<String> ownConstants)
 			throws ParserConfigurationException, SAXException, IOException {
 		final String nameWithFileEnding = f.getName();
 		final String nameWOfileEnding =
@@ -191,7 +192,8 @@ public final class LayoutReaderDom {
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	public static List<String> getLayoutsConstantDefinitions(final Document doc) {
+	@NotNull
+	public static List<String> getLayoutsConstantDefinitions(@NotNull final Document doc) {
 		// create list of own constant definitions
 		final ArrayList<String> ownConstants = new ArrayList<>();
 		final NodeList constants = doc.getElementsByTagName(CONSTANT);
@@ -250,7 +252,8 @@ public final class LayoutReaderDom {
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	public static List<String> getLayoutsConstantDefinitions(final File f)
+	@NotNull
+	public static List<String> getLayoutsConstantDefinitions(@NotNull final File f)
 			throws ParserConfigurationException, SAXException, IOException {
 		
 		final Document doc = XmlDomHelper.buildSecureDocumentBuilder().parse(f);

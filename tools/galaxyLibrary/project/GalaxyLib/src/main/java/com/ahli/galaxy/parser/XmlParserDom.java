@@ -7,8 +7,9 @@ import com.ahli.galaxy.parser.abstracts.XmlParserAbstract;
 import com.ahli.galaxy.parser.interfaces.ParsedXmlConsumer;
 import com.ahli.galaxy.ui.exceptions.UIException;
 import com.ahli.util.XmlDomHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -22,12 +23,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+@Slf4j
 public class XmlParserDom extends XmlParserAbstract {
 	private static final String ANY_TAG = "*";
-	private static final Logger logger = LoggerFactory.getLogger(XmlParserDom.class);
+	@Nullable
 	private DocumentBuilder dBuilder;
 	
+	@Nullable
 	private List<String> attrTypes;
+	@Nullable
 	private List<String> attrValues;
 	
 	public XmlParserDom() {
@@ -37,27 +41,25 @@ public class XmlParserDom extends XmlParserAbstract {
 	/**
 	 * @param consumer
 	 */
-	public XmlParserDom(final ParsedXmlConsumer consumer) {
+	public XmlParserDom(@Nullable final ParsedXmlConsumer consumer) {
 		super(consumer);
 		init();
 	}
 	
 	private void init() {
-		try {
-			if (dBuilder == null) {
-				dBuilder = XmlDomHelper.buildSecureDocumentBuilder();
+		if (consumer != null) {
+			try {
+				if (dBuilder == null) {
+					dBuilder = XmlDomHelper.buildSecureDocumentBuilder();
+				}
+			} catch (final ParserConfigurationException e) {
+				log.error("Parser configuration error: ", e);
 			}
-		} catch (final ParserConfigurationException e) {
-			logger.error("Parser configuration error: ", e);
+			attrTypes = new ArrayList<>(3);
+			attrValues = new ArrayList<>(3);
+		} else {
+			clear();
 		}
-		attrTypes = new ArrayList<>(3);
-		attrValues = new ArrayList<>(3);
-	}
-	
-	@Override
-	public void setConsumer(final ParsedXmlConsumer consumer) {
-		this.consumer = consumer;
-		init();
 	}
 	
 	@Override
@@ -69,9 +71,18 @@ public class XmlParserDom extends XmlParserAbstract {
 	}
 	
 	@Override
-	public void parseFile(final Path p) throws IOException {
-		if (logger.isTraceEnabled()) {
-			logger.trace("parsing layout file: {}", p.getFileName());
+	public void setConsumer(@Nullable final ParsedXmlConsumer consumer) {
+		this.consumer = consumer;
+		init();
+	}
+	
+	@Override
+	public void parseFile(@NotNull final Path p) throws IOException {
+		if (consumer == null || attrTypes == null || attrValues == null || dBuilder == null) {
+			throw new IllegalStateException("No consumer set");
+		}
+		if (log.isTraceEnabled()) {
+			log.trace("parsing layout file: {}", p.getFileName());
 		}
 		try {
 			final NodeList elements = dBuilder.parse(p.toFile()).getElementsByTagName(ANY_TAG);
@@ -85,12 +96,10 @@ public class XmlParserDom extends XmlParserAbstract {
 			for (j = 0, len = elements.getLength(); j < len; ++j) {
 				node = elements.item(j);
 				attributes = node.getAttributes();
-				if (attributes != null) {
-					for (i = 0, len2 = attributes.getLength(); i < len2; ++i) {
-						attr = attributes.item(i);
-						attrTypes.add(attr.getNodeName().toLowerCase(Locale.ROOT));
-						attrValues.add(attr.getNodeValue());
-					}
+				for (i = 0, len2 = attributes.getLength(); i < len2; ++i) {
+					attr = attributes.item(i);
+					attrTypes.add(attr.getNodeName().toLowerCase(Locale.ROOT));
+					attrValues.add(attr.getNodeValue());
 				}
 				consumer.parse(
 						getLevel(node.getParentNode()),
@@ -112,7 +121,7 @@ public class XmlParserDom extends XmlParserAbstract {
 	 * @param parent
 	 * @return
 	 */
-	private static int getLevel(final Node parent) {
+	private static int getLevel(@Nullable final Node parent) {
 		int i = 0;
 		Node n = parent;
 		while (n != null) {

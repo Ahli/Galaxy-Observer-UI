@@ -5,6 +5,8 @@ package com.ahli.galaxy.game;
 
 import com.ahli.galaxy.ui.interfaces.UICatalog;
 import lombok.Data;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Class containing the data of a game (Sc2/Heroes/...).
@@ -13,11 +15,12 @@ import lombok.Data;
  */
 @Data
 public class Game {
-	
+	@NotNull
 	private final GameDef gameDef;
+	@Nullable
 	private UICatalog uiCatalog;
 	
-	public Game(final GameDef gameDef) {
+	public Game(@NotNull final GameDef gameDef) {
 		this.gameDef = gameDef;
 	}
 	

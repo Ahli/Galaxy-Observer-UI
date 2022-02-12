@@ -19,6 +19,7 @@ import com.ahli.interfacebuilder.integration.log4j.StylizedTextAreaAppender;
 import com.ahli.interfacebuilder.projects.Project;
 import com.ahli.interfacebuilder.projects.ProjectService;
 import com.ahli.interfacebuilder.projects.enums.GameType;
+import com.ahli.interfacebuilder.threads.CleaningForkJoinPool;
 import com.ahli.interfacebuilder.ui.Alerts;
 import com.ahli.interfacebuilder.ui.AppController;
 import com.ahli.interfacebuilder.ui.FXMLSpringLoader;
@@ -60,7 +61,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ForkJoinPool;
 
 import static com.ahli.interfacebuilder.ui.AppController.FATAL_ERROR;
 
@@ -76,7 +76,7 @@ public class BrowseController implements Updateable, FxmlController {
 	private final FileService fileService;
 	private final NavigationController navigationController;
 	private final AppController appController;
-	private final ForkJoinPool executor;
+	private final CleaningForkJoinPool executor;
 	@FXML
 	public ListView<Project> projectListView;
 	@FXML
@@ -102,7 +102,7 @@ public class BrowseController implements Updateable, FxmlController {
 			final FileService fileService,
 			final NavigationController navigationController,
 			final AppController appController,
-			final ForkJoinPool executor) {
+			final CleaningForkJoinPool executor) {
 		this.appContext = appContext;
 		this.baseUiService = baseUiService;
 		this.configService = configService;
@@ -333,7 +333,7 @@ public class BrowseController implements Updateable, FxmlController {
 		final Updateable controller = createTab(gameData.getGameDef().name());
 		if (controller != null) {
 			final BrowseLoadBaseUiTask task =
-					new BrowseLoadBaseUiTask(appController, gameData, (BrowseTabController) controller, baseUiService);
+					new BrowseLoadBaseUiTask(executor, gameData, (BrowseTabController) controller, baseUiService);
 			executor.execute(task);
 		}
 	}
@@ -358,10 +358,7 @@ public class BrowseController implements Updateable, FxmlController {
 			// context menu with close option
 			final ContextMenu contextMenu = new ContextMenu();
 			final MenuItem closeItem = new MenuItem(Messages.getString("contextmenu.close"));
-			closeItem.setOnAction(new CloseTabAction(newTab,
-					(BrowseTabController) controller,
-					controllers,
-					appController));
+			closeItem.setOnAction(new CloseTabAction(newTab, (BrowseTabController) controller, controllers, executor));
 			contextMenu.getItems().add(closeItem);
 			newTab.setContextMenu(contextMenu);
 			
@@ -425,7 +422,7 @@ public class BrowseController implements Updateable, FxmlController {
 				}
 				
 				@SuppressWarnings("ObjectAllocationInLoop")
-				final BrowseCompileTask task = new BrowseCompileTask(appController,
+				final BrowseCompileTask task = new BrowseCompileTask(executor,
 						mod,
 						(BrowseTabController) controller,
 						compileService,
@@ -440,17 +437,17 @@ public class BrowseController implements Updateable, FxmlController {
 		private final Tab tab;
 		private final BrowseTabController controller;
 		private final List<Updateable> controllers;
-		private final AppController appController;
+		private final CleaningForkJoinPool executor;
 		
 		private CloseTabAction(
 				final Tab tab,
 				final BrowseTabController controller,
 				final List<Updateable> controllers,
-				final AppController appController) {
+				final CleaningForkJoinPool executor) {
 			this.tab = tab;
 			this.controller = controller;
 			this.controllers = controllers;
-			this.appController = appController;
+			this.executor = executor;
 		}
 		
 		@Override
@@ -463,7 +460,7 @@ public class BrowseController implements Updateable, FxmlController {
 			controller.setData(null);
 			
 			// TODO Tab is not garbage collected due to Scene's mouseHandler
-			appController.tryCleanUp();
+			executor.tryCleanUp();
 			
 			// context menu is not properly cleaned up
 			if (contextMenu != null) {

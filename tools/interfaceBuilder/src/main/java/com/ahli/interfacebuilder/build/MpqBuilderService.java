@@ -18,12 +18,15 @@ import com.ahli.interfacebuilder.integration.SettingsIniInterface;
 import com.ahli.interfacebuilder.projects.Project;
 import com.ahli.interfacebuilder.projects.ProjectService;
 import com.ahli.interfacebuilder.projects.enums.GameType;
+import com.ahli.interfacebuilder.threads.CleaningForkJoinPool;
+import com.ahli.interfacebuilder.threads.CleaningForkJoinTaskCleaner;
 import com.ahli.interfacebuilder.ui.AppController;
 import com.ahli.interfacebuilder.ui.navigation.NavigationController;
 import com.ahli.mpq.MpqEditorInterface;
 import com.ahli.mpq.MpqException;
 import com.ahli.mpq.mpqeditor.MpqEditorCompression;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.lang.NonNull;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -35,7 +38,6 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Stream;
 
 @Log4j2
@@ -48,21 +50,21 @@ public class MpqBuilderService {
 	private final BaseUiService baseUiService;
 	private final Game sc2BaseGame;
 	private final Game heroesBaseGame;
-	private final ForkJoinPool executor;
+	private final CleaningForkJoinPool executor;
 	private final AppController appController;
 	private final NavigationController navigationController;
 	
 	public MpqBuilderService(
-			final ConfigService configService,
-			final CompileService compileService,
-			final FileService fileService,
-			final ProjectService projectService,
-			final BaseUiService baseUiService,
-			final Game sc2BaseGame,
-			final Game heroesBaseGame,
-			final ForkJoinPool executor,
-			final AppController appController,
-			final NavigationController navigationController) {
+			@NonNull final ConfigService configService,
+			@NonNull final CompileService compileService,
+			@NonNull final FileService fileService,
+			@NonNull final ProjectService projectService,
+			@NonNull final BaseUiService baseUiService,
+			@NonNull final Game sc2BaseGame,
+			@NonNull final Game heroesBaseGame,
+			@NonNull final CleaningForkJoinPool executor,
+			@NonNull final AppController appController,
+			@NonNull final NavigationController navigationController) {
 		this.configService = configService;
 		this.compileService = compileService;
 		this.fileService = fileService;
@@ -80,7 +82,7 @@ public class MpqBuilderService {
 	 *
 	 * @param path
 	 */
-	public void build(final Path path) throws IOException {
+	public void build(@NonNull final Path path) throws IOException {
 		final Project project;
 		
 		final List<Project> projectsOfPath = projectService.getProjectsOfPath(path);
@@ -108,7 +110,8 @@ public class MpqBuilderService {
 	 * @param game
 	 * @return
 	 */
-	public boolean pathContainsCompileableForGame(final Path path, final Game game) throws IOException {
+	public boolean pathContainsCompileableForGame(@NonNull final Path path, @NonNull final Game game)
+			throws IOException {
 		final String extension = game.getGameDef().layoutFileEnding().toLowerCase(Locale.ROOT);
 		try (final Stream<Path> walk = Files.walk(path)) {
 			return walk.anyMatch(curPath -> curPath.getFileName()
@@ -123,8 +126,8 @@ public class MpqBuilderService {
 	 *
 	 * @param project
 	 */
-	public void build(final Project project, final boolean useCmdLineSettings) {
-		final BuildTask task = new BuildTask(appController, project, useCmdLineSettings, this, baseUiService);
+	public void build(@NonNull final Project project, final boolean useCmdLineSettings) {
+		final BuildTask task = new BuildTask(executor, project, useCmdLineSettings, this, baseUiService);
 		executor.execute(task);
 	}
 	
@@ -134,7 +137,8 @@ public class MpqBuilderService {
 	 * @param gameType
 	 * @return
 	 */
-	public Game getGameData(final GameType gameType) {
+	@NonNull
+	public Game getGameData(@NonNull final GameType gameType) {
 		return switch (gameType) {
 			case SC2 -> sc2BaseGame;
 			case HEROES -> heroesBaseGame;
@@ -148,8 +152,8 @@ public class MpqBuilderService {
 	 * @param useCmdLineSettings
 	 * @param project
 	 */
-	void buildSpecificUI(
-			final Game game, final boolean useCmdLineSettings, final Project project) {
+	public void buildSpecificUI(
+			@NonNull final Game game, final boolean useCmdLineSettings, @NonNull final Project project) {
 		if (executor.isShutdown()) {
 			log.error("ERROR: Executor shut down. Skipping building a UI...");
 			return;
@@ -251,16 +255,16 @@ public class MpqBuilderService {
 	 * @throws InterruptedException
 	 */
 	private void buildFile(
-			final Path sourceFile,
-			final Game game,
-			final MpqEditorInterface mpqi,
+			@NonNull final Path sourceFile,
+			@NonNull final Game game,
+			@NonNull final MpqEditorInterface mpqi,
 			final boolean compressXml,
 			final int compressMpq,
 			final boolean buildUnprotectedToo,
 			final boolean repairLayoutOrder,
 			final boolean verifyLayout,
 			final boolean verifyXml,
-			final Project project) throws IOException, InterruptedException {
+			@NonNull final Project project) throws IOException, InterruptedException {
 		appController.printInfoLogMessageToGeneral(sourceFile.getFileName() + " started construction.");
 		
 		final GameDef gameDef = game.getGameDef();
@@ -385,6 +389,7 @@ public class MpqBuilderService {
 	 * @param compressMpqSetting
 	 * @return
 	 */
+	@NonNull
 	private static MpqEditorCompression getCompressionModeOfSetting(final int compressMpqSetting) {
 		return switch (compressMpqSetting) {
 			case 0 -> MpqEditorCompression.NONE;
@@ -401,7 +406,7 @@ public class MpqBuilderService {
 	 * @param projects
 	 * @param useCmdLineSettings
 	 */
-	public void build(final Iterable<Project> projects, final boolean useCmdLineSettings) {
+	public void build(@NonNull final Iterable<Project> projects, final boolean useCmdLineSettings) {
 		boolean building = false;
 		for (final Project project : projects) {
 			building = true;

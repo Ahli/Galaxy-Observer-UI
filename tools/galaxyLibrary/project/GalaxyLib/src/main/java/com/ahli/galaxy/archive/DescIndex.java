@@ -7,6 +7,8 @@ import com.ahli.mpq.MpqException;
 import com.ahli.mpq.MpqInterface;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.tuple.Tuples;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -54,7 +56,7 @@ public class DescIndex {
 	 * @param mpqi
 	 * 		MpqInterface
 	 */
-	public DescIndex(final MpqInterface mpqi) {
+	public DescIndex(@NotNull final MpqInterface mpqi) {
 		this.mpqi = mpqi;
 		fileIntPathList = new ArrayList<>();
 	}
@@ -69,7 +71,7 @@ public class DescIndex {
 	/**
 	 * @param descIndexIntPath
 	 */
-	public void setDescIndexIntPath(final String descIndexIntPath) {
+	public void setDescIndexIntPath(@NotNull final String descIndexIntPath) {
 		this.descIndexIntPath = descIndexIntPath;
 	}
 	
@@ -77,6 +79,7 @@ public class DescIndex {
 	 * @param i
 	 * @return
 	 */
+	@NotNull
 	public String getLayoutIntPath(final int i) {
 		return fileIntPathList.get(i).getTwo();
 	}
@@ -85,7 +88,7 @@ public class DescIndex {
 	 * @param intPath
 	 * @return
 	 */
-	public boolean removeLayoutIntPath(final String intPath) {
+	public boolean removeLayoutIntPath(@NotNull final String intPath) {
 		for (int i = 0, len = fileIntPathList.size(); i < len; ++i) {
 			final Pair<Path, String> p = fileIntPathList.get(i);
 			if (p.getTwo().equals(intPath)) {
@@ -99,7 +102,7 @@ public class DescIndex {
 	/**
 	 * @param descIndexPath
 	 */
-	public void setDescIndexPathAndClear(final String descIndexPath) {
+	public void setDescIndexPathAndClear(@NotNull final String descIndexPath) {
 		clear();
 		setDescIndexIntPath(descIndexPath);
 	}
@@ -115,7 +118,7 @@ public class DescIndex {
 	 * @param layoutPathList
 	 * @throws MpqException
 	 */
-	public void addLayoutIntPath(final Iterable<String> layoutPathList) throws MpqException {
+	public void addLayoutIntPath(@NotNull final Iterable<String> layoutPathList) throws MpqException {
 		for (final String aLayoutPathList : layoutPathList) {
 			addLayoutIntPath(aLayoutPathList);
 		}
@@ -125,7 +128,7 @@ public class DescIndex {
 	 * @param intPath
 	 * @throws MpqException
 	 */
-	public void addLayoutIntPath(final String intPath) throws MpqException {
+	public void addLayoutIntPath(@NotNull final String intPath) throws MpqException {
 		String intPath2 = intPath;
 		Path p = mpqi.getFilePathFromMpq(intPath);
 		if (!Files.exists(p)) {
@@ -152,7 +155,8 @@ public class DescIndex {
 	 * @param intPath
 	 * @return
 	 */
-	public Path getLayoutFilePath(final String intPath) {
+	@Nullable
+	public Path getLayoutFilePath(@NotNull final String intPath) {
 		for (final Pair<Path, String> p : fileIntPathList) {
 			if (p.getTwo().equals(intPath)) {
 				return p.getOne();
@@ -177,8 +181,7 @@ public class DescIndex {
 			
 			bw.write(DESC);
 		} catch (final IOException e) {
-			logger.error("ERROR writing DescIndex to disc.", e);
-			throw e;
+			throw new IOException("ERROR writing Descindex to disc.", e);
 		}
 	}
 	
@@ -194,14 +197,12 @@ public class DescIndex {
 		final List<List<String>> ownConstants = new ArrayList<>();
 		
 		// grab dependencies and constant definitions for every layout file
-		List<String> layoutDeps;
-		List<String> curConstants;
 		for (final Pair<Path, String> pair : fileIntPathList) {
 			final File f = pair.getOne().toFile();
-			curConstants = LayoutReaderDom.getLayoutsConstantDefinitions(f);
+			final List<String> curConstants = LayoutReaderDom.getLayoutsConstantDefinitions(f);
 			
 			// add calculated list of dependencies from layout file
-			layoutDeps = LayoutReaderDom.getDependencyLayouts(f, curConstants);
+			final List<String> layoutDeps = LayoutReaderDom.getDependencyLayouts(f, curConstants);
 			logger.trace("Dependencies found: {}", layoutDeps);
 			
 			ownConstants.add(curConstants);
@@ -209,7 +210,8 @@ public class DescIndex {
 		}
 		
 		boolean insertOccurred = true;
-		for (int counter = 0; insertOccurred && counter < Math.pow(fileIntPathList.size(), 4); ++counter) {
+		final int end = (int) Math.pow(fileIntPathList.size(), 4);
+		for (int counter = 0; insertOccurred && counter < end; ++counter) {
 			logger.trace("counter={}", counter);
 			insertOccurred = false;
 			for (int i = 0, len = dependencies.size(); i < len; ++i) {
@@ -308,7 +310,7 @@ public class DescIndex {
 		
 		// change order according to templates
 		insertOccurred = true;
-		for (int counter = 0; insertOccurred && counter < Math.pow(fileIntPathList.size(), 4); ++counter) {
+		for (int counter = 0; insertOccurred && counter < end; ++counter) {
 			logger.trace("counter={}", counter);
 			insertOccurred = false;
 			x:

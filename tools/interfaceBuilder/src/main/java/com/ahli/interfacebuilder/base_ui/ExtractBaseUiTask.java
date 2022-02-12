@@ -4,12 +4,13 @@
 package com.ahli.interfacebuilder.base_ui;
 
 import com.ahli.interfacebuilder.projects.enums.GameType;
+import com.ahli.interfacebuilder.threads.CleaningForkJoinPool;
 import com.ahli.interfacebuilder.threads.CleaningForkJoinTask;
-import com.ahli.interfacebuilder.threads.CleaningForkJoinTaskCleaner;
 import com.ahli.interfacebuilder.ui.navigation.NavigationController;
 import com.ahli.interfacebuilder.ui.progress.ErrorTabController;
 import com.ahli.interfacebuilder.ui.progress.appenders.Appender;
 import javafx.application.Platform;
+import org.springframework.lang.NonNull;
 
 import java.io.Serial;
 import java.util.List;
@@ -28,14 +29,14 @@ public class ExtractBaseUiTask extends CleaningForkJoinTask {
 	private final transient NavigationController navigationController;
 	
 	public ExtractBaseUiTask(
-			final CleaningForkJoinTaskCleaner cleaner,
-			final BaseUiService baseUiService,
-			final GameType gameType,
+			@NonNull final CleaningForkJoinPool executor,
+			@NonNull final BaseUiService baseUiService,
+			@NonNull final GameType gameType,
 			final boolean usePtr,
-			final Appender[] output,
-			final ErrorTabController errorTabController,
-			final NavigationController navigationController) {
-		super(cleaner);
+			@NonNull final Appender[] output,
+			@NonNull final ErrorTabController errorTabController,
+			@NonNull final NavigationController navigationController) {
+		super(executor);
 		this.baseUiService = baseUiService;
 		this.gameType = gameType;
 		this.usePtr = usePtr;

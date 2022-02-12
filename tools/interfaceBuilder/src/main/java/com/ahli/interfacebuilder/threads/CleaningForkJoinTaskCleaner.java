@@ -3,6 +3,11 @@
 
 package com.ahli.interfacebuilder.threads;
 
+import java.util.concurrent.ForkJoinPool;
+
 public interface CleaningForkJoinTaskCleaner {
+	
+	void setExecutor(final ForkJoinPool executor);
+	
 	void tryCleanUp();
 }

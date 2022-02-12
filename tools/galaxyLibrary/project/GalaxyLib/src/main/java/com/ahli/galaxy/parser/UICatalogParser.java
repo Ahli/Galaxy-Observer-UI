@@ -26,6 +26,8 @@ import com.ahli.galaxy.ui.interfaces.UIState;
 import com.ahli.galaxy.ui.interfaces.UIStateGroup;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,7 +100,9 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	private int unnamedFrameCounter;
 	
 	public UICatalogParser(
-			final UICatalog catalog, final XmlParser parser, final DeduplicationIntensity deduplicationIntensity) {
+			@NotNull final UICatalog catalog,
+			@NotNull final XmlParser parser,
+			@NotNull final DeduplicationIntensity deduplicationIntensity) {
 		this.catalog = catalog;
 		this.parser = parser;
 		statesToClose = new ArrayList<>();
@@ -151,7 +155,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	 *
 	 * @param thisElem
 	 */
-	private static void setImplicitControllerNames(final UIAnimation thisElem) {
+	private static void setImplicitControllerNames(@NotNull final UIAnimation thisElem) {
 		logger.trace("Setting implicit controller names for UIAnimation {}", thisElem.getName());
 		final List<UIElement> controllers = thisElem.getControllers();
 		for (final UIElement uiElem : controllers) {
@@ -174,8 +178,9 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	 * @param path
 	 * @return
 	 */
+	@Nullable
 	private static UIElement findTemplateFromList(
-			final Iterable<UITemplate> templates, final String fileName, final String path) {
+			@NotNull final Iterable<UITemplate> templates, @NotNull final String fileName, @NotNull final String path) {
 		final String newPath = UIElement.removeLeftPathLevel(path);
 		
 		for (final UITemplate currTemplate : templates) {
@@ -197,8 +202,9 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	 * @param controllers
 	 * @return
 	 */
+	@NotNull
 	@SuppressWarnings("ObjectAllocationInLoop")
-	private static String getImplicitName(final String type, final List<UIElement> controllers) {
+	private static String getImplicitName(@Nullable final String type, @NotNull final List<UIElement> controllers) {
 		logger.trace("Constructing implicit controller name");
 		if (type == null) {
 			logger.error("'type=\"...\"' of Controller is not set or invalid.");
@@ -221,7 +227,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	
 	@SuppressWarnings("squid:S4973")
 	private static void copyAttributes(
-			final List<UIAttribute> attributesSource, final List<UIAttribute> attributesTarget) {
+			@NotNull final List<UIAttribute> attributesSource, @NotNull final List<UIAttribute> attributesTarget) {
 		for (final UIAttribute attrSource : attributesSource) {
 			boolean noChanges = true;
 			final String sourceName = attrSource.getName();
@@ -250,7 +256,8 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	 * @param templateElem
 	 * @param targetElem
 	 */
-	private static void applyTemplateElementToElement(final UIElement templateElem, final UIElement targetElem) {
+	private static void applyTemplateElementToElement(
+			@NotNull final UIElement templateElem, @NotNull final UIElement targetElem) {
 		logger.trace("Applying template {} to element {}", templateElem.getName(), targetElem.getName());
 		
 		final List<UIElement> templateChildren;
@@ -349,7 +356,10 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	 * @return
 	 */
 	private UIElement instanciateTemplateFromList(
-			final List<UITemplate> templates, final String fileName, final String path, final String newName) {
+			@NotNull final List<UITemplate> templates,
+			@NotNull final String fileName,
+			@NotNull final String path,
+			@NotNull final String newName) {
 		final UIElement frameFromPath = findTemplateFromList(templates, fileName, path);
 		if (frameFromPath != null) {
 			final UIElement clone = (UIElement) frameFromPath.deepCopy();
@@ -360,8 +370,11 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	}
 	
 	@Override
-	public void parseFile(final Path p, final String raceId, final boolean isDevLayout, final String consoleSkinId)
-			throws IOException {
+	public void parseFile(
+			@NotNull final Path p,
+			@NotNull final String raceId,
+			final boolean isDevLayout,
+			@NotNull final String consoleSkinId) throws IOException {
 		this.raceId = raceId;
 		this.consoleSkinId = consoleSkinId;
 		curIsDevLayout = isDevLayout;
@@ -375,8 +388,10 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	
 	@Override
 	public void parse(
-			final int level, final String tagName, final List<String> attrTypes, final List<String> attrValues)
-			throws UIException {
+			final int level,
+			@NotNull final String tagName,
+			@NotNull final List<String> attrTypes,
+			@NotNull final List<String> attrValues) throws UIException {
 		logger.trace("level={}, tag={}", level, tagName);
 		if (tagName == null) {
 			logger.error("ERROR: tag in XML is null.");

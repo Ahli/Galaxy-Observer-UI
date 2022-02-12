@@ -6,9 +6,10 @@ package com.ahli.interfacebuilder.build;
 import com.ahli.galaxy.game.Game;
 import com.ahli.interfacebuilder.base_ui.BaseUiService;
 import com.ahli.interfacebuilder.projects.Project;
+import com.ahli.interfacebuilder.threads.CleaningForkJoinPool;
 import com.ahli.interfacebuilder.threads.CleaningForkJoinTask;
-import com.ahli.interfacebuilder.threads.CleaningForkJoinTaskCleaner;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.lang.NonNull;
 
 import java.io.Serial;
 
@@ -24,12 +25,12 @@ public class BuildTask extends CleaningForkJoinTask {
 	private final transient BaseUiService baseUiService;
 	
 	public BuildTask(
-			final CleaningForkJoinTaskCleaner cleaner,
-			final Project project,
+			@NonNull final CleaningForkJoinPool executor,
+			@NonNull final Project project,
 			final boolean useCmdLineSettings,
-			final MpqBuilderService mpqBuilderService,
-			final BaseUiService baseUiService) {
-		super(cleaner);
+			@NonNull final MpqBuilderService mpqBuilderService,
+			@NonNull final BaseUiService baseUiService) {
+		super(executor);
 		this.project = project;
 		this.useCmdLineSettings = useCmdLineSettings;
 		this.mpqBuilderService = mpqBuilderService;

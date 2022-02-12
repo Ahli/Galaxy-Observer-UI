@@ -3,6 +3,8 @@
 
 package com.ahli.interfacebuilder.threads;
 
+import org.springframework.lang.NonNull;
+
 import java.io.Serial;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
@@ -36,20 +38,25 @@ public class CleaningForkJoinPool extends ForkJoinPool {
 				keepAliveTime,
 				unit);
 		this.cleaner = cleaner;
+		cleaner.setExecutor(this);
 	}
 	
 	@Override
-	public void execute(final Runnable task) {
-		if (task == null) {
-			throw new NullPointerException(null);
-		}
+	public void execute(@NonNull final Runnable task) {
 		if (task instanceof CleaningForkJoinTask) {
 			// is already a CleaningForkJoinTask
 			super.execute(task);
 		} else {
 			// wrap into CleaningForkJoinTask
-			execute(new TaskStarter(cleaner, task));
+			execute(new TaskStarter(this, task));
 		}
+	}
+	
+	/**
+	 * Orders the cleaner to clean up. Cleaning will only be performed, if the cleaner decides to do so.
+	 */
+	public void tryCleanUp() {
+		cleaner.tryCleanUp();
 	}
 	
 	private static final class TaskStarter extends CleaningForkJoinTask {
@@ -59,8 +66,8 @@ public class CleaningForkJoinPool extends ForkJoinPool {
 		
 		private final transient Runnable task;
 		
-		private TaskStarter(final CleaningForkJoinTaskCleaner cleaner, final Runnable task) {
-			super(cleaner);
+		private TaskStarter(final CleaningForkJoinPool executor, final Runnable task) {
+			super(executor);
 			this.task = task;
 		}
 		

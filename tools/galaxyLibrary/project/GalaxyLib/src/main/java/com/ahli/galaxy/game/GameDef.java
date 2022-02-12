@@ -3,18 +3,24 @@
 
 package com.ahli.galaxy.game;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Arrays;
 import java.util.Objects;
 
 /**
  * @author Ahli
  */
-public record GameDef(String name, String nameHandle, String modFileEnding, String[] coreModsOrDirectories,
-                      String defaultRaceId, String defaultConsoleSkinId, String documentsGameDirectoryName,
-                      String layoutFileEnding, String baseDataFolderName, String rootExeName, String switcherExeNameX32,
-                      String switcherExeNameX64, String supportDirectoryX32, String supportDirectoryX64,
-                      String documentsInterfaceSubdirectoryName, String modsSubDirectory, String ptrRootExeName,
-                      String componentsFileEnding, String styleFileEnding, String cutsceneFileEnding) {
+public record GameDef(@NotNull String name, @NotNull String nameHandle, @NotNull String modFileEnding,
+                      @NotNull String[] coreModsOrDirectories, @NotNull String defaultRaceId,
+                      @NotNull String defaultConsoleSkinId, @NotNull String documentsGameDirectoryName,
+                      @NotNull String layoutFileEnding, @NotNull String baseDataFolderName, @NotNull String rootExeName,
+                      @Nullable String switcherExeNameX32, @NotNull String switcherExeNameX64,
+                      @Nullable String supportDirectoryX32, @NotNull String supportDirectoryX64,
+                      @NotNull String documentsInterfaceSubdirectoryName, @NotNull String modsSubDirectory,
+                      @Nullable String ptrRootExeName, @NotNull String componentsFileEnding,
+                      @NotNull String styleFileEnding, @NotNull String cutsceneFileEnding) {
 	
 	public static GameDef buildSc2GameDef() {
 		return new GameDef(
@@ -70,7 +76,7 @@ public record GameDef(String name, String nameHandle, String modFileEnding, Stri
 	 * @param gameDef
 	 * @return
 	 */
-	public static boolean isSc2(final GameDef gameDef) {
+	public static boolean isSc2(@NotNull final GameDef gameDef) {
 		return "sc2".equals(gameDef.nameHandle());
 	}
 	
@@ -80,12 +86,12 @@ public record GameDef(String name, String nameHandle, String modFileEnding, Stri
 	 * @param gameDef
 	 * @return
 	 */
-	public static boolean isHeroes(final GameDef gameDef) {
+	public static boolean isHeroes(@NotNull final GameDef gameDef) {
 		return "heroes".equals(gameDef.nameHandle());
 	}
 	
 	@Override
-	public final boolean equals(final Object o) {
+	public boolean equals(@Nullable final Object o) {
 		if (this == o) {
 			return true;
 		}
@@ -114,7 +120,7 @@ public record GameDef(String name, String nameHandle, String modFileEnding, Stri
 	}
 	
 	@Override
-	public final int hashCode() {
+	public int hashCode() {
 		int result = Objects.hash(
 				name,
 				nameHandle,
@@ -140,6 +146,7 @@ public record GameDef(String name, String nameHandle, String modFileEnding, Stri
 	}
 	
 	@Override
+	@NotNull
 	public String toString() {
 		return "GameDef{" + "name='" + name + '\'' + ", nameHandle='" + nameHandle + '\'' + ", modFileEnding='" +
 				modFileEnding + '\'' + ", coreModsOrDirectories=" + Arrays.toString(coreModsOrDirectories) +

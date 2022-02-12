@@ -14,6 +14,7 @@ import com.ahli.interfacebuilder.compress.GameService;
 import com.ahli.interfacebuilder.projects.enums.GameType;
 import com.ahli.util.XmlDomHelper;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.lang.NonNull;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -39,7 +40,7 @@ public class CompileService {
 	
 	private final GameService gameService;
 	
-	public CompileService(final GameService gameService) {
+	public CompileService(@NonNull final GameService gameService) {
 		this.gameService = gameService;
 	}
 	
@@ -57,12 +58,12 @@ public class CompileService {
 	 * @throws InterruptedException
 	 */
 	public UICatalog compile(
-			final ModD mod,
-			final String raceId,
+			@NonNull final ModD mod,
+			@NonNull final String raceId,
 			final boolean repairLayoutOrder,
 			final boolean verifyLayout,
 			final boolean verifyXml,
-			final String consoleSkinId) throws InterruptedException {
+			@NonNull final String consoleSkinId) throws InterruptedException {
 		UICatalog catalogClone = null;
 		try {
 			long startTime;
@@ -135,7 +136,7 @@ public class CompileService {
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	private static void manageOrderOfLayoutFiles(final DescIndex descIndex)
+	private static void manageOrderOfLayoutFiles(@NonNull final DescIndex descIndex)
 			throws ParserConfigurationException, SAXException, IOException {
 		// manage order of layout files in DescIndex
 		descIndex.orderLayoutFiles();

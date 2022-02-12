@@ -5,8 +5,8 @@ package com.ahli.interfacebuilder.ui.browse;
 
 import com.ahli.galaxy.game.Game;
 import com.ahli.interfacebuilder.base_ui.BaseUiService;
+import com.ahli.interfacebuilder.threads.CleaningForkJoinPool;
 import com.ahli.interfacebuilder.threads.CleaningForkJoinTask;
-import com.ahli.interfacebuilder.threads.CleaningForkJoinTaskCleaner;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.Serial;
@@ -22,11 +22,11 @@ public class BrowseLoadBaseUiTask extends CleaningForkJoinTask {
 	private final transient BaseUiService baseUiService;
 	
 	public BrowseLoadBaseUiTask(
-			final CleaningForkJoinTaskCleaner cleaner,
+			final CleaningForkJoinPool executor,
 			final Game game,
 			final BrowseTabController controller,
 			final BaseUiService baseUiService) {
-		super(cleaner);
+		super(executor);
 		this.game = game;
 		this.controller = controller;
 		this.baseUiService = baseUiService;
