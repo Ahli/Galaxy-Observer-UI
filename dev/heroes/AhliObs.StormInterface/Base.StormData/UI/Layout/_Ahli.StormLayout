@@ -301,9 +301,33 @@
 					<Visible val="false"/>
 				</Frame>
 				
-				<!-- player vision UI changes -->
+				<!-- player vision UI & red team vision detector -->
 				<Frame type="ObserverPreviewFrame" name="ObserverPreviewFrame">
 					<Handle val="ObserverPreviewFrame"/>
+					
+					<StateGroup name="RedPlayerVisionDetector">
+						<State name="RedVision">
+							<When type="Property" frame="ContainerFrame" visible="true"/>
+							<When type="Property" frame="ContainerFrame/ColorImage" color="254,138,14"/>
+							<Action type="SetProperty" frame="RedPlayerVisionState" visible="true"/>	
+						</State>
+						<State name="RedVisionCB">
+							<When type="Property" frame="ContainerFrame" visible="true"/>
+							<When type="Property" frame="ContainerFrame/ColorImage" color="178,0,0"/>
+							<Action type="SetProperty" frame="RedPlayerVisionState" visible="true"/>							
+						</State>
+						<State name="PulldownOnRedTeamSlots">
+							<When type="Property" frame="ContainerFrame" visible="false"/>
+							<When type="Property" frame="$VisionPulldown" operator="GreaterThan" SelectedIndex="5"/>
+							<When type="Property" frame="$VisionPulldown" operator="LessThan" SelectedIndex="11"/>
+							<Action type="SetProperty" frame="RedPlayerVisionState" visible="true"/>
+						</State>
+					</StateGroup>
+					<Frame type="Frame" name="RedPlayerVisionState">
+						<Anchor relative="$parent"/>
+						<Visible val="false"/>
+						<Handle val="RedPlayerVisionState"/>
+					</Frame>
 				</Frame>
 
 				<!-- Interface control menu -->
@@ -1071,8 +1095,7 @@
 				<DefaultState val="FalseDflt"/>
 				<!-- @Override -->
 				<State name="False"><!-- red Vision => make top appear like bot -->
-					<When type="Property" frame="$VisionPulldown" operator="GreaterThan" SelectedIndex="5"/>
-					<When type="Property" frame="$VisionPulldown" operator="LessThan" SelectedIndex="11"/>
+					<When type="Property" frame="$RedPlayerVisionState" visible="true"/>
 					<When type="AnimationState" BottomBarCaptured="00"/>
 					<Action type="SetProperty" frame="ProgressBarMasker/ProgressBarsContainer/TopProgressBar/ProgressBar/Background" Visible="False"/>
 					<Action type="SetProperty" frame="ProgressBarMasker/ProgressBarsContainer/TopProgressBar/ProgressBar/FillImageContainer/FillImage" Texture="@UI/Storm_UI_HUD_WCAV_CountdownBarBottom_Inactive"/>
@@ -1086,8 +1109,7 @@
 				</State>
 				<!-- @Override -->
 				<State name="True"><!-- red Vision => make top appear like bot -->
-					<When type="Property" frame="$VisionPulldown" operator="GreaterThan" SelectedIndex="5"/>
-					<When type="Property" frame="$VisionPulldown" operator="LessThan" SelectedIndex="11"/>
+					<When type="Property" frame="$RedPlayerVisionState" visible="true"/>
 					<When type="AnimationState" BottomBarCaptured="10"/>
 					<Action type="SetProperty" frame="ProgressBarMasker/ProgressBarsContainer/TopProgressBar/ProgressBar/Background" Visible="True"/>
 					<Action type="SetProperty" frame="ProgressBarMasker/ProgressBarsContainer/TopProgressBar/ProgressBar/FillImageContainer/FillImage" Texture="@UI/Storm_UI_HUD_WCAV_CountdownBarBottom_Active"/>
@@ -1107,8 +1129,7 @@
 				</State>
 				<!-- @Override -->
 				<State name="Contested"><!-- red Vision => make top appear like bot -->
-					<When type="Property" frame="$VisionPulldown" operator="GreaterThan" SelectedIndex="5"/>
-					<When type="Property" frame="$VisionPulldown" operator="LessThan" SelectedIndex="11"/>
+					<When type="Property" frame="$RedPlayerVisionState" visible="true"/>
 					<When type="AnimationState" BottomBarCaptured="11"/>
 					<Action type="SetProperty" frame="ProgressBarMasker/ProgressBarsContainer/TopProgressBar/ProgressBar/FillImageContainer/FillImage" DarkAdjustColor="f6d71c"/>
 					<Action type="SetProperty" frame="ProgressBarMasker/ProgressBarsContainer/TopProgressBar/ProgressBar/FillImageContainer/FillImage" LightAdjustColor="FFFFFF"/>
@@ -1157,8 +1178,7 @@
 				<DefaultState val="FalseDflt"/>
 				<!-- @Override -->
 				<State name="False"><!-- red Vision => make bot appear like top -->
-					<When type="Property" frame="$VisionPulldown" operator="GreaterThan" SelectedIndex="5"/>
-					<When type="Property" frame="$VisionPulldown" operator="LessThan" SelectedIndex="11"/>
+					<When type="Property" frame="$RedPlayerVisionState" visible="true"/>
 					<When type="AnimationState" TopBarCaptured="00"/>
 					<Action type="SetProperty" frame="ProgressBarMasker/ProgressBarsContainer/BottomProgressBar/ProgressBar/Background" Visible="False"/>
 					<Action type="SetProperty" frame="ProgressBarMasker/ProgressBarsContainer/BottomProgressBar/ProgressBar/FillImageContainer/FillImage" Texture="@UI/Storm_UI_HUD_WCAV_CountdownBarTop_Inactive"/>
@@ -1172,8 +1192,7 @@
 				</State>
 				<!-- @Override -->
 				<State name="True"><!-- red Vision => make bot appear like top -->
-					<When type="Property" frame="$VisionPulldown" operator="GreaterThan" SelectedIndex="5"/>
-					<When type="Property" frame="$VisionPulldown" operator="LessThan" SelectedIndex="11"/>
+					<When type="Property" frame="$RedPlayerVisionState" visible="true"/>
 					<When type="AnimationState" TopBarCaptured="10"/>
 					<Action type="SetProperty" frame="ProgressBarMasker/ProgressBarsContainer/BottomProgressBar/ProgressBar/Background" Visible="True"/>
 					<Action type="SetProperty" frame="ProgressBarMasker/ProgressBarsContainer/BottomProgressBar/ProgressBar/FillImageContainer/FillImage" Texture="@UI/Storm_UI_HUD_WCAV_CountdownBarTop_Active"/>
@@ -1193,8 +1212,7 @@
 				</State>
 				<!-- @Override -->
 				<State name="Contested"><!-- red Vision => make bot appear like top -->
-					<When type="Property" frame="$VisionPulldown" operator="GreaterThan" SelectedIndex="5"/>
-					<When type="Property" frame="$VisionPulldown" operator="LessThan" SelectedIndex="11"/>
+					<When type="Property" frame="$RedPlayerVisionState" visible="true"/>
 					<When type="AnimationState" TopBarCaptured="11"/>
 					<Action type="SetProperty" frame="ProgressBarMasker/ProgressBarsContainer/BottomProgressBar/ProgressBar/FillImageContainer/FillImage" DarkAdjustColor="f6d71c"/>
 					<Action type="SetProperty" frame="ProgressBarMasker/ProgressBarsContainer/BottomProgressBar/ProgressBar/FillImageContainer/FillImage" LightAdjustColor="FFFFFF"/>
@@ -1313,8 +1331,7 @@
 
 			<StateGroup name="RedTeamVisionSwapBarPositions">
 				<State name="RedTeamVision">
-					<When type="Property" frame="$VisionPulldown" operator="GreaterThan" SelectedIndex="5"/>
-					<When type="Property" frame="$VisionPulldown" operator="LessThan" SelectedIndex="11"/>
+					<When type="Property" frame="$RedPlayerVisionState" visible="true"/>
 					<!-- Swap positions of the bars during red vision -->
 					<!-- Container height 51, Bar height 29, top was 2 higher (top min -2), bot was 1 pixel lower (bot max 1) =>  -->
 					<Action type="SetAnchor" frame="ProgressBarMasker/ProgressBarsContainer/TopProgressBar" side="Top" relative="$parent/ProgressBarsBG" pos="Min" offset="23"/>
@@ -1546,8 +1563,7 @@
         </Frame>
 		<StateGroup name="FixColors">
 			<State name="RedVision"><!-- red Vision => make blue appear like red -->
-				<When type="Property" frame="$VisionPulldown" operator="GreaterThan" SelectedIndex="5"/>
-				<When type="Property" frame="$VisionPulldown" operator="LessThan" SelectedIndex="11"/>
+				<When type="Property" frame="$RedPlayerVisionState" visible="true"/>
 				<!--<Action type="SetProperty" frame="SoulEaterModeBlueFrame/TopFireEffect/FireEffectBase" Texture[2]="@UI/HUD_MapMechanic_SpiderQueen_FireSeamless_Red" layer="2"/>-->
 				<Action type="SetProperty" frame="SoulEaterModeBlueFrame/TopFireEffect/FireEffectBase" visible="false"/>
 				<Action type="SetProperty" frame="SoulEaterModeBlueFrame/TopFireEffect/FireEffectBase2" visible="true"/>
@@ -1784,25 +1800,16 @@
 			<State name="Red"><!-- visible && notYetLockedIn && in red team vision -->
 				<When type="Property" visible="true"/>
 				<When type="Property" frame="StateVisionOnCreationNotYetLockedIn" visible="true"/>
-				<When type="Property" frame="$VisionPulldown" operator="GreaterThan" SelectedIndex="5"/>
-				<When type="Property" frame="$VisionPulldown" operator="LessThan" SelectedIndex="11"/>
+				<When type="Property" frame="$RedPlayerVisionState" visible="true"/>
 				<Action type="SetProperty" frame="DebugLabel7" undo="false" text="vc_red"/>
 				<Action type="SetProperty" frame="StateVisionOnCreationNotYetLockedIn" undo="false" visible="false"/>
 				<Action type="SetProperty" frame="StateVisionOnCreationWasRed" undo="false" visible="true"/>
 			</State>
-			<State name="NotRed1"><!-- visible && notYetLockedIn && not in red team vision -->
+			<State name="NotRed"><!-- visible && notYetLockedIn && not in red team vision -->
 				<When type="Property" visible="true"/>
 				<When type="Property" frame="StateVisionOnCreationNotYetLockedIn" visible="true"/>
-				<When type="Property" frame="$VisionPulldown" operator="LessThan" SelectedIndex="6"/>
-				<Action type="SetProperty" frame="DebugLabel7" undo="false" text="vc_notRed1"/>
-				<Action type="SetProperty" frame="StateVisionOnCreationNotYetLockedIn" undo="false" visible="false"/>
-				<Action type="SetProperty" frame="StateVisionOnCreationWasRed" undo="false" visible="false"/>
-			</State>
-			<State name="NotRed2"><!-- visible && notYetLockedIn && not in red team vision -->
-				<When type="Property" visible="true"/>
-				<When type="Property" frame="StateVisionOnCreationNotYetLockedIn" visible="true"/>
-				<When type="Property" frame="$VisionPulldown" operator="GreaterThan" SelectedIndex="10"/>
-				<Action type="SetProperty" frame="DebugLabel7" undo="false" text="vc_notRed2"/>
+				<When type="Property" frame="$RedPlayerVisionState" visible="false"/>
+				<Action type="SetProperty" frame="DebugLabel7" undo="false" text="vc_notRed"/>
 				<Action type="SetProperty" frame="StateVisionOnCreationNotYetLockedIn" undo="false" visible="false"/>
 				<Action type="SetProperty" frame="StateVisionOnCreationWasRed" undo="false" visible="false"/>
 			</State>
@@ -1868,16 +1875,14 @@
 				<State name="Blue3"><!-- quest: red & in red player vision => blue -->
 			        <When type="AnimationState" frame="$parent" KillLogItemType="Quest"/>
 					<When type="AnimationState" frame="$parent" SrcColor="Red"/>
-					<When type="Property" frame="$VisionPulldown" operator="GreaterThan" SelectedIndex="5"/>
-					<When type="Property" frame="$VisionPulldown" operator="LessThan" SelectedIndex="11"/>
+					<When type="Property" frame="$RedPlayerVisionState" visible="true"/>
 					<Action type="SetState" group="PortraitColor" undo="false" state="Blue"/>
 					<Action type="SetProperty" frame="$parent/DebugLabel1" text="s_blue3"/>
 				</State>
 				<State name="Red3"><!-- quest: blue & in red player vision => red -->
 			        <When type="AnimationState" frame="$parent" KillLogItemType="Quest"/>
 					<When type="AnimationState" frame="$parent" SrcColor="Blue"/>
-					<When type="Property" frame="$VisionPulldown" operator="GreaterThan" SelectedIndex="5"/>
-					<When type="Property" frame="$VisionPulldown" operator="LessThan" SelectedIndex="11"/>
+					<When type="Property" frame="$RedPlayerVisionState" visible="true"/>
 					<Action type="SetState" group="PortraitColor" undo="false" state="Red"/>
 					<Action type="SetProperty" frame="$parent/DebugLabel1" text="s_red3"/>
 				</State>
@@ -2087,16 +2092,14 @@
 				<!-- @Override -->
 				<State name="Red"><!-- blue tgtColor & in red player vision => red -->
 					<When type="AnimationState" frame="$parent" tgtColor="Blue"/>
-					<When type="Property" frame="$VisionPulldown" operator="GreaterThan" SelectedIndex="5"/>
-					<When type="Property" frame="$VisionPulldown" operator="LessThan" SelectedIndex="11"/>
+					<When type="Property" frame="$RedPlayerVisionState" visible="true"/>
 					<Action type="SetState" group="PortraitColor" undo="false" state="Red"/>
 					<Action type="SetProperty" frame="$parent/DebugLabel2" undo="false" text="t_redOnRed"/>
 				</State>
 				<!-- @Override -->
 				<State name="Blue"><!-- red tgtColor & in red player vision => blue -->
 					<When type="AnimationState" frame="$parent" tgtColor="Red"/>
-					<When type="Property" frame="$VisionPulldown" operator="GreaterThan" SelectedIndex="5"/>
-					<When type="Property" frame="$VisionPulldown" operator="LessThan" SelectedIndex="11"/>
+					<When type="Property" frame="$RedPlayerVisionState" visible="true"/>
 					<Action type="SetState" group="PortraitColor" undo="false" state="Blue"/>
 					<Action type="SetProperty" frame="$parent/DebugLabel2" undo="false" text="t_blueOnRed"/>
 				</State>
