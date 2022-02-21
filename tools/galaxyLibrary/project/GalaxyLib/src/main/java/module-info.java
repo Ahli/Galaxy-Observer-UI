@@ -8,10 +8,10 @@ module GalaxyLib {
 	requires org.eclipse.collections.api;
 	
 	requires transitive java.xml;
+	requires transitive org.jetbrains.annotations;
 	//requires org.apache.commons.lang3; // redundant... not required?
 	requires org.slf4j;
-	requires java.sql;
-	requires org.jetbrains.annotations; // configuration2 INI requires java.sql.Date for some reason // redundant, but required!
+	requires java.sql; // configuration2 INI requires java.sql.Date for some reason // redundant, but required!
 	
 	exports com.ahli.galaxy;
 	exports com.ahli.galaxy.archive;

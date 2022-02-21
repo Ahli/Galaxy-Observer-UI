@@ -19,9 +19,9 @@ import com.ahli.interfacebuilder.projects.Project;
 import com.ahli.interfacebuilder.projects.ProjectService;
 import com.ahli.interfacebuilder.projects.enums.GameType;
 import com.ahli.interfacebuilder.threads.CleaningForkJoinPool;
-import com.ahli.interfacebuilder.threads.CleaningForkJoinTaskCleaner;
 import com.ahli.interfacebuilder.ui.AppController;
 import com.ahli.interfacebuilder.ui.navigation.NavigationController;
+import com.ahli.interfacebuilder.ui.progress.ProgressController;
 import com.ahli.mpq.MpqEditorInterface;
 import com.ahli.mpq.MpqException;
 import com.ahli.mpq.mpqeditor.MpqEditorCompression;
@@ -53,6 +53,7 @@ public class MpqBuilderService {
 	private final CleaningForkJoinPool executor;
 	private final AppController appController;
 	private final NavigationController navigationController;
+	private final ProgressController progressController;
 	
 	public MpqBuilderService(
 			@NonNull final ConfigService configService,
@@ -64,7 +65,8 @@ public class MpqBuilderService {
 			@NonNull final Game heroesBaseGame,
 			@NonNull final CleaningForkJoinPool executor,
 			@NonNull final AppController appController,
-			@NonNull final NavigationController navigationController) {
+			@NonNull final NavigationController navigationController,
+			@NonNull final ProgressController progressController) {
 		this.configService = configService;
 		this.compileService = compileService;
 		this.fileService = fileService;
@@ -75,6 +77,7 @@ public class MpqBuilderService {
 		this.executor = executor;
 		this.appController = appController;
 		this.navigationController = navigationController;
+		this.progressController = progressController;
 	}
 	
 	/**
@@ -177,9 +180,11 @@ public class MpqBuilderService {
 		
 		// create tasks for the worker pool
 		try {
-			appController.addThreadlogTab(Thread.currentThread().getName(),
-					interfaceDirectory.getFileName().toString(),
-					true);
+			if (appController.getPrimaryStage() != null) {
+				progressController.addThreadlogTab(Thread.currentThread().getName(),
+						interfaceDirectory.getFileName().toString(),
+						true);
+			}
 			// create unique cache path
 			final MpqEditorInterface threadsMpqInterface = new MpqEditorInterface(configService.getMpqCachePath()
 					.resolve(Long.toString(Thread.currentThread().getId())), configService.getMpqEditorPath());

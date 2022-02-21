@@ -22,6 +22,7 @@ import com.ahli.interfacebuilder.ui.home.ViewRuleSetController;
 import com.ahli.interfacebuilder.ui.navigation.NavigationController;
 import com.ahli.interfacebuilder.ui.progress.BaseUiExtractionController;
 import com.ahli.interfacebuilder.ui.progress.CompressionMiningController;
+import com.ahli.interfacebuilder.ui.progress.ProgressController;
 import com.ahli.interfacebuilder.ui.progress.TabPaneController;
 import com.ahli.interfacebuilder.ui.settings.SettingsCommandLineToolController;
 import com.ahli.interfacebuilder.ui.settings.SettingsController;
@@ -70,8 +71,8 @@ public class FxmlConfiguration {
 	}
 	
 	@Bean
-	protected TabPaneController tabPaneController(final AppController appController) {
-		return new TabPaneController(appController);
+	protected TabPaneController tabPaneController() {
+		return new TabPaneController();
 	}
 	
 	@Bean
@@ -154,7 +155,8 @@ public class FxmlConfiguration {
 			final FileService fileService,
 			final NavigationController navigationController,
 			final AppController appController,
-			final CleaningForkJoinPool executor) {
+			final CleaningForkJoinPool executor,
+			final ProgressController progressController) {
 		return new BrowseController(
 				appContext,
 				baseUiService,
@@ -166,7 +168,8 @@ public class FxmlConfiguration {
 				fileService,
 				navigationController,
 				appController,
-				executor);
+				executor,
+				progressController);
 	}
 	
 	@Bean

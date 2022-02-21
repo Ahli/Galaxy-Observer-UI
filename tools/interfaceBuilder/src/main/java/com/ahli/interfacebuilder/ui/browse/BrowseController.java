@@ -28,6 +28,7 @@ import com.ahli.interfacebuilder.ui.Updateable;
 import com.ahli.interfacebuilder.ui.navigation.NavigationController;
 import com.ahli.interfacebuilder.ui.progress.BaseUiExtractionController;
 import com.ahli.interfacebuilder.ui.progress.ErrorTabController;
+import com.ahli.interfacebuilder.ui.progress.ProgressController;
 import com.ahli.mpq.MpqEditorInterface;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -77,6 +78,7 @@ public class BrowseController implements Updateable, FxmlController {
 	private final NavigationController navigationController;
 	private final AppController appController;
 	private final CleaningForkJoinPool executor;
+	private final ProgressController progressController;
 	@FXML
 	public ListView<Project> projectListView;
 	@FXML
@@ -102,7 +104,8 @@ public class BrowseController implements Updateable, FxmlController {
 			final FileService fileService,
 			final NavigationController navigationController,
 			final AppController appController,
-			final CleaningForkJoinPool executor) {
+			final CleaningForkJoinPool executor,
+			final ProgressController progressController) {
 		this.appContext = appContext;
 		this.baseUiService = baseUiService;
 		this.configService = configService;
@@ -114,6 +117,7 @@ public class BrowseController implements Updateable, FxmlController {
 		this.navigationController = navigationController;
 		this.appController = appController;
 		this.executor = executor;
+		this.progressController = progressController;
 	}
 	
 	/**
@@ -225,7 +229,7 @@ public class BrowseController implements Updateable, FxmlController {
 	}
 	
 	private void extractBaseUi(final GameType gameType, final boolean usePtr) throws IOException {
-		final ObservableList<Tab> tabs = appController.getTabPane().getTabs();
+		final ObservableList<Tab> tabs = progressController.getTabPane().getTabs();
 		final String tabName = "Extract " + gameType.name();
 		Tab newTab = null;
 		BaseUiExtractionController extractionController = null;
@@ -281,7 +285,7 @@ public class BrowseController implements Updateable, FxmlController {
 			Platform.runLater(() -> {
 				try {
 					controllerLoggingAreaChildren.add(scrollPane);
-					appController.getTabPane().getTabs().add(newTabFinal);
+					progressController.getTabPane().getTabs().add(newTabFinal);
 				} catch (final Exception e) {
 					log.fatal(FATAL_ERROR, e);
 				}
@@ -306,7 +310,7 @@ public class BrowseController implements Updateable, FxmlController {
 			}
 		}
 		// select progress & tab
-		appController.getTabPane().getSelectionModel().select(newTab);
+		progressController.getTabPane().getSelectionModel().select(newTab);
 		navigationController.clickProgress();
 		
 		extractionController.start(gameType, usePtr);

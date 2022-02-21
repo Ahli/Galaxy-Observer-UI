@@ -26,6 +26,8 @@ import com.ahli.interfacebuilder.threads.SpringForkJoinWorkerThreadFactory;
 import com.ahli.interfacebuilder.threads.TaskCleaner;
 import com.ahli.interfacebuilder.ui.AppController;
 import com.ahli.interfacebuilder.ui.navigation.NavigationController;
+import com.ahli.interfacebuilder.ui.progress.ProgressController;
+import com.ahli.interfacebuilder.ui.progress.TabPaneController;
 import com.ahli.mpq.MpqEditorInterface;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -109,6 +111,12 @@ public class AppConfiguration {
 	}
 	
 	@Bean
+	protected ProgressController progressController(final TabPaneController tabPaneController) {
+		log.debug("init bean: progressController");
+		return new ProgressController(tabPaneController);
+	}
+	
+	@Bean
 	protected MpqBuilderService mpqBuilderService(
 			final ConfigService configService,
 			final CompileService compileService,
@@ -120,7 +128,8 @@ public class AppConfiguration {
 			final Game heroesGame,
 			final CleaningForkJoinPool executor,
 			final AppController appController,
-			final NavigationController navigationController) {
+			final NavigationController navigationController,
+			final ProgressController progressController) {
 		log.debug("init bean: mpqBuilderService");
 		return new MpqBuilderService(
 				configService,
@@ -132,7 +141,8 @@ public class AppConfiguration {
 				heroesGame,
 				executor,
 				appController,
-				navigationController);
+				navigationController,
+				progressController);
 	}
 	
 	@Bean
@@ -166,9 +176,17 @@ public class AppConfiguration {
 			final DiscCacheService discCacheService,
 			final KryoService kryoService,
 			final AppController appController,
-			final GameService gameService) {
+			final GameService gameService,
+			final ProgressController progressController) {
 		log.debug("init bean: baseUiService");
-		return new BaseUiService(configService, gameService, fileService, discCacheService, kryoService, appController);
+		return new BaseUiService(
+				configService,
+				gameService,
+				fileService,
+				discCacheService,
+				kryoService,
+				appController,
+				progressController);
 	}
 	
 	@Bean

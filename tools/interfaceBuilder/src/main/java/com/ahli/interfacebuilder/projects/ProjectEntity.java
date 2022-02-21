@@ -91,7 +91,7 @@ public final class ProjectEntity implements Serializable {
 				.gameType(entity.getGameType())
 				.lastBuildDateTime(entity.getLastBuildDateTime())
 				.lastBuildSize(entity.getLastBuildSize() != null ? entity.getLastBuildSize() : 0)
-				.bestCompressionRuleSet(entity.getBestCompressionRuleSet())
+				//.bestCompressionRuleSet(entity.getBestCompressionRuleSet())
 				.build();
 	}
 	

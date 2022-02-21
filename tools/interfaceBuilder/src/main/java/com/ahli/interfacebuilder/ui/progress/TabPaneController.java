@@ -4,7 +4,6 @@
 package com.ahli.interfacebuilder.ui.progress;
 
 import com.ahli.interfacebuilder.integration.log4j.StylizedTextAreaAppender;
-import com.ahli.interfacebuilder.ui.AppController;
 import com.ahli.interfacebuilder.ui.FxmlController;
 import com.ahli.interfacebuilder.ui.Updateable;
 import javafx.collections.ObservableList;
@@ -16,12 +15,12 @@ import javafx.scene.text.TextFlow;
 
 public class TabPaneController implements Updateable, FxmlController {
 	
-	private final AppController appController;
+	private ProgressController progressController;
 	@FXML
 	private TabPane tabPane;
 	
-	public TabPaneController(final AppController appController) {
-		this.appController = appController;
+	public void setProgressController(final ProgressController progressController) {
+		this.progressController = progressController;
 	}
 	
 	/**
@@ -44,7 +43,7 @@ public class TabPaneController implements Updateable, FxmlController {
 		tab.setContent(scrollPane);
 		
 		final ErrorTabController errorTabCtrl = new ErrorTabController(tab, txtArea, false, true, true);
-		appController.addErrorTabController(errorTabCtrl);
+		progressController.addErrorTabController(errorTabCtrl);
 		StylizedTextAreaAppender.setGeneralController(errorTabCtrl);
 	}
 	

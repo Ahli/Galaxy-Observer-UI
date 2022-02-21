@@ -15,27 +15,16 @@ import com.ahli.interfacebuilder.integration.CommandLineParams;
 import com.ahli.interfacebuilder.integration.ReplayService;
 import com.ahli.interfacebuilder.integration.SettingsIniInterface;
 import com.ahli.interfacebuilder.integration.log4j.InterProcessCommunicationAppender;
-import com.ahli.interfacebuilder.integration.log4j.StylizedTextAreaAppender;
 import com.ahli.interfacebuilder.projects.enums.GameType;
 import com.ahli.interfacebuilder.ui.navigation.NavigationController;
 import com.ahli.interfacebuilder.ui.navigation.Notification;
-import com.ahli.interfacebuilder.ui.progress.ErrorTabController;
-import com.ahli.interfacebuilder.ui.progress.TabPaneController;
+import com.ahli.interfacebuilder.ui.progress.ProgressController;
 import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
 import javafx.scene.image.Image;
-import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import lombok.extern.log4j.Log4j2;
@@ -50,17 +39,13 @@ import java.io.IOException;
 import java.io.Serial;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 
 @Log4j2
 public class AppController {
 	public static final String FATAL_ERROR = "FATAL ERROR: ";
-	private final List<ErrorTabController> errorTabControllers;
 	private ForkJoinPool executor;
-	private TabPaneController tabPaneController;
 	private BaseUiService baseUiService;
 	private MpqBuilderService mpqBuilderService;
 	private GameService gameService;
@@ -70,10 +55,7 @@ public class AppController {
 	private Stage primaryStage;
 	private NavigationController navigationController;
 	private ReplayService replayService;
-	
-	public AppController() {
-		errorTabControllers = new ArrayList<>(0);
-	}
+	private ProgressController progressController;
 	
 	/**
 	 * Prints a message to the message log.
@@ -96,7 +78,6 @@ public class AppController {
 	@Autowired
 	protected void initBeans(
 			final ForkJoinPool executor,
-			final TabPaneController tabPaneController,
 			@Lazy final BaseUiService baseUiService,
 			@Lazy final MpqBuilderService mpqBuilderService,
 			final GameService gameService,
@@ -104,7 +85,6 @@ public class AppController {
 			final ReplayService replayService,
 			final ConfigurableApplicationContext appContext) {
 		this.executor = executor;
-		this.tabPaneController = tabPaneController;
 		this.baseUiService = baseUiService;
 		this.mpqBuilderService = mpqBuilderService;
 		this.gameService = gameService;
@@ -288,7 +268,7 @@ public class AppController {
 	 */
 	private void startReplayOrQuitOrShowError(final CommandLineParams params) {
 		if (params.isWasStartedWithParameters()) {
-			if (!anyErrorTrackerEncounteredError()) {
+			if (!progressController.anyErrorTrackerEncounteredError()) {
 				// start game, launch replay
 				runGameWithReplay(params);
 				
@@ -318,23 +298,11 @@ public class AppController {
 				}
 			} else {
 				// clear errors
-				clearErrorTrackers();
+				progressController.clearErrorTrackers();
 			}
 		}
 		// allow client to exit
 		InterProcessCommunicationAppender.sendTerminationSignal();
-	}
-	
-	/**
-	 * @return
-	 */
-	private boolean anyErrorTrackerEncounteredError() {
-		for (final ErrorTabController ctrl : errorTabControllers) {
-			if (ctrl.hasEncounteredError() && ctrl.isErrorPreventsExit()) {
-				return true;
-			}
-		}
-		return false;
 	}
 	
 	/**
@@ -401,17 +369,6 @@ public class AppController {
 	}
 	
 	/**
-	 * Clears the errors, so future build attempts can run.
-	 */
-	private void clearErrorTrackers() {
-		for (final ErrorTabController ctrl : errorTabControllers) {
-			if (ctrl.hasEncounteredError() && ctrl.isErrorPreventsExit()) {
-				ctrl.clearError(false);
-			}
-		}
-	}
-	
-	/**
 	 * Prints a message to the message log.
 	 *
 	 * @param msg
@@ -450,112 +407,6 @@ public class AppController {
 		log.info("App waves Goodbye!");
 	}
 	
-	/**
-	 * Adds a Tab for the specified Thread ID containing its log messages.
-	 *
-	 * @param threadName
-	 * @param tabName
-	 */
-	public void addThreadlogTab(
-			final String threadName, final String tabName, final boolean errorPreventsExit) {
-		if (primaryStage != null) {
-			final ObservableList<Tab> tabs = getTabPane().getTabs();
-			Tab newTab = null;
-			
-			// re-use existing tab with that name
-			for (final Tab tab : tabs) {
-				if (tab.getText().equals(tabName)) {
-					newTab = tab;
-					break;
-				}
-			}
-			if (newTab == null) {
-				// CASE: new tab
-				newTab = new Tab(tabName);
-				final TextFlow newTxtArea = new TextFlow();
-				final ErrorTabController errorTabCtrl =
-						new ErrorTabController(newTab, newTxtArea, true, false, errorPreventsExit);
-				errorTabCtrl.setRunning(true);
-				errorTabControllers.add(errorTabCtrl);
-				
-				final ScrollPane scrollPane = new ScrollPane(newTxtArea);
-				scrollPane.setPannable(true);
-				
-				// auto-downscrolling
-				scrollPane.vvalueProperty().bind(newTxtArea.heightProperty());
-				
-				newTab.setContent(scrollPane);
-				StylizedTextAreaAppender.setWorkerTaskController(errorTabCtrl, threadName);
-				
-				// context menu with close option
-				final ContextMenu contextMenu = new ContextMenu();
-				final MenuItem closeItem = new MenuItem(Messages.getString("contextmenu.close"));
-				closeItem.setOnAction(new CloseThreadlogTabAction(newTab, errorTabCtrl, errorTabControllers));
-				contextMenu.getItems().add(closeItem);
-				newTab.setContextMenu(contextMenu);
-				
-				// runlater needs to appear below the edits above, else it might be added before
-				// which results in UI edits not in UI thread -> error
-				final Tab newTabFinal = newTab;
-				Platform.runLater(() -> {
-					try {
-						getTabPane().getTabs().add(newTabFinal);
-					} catch (final Exception e) {
-						log.fatal(FATAL_ERROR, e);
-					}
-				});
-			} else {
-				// CASE: recycle existing Tab
-				final ErrorTabController errorTabCtrl = getErrorTabController(tabName);
-				if (errorTabCtrl != null) {
-					StylizedTextAreaAppender.setWorkerTaskController(errorTabCtrl, threadName);
-					Platform.runLater(() -> {
-						try {
-							errorTabCtrl.setErrorPreventsExit(errorPreventsExit);
-							errorTabCtrl.clearError(false);
-							errorTabCtrl.clearWarning(false);
-							errorTabCtrl.setRunning(true);
-						} catch (final Exception e) {
-							log.fatal(FATAL_ERROR, e);
-						}
-					});
-				}
-			}
-		}
-	}
-	
-	/**
-	 * @return
-	 */
-	public TabPane getTabPane() {
-		return tabPaneController.getTabPane();
-	}
-	
-	/**
-	 * @param tabName
-	 * @return
-	 */
-	public ErrorTabController getErrorTabController(final String tabName) {
-		for (final var ctrl : errorTabControllers) {
-			if (ctrl != null) {
-				final Tab tab = ctrl.getTab();
-				if (tab != null && tabName.equals(tab.getText())) {
-					// found the correct one
-					return ctrl;
-				}
-			}
-		}
-		return null;
-	}
-	
-	/**
-	 * Adds an ErrorTabController.
-	 *
-	 * @param errorTabCtrl
-	 */
-	public void addErrorTabController(final ErrorTabController errorTabCtrl) {
-		errorTabControllers.add(errorTabCtrl);
-	}
 	
 	/**
 	 * Returns the primary Stage of the App.
@@ -566,27 +417,6 @@ public class AppController {
 	public Stage getPrimaryStage() {
 		return primaryStage;
 	}
-	
-	private static final class CloseThreadlogTabAction implements EventHandler<ActionEvent> {
-		private final Tab tab;
-		private final ErrorTabController controller;
-		private final List<ErrorTabController> controllers;
-		
-		private CloseThreadlogTabAction(
-				final Tab tab, final ErrorTabController controller, final List<ErrorTabController> controllers) {
-			this.tab = tab;
-			this.controller = controller;
-			this.controllers = controllers;
-		}
-		
-		@Override
-		public void handle(final ActionEvent event) {
-			tab.getTabPane().getTabs().remove(tab);
-			tab.setContextMenu(null);
-			controllers.remove(controller);
-		}
-	}
-	
 	
 	private static final class AppControllerException extends RuntimeException {
 		

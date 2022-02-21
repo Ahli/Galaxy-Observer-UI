@@ -119,13 +119,13 @@ public class ProjectService {
 	 * @param project
 	 * @return
 	 */
-	@Transactional
+	@Transactional(readOnly = true)
 	public RuleSet fetchBestCompressionRuleSet(final Project project) {
-		if (!Hibernate.isInitialized(project.getBestCompressionRuleSet())) {
-			// grab from DB wire compression rules to old instance
-			final ProjectEntity project2 = projectRepo.getReferenceById(project.getId());
+		if (project.getBestCompressionRuleSet() == null) {
+			//if (!Hibernate.isInitialized(project.getBestCompressionRuleSet())) {
+			final ProjectEntity projectEntity = projectRepo.getReferenceById(project.getId());
 			try {
-				final RuleSet ruleSet = Hibernate.unproxy(project2.getBestCompressionRuleSet(), RuleSet.class);
+				final RuleSet ruleSet = Hibernate.unproxy(projectEntity.getBestCompressionRuleSet(), RuleSet.class);
 				project.setBestCompressionRuleSet(ruleSet);
 			} catch (final PersistenceException e) {
 				log.error("Error while fetching compression rule set from DB.", e);

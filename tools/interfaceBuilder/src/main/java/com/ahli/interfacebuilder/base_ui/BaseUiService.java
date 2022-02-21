@@ -19,6 +19,7 @@ import com.ahli.interfacebuilder.integration.kryo.KryoService;
 import com.ahli.interfacebuilder.integration.log4j.StylizedTextAreaAppender;
 import com.ahli.interfacebuilder.projects.enums.GameType;
 import com.ahli.interfacebuilder.ui.AppController;
+import com.ahli.interfacebuilder.ui.progress.ProgressController;
 import com.ahli.interfacebuilder.ui.progress.appenders.Appender;
 import com.esotericsoftware.kryo.Kryo;
 import com.kichik.pecoff4j.PE;
@@ -66,6 +67,7 @@ public class BaseUiService {
 	private final DiscCacheService discCacheService;
 	private final KryoService kryoService;
 	private final AppController appController;
+	private final ProgressController progressController;
 	
 	private final Map<String, Object> baseUiParsingLock;
 	
@@ -75,13 +77,15 @@ public class BaseUiService {
 			@NonNull final FileService fileService,
 			@NonNull final DiscCacheService discCacheService,
 			@NonNull final KryoService kryoService,
-			@NonNull final AppController appController) {
+			@NonNull final AppController appController,
+			@NonNull final ProgressController progressController) {
 		this.configService = configService;
 		this.gameService = gameService;
 		this.fileService = fileService;
 		this.discCacheService = discCacheService;
 		this.kryoService = kryoService;
 		this.appController = appController;
+		this.progressController = progressController;
 		baseUiParsingLock = new HashMap<>(2, 1.0f);
 	}
 	
@@ -302,9 +306,11 @@ public class BaseUiService {
 							new XmlParserVtd(),
 							DeduplicationIntensity.FULL));
 					appController.printInfoLogMessageToGeneral("Starting to parse base " + gameName + " UI.");
-					appController.addThreadlogTab(Thread.currentThread().getName(),
-							game.getGameDef().nameHandle() + "UI",
-							false);
+					if (appController.getPrimaryStage() != null) {
+						progressController.addThreadlogTab(Thread.currentThread().getName(),
+								game.getGameDef().nameHandle() + "UI",
+								false);
+					}
 					try {
 						for (final String modOrDir : game.getGameDef().coreModsOrDirectories()) {
 							
