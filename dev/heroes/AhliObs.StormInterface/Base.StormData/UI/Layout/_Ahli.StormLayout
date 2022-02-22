@@ -451,40 +451,33 @@
 					<Anchor side="Top" relative="$parent" pos="Min" offset="270"/>
 				</Frame>
 				
-				<!-- BUG: muting DOES NOT WORK?! Also, workaround at the top does not work either -->
+				<!-- mute talent selection panel -->
 				<Frame type="SelectionUnitStatusPanel" name="FloatingCombatUnitSelectionPanel">
 					<Frame type="UnitStatusFrame" name="UnitStatusFrame0">
 						<Frame type="HeroTalentTreeSelectionPanel" name="HeroTalentTreeSelectionPanel">
-							
-							<!-- TODO: this does not work... -->
+							<!-- @Override -->
 							<Animation name="Show">
+								<!-- Stop works, most other actions do not for some reason -->
+								<Event event="Toggle" action="Stop"/>
+								<Event event="Hide" action="Stop"/>
+								<Event event="Begin" action="Stop"/>
+								<Event event="End" action="Stop"/>
+							</Animation>
+							<!-- duplicate without sound => muted -->
+							<Animation name="Show2">
 								<Event event="Toggle" action="ToggleDirection, Play"/>
 								<Event event="Hide" action="DirectionReverse, Play"/>
 								<Event event="Begin" action="DirectionForward, Play"/>
 								<Event event="End" action="DirectionReverse, Play"/>
-								<Event event="Show" action="DirectionReverse, Play" frame="$parent/$parent/$parent/HeroCharacterSheetPanelContainer/HeroCharacterSheetPanel"/>
-
-								<Controller type="Fade" name="Fade_1" end="Pause">
+								<Controller type="Fade" end="Pause">
 									<Key type="Curve" time="0" value="0"/>
 									<Key type="Curve" time=".175" value="255"/>
 								</Controller>
-
-								<Controller type="Anchor" name="Anchor_1" end="Pause" side="Left" relative="true">
-									<Key type="Curve" time="0" value="-75" inout="Slow"/>
-									<Key type="Curve" time=".175" value="0" inout="Slow"/>
-								</Controller>
-
-								<Controller type="Sound" name="Sound_1" end="Pause">
-									<Key type="Sound" time="0.07" sound="@StormNoSound" direction="Forward"/>
-									<Key type="Sound" time="0.175" sound="@StormNoSound" direction="Reverse"/>
+								<Controller type="Anchor" end="Pause" side="Left" relative="true">
+									<Key type="Curve" time="0" value="-75" inout="Linear,Slow"/>
+									<Key type="Curve" time=".175" value="0" inout="Slow,Linear"/>
 								</Controller>
 							</Animation>
-							
-							<!--<Animation name="Show">
-								<Controller type="Sound" name="Sound_1" end="Pause">
-									<Key type="Sound" time="0" sound="@StormNoSound"/>
-								</Controller>
-							</Animation>-->
 						</Frame>
 					</Frame>
 				</Frame>
@@ -1091,7 +1084,8 @@
 				<Unclipped val="true"/>
 			</Frame>
 			
-			<!-- TODO: Animation state is set to the other team during red vision -->
+			<!-- TODO: Animation state is set to the other team during red vision,
+					blue captures => top "10", switch to red vision, red captures => top from "10" to "10", unusable with red vision -->
 			<StateGroup name="TopBarCaptured">
 				<DefaultState val="FalseDflt"/>
 				<!-- @Override -->
