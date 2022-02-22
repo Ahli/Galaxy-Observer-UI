@@ -1006,32 +1006,88 @@
 	<!-- MAP MECHANIC UI changes -->
 	<!-- Garden of Terror - fixes -->
 	<Frame type="Frame" name="GameUI/UIContainer/ConsoleUIContainer/MapMechanicPanel/GardenOfTerrorPanel/SeedsFrame" file="GameUI">
-
+	
 		<!-- FIX: team icons disappearing after red team vision -->
+        <Frame type="Image" name="Team1SeedBlue2" template="MapMechanicPanel/MapMechanicPanelTemplate/GardenOfTerrorPanel/SeedsFrame/Team1SeedBlue">
+		</Frame>
+        <Frame type="Image" name="Team2SeedRed2" template="MapMechanicPanel/MapMechanicPanelTemplate/GardenOfTerrorPanel/SeedsFrame/Team2SeedRed">
+		</Frame>
         <Frame type="Image" name="Team1SeedBlue">
-			<Animation name="KeepVisible">
-				<Event event="OnHidden" action="Reset,DirectionForward,Play"/>
-				<Controller type="Visibility" end="Pause">
-					<Key type="Bool" time="0" value="true"/>
-				</Controller>
-			</Animation>
+			<Visible val="false"/>
+			<Alpha val="0"/>
+			<RenderType val="Offscreen"/>
 		</Frame>
         <Frame type="Image" name="Team2SeedRed">
-			<Animation name="KeepVisible">
-				<Event event="OnHidden" action="Reset,DirectionForward,Play"/>
-				<Controller type="Visibility" end="Pause">
-					<Key type="Bool" time="0" value="true"/>
-				</Controller>
-			</Animation>
+			<Visible val="false"/>
+			<Alpha val="0"/>
+			<RenderType val="Offscreen"/>
 		</Frame>
+		
+		<!-- FIX: seed counter disappearing on time jump -->
+		<Frame type="Label" name="Team1SeedCounter">
+			<StateGroup name="FixVis">
+				<DefaultState val="Hid"/>
+				<State name="Vis">
+					<When type="Property" frame="$parent/Team1StatusLabel" visible="false"/>
+					<Action type="SetProperty" visible="true"/>
+					<Action type="SetProperty" frame="$AHLI_DEBUG5" text="blueSeeds"/>
+				</State>
+				<State name="Hid">
+					<Action type="SetProperty" visible="false"/>
+				</State>
+			</StateGroup>
+		</Frame>
+		<Frame type="Label" name="Team2SeedCounter">
+			<StateGroup name="FixVis">
+				<DefaultState val="Hid"/>
+				<State name="Fix">
+					<When type="Property" frame="$parent/Team2StatusLabel" visible="false"/>
+					<Action type="SetProperty" visible="true"/>
+					<Action type="SetProperty" frame="$AHLI_DEBUG6" text="redSeeds"/>
+				</State>
+				<State name="Hid">
+					<Action type="SetProperty" visible="false"/>
+				</State>
+			</StateGroup>
+		</Frame>
+		
+		<!-- TODO: FIX: notifications are visible on time jump until they really should appear
+		<Frame type="DataRefFrame" name="SeedsOnMap">
+			<Argument name="UnitCount" val="Seed"/>
+			<PlayerId val="0"/>
+		</Frame> -->
+		
 	</Frame>
-	<!-- TODO FIX: icon next to terror health bars is blue/red
+	<!-- FIX: icon next to terror health bars was blue/red depending on whose vision was last used -->
 	<Frame type="Frame" name="GardenTerrorHealthFrame" file="GardenMapMechanic">
+		<Frame type="Image" name="IconNew" template="GardenMapMechanic/GardenTerrorHealthFrame/Icon_Blue">
+			<Texture val="@UI/Storm_UI_HUD_GoT_TerrorHealthFrameIconBlue"/>
+			
+			<Frame type="DataRefFrame" name="TerrorCountR">
+				<Argument name="UnitCount" val="GardenTerror"/>
+				<PlayerId val="12"/>
+			</Frame>
+			
+			<StateGroup name="Color">
+				<State name="Red">
+					<When type="Property" frame="TerrorCountR" RealValue="0" operator="NotEqual"/>
+					<Action type="SetProperty" texture="@UI/Storm_UI_HUD_GoT_TerrorHealthFrameIconRed"/>
+				</State>
+			</StateGroup>
+		</Frame>
+		<!-- hide original images as a new one is used to avoid triggers causing issues -->
 		<Frame type="Image" name="Icon_Blue">
+			<Visible val="false"/>
+			<Alpha val="0"/>
+			<RenderType val="Offscreen"/>
 		</Frame>
 		<Frame type="Image" name="Icon_Red">
+			<Visible val="false"/>
+			<Alpha val="0"/>
+			<RenderType val="Offscreen"/>
 		</Frame>
-	</Frame>-->
+		
+	</Frame>
 	
 	
 	
