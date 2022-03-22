@@ -153,7 +153,7 @@ public class AppConfiguration {
 	}
 	
 	@Bean
-	protected ForkJoinPool forkJoinPool(final CleaningForkJoinTaskCleaner cleaner) {
+	protected CleaningForkJoinPool cleaningForkJoinPool(final CleaningForkJoinTaskCleaner cleaner) {
 		log.debug("init bean: forkJoinPool");
 		final int maxThreads = Math.max(1, Runtime.getRuntime().availableProcessors() / 2);
 		return new CleaningForkJoinPool(
