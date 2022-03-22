@@ -28,11 +28,8 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.context.event.EventListener;
-import org.springframework.lang.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,17 +42,37 @@ import java.util.concurrent.TimeUnit;
 @Log4j2
 public class AppController {
 	public static final String FATAL_ERROR = "FATAL ERROR: ";
-	private ForkJoinPool executor;
-	private BaseUiService baseUiService;
-	private MpqBuilderService mpqBuilderService;
-	private GameService gameService;
-	private ConfigService configService;
-	private ConfigurableApplicationContext appContext;
-	@Nullable
-	private Stage primaryStage;
+	private final ForkJoinPool executor;
+	private final BaseUiService baseUiService;
+	private final MpqBuilderService mpqBuilderService;
+	private final GameService gameService;
+	private final ConfigService configService;
+	private final ConfigurableApplicationContext appContext;
+	private final ReplayService replayService;
+	private final ProgressController progressController;
+	private final PrimaryStageHolder primaryStage;
 	private NavigationController navigationController;
-	private ReplayService replayService;
-	private ProgressController progressController;
+	
+	public AppController(
+			final ForkJoinPool executor,
+			final BaseUiService baseUiService,
+			final MpqBuilderService mpqBuilderService,
+			final GameService gameService,
+			final ConfigService configService,
+			final ReplayService replayService,
+			final ConfigurableApplicationContext appContext,
+			final ProgressController progressController,
+			final PrimaryStageHolder primaryStage) {
+		this.executor = executor;
+		this.baseUiService = baseUiService;
+		this.mpqBuilderService = mpqBuilderService;
+		this.gameService = gameService;
+		this.configService = configService;
+		this.replayService = replayService;
+		this.appContext = appContext;
+		this.progressController = progressController;
+		this.primaryStage = primaryStage;
+	}
 	
 	/**
 	 * Prints a message to the message log.
@@ -73,32 +90,11 @@ public class AppController {
 		});
 	}
 	
-	// Lazy Constructor injection does not work as java-modules requires access to swap out the proxy class with the bean
-	// usual Constructor parameter bean injection does not work due to circular dependencies
-	@Autowired
-	protected void initBeans(
-			final ForkJoinPool executor,
-			@Lazy final BaseUiService baseUiService,
-			@Lazy final MpqBuilderService mpqBuilderService,
-			final GameService gameService,
-			final ConfigService configService,
-			final ReplayService replayService,
-			final ConfigurableApplicationContext appContext) {
-		this.executor = executor;
-		this.baseUiService = baseUiService;
-		this.mpqBuilderService = mpqBuilderService;
-		this.gameService = gameService;
-		this.configService = configService;
-		this.replayService = replayService;
-		this.appContext = appContext;
-	}
-	
-	
 	@EventListener
 	public void onPrimaryStageReadyEvent(final PrimaryStageReadyEvent stageReadyEvent) {
 		try {
-			primaryStage = stageReadyEvent.getStage();
-			if (primaryStage != null) {
+			primaryStage.setPrimaryStage(stageReadyEvent.getStage());
+			if (primaryStage.hasPrimaryStage()) {
 				initUi();
 			}
 			
@@ -131,28 +127,28 @@ public class AppController {
 		
 		scene.getStylesheets().add(appContext.getResource("classpath:view/application.css").getURI().toString());
 		scene.getStylesheets().add(appContext.getResource("classpath:view/textStyles.css").getURI().toString());
-		
+		final Stage ps = primaryStage.getPrimaryStage();
 		// app icon
 		try {
-			primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/res/ahli.png")));
+			ps.getIcons().add(new Image(getClass().getResourceAsStream("/res/ahli.png")));
 		} catch (final Exception e) {
 			final String msg = "Failed to load ahli.png";
 			log.error(msg);
 			log.trace(msg, e);
 		}
-		primaryStage.setMaximized(true);
-		primaryStage.setScene(scene);
-		primaryStage.setTitle(Messages.getString("app.title"));
+		ps.setMaximized(true);
+		ps.setScene(scene);
+		ps.setTitle(Messages.getString("app.title"));
 		
 		// Fade animation (to hide white stage background flash)
-		primaryStage.setOpacity(0);
+		ps.setOpacity(0);
 		final FadeTransition ft = new FadeTransition(Duration.millis(750), root);
 		ft.setFromValue(0);
 		ft.setToValue(1.0);
 		ft.play();
 		
-		primaryStage.show();
-		primaryStage.setOpacity(1);
+		ps.show();
+		ps.setOpacity(1);
 	}
 	
 	/**
@@ -179,7 +175,7 @@ public class AppController {
 			Thread.currentThread().setName("Supervisor");
 			Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
 			
-			if (primaryStage != null) {
+			if (primaryStage.hasPrimaryStage()) {
 				Platform.runLater(() -> {
 					try {
 						navigationController.lockNavToProgress();
@@ -196,7 +192,7 @@ public class AppController {
 				startReplayOrQuitOrShowError(params);
 			}
 			
-			if (primaryStage != null) {
+			if (primaryStage.hasPrimaryStage()) {
 				Platform.runLater(() -> {
 					try {
 						navigationController.unlockNav();
@@ -213,7 +209,7 @@ public class AppController {
 	public void checkBaseUiUpdate() {
 		try {
 			if (baseUiService.isOutdated(GameType.SC2, false)) {
-				if (primaryStage != null) {
+				if (primaryStage.hasPrimaryStage()) {
 					navigationController.appendNotification(new Notification(Messages.getString(
 							"browse.notification.sc2OutOfDate"), NavigationController.BROWSE_TAB, "sc2OutOfDate"));
 				} else {
@@ -225,7 +221,7 @@ public class AppController {
 		}
 		try {
 			if (baseUiService.isOutdated(GameType.HEROES, false)) {
-				if (primaryStage != null) {
+				if (primaryStage.hasPrimaryStage()) {
 					navigationController.appendNotification(new Notification(Messages.getString(
 							"browse.notification.heroesOutOfDate"),
 							NavigationController.BROWSE_TAB,
@@ -239,7 +235,7 @@ public class AppController {
 		}
 		try {
 			if (baseUiService.isOutdated(GameType.HEROES, true)) {
-				if (primaryStage != null) {
+				if (primaryStage.hasPrimaryStage()) {
 					navigationController.appendNotification(new Notification(Messages.getString(
 							"browse.notification.heroesPtrOutOfDate"),
 							NavigationController.BROWSE_TAB,
@@ -273,13 +269,13 @@ public class AppController {
 				runGameWithReplay(params);
 				
 				// app started with params => potentially close itself
-				if (!params.isParamsOriginateFromExternalSource() && primaryStage != null) {
+				if (!params.isParamsOriginateFromExternalSource() && primaryStage.hasPrimaryStage()) {
 					if (!params.isHasParamCompilePath()) {
 						Platform.runLater(() -> {
 							try {
 								// close after 5 seconds, if compiled all and no errors
 								final PauseTransition delay = new PauseTransition(Duration.seconds(5));
-								delay.setOnFinished(event -> primaryStage.close());
+								delay.setOnFinished(event -> primaryStage.getPrimaryStage().close());
 								delay.play();
 							} catch (final Exception e) {
 								log.fatal(FATAL_ERROR, e);
@@ -289,7 +285,7 @@ public class AppController {
 						// close instantly, if only run or something else
 						Platform.runLater(() -> {
 							try {
-								primaryStage.close();
+								primaryStage.getPrimaryStage().close();
 							} catch (final Exception e) {
 								log.fatal(FATAL_ERROR, e);
 							}
@@ -351,7 +347,7 @@ public class AppController {
 			if (replay != null && Files.exists(replay) && Files.isRegularFile(replay)) {
 				log.info("Starting game with replay: {}", replay);
 				try {
-					printInfoLogMessageToGeneral("The game starts with a replay now...");
+					primaryStage.printInfoLogMessageToGeneral("The game starts with a replay now...");
 					final String[] cmd = new String[] { "cmd", "/C", "start",
 							"\"\" \"" + gamePath + "\" \"" + replay.toAbsolutePath() + "\"" };
 					Runtime.getRuntime().exec(cmd);
@@ -366,26 +362,6 @@ public class AppController {
 			log.error("Error while finding replay.", e);
 		}
 		return false;
-	}
-	
-	/**
-	 * Prints a message to the message log.
-	 *
-	 * @param msg
-	 * 		the message
-	 */
-	public void printInfoLogMessageToGeneral(final String msg) {
-		if (primaryStage != null) {
-			Platform.runLater(() -> {
-				try {
-					log.info(msg);
-				} catch (final Exception e) {
-					log.fatal(FATAL_ERROR, e);
-				}
-			});
-		} else {
-			log.info(msg);
-		}
 	}
 	
 	@EventListener
@@ -405,17 +381,6 @@ public class AppController {
 			Thread.currentThread().interrupt();
 		}
 		log.info("App waves Goodbye!");
-	}
-	
-	
-	/**
-	 * Returns the primary Stage of the App.
-	 *
-	 * @return
-	 */
-	@Nullable
-	public Stage getPrimaryStage() {
-		return primaryStage;
 	}
 	
 	private static final class AppControllerException extends RuntimeException {

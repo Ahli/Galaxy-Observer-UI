@@ -25,12 +25,14 @@ import com.ahli.interfacebuilder.threads.CleaningForkJoinTaskCleaner;
 import com.ahli.interfacebuilder.threads.SpringForkJoinWorkerThreadFactory;
 import com.ahli.interfacebuilder.threads.TaskCleaner;
 import com.ahli.interfacebuilder.ui.AppController;
+import com.ahli.interfacebuilder.ui.PrimaryStageHolder;
 import com.ahli.interfacebuilder.ui.navigation.NavigationController;
 import com.ahli.interfacebuilder.ui.progress.ProgressController;
 import com.ahli.interfacebuilder.ui.progress.TabPaneController;
 import com.ahli.mpq.MpqEditorInterface;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -48,6 +50,11 @@ import java.util.concurrent.TimeUnit;
 public class AppConfiguration {
 	
 	protected AppConfiguration() {
+	}
+	
+	@Bean
+	PrimaryStageHolder primaryStageHolder() {
+		return new PrimaryStageHolder();
 	}
 	
 	@Bean
@@ -127,9 +134,9 @@ public class AppConfiguration {
 			final Game sc2Game,
 			final Game heroesGame,
 			final CleaningForkJoinPool executor,
-			final AppController appController,
 			final NavigationController navigationController,
-			final ProgressController progressController) {
+			final ProgressController progressController,
+			final PrimaryStageHolder primaryStage) {
 		log.debug("init bean: mpqBuilderService");
 		return new MpqBuilderService(
 				configService,
@@ -140,9 +147,9 @@ public class AppConfiguration {
 				sc2Game,
 				heroesGame,
 				executor,
-				appController,
 				navigationController,
-				progressController);
+				progressController,
+				primaryStage);
 	}
 	
 	@Bean
@@ -164,9 +171,27 @@ public class AppConfiguration {
 	}
 	
 	@Bean
-	protected AppController appController() {
+	protected AppController appController(
+			final ForkJoinPool executor,
+			final BaseUiService baseUiService,
+			final MpqBuilderService mpqBuilderService,
+			final GameService gameService,
+			final ConfigService configService,
+			final ReplayService replayService,
+			final ConfigurableApplicationContext appContext,
+			final ProgressController progressController,
+			final PrimaryStageHolder primaryStage) {
 		log.debug("init bean: appController");
-		return new AppController();
+		return new AppController(
+				executor,
+				baseUiService,
+				mpqBuilderService,
+				gameService,
+				configService,
+				replayService,
+				appContext,
+				progressController,
+				primaryStage);
 	}
 	
 	@Bean
@@ -175,9 +200,9 @@ public class AppConfiguration {
 			final FileService fileService,
 			final DiscCacheService discCacheService,
 			final KryoService kryoService,
-			final AppController appController,
 			final GameService gameService,
-			final ProgressController progressController) {
+			final ProgressController progressController,
+			final PrimaryStageHolder primaryStage) {
 		log.debug("init bean: baseUiService");
 		return new BaseUiService(
 				configService,
@@ -185,8 +210,8 @@ public class AppConfiguration {
 				fileService,
 				discCacheService,
 				kryoService,
-				appController,
-				progressController);
+				progressController,
+				primaryStage);
 	}
 	
 	@Bean

@@ -20,6 +20,7 @@ import com.ahli.interfacebuilder.projects.ProjectService;
 import com.ahli.interfacebuilder.projects.enums.GameType;
 import com.ahli.interfacebuilder.threads.CleaningForkJoinPool;
 import com.ahli.interfacebuilder.ui.AppController;
+import com.ahli.interfacebuilder.ui.PrimaryStageHolder;
 import com.ahli.interfacebuilder.ui.navigation.NavigationController;
 import com.ahli.interfacebuilder.ui.progress.ProgressController;
 import com.ahli.mpq.MpqEditorInterface;
@@ -51,9 +52,9 @@ public class MpqBuilderService {
 	private final Game sc2BaseGame;
 	private final Game heroesBaseGame;
 	private final CleaningForkJoinPool executor;
-	private final AppController appController;
 	private final NavigationController navigationController;
 	private final ProgressController progressController;
+	private final PrimaryStageHolder primaryStage;
 	
 	public MpqBuilderService(
 			@NonNull final ConfigService configService,
@@ -64,9 +65,9 @@ public class MpqBuilderService {
 			@NonNull final Game sc2BaseGame,
 			@NonNull final Game heroesBaseGame,
 			@NonNull final CleaningForkJoinPool executor,
-			@NonNull final AppController appController,
 			@NonNull final NavigationController navigationController,
-			@NonNull final ProgressController progressController) {
+			@NonNull final ProgressController progressController,
+			@NonNull final PrimaryStageHolder primaryStage) {
 		this.configService = configService;
 		this.compileService = compileService;
 		this.fileService = fileService;
@@ -75,9 +76,9 @@ public class MpqBuilderService {
 		this.sc2BaseGame = sc2BaseGame;
 		this.heroesBaseGame = heroesBaseGame;
 		this.executor = executor;
-		this.appController = appController;
 		this.navigationController = navigationController;
 		this.progressController = progressController;
+		this.primaryStage = primaryStage;
 	}
 	
 	/**
@@ -180,7 +181,7 @@ public class MpqBuilderService {
 		
 		// create tasks for the worker pool
 		try {
-			if (appController.getPrimaryStage() != null) {
+			if (primaryStage.hasPrimaryStage()) {
 				progressController.addThreadlogTab(Thread.currentThread().getName(),
 						interfaceDirectory.getFileName().toString(),
 						true);
@@ -270,7 +271,7 @@ public class MpqBuilderService {
 			final boolean verifyLayout,
 			final boolean verifyXml,
 			@NonNull final Project project) throws IOException, InterruptedException {
-		appController.printInfoLogMessageToGeneral(sourceFile.getFileName() + " started construction.");
+		primaryStage.printInfoLogMessageToGeneral(sourceFile.getFileName() + " started construction.");
 		
 		final GameDef gameDef = game.getGameDef();
 		
@@ -383,7 +384,7 @@ public class MpqBuilderService {
 			project.setLastBuildSize(size);
 			log.info("Finished building... {}. Size: {}kb", sourceFileName, size / 1024);
 			projectService.saveProject(project);
-			appController.printInfoLogMessageToGeneral(sourceFileName + " finished construction.");
+			primaryStage.printInfoLogMessageToGeneral(sourceFileName + " finished construction.");
 		} catch (final IOException | MpqException e) {
 			log.error("ERROR: unable to construct final Interface file.", e);
 			AppController.printErrorLogMessageToGeneral(sourceFileName + " could not be created.");

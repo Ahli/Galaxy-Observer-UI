@@ -21,9 +21,9 @@ import com.ahli.interfacebuilder.projects.ProjectService;
 import com.ahli.interfacebuilder.projects.enums.GameType;
 import com.ahli.interfacebuilder.threads.CleaningForkJoinPool;
 import com.ahli.interfacebuilder.ui.Alerts;
-import com.ahli.interfacebuilder.ui.AppController;
 import com.ahli.interfacebuilder.ui.FXMLSpringLoader;
 import com.ahli.interfacebuilder.ui.FxmlController;
+import com.ahli.interfacebuilder.ui.PrimaryStageHolder;
 import com.ahli.interfacebuilder.ui.Updateable;
 import com.ahli.interfacebuilder.ui.navigation.NavigationController;
 import com.ahli.interfacebuilder.ui.progress.BaseUiExtractionController;
@@ -76,9 +76,9 @@ public class BrowseController implements Updateable, FxmlController {
 	private final CompileService compileService;
 	private final FileService fileService;
 	private final NavigationController navigationController;
-	private final AppController appController;
 	private final CleaningForkJoinPool executor;
 	private final ProgressController progressController;
+	private final PrimaryStageHolder primaryStage;
 	@FXML
 	public ListView<Project> projectListView;
 	@FXML
@@ -103,9 +103,9 @@ public class BrowseController implements Updateable, FxmlController {
 			final CompileService compileService,
 			final FileService fileService,
 			final NavigationController navigationController,
-			final AppController appController,
 			final CleaningForkJoinPool executor,
-			final ProgressController progressController) {
+			final ProgressController progressController,
+			final PrimaryStageHolder primaryStage) {
 		this.appContext = appContext;
 		this.baseUiService = baseUiService;
 		this.configService = configService;
@@ -115,9 +115,9 @@ public class BrowseController implements Updateable, FxmlController {
 		this.compileService = compileService;
 		this.fileService = fileService;
 		this.navigationController = navigationController;
-		this.appController = appController;
 		this.executor = executor;
 		this.progressController = progressController;
+		this.primaryStage = primaryStage;
 	}
 	
 	/**
@@ -224,7 +224,7 @@ public class BrowseController implements Updateable, FxmlController {
 			extractBaseUi(GameType.SC2, false);
 		} catch (final IOException e) {
 			log.error("Error extracting Heroes Base UI.", e);
-			Alerts.buildExceptionAlert(appController.getPrimaryStage(), e).showAndWait();
+			Alerts.buildExceptionAlert(primaryStage.getPrimaryStage(), e).showAndWait();
 		}
 	}
 	
@@ -323,7 +323,7 @@ public class BrowseController implements Updateable, FxmlController {
 			updatePtrStatusLabel(usePtr);
 		} catch (final IOException e) {
 			log.error("Error extracting Heroes Base UI.", e);
-			Alerts.buildExceptionAlert(appController.getPrimaryStage(), e).showAndWait();
+			Alerts.buildExceptionAlert(primaryStage.getPrimaryStage(), e).showAndWait();
 		}
 	}
 	

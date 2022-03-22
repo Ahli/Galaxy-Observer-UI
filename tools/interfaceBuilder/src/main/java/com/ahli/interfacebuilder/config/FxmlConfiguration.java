@@ -10,7 +10,7 @@ import com.ahli.interfacebuilder.compress.GameService;
 import com.ahli.interfacebuilder.integration.FileService;
 import com.ahli.interfacebuilder.projects.ProjectService;
 import com.ahli.interfacebuilder.threads.CleaningForkJoinPool;
-import com.ahli.interfacebuilder.ui.AppController;
+import com.ahli.interfacebuilder.ui.PrimaryStageHolder;
 import com.ahli.interfacebuilder.ui.browse.BrowseController;
 import com.ahli.interfacebuilder.ui.browse.BrowseTabController;
 import com.ahli.interfacebuilder.ui.home.AddProjectController;
@@ -154,9 +154,9 @@ public class FxmlConfiguration {
 			final CompileService compileService,
 			final FileService fileService,
 			final NavigationController navigationController,
-			final AppController appController,
 			final CleaningForkJoinPool executor,
-			final ProgressController progressController) {
+			final ProgressController progressController,
+			final PrimaryStageHolder primaryStage) {
 		return new BrowseController(
 				appContext,
 				baseUiService,
@@ -167,9 +167,9 @@ public class FxmlConfiguration {
 				compileService,
 				fileService,
 				navigationController,
-				appController,
 				executor,
-				progressController);
+				progressController,
+				primaryStage);
 	}
 	
 	@Bean

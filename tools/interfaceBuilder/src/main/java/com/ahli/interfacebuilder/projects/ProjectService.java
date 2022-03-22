@@ -11,7 +11,6 @@ import org.hibernate.Hibernate;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.dao.DataAccessException;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -119,7 +118,7 @@ public class ProjectService {
 	 * @param project
 	 * @return
 	 */
-	@Transactional(readOnly = true)
+	//	@Transactional(readOnly = true)
 	public RuleSet fetchBestCompressionRuleSet(final Project project) {
 		if (project.getBestCompressionRuleSet() == null) {
 			//if (!Hibernate.isInitialized(project.getBestCompressionRuleSet())) {

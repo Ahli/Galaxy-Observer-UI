@@ -18,7 +18,7 @@ import com.ahli.interfacebuilder.integration.kryo.KryoGameInfo;
 import com.ahli.interfacebuilder.integration.kryo.KryoService;
 import com.ahli.interfacebuilder.integration.log4j.StylizedTextAreaAppender;
 import com.ahli.interfacebuilder.projects.enums.GameType;
-import com.ahli.interfacebuilder.ui.AppController;
+import com.ahli.interfacebuilder.ui.PrimaryStageHolder;
 import com.ahli.interfacebuilder.ui.progress.ProgressController;
 import com.ahli.interfacebuilder.ui.progress.appenders.Appender;
 import com.esotericsoftware.kryo.Kryo;
@@ -66,10 +66,10 @@ public class BaseUiService {
 	private final FileService fileService;
 	private final DiscCacheService discCacheService;
 	private final KryoService kryoService;
-	private final AppController appController;
 	private final ProgressController progressController;
 	
 	private final Map<String, Object> baseUiParsingLock;
+	private final PrimaryStageHolder primaryStage;
 	
 	public BaseUiService(
 			@NonNull final ConfigService configService,
@@ -77,15 +77,15 @@ public class BaseUiService {
 			@NonNull final FileService fileService,
 			@NonNull final DiscCacheService discCacheService,
 			@NonNull final KryoService kryoService,
-			@NonNull final AppController appController,
-			@NonNull final ProgressController progressController) {
+			@NonNull final ProgressController progressController,
+			@NonNull final PrimaryStageHolder primaryStage) {
 		this.configService = configService;
 		this.gameService = gameService;
 		this.fileService = fileService;
 		this.discCacheService = discCacheService;
 		this.kryoService = kryoService;
-		this.appController = appController;
 		this.progressController = progressController;
+		this.primaryStage = primaryStage;
 		baseUiParsingLock = new HashMap<>(2, 1.0f);
 	}
 	
@@ -305,8 +305,8 @@ public class BaseUiService {
 					uiCatalog.setParser(new UICatalogParser(uiCatalog,
 							new XmlParserVtd(),
 							DeduplicationIntensity.FULL));
-					appController.printInfoLogMessageToGeneral("Starting to parse base " + gameName + " UI.");
-					if (appController.getPrimaryStage() != null) {
+					primaryStage.printInfoLogMessageToGeneral("Starting to parse base " + gameName + " UI.");
+					if (primaryStage.hasPrimaryStage()) {
 						progressController.addThreadlogTab(Thread.currentThread().getName(),
 								game.getGameDef().nameHandle() + "UI",
 								false);
@@ -336,7 +336,7 @@ public class BaseUiService {
 					}
 					final String msg = "Finished parsing base UI for " + gameName + ".";
 					log.info(msg);
-					appController.printInfoLogMessageToGeneral(msg);
+					primaryStage.printInfoLogMessageToGeneral(msg);
 					try {
 						discCacheService.put(uiCatalog, gameName, isPtr, getVersion(game.getGameDef(), isPtr));
 					} catch (final IOException e) {
