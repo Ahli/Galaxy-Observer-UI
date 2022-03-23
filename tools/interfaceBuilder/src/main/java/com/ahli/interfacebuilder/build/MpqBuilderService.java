@@ -26,6 +26,10 @@ import com.ahli.interfacebuilder.ui.progress.ProgressController;
 import com.ahli.mpq.MpqEditorInterface;
 import com.ahli.mpq.MpqException;
 import com.ahli.mpq.mpqeditor.MpqEditorCompression;
+import com.ahli.mpq.mpqeditor.MpqEditorCompressionRule;
+import com.ahli.mpq.mpqeditor.MpqEditorCompressionRuleMask;
+import com.ahli.mpq.mpqeditor.MpqEditorCompressionRuleMethod;
+import com.ahli.mpq.mpqeditor.MpqEditorCompressionRuleSize;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.lang.NonNull;
 import org.xml.sax.SAXException;
@@ -37,6 +41,7 @@ import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Stream;
@@ -212,11 +217,14 @@ public class MpqBuilderService {
 			
 			// load best compression ruleset
 			if (compressXml && compressMpqSetting == 2) {
-				final RuleSet ruleSet = projectService.fetchBestCompressionRuleSet(project);
-				if (ruleSet != null) {
-					// TODO verify/expand ruleset
-					threadsMpqInterface.setCustomCompressionRules(ruleSet.getCompressionRules());
+				RuleSet ruleSet = projectService.fetchBestCompressionRuleSet(project);
+				if (ruleSet == null) {
+					ruleSet = new RuleSet(createInitialRuleset(interfaceDirectory));
+					project.setBestCompressionRuleSet(ruleSet);
+					projectService.saveProject(project);
 				}
+				// TODO else verify ruleset
+				threadsMpqInterface.setCustomCompressionRules(ruleSet.getCompressionRules());
 			}
 			threadsMpqInterface.clearCacheExtractedMpq();
 			buildFile(interfaceDirectory,
@@ -237,6 +245,25 @@ public class MpqBuilderService {
 		} catch (final Exception e) {
 			log.fatal("FATAL ERROR: ", e);
 		}
+	}
+	
+	/**
+	 * Creates an initial ruleset.
+	 *
+	 * @param cacheModDirectory
+	 * @return
+	 * @throws IOException
+	 */
+	private MpqEditorCompressionRule[] createInitialRuleset(final Path cacheModDirectory) throws IOException {
+		final List<MpqEditorCompressionRule> initRules = new ArrayList<>(20);
+		initRules.add(new MpqEditorCompressionRuleSize(0, 0).setSingleUnit(true));
+		try (final Stream<Path> ps = Files.walk(cacheModDirectory)) {
+			ps.filter(Files::isRegularFile).forEach(p -> {
+				final var compressionRule = getDefaultRule(p, cacheModDirectory);
+				initRules.add(compressionRule);
+			});
+		}
+		return initRules.toArray(new MpqEditorCompressionRule[0]);
 	}
 	
 	/**
@@ -392,6 +419,18 @@ public class MpqBuilderService {
 	}
 	
 	/**
+	 * @param path
+	 * @param sourceDir
+	 * @return
+	 */
+	private static MpqEditorCompressionRuleMask getDefaultRule(final Path path, final Path sourceDir) {
+		final var rule = new MpqEditorCompressionRuleMask(getFileMask(path, sourceDir));
+		rule.setSingleUnit(true).setCompress(true);
+		rule.setCompressionMethod(MpqEditorCompressionRuleMethod.BZIP2);
+		return rule;
+	}
+	
+	/**
 	 * @param compressMpqSetting
 	 * @return
 	 */
@@ -404,6 +443,17 @@ public class MpqBuilderService {
 			case 3 -> MpqEditorCompression.SYSTEM_DEFAULT;
 			default -> throw new IllegalArgumentException("Unsupported mpq compression mode.");
 		};
+	}
+	
+	/**
+	 * Returns the MpqCompressionRuleSet's mask String for the Path of an extracted interface's file.
+	 *
+	 * @param p
+	 * @return
+	 */
+	private static String getFileMask(final Path p, final Path sourceDir) {
+		final String name = p.normalize().toString();
+		return name.substring(sourceDir.toString().length() + 1);
 	}
 	
 	/**

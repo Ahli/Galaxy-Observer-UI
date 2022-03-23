@@ -85,7 +85,7 @@ public class RandomCompressionMiner {
 				// do not modify the original array
 				rules = oldBestRuleset.clone();
 			}
-			rules = removeUnusedMaskEnries(rules, cacheDir);
+			rules = removeUnusedMaskEntries(rules, cacheDir);
 			fillFileSizeMap(rules, cacheDir);
 			replaceForbiddenRulesets(rules);
 			
@@ -159,7 +159,7 @@ public class RandomCompressionMiner {
 	 * @param dirty
 	 * @return
 	 */
-	private static MpqEditorCompressionRule[] removeUnusedMaskEnries(
+	private static MpqEditorCompressionRule[] removeUnusedMaskEntries(
 			final MpqEditorCompressionRule[] dirty, final Path cacheDir) {
 		final List<MpqEditorCompressionRule> clean = new ArrayList<>();
 		String mask;
@@ -262,11 +262,10 @@ public class RandomCompressionMiner {
 	private MpqEditorCompressionRule[] createInitialRuleset(final Path cacheModDirectory) throws IOException {
 		final List<MpqEditorCompressionRule> initRules = new ArrayList<>(20);
 		initRules.add(new MpqEditorCompressionRuleSize(0, 0).setSingleUnit(true));
-		final Path sourceDir = mod.getMpqCacheDirectory();
 		fileSizeMap = new ObjectLongHashMap<>();
 		try (final Stream<Path> ps = Files.walk(cacheModDirectory)) {
 			ps.filter(Files::isRegularFile).forEach(p -> {
-				final var compressionRule = getDefaultRule(p, sourceDir);
+				final var compressionRule = getDefaultRule(p, cacheModDirectory);
 				initRules.add(compressionRule);
 				fileSizeMap.put(compressionRule.getMask(), getFileSize(compressionRule.getMask(), cacheModDirectory));
 			});
@@ -391,7 +390,7 @@ public class RandomCompressionMiner {
 		for (final MpqEditorCompressionRule rule : rules) {
 			if (rule instanceof MpqEditorCompressionRuleMask ruleMask) {
 				rule.setCompressionMethod(getRandomCompressionMethod(ruleMask.getMask()));
-				rule.setSingleUnit(ThreadLocalRandom.current().nextBoolean());
+				rule.setSingleUnit(getRandomSingleUnit());
 			}
 		}
 	}
@@ -415,6 +414,10 @@ public class RandomCompressionMiner {
 			} while (hasInvalidCompressionRuleset(method));
 		}
 		return method;
+	}
+	
+	private boolean getRandomSingleUnit() {
+		return ThreadLocalRandom.current().nextFloat() < 0.95f;
 	}
 	
 	public MpqEditorCompressionRule[] getBestCompressionRules() {
@@ -471,5 +474,9 @@ public class RandomCompressionMiner {
 	
 	public MpqEditorInterface getMpqInterface() {
 		return mpqInterface;
+	}
+	
+	public MpqEditorCompressionRule[] getCurrentRules() {
+		return rules;
 	}
 }

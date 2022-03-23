@@ -227,6 +227,7 @@ public class CompressionMiningController implements Updateable, FxmlController {
 					comprMiner.randomizeRules();
 					lastSize = comprMiner.build();
 					updateUiAttemptSize(lastSize, attempts);
+					updateUiRules(comprMiner.getCurrentRules());
 					if (lastSize < bestSize) {
 						if (validateTargetFile(mod, expCompMiner.getMpqInterface())) {
 							bestSize = lastSize;
@@ -288,7 +289,6 @@ public class CompressionMiningController implements Updateable, FxmlController {
 		Platform.runLater(() -> {
 			try {
 				ruleSetObservableItems.setAll(rules);
-				ruleSetTable.setItems(ruleSetObservableItems);
 			} catch (final Exception e) {
 				log.fatal(FATAL_ERROR, e);
 			}
