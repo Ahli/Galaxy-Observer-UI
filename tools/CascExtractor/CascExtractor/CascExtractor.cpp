@@ -31,13 +31,13 @@ int main(const int argc, const char* const argv[])
 		}
 
 		std::string str = argv[1];
-		std::replace(str.begin(), str.end(), '/', '\\');
+		std::ranges::replace(str, '/', '\\');
 		path = CA2CT(str.c_str());
 
 		mask = argv[2];
 
 		str = argv[3];
-		std::replace(str.begin(), str.end(), '/', '\\');
+		std::ranges::replace(str, '/', '\\');
 		targetPath = str.c_str();
 
 #else
@@ -60,7 +60,7 @@ int main(const int argc, const char* const argv[])
 
 		std::cout << "Finding files with mask: " << mask << std::endl;
 
-		const LPCTSTR listFile = NULL;
+		const LPCTSTR listFile = nullptr;
 		CASC_FIND_DATA findData = {};
 		const PCASC_FIND_DATA pFindData = &findData;
 		HANDLE hFind = CascFindFirstFile(hStorage, mask, pFindData, listFile);
@@ -178,8 +178,10 @@ template <typename XCHAR> const XCHAR* GetPlainFileName(const XCHAR* szFileName)
 	while (*szFileName != 0)
 	{
 		if (*szFileName == '\\' || *szFileName == '/')
+		{
 			szPlainName = szFileName + 1;
-		szFileName++;
+		}
+		++szFileName;
 	}
 
 	return szPlainName;
@@ -189,16 +191,12 @@ static PCASC_FILE_SPAN_INFO GetFileInfo(HANDLE hFile, CASC_FILE_FULL_INFO& FileI
 {
 	PCASC_FILE_SPAN_INFO pSpans = nullptr;
 	// Retrieve the full file info
-	if (CascGetFileInfo(hFile, CascFileFullInfo, &FileInfo, sizeof(CASC_FILE_FULL_INFO), nullptr))
+	if (CascGetFileInfo(hFile, CascFileFullInfo, &FileInfo, sizeof(CASC_FILE_FULL_INFO), nullptr)
+		&& (pSpans = CASC_ALLOC<CASC_FILE_SPAN_INFO>(FileInfo.SpanCount)) != nullptr
+		&& !CascGetFileInfo(hFile, CascFileSpanInfo, pSpans, FileInfo.SpanCount * sizeof(CASC_FILE_SPAN_INFO), nullptr))
 	{
-		if ((pSpans = CASC_ALLOC<CASC_FILE_SPAN_INFO>(FileInfo.SpanCount)) != nullptr)
-		{
-			if (!CascGetFileInfo(hFile, CascFileSpanInfo, pSpans, FileInfo.SpanCount * sizeof(CASC_FILE_SPAN_INFO), nullptr))
-			{
-				CASC_FREE(pSpans);
-				pSpans = nullptr;
-			}
-		}
+		CASC_FREE(pSpans);
+		pSpans = nullptr;
 	}
 	return pSpans;
 }
@@ -210,9 +208,8 @@ static bool ExtractFile(HANDLE hStorage, const CASC_FIND_DATA& findData, const c
 	CASC_FILE_FULL_INFO fileInfo{};
 	LPCSTR szOpenName = findData.szFileName;
 	DWORD dwErrCode = ERROR_SUCCESS;
-	HANDLE hFile = NULL;
 
-	if (CascOpenFile(hStorage, szOpenName, NULL /*dwLocaleFlags*/, CASC_STRICT_DATA_CHECK, &hFile))
+	if (HANDLE hFile = nullptr; CascOpenFile(hStorage, szOpenName, NULL /*dwLocaleFlags*/, CASC_STRICT_DATA_CHECK, &hFile))
 	{
 		// Retrieve the information about file spans.
 		if ((pSpans = GetFileInfo(hFile, fileInfo)) != nullptr && fileInfo.ContentSize > 0)
@@ -226,17 +223,19 @@ static bool ExtractFile(HANDLE hStorage, const CASC_FIND_DATA& findData, const c
 			// and the amount of memcpys will be almost zero
 			for (DWORD i = 0; i < fileInfo.SpanCount && dwErrCode == ERROR_SUCCESS; i++)
 			{
-				const PCASC_FILE_SPAN_INFO pFileSpan = pSpans + i;
+				const CASC_FILE_SPAN_INFO* const pFileSpan = pSpans + i;
 				LPBYTE pbFileSpan = nullptr;
-				const DWORD cbFileSpan = static_cast<DWORD>(pFileSpan->EndOffset - pFileSpan->StartOffset);
+				const auto cbFileSpan = static_cast<DWORD>(pFileSpan->EndOffset - pFileSpan->StartOffset);
 
 				// Do not read empty spans.
 				if (cbFileSpan == 0)
+				{
 					continue;
+				}
 
 				// Allocate span buffer
 				pbFileSpan = CASC_ALLOC<BYTE>(cbFileSpan);
-				if (pbFileSpan == NULL)
+				if (pbFileSpan == nullptr)
 				{
 					std::cerr << "   ERROR: Not enough memory to allocate " << cbFileSpan << " bytes" << std::endl;
 					dwErrCode = ERROR_NOT_ENOUGH_MEMORY;
@@ -252,14 +251,14 @@ static bool ExtractFile(HANDLE hStorage, const CASC_FIND_DATA& findData, const c
 					// we can't do much about it. Only report it if we are going to extract one file
 					switch (dwErrCode = GetCascError())
 					{
-					case ERROR_SUCCESS: {
-					} break;
-					case ERROR_FILE_ENCRYPTED: {
+					case ERROR_SUCCESS:
+						break;
+					case ERROR_FILE_ENCRYPTED:
 						std::cout << "   WARNING: File is encrypted: " << szOpenName << std::endl;
-					} break;
-					default: {
+						break;
+					default:
 						std::cout << "   WARNING: Could not read file: " << szOpenName << std::endl;
-					}break;
+						break;
 					}
 				}
 
@@ -332,9 +331,8 @@ static bool ExtractFile(HANDLE hStorage, const CASC_FIND_DATA& findData, const c
 static FILE* OpenExtractedFile(const char* filePath)
 {
 	FILE* pFile;
-	errno_t err;
 	//std::cout << "outFile: " << filePath << std::endl;
-	if ((err = fopen_s(&pFile, filePath, "wb")) != 0) {
+	if (errno_t err; (err = fopen_s(&pFile, filePath, "wb")) != 0) {
 		char buf[1024];
 		strerror_s(buf, sizeof buf, err);
 		std::cout << "ERROR: could not write file: " << filePath << ". Reason: " << buf << std::endl;
