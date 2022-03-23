@@ -6,52 +6,52 @@ module interfacex.builder {
 	
 	requires static lombok; // static ones can be absent at run time
 	
-	requires jakarta.persistence;
-	requires org.flywaydb.core;
+	requires transitive jakarta.persistence;
+	requires org.flywaydb.core; // automatic module
 	
 	// javafx
 	requires java.desktop;
 	requires java.xml;
 	requires javafx.base;
-	requires javafx.controls;
-	requires javafx.fxml;
-	requires javafx.graphics;
+	requires transitive javafx.controls;
+	requires transitive javafx.fxml;
+	requires transitive javafx.graphics;
 	requires de.jensd.fx.glyphs.fontawesome;
 	
 	// misc
-	requires org.apache.commons.configuration2;
+	requires org.apache.commons.configuration2; // automatic module
 	requires org.apache.logging.log4j;
-	requires org.apache.logging.log4j.core;
-	requires com.esotericsoftware.kryo;
+	requires org.apache.logging.log4j.core; // automatic module
+	requires transitive com.esotericsoftware.kryo; // automatic module
 	//requires com.esotericsoftware.minlog;
 	requires com.kichik.pecoff4j;
 	//requires org.eclipse.collections.api;
-	requires org.eclipse.collections.impl;
+	requires org.eclipse.collections.impl; // automatic module
 	
 	// spring
 	//requires jakarta.activation;
-	requires org.hibernate.orm.core;
-	requires spring.beans;
-	requires spring.boot.autoconfigure;
-	requires spring.boot;
-	requires spring.context;
-	requires spring.core;
-	requires spring.data.commons;
-	requires spring.data.jpa;
-	requires spring.tx;
-	requires spring.jdbc;
+	requires org.hibernate.orm.core; // automatic module
+	requires transitive spring.beans; // automatic module
+	requires transitive spring.boot.autoconfigure; // automatic module
+	requires spring.boot; // automatic module
+	requires transitive spring.context; // automatic module
+	requires transitive spring.core; // automatic module
+	requires spring.data.commons; // automatic module
+	requires transitive spring.data.jpa;
+	requires spring.tx; // automatic module
+	requires spring.jdbc; // automatic module
 	requires com.fasterxml.classmate;//redundant, but required!
 	requires net.bytebuddy; // redundant, but required!
 	requires java.sql; //redundant, but required!
 	requires jakarta.xml.bind; // provides jakarta/xml/jaxbexception //redundant, but required!
-	requires org.apache.commons.lang3;
-	requires org.slf4j;
+	requires org.apache.commons.lang3; // automatic module
+	requires org.slf4j; // automatic module
 	
 	// own projects
 	requires transitive GalaxyLib;
 	
 	// log4j export is a test to fix stylized text area appender
-	exports com.ahli.interfacebuilder to javafx.graphics, javafx.fxml, spring.context;
+	exports com.ahli.interfacebuilder; //to javafx.graphics, javafx.fxml, spring.context;
 	opens com.ahli.interfacebuilder to javafx.fxml, spring.core, spring.beans;
 	opens com.ahli.interfacebuilder.config to spring.core;
 	opens com.ahli.interfacebuilder.ui to spring.core;
@@ -83,6 +83,7 @@ module interfacex.builder {
 	exports com.ahli.interfacebuilder.ui.progress.appenders;
 	exports com.ahli.interfacebuilder.ui;
 	exports com.ahli.interfacebuilder.threads;
+	exports com.ahli.interfacebuilder.integration.ipc;
 	
 	// for public API only
 	exports com.ahli.interfacebuilder.ui.progress;

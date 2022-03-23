@@ -47,6 +47,10 @@ public final class SpringBootApplication {
 	public static final int INTER_PROCESS_COMMUNICATION_PORT = 12317;
 	private static final boolean USE_DOMAIN_SOCKET = true;
 	
+	public SpringBootApplication() {
+		// explicit constructor
+	}
+	
 	@SuppressWarnings("java:S2095") //
 	public static void main(final String[] args) {
 		try {

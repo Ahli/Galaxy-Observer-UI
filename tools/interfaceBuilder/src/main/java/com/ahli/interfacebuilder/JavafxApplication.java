@@ -27,6 +27,10 @@ public class JavafxApplication extends Application {
 	@Nullable
 	private ConfigurableApplicationContext context;
 	
+	public JavafxApplication() {
+		// explicit constructor
+	}
+	
 	@Override
 	public void init() {
 		serverThread = findServerThread(CommandLineParams.getServerThreadId(getParameters()));

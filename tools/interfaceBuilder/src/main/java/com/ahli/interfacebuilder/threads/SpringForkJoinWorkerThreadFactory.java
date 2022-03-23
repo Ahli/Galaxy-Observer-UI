@@ -12,6 +12,10 @@ import java.util.concurrent.ForkJoinWorkerThread;
  */
 public class SpringForkJoinWorkerThreadFactory implements ForkJoinPool.ForkJoinWorkerThreadFactory {
 	
+	public SpringForkJoinWorkerThreadFactory() {
+		// explicit constructor
+	}
+	
 	@Override
 	public final ForkJoinWorkerThread newThread(final ForkJoinPool pool) {
 		return new MyForkJoinWorkerThread(pool);

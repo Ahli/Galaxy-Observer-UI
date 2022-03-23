@@ -8,14 +8,12 @@ import com.ahli.interfacebuilder.projects.enums.GameType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.ToString;
 
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Data
-@ToString
 @Builder
 @AllArgsConstructor
 public class Project {

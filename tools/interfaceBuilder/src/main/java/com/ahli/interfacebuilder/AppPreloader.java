@@ -22,6 +22,10 @@ public class AppPreloader extends Preloader {
 	@Nullable
 	private Stage stage;
 	
+	public AppPreloader() {
+		// explicit constructor
+	}
+	
 	@Override
 	public void start(final Stage primaryStage) {
 		stage = primaryStage;

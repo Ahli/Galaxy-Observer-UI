@@ -16,6 +16,10 @@ import java.util.List;
 @Converter
 public class StringArrayToListConverter implements AttributeConverter<String[], List<String>> {
 	
+	public StringArrayToListConverter() {
+		// explicit constructor
+	}
+	
 	@Override
 	public List<String> convertToDatabaseColumn(final String[] attribute) {
 		if (attribute == null || attribute.length <= 0) {

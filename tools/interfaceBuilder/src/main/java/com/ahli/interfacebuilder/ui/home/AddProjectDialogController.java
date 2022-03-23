@@ -14,6 +14,10 @@ public class AddProjectDialogController {
 	@FXML
 	private Dialog<Project> dialog;
 	
+	public AddProjectDialogController() {
+		// explicit constructor
+	}
+	
 	public AddProjectController getContentController() {
 		return contentPaneController;
 	}

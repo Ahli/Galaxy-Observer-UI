@@ -44,6 +44,10 @@ public class FxmlConfiguration {
 	// Prototype Scope should be used for everything but controllers that should remain alive long
 	// If it is not a prototype, the bean will not be garbage collected when not used anymore.
 	
+	public FxmlConfiguration() {
+		// explicit constructor
+	}
+	
 	@Bean
 	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 	protected ViewRuleSetController viewRuleSetController(final ProjectService projectService) {

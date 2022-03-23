@@ -14,6 +14,10 @@ public class NewProjectDialogController {
 	@FXML
 	private Dialog<Project> dialog;
 	
+	public NewProjectDialogController() {
+		// explicit constructor
+	}
+	
 	/**
 	 * Automatically called by FxmlLoader
 	 */

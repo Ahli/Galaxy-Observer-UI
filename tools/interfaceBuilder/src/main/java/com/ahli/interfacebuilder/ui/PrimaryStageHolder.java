@@ -12,7 +12,12 @@ import static com.ahli.interfacebuilder.ui.AppController.FATAL_ERROR;
 @Getter
 @Setter
 public class PrimaryStageHolder {
+	
 	private Stage primaryStage;
+	
+	public PrimaryStageHolder() {
+		// explicit constructor
+	}
 	
 	public boolean hasPrimaryStage() {
 		return primaryStage != null;

@@ -19,6 +19,10 @@ public class TabPaneController implements Updateable, FxmlController {
 	@FXML
 	private TabPane tabPane;
 	
+	public TabPaneController() {
+		// explicit constructor
+	}
+	
 	public void setProgressController(final ProgressController progressController) {
 		this.progressController = progressController;
 	}
