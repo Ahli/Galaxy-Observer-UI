@@ -1,7 +1,7 @@
 /*
-Build does not work due to a bean's generated proxy class (via cglib) not being able to access some unnamed module
-within spring.
-*/
+ * requires:
+ * --add-opens=javafx.controls/javafx.scene.control=interfacex.builder
+ */
 module interfacex.builder {
 	
 	requires static lombok; // static ones can be absent at run time
