@@ -24,7 +24,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
@@ -52,7 +52,7 @@ public class BaseUiExtractionController implements Updateable, FxmlController {
 	@FXML
 	private ScrollPane scrollPane3;
 	@FXML
-	private VBox loggingArea;
+	private Pane loggingArea;
 	@FXML
 	private Label titleLabel;
 	@FXML
@@ -86,7 +86,7 @@ public class BaseUiExtractionController implements Updateable, FxmlController {
 		threadNames[2] = threadName + ++threadCount;
 	}
 	
-	public VBox getLoggingArea() {
+	public Pane getLoggingArea() {
 		return loggingArea;
 	}
 	
