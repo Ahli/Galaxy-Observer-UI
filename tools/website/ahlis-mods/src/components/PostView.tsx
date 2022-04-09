@@ -1,9 +1,9 @@
-import Button from '@mui/material/Button/Button';
-import Card from '@mui/material/Card/Card';
-import CardActions from '@mui/material/CardActions/CardActions';
-import CardContent from '@mui/material/CardContent/CardContent';
-import CardMedia from '@mui/material/CardMedia/CardMedia';
-import Typography from '@mui/material/Typography/Typography';
+import Button from '@mui/material/Button';
+import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
+import CardMedia from '@mui/material/CardMedia';
+import Typography from '@mui/material/Typography';
 import { useState } from 'react';
 import { Post, Changelog, Change } from '../types/Post';
 
