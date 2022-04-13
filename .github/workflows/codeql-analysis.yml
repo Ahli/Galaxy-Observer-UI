@@ -42,14 +42,14 @@ jobs:
       uses: actions/checkout@v3
 
 #     - if: matrix.language == 'java' 
-#       name: Install Toolchain JDK
+#       name: Java - Install Toolchain JDK
 #       uses: battila7/jdk-via-jabba@v1
 #       with:
 #         jdk: zulu@1.18.0-0
 #         javaHomeEnvironmentVariable: TOOLCHAIN_JDK
 
     - if: matrix.language == 'java' 
-      name: Set up JDK
+      name: Java - Set up JDK
       uses: actions/setup-java@v3
       with:
         java-version: '18'
@@ -57,7 +57,7 @@ jobs:
         cache: 'maven'
 
     - if: matrix.language == 'java' 
-      name: Set up Toolchain
+      name: Java - Set up Toolchain
       shell: cmd
       run: |
           if not exist "%USERPROFILE%\.m2\" mkdir "%USERPROFILE%\.m2\"
@@ -78,7 +78,7 @@ jobs:
           echo userprofile: %USERPROFILE%
 
 #    - if: matrix.language == 'java' 
-#      name: Set up JDK
+#      name: Java - Set up JDK
 #      uses: actions/setup-java@v3
 #      with:
 #        java-version: '18'
@@ -109,48 +109,56 @@ jobs:
     #    uses a compiled language
 
     - if: matrix.language == 'java' 
-      name: Build GalaxyLib
+      name: Java - Build GalaxyLib
       shell: cmd
       run: |
         cd tools\galaxyLibrary\project\GalaxyLib
         mvn clean install --batch-mode --update-snapshots --show-version
 
     - if: matrix.language == 'java' 
-      name: Build InterfaceBuilder
+      name: Java - Build InterfaceBuilder
       shell: cmd
       run: |
         cd tools\interfaceBuilder
         mvn clean verify --batch-mode --update-snapshots
 
     - if: matrix.language == 'java' 
-      name: Build SettingsEditor
+      name: Java - Build SettingsEditor
       shell: cmd
       run: |
         cd tools\observerUiSettingsEditor\project
         mvn clean verify --batch-mode --update-snapshots
 
     - if: matrix.language == 'cpp'
-      name: Add msbuild to PATH
+      name: C++ - Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.1
 
     - if: matrix.language == 'cpp'
-      name: Run MSBuild
+      name: C++ - Run MSBuild
       run: msbuild.exe tools\CascExtractor\CascExtractor
       
     - if: matrix.language == 'javascript'
-      name: Load dependencies of website
-      run: npm ci --prefix tools\website\ahlis-mods
+      name: JS - Cache node_modules
+      id: node_modules-cache
+      uses: actions/cache@v2
+      with:
+        path: tools/website/ahlis-mods/node_modules
+        key: modules-${{ hashFiles('tools/website/ahlis-mods/package-lock.json') }}
+      
+    - if: matrix.language == 'javascript' && steps.node_modules-cache.outputs.cache-hit != 'true'
+      name: JS - Load dependencies of website
+      run: npm ci --ignore-scripts --prefix tools\website\ahlis-mods
       
     - if: matrix.language == 'javascript'
-      name: Test website
+      name: JS - Test website
       run: npm test --prefix tools\website\ahlis-mods -- --watchAll=false
 
     - if: matrix.language == 'javascript'
-      name: Lint website
+      name: JS - Lint website
       run: npm run lint --prefix tools\website\ahlis-mods
 
     - if: matrix.language == 'javascript'
-      name: Build prod website
+      name: JS - Build prod website
       run: npm run build --prefix tools\website\ahlis-mods
       
     - name: Perform CodeQL Analysis
