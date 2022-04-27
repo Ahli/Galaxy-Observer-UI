@@ -2,25 +2,26 @@
 import './App.css';
 import { Home } from './pages/Home';
 import '@fontsource/roboto';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { Navbar } from './components/NavBar';
+import { PostList } from './components/PostList';
+import { NotFound } from './components/NotFound';
 
 function App() {
   return (
     <div className='App'>
-      {/* <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header> */}
-      <Home />
+      <Router>
+        <div className='App'>
+          <Navbar />
+          <div className='content'>
+            <Routes>
+              <Route path='/' element={<Home />} />
+              <Route path='/ahliobs/changelog/:id' element={<PostList title={''} posts={[]} />} />
+              <Route path='*' element={<NotFound />} />
+            </Routes>
+          </div>
+        </div>
+      </Router>
     </div>
   );
 }
