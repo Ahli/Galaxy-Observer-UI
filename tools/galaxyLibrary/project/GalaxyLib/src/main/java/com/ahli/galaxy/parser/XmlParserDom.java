@@ -86,18 +86,11 @@ public class XmlParserDom extends XmlParserAbstract {
 		}
 		try {
 			final NodeList elements = dBuilder.parse(p.toFile()).getElementsByTagName(ANY_TAG);
-			Node node;
-			NamedNodeMap attributes;
-			Node attr;
-			int i;
-			int j;
-			final int len;
-			int len2;
-			for (j = 0, len = elements.getLength(); j < len; ++j) {
-				node = elements.item(j);
-				attributes = node.getAttributes();
-				for (i = 0, len2 = attributes.getLength(); i < len2; ++i) {
-					attr = attributes.item(i);
+			for (int j = 0, len = elements.getLength(); j < len; ++j) {
+				final Node node = elements.item(j);
+				final NamedNodeMap attributes = node.getAttributes();
+				for (int i = 0, len2 = attributes.getLength(); i < len2; ++i) {
+					final Node attr = attributes.item(i);
 					attrTypes.add(attr.getNodeName().toLowerCase(Locale.ROOT));
 					attrValues.add(attr.getNodeValue());
 				}
