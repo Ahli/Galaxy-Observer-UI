@@ -39,7 +39,7 @@ final class RecursiveDOMTest {
 		System.out.println("memory: " + ((float) startMem) / (1 << 20) + " MB.");
 		final long startTime = System.currentTimeMillis();
 		final File f = new File(
-				"C:\\projects\\GalaxyObsUi\\baseUI\\heroes\\mods\\core.stormmod\\base.stormdata\\UI\\Layout\\UI\\GameUI.StormLayout");
+				"D:\\GalaxyObsUi\\baseUI\\heroes\\mods\\core.stormmod\\base.stormdata\\ui\\layout\\ui\\gameui.stormlayout");
 		final DocumentBuilder dBuilder;
 		
 		try {
@@ -102,7 +102,7 @@ final class RecursiveDOMTest {
 		int j;
 		final int len;
 		int len2;
-		for (j = 0, len = elements.getLength(); j < len; j++) {
+		for (j = 0, len = elements.getLength(); j < len; ++j) {
 			node = elements.item(j);
 			// final int n = nav.getCurrentIndex();
 			n = getLevel(node.getParentNode());
@@ -114,17 +114,15 @@ final class RecursiveDOMTest {
 			// System.out.println(j + " - " + elName + " @ " + executionTime);
 			
 			attributes = node.getAttributes();
-			if (attributes != null) {
-				for (i = 0, len2 = attributes.getLength(); i < len2; ++i) {
-					attr = attributes.item(i);
-					// i will be attr name, i+1 will be attribute value
-					attrName = attr.getNodeName().toLowerCase(Locale.ROOT);
-					attrVal = attr.getNodeValue();
-					list.add(attrName);
-					list.add(attrVal);
-					// executionTime = (System.currentTimeMillis() - startTime);
-					// System.out.println(attrName + "=" + attrVal + " @ " + executionTime);
-				}
+			for (i = 0, len2 = attributes.getLength(); i < len2; ++i) {
+				attr = attributes.item(i);
+				// i will be attr name, i+1 will be attribute value
+				attrName = attr.getNodeName().toLowerCase(Locale.ROOT);
+				attrVal = attr.getNodeValue();
+				list.add(attrName);
+				list.add(attrVal);
+				// executionTime = (System.currentTimeMillis() - startTime);
+				// System.out.println(attrName + "=" + attrVal + " @ " + executionTime);
 			}
 		}
 	}

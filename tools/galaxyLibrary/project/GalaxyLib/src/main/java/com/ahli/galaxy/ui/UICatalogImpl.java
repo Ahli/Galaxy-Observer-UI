@@ -6,7 +6,7 @@ package com.ahli.galaxy.ui;
 import com.ahli.galaxy.game.GameDef;
 import com.ahli.galaxy.parser.DeduplicationIntensity;
 import com.ahli.galaxy.parser.UICatalogParser;
-import com.ahli.galaxy.parser.XmlParserVtd;
+import com.ahli.galaxy.parser.XmlParserAalto;
 import com.ahli.galaxy.parser.interfaces.ParsedXmlConsumer;
 import com.ahli.galaxy.parser.interfaces.XmlParser;
 import com.ahli.galaxy.ui.exceptions.UIException;
@@ -253,7 +253,7 @@ public class UICatalogImpl implements UICatalog {
 			}
 		}
 		final Path filePath = Path.of(basePathTemp, path);
-		final XmlParser xmlParser = new XmlParserVtd();
+		final XmlParser xmlParser = new XmlParserAalto();
 		final UICatalogParser parserTemp = new UICatalogParser(this, xmlParser, deduplicationAllowed);
 		try {
 			parserTemp.parseFile(filePath, raceId, isDevLayout, consoleSkinId);

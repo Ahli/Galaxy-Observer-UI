@@ -8,7 +8,7 @@ import com.ahli.galaxy.archive.DescIndex;
 import com.ahli.galaxy.game.GameDef;
 import com.ahli.galaxy.parser.DeduplicationIntensity;
 import com.ahli.galaxy.parser.UICatalogParser;
-import com.ahli.galaxy.parser.XmlParserVtd;
+import com.ahli.galaxy.parser.XmlParserAalto;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
 import com.ahli.interfacebuilder.compress.GameService;
 import com.ahli.interfacebuilder.projects.enums.GameType;
@@ -91,8 +91,8 @@ public class CompileService {
 					return null;
 				}
 				
-				catalogClone.setParser(new UICatalogParser(catalogClone,
-						new XmlParserVtd(),
+				catalogClone.setParser(new UICatalogParser(catalogClone, new XmlParserAalto(),
+						//						new XmlParserVtd(),
 						DeduplicationIntensity.SIMPLE));
 				
 				// apply mod's UI

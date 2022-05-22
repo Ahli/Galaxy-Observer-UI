@@ -7,7 +7,7 @@ import com.ahli.galaxy.game.Game;
 import com.ahli.galaxy.game.GameDef;
 import com.ahli.galaxy.parser.DeduplicationIntensity;
 import com.ahli.galaxy.parser.UICatalogParser;
-import com.ahli.galaxy.parser.XmlParserVtd;
+import com.ahli.galaxy.parser.XmlParserAalto;
 import com.ahli.galaxy.ui.UICatalogImpl;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
 import com.ahli.interfacebuilder.compress.GameService;
@@ -303,7 +303,7 @@ public class BaseUiService {
 					// parse baseUI
 					uiCatalog = new UICatalogImpl(game.getGameDef());
 					uiCatalog.setParser(new UICatalogParser(uiCatalog,
-							new XmlParserVtd(),
+							new XmlParserAalto(),
 							DeduplicationIntensity.FULL));
 					primaryStage.printInfoLogMessageToGeneral("Starting to parse base " + gameName + " UI.");
 					if (primaryStage.hasPrimaryStage()) {

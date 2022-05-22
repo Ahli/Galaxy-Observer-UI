@@ -393,10 +393,6 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			@NotNull final List<String> attrTypes,
 			@NotNull final List<String> attrValues) throws UIException {
 		logger.trace("level={}, tag={}", level, tagName);
-		if (tagName == null) {
-			logger.error("ERROR: tag in XML is null.");
-			return;
-		}
 		
 		// move curElement to parent position of new frame
 		if (level <= 2) {
