@@ -18,11 +18,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-final class RecursiveDOMTest {
+final class ReadDOMTest {
 	private static final List<Object> list = new ArrayList<>();
 	private static final String TAG = "*";
 	
-	private RecursiveDOMTest() {
+	private ReadDOMTest() {
 	}
 	
 	public static void main(final String[] args) {
@@ -47,7 +47,7 @@ final class RecursiveDOMTest {
 			// for (int i = 0; i < 1000; ++i) {
 			while (System.currentTimeMillis() - startTime < 60_000) {
 				list.clear();
-				loadRecursiveXML(dBuilder, f);
+				loadXml(dBuilder, f);
 				iterations++;
 				// if (i % 100 == 0) {
 				// endMem = rt.totalMemory() - rt.freeMemory();
@@ -80,7 +80,7 @@ final class RecursiveDOMTest {
 		}
 	}
 	
-	public static void loadRecursiveXML(final DocumentBuilder dBuilder, final File f) throws SAXException, IOException {
+	public static void loadXml(final DocumentBuilder dBuilder, final File f) throws SAXException, IOException {
 		
 		// long startTime = System.currentTimeMillis();
 		

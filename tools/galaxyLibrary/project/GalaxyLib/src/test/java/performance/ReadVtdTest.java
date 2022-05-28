@@ -15,11 +15,11 @@
 //import java.util.ArrayList;
 //import java.util.List;
 //
-//final class RecursiveVtdTest {
+//final class ReadVtdTest {
 //	private static final List<Object> list = new ArrayList<>();
 //	private static final String TAG = "*";
 //
-//	private RecursiveVtdTest() {
+//	private ReadVtdTest() {
 //	}
 //
 //	public static void main(final String[] args) {
@@ -44,7 +44,7 @@
 //			// for (int i = 0; i < 1000; ++i) {
 //			while (System.currentTimeMillis() - startTime < 60_000) {
 //				list.clear();
-//				loadRecursiveXML(vtd, p);
+//				loadXml(vtd, p);
 //				iterations++;
 //				// if (i % 100 == 0) {
 //				// endMem = rt.totalMemory() - rt.freeMemory();
@@ -77,7 +77,7 @@
 //		}
 //	}
 //
-//	public static void loadRecursiveXML(final VTDGen vtd, final Path p)
+//	public static void loadXml(final VTDGen vtd, final Path p)
 //			throws NavException, IOException, ParseException {
 //		// long startTime = System.currentTimeMillis();
 //		// if (!vtd.parseFile(f.getPath(), false)) {

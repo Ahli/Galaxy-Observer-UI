@@ -25,7 +25,6 @@ import org.springframework.lang.Nullable;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.channels.Channels;
@@ -151,7 +150,7 @@ public final class SpringBootApplication {
 	private static boolean oldH2DbFilePresent() {
 		final Path dbPath = getDbDir().resolve("DB.mv.db");
 		if (Files.exists(dbPath)) {
-			try (final BufferedReader brTest = new BufferedReader(new FileReader(dbPath.toFile()))) {
+			try (final BufferedReader brTest = Files.newBufferedReader(dbPath)) {
 				final String firstLine = brTest.readLine();
 				if (firstLine.contains(",format:1,")) {
 					return true;

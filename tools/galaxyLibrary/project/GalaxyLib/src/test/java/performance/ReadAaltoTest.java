@@ -17,10 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-final class RecursiveAaltoTest {
+final class ReadAaltoTest {
 	private static final List<Object> list = new ArrayList<>();
 	
-	private RecursiveAaltoTest() {
+	private ReadAaltoTest() {
 	}
 	
 	public static void main(final String[] args) {
@@ -46,7 +46,7 @@ final class RecursiveAaltoTest {
 			// for (int i = 0; i < 1000; ++i) {
 			while (System.currentTimeMillis() - startTime < 60_000) {
 				list.clear();
-				loadRecursiveXML(asyncInputFactory, p);
+				loadXml(asyncInputFactory, p);
 				iterations++;
 				// if (i % 100 == 0) {
 				// endMem = rt.totalMemory() - rt.freeMemory();
@@ -79,7 +79,7 @@ final class RecursiveAaltoTest {
 		}
 	}
 	
-	public static void loadRecursiveXML(final AsyncXMLInputFactory asyncInputFactory, final Path p)
+	public static void loadXml(final AsyncXMLInputFactory asyncInputFactory, final Path p)
 			throws IOException, XMLStreamException {
 		
 		// long startTime = System.currentTimeMillis();
