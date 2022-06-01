@@ -14,6 +14,7 @@ import javafx.scene.control.TextField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 public class DynamicValueDefEditingTableCell extends TableCell<ValueDef, String> {
@@ -105,7 +106,7 @@ public class DynamicValueDefEditingTableCell extends TableCell<ValueDef, String>
 		final ComboBox<String> comboBox = new ComboBox<>(items);
 		
 		comboBox.valueProperty().addListener((obs, oldItem, newItem) -> {
-			final String newVal = newItem != null ? newItem : "";
+			final String newVal = Objects.requireNonNull(newItem, "");
 			data.valueProperty().set(newVal);
 		});
 		
