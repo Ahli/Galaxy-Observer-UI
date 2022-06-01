@@ -102,19 +102,20 @@ public class DynamicValueDefEditingTableCell extends TableCell<ValueDef, String>
 	}
 	
 	private void createChoiceEditor(final ValueDef data) {
-		final ObservableList<String> items = FXCollections.observableArrayList(data.getAllowedValues());
+		final ObservableList<String> items = FXCollections.observableArrayList(data.getAllowedValuesDisplayNames());
 		final ComboBox<String> comboBox = new ComboBox<>(items);
 		
+		// TODO combobox needs to set the value of the selected item
 		comboBox.valueProperty().addListener((obs, oldItem, newItem) -> {
 			final String newVal = Objects.requireNonNull(newItem, "");
 			data.valueProperty().set(newVal);
 		});
 		
-		final String valuePropStr = data.getValue();
-		if (!valuePropStr.isEmpty()) {
-			comboBox.getSelectionModel().select(valuePropStr);
+		final int selectedIndex = data.getSelectedIndex();
+		if (selectedIndex != -1) {
+			comboBox.getSelectionModel().select(selectedIndex);
 		} else {
-			comboBox.getSelectionModel().select(data.getDefaultValue());
+			comboBox.getSelectionModel().select(data.getIndexOfDefaultValue());
 		}
 		
 		setGraphic(comboBox);

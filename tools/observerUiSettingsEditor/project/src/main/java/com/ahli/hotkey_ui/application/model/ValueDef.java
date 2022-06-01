@@ -6,6 +6,7 @@ package com.ahli.hotkey_ui.application.model;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -22,6 +23,7 @@ public class ValueDef {
 	private final SimpleStringProperty oldValue;
 	private final SimpleBooleanProperty hasChanged;
 	private final String[] allowedValues;
+	private final String[] allowedValuesDisplayNames;
 	private final ValueType type;
 	private final String gamestringsAdd;
 	
@@ -38,6 +40,7 @@ public class ValueDef {
 		this.description = new SimpleStringProperty(description);
 		this.defaultValue = new SimpleStringProperty(defaultValue);
 		allowedValues = null;
+		allowedValuesDisplayNames = null;
 		gamestringsAdd = "";
 		type = ValueType.TEXT;
 		oldValue = new SimpleStringProperty("");
@@ -63,12 +66,35 @@ public class ValueDef {
 			final String defaultValue,
 			final String type,
 			final String[] allowedValues,
+			final String[] allowedValuesDisplayNames,
 			final String gamestringsAdd) {
 		this.id = new SimpleStringProperty(id);
 		value = new SimpleStringProperty("");
 		this.description = new SimpleStringProperty(description);
 		this.defaultValue = new SimpleStringProperty(defaultValue);
 		this.allowedValues = allowedValues;
+		if (allowedValues != null) {
+			if (allowedValuesDisplayNames != null) {
+				if (allowedValuesDisplayNames.length == allowedValues.length) {
+					this.allowedValuesDisplayNames = allowedValuesDisplayNames;
+				} else {
+					this.allowedValuesDisplayNames = Arrays.copyOf(allowedValuesDisplayNames, allowedValues.length);
+					// if there are not enough displayNames for each allowedValue => copy them from allowedValues
+					if (allowedValues.length >= allowedValuesDisplayNames.length) {
+						System.arraycopy(
+								allowedValues,
+								allowedValuesDisplayNames.length,
+								this.allowedValuesDisplayNames,
+								allowedValuesDisplayNames.length,
+								allowedValues.length - allowedValuesDisplayNames.length);
+					}
+				}
+			} else {
+				this.allowedValuesDisplayNames = allowedValues;
+			}
+		} else {
+			this.allowedValuesDisplayNames = null;
+		}
 		this.gamestringsAdd = gamestringsAdd;
 		this.type = determineType(type);
 		oldValue = new SimpleStringProperty("");
@@ -217,6 +243,10 @@ public class ValueDef {
 		return allowedValues;
 	}
 	
+	public String[] getAllowedValuesDisplayNames() {
+		return allowedValuesDisplayNames;
+	}
+	
 	/**
 	 * Returns whether the value has changed.
 	 *
@@ -240,5 +270,28 @@ public class ValueDef {
 	 */
 	public void setDefaultValue(final String defaultValue) {
 		this.defaultValue.set(defaultValue);
+	}
+	
+	/**
+	 * @return
+	 */
+	public int getSelectedIndex() {
+		final String v = value.get();
+		for (int i = 0; i < allowedValues.length; ++i) {
+			if (v.equals(allowedValues[i])) {
+				return i;
+			}
+		}
+		return -1;
+	}
+	
+	public int getIndexOfDefaultValue() {
+		final String v = defaultValue.get();
+		for (int i = 0; i < allowedValues.length; ++i) {
+			if (v.equals(allowedValues[i])) {
+				return i;
+			}
+		}
+		return -1;
 	}
 }

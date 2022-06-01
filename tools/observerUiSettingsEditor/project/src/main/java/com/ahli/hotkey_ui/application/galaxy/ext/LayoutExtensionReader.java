@@ -34,6 +34,7 @@ public class LayoutExtensionReader {
 	private static final String ATTRIBUTE_DEFAULT = "default";
 	private static final String ATTRIBUTE_DESCRIPTION = "description";
 	private static final String ATTRIBUTE_VALUES = "values";
+	private static final String ATTRIBUTE_VALUES_DISPLAY_NAMES = "valuesdisplaynames";
 	private static final String ATTRIBUTE_TYPE = "type";
 	private static final String ATTRIBUTE_GAMESTRINGS_ADD = "gamestrings_add";
 	private static final String HOTKEY = "@hotkey";
@@ -202,6 +203,7 @@ public class LayoutExtensionReader {
 					String type = "";
 					String gamestringsAdd = "";
 					String[] allowedValues = null;
+					String[] allowedValuesDisplayNames = null;
 					
 					// move behind keyword
 					final int pos = isHotkey ? HOTKEY.length() : SETTING.length();
@@ -231,6 +233,12 @@ public class LayoutExtensionReader {
 								allowedValues[i] = getValueWithinQuotes(allowedValues[i]);
 							}
 							logger.trace("values = {}", part);
+						} else if (partLower.startsWith(ATTRIBUTE_VALUES_DISPLAY_NAMES)) {
+							allowedValues = part.split("/");
+							for (int i = 0; i < allowedValues.length; ++i) {
+								allowedValues[i] = getValueWithinQuotes(allowedValues[i]);
+							}
+							logger.trace("valuesDisplayNames = {}", part);
 						} else if (partLower.startsWith(ATTRIBUTE_TYPE)) {
 							type = getValueWithinQuotes(part).trim();
 							logger.trace("type = {}", part);
@@ -248,6 +256,7 @@ public class LayoutExtensionReader {
 								defaultValue,
 								type,
 								allowedValues,
+								allowedValuesDisplayNames,
 								gamestringsAdd));
 					}
 				}
