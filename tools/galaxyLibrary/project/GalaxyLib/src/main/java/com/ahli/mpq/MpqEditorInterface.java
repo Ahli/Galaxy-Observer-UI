@@ -161,6 +161,9 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	 * @throws IOException
 	 */
 	public static int getFileCountInFolder(final Path path) throws IOException {
+		if (!Files.exists(path)) {
+			return 0;
+		}
 		final FileCountingVisitor fileVisitor = new FileCountingVisitor();
 		Files.walkFileTree(path, fileVisitor);
 		return fileVisitor.getCount();
