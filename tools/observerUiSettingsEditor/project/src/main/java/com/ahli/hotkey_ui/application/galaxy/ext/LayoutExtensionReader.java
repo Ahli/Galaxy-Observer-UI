@@ -4,7 +4,7 @@
 package com.ahli.hotkey_ui.application.galaxy.ext;
 
 import com.ahli.galaxy.game.GameDef;
-import com.ahli.hotkey_ui.application.model.ValueDef;
+import com.ahli.hotkey_ui.application.model.abstracts.ValueDef;
 import com.ahli.util.XmlDomHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,10 +41,10 @@ public class LayoutExtensionReader {
 	private static final String SETTING = "@setting";
 	private static final Logger logger = LoggerFactory.getLogger(LayoutExtensionReader.class);
 	private static final Pattern HOTKEY_SETTING_REGEX_PATTERN = Pattern.compile("(?<=@hotkey|@setting)/i");
-	private static final Pattern ATTRIBUTES_REGEX_PATTERN =
-			Pattern.compile("(?i)(?=(?:constant|default|description|values|type|gamestrings_add)[\\s]*=)");
-	private List<ValueDef> hotkeys = new ArrayList<>();
-	private List<ValueDef> settings = new ArrayList<>();
+	private static final Pattern ATTRIBUTES_REGEX_PATTERN = Pattern.compile(
+			"(?i)(?=(?:constant|default|description|values|valuesdisplaynames|type|gamestrings_add)[\\s]*=)");
+	private final List<ValueDef> hotkeys = new ArrayList<>();
+	private final List<ValueDef> settings = new ArrayList<>();
 	
 	
 	private static String getValueAfterEqualsChar(final String part) {
@@ -60,7 +60,6 @@ public class LayoutExtensionReader {
 		return part.substring(quoteStart + 1, quoteEnd);
 	}
 	
-	
 	/**
 	 * @return the hotkeys
 	 */
@@ -69,26 +68,10 @@ public class LayoutExtensionReader {
 	}
 	
 	/**
-	 * @param hotkeys
-	 * 		the hotkeys to set
-	 */
-	public void setHotkeys(final List<ValueDef> hotkeys) {
-		this.hotkeys = hotkeys;
-	}
-	
-	/**
 	 * @return the settings
 	 */
 	public List<ValueDef> getSettings() {
 		return settings;
-	}
-	
-	/**
-	 * @param settings
-	 * 		the settings to set
-	 */
-	public void setSettings(final List<ValueDef> settings) {
-		this.settings = settings;
 	}
 	
 	/**
@@ -228,16 +211,10 @@ public class LayoutExtensionReader {
 							description = getValueWithinQuotes(part);
 							logger.trace("description = {}", description);
 						} else if (partLower.startsWith(ATTRIBUTE_VALUES)) {
-							allowedValues = part.split("/");
-							for (int i = 0; i < allowedValues.length; ++i) {
-								allowedValues[i] = getValueWithinQuotes(allowedValues[i]);
-							}
+							allowedValues = parseListOfValues(part);
 							logger.trace("values = {}", part);
 						} else if (partLower.startsWith(ATTRIBUTE_VALUES_DISPLAY_NAMES)) {
-							allowedValues = part.split("/");
-							for (int i = 0; i < allowedValues.length; ++i) {
-								allowedValues[i] = getValueWithinQuotes(allowedValues[i]);
-							}
+							allowedValuesDisplayNames = parseListOfValues(part);
 							logger.trace("valuesDisplayNames = {}", part);
 						} else if (partLower.startsWith(ATTRIBUTE_TYPE)) {
 							type = getValueWithinQuotes(part).trim();
@@ -251,7 +228,8 @@ public class LayoutExtensionReader {
 					if (isHotkey) {
 						addHotkeyValueDef(constant, description, defaultValue);
 					} else {
-						settings.add(new ValueDef(constant,
+						settings.add(new ValueDef(
+								constant,
 								description,
 								defaultValue,
 								type,
@@ -266,6 +244,14 @@ public class LayoutExtensionReader {
 		} catch (final Exception e) {
 			logger.trace("Parsing Comment failed.", e);
 		}
+	}
+	
+	private String[] parseListOfValues(final String part) {
+		final String[] values = part.split("/");
+		for (int i = 0; i < values.length; ++i) {
+			values[i] = getValueWithinQuotes(values[i]);
+		}
+		return values;
 	}
 	
 	private void addHotkeyValueDef(final String constant, final String description, final String defaultValue) {
@@ -299,6 +285,7 @@ public class LayoutExtensionReader {
 				
 				Files.walkFileTree(projectInCache, visitor);
 			} catch (final IOException e) {
+				// TODO do not eat this exception -> stop and show error
 				logger.error("Transforming to generate XML file failed.", e);
 			}
 			return true;

@@ -4,7 +4,7 @@
 package com.ahli.hotkey_ui.application.ui;
 
 import com.ahli.hotkey_ui.application.model.Constants;
-import com.ahli.hotkey_ui.application.model.ValueDef;
+import com.ahli.hotkey_ui.application.model.abstracts.ValueDef;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

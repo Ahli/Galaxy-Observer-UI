@@ -1,7 +1,7 @@
 package com.ahli.hotkey_ui.application.galaxy.ext;
 
 import com.ahli.hotkey_ui.application.model.Constants;
-import com.ahli.hotkey_ui.application.model.ValueDef;
+import com.ahli.hotkey_ui.application.model.abstracts.ValueDef;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

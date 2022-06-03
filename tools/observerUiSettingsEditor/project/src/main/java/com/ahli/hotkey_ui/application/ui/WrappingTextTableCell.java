@@ -3,7 +3,7 @@
 
 package com.ahli.hotkey_ui.application.ui;
 
-import com.ahli.hotkey_ui.application.model.ValueDef;
+import com.ahli.hotkey_ui.application.model.abstracts.ValueDef;
 import javafx.application.Platform;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
