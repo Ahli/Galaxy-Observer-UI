@@ -1,6 +1,8 @@
 package com.ahli.hotkey_ui.application.galaxy.ext;
 
-import com.ahli.hotkey_ui.application.model.ValueDef;
+import com.ahli.hotkey_ui.application.model.OptionValueDef;
+import com.ahli.hotkey_ui.application.model.TextValueDef;
+import com.ahli.hotkey_ui.application.model.abstracts.ValueDef;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -35,14 +37,14 @@ final class LayoutFileUpdater extends SimpleFileVisitor<Path> {
 	private final DocumentBuilder dBuilder;
 	private final Transformer transformer;
 	private final String[] fileExtensions;
-	private final List<ValueDef> hotkeys;
+	private final List<TextValueDef> hotkeys;
 	private final List<ValueDef> settings;
 	
 	LayoutFileUpdater(
 			final DocumentBuilder dBuilder,
 			final Transformer transformer,
 			final String[] fileExtensions,
-			final List<ValueDef> hotkeys,
+			final List<TextValueDef> hotkeys,
 			final List<ValueDef> settings) {
 		this.dBuilder = dBuilder;
 		this.transformer = transformer;
@@ -52,7 +54,7 @@ final class LayoutFileUpdater extends SimpleFileVisitor<Path> {
 	}
 	
 	private static void modifyConstants(
-			final NodeList childNodes, final List<ValueDef> hotkeys, final List<ValueDef> settings) {
+			final NodeList childNodes, final List<TextValueDef> hotkeys, final List<ValueDef> settings) {
 		for (int i = 0, len = childNodes.getLength(); i < len; ++i) {
 			final Node curNode = childNodes.item(i);
 			
@@ -77,7 +79,7 @@ final class LayoutFileUpdater extends SimpleFileVisitor<Path> {
 	 * @param settings
 	 */
 	public static void readConstants(
-			final NodeList childNodes, final List<ValueDef> hotkeys, final List<ValueDef> settings) {
+			final NodeList childNodes, final List<TextValueDef> hotkeys, final List<ValueDef> settings) {
 		for (int i = 0, len = childNodes.getLength(); i < len; ++i) {
 			final Node curNode = childNodes.item(i);
 			
@@ -99,7 +101,8 @@ final class LayoutFileUpdater extends SimpleFileVisitor<Path> {
 	 * @param hotkeys
 	 * @param settings
 	 */
-	private static void processConstant(final Node node, final List<ValueDef> hotkeys, final List<ValueDef> settings) {
+	private static void processConstant(
+			final Node node, final List<TextValueDef> hotkeys, final List<ValueDef> settings) {
 		final Node nameAttrNode = getNamedItemIgnoreCase(node.getAttributes(), NAME);
 		if (nameAttrNode != null) {
 			final String name = nameAttrNode.getNodeValue();
@@ -123,8 +126,8 @@ final class LayoutFileUpdater extends SimpleFileVisitor<Path> {
 	 * @param settings
 	 */
 	private static void setValueDefCurValue(
-			final String name, final String val, final List<ValueDef> hotkeys, final List<ValueDef> settings) {
-		for (final ValueDef item : hotkeys) {
+			final String name, final String val, final List<TextValueDef> hotkeys, final List<ValueDef> settings) {
+		for (final TextValueDef item : hotkeys) {
 			if (item.getId().equalsIgnoreCase(name)) {
 				item.setValue(val);
 				item.setOldValue(val);
@@ -133,9 +136,15 @@ final class LayoutFileUpdater extends SimpleFileVisitor<Path> {
 		}
 		for (final ValueDef item : settings) {
 			if (item.getId().equalsIgnoreCase(name)) {
-				item.setValue(val);
-				item.setOldValue(val);
-				return;
+				if (item instanceof TextValueDef tvd) {
+					tvd.setValue(val);
+					tvd.setOldValue(val);
+					return;
+				} else if (item instanceof OptionValueDef ovd) {
+					ovd.setSelectedValue(val);
+					ovd.setOldSelectedValue(val);
+					return;
+				}
 			}
 		}
 		logger.debug("no ValueDef found with name: {}", name);
@@ -149,7 +158,7 @@ final class LayoutFileUpdater extends SimpleFileVisitor<Path> {
 	 * @param settings
 	 */
 	private static void modifyConstant(
-			final Node node, final List<ValueDef> hotkeys, final List<ValueDef> settings) {
+			final Node node, final List<TextValueDef> hotkeys, final List<ValueDef> settings) {
 		final Node nameAttrNode = getNamedItemIgnoreCase(node.getAttributes(), NAME);
 		if (nameAttrNode != null) {
 			final String name = nameAttrNode.getNodeValue();
@@ -157,7 +166,7 @@ final class LayoutFileUpdater extends SimpleFileVisitor<Path> {
 			if (valAttrNode != null) {
 				final String val = valAttrNode.getNodeValue();
 				
-				for (final ValueDef item : hotkeys) {
+				for (final TextValueDef item : hotkeys) {
 					if (item.getId().equalsIgnoreCase(name)) {
 						final String itemVal = item.getValue();
 						if (!Objects.equals(itemVal, val)) {
@@ -169,8 +178,8 @@ final class LayoutFileUpdater extends SimpleFileVisitor<Path> {
 				}
 				for (final ValueDef item : settings) {
 					if (item.getId().equalsIgnoreCase(name)) {
-						if (!Objects.equals(item.getValue(), val)) {
-							final String itemVal = item.getValue();
+						final String itemVal = item.getValue();
+						if (!Objects.equals(itemVal, val)) {
 							logger.debug("updating setting constant: '{}' with val: '{}' from '{}'",
 									name,
 									itemVal,

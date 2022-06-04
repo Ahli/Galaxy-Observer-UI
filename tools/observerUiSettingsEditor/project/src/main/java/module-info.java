@@ -21,4 +21,6 @@ module ObserverUiSettingsEditor {
 	opens com.ahli.hotkey_ui.application.model to javafx.base;
 	opens res;
 	opens view;
+	exports com.ahli.hotkey_ui.application.model.abstracts to javafx.fxml;
+	opens com.ahli.hotkey_ui.application.model.abstracts to javafx.base;
 }

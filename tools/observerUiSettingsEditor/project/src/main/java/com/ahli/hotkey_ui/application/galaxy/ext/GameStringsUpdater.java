@@ -1,7 +1,9 @@
 package com.ahli.hotkey_ui.application.galaxy.ext;
 
 import com.ahli.hotkey_ui.application.model.Constants;
-import com.ahli.hotkey_ui.application.model.ValueDef;
+import com.ahli.hotkey_ui.application.model.OptionValueDef;
+import com.ahli.hotkey_ui.application.model.OptionValueDefType;
+import com.ahli.hotkey_ui.application.model.abstracts.ValueDef;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,9 +21,9 @@ public class GameStringsUpdater extends SimpleFileVisitor<Path> {
 	
 	private static final Logger logger = LoggerFactory.getLogger(GameStringsUpdater.class);
 	
-	private final List<ValueDef> gamestringsAddSettings;
+	private final List<OptionValueDef> gamestringsAddSettings;
 	
-	public GameStringsUpdater(final List<ValueDef> gamestringsAddSettings) {
+	public GameStringsUpdater(final List<OptionValueDef> gamestringsAddSettings) {
 		this.gamestringsAddSettings = gamestringsAddSettings;
 	}
 	
@@ -36,17 +38,18 @@ public class GameStringsUpdater extends SimpleFileVisitor<Path> {
 			
 			boolean changed = false;
 			for (final ValueDef setting : gamestringsAddSettings) {
-				final String value = setting.getValue();
-				if (Objects.equals(value, Constants.TRUE)) {
-					if (setting.getGamestringsAdd().charAt(0) != '\n') {
-						gamestrings.append('\n');
+				if (setting instanceof OptionValueDef ovd && ovd.getType() == OptionValueDefType.BOOLEAN) {
+					if (Objects.equals(ovd.getSelectedValue(), Constants.TRUE)) {
+						if (ovd.getGamestringsAdd().charAt(0) != '\n') {
+							gamestrings.append('\n');
+						}
+						gamestrings.append(ovd.getGamestringsAdd());
+						changed = true;
+					} else if (Objects.equals(ovd.getSelectedValue(), Constants.FALSE)) {
+						gamestrings = new StringBuilder(gamestrings.toString()
+								.replaceAll("[\n\r]?" + ovd.getGamestringsAdd(), ""));
+						changed = true;
 					}
-					gamestrings.append(setting.getGamestringsAdd());
-					changed = true;
-				} else if (Objects.equals(value, Constants.FALSE)) {
-					gamestrings = new StringBuilder(gamestrings.toString()
-							.replaceAll("[\n\r]?" + setting.getGamestringsAdd(), ""));
-					changed = true;
 				}
 			}
 			

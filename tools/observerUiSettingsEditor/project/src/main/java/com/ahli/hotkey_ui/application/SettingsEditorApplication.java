@@ -13,7 +13,8 @@ import com.ahli.hotkey_ui.application.galaxy.ext.LayoutExtensionReader;
 import com.ahli.hotkey_ui.application.i18n.Messages;
 import com.ahli.hotkey_ui.application.integration.FileListingVisitor;
 import com.ahli.hotkey_ui.application.integration.JarHelper;
-import com.ahli.hotkey_ui.application.model.ValueDef;
+import com.ahli.hotkey_ui.application.model.TextValueDef;
+import com.ahli.hotkey_ui.application.model.abstracts.ValueDef;
 import com.ahli.hotkey_ui.application.ui.Alerts;
 import com.ahli.hotkey_ui.application.ui.ShowToUserException;
 import com.ahli.mpq.MpqEditorInterface;
@@ -327,7 +328,8 @@ public class SettingsEditorApplication extends Application {
 			updateAppTitle();
 		} catch (final InterruptedException e) {
 			Thread.currentThread().interrupt();
-		} catch (final IOException | ParserConfigurationException | TransformerConfigurationException | MpqException e) {
+		} catch (final IOException | ParserConfigurationException | TransformerConfigurationException |
+		               MpqException e) {
 			logger.error("Failed to save MPQ.", e);
 			showErrorAlert(e);
 		}
@@ -481,26 +483,26 @@ public class SettingsEditorApplication extends Application {
 				tabsCtrl.clearData();
 				hasUnsavedFileChanges = false;
 				
-				// TODO rewrite with nio stream
+				// TODO rewrite with filewalker in LayoutExtensionReader accepting path
 				final List<Path> layoutFiles = listFiles(mpqi.getCache());
 				
 				layoutExtReader = new LayoutExtensionReader();
 				layoutExtReader.processLayoutFiles(layoutFiles);
 				
-				final List<ValueDef> hotkeys = layoutExtReader.getHotkeys();
+				final List<TextValueDef> hotkeys = layoutExtReader.getHotkeys();
 				tabsCtrl.getHotkeysData().addAll(hotkeys);
 				
 				final List<ValueDef> settings = layoutExtReader.getSettings();
 				tabsCtrl.getSettingsData().addAll(settings);
 				
-				final ChangeListener<String> changeListener =
+				final ChangeListener<Object> changeListener =
 						(observable, oldValue, newValue) -> notifyFileDataWasChanged();
 				
-				for (final ValueDef valueDef : hotkeys) {
-					valueDef.valueProperty().addListener(changeListener);
+				for (final TextValueDef valueDef : hotkeys) {
+					valueDef.addListener(changeListener);
 				}
 				for (final ValueDef valueDef : settings) {
-					valueDef.valueProperty().addListener(changeListener);
+					valueDef.addListener(changeListener);
 				}
 				
 			} catch (final MpqException | ShowToUserException e) {
@@ -647,7 +649,8 @@ public class SettingsEditorApplication extends Application {
 				updateAppTitle();
 			} catch (final InterruptedException e) {
 				Thread.currentThread().interrupt();
-			} catch (final IOException | ParserConfigurationException | TransformerConfigurationException | MpqException e) {
+			} catch (final IOException | ParserConfigurationException | TransformerConfigurationException |
+			               MpqException e) {
 				logger.error("Error while saving", e);
 				showErrorAlert(e);
 			}

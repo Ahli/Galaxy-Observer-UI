@@ -3,7 +3,7 @@
 
 package com.ahli.hotkey_ui.application.ui;
 
-import com.ahli.hotkey_ui.application.model.ValueDef;
+import com.ahli.hotkey_ui.application.model.abstracts.ValueDef;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableCell;
@@ -37,13 +37,13 @@ public class ResetDefaultButtonTableCell extends TableCell<ValueDef, Boolean> {
 	private void resetToDefault(final ActionEvent event) {
 		logger.trace("reset value to default value button clicked");
 		final ValueDef data = getTableRow().getItem();
-		data.setValue(data.getDefaultValue());
+		data.resetToDefault();
 	}
 	
 	private void resetToOldValue(final ActionEvent event) {
 		logger.trace("reset value to old value button clicked");
 		final ValueDef data = getTableRow().getItem();
-		data.setValue(data.getOldValue());
+		data.resetToOldValue();
 	}
 	
 	// Display button if the row is not empty

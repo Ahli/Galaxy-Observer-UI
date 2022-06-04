@@ -3,8 +3,10 @@
 
 package com.ahli.hotkey_ui.application.ui;
 
-import com.ahli.hotkey_ui.application.model.Constants;
-import com.ahli.hotkey_ui.application.model.ValueDef;
+import com.ahli.hotkey_ui.application.model.OptionValueDef;
+import com.ahli.hotkey_ui.application.model.TextValueDef;
+import com.ahli.hotkey_ui.application.model.TextValueDefType;
+import com.ahli.hotkey_ui.application.model.abstracts.ValueDef;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -14,12 +16,11 @@ import javafx.scene.control.TextField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Objects;
 import java.util.regex.Pattern;
 
 public class DynamicValueDefEditingTableCell extends TableCell<ValueDef, String> {
 	private static final Logger logger = LoggerFactory.getLogger(DynamicValueDefEditingTableCell.class);
-	private static final Pattern NUMBER_INPUT_REGEX_PATTERN = Pattern.compile("[-]?\\d{0,7}(?:[.]\\d{0,4})?");
+	private static final Pattern NUMBER_INPUT_REGEX_PATTERN = Pattern.compile("-?\\d{0,7}(?:[.]\\d{0,4})?");
 	
 	@Override
 	protected void updateItem(final String item, final boolean empty) {
@@ -40,38 +41,23 @@ public class DynamicValueDefEditingTableCell extends TableCell<ValueDef, String>
 	
 	private void updateItem(final String item) {
 		final ValueDef data = getTableRow().getItem();
-		if (data != null) {
-			logger.trace("update valuedef-edit table cell - label {} - type: {}", item, data.getType());
-			switch (data.getType()) {
-				case BOOLEAN -> createBooleanEditor(data);
-				case NUMBER -> createNumberEditor(data, item);
-				default -> createChoiceOrTextEditor(data, item);
+		if (data instanceof TextValueDef tvd) {
+			logger.trace("update valuedef-edit table cell - label {} - type: {}", item, tvd.getType());
+			if (tvd.getType() == TextValueDefType.NUMBER) {
+				createNumberEditor(tvd, item);
+			} else {
+				createTextEditor(tvd, item);
 			}
+		} else if (data instanceof OptionValueDef ovd) {
+			logger.trace("update valuedef-edit table cell - label {} - type: {}", item, ovd.getType());
+			createChoiceEditor(ovd);
 		} else {
 			logger.trace("update valuedef-edit table cell - label {} - null ValueDef", item);
 			setGraphic(null);
 		}
 	}
 	
-	private void createBooleanEditor(final ValueDef data) {
-		final ObservableList<String> items = FXCollections.observableArrayList(Constants.FALSE, Constants.TRUE);
-		final ComboBox<String> comboBox = new ComboBox<>(items);
-		comboBox.valueProperty().addListener((observable, oldItem, newItem) -> {
-			final String newVal = newItem != null ? newItem : "";
-			data.valueProperty().set(newVal);
-		});
-		
-		final String valuePropStr = data.getValue();
-		if (!valuePropStr.isEmpty()) {
-			comboBox.getSelectionModel().select(valuePropStr);
-		} else {
-			comboBox.getSelectionModel().select(data.getDefaultValue());
-		}
-		
-		setGraphic(comboBox);
-	}
-	
-	private void createNumberEditor(final ValueDef data, final String item) {
+	private void createNumberEditor(final TextValueDef data, final String item) {
 		final TextField textField = new TextField(item);
 		
 		textField.focusedProperty().addListener((obs, wasFocussed, isFocussed) -> {
@@ -80,9 +66,10 @@ public class DynamicValueDefEditingTableCell extends TableCell<ValueDef, String>
 				final TextField control = (TextField) ((ReadOnlyBooleanProperty) obs).getBean();
 				final String input = control.getText().trim();
 				if (NUMBER_INPUT_REGEX_PATTERN.matcher(input).matches()) {
-					data.valueProperty().set(input);
+					data.setValue(input);
 				} else {
-					control.setText(data.valueProperty().getValue());
+					// reset input
+					control.setText(data.getValue());
 				}
 			}
 		});
@@ -92,47 +79,36 @@ public class DynamicValueDefEditingTableCell extends TableCell<ValueDef, String>
 		setGraphic(textField);
 	}
 	
-	private void createChoiceOrTextEditor(final ValueDef data, final String item) {
-		final String[] allowedValues = data.getAllowedValues();
-		if (allowedValues != null && allowedValues.length > 0) {
-			createChoiceEditor(data);
-		} else {
-			createTextEditor(data, item);
-		}
-	}
-	
-	private void createChoiceEditor(final ValueDef data) {
-		final ObservableList<String> items = FXCollections.observableArrayList(data.getAllowedValues());
-		final ComboBox<String> comboBox = new ComboBox<>(items);
-		
-		comboBox.valueProperty().addListener((obs, oldItem, newItem) -> {
-			final String newVal = Objects.requireNonNull(newItem, "");
-			data.valueProperty().set(newVal);
-		});
-		
-		final String valuePropStr = data.getValue();
-		if (!valuePropStr.isEmpty()) {
-			comboBox.getSelectionModel().select(valuePropStr);
-		} else {
-			comboBox.getSelectionModel().select(data.getDefaultValue());
-		}
-		
-		setGraphic(comboBox);
-	}
-	
-	private void createTextEditor(final ValueDef data, final String item) {
+	private void createTextEditor(final TextValueDef data, final String item) {
 		final TextField textField = new TextField(item);
 		
 		textField.focusedProperty().addListener((obs, wasFocussed, isFocussed) -> {
 			logger.debug("createTextEditor: {}", isFocussed);
 			if (isFocussed != null && !isFocussed) {
 				final TextField control = (TextField) ((ReadOnlyBooleanProperty) obs).getBean();
-				data.valueProperty().set(control.getText());
+				data.setValue(control.getText());
 			}
 		});
 		
-		textField.setText(data.getValue());
+		textField.setText(data.getDisplayValue());
 		
 		setGraphic(textField);
 	}
+	
+	private void createChoiceEditor(final OptionValueDef data) {
+		final ObservableList<String> items = FXCollections.observableArrayList(data.getAllowedDisplayValues());
+		final ComboBox<String> comboBox = new ComboBox<>(items);
+		
+		comboBox.getSelectionModel()
+				.selectedIndexProperty()
+				.addListener((observable, oldIndex, newIndex) -> data.setSelectedIndex(newIndex.intValue()));
+		
+		data.getSelectedIndexProperty()
+				.addListener((obs, oldIndex, newIndex) -> comboBox.getSelectionModel().select(newIndex.intValue()));
+		
+		comboBox.getSelectionModel().select(data.getSelectedIndex());
+		
+		setGraphic(comboBox);
+	}
+	
 }

@@ -4,7 +4,7 @@
 package com.ahli.hotkey_ui.application.controllers;
 
 import com.ahli.hotkey_ui.application.i18n.Messages;
-import com.ahli.hotkey_ui.application.model.ValueDef;
+import com.ahli.hotkey_ui.application.model.abstracts.ValueDef;
 import com.ahli.hotkey_ui.application.ui.DynamicValueDefEditingTableCell;
 import com.ahli.hotkey_ui.application.ui.ResetDefaultButtonTableCell;
 import com.ahli.hotkey_ui.application.ui.WrappingTextTableCell;
