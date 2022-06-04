@@ -4,6 +4,9 @@
 package com.ahli.hotkey_ui.application.galaxy.ext;
 
 import com.ahli.galaxy.game.GameDef;
+import com.ahli.hotkey_ui.application.model.OptionValueDef;
+import com.ahli.hotkey_ui.application.model.TextValueDef;
+import com.ahli.hotkey_ui.application.model.TextValueDefType;
 import com.ahli.hotkey_ui.application.model.abstracts.ValueDef;
 import com.ahli.util.XmlDomHelper;
 import org.slf4j.Logger;
@@ -43,7 +46,7 @@ public class LayoutExtensionReader {
 	private static final Pattern HOTKEY_SETTING_REGEX_PATTERN = Pattern.compile("(?<=@hotkey|@setting)/i");
 	private static final Pattern ATTRIBUTES_REGEX_PATTERN = Pattern.compile(
 			"(?i)(?=(?:constant|default|description|values|valuesdisplaynames|type|gamestrings_add)[\\s]*=)");
-	private final List<ValueDef> hotkeys = new ArrayList<>();
+	private final List<TextValueDef> hotkeys = new ArrayList<>();
 	private final List<ValueDef> settings = new ArrayList<>();
 	
 	
@@ -60,10 +63,18 @@ public class LayoutExtensionReader {
 		return part.substring(quoteStart + 1, quoteEnd);
 	}
 	
+	private static String[] parseListOfValues(final String part) {
+		final String[] values = part.split("/");
+		for (int i = 0; i < values.length; ++i) {
+			values[i] = getValueWithinQuotes(values[i]);
+		}
+		return values;
+	}
+	
 	/**
 	 * @return the hotkeys
 	 */
-	public List<ValueDef> getHotkeys() {
+	public List<TextValueDef> getHotkeys() {
 		return hotkeys;
 	}
 	
@@ -210,12 +221,12 @@ public class LayoutExtensionReader {
 						} else if (partLower.startsWith(ATTRIBUTE_DESCRIPTION)) {
 							description = getValueWithinQuotes(part);
 							logger.trace("description = {}", description);
-						} else if (partLower.startsWith(ATTRIBUTE_VALUES)) {
-							allowedValues = parseListOfValues(part);
-							logger.trace("values = {}", part);
 						} else if (partLower.startsWith(ATTRIBUTE_VALUES_DISPLAY_NAMES)) {
 							allowedValuesDisplayNames = parseListOfValues(part);
 							logger.trace("valuesDisplayNames = {}", part);
+						} else if (partLower.startsWith(ATTRIBUTE_VALUES)) {
+							allowedValues = parseListOfValues(part);
+							logger.trace("values = {}", part);
 						} else if (partLower.startsWith(ATTRIBUTE_TYPE)) {
 							type = getValueWithinQuotes(part).trim();
 							logger.trace("type = {}", part);
@@ -228,14 +239,14 @@ public class LayoutExtensionReader {
 					if (isHotkey) {
 						addHotkeyValueDef(constant, description, defaultValue);
 					} else {
-						settings.add(new ValueDef(
+						addSettingsValueDef(
 								constant,
 								description,
 								defaultValue,
 								type,
+								gamestringsAdd,
 								allowedValues,
-								allowedValuesDisplayNames,
-								gamestringsAdd));
+								allowedValuesDisplayNames);
 					}
 				}
 			}
@@ -246,16 +257,33 @@ public class LayoutExtensionReader {
 		}
 	}
 	
-	private String[] parseListOfValues(final String part) {
-		final String[] values = part.split("/");
-		for (int i = 0; i < values.length; ++i) {
-			values[i] = getValueWithinQuotes(values[i]);
+	private void addSettingsValueDef(
+			final String constant,
+			final String description,
+			final String defaultValue,
+			final String type,
+			final String gamestringsAdd,
+			final String[] allowedValues,
+			final String[] allowedValuesDisplayNames) {
+		
+		final ValueDef valueDef;
+		if (allowedValues != null || type.equalsIgnoreCase("boolean")) {
+			valueDef = new OptionValueDef(
+					constant,
+					description,
+					defaultValue,
+					type,
+					allowedValues,
+					allowedValuesDisplayNames,
+					gamestringsAdd);
+		} else {
+			valueDef = new TextValueDef(constant, description, defaultValue, type);
 		}
-		return values;
+		settings.add(valueDef);
 	}
 	
 	private void addHotkeyValueDef(final String constant, final String description, final String defaultValue) {
-		hotkeys.add(new ValueDef(constant, description, defaultValue));
+		hotkeys.add(new TextValueDef(constant, description, defaultValue, TextValueDefType.HOTKEY));
 	}
 	
 	/**
@@ -267,8 +295,8 @@ public class LayoutExtensionReader {
 	public boolean updateLayoutFiles(final Path projectInCache)
 			throws ParserConfigurationException, TransformerConfigurationException {
 		
-		final List<ValueDef> changedHotkeys = hotkeys.stream().filter(ValueDef::hasChanged).toList();
-		final List<ValueDef> changedSettings = settings.stream().filter(ValueDef::hasChanged).toList();
+		final List<TextValueDef> changedHotkeys = hotkeys.stream().filter(ValueDef::getHasChanged).toList();
+		final List<ValueDef> changedSettings = settings.stream().filter(ValueDef::getHasChanged).toList();
 		
 		if (!changedHotkeys.isEmpty() || !changedSettings.isEmpty()) {
 			
@@ -306,10 +334,10 @@ public class LayoutExtensionReader {
 	 * @return true if changes were present
 	 */
 	public boolean updateGameStrings(final Path projectInCache) {
-		final List<ValueDef> gamestringsAddSettings = new ArrayList<>();
+		final List<OptionValueDef> gamestringsAddSettings = new ArrayList<>();
 		for (final ValueDef setting : settings) {
-			if (setting.hasChanged() && !setting.getGamestringsAdd().isEmpty()) {
-				gamestringsAddSettings.add(setting);
+			if (setting instanceof OptionValueDef ovd && ovd.getHasChanged() && !ovd.getGamestringsAdd().isEmpty()) {
+				gamestringsAddSettings.add(ovd);
 			}
 		}
 		if (!gamestringsAddSettings.isEmpty()) {
@@ -331,12 +359,12 @@ public class LayoutExtensionReader {
 	 */
 	public boolean hasChanges() {
 		for (final ValueDef setting : settings) {
-			if (setting.hasChanged()) {
+			if (setting.getHasChanged()) {
 				return true;
 			}
 		}
-		for (final ValueDef hotkey : hotkeys) {
-			if (hotkey.hasChanged()) {
+		for (final TextValueDef hotkey : hotkeys) {
+			if (hotkey.getHasChanged()) {
 				return true;
 			}
 		}

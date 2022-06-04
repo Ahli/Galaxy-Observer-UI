@@ -2,28 +2,18 @@ package com.ahli.hotkey_ui.application.model;
 
 import com.ahli.hotkey_ui.application.model.abstracts.ValueDef;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
 
 import java.util.Locale;
 
 public class TextValueDef extends ValueDef {
 	
-	private final SimpleStringProperty value;
-	private final SimpleStringProperty defaultValue;
 	private final SimpleStringProperty oldValue;
 	private final TextValueDefType type;
 	
-	/**
-	 * Constructor.
-	 *
-	 * @param id
-	 * @param description
-	 * @param defaultValue
-	 */
-	protected TextValueDef(final String id, final String description, final String defaultValue, final String typeStr) {
-		super(id, description, TextValueDefType.TEXT);
-		value = new SimpleStringProperty("");
+	public TextValueDef(final String id, final String description, final String defaultValue, final String typeStr) {
+		super(id, description, defaultValue);
 		oldValue = new SimpleStringProperty("");
-		this.defaultValue = new SimpleStringProperty(defaultValue);
 		type = determineType(typeStr);
 		initHasChangedBinding();
 	}
@@ -38,11 +28,56 @@ public class TextValueDef extends ValueDef {
 	
 	@Override
 	protected void initHasChangedBinding() {
-		hasChanged.bind(value.isNotEqualTo(oldValue));
+		hasChanged.bind(displayValue.isNotEqualTo(oldValue));
+	}
+	
+	public TextValueDef(
+			final String id, final String description, final String defaultValue, final TextValueDefType type) {
+		super(id, description, defaultValue);
+		oldValue = new SimpleStringProperty("");
+		this.type = type;
+		initHasChangedBinding();
 	}
 	
 	@Override
 	public boolean isDefaultValue() {
-		return value.get().equals(defaultValue.get());
+		return displayValue.get().equals(defaultDisplayValue.get());
+	}
+	
+	@Override
+	public void addListener(final ChangeListener<Object> changeListener) {
+		displayValue.addListener(changeListener);
+	}
+	
+	public TextValueDefType getType() {
+		return type;
+	}
+	
+	@Override
+	public void resetToDefault() {
+		displayValue.set(defaultDisplayValue.get());
+	}
+	
+	@Override
+	public void resetToOldValue() {
+		displayValue.set(oldValue.get());
+	}
+	
+	@Override
+	public String getValue() {
+		return displayValue.get();
+	}
+	
+	public void setValue(final String value) {
+		displayValue.set(value);
+	}
+	
+	@Override
+	public String getDisplayValue() {
+		return displayValue.get();
+	}
+	
+	public void setOldValue(final String oldValue) {
+		this.oldValue.set(oldValue);
 	}
 }

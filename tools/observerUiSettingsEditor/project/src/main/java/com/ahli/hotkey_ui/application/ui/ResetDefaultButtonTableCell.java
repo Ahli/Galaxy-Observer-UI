@@ -37,13 +37,13 @@ public class ResetDefaultButtonTableCell extends TableCell<ValueDef, Boolean> {
 	private void resetToDefault(final ActionEvent event) {
 		logger.trace("reset value to default value button clicked");
 		final ValueDef data = getTableRow().getItem();
-		data.setValue(data.getDefaultValue());
+		data.resetToDefault();
 	}
 	
 	private void resetToOldValue(final ActionEvent event) {
 		logger.trace("reset value to old value button clicked");
 		final ValueDef data = getTableRow().getItem();
-		data.setValue(data.getOldValue());
+		data.resetToOldValue();
 	}
 	
 	// Display button if the row is not empty
