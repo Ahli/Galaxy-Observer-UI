@@ -419,7 +419,7 @@ public class SettingsEditorApplication extends Application {
 	/**
 	 * Open File window and actions.
 	 */
-	public void openUiMpq() {
+	public File openUiMpq() {
 		final FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle(Messages.getString("Main.openObserverInterfaceTitle"));
 		
@@ -438,6 +438,7 @@ public class SettingsEditorApplication extends Application {
 		if (f != null) {
 			openMpqFileThreaded(f.toPath());
 		}
+		return f;
 	}
 	
 	/**

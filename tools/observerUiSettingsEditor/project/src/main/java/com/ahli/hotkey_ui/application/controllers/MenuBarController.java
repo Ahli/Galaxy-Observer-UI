@@ -5,9 +5,11 @@ package com.ahli.hotkey_ui.application.controllers;
 
 import com.ahli.hotkey_ui.application.SettingsEditorApplication;
 import com.ahli.hotkey_ui.application.i18n.Messages;
+import com.ahli.hotkey_ui.application.integration.RecentlyUsed;
 import com.ahli.hotkey_ui.application.ui.Alerts;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
@@ -15,16 +17,18 @@ import javafx.scene.input.KeyCombination;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * @author Ahli
  */
 public class MenuBarController {
 	private static final Logger logger = LoggerFactory.getLogger(MenuBarController.class);
-	
+	private final RecentlyUsed recentlyUsed = new RecentlyUsed();
 	private SettingsEditorApplication main;
-	
 	@FXML
 	private MenuItem menuOpen;
 	@FXML
@@ -33,6 +37,8 @@ public class MenuBarController {
 	private MenuItem menuSaveAs;
 	@FXML
 	private MenuItem menuClose;
+	@FXML
+	private Menu menuRecent;
 	
 	/**
 	 * Automatically called on Controller initialization.
@@ -44,11 +50,24 @@ public class MenuBarController {
 				KeyCombination.CONTROL_DOWN,
 				KeyCombination.ALT_DOWN));
 		menuClose.setAccelerator(new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN));
+		menuRecent.setAccelerator(new KeyCodeCombination(KeyCode.R, KeyCombination.CONTROL_DOWN));
+		for (final Path recent : recentlyUsed.getRecent()) {
+			final MenuItem menuItem = new MenuItem(recent.toString());
+			menuItem.setOnAction(event -> {
+				if (Files.exists(recent)) {
+					main.openMpqFileThreaded(recent);
+					recentlyUsed.addRecent(recent);
+				} else {
+					Alerts.buildWarningAlert(main.getPrimaryStage().getOwner(),
+							Messages.getString("Main.warningAlertTitle"),
+							Messages.getString("Main.fileNotFound"),
+							"");
+				}
+			});
+			menuRecent.getItems().add(menuItem);
+		}
 	}
 	
-	/**
-	 * @param main
-	 */
 	public void setMainApp(final SettingsEditorApplication main) {
 		this.main = main;
 	}
@@ -66,7 +85,13 @@ public class MenuBarController {
 	 */
 	@FXML
 	public void open() {
-		main.openUiMpq();
+		final File file = main.openUiMpq();
+		if (file != null) {
+			recentlyUsed.addRecent(file.toPath());
+			final MenuItem menuItem = new MenuItem(file.getAbsolutePath());
+			menuItem.setOnAction(event -> main.openMpqFileThreaded(file.toPath()));
+			menuRecent.getItems().add(menuItem);
+		}
 	}
 	
 	/**
@@ -93,9 +118,6 @@ public class MenuBarController {
 		main.closeApp();
 	}
 	
-	/**
-	 * Updates the menu bar's items.
-	 */
 	public void updateMenuBar() {
 		final boolean docNotLoaded = main.isInvalidOpenedDocPath();
 		
@@ -104,14 +126,11 @@ public class MenuBarController {
 		menuClose.setDisable(docNotLoaded);
 	}
 	
-	/**
-	 * clicked on About
-	 */
 	@FXML
 	public void aboutClicked() {
 		final String content =
 				String.format(Messages.getString("MenuBarController.AboutText"), SettingsEditorApplication.VERSION) +
-						"\n" + "\n" + Messages.getString("MenuBarController.AboutText2");
+						"\n\n" + Messages.getString("MenuBarController.AboutText2");
 		final String title = Messages.getString("MenuBarController.About");
 		final String header = Messages.getString("MenuBarController.ObserverUISettingsEditor");
 		

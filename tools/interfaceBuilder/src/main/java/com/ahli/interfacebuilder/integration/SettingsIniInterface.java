@@ -181,16 +181,6 @@ public class SettingsIniInterface {
 		section.setProperty(BUILD_UNPROTECTED_TOO, guiBuildUnprotectedToo);
 	}
 	
-	//	/**
-	//	 * Read all Settings from the Settings file. If that file does not exist, it will be created.
-	//	 *
-	//	 * @throws IOException
-	//	 * 		when there is an error reading the file
-	//	 */
-	//	public void readSettingsFromFile() throws IOException {
-	//		readSettingsFromFilePrivate();
-	//	}
-	
 	/**
 	 * @return
 	 */
