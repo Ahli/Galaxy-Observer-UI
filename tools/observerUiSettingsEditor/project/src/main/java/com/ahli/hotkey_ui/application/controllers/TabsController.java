@@ -7,7 +7,6 @@ import com.ahli.hotkey_ui.application.i18n.Messages;
 import com.ahli.hotkey_ui.application.model.abstracts.ValueDef;
 import com.ahli.hotkey_ui.application.ui.DynamicValueDefEditingTableCell;
 import com.ahli.hotkey_ui.application.ui.ResetDefaultButtonTableCell;
-import com.ahli.hotkey_ui.application.ui.WrappingTextTableCell;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -17,6 +16,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.text.Text;
 import javafx.util.Callback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +33,15 @@ public class TabsController {
 					Messages.getString("TabsController.ResetOldValue"));
 	
 	private static final Callback<TableColumn<ValueDef, String>, TableCell<ValueDef, String>> WRAPPING_CELL_FACTORY =
-			tableColumn -> new WrappingTextTableCell();
+			tableColumn -> {
+				TableCell<ValueDef, String> cell = new TableCell<>();
+				Text text = new Text();
+				cell.setGraphic(text);
+				text.wrappingWidthProperty().bind(cell.widthProperty());
+				text.textProperty().bind(cell.itemProperty());
+				text.setStyle("-fx-fill: white;-fx-font-smoothing-type: lcd;");
+				return cell;
+			};
 	
 	private static final Callback<TableColumn<ValueDef, String>, TableCell<ValueDef, String>>
 			VALUEDEF_EDIT_CELL_FACTORY = tableColumn -> new DynamicValueDefEditingTableCell();
