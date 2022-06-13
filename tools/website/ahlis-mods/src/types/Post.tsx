@@ -3,7 +3,7 @@ export class Post {
   title!: string;
   createdAt!: string;
   text?: string;
-  image?: string;
+  image?: string | Array<string>;
   download?: string;
   updatedAt?: string;
 }

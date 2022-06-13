@@ -20,8 +20,9 @@ export const PostView = (props: PostProps) => {
   const [data] = useState({ post: props.post, isChangelog: (props.post as Changelog) != undefined } as Data);
   console.log(data);
   return (
+    // TODO show multiple images
     <Card variant='elevation'>
-      {data.post.image && <CardMedia component='img' image={data.post.image} alt='screenshot' />}
+      {data.post.image && <CardMedia component='img' image={getFirstImage(data.post)} alt='screenshot' />}
       <CardContent>
         <Typography gutterBottom variant='h5' component='div'>
           {data.post.title}
@@ -77,4 +78,14 @@ function renderChange(change: string | Change) {
       )}
     </>
   );
+}
+
+function getFirstImage(post: Post): string | undefined {
+  if (!post.image) {
+    return undefined;
+  }
+  if (typeof post.image === 'string') {
+    return post.image;
+  }
+  return post.image[0];
 }

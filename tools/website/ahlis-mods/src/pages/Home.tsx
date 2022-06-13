@@ -1,9 +1,63 @@
 import { PostList } from '../components/PostList';
 import { Change, Changelog, Post } from '../types/Post';
 import ahliObs72 from '../assets/ahliObs/72.jpg';
+import ahliObs73a from '../assets/ahliObs/73a.jpg';
+import ahliObs73b from '../assets/ahliObs/73b.jpg';
+import ahliObs74a from '../assets/ahliObs/74a.jpg';
+import ahliObs74b from '../assets/ahliObs/74b.jpg';
 
 export const Home = () => {
   const posts: Post[] = [
+    {
+      id: '74',
+      title: '0.74 - fixes and polish',
+      image: [ahliObs74a, ahliObs74b],
+      createdAt: '2nd March 2022',
+      download: 'https://www.dropbox.com/s/tv931liwl3a3mjs/AhliObs%200.74.StormInterface?dl=1',
+      version: '0.73',
+      date: '2nd March 2022',
+      changes: [
+        'fixed self healing and heal other stats in bottom panel referencing the damage taken values instead of its actual value',
+        "fixed the colors during Tomb of the Spider Queen's Webweaver UI while being in red team's vision",
+        "fixed appearance of kill/quest notifications and some map objective UIs when the selected unit's player vision button is held down (v shortcut)",
+        'fixed the F ability button (e.g. Nuke) being visible on maps that do not use it',
+        "fixed the F ability button's cooldown label being drawn next to the button instead of on top of it",
+        'talent selection UI (accessible only in player vision via the usual hotkey) is now muted',
+        "fix most issues with Garden of Terror's map mechanic UI elements regarding vision and replay time jumps",
+        "re-implemented Murky and Thrall's hero UI to make it appear in everyone vision and only if that hero is the sole selected unit",
+        "fixed Skull Golem health bars and its skull counter's appearance during red team vision on Haunted Mines",
+      ],
+    },
+    {
+      id: '73',
+      title: '0.73 - charge and k',
+      image: [ahliObs73a, ahliObs73b],
+      createdAt: '23rd January 2022',
+      download: 'https://www.dropbox.com/s/rbwt2ahfqfvgu35/AhliObs%200.73.StormInterface?dl=1',
+      version: '0.73',
+      date: '23rd January 2022',
+      changes: [
+        new Change('added a charge counter for heroics in the top panel supporting:', [
+          'Brightwing, Lunara, Garrosh, Stukov, DVa, Rangaros, Zagara, Nova, Valla, Artanis, Muradin and Deckard',
+        ]),
+        new Change('changed bottom panel:', [
+          'stats are now displayed showing values in k',
+          'role icons from support to healer and from warrior to tank',
+          'column title background image is now less transparent',
+        ]),
+        "added Keep icons to the Core's health bars in the top panel on Alterac Pass",
+        "fixed blue team's heroic icons being displayed cut off in the top panel",
+        'fixed ability button border images being cut off in the bottom left panel',
+        "fixed activatable talent's ability button's image being drawn outside the border image in the bottom left panel",
+        "fixed Garden of Terror's map mechanic UI's seed icons not always being displayed",
+        'fixed a gap appearing in heto UIs for Fenix and Junkrat',
+        "Leoric's ghost won't display a low health label anymore",
+        new Change(
+          'exposed a setting to the Settings Editor that allows hiding player names near captured camps and destroyed forts',
+          ['please update the Settings Editor as this is a new feature']
+        ),
+      ],
+    },
     {
       id: '72',
       title: '0.72 - fixes & improvements',
@@ -52,12 +106,6 @@ export const Home = () => {
         'made the map objective UI of Alterac Pass more resistant to player vision changes',
       ],
     } as Changelog,
-    {
-      id: 'test-2',
-      title: 'Post 2',
-      text: 'test test test 2',
-      createdAt: 'test',
-    },
   ];
   const title = 'Changelog';
 
