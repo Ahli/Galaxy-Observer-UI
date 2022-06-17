@@ -10,7 +10,7 @@ import { NotFound } from './components/NotFound';
 function App() {
   return (
     <div className='App'>
-      <Router>
+      <Router basename='/Galaxy-Observer-UI'>
         <div className='App'>
           <Navbar />
           <div className='content'>
