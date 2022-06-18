@@ -2,24 +2,24 @@
 import './App.css';
 import { Home } from './pages/Home';
 import '@fontsource/roboto';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { Navbar } from './components/NavBar';
-import { PostList } from './components/PostList';
 import { NotFound } from './components/NotFound';
+
+export const basename = '/Galaxy-Observer-UI';
 
 function App() {
   return (
     <div className='App'>
-      <Router basename='/Galaxy-Observer-UI'>
-        <div className='App'>
-          <Navbar />
-          <div className='content'>
-            <Routes>
-              <Route path='/' element={<Home />} />
-              <Route path='/ahliobs/changelog/:id' element={<PostList title={''} posts={[]} />} />
-              <Route path='*' element={<NotFound />} />
-            </Routes>
-          </div>
+      <Router>
+        <Navbar />
+        <div className='content'>
+          <Routes>
+            <Route path='/' element={<Navigate to={basename} replace />} />
+            <Route path={basename} element={<Home />} />
+            {/* <Route path={basename + '/ahliobs/changelog/:id'} element={<PostList title={''} posts={[]} />} /> */}
+            <Route path='*' element={<NotFound />} />
+          </Routes>
         </div>
       </Router>
     </div>

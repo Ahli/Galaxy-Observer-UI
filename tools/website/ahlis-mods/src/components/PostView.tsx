@@ -18,7 +18,6 @@ type Data = {
 
 export const PostView = (props: PostProps) => {
   const [data] = useState({ post: props.post, isChangelog: (props.post as Changelog) != undefined } as Data);
-  console.log(data);
   return (
     // TODO show multiple images
     <Card variant='elevation'>
