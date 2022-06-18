@@ -471,7 +471,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			if (j > 0) {
 				final String parentName = name.substring(0, j);
 				if (curExtTemplate == null) {
-					logger.error("ERROR: CurExtTemplate is null, but there is a path in the name {}", name);
+					logger.error("ERROR: Failed to open path '{}'.", name);
 					curElement = null;
 				} else {
 					curElement = curExtTemplate.receiveFrameFromPath(parentName);
