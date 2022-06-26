@@ -19,6 +19,11 @@ export const Navbar = () => {
       icon: null,
       onclick: () => navigate(basename + '/gameheart'),
     },
+    {
+      text: 'Pro2020 AhliMod',
+      icon: null,
+      onclick: () => navigate(basename + '/pro2020ahlimod'),
+    },
   ];
   return (
     <Drawer
