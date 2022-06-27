@@ -1,12 +1,15 @@
-import { Link } from 'react-router-dom';
-import { basename } from '../App';
+import { Card, Link } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 export const NotFound = () => {
+  const navigate = useNavigate();
   return (
-    <div className='not-found'>
+    <Card sx={{ borderRadius: '0px', height: '100vh' }}>
       <h2>404 Error</h2>
       <p>We cannot find that page!</p>
-      <Link to={basename}>Take me back to Home</Link>
-    </div>
+      <Link onClick={() => navigate('/')} sx={{ cursor: 'pointer' }}>
+        Take me back to Home
+      </Link>
+    </Card>
   );
 };
