@@ -21,7 +21,9 @@ export const PostView = (props: PostProps) => {
   return (
     // TODO show multiple images
     <Card variant='elevation'>
-      {data.post.image && <CardMedia component='img' image={getFirstImage(data.post)} alt='screenshot' />}
+      {data.post.image && (
+        <CardMedia component='img' loading='lazy' image={getFirstImage(data.post)} alt='screenshot' />
+      )}
       <CardContent>
         <Typography gutterBottom variant='h5' component='div'>
           {data.post.title}
