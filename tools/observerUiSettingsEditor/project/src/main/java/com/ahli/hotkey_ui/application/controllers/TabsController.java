@@ -39,7 +39,7 @@ public class TabsController {
 				cell.setGraphic(text);
 				text.wrappingWidthProperty().bind(cell.widthProperty());
 				text.textProperty().bind(cell.itemProperty());
-				text.setStyle("-fx-fill: white;-fx-font-smoothing-type: lcd;");
+				text.getStyleClass().add("cellWrapText");
 				return cell;
 			};
 	
