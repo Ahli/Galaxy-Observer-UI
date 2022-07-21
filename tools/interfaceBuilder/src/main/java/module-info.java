@@ -40,10 +40,10 @@ module interfacex.builder {
 	requires transitive spring.data.jpa;
 	requires spring.tx; // automatic module
 	requires spring.jdbc; // automatic module
-	requires com.fasterxml.classmate;//redundant, but required!
-	requires net.bytebuddy; // redundant, but required!
+//	requires com.fasterxml.classmate;//redundant, but required!
+//	requires net.bytebuddy; // redundant, but required!
 	requires java.sql; //redundant, but required!
-	requires jakarta.xml.bind; // provides jakarta/xml/jaxbexception //redundant, but required!
+//	requires jakarta.xml.bind; // provides jakarta/xml/jaxbexception //redundant, but required!
 	requires org.apache.commons.lang3; // automatic module
 	requires org.slf4j; // automatic module
 	
