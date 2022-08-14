@@ -94,7 +94,7 @@ export const ahliObsChangelog: Post[] = [
       'fixed ability button border images being cut off in the bottom left panel',
       "fixed activatable talent's ability button's image being drawn outside the border image in the bottom left panel",
       "fixed Garden of Terror's map mechanic UI's seed icons not always being displayed",
-      'fixed a gap appearing in heto UIs for Fenix and Junkrat',
+      'fixed a gap appearing in hero UIs for Fenix and Junkrat',
       "Leoric's ghost won't display a low health label anymore",
       new Change(
         'exposed a setting to the Settings Editor that allows hiding player names near captured camps and destroyed forts',
