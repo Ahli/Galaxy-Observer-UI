@@ -8,7 +8,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { ChangelogPage } from './pages/ChangelogPage';
 import { ahliObsChangelog } from './content/ahliObs/changelog/ahliObsChangelog';
 import { gh3changelog } from './content/gameheart/v3/changelog/gh3changelog';
-import { pro2020AhliModChangelog } from './content/pro2020/changelog/pro2020ahliModChangelog';
+import { pro2020AhliModChangelog } from './content/pro2020ahlimod/changelog/pro2020ahliModChangelog';
 
 const darkTheme = createTheme({
   palette: {

@@ -6,7 +6,7 @@ package com.ahli.galaxy.parser;
 import com.ahli.galaxy.parser.abstracts.XmlParserAbstract;
 import com.ahli.galaxy.parser.interfaces.ParsedXmlConsumer;
 import com.ahli.galaxy.ui.exceptions.UIException;
-import com.ahli.util.XmlDomHelper;
+import com.ahli.xml.XmlDomHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

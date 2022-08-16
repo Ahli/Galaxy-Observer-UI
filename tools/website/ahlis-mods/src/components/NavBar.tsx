@@ -1,6 +1,7 @@
 import { Drawer, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import HomeIcon from '@mui/icons-material/Home';
+import { NavBarItem } from '../types/NavBarItem';
 
 export const navBarWidth = 200;
 
@@ -11,19 +12,19 @@ export const Navbar = () => {
     {
       text: 'AhliObs',
       icon: null,
-      onclick: () => navigate('/ahliobs'),
+      onClick: () => navigate('/ahliobs'),
     },
     {
       text: 'GameHeart',
       icon: null,
-      onclick: () => navigate('/gameheart'),
+      onClick: () => navigate('/gameheart'),
     },
     {
       text: 'Pro2020 AhliMod',
       icon: null,
-      onclick: () => navigate('/pro2020ahlimod'),
+      onClick: () => navigate('/pro2020ahlimod'),
     },
-  ];
+  ] as Array<NavBarItem>;
   return (
     <Drawer
       variant='permanent'
@@ -44,9 +45,9 @@ export const Navbar = () => {
       }}>
       <List>
         {itemslist.map((item /*, index*/) => {
-          const { text, icon, onclick } = item;
+          const { text, icon, onClick } = item;
           return (
-            <ListItem button key={text} onClick={onclick}>
+            <ListItem button key={text} onClick={onClick}>
               <ListItemIcon>{icon}</ListItemIcon>
               <ListItemText primary={text} />
             </ListItem>

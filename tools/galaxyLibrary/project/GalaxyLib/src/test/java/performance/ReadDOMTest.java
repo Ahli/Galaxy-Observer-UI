@@ -3,7 +3,7 @@
 
 package performance;
 
-import com.ahli.util.XmlDomHelper;
+import com.ahli.xml.XmlDomHelper;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;

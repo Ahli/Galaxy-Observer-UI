@@ -4,7 +4,7 @@
 package com.ahli.galaxy.ui;
 
 import com.ahli.galaxy.ui.interfaces.UIElement;
-import com.ahli.util.DeepCopyable;
+import com.ahli.cloning.DeepCopyable;
 
 import java.util.Objects;
 

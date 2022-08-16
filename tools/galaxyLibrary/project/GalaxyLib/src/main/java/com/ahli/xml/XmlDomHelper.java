@@ -1,7 +1,7 @@
 // This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-package com.ahli.util;
+package com.ahli.xml;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -79,16 +79,18 @@ public final class XmlDomHelper {
 	 */
 	public static DocumentBuilder buildSecureDocumentBuilder(
 			final boolean useSilentErrorHandler, final boolean ignoreComments) throws ParserConfigurationException {
+		// according to https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html#jaxp-documentbuilderfactory-saxparserfactory-and-dom4j
 		final DocumentBuilderFactory dbFac = DocumentBuilderFactory.newInstance();
-		dbFac.setNamespaceAware(false);
 		dbFac.setValidating(false);
 		dbFac.setAttribute("http://xml.org/sax/features/external-general-entities", false);
-		dbFac.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
 		dbFac.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
 		dbFac.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
 		dbFac.setXIncludeAware(false);
 		dbFac.setExpandEntityReferences(false);
+		// other
 		dbFac.setAttribute(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+		dbFac.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+		dbFac.setNamespaceAware(false);
 		if (ignoreComments) {
 			dbFac.setIgnoringComments(true);
 		}
@@ -102,6 +104,10 @@ public final class XmlDomHelper {
 	
 	public static Transformer buildSecureTransformer() throws TransformerConfigurationException {
 		final TransformerFactory factory = TransformerFactory.newInstance();
+		// according to https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html#TransformerFactory
+		factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+		factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+		// other:
 		factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
 		return factory.newTransformer();
 	}

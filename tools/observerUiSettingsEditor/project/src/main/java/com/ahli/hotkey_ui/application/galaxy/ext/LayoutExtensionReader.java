@@ -8,7 +8,7 @@ import com.ahli.hotkey_ui.application.model.OptionValueDef;
 import com.ahli.hotkey_ui.application.model.TextValueDef;
 import com.ahli.hotkey_ui.application.model.TextValueDefType;
 import com.ahli.hotkey_ui.application.model.abstracts.ValueDef;
-import com.ahli.util.XmlDomHelper;
+import com.ahli.xml.XmlDomHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Comment;

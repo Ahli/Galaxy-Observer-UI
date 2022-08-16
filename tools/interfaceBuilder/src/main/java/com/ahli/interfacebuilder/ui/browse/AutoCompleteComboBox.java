@@ -42,7 +42,7 @@ public class AutoCompleteComboBox extends ComboBox<String> {
 	}
 	
 	/**
-	 * Code by Icza from https://stackoverflow.com/a/25379180/12849006
+	 * Code by <a href="https://stackoverflow.com/a/25379180/12849006">Icza</a>
 	 *
 	 * @param src
 	 * @param what

@@ -1,7 +1,7 @@
 package com.ahli.interfacebuilder.threads;
 
 import com.ahli.galaxy.game.Game;
-import com.ahli.util.StringInterner;
+import com.ahli.memory.StringInterner;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.BeanCreationNotAllowedException;
 import org.springframework.lang.NonNull;

@@ -265,24 +265,6 @@ public class SettingsIniInterface {
 		this.guiBuildUnprotectedToo = guiBuildUnprotectedToo;
 	}
 	
-	//	/**
-	//	 * Returns path to settings file.
-	//	 *
-	//	 * @return path of the settings file
-	//	 */
-	//	public Path getSettingsFilePath() {
-	//		return settingsFilePath;
-	//	}
-	
-	//	/**
-	//	 * Constructor.
-	//	 *
-	//	 * @param path
-	//	 */
-	//	public void setSettingsFilePath(final Path path) {
-	//		settingsFilePath = path;
-	//	}
-	
 	/**
 	 * @return
 	 */

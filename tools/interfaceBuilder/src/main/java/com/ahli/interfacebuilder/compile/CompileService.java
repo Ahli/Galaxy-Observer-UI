@@ -12,7 +12,7 @@ import com.ahli.galaxy.parser.XmlParserAalto;
 import com.ahli.galaxy.ui.interfaces.UICatalog;
 import com.ahli.interfacebuilder.compress.GameService;
 import com.ahli.interfacebuilder.projects.enums.GameType;
-import com.ahli.util.XmlDomHelper;
+import com.ahli.xml.XmlDomHelper;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.lang.NonNull;
 import org.xml.sax.SAXException;

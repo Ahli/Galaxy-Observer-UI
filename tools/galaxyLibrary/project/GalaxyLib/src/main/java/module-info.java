@@ -14,29 +14,36 @@ module GalaxyLib {
 	requires java.sql; // configuration2 INI requires java.sql.Date for some reason // redundant, but required!
 	requires com.fasterxml.aalto;
 	
+	exports com.ahli.cloning;
+	exports com.ahli.files;
 	exports com.ahli.galaxy;
 	exports com.ahli.galaxy.archive;
 	exports com.ahli.galaxy.game;
-	exports com.ahli.galaxy.parser;
-	exports com.ahli.galaxy.parser.abstracts;
-	exports com.ahli.galaxy.parser.interfaces;
 	exports com.ahli.galaxy.ui;
 	exports com.ahli.galaxy.ui.abstracts;
 	exports com.ahli.galaxy.ui.exceptions;
 	exports com.ahli.galaxy.ui.interfaces;
+	exports com.ahli.galaxy.parser;
+	exports com.ahli.galaxy.parser.abstracts;
+	exports com.ahli.galaxy.parser.interfaces;
+	exports com.ahli.memory;
+	exports com.ahli.memory.interner;
 	exports com.ahli.mpq;
 	exports com.ahli.mpq.i18n;
 	exports com.ahli.mpq.mpqeditor;
-	exports com.ahli.util;
+	exports com.ahli.xml;
 	
+	opens com.ahli.cloning;
+	opens com.ahli.files;
+	opens com.ahli.galaxy.archive;
+	opens com.ahli.galaxy.game;
+	opens com.ahli.galaxy;
 	opens com.ahli.galaxy.ui;
 	opens com.ahli.galaxy.ui.abstracts;
 	opens com.ahli.galaxy.ui.interfaces;
-	opens com.ahli.util;
 	opens com.ahli.galaxy.parser.interfaces;
-	opens com.ahli.galaxy.game;
+	opens com.ahli.memory;
 	opens com.ahli.mpq;
-	opens com.ahli.galaxy.archive;
 	opens com.ahli.mpq.mpqeditor;
-	opens com.ahli.galaxy;
+	opens com.ahli.xml;
 }

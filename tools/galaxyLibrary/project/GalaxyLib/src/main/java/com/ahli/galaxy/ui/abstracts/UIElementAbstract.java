@@ -4,7 +4,7 @@
 package com.ahli.galaxy.ui.abstracts;
 
 import com.ahli.galaxy.ui.interfaces.UIElement;
-import com.ahli.util.StringInterner;
+import com.ahli.memory.StringInterner;
 
 /**
  * @author Ahli

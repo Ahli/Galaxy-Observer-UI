@@ -1,6 +1,8 @@
 // This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
-package com.ahli.util;
+package com.ahli.memory;
+
+import com.ahli.memory.interner.ConcurrentWeakWeakHashMap;
 
 public final class StringInterner {
 	private static final ConcurrentWeakWeakHashMap<String> map = new ConcurrentWeakWeakHashMap<>(8, 0.9F, 1);

@@ -3,7 +3,7 @@
 
 package com.ahli.interfacebuilder.integration.kryo.serializer;
 
-import com.ahli.util.StringInterner;
+import com.ahli.memory.StringInterner;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;

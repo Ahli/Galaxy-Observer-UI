@@ -3,7 +3,7 @@
 
 package com.ahli.interfacebuilder.integration;
 
-import com.ahli.util.FileCountingVisitor;
+import com.ahli.files.FileCountingVisitor;
 import org.springframework.util.FileSystemUtils;
 
 import java.io.IOException;

@@ -33,8 +33,8 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * TextAreaAppender for Log4j2. Source: http://blog.pikodat.com/2015/10/11/frontend-logging-with-javafx/ , modified for
- * org.fxmisc.richtext.StyleClassedTextArea: Ahli
+ * TextAreaAppender for Log4j2. <a href="http://blog.pikodat.com/2015/10/11/frontend-logging-with-javafx/">initial
+ * Source</a>, modified for org.fxmisc.richtext.StyleClassedTextArea: Ahli
  * <p>
  * If this Appender does not work, then the Log4j2Plugins.dat might not have been created.
  */

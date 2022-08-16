@@ -1,6 +1,6 @@
 // This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
-package com.ahli.util;
+package com.ahli.memory.interner;
 
 /*
  * Copyright Terracotta, Inc.
@@ -18,6 +18,8 @@ package com.ahli.util;
  * limitations under the License.
  */
 
+import org.jetbrains.annotations.NotNull;
+
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
@@ -33,7 +35,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * Source: https://github.com/ehcache/ehcache3/blob/master/core/src/main/java/org/ehcache/core/collections/ConcurrentWeakIdentityHashMap.java
+ * <a
+ * href="https://github.com/ehcache/ehcache3/blob/master/core/src/main/java/org/ehcache/core/collections/ConcurrentWeakIdentityHashMap.java">Based
+ * on this version by Alex Snaps</a>
  *
  * @author Alex Snaps, modified by Ahli
  */
@@ -51,7 +55,7 @@ public class ConcurrentWeakWeakHashMap<K> implements ConcurrentMap<K, K> {
 	}
 	
 	@Override
-	public K putIfAbsent(final K key, final K value) {
+	public K putIfAbsent(final @NotNull K key, final K value) {
 		purgeKeys();
 		final var weakRef = newKey(key);
 		final var result = map.putIfAbsent(weakRef, weakRef);
@@ -74,13 +78,13 @@ public class ConcurrentWeakWeakHashMap<K> implements ConcurrentMap<K, K> {
 	}
 	
 	@Override
-	public boolean remove(final Object key, final Object value) {
+	public boolean remove(final @NotNull Object key, final Object value) {
 		purgeKeys();
 		return map.remove(new WeakReferenceWithHash<>(key), key);
 	}
 	
 	@Override
-	public boolean replace(final K key, final K oldValue, final K newValue) {
+	public boolean replace(final @NotNull K key, final @NotNull K oldValue, final @NotNull K newValue) {
 		purgeKeys();
 		final var weakKeyRefKey = newKey(key);
 		// TODO I guess this is wrong, but I don't use it...
@@ -88,7 +92,7 @@ public class ConcurrentWeakWeakHashMap<K> implements ConcurrentMap<K, K> {
 	}
 	
 	@Override
-	public K replace(final K key, final K value) {
+	public K replace(final @NotNull K key, final @NotNull K value) {
 		purgeKeys();
 		final var weakKeyRef = newKey(key);
 		final var result = map.replace(weakKeyRef, weakKeyRef);
@@ -261,7 +265,7 @@ public class ConcurrentWeakWeakHashMap<K> implements ConcurrentMap<K, K> {
 		}
 		
 		@Override
-		public Iterator<K> iterator() {
+		public @NotNull Iterator<K> iterator() {
 			weakHashMap.purgeKeys();
 			return new WeakHashMapKeySetIterator<>(weakHashMap.map.keySet().iterator());
 		}
@@ -318,7 +322,7 @@ public class ConcurrentWeakWeakHashMap<K> implements ConcurrentMap<K, K> {
 		}
 		
 		@Override
-		public Iterator<Entry<K, K>> iterator() {
+		public @NotNull Iterator<Entry<K, K>> iterator() {
 			weakHashMap.purgeKeys();
 			return new WeakHashMapEntrySetIterator<>(weakHashMap.map.entrySet().iterator());
 		}

@@ -3,7 +3,7 @@
 
 package com.ahli.mpq.mpqeditor;
 
-import com.ahli.util.DeepCopyable;
+import com.ahli.cloning.DeepCopyable;
 
 import java.io.Serial;
 import java.io.Serializable;

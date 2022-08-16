@@ -4,7 +4,7 @@
 package com.ahli.galaxy.archive;
 
 import com.ahli.galaxy.game.GameDef;
-import com.ahli.util.XmlDomHelper;
+import com.ahli.xml.XmlDomHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;

@@ -7,7 +7,7 @@ import com.ahli.galaxy.ui.abstracts.UIElementAbstract;
 import com.ahli.galaxy.ui.interfaces.UIAttribute;
 import com.ahli.galaxy.ui.interfaces.UIElement;
 import com.ahli.galaxy.ui.interfaces.UIFrame;
-import com.ahli.util.StringInterner;
+import com.ahli.memory.StringInterner;
 
 import java.util.ArrayList;
 import java.util.Arrays;

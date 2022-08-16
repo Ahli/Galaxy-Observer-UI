@@ -3,7 +3,7 @@
 
 package com.ahli.mpq.mpqeditor;
 
-import com.ahli.util.DeepCopyable;
+import com.ahli.cloning.DeepCopyable;
 import org.apache.commons.configuration2.INIConfiguration;
 import org.apache.commons.configuration2.SubnodeConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;

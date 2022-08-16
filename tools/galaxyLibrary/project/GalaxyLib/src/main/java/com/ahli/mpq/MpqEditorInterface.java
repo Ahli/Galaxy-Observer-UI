@@ -7,8 +7,8 @@ import com.ahli.mpq.i18n.Messages;
 import com.ahli.mpq.mpqeditor.MpqEditorCompression;
 import com.ahli.mpq.mpqeditor.MpqEditorCompressionRule;
 import com.ahli.mpq.mpqeditor.MpqEditorSettingsInterface;
-import com.ahli.util.DeepCopyable;
-import com.ahli.util.FileCountingVisitor;
+import com.ahli.cloning.DeepCopyable;
+import com.ahli.files.FileCountingVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

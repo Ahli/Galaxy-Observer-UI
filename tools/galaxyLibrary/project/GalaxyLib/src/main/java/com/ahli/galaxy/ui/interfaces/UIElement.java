@@ -3,7 +3,7 @@
 
 package com.ahli.galaxy.ui.interfaces;
 
-import com.ahli.util.DeepCopyable;
+import com.ahli.cloning.DeepCopyable;
 
 import java.util.List;
 

@@ -6,7 +6,7 @@ package com.ahli.galaxy.ui;
 import com.ahli.galaxy.ui.abstracts.UIElementAbstract;
 import com.ahli.galaxy.ui.interfaces.UIConstant;
 import com.ahli.galaxy.ui.interfaces.UIElement;
-import com.ahli.util.StringInterner;
+import com.ahli.memory.StringInterner;
 
 import java.util.Collections;
 import java.util.List;
