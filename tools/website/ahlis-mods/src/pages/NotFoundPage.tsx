@@ -1,7 +1,7 @@
 import { Card, Link } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
-export const NotFound = () => {
+export const NotFoundPage = () => {
   const navigate = useNavigate();
   return (
     <Card sx={{ borderRadius: '0px', height: '100vh' }}>

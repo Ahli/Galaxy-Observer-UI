@@ -1,4 +1,4 @@
-import { PostList } from '../components/PostList';
+import { PostList } from '../components/posts/PostList';
 import { Post } from '../types/Post';
 import { Card } from '@mui/material';
 import { newsPosts } from '../content/_news/news';

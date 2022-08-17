@@ -2,8 +2,8 @@ import './App.css';
 import { HomePage } from './pages/HomePage';
 import '@fontsource/roboto';
 import { HashRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import { Navbar, navBarWidth } from './components/NavBar';
-import { NotFound } from './components/NotFound';
+import { Navbar, navBarWidth } from './components/navigation/NavBar';
+import { NotFoundPage } from './pages/NotFoundPage';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { ChangelogPage } from './pages/ChangelogPage';
 import { ahliObsChangelog } from './content/ahliObs/changelog/ahliObsChangelog';
@@ -30,6 +30,9 @@ function App() {
                 path='/ahliobs/changelog'
                 element={<ChangelogPage posts={ahliObsChangelog} title='AhliObs - Changelog' />}
               />
+              {
+                //<Route path='/ahliobs/shortcuts' element={<ShortcutsPage data={{}} title='AhliObs - Shortcuts' />} />
+              }
               <Route path='/gameheart' element={<Navigate to='/gameheart/v3/changelog' replace />} />
               <Route
                 path='/gameheart/v3/changelog'
@@ -40,7 +43,7 @@ function App() {
                 path='/pro2020ahlimod/changelog'
                 element={<ChangelogPage posts={pro2020AhliModChangelog} title='Pro2020 AhliMod - Changelog' />}
               />
-              <Route path='*' element={<NotFound />} />
+              <Route path='*' element={<NotFoundPage />} />
             </Routes>
           </div>
         </Router>

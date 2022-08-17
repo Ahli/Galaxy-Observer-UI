@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Post } from '../types/Post';
+import { Post } from '../../types/Post';
 import { PostView } from './PostView';
 
 export type PostListProps = {
