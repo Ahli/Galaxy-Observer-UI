@@ -5,5 +5,6 @@ export type ShortcutsPageProps = {
 };
 
 export const ShortcutsPage = (props: ShortcutsPageProps) => {
+  props;
   return <Card sx={{ borderRadius: '0px' }}></Card>;
 };
