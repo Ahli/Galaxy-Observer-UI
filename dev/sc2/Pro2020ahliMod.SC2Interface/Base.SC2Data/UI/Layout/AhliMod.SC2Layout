@@ -18,10 +18,15 @@
 				default = "NumPad4",
 				description = "Toggles visibility of the Resources Gathered Graph. Requires HomeStoryCup XX extension mod."
 				) -->
+	<!-- @Hotkey (	constant = "Toggle Battle Report - Hotkey",
+				default = "Shift+B",
+				description = "Toggles visibility of the Battle Report dialog. Requires HomeStoryCup XX extension mod."
+				) -->
     <Constant name="Toggle Income Graph - Hotkey" val="NumPad1"/>
     <Constant name="Toggle Army Supply Graph - Hotkey" val="NumPad2"/>
     <Constant name="Toggle Resource Lost Diff Graph - Hotkey" val="NumPad3"/>
     <Constant name="Toggle Resources Gathered Graph - Hotkey" val="NumPad4"/>
+	<Constant name="Toggle Battle Report - Hotkey" val="Shift+B"/>
 	
 	<Constant name="unitSlotGap" val="#hOffset_LeaderPanelIcon"/>
 	
@@ -67,6 +72,7 @@
 					<LinkedModalFrame val="$parent/$parent/PlayerStatPanel/TopStatContainer"/>
 					<LinkedModalFrame val="$parent/$parent/PlayerStatPanel/BottomStatContainer"/>
 					<LinkedModalFrame val="$parent/$parent/$parent/ConsoleUIContainer/UnitsLostPopup"/>
+					<LinkedModalFrame val="$parent/$parent/BattleReportToggle"/>
 				</Frame>
 				<Frame type="ToggleControl" name="ArmySizeGraph">
 					<Frame type="Frame" name="Graph">
@@ -105,6 +111,7 @@
 					<LinkedModalFrame val="$parent/$parent/PlayerStatPanel/TopStatContainer"/>
 					<LinkedModalFrame val="$parent/$parent/PlayerStatPanel/BottomStatContainer"/>
 					<LinkedModalFrame val="$parent/$parent/$parent/ConsoleUIContainer/UnitsLostPopup"/>
+					<LinkedModalFrame val="$parent/$parent/BattleReportToggle"/>
 				</Frame>
 				<Frame type="ToggleControl" name="ResourcesLostDiffGraph">
 					<Frame type="Frame" name="Graph">
@@ -143,6 +150,7 @@
 					<LinkedModalFrame val="$parent/$parent/PlayerStatPanel/TopStatContainer"/>
 					<LinkedModalFrame val="$parent/$parent/PlayerStatPanel/BottomStatContainer"/>
 					<LinkedModalFrame val="$parent/$parent/$parent/ConsoleUIContainer/UnitsLostPopup"/>
+					<LinkedModalFrame val="$parent/$parent/BattleReportToggle"/>
 				</Frame>
 				<Frame type="ToggleControl" name="ResourcesGatheredGraph">
 					<Frame type="Frame" name="Graph">
@@ -181,9 +189,28 @@
 					<LinkedModalFrame val="$parent/$parent/PlayerStatPanel/TopStatContainer"/>
 					<LinkedModalFrame val="$parent/$parent/PlayerStatPanel/BottomStatContainer"/>
 					<LinkedModalFrame val="$parent/$parent/$parent/ConsoleUIContainer/UnitsLostPopup"/>
+					<LinkedModalFrame val="$parent/$parent/BattleReportToggle"/>
 				</Frame>
 			</Frame>
 			
+			<Frame type="ToggleControl" name="BattleReportToggle">
+				<Shortcut val="#Toggle Battle Report - Hotkey"/>
+				<LinkedModalFrame val="$parent/GraphContainer/IncomeGraph"/>
+				<LinkedModalFrame val="$parent/GraphContainer/ArmySizeGraph"/>
+				<LinkedModalFrame val="$parent/GraphContainer/ResourcesLostDiffGraph"/>
+				<LinkedModalFrame val="$parent/GraphContainer/ResourcesGatheredGraph"/>
+				<LinkedModalFrame val="$parent/PlayerStatPanel/StatResourcesFrame"/>
+				<LinkedModalFrame val="$parent/PlayerStatPanel/StatResourcesGasFrame"/>
+				<LinkedModalFrame val="$parent/PlayerStatPanel/StatArmySupplyFrame"/>
+				<LinkedModalFrame val="$parent/PlayerStatPanel/StatWorkerSupplyFrame"/>
+				<LinkedModalFrame val="$parent/PlayerStatPanel/StatArmyLostFrame"/>
+				<LinkedModalFrame val="$parent/PlayerStatPanel/StatWorkerLostFrame"/>
+				<LinkedModalFrame val="$parent/PlayerStatPanel/StatAPMFrame"/>
+				<LinkedModalFrame val="$parent/PlayerStatPanel/StatCPMFrame"/>
+				<LinkedModalFrame val="$parent/PlayerStatPanel/TopStatContainer"/>
+				<LinkedModalFrame val="$parent/PlayerStatPanel/BottomStatContainer"/>
+				<LinkedModalFrame val="$parent/$parent/ConsoleUIContainer/UnitsLostPopup"/>
+			</Frame>
 		</Frame>
 		<Frame type="Frame" name="ConsoleUIContainer">
 			
@@ -203,6 +230,7 @@
 				<LinkedModalFrame val="$parent/$parent/FullscreenUpperContainer/GraphContainer/ArmySizeGraph"/>
 				<LinkedModalFrame val="$parent/$parent/FullscreenUpperContainer/GraphContainer/ResourcesLostDiffGraph"/>
 				<LinkedModalFrame val="$parent/$parent/FullscreenUpperContainer/GraphContainer/ResourcesGatheredGraph"/>
+				<LinkedModalFrame val="$parent/$parent/FullscreenUpperContainer/BattleReportToggle"/>
 			</Frame>
 			
 		</Frame>
@@ -225,6 +253,9 @@
 				<Key type="Bool" time="0" value="false"/>
 			</Controller>
 			<Controller type="Visibility" end="Pause" frame="$parent/$parent/GraphContainer/ResourcesGatheredGraph">
+				<Key type="Bool" time="0" value="false"/>
+			</Controller>
+			<Controller type="Visibility" end="Pause" frame="$parent/$parent/BattleReportToggle">
 				<Key type="Bool" time="0" value="false"/>
 			</Controller>
 		</Animation>
@@ -290,6 +321,15 @@
 				</Frame>
 				<Frame type="Label" name="Hotkey">
 					<Text val="#Toggle Resources Gathered Graph - Hotkey"/>
+				</Frame>
+			</Frame>
+			<Frame type="Frame" name="ToggleBattleReport" template="Pro2020_Panels_Hotkeys/HotkeyTemplate">
+				<Anchor side="Top" relative="$parent/ToggleResourcesGatheredGraph" pos="Max" offset="#HotkeyGap"/>
+				<Frame type="Label" name="Description">
+					<Text val="@WCS/HotkeyMenu/ToggleBattleReport"/>
+				</Frame>
+				<Frame type="Label" name="Hotkey">
+					<Text val="#Toggle Battle Report - Hotkey"/>
 				</Frame>
 			</Frame>
 		</Frame>
@@ -2906,4 +2946,168 @@
 		</Frame>
 	</Frame>
 	
+	<!-- bottom panel -->
+	<Frame type="Frame" name="GameUI/UIContainer/ConsoleUIContainer/MainDisplay/1v1" file="GameUI">
+		<Frame type="Frame" name="PlayerBar_Top_Player0">
+			<Frame type="PlayerFrame" name="PlayerData">
+				<Frame type="Frame" name="MineralsContainer">
+					<Frame type="PlayerScoreValueFrame" name="Income">
+						<Anchor relative="$parent"/>
+						<VersusModePlayerSide val="{$ancestor[@name=PlayerData]/@VersusModePlayerSide}"/>
+						<VersusModePlayerIndex val="{$ancestor[@name=PlayerData]/@VersusModePlayerIndex}"/>
+					
+						<Frame type="Label" name="Plus">
+							<Anchor side="Top" relative="$parent" pos="Min" offset="38"/>
+							<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+							<Anchor side="Left" relative="$parent" pos="Min" offset="42"/>
+							<Style val="TSLIncome"/>
+							<Color val="#Color_Minerals"/>
+							<Text val="+"/>
+						</Frame>
+						
+						<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+							<Anchor side="Top" relative="$parent/Plus" pos="Min" offset="0"/>
+							<Anchor side="Bottom" relative="$parent/Plus" pos="Max" offset="0"/>
+							<Anchor side="Left" relative="$parent/Plus" pos="Max" offset="-2"/>
+							<Anchor side="Right" relative="$this/Label" pos="Max" offset="0"/>
+							<ScoreValue val="MineralsCollectionRate"/>
+							<AddCommas val="False"/>
+							
+							<Frame type="Label" name="Label">
+								<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+								<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+								<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+								<Style val="TSLIncome"/>
+								<Color val="#Color_Minerals"/>
+								<Options val="NoWrapping|ScaleToPreventTruncation"/>
+							</Frame>
+						</Frame>
+					</Frame>
+				</Frame>
+				<Frame type="Frame" name="MineralsIncomeAdvantage">
+					<Visible val="false"/>
+				</Frame>
+				<Frame type="Frame" name="GasContainer">
+					<Frame type="PlayerScoreValueFrame" name="Income">
+						<Anchor relative="$parent"/>
+						<VersusModePlayerSide val="{$ancestor[@name=PlayerData]/@VersusModePlayerSide}"/>
+						<VersusModePlayerIndex val="{$ancestor[@name=PlayerData]/@VersusModePlayerIndex}"/>
+						
+						<Frame type="Label" name="Plus">
+							<Anchor side="Top" relative="$parent" pos="Min" offset="38"/>
+							<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+							<Anchor side="Left" relative="$parent" pos="Min" offset="42"/>
+							<Style val="TSLIncome"/>
+							<Color val="#Color_Gas"/>
+							<Text val="+"/>
+						</Frame>
+						
+						<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+							<Anchor side="Top" relative="$parent/Plus" pos="Min" offset="0"/>
+							<Anchor side="Bottom" relative="$parent/Plus" pos="Max" offset="0"/>
+							<Anchor side="Left" relative="$parent/Plus" pos="Max" offset="-2"/>
+							<Anchor side="Right" relative="$this/Label" pos="Max" offset="0"/>
+							<ScoreValue val="VespeneCollectionRate"/>
+							<AddCommas val="False"/>
+							
+							<Frame type="Label" name="Label">
+								<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+								<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+								<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+								<Style val="TSLIncome"/>
+								<Color val="#Color_Gas"/>
+								<Options val="NoWrapping|ScaleToPreventTruncation"/>
+							</Frame>
+						</Frame>
+					</Frame>
+				</Frame>
+				<Frame type="Frame" name="GasIncomeAdvantage">
+					<Visible val="false"/>
+				</Frame>
+			</Frame>
+		</Frame>
+		<Frame type="Frame" name="PlayerBar_Bottom_Player0">
+			<Frame type="PlayerFrame" name="PlayerData">
+				<Frame type="Frame" name="MineralsContainer">
+					<Frame type="PlayerScoreValueFrame" name="Income">
+						<Anchor relative="$parent"/>
+						<VersusModePlayerSide val="{$ancestor[@name=PlayerData]/@VersusModePlayerSide}"/>
+						<VersusModePlayerIndex val="{$ancestor[@name=PlayerData]/@VersusModePlayerIndex}"/>
+						
+						<Frame type="Label" name="Plus">
+							<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+							<Anchor side="Bottom" relative="$parent" pos="Max" offset="-38"/>
+							<Anchor side="Left" relative="$parent" pos="Min" offset="42"/>
+							<Style val="AhliIncome"/>
+							<Color val="#Color_Minerals"/>
+							<Text val="+"/>
+						</Frame>
+						
+						<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+							<Anchor side="Top" relative="$parent/Plus" pos="Min" offset="0"/>
+							<Anchor side="Bottom" relative="$parent/Plus" pos="Max" offset="0"/>
+							<Anchor side="Left" relative="$parent/Plus" pos="Max" offset="-2"/>
+							<Anchor side="Right" relative="$this/Label" pos="Max" offset="0"/>
+							<ScoreValue val="MineralsCollectionRate"/>
+							<AddCommas val="False"/>
+							
+							<Frame type="Label" name="Label">
+								<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+								<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+								<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+								<Style val="AhliIncome"/>
+								<Color val="#Color_Minerals"/>
+								<Options val="NoWrapping|ScaleToPreventTruncation"/>
+							</Frame>
+						</Frame>
+					</Frame>
+				</Frame>
+				<Frame type="Frame" name="MineralsIncomeAdvantage">
+					<Visible val="false"/>
+				</Frame>
+				<Frame type="Frame" name="GasContainer">
+					<Frame type="PlayerScoreValueFrame" name="Income">
+						<Anchor relative="$parent"/>
+						<VersusModePlayerSide val="{$ancestor[@name=PlayerData]/@VersusModePlayerSide}"/>
+						<VersusModePlayerIndex val="{$ancestor[@name=PlayerData]/@VersusModePlayerIndex}"/>
+						
+						<Frame type="Label" name="Plus">
+							<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+							<Anchor side="Bottom" relative="$parent" pos="Max" offset="-38"/>
+							<Anchor side="Left" relative="$parent" pos="Min" offset="42"/>
+							<Style val="AhliIncome"/>
+							<Color val="#Color_Gas"/>
+							<Text val="+"/>
+						</Frame>
+						
+						<Frame type="ScoreValueLabelFrame" name="ScoreValueFrame0">
+							<Anchor side="Top" relative="$parent/Plus" pos="Min" offset="0"/>
+							<Anchor side="Bottom" relative="$parent/Plus" pos="Max" offset="0"/>
+							<Anchor side="Left" relative="$parent/Plus" pos="Max" offset="-2"/>
+							<Anchor side="Right" relative="$this/Label" pos="Max" offset="0"/>
+							<ScoreValue val="VespeneCollectionRate"/>
+							<AddCommas val="False"/>
+							
+							<Frame type="Label" name="Label">
+								<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+								<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+								<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+								<Style val="AhliIncome"/>
+								<Color val="#Color_Gas"/>
+								<Options val="NoWrapping|ScaleToPreventTruncation"/>
+							</Frame>
+						</Frame>
+					</Frame>
+				</Frame>
+				<Frame type="Frame" name="GasIncomeAdvantage">
+					<Visible val="false"/>
+				</Frame>
+			</Frame>
+		</Frame>
+	</Frame>
+
+	<!-- hide error checkbox for easier test screenshots -->
+	<Frame type="Frame" name="GameUI/UIContainer/FullscreenUpperContainer/LogMessagePanel/ShowErrorsCheckBox" file="GameUI">
+		<Alpha val="0"/>
+	</Frame>
 </Desc>
