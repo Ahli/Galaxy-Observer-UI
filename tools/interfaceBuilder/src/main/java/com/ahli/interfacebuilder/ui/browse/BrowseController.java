@@ -19,7 +19,7 @@ import com.ahli.interfacebuilder.integration.log4j.StylizedTextAreaAppender;
 import com.ahli.interfacebuilder.projects.Project;
 import com.ahli.interfacebuilder.projects.ProjectService;
 import com.ahli.interfacebuilder.projects.enums.GameType;
-import com.ahli.interfacebuilder.threads.CleaningForkJoinPool;
+import com.ahli.interfacebuilder.threads.CleaningTask;
 import com.ahli.interfacebuilder.ui.Alerts;
 import com.ahli.interfacebuilder.ui.FXMLSpringLoader;
 import com.ahli.interfacebuilder.ui.FxmlController;
@@ -76,9 +76,10 @@ public class BrowseController implements Updateable, FxmlController {
 	private final CompileService compileService;
 	private final FileService fileService;
 	private final NavigationController navigationController;
-	private final CleaningForkJoinPool executor;
 	private final ProgressController progressController;
 	private final PrimaryStageHolder primaryStage;
+	private final Game sc2Game;
+	private final Game heroesGame;
 	@FXML
 	public ListView<Project> projectListView;
 	@FXML
@@ -103,9 +104,10 @@ public class BrowseController implements Updateable, FxmlController {
 			final CompileService compileService,
 			final FileService fileService,
 			final NavigationController navigationController,
-			final CleaningForkJoinPool executor,
 			final ProgressController progressController,
-			final PrimaryStageHolder primaryStage) {
+			final PrimaryStageHolder primaryStage,
+			final Game sc2Game,
+			final Game heroesGame) {
 		this.appContext = appContext;
 		this.baseUiService = baseUiService;
 		this.configService = configService;
@@ -115,9 +117,10 @@ public class BrowseController implements Updateable, FxmlController {
 		this.compileService = compileService;
 		this.fileService = fileService;
 		this.navigationController = navigationController;
-		this.executor = executor;
 		this.progressController = progressController;
 		this.primaryStage = primaryStage;
+		this.sc2Game = sc2Game;
+		this.heroesGame = heroesGame;
 	}
 	
 	/**
@@ -336,9 +339,9 @@ public class BrowseController implements Updateable, FxmlController {
 		final Game gameData = mpqBuilderService.getGameData(gameType);
 		final Updateable controller = createTab(gameData.getGameDef().name());
 		if (controller != null) {
-			final BrowseLoadBaseUiTask task =
-					new BrowseLoadBaseUiTask(executor, gameData, (BrowseTabController) controller, baseUiService);
-			executor.execute(task);
+			Thread.startVirtualThread(new BrowseLoadBaseUiTask(gameData,
+					(BrowseTabController) controller,
+					baseUiService));
 		}
 	}
 	
@@ -362,7 +365,11 @@ public class BrowseController implements Updateable, FxmlController {
 			// context menu with close option
 			final ContextMenu contextMenu = new ContextMenu();
 			final MenuItem closeItem = new MenuItem(Messages.getString("contextmenu.close"));
-			closeItem.setOnAction(new CloseTabAction(newTab, (BrowseTabController) controller, controllers, executor));
+			closeItem.setOnAction(new CloseTabAction(newTab,
+					(BrowseTabController) controller,
+					controllers,
+					sc2Game,
+					heroesGame));
 			contextMenu.getItems().add(closeItem);
 			newTab.setContextMenu(contextMenu);
 			
@@ -425,14 +432,13 @@ public class BrowseController implements Updateable, FxmlController {
 					continue;
 				}
 				
-				@SuppressWarnings("ObjectAllocationInLoop")
-				final BrowseCompileTask task = new BrowseCompileTask(executor,
-						mod,
+				Thread.startVirtualThread(new BrowseCompileTask(mod,
 						(BrowseTabController) controller,
 						compileService,
 						baseUiService,
-						configService);
-				executor.execute(task);
+						configService,
+						sc2Game,
+						heroesGame));
 			}
 		}
 	}
@@ -441,17 +447,20 @@ public class BrowseController implements Updateable, FxmlController {
 		private final Tab tab;
 		private final BrowseTabController controller;
 		private final List<Updateable> controllers;
-		private final CleaningForkJoinPool executor;
+		private final Game sc2Game;
+		private final Game heroesGame;
 		
 		private CloseTabAction(
 				final Tab tab,
 				final BrowseTabController controller,
 				final List<Updateable> controllers,
-				final CleaningForkJoinPool executor) {
+				final Game sc2Game,
+				final Game heroesGame) {
 			this.tab = tab;
 			this.controller = controller;
 			this.controllers = controllers;
-			this.executor = executor;
+			this.sc2Game = sc2Game;
+			this.heroesGame = heroesGame;
 		}
 		
 		@Override
@@ -464,7 +473,7 @@ public class BrowseController implements Updateable, FxmlController {
 			controller.setData(null);
 			
 			// TODO Tab is not garbage collected due to Scene's mouseHandler
-			executor.tryCleanUp();
+			CleaningTask.tryToCleanUp(sc2Game, heroesGame);
 			
 			// context menu is not properly cleaned up
 			if (contextMenu != null) {

@@ -39,7 +39,6 @@ import org.springframework.lang.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serial;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -49,13 +48,10 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ForkJoinTask;
-import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -193,7 +189,7 @@ public class BaseUiService {
 	 * @return list of executable tasks
 	 */
 	@NonNull
-	public List<ForkJoinTask<Void>> createExtractionTasks(
+	public List<Runnable> createExtractionTasks(
 			@NonNull final GameType gameType, final boolean usePtr, @NonNull final Appender[] outputs) {
 		log.info("Extracting baseUI for {}", gameType);
 		
@@ -209,10 +205,10 @@ public class BaseUiService {
 			discCacheService.remove(gameDef.name(), usePtr);
 		} catch (final IOException e) {
 			log.error(String.format("Directory %s could not be cleaned.", destination), e);
-			return Collections.emptyList();
+			return List.of();
 		}
 		
-		final List<ForkJoinTask<Void>> tasks = new ArrayList<>(4);
+		final List<Runnable> tasks = new ArrayList<>(4);
 		final File extractorExe = configService.getCascExtractorExeFile();
 		final String gamePath = gameService.getGameDirPath(gameDef, usePtr);
 		final String[] queryMasks = getQueryMasks(gameType);
@@ -223,7 +219,7 @@ public class BaseUiService {
 			tasks.add(new CascFileExtractionTask(extractorExe, gamePath, mask, destination, outputAppender));
 		}
 		
-		final ForkJoinTask<Void> task = new ExtractVersionTask(gameDef, usePtr, destination, this, kryoService);
+		final Runnable task = new ExtractVersionTask(gameDef, usePtr, destination, this, kryoService);
 		tasks.add(task);
 		
 		return tasks;
@@ -271,8 +267,8 @@ public class BaseUiService {
 		// lock per game
 		final String gameBaseUiDir =
 				configService.getBaseUiPath(game.getGameDef()) + File.separator + game.getGameDef().modsSubDirectory();
-		final Lock LOCK = getLock(gameBaseUiDir);
-		LOCK.lock();
+		final Lock lock = getLock(gameBaseUiDir);
+		lock.lock();
 		try {
 			final String gameName = game.getGameDef().name();
 			UICatalog uiCatalog = game.getUiCatalog();
@@ -353,7 +349,7 @@ public class BaseUiService {
 				}
 			}
 		} finally {
-			LOCK.unlock();
+			lock.unlock();
 		}
 	}
 	
@@ -473,15 +469,12 @@ public class BaseUiService {
 		}
 	}
 	
-	private static final class CascFileExtractionTask extends RecursiveAction {
-		@Serial
-		private static final long serialVersionUID = -775938058915435006L;
-		
+	private static final class CascFileExtractionTask implements Runnable {
 		private final File extractorExe;
 		private final String gamePath;
 		private final String mask;
-		private final transient Path destination;
-		private final transient Appender outputAppender;
+		private final Path destination;
+		private final Appender outputAppender;
 		
 		private CascFileExtractionTask(
 				@NonNull final File extractorExe,
@@ -497,7 +490,7 @@ public class BaseUiService {
 		}
 		
 		@Override
-		protected void compute() {
+		public void run() {
 			try {
 				if (extract(extractorExe, gamePath, mask, destination, outputAppender)) {
 					Thread.sleep(50);
@@ -564,16 +557,12 @@ public class BaseUiService {
 		}
 	}
 	
-	private static final class ExtractVersionTask extends RecursiveAction {
-		
-		@Serial
-		private static final long serialVersionUID = 3071926102876787289L;
-		
-		private final transient GameDef gameDef;
+	private static final class ExtractVersionTask implements Runnable {
+		private final GameDef gameDef;
 		private final boolean usePtr;
-		private final transient Path destination;
-		private final transient BaseUiService baseUiService;
-		private final transient KryoService kryoService;
+		private final Path destination;
+		private final BaseUiService baseUiService;
+		private final KryoService kryoService;
 		
 		private ExtractVersionTask(
 				@NonNull final GameDef gameDef,
@@ -589,7 +578,7 @@ public class BaseUiService {
 		}
 		
 		@Override
-		protected void compute() {
+		public void run() {
 			final int[] version = baseUiService.getVersion(gameDef, usePtr);
 			try {
 				writeToMetaFile(destination, gameDef.name(), version, usePtr);
@@ -604,9 +593,7 @@ public class BaseUiService {
 				@NonNull final int[] version,
 				final boolean isPtr) throws IOException {
 			final Path path = directory.resolve(META_FILE_NAME);
-			final KryoGameInfo metaInfo = new KryoGameInfo(version, gameName, isPtr);
-			final List<Object> payload = new ArrayList<>(1);
-			payload.add(metaInfo);
+			final List<Object> payload = List.of(new KryoGameInfo(version, gameName, isPtr));
 			final Kryo kryo = kryoService.getKryoForBaseUiMetaFile();
 			kryoService.put(path, payload, kryo);
 		}

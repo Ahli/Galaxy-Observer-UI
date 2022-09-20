@@ -34,7 +34,6 @@ import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.concurrent.ForkJoinPool;
 
 import static com.ahli.interfacebuilder.ui.AppController.FATAL_ERROR;
 
@@ -44,7 +43,6 @@ public class CompressionMiningController implements Updateable, FxmlController {
 	private final ProjectService projectService;
 	private final ConfigService configService;
 	private final FileService fileService;
-	private final ForkJoinPool executor;
 	@FXML
 	private Button miningButton;
 	@FXML
@@ -83,13 +81,11 @@ public class CompressionMiningController implements Updateable, FxmlController {
 			final GameService gameService,
 			final ProjectService projectService,
 			final ConfigService configService,
-			final FileService fileService,
-			final ForkJoinPool executor) {
+			final FileService fileService) {
 		this.gameService = gameService;
 		this.projectService = projectService;
 		this.configService = configService;
 		this.fileService = fileService;
-		this.executor = executor;
 		keepTaskRunning = true;
 	}
 	
@@ -259,7 +255,7 @@ public class CompressionMiningController implements Updateable, FxmlController {
 			}
 		};
 		attemptCounterLabel.setText("0");
-		executor.execute(task);
+		Thread.startVirtualThread(task);
 		miningButton.setText(Messages.getString("progress.compressionMining.stopMining"));
 	}
 	

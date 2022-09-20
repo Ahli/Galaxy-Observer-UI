@@ -18,7 +18,7 @@ import com.ahli.interfacebuilder.integration.SettingsIniInterface;
 import com.ahli.interfacebuilder.projects.Project;
 import com.ahli.interfacebuilder.projects.ProjectService;
 import com.ahli.interfacebuilder.projects.enums.GameType;
-import com.ahli.interfacebuilder.threads.CleaningForkJoinPool;
+import com.ahli.interfacebuilder.threads.CleaningTask;
 import com.ahli.interfacebuilder.ui.AppController;
 import com.ahli.interfacebuilder.ui.PrimaryStageHolder;
 import com.ahli.interfacebuilder.ui.navigation.NavigationController;
@@ -54,9 +54,8 @@ public class MpqBuilderService {
 	private final FileService fileService;
 	private final ProjectService projectService;
 	private final BaseUiService baseUiService;
-	private final Game sc2BaseGame;
-	private final Game heroesBaseGame;
-	private final CleaningForkJoinPool executor;
+	private final Game sc2Game;
+	private final Game heroesGame;
 	private final NavigationController navigationController;
 	private final ProgressController progressController;
 	private final PrimaryStageHolder primaryStage;
@@ -67,9 +66,8 @@ public class MpqBuilderService {
 			@NonNull final FileService fileService,
 			@NonNull final ProjectService projectService,
 			@NonNull final BaseUiService baseUiService,
-			@NonNull final Game sc2BaseGame,
-			@NonNull final Game heroesBaseGame,
-			@NonNull final CleaningForkJoinPool executor,
+			@NonNull final Game sc2Game,
+			@NonNull final Game heroesGame,
 			@NonNull final NavigationController navigationController,
 			@NonNull final ProgressController progressController,
 			@NonNull final PrimaryStageHolder primaryStage) {
@@ -78,9 +76,8 @@ public class MpqBuilderService {
 		this.fileService = fileService;
 		this.projectService = projectService;
 		this.baseUiService = baseUiService;
-		this.sc2BaseGame = sc2BaseGame;
-		this.heroesBaseGame = heroesBaseGame;
-		this.executor = executor;
+		this.sc2Game = sc2Game;
+		this.heroesGame = heroesGame;
 		this.navigationController = navigationController;
 		this.progressController = progressController;
 		this.primaryStage = primaryStage;
@@ -97,9 +94,9 @@ public class MpqBuilderService {
 		final List<Project> projectsOfPath = projectService.getProjectsOfPath(path);
 		if (projectsOfPath.isEmpty()) {
 			final GameType gameType;
-			if (pathContainsCompileableForGame(path, heroesBaseGame)) {
+			if (pathContainsCompileableForGame(path, heroesGame)) {
 				gameType = GameType.HEROES;
-			} else if (pathContainsCompileableForGame(path, sc2BaseGame)) {
+			} else if (pathContainsCompileableForGame(path, sc2Game)) {
 				gameType = GameType.SC2;
 			} else {
 				throw new IllegalArgumentException("Specified path '" + path + "' did not contain any project.");
@@ -136,8 +133,7 @@ public class MpqBuilderService {
 	 * @param project
 	 */
 	public void build(@NonNull final Project project, final boolean useCmdLineSettings) {
-		final BuildTask task = new BuildTask(executor, project, useCmdLineSettings, this, baseUiService);
-		executor.execute(task);
+		Thread.startVirtualThread(new BuildTask(project, useCmdLineSettings, this, baseUiService, sc2Game, heroesGame));
 	}
 	
 	/**
@@ -149,8 +145,8 @@ public class MpqBuilderService {
 	@NonNull
 	public Game getGameData(@NonNull final GameType gameType) {
 		return switch (gameType) {
-			case SC2 -> sc2BaseGame;
-			case HEROES -> heroesBaseGame;
+			case SC2 -> sc2Game;
+			case HEROES -> heroesGame;
 		};
 	}
 	
@@ -163,7 +159,7 @@ public class MpqBuilderService {
 	 */
 	public void buildSpecificUI(
 			@NonNull final Game game, final boolean useCmdLineSettings, @NonNull final Project project) {
-		if (executor.isShutdown()) {
+		if (CleaningTask.hasShutDown()) {
 			log.error("ERROR: Executor shut down. Skipping building a UI...");
 			return;
 		}
@@ -464,6 +460,7 @@ public class MpqBuilderService {
 	 */
 	public void build(@NonNull final Iterable<Project> projects, final boolean useCmdLineSettings) {
 		boolean building = false;
+		// TODO create single task that waits for the other ones to complete and outputs how long this task took
 		for (final Project project : projects) {
 			building = true;
 			build(project, useCmdLineSettings);

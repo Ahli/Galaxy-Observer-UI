@@ -20,10 +20,6 @@ import com.ahli.interfacebuilder.integration.kryo.KryoService;
 import com.ahli.interfacebuilder.projects.ProjectEntity;
 import com.ahli.interfacebuilder.projects.ProjectJpaRepository;
 import com.ahli.interfacebuilder.projects.ProjectService;
-import com.ahli.interfacebuilder.threads.CleaningForkJoinPool;
-import com.ahli.interfacebuilder.threads.CleaningForkJoinTaskCleaner;
-import com.ahli.interfacebuilder.threads.SpringForkJoinWorkerThreadFactory;
-import com.ahli.interfacebuilder.threads.TaskCleaner;
 import com.ahli.interfacebuilder.ui.AppController;
 import com.ahli.interfacebuilder.ui.PrimaryStageHolder;
 import com.ahli.interfacebuilder.ui.navigation.NavigationController;
@@ -40,8 +36,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import javax.swing.filechooser.FileSystemView;
 import java.io.File;
 import java.nio.file.Path;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.TimeUnit;
 
 @Configuration
 @EntityScan(basePackageClasses = { ProjectEntity.class, RuleSet.class })
@@ -59,13 +53,13 @@ public class AppConfiguration {
 	
 	@Bean
 	protected Game sc2Game() {
-		log.debug("init bean: sc2BaseGame");
+		log.debug("init bean: sc2Game");
 		return new Game(GameDef.buildSc2GameDef());
 	}
 	
 	@Bean
 	protected Game heroesGame() {
-		log.debug("init bean: heroesBaseGame");
+		log.debug("init bean: heroesGame");
 		return new Game(GameDef.buildHeroesGameDef());
 	}
 	
@@ -112,12 +106,6 @@ public class AppConfiguration {
 	}
 	
 	@Bean
-	protected CleaningForkJoinTaskCleaner taskCleaner(final Game sc2Game, final Game heroesGame) {
-		log.debug("init bean: taskCleaner");
-		return new TaskCleaner(sc2Game, heroesGame);
-	}
-	
-	@Bean
 	protected ProgressController progressController(final TabPaneController tabPaneController) {
 		log.debug("init bean: progressController");
 		return new ProgressController(tabPaneController);
@@ -133,7 +121,6 @@ public class AppConfiguration {
 			// Spring uses the parameter name as a qualifier
 			final Game sc2Game,
 			final Game heroesGame,
-			final CleaningForkJoinPool executor,
 			final NavigationController navigationController,
 			final ProgressController progressController,
 			final PrimaryStageHolder primaryStage) {
@@ -146,33 +133,13 @@ public class AppConfiguration {
 				baseUiService,
 				sc2Game,
 				heroesGame,
-				executor,
 				navigationController,
 				progressController,
 				primaryStage);
 	}
 	
 	@Bean
-	protected CleaningForkJoinPool cleaningForkJoinPool(final CleaningForkJoinTaskCleaner cleaner) {
-		log.debug("init bean: forkJoinPool");
-		final int maxThreads = Math.max(1, Runtime.getRuntime().availableProcessors() / 2);
-		return new CleaningForkJoinPool(
-				maxThreads,
-				new SpringForkJoinWorkerThreadFactory(),
-				null,
-				true,
-				maxThreads,
-				256,
-				1,
-				null,
-				5_000L,
-				TimeUnit.MILLISECONDS,
-				cleaner);
-	}
-	
-	@Bean
 	protected AppController appController(
-			final ForkJoinPool executor,
 			final BaseUiService baseUiService,
 			final MpqBuilderService mpqBuilderService,
 			final GameService gameService,
@@ -183,7 +150,6 @@ public class AppConfiguration {
 			final PrimaryStageHolder primaryStage) {
 		log.debug("init bean: appController");
 		return new AppController(
-				executor,
 				baseUiService,
 				mpqBuilderService,
 				gameService,

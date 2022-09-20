@@ -3,12 +3,12 @@
 
 package com.ahli.interfacebuilder.ui.progress;
 
+import com.ahli.galaxy.game.Game;
 import com.ahli.galaxy.game.GameDef;
 import com.ahli.interfacebuilder.base_ui.BaseUiService;
 import com.ahli.interfacebuilder.base_ui.ExtractBaseUiTask;
 import com.ahli.interfacebuilder.compress.GameService;
 import com.ahli.interfacebuilder.projects.enums.GameType;
-import com.ahli.interfacebuilder.threads.CleaningForkJoinPool;
 import com.ahli.interfacebuilder.ui.FxmlController;
 import com.ahli.interfacebuilder.ui.Updateable;
 import com.ahli.interfacebuilder.ui.navigation.NavigationController;
@@ -37,8 +37,8 @@ public class BaseUiExtractionController implements Updateable, FxmlController {
 	private final BaseUiService baseUiService;
 	private final GameService gameService;
 	private final NavigationController navigationController;
-	private final CleaningForkJoinPool executor;
-	
+	private final Game sc2Game;
+	private final Game heroesGame;
 	@FXML
 	private FontAwesomeIconView stateImage1;
 	@FXML
@@ -67,18 +67,19 @@ public class BaseUiExtractionController implements Updateable, FxmlController {
 	private TextFlow txtArea3;
 	@FXML
 	private Label areaLabel3;
-	
 	private ErrorTabController errorTabController;
 	
 	public BaseUiExtractionController(
 			final BaseUiService baseUiService,
 			final GameService gameService,
 			final NavigationController navigationController,
-			final CleaningForkJoinPool executor) {
+			final Game sc2Game,
+			final Game heroesGame) {
 		this.baseUiService = baseUiService;
 		this.gameService = gameService;
 		this.navigationController = navigationController;
-		this.executor = executor;
+		this.sc2Game = sc2Game;
+		this.heroesGame = heroesGame;
 		final String threadName = "extractThread_";
 		threadNames = new String[3];
 		threadNames[0] = threadName + ++threadCount;
@@ -141,14 +142,15 @@ public class BaseUiExtractionController implements Updateable, FxmlController {
 		stateImage2.setVisible(true);
 		stateImage3.setVisible(true);
 		
-		final ExtractBaseUiTask task = new ExtractBaseUiTask(executor,
+		Thread.startVirtualThread(new ExtractBaseUiTask(
 				baseUiService,
 				gameType,
 				usePtr,
 				appenders,
 				errorTabController,
-				navigationController);
-		executor.execute(task);
+				navigationController,
+				sc2Game,
+				heroesGame));
 	}
 	
 	public String[] getThreadNames() {

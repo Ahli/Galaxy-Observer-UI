@@ -16,6 +16,7 @@ import com.ahli.interfacebuilder.integration.ReplayService;
 import com.ahli.interfacebuilder.integration.SettingsIniInterface;
 import com.ahli.interfacebuilder.integration.log4j.InterProcessCommunicationAppender;
 import com.ahli.interfacebuilder.projects.enums.GameType;
+import com.ahli.interfacebuilder.threads.CleaningTask;
 import com.ahli.interfacebuilder.ui.navigation.NavigationController;
 import com.ahli.interfacebuilder.ui.navigation.Notification;
 import com.ahli.interfacebuilder.ui.progress.ProgressController;
@@ -36,13 +37,10 @@ import java.io.IOException;
 import java.io.Serial;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.TimeUnit;
 
 @Log4j2
 public class AppController {
 	public static final String FATAL_ERROR = "FATAL ERROR: ";
-	private final ForkJoinPool executor;
 	private final BaseUiService baseUiService;
 	private final MpqBuilderService mpqBuilderService;
 	private final GameService gameService;
@@ -54,7 +52,6 @@ public class AppController {
 	private NavigationController navigationController;
 	
 	public AppController(
-			final ForkJoinPool executor,
 			final BaseUiService baseUiService,
 			final MpqBuilderService mpqBuilderService,
 			final GameService gameService,
@@ -63,7 +60,6 @@ public class AppController {
 			final ConfigurableApplicationContext appContext,
 			final ProgressController progressController,
 			final PrimaryStageHolder primaryStage) {
-		this.executor = executor;
 		this.baseUiService = baseUiService;
 		this.mpqBuilderService = mpqBuilderService;
 		this.gameService = gameService;
@@ -187,10 +183,8 @@ public class AppController {
 			
 			mpqBuilderService.build(Path.of(params.getParamCompilePath()));
 			
-			final var executorTmp = getExecutor();
-			if (executorTmp != null && executorTmp.awaitQuiescence(15, TimeUnit.MINUTES)) {
-				startReplayOrQuitOrShowError(params);
-			}
+			CleaningTask.waitForTasksToComplete(900_000, 25);
+			startReplayOrQuitOrShowError(params);
 			
 			if (primaryStage.hasPrimaryStage()) {
 				Platform.runLater(() -> {
@@ -222,8 +216,8 @@ public class AppController {
 		try {
 			if (baseUiService.isOutdated(GameType.HEROES, false)) {
 				if (primaryStage.hasPrimaryStage()) {
-					navigationController.appendNotification(new Notification(Messages.getString(
-							"browse.notification.heroesOutOfDate"),
+					navigationController.appendNotification(new Notification(
+							Messages.getString("browse.notification.heroesOutOfDate"),
 							NavigationController.BROWSE_TAB,
 							"heroesOutOfDate"));
 				} else {
@@ -236,8 +230,8 @@ public class AppController {
 		try {
 			if (baseUiService.isOutdated(GameType.HEROES, true)) {
 				if (primaryStage.hasPrimaryStage()) {
-					navigationController.appendNotification(new Notification(Messages.getString(
-							"browse.notification.heroesPtrOutOfDate"),
+					navigationController.appendNotification(new Notification(
+							Messages.getString("browse.notification.heroesPtrOutOfDate"),
 							NavigationController.BROWSE_TAB,
 							"heroesPtrOutOfDate"));
 				} else {
@@ -247,13 +241,6 @@ public class AppController {
 		} catch (final IOException e) {
 			log.error("Error during Heroes PTR baseUI update check.", e);
 		}
-	}
-	
-	/**
-	 * @return the executor
-	 */
-	public ForkJoinPool getExecutor() {
-		return executor;
 	}
 	
 	/**
@@ -367,17 +354,15 @@ public class AppController {
 	@EventListener
 	public void onAppClosingEvent(final AppClosingEvent appCLosingEvent) {
 		log.info("App is about to shut down.");
-		if (!executor.isShutdown()) {
-			executor.shutdownNow();
+		if (!CleaningTask.hasShutDown()) {
+			CleaningTask.shutDown();
 		} else {
 			log.info("Executor was already shut down.");
 		}
 		try {
-			//noinspection ResultOfMethodCallIgnored
-			executor.awaitTermination(120L, TimeUnit.SECONDS);
+			CleaningTask.waitForTasksToComplete(120_000, 25);
 		} catch (final InterruptedException e) {
-			log.error("ERROR: Executor timed out waiting for Worker Theads to terminate. A Thread might run rampage.",
-					e);
+			log.error("ERROR: Timed out waiting for a CleaningTask to terminate. A Thread might run rampage.", e);
 			Thread.currentThread().interrupt();
 		}
 		log.info("App waves Goodbye!");

@@ -3,13 +3,13 @@
 
 package com.ahli.interfacebuilder.config;
 
+import com.ahli.galaxy.game.Game;
 import com.ahli.interfacebuilder.base_ui.BaseUiService;
 import com.ahli.interfacebuilder.build.MpqBuilderService;
 import com.ahli.interfacebuilder.compile.CompileService;
 import com.ahli.interfacebuilder.compress.GameService;
 import com.ahli.interfacebuilder.integration.FileService;
 import com.ahli.interfacebuilder.projects.ProjectService;
-import com.ahli.interfacebuilder.threads.CleaningForkJoinPool;
 import com.ahli.interfacebuilder.ui.PrimaryStageHolder;
 import com.ahli.interfacebuilder.ui.browse.BrowseController;
 import com.ahli.interfacebuilder.ui.browse.BrowseTabController;
@@ -34,8 +34,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
-
-import java.util.concurrent.ForkJoinPool;
 
 @Lazy
 @Configuration
@@ -64,8 +62,7 @@ public class FxmlConfiguration {
 			final TabPaneController tabPaneController,
 			final NavigationController navigationController,
 			final MpqBuilderService mpqBuilderService) {
-		return new HomeController(
-				appContext,
+		return new HomeController(appContext,
 				projectService,
 				fileService,
 				gameService,
@@ -141,9 +138,8 @@ public class FxmlConfiguration {
 			final GameService gameService,
 			final ProjectService projectService,
 			final ConfigService configService,
-			final FileService fileService,
-			final ForkJoinPool executor) {
-		return new CompressionMiningController(gameService, projectService, configService, fileService, executor);
+			final FileService fileService) {
+		return new CompressionMiningController(gameService, projectService, configService, fileService);
 	}
 	
 	@Bean
@@ -158,11 +154,11 @@ public class FxmlConfiguration {
 			final CompileService compileService,
 			final FileService fileService,
 			final NavigationController navigationController,
-			final CleaningForkJoinPool executor,
 			final ProgressController progressController,
-			final PrimaryStageHolder primaryStage) {
-		return new BrowseController(
-				appContext,
+			final PrimaryStageHolder primaryStage,
+			final Game sc2Game,
+			final Game heroesGame) {
+		return new BrowseController(appContext,
 				baseUiService,
 				configService,
 				mpqBuilderService,
@@ -171,9 +167,10 @@ public class FxmlConfiguration {
 				compileService,
 				fileService,
 				navigationController,
-				executor,
 				progressController,
-				primaryStage);
+				primaryStage,
+				sc2Game,
+				heroesGame);
 	}
 	
 	@Bean
@@ -188,7 +185,8 @@ public class FxmlConfiguration {
 			final BaseUiService baseUiService,
 			final GameService gameServic,
 			final NavigationController navigationController,
-			final CleaningForkJoinPool executor) {
-		return new BaseUiExtractionController(baseUiService, gameServic, navigationController, executor);
+			final Game sc2Game,
+			final Game heroesGame) {
+		return new BaseUiExtractionController(baseUiService, gameServic, navigationController, sc2Game, heroesGame);
 	}
 }
