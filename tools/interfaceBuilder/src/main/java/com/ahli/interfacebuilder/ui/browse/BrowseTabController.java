@@ -49,6 +49,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Predicate;
 
@@ -72,7 +73,7 @@ public class BrowseTabController implements Updateable, FxmlController {
 	private static final String ATTRIBUTE_SEPARATOR = ", ";
 	private static final String GAME_UI = "GameUI";
 	private static final String SPACE_HIVEN_SPACE = " - ";
-	private static final ReentrantLock LOCK = new ReentrantLock();
+	private static final Lock LOCK = new ReentrantLock();
 	private final StringProperty queryString;
 	private final Callable<TreeItemPredicate<UIElement>> searchCallable;
 	private final TextFlowFactory flowFactory;

@@ -20,6 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Stream;
 
@@ -37,8 +38,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	private static final String MPQ_INTERFACE_MPQ_EDITOR_NOT_FOUND = "MpqInterface.MpqEditorNotFound";
 	private static final String CMD = "cmd";
 	private static final String SLASH_C = "/C";
-	private static final Object classWideLock = new Object();
-	private static final ReentrantLock LOCK = new ReentrantLock();
+	private static final Lock LOCK = new ReentrantLock();
 	private MpqEditorSettingsInterface settings;
 	private Path mpqEditorPath;
 	private Path mpqCachePath;
