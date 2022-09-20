@@ -50,25 +50,23 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveAction;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Log4j2
 public class BaseUiService {
 	private static final String META_FILE_NAME = ".meta";
-	
+	private static final ReentrantLock LOCK = new ReentrantLock();
 	private final ConfigService configService;
 	private final GameService gameService;
 	private final FileService fileService;
 	private final DiscCacheService discCacheService;
 	private final KryoService kryoService;
 	private final ProgressController progressController;
-	
-	private final Map<String, Object> baseUiParsingLock;
+	//	private final Map<String, Object> baseUiParsingLock;
 	private final PrimaryStageHolder primaryStage;
 	
 	public BaseUiService(
@@ -86,7 +84,7 @@ public class BaseUiService {
 		this.kryoService = kryoService;
 		this.progressController = progressController;
 		this.primaryStage = primaryStage;
-		baseUiParsingLock = new HashMap<>(2, 1.0f);
+		//		baseUiParsingLock = new HashMap<>(2, 1.0f);
 	}
 	
 	/**
@@ -271,7 +269,9 @@ public class BaseUiService {
 		// lock per game
 		final String gameBaseUiDir =
 				configService.getBaseUiPath(game.getGameDef()) + File.separator + game.getGameDef().modsSubDirectory();
-		synchronized (getLock(gameBaseUiDir)) {
+		LOCK.lock();
+		try {
+			//		synchronized (getLock(gameBaseUiDir)) {
 			final String gameName = game.getGameDef().name();
 			UICatalog uiCatalog = game.getUiCatalog();
 			if (uiCatalog != null) {
@@ -350,15 +350,17 @@ public class BaseUiService {
 					StylizedTextAreaAppender.finishedWork(Thread.currentThread().getName(), true, 50);
 				}
 			}
+		} finally {
+			LOCK.unlock();
 		}
 	}
 	
-	@NonNull
-	private Object getLock(@NonNull final String gameName) {
-		synchronized (BaseUiService.class) {
-			return baseUiParsingLock.computeIfAbsent(gameName, k -> new Object());
-		}
-	}
+	//	@NonNull
+	//	private Object getLock(@NonNull final String gameName) {
+	//		synchronized (BaseUiService.class) {
+	//			return baseUiParsingLock.computeIfAbsent(gameName, k -> new Object());
+	//		}
+	//	}
 	
 	/**
 	 * Checks if the baseUiDirectory is PTR.

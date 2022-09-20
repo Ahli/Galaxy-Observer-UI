@@ -3,12 +3,12 @@
 
 package com.ahli.mpq;
 
+import com.ahli.cloning.DeepCopyable;
+import com.ahli.files.FileCountingVisitor;
 import com.ahli.mpq.i18n.Messages;
 import com.ahli.mpq.mpqeditor.MpqEditorCompression;
 import com.ahli.mpq.mpqeditor.MpqEditorCompressionRule;
 import com.ahli.mpq.mpqeditor.MpqEditorSettingsInterface;
-import com.ahli.cloning.DeepCopyable;
-import com.ahli.files.FileCountingVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Stream;
 
 /**
@@ -37,6 +38,7 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	private static final String CMD = "cmd";
 	private static final String SLASH_C = "/C";
 	private static final Object classWideLock = new Object();
+	private static final ReentrantLock LOCK = new ReentrantLock();
 	private MpqEditorSettingsInterface settings;
 	private Path mpqEditorPath;
 	private Path mpqCachePath;
@@ -228,16 +230,16 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 		// mpq compression
 		settingsFinal.setCompression(compressMpq);
 		final String cachePath = mpqCachePath.toString();
-		synchronized (classWideLock) {
+		LOCK.lock();
+		try {
 			settingsFinal.applyCompression();
-			try {
-				// build protected file
-				newMpq(absolutePath, fileCount);
-				addToMpq(absolutePath, cachePath, "");
-				compactMpq(absolutePath);
-			} finally {
-				settingsFinal.restoreOriginalSettingFiles();
-			}
+			// build protected file
+			newMpq(absolutePath, fileCount);
+			addToMpq(absolutePath, cachePath, "");
+			compactMpq(absolutePath);
+		} finally {
+			settingsFinal.restoreOriginalSettingFiles();
+			LOCK.unlock();
 		}
 	}
 	
