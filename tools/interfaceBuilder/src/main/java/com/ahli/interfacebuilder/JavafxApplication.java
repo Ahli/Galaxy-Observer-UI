@@ -65,7 +65,7 @@ public class JavafxApplication extends Application {
 				//final Thread[] threads = new Thread[threadGroup.activeCount()];
 				threadGroup.enumerate(threads, false);
 				for (int i = threads.length - 1; i > 0; --i) {
-					if (threads[i].getId() == idLong && threads[i] instanceof final IpcServerThread serverThread) {
+					if (threads[i].threadId() == idLong && threads[i] instanceof final IpcServerThread serverThread) {
 						return serverThread;
 					}
 				}

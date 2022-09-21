@@ -66,7 +66,7 @@ public class RandomCompressionMiner {
 			final MpqEditorCompressionRule[] oldBestRuleset,
 			final FileService fileService) throws IOException, MpqException, InterruptedException {
 		this.mod = mod;
-		final String id = Long.toString(Thread.currentThread().getId());
+		final String id = Long.toString(Thread.currentThread().threadId());
 		mpqInterface = new MpqEditorInterface(mpqCachePath.resolve(id), mpqEditorPath);
 		final Path cacheDir = mpqInterface.getCache();
 		mod.setMpqCacheDirectory(cacheDir);

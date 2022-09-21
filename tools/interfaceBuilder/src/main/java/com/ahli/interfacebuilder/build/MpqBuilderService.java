@@ -189,7 +189,7 @@ public class MpqBuilderService {
 			}
 			// create unique cache path
 			final MpqEditorInterface threadsMpqInterface = new MpqEditorInterface(configService.getMpqCachePath()
-					.resolve(Long.toString(Thread.currentThread().getId())), configService.getMpqEditorPath());
+					.resolve(Long.toString(Thread.currentThread().threadId())), configService.getMpqEditorPath());
 			
 			// work
 			final boolean compressXml;
