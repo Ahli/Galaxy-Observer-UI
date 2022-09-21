@@ -473,6 +473,14 @@ public class BrowseController implements Updateable, FxmlController {
 			controller.setData(null);
 			
 			// TODO Tab is not garbage collected due to Scene's mouseHandler
+			//			Thread.startVirtualThread(() -> {
+			//				try {
+			//					Thread.sleep(50);
+			//				} catch (final InterruptedException e) {
+			//					Thread.currentThread().interrupt();
+			//				}
+			//				CleaningTask.tryToCleanUp(sc2Game, heroesGame);
+			//			});
 			CleaningTask.tryToCleanUp(sc2Game, heroesGame);
 			
 			// context menu is not properly cleaned up

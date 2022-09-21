@@ -458,15 +458,16 @@ public class MpqBuilderService {
 	 * @param projects
 	 * @param useCmdLineSettings
 	 */
-	public void build(@NonNull final Iterable<Project> projects, final boolean useCmdLineSettings) {
-		boolean building = false;
+	public void build(@NonNull final List<Project> projects, final boolean useCmdLineSettings) {
 		// TODO create single task that waits for the other ones to complete and outputs how long this task took
-		for (final Project project : projects) {
-			building = true;
-			build(project, useCmdLineSettings);
-		}
-		if (building) {
-			// switch to progress
+		Thread.startVirtualThread(new MultiBuildTask(projects,
+				useCmdLineSettings,
+				this,
+				baseUiService,
+				sc2Game,
+				heroesGame));
+		if (!projects.isEmpty()) {
+			// switch to progress tab
 			navigationController.clickProgress();
 		}
 	}

@@ -9,7 +9,7 @@
 : java -jar compile-spring-boot.jar -XX:+UseZGC -XX:ZUncommitDelay=5
 
 : ShenandoahGC
-java -jar compile-spring-boot.jar -XX:+UseShenandoahGC
+java --enable-preview -jar compile-spring-boot.jar -XX:+UseShenandoahGC
 
 : ParallelGC
 : java -jar compile-spring-boot.jar -XX:+UseParallelGC

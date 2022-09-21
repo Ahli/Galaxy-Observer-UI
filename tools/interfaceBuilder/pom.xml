@@ -25,7 +25,7 @@
 	</parent>
 
 	<properties>
-		<java.version>17</java.version>
+		<java.version>19</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<jarName>compile</jarName>
@@ -38,13 +38,13 @@
 		<!-- https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-core -->
 		<hibernate.version>6.1.3.Final</hibernate.version>
 		<h2.version>2.1.214</h2.version>
-		<junit-jupiter.version>5.9.0</junit-jupiter.version>
-		<slf4j.version>2.0.1</slf4j.version>
+		<junit-jupiter.version>5.9.1</junit-jupiter.version>
+		<slf4j.version>2.0.2</slf4j.version>
 		<commons-lang3.version>3.12.0</commons-lang3.version>
 		<hikaricp.version>5.0.1</hikaricp.version>
 		<jboss-logging.version>3.5.0.Final</jboss-logging.version>
 		<mockito.version>4.8.0</mockito.version>
-		<flyway.version>9.3.0</flyway.version>
+		<flyway.version>9.3.1</flyway.version>
 
 		<!-- local versions -->
 		<javafx.version>20-ea+2</javafx.version>
@@ -53,7 +53,7 @@
 		<objenesis.version>3.3</objenesis.version>
 		<pecoff4j.version>0.3.2</pecoff4j.version>
 		<asm.version>9.3</asm.version>
-		<log4j2.version>2.18.0</log4j2.version>
+		<log4j2.version>2.19.0</log4j2.version>
 		<lmax-disruptor.version>3.4.4</lmax-disruptor.version>
 		<fontawesomefx-fontawesome.version>4.7.0-9.1.2</fontawesomefx-fontawesome.version>
 		<commons-text.version>1.9</commons-text.version>
@@ -157,8 +157,7 @@
 			<artifactId>spring-boot-starter-log4j2</artifactId>
 			<exclusions>
 				<exclusion>
-					<!-- removed in favor of log4j-slf4j18-impl more compatible with slf4j 2.x.
-					 		it is not 100% compatible, but it seems to work fine except for an error at startup -->
+					<!-- removed in favor of log4j-slf4j2-impl for slf4j 2.x -->
 					<groupId>org.apache.logging.log4j</groupId>
 					<artifactId>log4j-slf4j-impl</artifactId>
 				</exclusion>
@@ -166,7 +165,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-slf4j18-impl</artifactId>
+			<artifactId>log4j-slf4j2-impl</artifactId>
 			<version>${log4j2.version}</version>
 		</dependency>
 		<dependency>
@@ -205,6 +204,12 @@
 			<groupId>org.flywaydb</groupId>
 			<artifactId>flyway-core</artifactId>
 			<version>${flyway.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.electronwill.night-config</groupId>
+					<artifactId>toml</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<!-- ensure proper equals implementations -->
 		<dependency>
@@ -319,7 +324,6 @@
 				</exclusions>
 			</dependency>
 
-
 			<!-- TO UPDATE DEPENDENCIES within other dependencies -->
 			<!-- update dependency within configuration2 -->
 			<dependency>
@@ -333,6 +337,13 @@
 				<groupId>org.objenesis</groupId>
 				<artifactId>objenesis</artifactId>
 				<version>${objenesis.version}</version>
+			</dependency>
+
+			<!-- altlr4-runtime required by hibernate -->
+			<dependency>
+				<groupId>org.antlr</groupId>
+				<artifactId>antlr4-runtime</artifactId>
+				<version>4.11.1</version>
 			</dependency>
 
 		</dependencies>
@@ -391,10 +402,6 @@
 					<encoding>UTF-8</encoding>
 					<showWarnings>true</showWarnings>
 					<showDeprecation>true</showDeprecation>
-					<!--<compilerArgs>-->
-					<!-- when testing java preview features -->
-					<!--&#45;&#45;enable-preview-->
-					<!--</compilerArgs>-->
 					<annotationProcessorPaths>
 						<path>
 							<!-- Creates .dat file for log4j custom appenders -->
@@ -409,6 +416,7 @@
 						</path>
 					</annotationProcessorPaths>
 					<compilerArgs>
+						<compilerArg>--enable-preview</compilerArg>
 						<compilerArg>-Xlint:all</compilerArg>
 					</compilerArgs>
 				</configuration>
@@ -470,7 +478,7 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>3.0.0-M7</version>
 				<configuration>
-					<!--<argLine>&#45;&#45;enable-preview</argLine>-->
+					<argLine>--enable-preview</argLine>
 				</configuration>
 				<dependencies>
 					<dependency>
@@ -560,7 +568,7 @@
 			<plugin>
 				<groupId>org.owasp</groupId>
 				<artifactId>dependency-check-maven</artifactId>
-				<version>7.2.0</version>
+				<version>7.2.1</version>
 				<executions>
 					<execution>
 						<goals>

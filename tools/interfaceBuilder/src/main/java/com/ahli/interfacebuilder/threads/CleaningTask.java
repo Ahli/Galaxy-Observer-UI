@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Log4j2
 public abstract class CleaningTask implements Runnable {
 	private static final AtomicInteger tasksRunning = new AtomicInteger();
+	private static final AtomicInteger tasksStarted = new AtomicInteger();
 	private static final AtomicBoolean shutDown = new AtomicBoolean();
 	private final Game sc2Game;
 	private final Game heroesGame;
@@ -42,8 +43,13 @@ public abstract class CleaningTask implements Runnable {
 		return tasksRunning.get() != 0;
 	}
 	
+	public static int getRunningTaskCount() {
+		return tasksRunning.get();
+	}
+	
 	public void start() {
 		tasksRunning.getAndIncrement();
+		Thread.currentThread().setName("ClnTsk-" + tasksStarted.incrementAndGet());
 	}
 	
 	public void end() {
@@ -79,9 +85,9 @@ public abstract class CleaningTask implements Runnable {
 			StringInterner.cleanUpGarbage();
 			log.trace("string interner size after cleaning: {}", StringInterner::size);
 			// TODO not all Strings are removed for some reason
-			//				if (StringInterner.size() < 10) {
-			//					log.trace("interner content: \n{}", StringInterner.print());
-			//				}
+			if (log.isTraceEnabled() && StringInterner.size() < 1000) {
+				log.trace("interner content: \n{}", StringInterner.print());
+			}
 		}
 	}
 	
