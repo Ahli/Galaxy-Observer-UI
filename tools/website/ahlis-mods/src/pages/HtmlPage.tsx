@@ -1,11 +1,11 @@
 import { Card } from '@mui/material';
 
-export type ShortcutsPageProps = {
+export type HtmlPageProps = {
   title: string;
   contentHtml: string;
 };
 
-export const ShortcutsPage = (props: ShortcutsPageProps) => {
+export const HtmlPage = (props: HtmlPageProps) => {
   return (
     <Card sx={{ borderRadius: '0px' }}>
       <h2>{props.title}</h2>

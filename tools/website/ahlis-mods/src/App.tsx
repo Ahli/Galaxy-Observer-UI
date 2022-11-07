@@ -9,7 +9,7 @@ import { ChangelogPage } from './pages/ChangelogPage';
 import { ahliObsChangelog } from './content/ahliObs/changelog/ahliObsChangelog';
 import { gh3changelog } from './content/gameheart/v3/changelog/gh3changelog';
 import { pro2020AhliModChangelog } from './content/pro2020ahlimod/changelog/pro2020ahliModChangelog';
-import { ShortcutsPage } from './pages/ShortcutsPage';
+import { HtmlPage } from './pages/HtmlPage';
 import { ahliObsShortcuts } from './content/ahliObs/shortcuts/ahliObsShortcuts';
 
 const darkTheme = createTheme({
@@ -35,7 +35,7 @@ function App() {
               {
                 <Route
                   path='/ahliobs/shortcuts'
-                  element={<ShortcutsPage title='AhliObs - Shortcuts' contentHtml={ahliObsShortcuts} />}
+                  element={<HtmlPage title='AhliObs - Shortcuts' contentHtml={ahliObsShortcuts} />}
                 />
               }
               <Route path='/gameheart' element={<Navigate to='/gameheart/v3/changelog' replace />} />
