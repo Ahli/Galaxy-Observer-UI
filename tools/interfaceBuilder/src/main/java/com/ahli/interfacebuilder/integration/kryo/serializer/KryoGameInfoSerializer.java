@@ -14,8 +14,8 @@ public class KryoGameInfoSerializer extends Serializer<KryoGameInfo> {
 	@Override
 	public void write(final Kryo kryo, final Output output, final KryoGameInfo gameInfo) {
 		output.setVariableLengthEncoding(false);
-		output.writeInts(gameInfo.getVersion(), 0, 4, true);
-		output.writeString(gameInfo.getGameName());
+		output.writeInts(gameInfo.version(), 0, 4, true);
+		output.writeString(gameInfo.gameName());
 		output.writeBoolean(gameInfo.isPtr());
 	}
 	

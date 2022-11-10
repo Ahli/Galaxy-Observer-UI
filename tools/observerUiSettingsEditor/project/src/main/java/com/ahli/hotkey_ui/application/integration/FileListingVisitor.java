@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FileListingVisitor extends SimpleFileVisitor<Path> {
-	private List<Path> paths = new ArrayList<>();
+	private final List<Path> paths = new ArrayList<>();
 	
 	@Override
 	public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) {
@@ -20,7 +20,4 @@ public class FileListingVisitor extends SimpleFileVisitor<Path> {
 		return paths;
 	}
 	
-	public void resetFiles() {
-		paths = new ArrayList<>();
-	}
 }

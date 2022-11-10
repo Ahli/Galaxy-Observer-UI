@@ -54,13 +54,6 @@ public final class ErrorTabController {
 		return encounteredError;
 	}
 	
-	/**
-	 * @return
-	 */
-	public boolean hasEncounteredWarning() {
-		return encounteredWarning;
-	}
-	
 	public void clearError(final boolean updateTabHeader) {
 		encounteredError = false;
 		if (updateTabHeader) {
@@ -116,13 +109,6 @@ public final class ErrorTabController {
 	 */
 	public Tab getTab() {
 		return tab;
-	}
-	
-	/**
-	 * @return the running
-	 */
-	public boolean isRunning() {
-		return running;
 	}
 	
 	/**

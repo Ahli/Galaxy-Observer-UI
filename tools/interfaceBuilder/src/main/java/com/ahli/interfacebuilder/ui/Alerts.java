@@ -10,7 +10,6 @@ import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.stage.Window;
@@ -20,26 +19,6 @@ public final class Alerts {
 	
 	private Alerts() {
 		// no instances allowed
-	}
-	
-	/**
-	 * @param owner
-	 * @param title
-	 * @param header
-	 * @param content
-	 * @return
-	 */
-	public static Alert buildYesNoCancelAlert(
-			final Window owner, final String title, final String header, final String content) {
-		final ButtonType yesButton = new ButtonType(Messages.getString("general.yesButton"), ButtonData.YES);
-		final ButtonType noButton = new ButtonType(Messages.getString("general.noButton"), ButtonData.NO);
-		final ButtonType cancelButton =
-				new ButtonType(Messages.getString("general.cancelButton"), ButtonData.CANCEL_CLOSE);
-		final Alert alert = new Alert(AlertType.INFORMATION, content, yesButton, noButton, cancelButton);
-		alert.initOwner(owner);
-		alert.setTitle(title);
-		alert.setHeaderText(header);
-		return alert;
 	}
 	
 	/**
@@ -61,45 +40,6 @@ public final class Alerts {
 	
 	private static ButtonType createOkButton() {
 		return new ButtonType(Messages.getString("general.okButton"), ButtonData.OK_DONE);
-	}
-	
-	/**
-	 * @param owner
-	 * @param title
-	 * @param header
-	 * @param content
-	 * @return
-	 */
-	public static Alert buildWarningAlert(
-			final Window owner, final String title, final String header, final String content) {
-		final ButtonType okButton = createOkButton();
-		final Alert alert = new Alert(AlertType.WARNING, content, okButton);
-		alert.initOwner(owner);
-		alert.setTitle(title);
-		alert.setHeaderText(header);
-		return alert;
-	}
-	
-	/**
-	 * @param owner
-	 * @param title
-	 * @param header
-	 * @param content
-	 * @param imageUrl
-	 * @return
-	 */
-	public static Alert buildAboutAlert(
-			final Window owner, final String title, final String header, final String content, final String imageUrl) {
-		final ButtonType okButton = createOkButton();
-		final Alert alert = new Alert(AlertType.INFORMATION, content, okButton);
-		alert.initOwner(owner);
-		alert.setTitle(title);
-		alert.setHeaderText(header);
-		if (imageUrl != null) {
-			alert.setGraphic(new ImageView(imageUrl));
-		}
-		alert.getDialogPane().setPrefSize(480, 360);
-		return alert;
 	}
 	
 	/**

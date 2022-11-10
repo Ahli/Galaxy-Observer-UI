@@ -36,7 +36,7 @@ module interfacex.builder {
 	requires spring.boot; // automatic module
 	requires transitive spring.context; // automatic module
 	requires transitive spring.core; // automatic module
-	requires spring.data.commons; // automatic module
+//	requires spring.data.commons; // automatic module
 	requires transitive spring.data.jpa;
 	requires spring.tx; // automatic module
 	requires spring.jdbc; // automatic module
@@ -45,7 +45,7 @@ module interfacex.builder {
 	requires java.sql; //redundant, but required!
 //	requires jakarta.xml.bind; // provides jakarta/xml/jaxbexception //redundant, but required!
 	requires org.apache.commons.lang3; // automatic module
-	requires org.slf4j; // automatic module
+//	requires org.slf4j; // automatic module
 	
 	// own projects
 	requires transitive GalaxyLib;

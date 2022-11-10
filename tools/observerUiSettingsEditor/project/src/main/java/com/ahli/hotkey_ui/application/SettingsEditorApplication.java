@@ -391,7 +391,7 @@ public class SettingsEditorApplication extends Application {
 	private void showErrorAlert(final Exception e) {
 		Platform.runLater(() -> {
 			logger.trace("showing error popup");
-			final String title = Messages.getString("Main.anErrorOccured");
+			final String title = Messages.getString("Main.anErrorOccurred");
 			final String content = e.getMessage();
 			final Alert alert = Alerts.buildErrorAlert(getPrimaryStage(), title, title, content);
 			alert.showAndWait();

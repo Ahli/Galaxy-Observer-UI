@@ -72,6 +72,6 @@ All settings you wish to edit has to use constants, so your actual control frame
 		<Shortcut val="#Hotkey - Toggle Talents"/>
 	</Frame>
 
-Furthermore, you should define a default value and a description for your settings and hotkeys. These information are not required, but help the user.
+Furthermore, you should define a default value and a description for your settings and hotkeys. This information is not required, but helps the user.
 
 

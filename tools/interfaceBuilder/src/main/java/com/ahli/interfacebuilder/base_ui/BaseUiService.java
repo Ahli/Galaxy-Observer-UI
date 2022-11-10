@@ -117,7 +117,7 @@ public class BaseUiService {
 			log.trace(msg, e);
 			return true;
 		}
-		final int[] versionBaseUi = baseUiInfo.getVersion();
+		final int[] versionBaseUi = baseUiInfo.version();
 		final int[] versionExe = getVersion(gameDef, usePtr);
 		boolean isUpToDate = true;
 		for (int i = 0; i < versionExe.length && isUpToDate; ++i) {
@@ -401,13 +401,13 @@ public class BaseUiService {
 		}
 		
 		final KryoGameInfo cacheInfo = discCacheService.getCachedBaseUiInfo(cacheFile);
-		final int[] versionCache = cacheInfo.getVersion();
+		final int[] versionCache = cacheInfo.version();
 		
 		final KryoGameInfo baseUiInfo = readMetaFile(metaFileDir);
 		if (baseUiInfo == null) {
 			return false;
 		}
-		final int[] versionBaseUi = baseUiInfo.getVersion();
+		final int[] versionBaseUi = baseUiInfo.version();
 		
 		boolean isUpToDate = true;
 		for (int i = 0; i < versionCache.length && isUpToDate; ++i) {

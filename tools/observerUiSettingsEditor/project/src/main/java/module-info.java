@@ -1,6 +1,7 @@
 module ObserverUiSettingsEditor {
 	// automatic modules :(
 	requires org.apache.commons.lang3;
+	requires com.esotericsoftware.kryo;
 	
 	requires java.desktop;
 	requires java.xml;
@@ -12,7 +13,6 @@ module ObserverUiSettingsEditor {
 	requires ch.qos.logback.classic;
 	requires ch.qos.logback.core;
 	requires java.naming; // required for logback classic
-	requires com.esotericsoftware.kryo;
 	
 	requires GalaxyLib;
 	exports com.ahli.hotkey_ui.application to javafx.graphics;

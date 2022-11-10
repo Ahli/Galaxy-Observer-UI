@@ -374,7 +374,7 @@ public class UICatalogImpl implements UICatalog {
 			}
 		}
 		// no constant tag
-		if (i <= 0) {
+		if (i == 0) {
 			return constantRef;
 		}
 		final String prefix = constantRef.substring(0, i);

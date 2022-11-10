@@ -6,28 +6,7 @@ package com.ahli.interfacebuilder.integration.kryo;
 import java.util.Arrays;
 import java.util.Objects;
 
-public class KryoGameInfo {
-	private final int[] version;
-	private final String gameName;
-	private final boolean isPtr;
-	
-	public KryoGameInfo(final int[] version, final String gameName, final boolean isPtr) {
-		this.version = version;
-		this.gameName = gameName;
-		this.isPtr = isPtr;
-	}
-	
-	public String getGameName() {
-		return gameName;
-	}
-	
-	public boolean isPtr() {
-		return isPtr;
-	}
-	
-	public int[] getVersion() {
-		return version;
-	}
+public record KryoGameInfo(int[] version, String gameName, boolean isPtr) {
 	
 	@Override
 	public String toString() {
@@ -35,7 +14,7 @@ public class KryoGameInfo {
 	}
 	
 	@Override
-	public final boolean equals(final Object obj) {
+	public boolean equals(final Object obj) {
 		if (this == obj) {
 			return true;
 		}
@@ -46,7 +25,7 @@ public class KryoGameInfo {
 	}
 	
 	@Override
-	public final int hashCode() {
+	public int hashCode() {
 		@SuppressWarnings("ObjectInstantiationInEqualsHashCode")
 		int result = Objects.hash(gameName, isPtr);
 		result = 31 * result + Arrays.hashCode(version);

@@ -5,7 +5,6 @@ package com.ahli.interfacebuilder.i18n;
 
 import lombok.extern.log4j.Log4j2;
 
-import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -18,9 +17,7 @@ import java.util.ResourceBundle;
 @Log4j2
 public final class Messages {
 	private static final String BUNDLE_NAME = "i18n.messages";
-	private static ResourceBundle resourceBundle = ResourceBundle.getBundle(BUNDLE_NAME);
-	
-	private static Locale usedLocale = Locale.getDefault();
+	private static final ResourceBundle resourceBundle = ResourceBundle.getBundle(BUNDLE_NAME);
 	
 	private Messages() {
 		// no instances alllowed
@@ -42,48 +39,4 @@ public final class Messages {
 		}
 	}
 	
-	/**
-	 * Returns the currently used bundle.
-	 *
-	 * @return the ResourceBundle
-	 */
-	public static ResourceBundle getBundle() {
-		return resourceBundle;
-	}
-	
-	/**
-	 * Sets a bundle based on the specified Locale.
-	 *
-	 * @param loc
-	 * 		the Locale
-	 */
-	public static void setBundle(final Locale loc) {
-		resourceBundle = ResourceBundle.getBundle(BUNDLE_NAME, loc);
-		usedLocale = loc;
-	}
-	
-	/**
-	 * Returns the Locale that was used to get the bundle in effect.
-	 *
-	 * @return used Locale
-	 */
-	public static Locale getUsedLocale() {
-		return usedLocale;
-	}
-	
-	/**
-	 * Checks if the Locale's resource bundle is the one used.
-	 *
-	 * @param locale
-	 * 		a Locale
-	 * @return whether the specified Locale is used or not
-	 */
-	public static boolean checkIfTargetResourceIsUsed(final Locale locale) {
-		final boolean result = resourceBundle.equals(ResourceBundle.getBundle(BUNDLE_NAME, locale));
-		log.trace("compare used locale's resource '{}' with one for locale '{}', result: {}",
-				usedLocale,
-				locale,
-				result);
-		return result;
-	}
 }

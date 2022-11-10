@@ -89,7 +89,7 @@ public class JavafxApplication extends Application {
 	}
 	
 	@Override
-	public void start(final Stage primaryStage) throws Exception {
+	public void start(final Stage primaryStage) {
 		Thread.currentThread().setName("UI");
 		Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 		final CommandLineParams startingParams = new CommandLineParams(getParameters());

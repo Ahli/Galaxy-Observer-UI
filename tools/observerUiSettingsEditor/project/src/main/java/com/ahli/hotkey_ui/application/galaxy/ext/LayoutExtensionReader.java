@@ -102,7 +102,7 @@ public class LayoutExtensionReader {
 		
 		for (int i = 0, len = layoutFiles.size(); i < len; ++i) {
 			final Path path = layoutFiles.get(i);
-			Document doc = null;
+			final Document doc;
 			try {
 				doc = dBuilder.parse(path.toString());
 			} catch (final SAXParseException e) {
@@ -181,7 +181,7 @@ public class LayoutExtensionReader {
 	public void processCommentText(final String textInput) {
 		logger.debug("textInput:{}", textInput);
 		try {
-			// split at keywords @hotkey or @setting without removing, case insensitive
+			// split at keywords @hotkey or @setting without removing, case-insensitive
 			for (String text : HOTKEY_SETTING_REGEX_PATTERN.split(textInput)) {
 				logger.debug("token start:{}", text);
 				text = text.trim();

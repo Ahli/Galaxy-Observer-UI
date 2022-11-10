@@ -65,14 +65,6 @@ public final class RuleSet implements Serializable {
 		compressionRulesString = rulesStrings;
 	}
 	
-	public Long getId() {
-		return id;
-	}
-	
-	public void setId(final Long id) {
-		this.id = id;
-	}
-	
 	@Transient
 	public MpqEditorCompressionRule[] getCompressionRules() throws IOException {
 		// lazy-load array
@@ -85,17 +77,8 @@ public final class RuleSet implements Serializable {
 		return compressionRules;
 	}
 	
-	@Transient
-	public void setCompressionRules(final MpqEditorCompressionRule... compressionRules) {
-		setCompressionRulesPrivate(compressionRules);
-	}
-	
 	public List<String> getCompressionRulesString() {
 		return compressionRulesString;
-	}
-	
-	public void setCompressionRulesString(final List<String> compressionRulesString) {
-		this.compressionRulesString = compressionRulesString;
 	}
 	
 	@Override

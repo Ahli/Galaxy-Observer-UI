@@ -24,23 +24,4 @@ public final class ShowToUserException extends Exception {
 		super(message);
 	}
 	
-	/**
-	 * Constructor.
-	 *
-	 * @param message
-	 * @param e
-	 */
-	public ShowToUserException(final String message, final Exception e) {
-		super(message, e);
-	}
-	
-	/**
-	 * Constructor.
-	 *
-	 * @param e
-	 */
-	public ShowToUserException(final Exception e) {
-		super(e);
-	}
-	
 }

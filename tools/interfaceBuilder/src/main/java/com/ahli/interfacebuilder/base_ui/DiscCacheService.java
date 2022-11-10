@@ -112,13 +112,4 @@ public class DiscCacheService {
 		}
 	}
 	
-	/**
-	 * @param gameDefName
-	 * @param isPtr
-	 * @return
-	 */
-	public boolean exists(@NonNull final String gameDefName, final boolean isPtr) {
-		return Files.exists(getCacheFilePath(gameDefName, isPtr));
-	}
-	
 }

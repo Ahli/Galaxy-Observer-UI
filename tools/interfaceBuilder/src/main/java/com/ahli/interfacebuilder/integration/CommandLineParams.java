@@ -113,11 +113,6 @@ public class CommandLineParams implements Serializable {
 		paramRunPath = namedParams.get(RUN);
 	}
 	
-	@Nullable
-	public static String getServerThreadId(final String... params) {
-		return getParamsValue(params, PARAM_PREFIX + SERVER + EQUAL);
-	}
-	
 	public static String getServerThreadId(@Nullable final Application.Parameters params) {
 		return params != null ? params.getNamed().get(SERVER) : "";
 	}
