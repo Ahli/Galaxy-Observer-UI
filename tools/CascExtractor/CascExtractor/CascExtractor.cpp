@@ -166,8 +166,10 @@ template <typename T> T* CASC_ALLOC(size_t nCount) noexcept
 
 template <typename T> void CASC_FREE(T*& ptr) noexcept
 {
-	free(ptr);
-	ptr = nullptr;
+	if (ptr != nullptr) {
+		free(ptr);
+		ptr = nullptr;
+	}
 }
 
 // Retrieves the pointer to plain name
@@ -205,11 +207,12 @@ static bool ExtractFile(HANDLE hStorage, const CASC_FIND_DATA& findData, const c
 	namespace fs = std::filesystem;
 
 	PCASC_FILE_SPAN_INFO pSpans = nullptr;
+	HANDLE hFile = nullptr;
 	CASC_FILE_FULL_INFO fileInfo{};
 	LPCSTR szOpenName = findData.szFileName;
 	DWORD dwErrCode = ERROR_SUCCESS;
 
-	if (HANDLE hFile = nullptr; CascOpenFile(hStorage, szOpenName, NULL /*dwLocaleFlags*/, CASC_STRICT_DATA_CHECK, &hFile))
+	if (CascOpenFile(hStorage, szOpenName, NULL /*dwLocaleFlags*/, CASC_STRICT_DATA_CHECK, &hFile))
 	{
 		// Retrieve the information about file spans.
 		if ((pSpans = GetFileInfo(hFile, fileInfo)) != nullptr && fileInfo.ContentSize > 0)
@@ -221,11 +224,12 @@ static bool ExtractFile(HANDLE hStorage, const CASC_FIND_DATA& findData, const c
 			// Load the entire file, one read request per span.
 			// Using span-aligned reads will cause CascReadFile not to do any caching,
 			// and the amount of memcpys will be almost zero
-			for (DWORD i = 0; i < fileInfo.SpanCount && dwErrCode == ERROR_SUCCESS; i++)
+			for (DWORD i = 0; i < fileInfo.SpanCount && dwErrCode == ERROR_SUCCESS; ++i)
 			{
 				const CASC_FILE_SPAN_INFO* const pFileSpan = pSpans + i;
 				LPBYTE pbFileSpan = nullptr;
-				const auto cbFileSpan = static_cast<DWORD>(pFileSpan->EndOffset - pFileSpan->StartOffset);
+				const auto cbFileSpan = (DWORD) (pFileSpan->EndOffset - pFileSpan->StartOffset);
+				bool bReadOk = true;
 
 				// Do not read empty spans.
 				if (cbFileSpan == 0)
@@ -245,24 +249,8 @@ static bool ExtractFile(HANDLE hStorage, const CASC_FIND_DATA& findData, const c
 				// CascReadFile will read as much as possible. If there is a frame error
 				// (e.g. MD5 mismatch, missing encryption key or disc error),
 				// CascReadFile only returns frames that are loaded entirely.
-				if (!CascReadFile(hFile, pbFileSpan, cbFileSpan, &dwBytesRead))
-				{
-					// Do not report some errors; for example, when the file is encrypted,
-					// we can't do much about it. Only report it if we are going to extract one file
-					switch (dwErrCode = GetCascError())
-					{
-					case ERROR_SUCCESS:
-						break;
-					case ERROR_FILE_ENCRYPTED:
-						std::cout << "   WARNING: File is encrypted: " << szOpenName << std::endl;
-						break;
-					default:
-						std::cout << "   WARNING: Could not read file: " << szOpenName << std::endl;
-						break;
-					}
-				}
-
-				if (dwBytesRead > 0) {
+				bReadOk = CascReadFile(hFile, pbFileSpan, cbFileSpan, &dwBytesRead);
+				if (bReadOk) {
 					// prepare file stream
 					if (!pOutFile) {
 
@@ -285,6 +273,26 @@ static bool ExtractFile(HANDLE hStorage, const CASC_FIND_DATA& findData, const c
 					}
 
 					totalWritten += dwBytesRead;
+
+					// If we read less than expected, we report read error
+					bReadOk = (dwBytesRead == cbFileSpan);
+				}
+
+				if (bReadOk)
+				{
+					// Do not report some errors; for example, when the file is encrypted,
+					// we can't do much about it. Only report it if we are going to extract one file
+					switch (dwErrCode = GetCascError())
+					{
+					case ERROR_SUCCESS:
+						break;
+					case ERROR_FILE_ENCRYPTED:
+						std::cout << "   WARNING: File is encrypted: " << szOpenName << std::endl;
+						break;
+					default:
+						std::cout << "   WARNING: Could not read file: " << szOpenName << std::endl;
+						break;
+					}
 				}
 
 				// Free the memory occupied by the file span
