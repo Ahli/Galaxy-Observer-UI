@@ -17,7 +17,7 @@ export const pro2020AhliModChangelog: Post[] = [
         'Resources Lost Difference Graph on NumPad3',
         'Production Tab of the Leaderpanel will show a Chrono Boost indicator',
       ]),
-      "reverted shortcuts of graphs back to NumPad1 and NumPad2. Use AHli's Settings Editor to customize these",
+      "reverted shortcuts of graphs back to NumPad1 and NumPad2. Use Ahli's Settings Editor to customize these",
     ],
   } as Changelog,
   {
