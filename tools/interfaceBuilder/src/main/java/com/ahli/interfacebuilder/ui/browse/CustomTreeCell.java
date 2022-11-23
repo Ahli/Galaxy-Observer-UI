@@ -12,6 +12,7 @@ public class CustomTreeCell extends TreeCell<UIElement> {
 	
 	public CustomTreeCell(final TextFlowFactory flowFactory) {
 		this.flowFactory = flowFactory;
+		setMinHeight(20);
 	}
 	
 	@Override

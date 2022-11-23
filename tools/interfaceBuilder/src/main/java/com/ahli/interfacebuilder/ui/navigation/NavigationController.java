@@ -188,13 +188,6 @@ public class NavigationController {
 		showPanelContent(PROGRESS_TAB);
 	}
 	
-	public void lockNavToBrowse() {
-		home.setDisable(true);
-		progress.setDisable(true);
-		settings.setDisable(true);
-		showPanelContent(BROWSE_TAB);
-	}
-	
 	/**
 	 * Releases all navigation button locks.
 	 */
