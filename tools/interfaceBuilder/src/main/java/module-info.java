@@ -23,29 +23,21 @@ module interfacex.builder {
 	requires org.apache.logging.log4j;
 	requires org.apache.logging.log4j.core; // automatic module
 	requires transitive com.esotericsoftware.kryo; // automatic module
-	//requires com.esotericsoftware.minlog;
 	requires com.kichik.pecoff4j;
-	//requires org.eclipse.collections.api;
 	requires org.eclipse.collections.impl; // automatic module
 	
 	// spring
-	//requires jakarta.activation;
 	requires org.hibernate.orm.core; // automatic module
 	requires transitive spring.beans; // automatic module
 	requires transitive spring.boot.autoconfigure; // automatic module
 	requires spring.boot; // automatic module
 	requires transitive spring.context; // automatic module
 	requires transitive spring.core; // automatic module
-//	requires spring.data.commons; // automatic module
 	requires transitive spring.data.jpa;
 	requires spring.tx; // automatic module
 	requires spring.jdbc; // automatic module
-//	requires com.fasterxml.classmate;//redundant, but required!
-//	requires net.bytebuddy; // redundant, but required!
 	requires java.sql; //redundant, but required!
-//	requires jakarta.xml.bind; // provides jakarta/xml/jaxbexception //redundant, but required!
 	requires org.apache.commons.lang3; // automatic module
-//	requires org.slf4j; // automatic module
 	
 	// own projects
 	requires transitive GalaxyLib;

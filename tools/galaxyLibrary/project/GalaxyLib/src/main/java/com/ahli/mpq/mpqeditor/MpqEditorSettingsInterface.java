@@ -239,7 +239,6 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 				ini.clear();
 			} catch (final ConfigurationException e) {
 				logger.error("Error while editing custom ruleset file.", e);
-				ini = null;
 			}
 		}
 		if (ini == null) {

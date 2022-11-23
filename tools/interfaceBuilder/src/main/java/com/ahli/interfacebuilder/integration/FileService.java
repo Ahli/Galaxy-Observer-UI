@@ -100,7 +100,7 @@ public class FileService {
 				Files.createDirectories(directory);
 				return;
 			} catch (final IOException e) {
-				if (i <= 1) {
+				if (i == 1) {
 					throw e;
 				} else {
 					try {

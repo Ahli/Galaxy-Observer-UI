@@ -341,7 +341,7 @@ public class MpqBuilderService {
 			} catch (final FileSystemException e) {
 				if (copyAttempts == 0) {
 					log.warn("Attempt to copy directory failed.", e);
-				} else if (copyAttempts >= 100) {
+				} else if (copyAttempts == 100) {
 					final String msg = "Unable to copy directory after 100 copy attempts: " + e.getMessage();
 					log.error(msg, e);
 					throw new FileSystemException(msg);

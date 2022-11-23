@@ -9,9 +9,7 @@ module GalaxyLib {
 	
 	requires transitive java.xml;
 	requires transitive org.jetbrains.annotations;
-	//requires org.apache.commons.lang3; // redundant... not required?
 	requires org.slf4j;
-	requires java.sql; // configuration2 INI requires java.sql.Date for some reason // redundant, but required!
 	requires com.fasterxml.aalto;
 	
 	exports com.ahli.cloning;

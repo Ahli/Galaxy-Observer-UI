@@ -127,7 +127,6 @@ public class UIAttributeImmutable extends UIElementAbstract implements UIAttribu
 	
 	@Override
 	public final int hashCode() {
-		//noinspection ObjectInstantiationInEqualsHashCode
 		int h = hash;
 		if ((h == 0 && !hashIsZero) /*|| hashIsDirty*/) {
 			h = calcHashCode();
