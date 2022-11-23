@@ -94,6 +94,9 @@ public class JavafxApplication extends Application {
 		Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 		final CommandLineParams startingParams = new CommandLineParams(getParameters());
 		hidePreloader();
+		// fix app freezing when windows is made too small in browse tab
+		primaryStage.setMinHeight(50);
+		primaryStage.setMinWidth(50);
 		if (context != null) {
 			context.publishEvent(new PrimaryStageReadyEvent(primaryStage, startingParams));
 		}
