@@ -12,9 +12,9 @@ import com.ahli.memory.StringInterner;
 public abstract class UIElementAbstract implements UIElement {
 	
 	// for hashcode caching
-	protected boolean hashIsDirty;
-	protected boolean hashIsZero;
-	protected int hash;
+	//	protected boolean hashIsDirty;
+	//	protected boolean hashIsZero;
+	//	protected int hash;
 	private String name;
 	
 	/**
@@ -75,8 +75,8 @@ public abstract class UIElementAbstract implements UIElement {
 		return 59 + (name == null ? 43 : name.hashCode());
 	}
 	
-	@Override
-	public void invalidateHashcode() {
-		hashIsDirty = true;
-	}
+	//	@Override
+	//	public void invalidateHashcode() {
+	//		hashIsDirty = true;
+	//	}
 }

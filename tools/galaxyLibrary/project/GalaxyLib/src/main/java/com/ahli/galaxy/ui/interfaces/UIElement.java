@@ -77,5 +77,5 @@ public interface UIElement extends DeepCopyable {
 	@Override
 	int hashCode();
 	
-	void invalidateHashcode();
+	//	void invalidateHashcode();
 }

@@ -13,7 +13,7 @@ class UIStateTest {
 	void equalsContract() {
 		EqualsVerifier.forClass(UIStateMutable.class)
 				.withRedefinedSuperclass()
-				.withIgnoredFields("hash", "hashIsZero", "hashIsDirty")
+				//.withIgnoredFields("hash", "hashIsZero", "hashIsDirty")
 				.suppress(Warning.NONFINAL_FIELDS)
 				.verify();
 	}

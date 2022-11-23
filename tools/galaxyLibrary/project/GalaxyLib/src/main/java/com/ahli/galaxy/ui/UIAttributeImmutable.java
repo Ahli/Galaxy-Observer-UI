@@ -20,6 +20,11 @@ import java.util.Objects;
 public class UIAttributeImmutable extends UIElementAbstract implements UIAttribute {
 	private final List<String> keyValueList;
 	
+	// for hashcode caching
+	//	protected boolean hashIsDirty;
+	private boolean hashIsZero;
+	private int hash;
+	
 	/**
 	 * Constructor for Kryo
 	 */
@@ -124,14 +129,14 @@ public class UIAttributeImmutable extends UIElementAbstract implements UIAttribu
 	public final int hashCode() {
 		//noinspection ObjectInstantiationInEqualsHashCode
 		int h = hash;
-		if ((h == 0 && !hashIsZero) || hashIsDirty) {
+		if ((h == 0 && !hashIsZero) /*|| hashIsDirty*/) {
 			h = calcHashCode();
 			if (h == 0) {
 				hashIsZero = true;
 			} else {
 				hash = h;
 			}
-			hashIsDirty = false;
+			// hashIsDirty = false;
 		}
 		return h;
 	}

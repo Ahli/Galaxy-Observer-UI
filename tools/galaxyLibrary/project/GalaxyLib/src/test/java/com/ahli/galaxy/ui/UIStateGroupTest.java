@@ -14,7 +14,7 @@ class UIStateGroupTest {
 	void equalsContract() {
 		EqualsVerifier.forClass(UIStateGroupMutable.class)
 				.withRedefinedSuperclass()
-				.withIgnoredFields("hash", "hashIsZero", "hashIsDirty")
+				//.withIgnoredFields("hash", "hashIsZero", "hashIsDirty")
 				.suppress(Warning.NONFINAL_FIELDS)
 				.verify();
 	}

@@ -272,7 +272,7 @@ final class UIFrameTest {
 	void equalsContract() {
 		EqualsVerifier.forClass(UIFrameMutable.class)
 				.withRedefinedSuperclass()
-				.withIgnoredFields("hash", "hashIsZero", "hashIsDirty")
+				//.withIgnoredFields("hash", "hashIsZero", "hashIsDirty")
 				.suppress(Warning.NONFINAL_FIELDS)
 				.verify();
 	}

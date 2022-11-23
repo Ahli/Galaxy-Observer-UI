@@ -26,7 +26,7 @@ class UIElementTest {
 				.withRedefinedSubclass(UIAnimationMutable.class)
 				.withRedefinedSubclass(UIConstantImmutable.class)
 				.withRedefinedSubclass(UIControllerMutable.class)
-				.withIgnoredFields("hash", "hashIsZero", "hashIsDirty")
+				//.withIgnoredFields("hash", "hashIsZero", "hashIsDirty")
 				.suppress(Warning.NONFINAL_FIELDS)
 				.verify();
 	}

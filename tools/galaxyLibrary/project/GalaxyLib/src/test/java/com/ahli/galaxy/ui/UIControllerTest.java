@@ -14,7 +14,7 @@ class UIControllerTest {
 	void equalsContract() {
 		EqualsVerifier.forClass(UIControllerMutable.class)
 				.withRedefinedSuperclass()
-				.withIgnoredFields("hash", "hashIsZero", "hashIsDirty")
+				//.withIgnoredFields("hash", "hashIsZero", "hashIsDirty")
 				.suppress(Warning.NONFINAL_FIELDS)
 				.verify();
 	}

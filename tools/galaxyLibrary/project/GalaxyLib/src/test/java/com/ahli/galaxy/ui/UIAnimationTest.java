@@ -14,7 +14,7 @@ class UIAnimationTest {
 	void equalsContract() {
 		EqualsVerifier.forClass(UIAnimationMutable.class)
 				.withRedefinedSuperclass()
-				.withIgnoredFields("hash", "hashIsZero", "hashIsDirty")
+				//.withIgnoredFields("hash", "hashIsZero", "hashIsDirty")
 				.suppress(Warning.NONFINAL_FIELDS)
 				.verify();
 	}
