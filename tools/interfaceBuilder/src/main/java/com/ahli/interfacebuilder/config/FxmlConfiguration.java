@@ -178,8 +178,8 @@ public class FxmlConfiguration {
 	
 	@Bean
 	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-	protected BrowseTabController browseTabController() {
-		return new BrowseTabController();
+	protected BrowseTabController browseTabController(final NavigationController navigationController) {
+		return new BrowseTabController(navigationController);
 	}
 	
 	@Bean

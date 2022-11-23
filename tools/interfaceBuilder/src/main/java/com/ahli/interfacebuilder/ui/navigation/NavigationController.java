@@ -184,7 +184,15 @@ public class NavigationController {
 	public void lockNavToProgress() {
 		home.setDisable(true);
 		settings.setDisable(true);
+		browse.setDisable(true);
 		showPanelContent(PROGRESS_TAB);
+	}
+	
+	public void lockNavToBrowse() {
+		home.setDisable(true);
+		progress.setDisable(true);
+		settings.setDisable(true);
+		showPanelContent(BROWSE_TAB);
 	}
 	
 	/**
@@ -194,6 +202,7 @@ public class NavigationController {
 		home.setDisable(false);
 		settings.setDisable(false);
 		progress.setDisable(false);
+		browse.setDisable(false);
 	}
 	
 	/**

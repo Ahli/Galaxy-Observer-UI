@@ -16,6 +16,7 @@ import com.ahli.galaxy.ui.interfaces.UIState;
 import com.ahli.galaxy.ui.interfaces.UIStateGroup;
 import com.ahli.interfacebuilder.ui.FxmlController;
 import com.ahli.interfacebuilder.ui.Updateable;
+import com.ahli.interfacebuilder.ui.navigation.NavigationController;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
@@ -75,6 +76,7 @@ public class BrowseTabController implements Updateable, FxmlController {
 	private final Callable<TreeItemPredicate<UIElement>> searchCallable;
 	private final TextFlowFactory flowFactory;
 	private final Object instanceLock = new Object();
+	private final NavigationController navigationController;
 	private AutoCompleteComboBox fileSelector;
 	private AutoCompleteComboBox templateSelector;
 	@FXML
@@ -107,7 +109,8 @@ public class BrowseTabController implements Updateable, FxmlController {
 	private TreeFilteringChangeListener treeFilterListener;
 	private FrameTreeSelectionChangedHandler treeSelectionlistener;
 	
-	public BrowseTabController() {
+	public BrowseTabController(final NavigationController navigationController) {
+		this.navigationController = navigationController;
 		queryIdling = true;
 		queryString = new SimpleStringProperty("");
 		
@@ -174,7 +177,7 @@ public class BrowseTabController implements Updateable, FxmlController {
 		fileSelector.setOnAction(new FileSelectionEventHandler(this));
 		
 		// must be strong EventHandler reference
-		templateSelector.setOnAction(new TemplateSelectionEventHandler(this));
+		templateSelector.setOnAction(new TemplateSelectionEventHandler(this, navigationController));
 		
 		// table
 		columnAttributes.setCellValueFactory(new KeyCellFactory());
@@ -525,10 +528,13 @@ public class BrowseTabController implements Updateable, FxmlController {
 	
 	private static final class TemplateSelectionEventHandler implements EventHandler<ActionEvent> {
 		private final BrowseTabController browseTabController;
+		private final NavigationController navigationController;
 		private UITemplate curTreeTemplate;
 		
-		private TemplateSelectionEventHandler(final BrowseTabController browseTabController) {
+		private TemplateSelectionEventHandler(
+				final BrowseTabController browseTabController, final NavigationController navigationController) {
 			this.browseTabController = browseTabController;
+			this.navigationController = navigationController;
 		}
 		
 		@Override
@@ -557,6 +563,8 @@ public class BrowseTabController implements Updateable, FxmlController {
 			curTreeTemplate = template;
 			browseTabController.framesTotal = 0;
 			if (template != null) {
+				// FIX: browsing away breaks the rendering of the treeview when the root is added causing massive RAM usage
+				navigationController.lockNavToBrowse();
 				final UIElement rootElement = template.getElement();
 				new Thread(() -> {
 					final FilterableTreeItem<UIElement> rootItem = new FilterableTreeItem<>(rootElement);
@@ -574,6 +582,7 @@ public class BrowseTabController implements Updateable, FxmlController {
 					Platform.runLater(() -> {
 						log.trace("setting root");
 						browseTabController.frameTree.setRoot(rootItem);
+						navigationController.unlockNav();
 						log.trace("selecting first entry");
 						browseTabController.frameTree.getSelectionModel().select(0);
 						if (log.isTraceEnabled()) {
