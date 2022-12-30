@@ -16,11 +16,14 @@ const heroesIcon = <img width='40' height='40' src={heroesImg} />;
 const navbarItems = [
   new NavBarLinkData('News', <HomeIcon />, '/'),
   new NavBarCollapsibleData('AhliObs', heroesIcon, [
-    new NavBarLinkData('Changelog', <NoteAltOutlinedIcon />, '/ahliobs'),
+    new NavBarLinkData('Changelog', <NoteAltOutlinedIcon />, '/ahliobs/changelog'),
     new NavBarLinkData('Shortcuts', <KeyboardOutlinedIcon />, '/ahliobs/shortcuts'),
   ]),
   new NavBarLinkData('GameHeart', sc2icon, '/gameheart'),
   new NavBarLinkData('Pro2020 AhliMod', sc2icon, '/pro2020ahlimod'),
+  new NavBarCollapsibleData('Heroes of the Storm', heroesIcon, [
+    new NavBarLinkData('Settings', <NoteAltOutlinedIcon />, '/heroes/settings'),
+  ]),
 ] as Array<NavBarItemData>;
 
 export const Navbar = () => {

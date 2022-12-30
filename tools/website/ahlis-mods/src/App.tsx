@@ -11,6 +11,7 @@ import { gh3changelog } from './content/gameheart/v3/changelog/gh3changelog';
 import { pro2020AhliModChangelog } from './content/pro2020ahlimod/changelog/pro2020ahliModChangelog';
 import { HtmlPage } from './pages/HtmlPage';
 import { ahliObsShortcuts } from './content/ahliObs/shortcuts/ahliObsShortcuts';
+import { heroesSettings } from './content/heroes/settings';
 
 const darkTheme = createTheme({
   palette: {
@@ -47,6 +48,11 @@ function App() {
               <Route
                 path='/pro2020ahlimod/changelog'
                 element={<ChangelogPage posts={pro2020AhliModChangelog} title='Pro2020 AhliMod - Changelog' />}
+              />
+              <Route path='/heroes' element={<Navigate to='/heroes/settings' replace />} />
+              <Route
+                path='/heroes/settings'
+                element={<HtmlPage title='Heroes of the Storm - Settings' contentHtml={heroesSettings} />}
               />
               <Route path='*' element={<NotFoundPage />} />
             </Routes>
