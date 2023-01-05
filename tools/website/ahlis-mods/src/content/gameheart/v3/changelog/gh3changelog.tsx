@@ -1,8 +1,26 @@
 import { Change, Changelog, Post } from '../../../../types/Post';
 import gh3_34 from '../../../../assets/gameheart/v3/gh3_34.jpg';
 import gh3_35 from '../../../../assets/gameheart/v3/gh3_35.jpg';
+import gh3_36 from '../../../../assets/gameheart/v3/gh3_36.jpg';
 
 export const gh3changelog: Post[] = [
+  {
+    id: '36',
+    title: '3.6',
+    image: [gh3_36],
+    createdAt: '5th January 2023',
+    download: 'https://www.dropbox.com/s/1edtu9ci9z767cg/GameHeart_3.6.SC2Interface?dl=1',
+    version: '3.6',
+    date: '5th January 2023',
+    changes: [
+      'added customizable Battle Report shortcut',
+      'added Battle Report to the dialog auto-hiding system that makes dialogs hide each other when opened',
+      "renamed to 'GameHeart 3' in the game options' dropdowns",
+      'added support for AhliObs extension mods (Battle Report, Production Tab)',
+      'fixed cargo displaying a solid square image instead of a colored border',
+      'fixed Workers killed Notifications not being visible in some extension mods',
+    ],
+  } as Changelog,
   {
     id: '35',
     title: '3.5',

@@ -1,8 +1,24 @@
 import { Change, Changelog, Post } from '../../../types/Post';
-import pro2020_11 from '../../../assets/pro2020ahliMod/pro2020ahliMod_11.jpg';
 import pro2020_10 from '../../../assets/pro2020ahliMod/pro2020ahliMod_10.jpg';
+import pro2020_11 from '../../../assets/pro2020ahliMod/pro2020ahliMod_11.jpg';
+import pro2020_12 from '../../../assets/pro2020ahliMod/pro2020ahliMod_12.jpg';
 
 export const pro2020AhliModChangelog: Post[] = [
+  {
+    id: '12',
+    title: '1.2',
+    image: [pro2020_12],
+    createdAt: '5th Januaray 2023',
+    download: 'https://www.dropbox.com/s/1efcfpgb7m9fk9n/Pro2020ahliMod_1.2.SC2Interface?dl=1',
+    version: '1.2',
+    date: '5th Januaray 2023',
+    changes: [
+      'added support for AhliObs extension mods (Battle Report, Production Tab)',
+      'replaced advantage icons with the resource income values per player',
+      'integrated the Battle Report dialog into the system that makes dialogs hide each other',
+      'added configurable hotkey for BattleReport (Shift+B) and list it in the message log screen',
+    ],
+  } as Changelog,
   {
     id: '11',
     title: '1.1',
