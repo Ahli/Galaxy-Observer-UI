@@ -8,7 +8,7 @@ import { NavBarCollapsible } from './NavBarCollapsible';
 import sc2Img from '../../assets/common/sc2.png';
 import heroesImg from '../../assets/common/heroes.png';
 
-export const navBarWidth = 200;
+export const navBarWidth = 220;
 
 const sc2icon = <img width='40' height='40' src={sc2Img} />;
 const heroesIcon = <img width='40' height='40' src={heroesImg} />;
