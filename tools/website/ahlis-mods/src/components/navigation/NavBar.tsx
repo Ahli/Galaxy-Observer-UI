@@ -24,6 +24,9 @@ const navbarItems = [
   new NavBarCollapsibleData('Heroes of the Storm', heroesIcon, [
     new NavBarLinkData('Settings', <NoteAltOutlinedIcon />, '/heroes/settings'),
   ]),
+  new NavBarCollapsibleData('StarCraft II', sc2icon, [
+    new NavBarLinkData('Logos.SC2Mod', <NoteAltOutlinedIcon />, '/sc2/logosmod'),
+  ]),
 ] as Array<NavBarItemData>;
 
 export const Navbar = () => {

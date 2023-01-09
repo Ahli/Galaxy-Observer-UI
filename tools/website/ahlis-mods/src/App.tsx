@@ -12,6 +12,7 @@ import { pro2020AhliModChangelog } from './content/pro2020ahlimod/changelog/pro2
 import { HtmlPage } from './pages/HtmlPage';
 import { ahliObsShortcuts } from './content/ahliObs/shortcuts/ahliObsShortcuts';
 import { heroesSettings } from './content/heroes/settings';
+import { sc2logosMod } from './content/sc2/LogosMod';
 
 const darkTheme = createTheme({
   palette: {
@@ -53,6 +54,10 @@ function App() {
               <Route
                 path='/heroes/settings'
                 element={<HtmlPage title='Heroes of the Storm - Settings' contentHtml={heroesSettings} />}
+              />
+              <Route
+                path='/sc2/logosmod'
+                element={<HtmlPage title='StarCraf 2 - Logos.SC2Mod' contentHtml={sc2logosMod} />}
               />
               <Route path='*' element={<NotFoundPage />} />
             </Routes>
