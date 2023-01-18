@@ -81,15 +81,15 @@ public final class XmlDomHelper {
 			final boolean useSilentErrorHandler, final boolean ignoreComments) throws ParserConfigurationException {
 		// according to https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html#jaxp-documentbuilderfactory-saxparserfactory-and-dom4j
 		final DocumentBuilderFactory dbFac = DocumentBuilderFactory.newInstance();
-		dbFac.setValidating(false);
-		dbFac.setAttribute("http://xml.org/sax/features/external-general-entities", false);
+		dbFac.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+		dbFac.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+		dbFac.setFeature("http://xml.org/sax/features/external-general-entities", false);
 		dbFac.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
 		dbFac.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
 		dbFac.setXIncludeAware(false);
 		dbFac.setExpandEntityReferences(false);
 		// other
-		dbFac.setAttribute(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-		dbFac.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+		dbFac.setValidating(false);
 		dbFac.setNamespaceAware(false);
 		if (ignoreComments) {
 			dbFac.setIgnoringComments(true);
