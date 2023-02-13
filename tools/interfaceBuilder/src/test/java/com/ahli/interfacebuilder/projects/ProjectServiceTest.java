@@ -7,14 +7,13 @@ import com.ahli.interfacebuilder.SpringBootApplication;
 import com.ahli.interfacebuilder.projects.enums.GameType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.SpringBootDependencyInjectionTestExecutionListener;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestExecutionListeners;
 
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -22,12 +21,9 @@ import java.util.Arrays;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
 @DataJpaTest
 @ContextConfiguration(classes = SpringBootApplication.class)
-@TestExecutionListeners(
-		listeners = { MockitoTestExecutionListener.class, SpringBootDependencyInjectionTestExecutionListener.class },
-		mergeMode = TestExecutionListeners.MergeMode.REPLACE_DEFAULTS)
+@Execution(ExecutionMode.SAME_THREAD)
 final class ProjectServiceTest {
 	
 	@MockBean
