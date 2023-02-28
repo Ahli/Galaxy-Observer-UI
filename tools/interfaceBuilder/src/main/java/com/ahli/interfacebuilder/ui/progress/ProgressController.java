@@ -141,7 +141,7 @@ public class ProgressController {
 	 *
 	 * @param errorTabCtrl
 	 */
-	public void addErrorTabController(final ErrorTabController errorTabCtrl) {
+	public synchronized void addErrorTabController(final ErrorTabController errorTabCtrl) {
 		errorTabControllers.add(errorTabCtrl);
 	}
 	
