@@ -553,7 +553,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		} else {
 			// use lowercase for cases!
 			switch (tagName) {
-				case FRAME:
+				case FRAME -> {
 					if (newElem == null) {
 						if (name == null) {
 							logger.error("A new 'Frame' was defined without a name.");
@@ -580,11 +580,12 @@ public class UICatalogParser implements ParsedXmlConsumer {
 							logger.error("Frame appearing in unexpected parent element: {}", curElement);
 						}
 					}
-					break;
-				case ANCHOR:
+				}
+				case ANCHOR -> {
 					parseAnchor(attrTypes, attrValues);
 					return;
-				case STATE:
+				}
+				case STATE -> {
 					if (newElem == null) {
 						if (name == null) {
 							logger.error("A new 'State' was defined without a name.");
@@ -608,8 +609,8 @@ public class UICatalogParser implements ParsedXmlConsumer {
 							}
 						}
 					}
-					break;
-				case CONTROLLER:
+				}
+				case CONTROLLER -> {
 					// name is allowed to be null here => receives an implicit name
 					newElem = new UIControllerMutable(name);
 					final var newElemUiController = (UIController) newElem;
@@ -627,8 +628,8 @@ public class UICatalogParser implements ParsedXmlConsumer {
 							logger.error("Controller appearing in unexpected parent element: {}", curElement);
 						}
 					}
-					break;
-				case ANIMATION:
+				}
+				case ANIMATION -> {
 					if (name == null) {
 						logger.error("A new 'Animation' was defined without a name.");
 						name = "UnnamedAnimation" + (++unnamedFrameCounter);
@@ -642,8 +643,8 @@ public class UICatalogParser implements ParsedXmlConsumer {
 							logger.error("Animation appearing in unexpected parent element: {}", curElement);
 						}
 					}
-					break;
-				case STATEGROUP:
+				}
+				case STATEGROUP -> {
 					if (name == null) {
 						logger.error("A new 'StateGroup' was defined without a name.");
 						name = "UnnamedStateGroup" + (++unnamedFrameCounter);
@@ -657,8 +658,8 @@ public class UICatalogParser implements ParsedXmlConsumer {
 							logger.error("StateGroup appearing in unexpected parent element: {}", curElement);
 						}
 					}
-					break;
-				case CONSTANT:
+				}
+				case CONSTANT -> {
 					if (name == null) {
 						logger.error("A new 'Constant' was defined without a name.");
 						name = "UnnamedConstant" + (++unnamedFrameCounter);
@@ -682,9 +683,11 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					}
 					catalog.addConstant(newElemUiConstant, curIsDevLayout);
 					return;
-				case DESC:      // nothing to do
+				}
+				case DESC -> {      // nothing to do
 					return;
-				case DESCFLAGS: // locked or internal or empty to remove internal
+				}
+				case DESCFLAGS -> { // locked or internal or empty to remove internal
 					if (level <= 2) {
 						// is on root level outside templates => must be 'locked'
 						final int j = attrTypes.indexOf(VAL);
@@ -710,15 +713,16 @@ public class UICatalogParser implements ParsedXmlConsumer {
 						// TODO 'locked' only on root level; other frames can only have 'internal' or ''
 					}
 					return;
-				case INCLUDE:
+				}
+				case INCLUDE -> {
 					final int j = attrTypes.indexOf(PATH);
 					if (j != -1) {
 						final String path = attrValues.get(j);
 						final boolean isDevLayout = curIsDevLayout || attrTypes.contains(REQUIREDTOLOAD);
 						catalog.processInclude(path, isDevLayout, raceId, consoleSkinId, deduplicationIntensity);
 					}
-					break;
-				default:
+				}
+				default -> {
 					// attribute or something unknown that will cause an error
 					final ArrayList<String> attributeKeyValueList = new ArrayList<>(2 * attrTypes.size());
 					i = 0;
@@ -731,7 +735,6 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					}
 					UIAttribute newElemUiAttr = new UIAttributeImmutable(tagName, attributeKeyValueList);
 					newElem = newElemUiAttr;
-					
 					if (deduplicateDuringParsing) {
 						final UIElement refToDuplicate = addedFinalElements.get(newElem);
 						if (refToDuplicate != null) {
@@ -790,9 +793,8 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					} else {
 						logger.error("found an attribute that cannot be added to anything: {}", newElem);
 					}
-					
 					newElem = null;
-					break;
+				}
 			}
 		}
 		

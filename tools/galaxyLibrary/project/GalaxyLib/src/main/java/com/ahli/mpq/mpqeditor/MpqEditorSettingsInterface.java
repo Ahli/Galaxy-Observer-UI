@@ -253,7 +253,7 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 		section.setProperty(RAW_CHUNK_SIZE, 0); // default 0
 		
 		switch (compression) {
-			case CUSTOM:
+			case CUSTOM -> {
 				if (customRules != null) {
 					for (final MpqEditorCompressionRule customRule : customRules) {
 						if (customRule != null) {
@@ -266,13 +266,10 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 				} else {
 					section.addProperty(DEFAULT, NO_COMPRESSION_CUSTOM_RULE);
 				}
-				break;
-			case NONE:
-				section.addProperty(DEFAULT, NO_COMPRESSION_CUSTOM_RULE);
-				break;
-			case SYSTEM_DEFAULT, BLIZZARD_SC2_HEROES:
-			default:
-				break;
+			}
+			case NONE -> section.addProperty(DEFAULT, NO_COMPRESSION_CUSTOM_RULE);
+			default -> {
+			}
 		}
 		
 		try (final BufferedWriter bw = Files.newBufferedWriter(rulesetFile)) {

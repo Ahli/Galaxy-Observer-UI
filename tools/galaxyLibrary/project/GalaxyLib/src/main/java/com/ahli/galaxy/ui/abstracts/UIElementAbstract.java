@@ -6,6 +6,8 @@ package com.ahli.galaxy.ui.abstracts;
 import com.ahli.galaxy.ui.interfaces.UIElement;
 import com.ahli.memory.StringInterner;
 
+import java.util.Objects;
+
 /**
  * @author Ahli
  */
@@ -44,7 +46,7 @@ public abstract class UIElementAbstract implements UIElement {
 		if (!other.canEqual(this)) {
 			return false;
 		}
-		return name == null ? other.name == null : name.equals(other.name);
+		return Objects.equals(name, other.name);
 	}
 	
 	@Override
