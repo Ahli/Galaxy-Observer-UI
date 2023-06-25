@@ -26,7 +26,7 @@ int main(const int argc, const char* const argv[])
 		LPCSTR targetPath = nullptr;
 #ifndef _DEBUG
 		if (argc != 4) {
-			std::cout << "ERROR: Please provide 3 arguments: CascExtractor.exe [\"Path\\to\\the\\CASC storage\"] [\"*mask.txt\"] [\"Path\\to\\the\\output Directory\"]." << std::endl;
+			std::cout << R"(ERROR: Please provide 3 arguments: CascExtractor.exe ["Path\to\the\CASC storage"] ["*mask.txt"] ["Path\to\the\output Directory"].)" << std::endl;
 			return EXIT_FAILURE;
 		}
 
