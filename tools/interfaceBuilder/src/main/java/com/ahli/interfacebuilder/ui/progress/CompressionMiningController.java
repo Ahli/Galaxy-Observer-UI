@@ -192,32 +192,7 @@ public class CompressionMiningController implements Updateable, FxmlController {
 			try {
 				long bestSize;
 				final ModD mod = gameService.getModData(project.getGameType());
-				{
-					final Path projectSource = project.getProjectPath();
-					
-					modTargetFile = configService.getMiningTempPath().resolve(projectSource.getFileName());
-					mod.setTargetFile(modTargetFile);
-					mod.setSourceDirectory(projectSource);
-					
-					final RuleSet bestCompressionRuleSet = projectService.fetchBestCompressionRuleSet(project);
-					final MpqEditorCompressionRule[] prevBestCompressionRules =
-							(bestCompressionRuleSet != null) ? bestCompressionRuleSet.getCompressionRules() : null;
-					
-					expCompMiner = new RandomCompressionMiner(
-							mod,
-							configService.getMpqCachePath(),
-							configService.getMpqEditorPath(),
-							prevBestCompressionRules,
-							fileService);
-					bestSize = expCompMiner.getBestSize();
-						/* save initial as best, if there was no best before
-						initial one might have been altered by the miner */
-					if (bestCompressionRuleSet == null || expCompMiner.isOldRulesetHadMissingFiles() ||
-							!new RuleSet(expCompMiner.getBestCompressionRules()).equals(bestCompressionRuleSet)) {
-						project.setBestCompressionRuleSet(new RuleSet(expCompMiner.getBestCompressionRules()));
-						projectService.saveProject(project);
-					}
-				}
+				bestSize = findBetterCompressions(mod);
 				log.info("Best size before mining: {} kb.", bestSize / 1024);
 				updateUiRules(expCompMiner.getBestCompressionRules());
 				updateUiSizeToBeat(bestSize);
@@ -261,6 +236,36 @@ public class CompressionMiningController implements Updateable, FxmlController {
 		attemptCounterLabel.setText("0");
 		executor.execute(task);
 		miningButton.setText(Messages.getString("progress.compressionMining.stopMining"));
+	}
+	
+	private long findBetterCompressions(final ModD mod) throws IOException, MpqException, InterruptedException {
+		long bestSize;
+		final Path modTargetFile;
+		final Path projectSource = project.getProjectPath();
+		
+		modTargetFile = configService.getMiningTempPath().resolve(projectSource.getFileName());
+		mod.setTargetFile(modTargetFile);
+		mod.setSourceDirectory(projectSource);
+		
+		final RuleSet bestCompressionRuleSet = projectService.fetchBestCompressionRuleSet(project);
+		final MpqEditorCompressionRule[] prevBestCompressionRules =
+				(bestCompressionRuleSet != null) ? bestCompressionRuleSet.getCompressionRules() : null;
+		
+		expCompMiner = new RandomCompressionMiner(
+				mod,
+				configService.getMpqCachePath(),
+				configService.getMpqEditorPath(),
+				prevBestCompressionRules,
+				fileService);
+		bestSize = expCompMiner.getBestSize();
+						/* save initial as best, if there was no best before
+						initial one might have been altered by the miner */
+		if (bestCompressionRuleSet == null || expCompMiner.isOldRulesetHadMissingFiles() ||
+				!new RuleSet(expCompMiner.getBestCompressionRules()).equals(bestCompressionRuleSet)) {
+			project.setBestCompressionRuleSet(new RuleSet(expCompMiner.getBestCompressionRules()));
+			projectService.saveProject(project);
+		}
+		return bestSize;
 	}
 	
 	/**

@@ -3,8 +3,8 @@
 
 package com.ahli.galaxy.ui;
 
-import com.ahli.galaxy.ui.interfaces.UIElement;
 import com.ahli.cloning.DeepCopyable;
+import com.ahli.galaxy.ui.interfaces.UIElement;
 
 import java.util.Objects;
 

@@ -12,10 +12,8 @@ class UIControllerTest {
 	@Test
 	@SuppressWarnings("JUnitTestMethodWithNoAssertions")
 	void equalsContract() {
-		EqualsVerifier.forClass(UIControllerMutable.class)
-				.withRedefinedSuperclass()
+		EqualsVerifier.forClass(UIControllerMutable.class).withRedefinedSuperclass()
 				//.withIgnoredFields("hash", "hashIsZero", "hashIsDirty")
-				.suppress(Warning.NONFINAL_FIELDS)
-				.verify();
+				.suppress(Warning.NONFINAL_FIELDS).verify();
 	}
 }
