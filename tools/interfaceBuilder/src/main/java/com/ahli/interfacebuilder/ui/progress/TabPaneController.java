@@ -17,7 +17,7 @@ import lombok.Getter;
 public class TabPaneController implements Updateable, FxmlController {
 	
 	private ProgressController progressController;
-
+	
 	@Getter
 	@FXML
 	private TabPane tabPane;

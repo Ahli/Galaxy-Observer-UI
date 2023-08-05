@@ -206,11 +206,9 @@ public class BrowseController implements Updateable, FxmlController {
 	}
 	
 	private void updateBaseUiDetails() {
-		heroesBaseUiDetailsLabel.setText(buildBaseUiDetailsString(
-				GameType.HEROES,
+		heroesBaseUiDetailsLabel.setText(buildBaseUiDetailsString(GameType.HEROES,
 				baseUiService.isPtrActive(gameService.getGameDef(GameType.HEROES))));
-		sc2BaseUiDetailsLabel.setText(buildBaseUiDetailsString(
-				GameType.SC2,
+		sc2BaseUiDetailsLabel.setText(buildBaseUiDetailsString(GameType.SC2,
 				baseUiService.isPtrActive(gameService.getGameDef(GameType.SC2))));
 	}
 	
@@ -226,12 +224,12 @@ public class BrowseController implements Updateable, FxmlController {
 		}
 		try {
 			if (baseUiService.isOutdated(gameType, isPtr)) {
-				sb.append(" - requires update");
+				sb.append(Messages.getString("browse.requiresUpdate"));
 			} else {
-				sb.append(" - up to date");
+				sb.append(Messages.getString("browse.upToDate"));
 			}
 		} catch (final IOException e) {
-			sb.append(" - could not check game version");
+			sb.append(Messages.getString("browse.couldNotCheckGameVersion"));
 			log.trace("Error: could not check game version", e);
 		}
 		return sb.toString();
@@ -250,7 +248,7 @@ public class BrowseController implements Updateable, FxmlController {
 	
 	private void extractBaseUi(final GameType gameType, final boolean usePtr) throws IOException {
 		final ObservableList<Tab> tabs = progressController.getTabPane().getTabs();
-		final String tabName = "Extract " + gameType.name();
+		final String tabName = String.format(Messages.getString("browse.extract"), gameType.name());
 		Tab newTab = null;
 		BaseUiExtractionController extractionController = null;
 		
@@ -277,7 +275,7 @@ public class BrowseController implements Updateable, FxmlController {
 			scrollPane.visibleProperty().bind(Bindings.isNotEmpty(newTxtArea.getChildren()));
 			
 			final FXMLSpringLoader loader = new FXMLSpringLoader(appContext);
-			final var rootNode = loader.<AnchorPane>load("classpath:view/Progress_ExtractBaseUi.fxml");
+			final AnchorPane rootNode = loader.load("classpath:view/Progress_ExtractBaseUi.fxml");
 			
 			newTab.setContent(rootNode);
 			

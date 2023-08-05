@@ -99,8 +99,8 @@ public class FxmlConfiguration {
 	@Bean
 	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 	protected SettingsGamesPathsController settingsGamesPathsController(
-			final ConfigService configService, final FileService fileService) {
-		return new SettingsGamesPathsController(configService, fileService);
+			final ConfigService configService, final FileService fileService, final GameService gameService) {
+		return new SettingsGamesPathsController(configService, fileService, gameService);
 	}
 	
 	@Bean

@@ -224,8 +224,10 @@ public class AppController {
 		try {
 			if (baseUiService.isOutdated(GameType.SC2, true)) {
 				if (primaryStage.hasPrimaryStage()) {
-					navigationController.appendNotification(new Notification(Messages.getString(
-							"browse.notification.sc2PtrOutOfDate"), NavigationController.BROWSE_TAB, "sc2PtrOutOfDate"));
+					navigationController.appendNotification(new Notification(
+							Messages.getString("browse.notification.sc2PtrOutOfDate"),
+							NavigationController.BROWSE_TAB,
+							"sc2PtrOutOfDate"));
 				} else {
 					log.warn(Messages.getString("browse.notification.sc2PtrOutOfDate"));
 				}
@@ -236,8 +238,8 @@ public class AppController {
 		try {
 			if (baseUiService.isOutdated(GameType.HEROES, false)) {
 				if (primaryStage.hasPrimaryStage()) {
-					navigationController.appendNotification(new Notification(Messages.getString(
-							"browse.notification.heroesOutOfDate"),
+					navigationController.appendNotification(new Notification(
+							Messages.getString("browse.notification.heroesOutOfDate"),
 							NavigationController.BROWSE_TAB,
 							"heroesOutOfDate"));
 				} else {
@@ -250,8 +252,8 @@ public class AppController {
 		try {
 			if (baseUiService.isOutdated(GameType.HEROES, true)) {
 				if (primaryStage.hasPrimaryStage()) {
-					navigationController.appendNotification(new Notification(Messages.getString(
-							"browse.notification.heroesPtrOutOfDate"),
+					navigationController.appendNotification(new Notification(
+							Messages.getString("browse.notification.heroesPtrOutOfDate"),
 							NavigationController.BROWSE_TAB,
 							"heroesPtrOutOfDate"));
 				} else {
@@ -385,7 +387,8 @@ public class AppController {
 			//noinspection ResultOfMethodCallIgnored
 			executor.awaitTermination(120L, TimeUnit.SECONDS);
 		} catch (final InterruptedException e) {
-			log.error("ERROR: Executor timed out waiting for Worker Theads to terminate. A Thread might run rampage.",
+			log.error(
+					"ERROR: Executor timed out waiting for Worker Threads to terminate. A Thread might run rampage.",
 					e);
 			Thread.currentThread().interrupt();
 		}

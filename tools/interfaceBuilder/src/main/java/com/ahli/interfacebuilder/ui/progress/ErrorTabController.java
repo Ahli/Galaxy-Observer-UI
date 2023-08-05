@@ -22,14 +22,14 @@ public final class ErrorTabController {
 	private static final String TAB_TEXT_COLOR_WHITE = "-tab-text-color: white;";
 	private final boolean colorizeTitle;
 	private final boolean showResultIcon;
-	private boolean encounteredError;
-	private boolean running;
-	private boolean encounteredWarning;
-	private State state = State.NOT_STARTED;
 	@Getter
 	private final Tab tab;
 	@Getter
 	private final TextFlow textArea;
+	private boolean encounteredError;
+	private boolean running;
+	private boolean encounteredWarning;
+	private State state = State.NOT_STARTED;
 	@Getter
 	@Setter
 	private boolean errorPreventsExit;

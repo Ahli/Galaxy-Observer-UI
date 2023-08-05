@@ -97,7 +97,7 @@ public class ViewRuleSetController {
 	}
 	
 	/**
-	 * Inject a project whose best compression ruleset is shown.
+	 * Inject a project whose best compression rule set is shown.
 	 *
 	 * @param project
 	 */
@@ -107,7 +107,7 @@ public class ViewRuleSetController {
 	}
 	
 	/**
-	 * Shows the compression ruleset of a specified project.
+	 * Shows the compression rule set of a specified project.
 	 *
 	 * @param project
 	 */

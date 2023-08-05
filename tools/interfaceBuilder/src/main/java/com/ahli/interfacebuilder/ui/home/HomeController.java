@@ -283,15 +283,11 @@ public class HomeController implements Updateable, FxmlController {
 			final Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
 			alert.initOwner(getWindow());
 			if (selectedItems.length > 1) {
-				alert.setTitle(String.format("Remove selected Projects from list? - %s items selected",
-						selectedItems.length));
+				alert.setTitle(String.format(Messages.getString("removeProject.removeSelected"), selectedItems.length));
 			} else {
-				alert.setTitle("Remove selected Project from list? - 1 item selected");
+				alert.setTitle(Messages.getString("removeProject.removeSelectedSingle"));
 			}
-			alert.setHeaderText("""
-			                       Are you sure you want to remove the selected projects?
-			                       This will not remove any files from the project.
-			                    """);
+			alert.setHeaderText(Messages.getString("removeProject.removeSelectedWarning"));
 			final ButtonType result = alert.showAndWait().orElse(null);
 			if (result == ButtonType.OK) {
 				for (final Project p : selectedItems) {

@@ -188,7 +188,6 @@ public class CompressionMiningController implements Updateable, FxmlController {
 		}
 		keepTaskRunning = true;
 		task = () -> {
-			final Path modTargetFile;
 			try {
 				long bestSize;
 				final ModD mod = gameService.getModData(project.getGameType());

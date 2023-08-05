@@ -48,7 +48,7 @@ public class NewProjectController {
 	
 	public void browsePathAction() {
 		final DirectoryChooser directoryChooser = new DirectoryChooser();
-		directoryChooser.setTitle("Select a directory to create a template Project in");
+		directoryChooser.setTitle(Messages.getString("newProject.selectDirectory"));
 		final Path path = fileService.cutTillValidDirectory(Path.of(projectPathLabel.getText()));
 		if (path != null) {
 			directoryChooser.setInitialDirectory(path.toFile());
@@ -78,7 +78,7 @@ public class NewProjectController {
 	 */
 	private void initialize() {
 		if (dialog != null) {
-			dialog.setTitle("Create new Observer Interface Project...");
+			dialog.setTitle(Messages.getString("newProject.dialogTitle"));
 			final DialogPane dialogPane = dialog.getDialogPane();
 			dialogPane.getButtonTypes().addAll(ButtonType.APPLY, ButtonType.CANCEL);
 			final Button okBttn = (Button) dialogPane.lookupButton(ButtonType.APPLY);
@@ -112,11 +112,9 @@ public class NewProjectController {
 		if (!projectService.getProjectsOfPath(path).isEmpty()) {
 			final Alert alert = Alerts.buildErrorAlert(
 					dialog.getOwner(),
-					"An Error occurred",
-					"Project's path already used in another project",
-					String.format(
-							"Could not create a Project for path '%s' as it is already registered in another project.",
-							path));
+					Messages.getString("Main.anErrorOccurred"),
+					Messages.getString("newProject.pathAlreadyUsedInOtherProject.header"),
+					String.format(Messages.getString("newProject.pathAlreadyUsedInOtherProject.content"), path));
 			alert.showAndWait();
 			return;
 		}
@@ -130,9 +128,10 @@ public class NewProjectController {
 			log.error("ERROR: Could not create project.", e);
 			final Alert alert = Alerts.buildErrorAlert(
 					dialog.getOwner(),
-					"An Error occurred",
-					"Could not create the Project.",
-					String.format("Could not create a Project in '%s'", path) + e.getLocalizedMessage());
+					Messages.getString("Main.anErrorOccurred"),
+					Messages.getString("newProject.couldNotCreateProject.header"),
+					String.format(Messages.getString("newProject.couldNotCreateProject.content"), path) +
+							e.getLocalizedMessage());
 			alert.showAndWait();
 			return;
 		}
@@ -146,9 +145,10 @@ public class NewProjectController {
 			projectService.deleteProject(project);
 			final Alert alert = Alerts.buildErrorAlert(
 					dialog.getOwner(),
-					"An Error occurred",
-					"Could not create the Template.",
-					String.format("Could not create a Template in '%s'", path) + e.getLocalizedMessage());
+					Messages.getString("Main.anErrorOccurred"),
+					Messages.getString("newProject.couldNotCreateTemplate.header"),
+					String.format(Messages.getString("newProject.couldNotCreateTemplate.content"), path) +
+							e.getLocalizedMessage());
 			alert.showAndWait();
 		}
 	}

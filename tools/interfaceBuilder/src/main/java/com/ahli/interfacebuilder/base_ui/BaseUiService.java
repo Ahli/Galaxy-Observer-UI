@@ -26,8 +26,8 @@ import com.kichik.pecoff4j.PE;
 import com.kichik.pecoff4j.ResourceDirectory;
 import com.kichik.pecoff4j.ResourceEntry;
 import com.kichik.pecoff4j.constant.ResourceType;
+import com.kichik.pecoff4j.io.DataReader;
 import com.kichik.pecoff4j.io.PEParser;
-import com.kichik.pecoff4j.io.ResourceParser;
 import com.kichik.pecoff4j.resources.StringFileInfo;
 import com.kichik.pecoff4j.resources.StringTable;
 import com.kichik.pecoff4j.resources.VersionInfo;
@@ -160,7 +160,7 @@ public class BaseUiService {
 			for (final ResourceEntry entry : entries) {
 				final byte[] data = entry.getData();
 				@SuppressWarnings("ObjectAllocationInLoop")
-				final VersionInfo version = ResourceParser.readVersionInfo(data);
+				final VersionInfo version = VersionInfo.read(new DataReader(data));
 				
 				final StringFileInfo strings = version.getStringFileInfo();
 				final StringTable table = strings.getTable(0);

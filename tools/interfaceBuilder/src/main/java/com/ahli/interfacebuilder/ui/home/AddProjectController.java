@@ -45,7 +45,7 @@ public class AddProjectController {
 	
 	public void browsePathAction() {
 		final DirectoryChooser directoryChooser = new DirectoryChooser();
-		directoryChooser.setTitle("Select an existing Observer UI's directory.");
+		directoryChooser.setTitle(Messages.getString("addProject.selectExistingObserverUiDirectory"));
 		final Path path = fileService.cutTillValidDirectory(Path.of(projectPathLabel.getText()));
 		if (path != null) {
 			directoryChooser.setInitialDirectory(path.toFile());
@@ -67,7 +67,7 @@ public class AddProjectController {
 	 */
 	public void setProjectToEdit(final Project project) {
 		this.project = project;
-		dialog.setTitle("Edit Observer Interface Project...");
+		dialog.setTitle(Messages.getString("addProject.editObserverInterfaceProject"));
 		projectNameLabel.setText(project.getName());
 		projectPathLabel.setText(project.getProjectPath().toString());
 		gameDropdown.getSelectionModel().select(project.getGameType());
@@ -88,7 +88,7 @@ public class AddProjectController {
 	 */
 	private void initialize() {
 		if (dialog != null) {
-			dialog.setTitle("Add Observer Interface Project...");
+			dialog.setTitle(Messages.getString("addProject.addObserverInterfaceProject"));
 			final DialogPane dialogPane = dialog.getDialogPane();
 			dialogPane.getButtonTypes().addAll(ButtonType.APPLY, ButtonType.CANCEL);
 			final Button okBttn = (Button) dialogPane.lookupButton(ButtonType.APPLY);
