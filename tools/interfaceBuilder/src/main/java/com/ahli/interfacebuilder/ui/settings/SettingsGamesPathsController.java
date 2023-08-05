@@ -28,13 +28,19 @@ public class SettingsGamesPathsController extends SettingsAutoSaveController {
 	@FXML
 	private TextField sc2Path;
 	@FXML
+	private TextField sc2PtrPath;
+	@FXML
 	private CheckBox sc2Architecture;
+	@FXML
+	private CheckBox sc2PtrArchitecture;
 	@FXML
 	private TextField heroesPath;
 	@FXML
 	private TextField heroesPtrPath;
 	@FXML
 	private Label sc2PathLabel;
+	@FXML
+	private Label sc2PtrPathLabel;
 	@FXML
 	private Label heroesPathLabel;
 	@FXML
@@ -74,12 +80,19 @@ public class SettingsGamesPathsController extends SettingsAutoSaveController {
 		heroesPath.setText(settings.getHeroesPath());
 		heroesPtrPath.setText(settings.getHeroesPtrPath());
 		sc2Path.setText(settings.getSc2Path());
-		sc2Architecture.setSelected(settings.isSc64bit());
+		sc2PtrPath.setText(settings.getSc2PtrPath());
+		sc2Architecture.setSelected(settings.isSc2X64());
+		sc2PtrArchitecture.setSelected(settings.isSc2PtrX64());
 		
 		// change listener for editable text fields
 		sc2Path.textProperty().addListener((observable, oldVal, newVal) -> {
 			if (!oldVal.equals(newVal)) {
 				setSc2Path(newVal);
+			}
+		});
+		sc2PtrPath.textProperty().addListener((observable, oldVal, newVal) -> {
+			if (!oldVal.equals(newVal)) {
+				setSc2PtrPath(newVal);
 			}
 		});
 		heroesPath.textProperty().addListener((observable, oldVal, newVal) -> {
@@ -101,7 +114,14 @@ public class SettingsGamesPathsController extends SettingsAutoSaveController {
 	@FXML
 	public void onSc2ArchitectureChange(final ActionEvent actionEvent) {
 		final boolean val = ((CheckBox) actionEvent.getSource()).selectedProperty().getValue();
-		configService.getIniSettings().setSc2Is64Bit(val);
+		configService.getIniSettings().setSc2X64(val);
+		persistSettingsIni();
+	}
+	
+	@FXML
+	public void onSc2PtrArchitectureChange(final ActionEvent actionEvent) {
+		final boolean val = ((CheckBox) actionEvent.getSource()).selectedProperty().getValue();
+		configService.getIniSettings().setSc2PtrX64(val);
 		persistSettingsIni();
 	}
 	
@@ -204,6 +224,22 @@ public class SettingsGamesPathsController extends SettingsAutoSaveController {
 		heroesPtrPath.setText(path);
 		configService.getIniSettings().setHeroesPtrPath(path);
 		validatePath(path, HEROES_SWITCHER_EXE, heroesPtrPathLabel);
+		persistSettingsIni();
+	}
+	
+	@FXML
+	public void onSc2PtrPathButtonClick() {
+		final File selectedFile =
+				showDirectoryChooser("Select StarCraft II's PTR installation directory", Path.of(sc2PtrPath.getText()));
+		if (selectedFile != null) {
+			setSc2PtrPath(selectedFile.getAbsolutePath());
+		}
+	}
+	
+	private void setSc2PtrPath(final String path) {
+		sc2PtrPath.setText(path);
+		configService.getIniSettings().setSc2PtrPath(path);
+		validatePath(path, SC2_SWITCHER_EXE, sc2PtrPathLabel);
 		persistSettingsIni();
 	}
 }

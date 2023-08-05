@@ -9,12 +9,19 @@ import com.ahli.galaxy.game.GameDef;
 import com.ahli.interfacebuilder.config.ConfigService;
 import com.ahli.interfacebuilder.integration.SettingsIniInterface;
 import com.ahli.interfacebuilder.projects.enums.GameType;
+import lombok.Getter;
 
 public class GameService {
 	private final ConfigService configService;
+	@Getter
+	private final GameDef gameDefSc2;
+	@Getter
+	private final GameDef gameDefHeroes;
 	
 	public GameService(final ConfigService configService) {
 		this.configService = configService;
+		gameDefSc2 = GameDef.buildSc2GameDef();
+		gameDefHeroes = GameDef.buildHeroesGameDef();
 	}
 	
 	/**
@@ -35,11 +42,10 @@ public class GameService {
 	 */
 	public GameDef getGameDef(final GameType gameType) {
 		return switch (gameType) {
-			case SC2 -> GameDef.buildSc2GameDef();
-			case HEROES -> GameDef.buildHeroesGameDef();
+			case SC2 -> gameDefSc2;
+			case HEROES -> gameDefHeroes;
 		};
 	}
-	
 	
 	/**
 	 * Returns the path of the image that reflects the specified game.

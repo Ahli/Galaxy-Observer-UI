@@ -51,7 +51,9 @@ public class ExtractBaseUiTask extends CleaningForkJoinTask {
 		
 		Platform.runLater(() -> {
 			final String notificationId;
-			if (gameType == GameType.SC2) {
+			if (usePtr && gameType == GameType.SC2) {
+				notificationId = "sc2PtrOutOfDate";
+			} else if (gameType == GameType.SC2) {
 				notificationId = "sc2OutOfDate";
 			} else if (usePtr && gameType == GameType.HEROES) {
 				notificationId = "heroesPtrOutOfDate";

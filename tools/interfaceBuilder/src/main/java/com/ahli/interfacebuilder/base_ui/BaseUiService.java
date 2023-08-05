@@ -420,8 +420,8 @@ public class BaseUiService {
 	/**
 	 * @return
 	 */
-	public boolean isHeroesPtrActive() {
-		final Path baseUiMetaFileDir = configService.getBaseUiPath(gameService.getGameDef(GameType.HEROES));
+	public boolean isPtrActive(GameDef gameDef) {
+		final Path baseUiMetaFileDir = configService.getBaseUiPath(gameDef);
 		try {
 			final KryoGameInfo baseUiInfo = readMetaFile(baseUiMetaFileDir);
 			if (baseUiInfo != null) {

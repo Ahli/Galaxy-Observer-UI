@@ -4,6 +4,7 @@
 package com.ahli.interfacebuilder.integration;
 
 import javafx.application.Application;
+import lombok.Getter;
 import org.springframework.lang.Nullable;
 
 import java.io.File;
@@ -23,11 +24,17 @@ public class CommandLineParams implements Serializable {
 	@Serial
 	private static final long serialVersionUID = -1392167025965886051L;
 	
+	@Getter
 	private final String paramRunPath;
+	@Getter
 	private final boolean compileAndRun;
+	@Getter
 	private final boolean hasParamCompilePath;
+	@Getter
 	private final String paramCompilePath;
+	@Getter
 	private final boolean wasStartedWithParameters;
+	@Getter
 	private final boolean paramsOriginateFromExternalSource;
 	
 	public CommandLineParams() {
@@ -115,30 +122,6 @@ public class CommandLineParams implements Serializable {
 	
 	public static String getServerThreadId(@Nullable final Application.Parameters params) {
 		return params != null ? params.getNamed().get(SERVER) : "";
-	}
-	
-	public String getParamCompilePath() {
-		return paramCompilePath;
-	}
-	
-	public String getParamRunPath() {
-		return paramRunPath;
-	}
-	
-	public boolean isCompileAndRun() {
-		return compileAndRun;
-	}
-	
-	public boolean isWasStartedWithParameters() {
-		return wasStartedWithParameters;
-	}
-	
-	public boolean isHasParamCompilePath() {
-		return hasParamCompilePath;
-	}
-	
-	public boolean isParamsOriginateFromExternalSource() {
-		return paramsOriginateFromExternalSource;
 	}
 	
 }

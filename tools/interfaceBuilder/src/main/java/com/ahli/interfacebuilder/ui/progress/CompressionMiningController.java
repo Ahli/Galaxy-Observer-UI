@@ -238,6 +238,23 @@ public class CompressionMiningController implements Updateable, FxmlController {
 		miningButton.setText(Messages.getString("progress.compressionMining.stopMining"));
 	}
 	
+	/**
+	 *
+	 */
+	public void stopMining() {
+		if (task == null) {
+			return;
+		}
+		keepTaskRunning = false;
+		task = null;
+		if (expCompMiner != null) {
+			final long newBest = expCompMiner.getBestSize();
+			expCompMiner = null;
+			log.info("Currently best Compression produces archives of size: {} kb", newBest / 1024);
+		}
+		miningButton.setText(Messages.getString("progress.compressionMining.startMining"));
+	}
+	
 	private long findBetterCompressions(final ModD mod) throws IOException, MpqException, InterruptedException {
 		long bestSize;
 		final Path modTargetFile;
@@ -266,23 +283,6 @@ public class CompressionMiningController implements Updateable, FxmlController {
 			projectService.saveProject(project);
 		}
 		return bestSize;
-	}
-	
-	/**
-	 *
-	 */
-	public void stopMining() {
-		if (task == null) {
-			return;
-		}
-		keepTaskRunning = false;
-		task = null;
-		if (expCompMiner != null) {
-			final long newBest = expCompMiner.getBestSize();
-			expCompMiner = null;
-			log.info("Currently best Compression produces archives of size: {} kb", newBest / 1024);
-		}
-		miningButton.setText(Messages.getString("progress.compressionMining.startMining"));
 	}
 	
 	/**

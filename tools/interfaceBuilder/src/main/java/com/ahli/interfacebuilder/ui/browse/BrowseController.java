@@ -88,9 +88,13 @@ public class BrowseController implements Updateable, FxmlController {
 	@FXML
 	private TabPane tabPane;
 	@FXML
-	private Label ptrStatusLabel;
+	private Label heroesPtrStatusLabel;
+	@FXML
+	private Label sc2PtrStatusLabel;
 	@FXML
 	private ChoiceBox<String> heroesChoiceBox;
+	@FXML
+	private ChoiceBox<String> sc2ChoiceBox;
 	private List<Updateable> controllers;
 	
 	public BrowseController(
@@ -128,9 +132,14 @@ public class BrowseController implements Updateable, FxmlController {
 		controllers = new ArrayList<>(0);
 		heroesChoiceBox.setItems(FXCollections.observableArrayList(Messages.getString("browse.live"),
 				Messages.getString("browse.ptr")));
-		final boolean ptrActive = baseUiService.isHeroesPtrActive();
-		heroesChoiceBox.getSelectionModel().select(ptrActive ? 1 : 0);
-		updatePtrStatusLabel(ptrActive);
+		final boolean heroesPtrActive = baseUiService.isPtrActive(gameService.getGameDefHeroes());
+		heroesChoiceBox.getSelectionModel().select(heroesPtrActive ? 1 : 0);
+		updateHeroesPtrStatusLabel(heroesPtrActive);
+		sc2ChoiceBox.setItems(FXCollections.observableArrayList(Messages.getString("browse.live"),
+				Messages.getString("browse.ptr")));
+		final boolean sc2PtrActive = baseUiService.isPtrActive(gameService.getGameDefSc2());
+		sc2ChoiceBox.getSelectionModel().select(sc2PtrActive ? 1 : 0);
+		updateSc2PtrStatusLabel(sc2PtrActive);
 		
 		final ObservableList<Project> projectsObservable =
 				FXCollections.observableList(projectService.getAllProjects());
@@ -155,8 +164,12 @@ public class BrowseController implements Updateable, FxmlController {
 		});
 	}
 	
-	private void updatePtrStatusLabel(final boolean ptrActive) {
-		ptrStatusLabel.setText(ptrActive ? Messages.getString("browse.ptrActive") : "");
+	private void updateHeroesPtrStatusLabel(final boolean ptrActive) {
+		heroesPtrStatusLabel.setText(ptrActive ? Messages.getString("browse.ptrActive") : "");
+	}
+	
+	private void updateSc2PtrStatusLabel(final boolean ptrActive) {
+		sc2PtrStatusLabel.setText(ptrActive ? Messages.getString("browse.ptrActive") : "");
 	}
 	
 	/**
@@ -187,13 +200,18 @@ public class BrowseController implements Updateable, FxmlController {
 	
 	@Override
 	public void update() {
-		updatePtrStatusLabel(baseUiService.isHeroesPtrActive());
+		updateHeroesPtrStatusLabel(baseUiService.isPtrActive(gameService.getGameDef(GameType.HEROES)));
+		updateSc2PtrStatusLabel(baseUiService.isPtrActive(gameService.getGameDef(GameType.SC2)));
 		updateBaseUiDetails();
 	}
 	
 	private void updateBaseUiDetails() {
-		sc2BaseUiDetailsLabel.setText(buildBaseUiDetailsString(GameType.SC2, false));
-		heroesBaseUiDetailsLabel.setText(buildBaseUiDetailsString(GameType.HEROES, baseUiService.isHeroesPtrActive()));
+		heroesBaseUiDetailsLabel.setText(buildBaseUiDetailsString(
+				GameType.HEROES,
+				baseUiService.isPtrActive(gameService.getGameDef(GameType.HEROES))));
+		sc2BaseUiDetailsLabel.setText(buildBaseUiDetailsString(
+				GameType.SC2,
+				baseUiService.isPtrActive(gameService.getGameDef(GameType.SC2))));
 	}
 	
 	private String buildBaseUiDetailsString(final GameType gameType, final boolean isPtr) {
@@ -219,9 +237,11 @@ public class BrowseController implements Updateable, FxmlController {
 		return sb.toString();
 	}
 	
-	public void extractBaseUiSc2() {
+	public void extractBaseUiHeroes() {
 		try {
-			extractBaseUi(GameType.SC2, false);
+			final boolean heroesPtr = heroesChoiceBox.getSelectionModel().getSelectedIndex() != 0;
+			extractBaseUi(GameType.HEROES, heroesPtr);
+			updateHeroesPtrStatusLabel(heroesPtr);
 		} catch (final IOException e) {
 			log.error("Error extracting Heroes Base UI.", e);
 			Alerts.buildExceptionAlert(primaryStage.getPrimaryStage(), e).showAndWait();
@@ -263,7 +283,7 @@ public class BrowseController implements Updateable, FxmlController {
 			
 			extractionController = loader.getController();
 			final ErrorTabController errorTabCtrl = new ErrorTabController(newTab, newTxtArea, true, false, false);
-			extractionController.setErrorTabControl(errorTabCtrl);
+			extractionController.setErrorTabController(errorTabCtrl);
 			controllers.add(extractionController);
 			
 			for (final String threadName : extractionController.getThreadNames()) {
@@ -316,13 +336,13 @@ public class BrowseController implements Updateable, FxmlController {
 		extractionController.start(gameType, usePtr);
 	}
 	
-	public void extractBaseUiHeroes() {
+	public void extractBaseUiSc2() {
 		try {
-			final boolean usePtr = heroesChoiceBox.getSelectionModel().getSelectedIndex() != 0;
-			extractBaseUi(GameType.HEROES, usePtr);
-			updatePtrStatusLabel(usePtr);
+			final boolean sc2Ptr = sc2ChoiceBox.getSelectionModel().getSelectedIndex() != 0;
+			extractBaseUi(GameType.SC2, sc2Ptr);
+			updateSc2PtrStatusLabel(sc2Ptr);
 		} catch (final IOException e) {
-			log.error("Error extracting Heroes Base UI.", e);
+			log.error("Error extracting SC2 Base UI.", e);
 			Alerts.buildExceptionAlert(primaryStage.getPrimaryStage(), e).showAndWait();
 		}
 	}
@@ -489,7 +509,7 @@ public class BrowseController implements Updateable, FxmlController {
 		public void handle(final ActionEvent event) {
 			tab.getTabPane().getTabs().remove(tab);
 			controllers.remove(controller);
-			controller.setErrorTabControl(null);
+			controller.setErrorTabController(null);
 			StylizedTextAreaAppender.unregister(controller.getErrorTabController());
 			// for some reason this class was not garbage collected
 			tab.getContextMenu().getItems().get(0).setOnAction(null);

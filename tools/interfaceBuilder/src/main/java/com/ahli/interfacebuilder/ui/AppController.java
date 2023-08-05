@@ -27,6 +27,7 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.EventListener;
@@ -42,6 +43,7 @@ import java.util.concurrent.TimeUnit;
 @Log4j2
 public class AppController {
 	public static final String FATAL_ERROR = "FATAL ERROR: ";
+	@Getter
 	private final ForkJoinPool executor;
 	private final BaseUiService baseUiService;
 	private final MpqBuilderService mpqBuilderService;
@@ -220,6 +222,18 @@ public class AppController {
 			log.error("Error during SC2 baseUI update check.", e);
 		}
 		try {
+			if (baseUiService.isOutdated(GameType.SC2, true)) {
+				if (primaryStage.hasPrimaryStage()) {
+					navigationController.appendNotification(new Notification(Messages.getString(
+							"browse.notification.sc2PtrOutOfDate"), NavigationController.BROWSE_TAB, "sc2PtrOutOfDate"));
+				} else {
+					log.warn(Messages.getString("browse.notification.sc2PtrOutOfDate"));
+				}
+			}
+		} catch (final IOException e) {
+			log.error("Error during SC2 PTR baseUI update check.", e);
+		}
+		try {
 			if (baseUiService.isOutdated(GameType.HEROES, false)) {
 				if (primaryStage.hasPrimaryStage()) {
 					navigationController.appendNotification(new Notification(Messages.getString(
@@ -247,13 +261,6 @@ public class AppController {
 		} catch (final IOException e) {
 			log.error("Error during Heroes PTR baseUI update check.", e);
 		}
-	}
-	
-	/**
-	 * @return the executor
-	 */
-	public ForkJoinPool getExecutor() {
-		return executor;
 	}
 	
 	/**
@@ -324,8 +331,8 @@ public class AppController {
 			if (params.getParamCompilePath().contains(File.separator + "heroes" + File.separator)) {
 				// Heroes
 				isHeroes = true;
-				gameDef = gameService.getGameDef(GameType.HEROES);
-				final boolean isPtr = baseUiService.isHeroesPtrActive();
+				gameDef = gameService.getGameDefHeroes();
+				final boolean isPtr = baseUiService.isPtrActive(gameDef);
 				final String supportDir = gameDef.supportDirectoryX64();
 				final String swicherExe = gameDef.switcherExeNameX64();
 				gamePath =
@@ -334,11 +341,13 @@ public class AppController {
 			} else {
 				// SC2
 				isHeroes = false;
-				gameDef = gameService.getGameDef(GameType.SC2);
-				final boolean is64bit = settings.isSc64bit();
+				gameDef = gameService.getGameDefSc2();
+				final boolean isPtr = baseUiService.isPtrActive(gameDef);
+				final boolean is64bit = isPtr ? settings.isSc2PtrX64() : settings.isSc2X64();
 				final String supportDir = is64bit ? gameDef.supportDirectoryX64() : gameDef.supportDirectoryX32();
 				final String swicherExe = is64bit ? gameDef.switcherExeNameX64() : gameDef.switcherExeNameX32();
-				gamePath = settings.getSc2Path() + File.separator + supportDir + File.separator + swicherExe;
+				gamePath = (isPtr ? settings.getSc2PtrPath() : settings.getSc2Path()) + File.separator + supportDir +
+						File.separator + swicherExe;
 			}
 		}
 		log.info("Game location: {}", gamePath);

@@ -12,10 +12,13 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.text.TextFlow;
+import lombok.Getter;
 
 public class TabPaneController implements Updateable, FxmlController {
 	
 	private ProgressController progressController;
+
+	@Getter
 	@FXML
 	private TabPane tabPane;
 	
@@ -49,15 +52,6 @@ public class TabPaneController implements Updateable, FxmlController {
 		final ErrorTabController errorTabCtrl = new ErrorTabController(tab, txtArea, false, true, true);
 		progressController.addErrorTabController(errorTabCtrl);
 		StylizedTextAreaAppender.setGeneralController(errorTabCtrl);
-	}
-	
-	/**
-	 * Returns the TabPane.
-	 *
-	 * @return
-	 */
-	public TabPane getTabPane() {
-		return tabPane;
 	}
 	
 	@Override

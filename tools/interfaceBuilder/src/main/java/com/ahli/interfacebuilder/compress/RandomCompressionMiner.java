@@ -12,6 +12,7 @@ import com.ahli.mpq.mpqeditor.MpqEditorCompressionRule;
 import com.ahli.mpq.mpqeditor.MpqEditorCompressionRuleMask;
 import com.ahli.mpq.mpqeditor.MpqEditorCompressionRuleMethod;
 import com.ahli.mpq.mpqeditor.MpqEditorCompressionRuleSize;
+import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectLongHashMap;
 
@@ -39,12 +40,17 @@ public class RandomCompressionMiner {
 	private static final String OTF = ".otf";
 	private static final String M_3 = ".m3";
 	private final ModD mod;
+	@Getter
 	private final MpqEditorInterface mpqInterface;
 	private final MpqEditorCompressionRuleMethod[] compressionSetting = MpqEditorCompressionRuleMethod.values();
 	private ObjectLongHashMap<String> fileSizeMap;
-	private MpqEditorCompressionRule[] rules;
+	@Getter
+	private MpqEditorCompressionRule[] currentRules;
+	@Getter
 	private long bestSize;
-	private MpqEditorCompressionRule[] bestRuleSet;
+	@Getter
+	private MpqEditorCompressionRule[] bestCompressionRules;
+	@Getter
 	private boolean oldRulesetHadMissingFiles;
 	
 	/**
@@ -79,18 +85,18 @@ public class RandomCompressionMiner {
 			// check for file coverage holes
 			final List<File> untrackedFiles = getUntrackedFiles(oldBestRuleset, cacheDir);
 			if (!untrackedFiles.isEmpty()) {
-				rules = addRulesForFiles(oldBestRuleset, untrackedFiles, cacheDir);
+				currentRules = addRulesForFiles(oldBestRuleset, untrackedFiles, cacheDir);
 				oldRulesetHadMissingFiles = true;
 			} else {
 				// do not modify the original array
-				rules = oldBestRuleset.clone();
+				currentRules = oldBestRuleset.clone();
 			}
-			rules = removeUnusedMaskEntries(rules, cacheDir);
-			fillFileSizeMap(rules, cacheDir);
-			replaceForbiddenRulesets(rules);
+			currentRules = removeUnusedMaskEntries(currentRules, cacheDir);
+			fillFileSizeMap(currentRules, cacheDir);
+			replaceForbiddenRulesets(currentRules);
 			
-			bestRuleSet = deepCopy(rules);
-			bestSize = build(rules, true);
+			bestCompressionRules = deepCopy(currentRules);
+			bestSize = build(currentRules, true);
 			// only compress once
 			compressXml = false;
 		} else {
@@ -102,8 +108,8 @@ public class RandomCompressionMiner {
 		final long initRuleSetSize = build(initRules, compressXml);
 		if (initRuleSetSize < bestSize) {
 			bestSize = initRuleSetSize;
-			rules = initRules;
-			bestRuleSet = deepCopy(initRules);
+			currentRules = initRules;
+			bestCompressionRules = deepCopy(initRules);
 		}
 	}
 	
@@ -373,10 +379,10 @@ public class RandomCompressionMiner {
 	 * @throws MpqException
 	 */
 	public long build() throws InterruptedException, IOException, MpqException {
-		final long size = build(rules, false);
+		final long size = build(currentRules, false);
 		if (size < bestSize) {
 			bestSize = size;
-			bestRuleSet = deepCopy(rules);
+			bestCompressionRules = deepCopy(currentRules);
 		}
 		return size;
 	}
@@ -387,7 +393,7 @@ public class RandomCompressionMiner {
 	public void randomizeRules() {
 		// fine for all: NONE, BZIP2, ZLIB, PKWARE, SPARSE, SPARSE_BZIP2, SPARSE_ZLIB
 		// not fine: LZMA (crash during load)
-		for (final MpqEditorCompressionRule rule : rules) {
+		for (final MpqEditorCompressionRule rule : currentRules) {
 			if (rule instanceof MpqEditorCompressionRuleMask ruleMask) {
 				rule.setCompressionMethod(getRandomCompressionMethod(ruleMask.getMask()));
 				rule.setSingleUnit(getRandomSingleUnit());
@@ -418,18 +424,6 @@ public class RandomCompressionMiner {
 	
 	private boolean getRandomSingleUnit() {
 		return ThreadLocalRandom.current().nextFloat() < 0.95f;
-	}
-	
-	public MpqEditorCompressionRule[] getBestCompressionRules() {
-		return bestRuleSet;
-	}
-	
-	public long getBestSize() {
-		return bestSize;
-	}
-	
-	public boolean isOldRulesetHadMissingFiles() {
-		return oldRulesetHadMissingFiles;
 	}
 	
 	/**
@@ -472,11 +466,4 @@ public class RandomCompressionMiner {
 		log.error("Failed to clean up compression mining target file");
 	}
 	
-	public MpqEditorInterface getMpqInterface() {
-		return mpqInterface;
-	}
-	
-	public MpqEditorCompressionRule[] getCurrentRules() {
-		return rules;
-	}
 }

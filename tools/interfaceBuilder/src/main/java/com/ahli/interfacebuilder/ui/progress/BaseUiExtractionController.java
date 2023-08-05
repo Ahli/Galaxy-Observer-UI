@@ -28,11 +28,14 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.lang.NonNull;
 
 public class BaseUiExtractionController implements Updateable, FxmlController {
 	
 	private static int threadCount;
+	@Getter
 	private final String[] threadNames;
 	private final BaseUiService baseUiService;
 	private final GameService gameService;
@@ -51,6 +54,7 @@ public class BaseUiExtractionController implements Updateable, FxmlController {
 	private ScrollPane scrollPane2;
 	@FXML
 	private ScrollPane scrollPane3;
+	@Getter
 	@FXML
 	private Pane loggingArea;
 	@FXML
@@ -68,6 +72,8 @@ public class BaseUiExtractionController implements Updateable, FxmlController {
 	@FXML
 	private Label areaLabel3;
 	
+	@Getter
+	@Setter
 	private ErrorTabController errorTabController;
 	
 	public BaseUiExtractionController(
@@ -84,10 +90,6 @@ public class BaseUiExtractionController implements Updateable, FxmlController {
 		threadNames[0] = threadName + ++threadCount;
 		threadNames[1] = threadName + ++threadCount;
 		threadNames[2] = threadName + ++threadCount;
-	}
-	
-	public Pane getLoggingArea() {
-		return loggingArea;
 	}
 	
 	/**
@@ -149,18 +151,6 @@ public class BaseUiExtractionController implements Updateable, FxmlController {
 				errorTabController,
 				navigationController);
 		executor.execute(task);
-	}
-	
-	public String[] getThreadNames() {
-		return threadNames;
-	}
-	
-	public void setErrorTabControl(final ErrorTabController errorTabCtrl) {
-		errorTabController = errorTabCtrl;
-	}
-	
-	public ErrorTabController getErrorTabController() {
-		return errorTabController;
 	}
 	
 	private static final class EndedListener implements ChangeListener<Boolean> {

@@ -8,6 +8,8 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.scene.control.Tab;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextFlow;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Tracks occurrence of an error.
@@ -20,12 +22,16 @@ public final class ErrorTabController {
 	private static final String TAB_TEXT_COLOR_WHITE = "-tab-text-color: white;";
 	private final boolean colorizeTitle;
 	private final boolean showResultIcon;
-	private final Tab tab;
-	private final TextFlow textArea;
 	private boolean encounteredError;
 	private boolean running;
 	private boolean encounteredWarning;
 	private State state = State.NOT_STARTED;
+	@Getter
+	private final Tab tab;
+	@Getter
+	private final TextFlow textArea;
+	@Getter
+	@Setter
 	private boolean errorPreventsExit;
 	
 	/**
@@ -105,26 +111,12 @@ public final class ErrorTabController {
 	}
 	
 	/**
-	 * @return the tab
-	 */
-	public Tab getTab() {
-		return tab;
-	}
-	
-	/**
 	 * @param running
 	 * 		the running to set
 	 */
 	public void setRunning(final boolean running) {
 		this.running = running;
 		updateIcon();
-	}
-	
-	/**
-	 * @return
-	 */
-	public TextFlow getTextArea() {
-		return textArea;
 	}
 	
 	/**
@@ -151,14 +143,6 @@ public final class ErrorTabController {
 			}
 			updateIcon();
 		}
-	}
-	
-	public boolean isErrorPreventsExit() {
-		return errorPreventsExit;
-	}
-	
-	public void setErrorPreventsExit(final boolean errorPreventsExit) {
-		this.errorPreventsExit = errorPreventsExit;
 	}
 	
 	private enum State {NOT_STARTED, RUNNING, WARNING, ERROR, GOOD}

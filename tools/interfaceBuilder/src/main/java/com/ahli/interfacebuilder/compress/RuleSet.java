@@ -16,6 +16,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
+import lombok.Getter;
 import org.hibernate.Hibernate;
 
 import java.io.IOException;
@@ -40,6 +41,7 @@ public final class RuleSet implements Serializable {
 	@Transient
 	private MpqEditorCompressionRule[] compressionRules;
 	
+	@Getter
 	@ElementCollection(fetch = FetchType.EAGER)
 	@CollectionTable(name = "rule_set_compression_rules_string", joinColumns = { @JoinColumn(name = "rule_set_id") })
 	@Column(name = "compression_rules_string")
@@ -75,10 +77,6 @@ public final class RuleSet implements Serializable {
 			}
 		}
 		return compressionRules;
-	}
-	
-	public List<String> getCompressionRulesString() {
-		return compressionRulesString;
 	}
 	
 	@Override

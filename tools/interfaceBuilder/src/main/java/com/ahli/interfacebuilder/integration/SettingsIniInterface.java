@@ -3,6 +3,8 @@
 
 package com.ahli.interfacebuilder.integration;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.configuration2.INIConfiguration;
 import org.apache.commons.configuration2.SubnodeConfiguration;
@@ -30,6 +32,8 @@ public class SettingsIniInterface {
 	private static final String HEROES_PTR_PATH = "HeroesPTR_Path";
 	private static final String STARCRAFT2_PATH = "StarCraft2_Path";
 	private static final String STARCRAFT2_USE64BIT = "StarCraft2_use64bit";
+	private static final String STARCRAFT2_PTR_PATH = "StarCraft2PTR_Path";
+	private static final String STARCRAFT2_PTR_USE64BIT = "StarCraft2PTR_use64bit";
 	private static final String CATEGORY_COMMAND_LINE_TOOL = "CommandLineExecution";
 	private static final String CATEGORY_GUI_TOOL = "GuiExecution";
 	private static final String VERIFY_XML = "verifyXml";
@@ -40,23 +44,59 @@ public class SettingsIniInterface {
 	private static final String BUILD_UNPROTECTED_TOO = "buildUnprotectedToo";
 	private static final String UTF_8 = "UTF-8";
 	private final Path settingsFilePath;
+	@Getter
+	@Setter
 	private String sc2Path = "";
+	@Getter
+	@Setter
+	private String sc2PtrPath = "";
+	@Getter
+	@Setter
 	private String heroesPath = "";
+	@Getter
+	@Setter
 	private String heroesPtrPath = "";
+	@Getter
+	@Setter
 	private boolean sc2X64;
+	@Getter
+	@Setter
+	private boolean sc2PtrX64;
+	@Getter
+	@Setter
 	private boolean cmdLineVerifyXml = true;
+	@Getter
+	@Setter
 	private boolean cmdLineRepairLayoutOrder = true;
+	@Getter
+	@Setter
 	private boolean cmdLineVerifyLayout = true;
+	@Getter
+	@Setter
 	private boolean cmdLineCompressXml;
-	/* compression: 0=None, 1=Blizz, 2=ExperimentalBest, 3=SystemDefault */
-	private int cmdLineCompressMpq;
+	@Getter
+	@Setter
+	/* compression: 0=None, 1=Blizz, 2=ExperimentalBest, 3=SystemDefault */ private int cmdLineCompressMpq;
+	@Getter
+	@Setter
 	private boolean cmdLineBuildUnprotectedToo;
+	@Getter
+	@Setter
 	private boolean guiVerifyXml = true;
+	@Getter
+	@Setter
 	private boolean guiRepairLayoutOrder = true;
+	@Getter
+	@Setter
 	private boolean guiVerifyLayout = true;
+	@Getter
+	@Setter
 	private boolean guiCompressXml = true;
-	/* compression: 0=None, 1=Blizz, 2=ExperimentalBest, 3=SystemDefault */
-	private int guiCompressMpq = 3;
+	@Getter
+	@Setter
+	/* compression: 0=None, 1=Blizz, 2=ExperimentalBest, 3=SystemDefault */ private int guiCompressMpq = 3;
+	@Getter
+	@Setter
 	private boolean guiBuildUnprotectedToo;
 	
 	/**
@@ -107,7 +147,9 @@ public class SettingsIniInterface {
 		heroesPath = section.getString(HEROES_PATH, emptryStr);
 		heroesPtrPath = section.getString(HEROES_PTR_PATH, emptryStr);
 		sc2Path = section.getString(STARCRAFT2_PATH, emptryStr);
+		sc2PtrPath = section.getString(STARCRAFT2_PTR_PATH, emptryStr);
 		sc2X64 = section.getBoolean(STARCRAFT2_USE64BIT, false);
+		sc2PtrX64 = section.getBoolean(STARCRAFT2_PTR_USE64BIT, false);
 		
 		section = ini.getSection(CATEGORY_COMMAND_LINE_TOOL);
 		cmdLineVerifyXml = section.getBoolean(VERIFY_XML, true);
@@ -160,9 +202,11 @@ public class SettingsIniInterface {
 	private void writeValuesToIni(final INIConfiguration ini) {
 		SubnodeConfiguration section = ini.getSection(CATEGORY_GAME_PATHS);
 		section.setProperty(STARCRAFT2_PATH, sc2Path);
+		section.setProperty(STARCRAFT2_PTR_PATH, sc2PtrPath);
 		section.setProperty(HEROES_PATH, heroesPath);
 		section.setProperty(HEROES_PTR_PATH, heroesPtrPath);
 		section.setProperty(STARCRAFT2_USE64BIT, sc2X64);
+		section.setProperty(STARCRAFT2_PTR_USE64BIT, sc2PtrX64);
 		
 		section = ini.getSection(CATEGORY_COMMAND_LINE_TOOL);
 		section.setProperty(VERIFY_XML, cmdLineVerifyXml);
@@ -181,227 +225,4 @@ public class SettingsIniInterface {
 		section.setProperty(BUILD_UNPROTECTED_TOO, guiBuildUnprotectedToo);
 	}
 	
-	/**
-	 * @return
-	 */
-	public boolean isGuiVerifyXml() {
-		return guiVerifyXml;
-	}
-	
-	/**
-	 * @param guiVerifyXml
-	 */
-	public void setGuiVerifyXml(final boolean guiVerifyXml) {
-		this.guiVerifyXml = guiVerifyXml;
-	}
-	
-	/**
-	 * @return
-	 */
-	public boolean isGuiRepairLayoutOrder() {
-		return guiRepairLayoutOrder;
-	}
-	
-	/**
-	 * @param guiRepairLayoutOrder
-	 */
-	public void setGuiRepairLayoutOrder(final boolean guiRepairLayoutOrder) {
-		this.guiRepairLayoutOrder = guiRepairLayoutOrder;
-	}
-	
-	/**
-	 * @return
-	 */
-	public boolean isGuiVerifyLayout() {
-		return guiVerifyLayout;
-	}
-	
-	/**
-	 * @param guiVerifyLayout
-	 */
-	public void setGuiVerifyLayout(final boolean guiVerifyLayout) {
-		this.guiVerifyLayout = guiVerifyLayout;
-	}
-	
-	/**
-	 * @return
-	 */
-	public boolean isGuiCompressXml() {
-		return guiCompressXml;
-	}
-	
-	/**
-	 * @param guiCompressXml
-	 */
-	public void setGuiCompressXml(final boolean guiCompressXml) {
-		this.guiCompressXml = guiCompressXml;
-	}
-	
-	/**
-	 * @return
-	 */
-	public int getGuiCompressMpq() {
-		return guiCompressMpq;
-	}
-	
-	/**
-	 * @param guiCompressMpq
-	 */
-	public void setGuiCompressMpq(final int guiCompressMpq) {
-		this.guiCompressMpq = guiCompressMpq;
-	}
-	
-	/**
-	 * @return
-	 */
-	public boolean isGuiBuildUnprotectedToo() {
-		return guiBuildUnprotectedToo;
-	}
-	
-	/**
-	 * @param guiBuildUnprotectedToo
-	 */
-	public void setGuiBuildUnprotectedToo(final boolean guiBuildUnprotectedToo) {
-		this.guiBuildUnprotectedToo = guiBuildUnprotectedToo;
-	}
-	
-	/**
-	 * @return
-	 */
-	public String getHeroesPath() {
-		return heroesPath;
-	}
-	
-	/**
-	 * @param heroesPath
-	 */
-	public void setHeroesPath(final String heroesPath) {
-		this.heroesPath = heroesPath;
-	}
-	
-	/**
-	 * @return
-	 */
-	public String getHeroesPtrPath() {
-		return heroesPtrPath;
-	}
-	
-	/**
-	 * @param heroesPtrPath
-	 */
-	public void setHeroesPtrPath(final String heroesPtrPath) {
-		this.heroesPtrPath = heroesPtrPath;
-	}
-	
-	/**
-	 * @return
-	 */
-	public boolean isSc64bit() {
-		return sc2X64;
-	}
-	
-	/**
-	 * @param sc2Is64Bit
-	 */
-	public void setSc2Is64Bit(final boolean sc2Is64Bit) {
-		sc2X64 = sc2Is64Bit;
-	}
-	
-	/**
-	 * @return
-	 */
-	public boolean isCmdLineCompressXml() {
-		return cmdLineCompressXml;
-	}
-	
-	/**
-	 * @param cmdLineCompressXml
-	 */
-	public void setCmdLineCompressXml(final boolean cmdLineCompressXml) {
-		this.cmdLineCompressXml = cmdLineCompressXml;
-	}
-	
-	/**
-	 * @return
-	 */
-	public int getCmdLineCompressMpq() {
-		return cmdLineCompressMpq;
-	}
-	
-	//	/**
-	//	 * @param cmdLineCompressMpq
-	//	 */
-	//	public void setCmdLineCompressMpq(final int cmdLineCompressMpq) {
-	//		this.cmdLineCompressMpq = cmdLineCompressMpq;
-	//	}
-	
-	/**
-	 * @return
-	 */
-	public String getSc2Path() {
-		return sc2Path;
-	}
-	
-	/**
-	 * @param sc2Path
-	 */
-	public void setSc2Path(final String sc2Path) {
-		this.sc2Path = sc2Path;
-	}
-	
-	/**
-	 * @return
-	 */
-	public boolean isCmdLineRepairLayoutOrder() {
-		return cmdLineRepairLayoutOrder;
-	}
-	
-	/**
-	 * @param cmdLineRepairLayoutOrder
-	 */
-	public void setCmdLineRepairLayoutOrder(final boolean cmdLineRepairLayoutOrder) {
-		this.cmdLineRepairLayoutOrder = cmdLineRepairLayoutOrder;
-	}
-	
-	/**
-	 * @return
-	 */
-	public boolean isCmdLineVerifyLayout() {
-		return cmdLineVerifyLayout;
-	}
-	
-	/**
-	 * @param cmdLineVerifyLayout
-	 */
-	public void setCmdLineVerifyLayout(final boolean cmdLineVerifyLayout) {
-		this.cmdLineVerifyLayout = cmdLineVerifyLayout;
-	}
-	
-	/**
-	 * @return
-	 */
-	public boolean isCmdLineBuildUnprotectedToo() {
-		return cmdLineBuildUnprotectedToo;
-	}
-	
-	/**
-	 * @param cmdLineBuildUnprotectedToo
-	 */
-	public void setCmdLineBuildUnprotectedToo(final boolean cmdLineBuildUnprotectedToo) {
-		this.cmdLineBuildUnprotectedToo = cmdLineBuildUnprotectedToo;
-	}
-	
-	/**
-	 * @return
-	 */
-	public boolean isCmdLineVerifyXml() {
-		return cmdLineVerifyXml;
-	}
-	
-	/**
-	 * @param cmdLineVerifyXml
-	 */
-	public void setCmdLineVerifyXml(final boolean cmdLineVerifyXml) {
-		this.cmdLineVerifyXml = cmdLineVerifyXml;
-	}
 }
