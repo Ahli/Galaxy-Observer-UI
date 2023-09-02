@@ -19,6 +19,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.DirectoryChooser;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class SettingsGamesPathsController extends SettingsAutoSaveController {
@@ -47,9 +48,7 @@ public class SettingsGamesPathsController extends SettingsAutoSaveController {
 	private Label heroesPtrPathLabel;
 	
 	public SettingsGamesPathsController(
-			final ConfigService configService,
-			final FileService fileService,
-			final GameService gameService) {
+			final ConfigService configService, final FileService fileService, final GameService gameService) {
 		super(configService);
 		this.fileService = fileService;
 		this.gameService = gameService;
@@ -168,7 +167,7 @@ public class SettingsGamesPathsController extends SettingsAutoSaveController {
 		configService.getIniSettings().setSc2Path(path);
 		String sc2switcher64 = gameService.getGameDefSc2().switcherExeNameX64();
 		String sc2switcher32 = gameService.getGameDefSc2().switcherExeNameX32();
-		validatePath(sc2Path.getText(), sc2switcher64, sc2switcher32, sc2PathLabel);
+		validatePath(path, sc2switcher64, sc2switcher32, sc2PathLabel);
 		persistSettingsIni();
 	}
 	
@@ -185,10 +184,7 @@ public class SettingsGamesPathsController extends SettingsAutoSaveController {
 	 * 		label set visible if invalid, can be null
 	 */
 	private static void validatePath(
-			final String path,
-			final String switcher64,
-			final String switcher32,
-			final Label invalidLabel) {
+			final String path, final String switcher64, final String switcher32, final Label invalidLabel) {
 		@SuppressWarnings("BooleanVariableAlwaysNegated")
 		boolean valid = false;
 		if (path != null) {
@@ -207,8 +203,9 @@ public class SettingsGamesPathsController extends SettingsAutoSaveController {
 	 */
 	private static boolean switcherExists(
 			final String gameDirectoryPath, final String switcherName, final boolean is64bit) {
-		return new File(gameDirectoryPath + File.separator + "Support" + (is64bit ? "64" : "") + File.separator +
-				switcherName).exists();
+		return Files.exists(Path.of(
+				gameDirectoryPath + File.separator + "Support" + (is64bit ? "64" : "") + File.separator +
+						switcherName));
 	}
 	
 	@FXML
@@ -224,7 +221,7 @@ public class SettingsGamesPathsController extends SettingsAutoSaveController {
 		heroesPath.setText(path);
 		configService.getIniSettings().setHeroesPath(path);
 		String heroesSwitcher64 = gameService.getGameDefHeroes().switcherExeNameX64();
-		validatePath(heroesPath.getText(), heroesSwitcher64, null, heroesPathLabel);
+		validatePath(path, heroesSwitcher64, null, heroesPathLabel);
 		persistSettingsIni();
 	}
 	
@@ -241,7 +238,7 @@ public class SettingsGamesPathsController extends SettingsAutoSaveController {
 		heroesPtrPath.setText(path);
 		configService.getIniSettings().setHeroesPtrPath(path);
 		String heroesSwitcher64 = gameService.getGameDefHeroes().switcherExeNameX64();
-		validatePath(heroesPath.getText(), heroesSwitcher64, null, heroesPtrPathLabel);
+		validatePath(path, heroesSwitcher64, null, heroesPtrPathLabel);
 		persistSettingsIni();
 	}
 	
@@ -259,7 +256,7 @@ public class SettingsGamesPathsController extends SettingsAutoSaveController {
 		configService.getIniSettings().setSc2PtrPath(path);
 		String sc2switcher64 = gameService.getGameDefSc2().switcherExeNameX64();
 		String sc2switcher32 = gameService.getGameDefSc2().switcherExeNameX32();
-		validatePath(sc2Path.getText(), sc2switcher64, sc2switcher32, sc2PtrPathLabel);
+		validatePath(path, sc2switcher64, sc2switcher32, sc2PtrPathLabel);
 		persistSettingsIni();
 	}
 }

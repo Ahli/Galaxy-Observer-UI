@@ -213,8 +213,11 @@ public class BrowseController implements Updateable, FxmlController {
 	}
 	
 	private String buildBaseUiDetailsString(final GameType gameType, final boolean isPtr) {
-		final StringBuilder sb = new StringBuilder(25); // big enough for default case
 		final int[] version = baseUiService.getVersion(gameService.getGameDef(gameType), isPtr);
+		if (version == null) {
+			return Messages.getString("browse.couldNotCheckGameVersion");
+		}
+		final StringBuilder sb = new StringBuilder(26); // big enough for default case
 		for (final int v : version) {
 			sb.append(v).append('.');
 		}
@@ -224,12 +227,12 @@ public class BrowseController implements Updateable, FxmlController {
 		}
 		try {
 			if (baseUiService.isOutdated(gameType, isPtr)) {
-				sb.append(Messages.getString("browse.requiresUpdate"));
+				sb.append(' ').append(Messages.getString("browse.requiresUpdate"));
 			} else {
-				sb.append(Messages.getString("browse.upToDate"));
+				sb.append(' ').append(Messages.getString("browse.upToDate"));
 			}
 		} catch (final IOException e) {
-			sb.append(Messages.getString("browse.couldNotCheckGameVersion"));
+			sb.append(' ').append(Messages.getString("browse.couldNotCheckGameVersion"));
 			log.trace("Error: could not check game version", e);
 		}
 		return sb.toString();

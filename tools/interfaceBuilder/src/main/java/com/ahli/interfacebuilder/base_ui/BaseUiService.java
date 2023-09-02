@@ -100,7 +100,14 @@ public class BaseUiService {
 		final GameDef gameDef = gameService.getGameDef(gameType);
 		final Path gameBaseUI = configService.getBaseUiPath(gameDef);
 		
-		if (!Files.exists(gameBaseUI) || fileService.isEmptyDirectory(gameBaseUI)) {
+		final Path switcherExePath = Path.of(gameService.getGameDirPath(gameDef, usePtr),
+				gameDef.supportDirectoryX64(),
+				gameDef.switcherExeNameX64());
+		if (!Files.exists(switcherExePath)) {
+			return false;
+		}
+		
+		if ((!Files.exists(gameBaseUI) || fileService.isEmptyDirectory(gameBaseUI))) {
 			return true;
 		}
 		
@@ -117,8 +124,13 @@ public class BaseUiService {
 			log.trace(msg, e);
 			return true;
 		}
-		final int[] versionBaseUi = baseUiInfo.version();
 		final int[] versionExe = getVersion(gameDef, usePtr);
+		
+		if (versionExe == null) {
+			return true;
+		}
+		
+		final int[] versionBaseUi = baseUiInfo.version();
 		boolean isUpToDate = true;
 		for (int i = 0; i < versionExe.length && isUpToDate; ++i) {
 			isUpToDate = versionExe[i] <= versionBaseUi[i];
@@ -145,12 +157,22 @@ public class BaseUiService {
 		return null;
 	}
 	
-	@NonNull
+	/**
+	 * Returns the game version of the Game installation.
+	 *
+	 * @param gameDef
+	 * @param isPtr
+	 * @return version, or null if not existing
+	 */
 	public int[] getVersion(@NonNull final GameDef gameDef, final boolean isPtr) {
-		final int[] versions = new int[4];
 		final Path path = Path.of(gameService.getGameDirPath(gameDef, isPtr),
 				gameDef.supportDirectoryX64(),
 				gameDef.switcherExeNameX64());
+		
+		if (!Files.exists(path)) {
+			return null;
+		}
+		
 		try {
 			final PE pe = PEParser.parse(path.toFile());
 			final ResourceDirectory rd = pe.getImageData().getResourceTable();
@@ -171,6 +193,7 @@ public class BaseUiService {
 						log.trace("found FileVersion={}", value);
 						
 						final String[] parts = value.split("\\.");
+						final int[] versions = new int[4];
 						for (int k = 0; k < 4; ++k) {
 							versions[k] = Integer.parseInt(parts[k]);
 						}
@@ -181,7 +204,7 @@ public class BaseUiService {
 		} catch (final IOException e) {
 			log.error("Error attempting to parse FileVersion from game's exe: ", e);
 		}
-		return versions;
+		return null;
 	}
 	
 	/**
@@ -314,10 +337,10 @@ public class BaseUiService {
 					try {
 						for (final String modOrDir : game.getGameDef().coreModsOrDirectories()) {
 							
-							
 							final Path directory = Path.of(gameBaseUiDir + File.separator + modOrDir);
 							if (!Files.exists(directory) || !Files.isDirectory(directory)) {
-								throw new IOException("BaseUI does not exist.");
+								log.error("ERROR: BaseUI has not been extracted. Missing: {}", directory);
+								throw new IOException("BaseUI has not been extracted. Missing: " + directory);
 							}
 							
 							final BaseUiDescIndexFileParsingVisitor fileVisitor =
@@ -338,7 +361,10 @@ public class BaseUiService {
 					log.info(msg);
 					primaryStage.printInfoLogMessageToGeneral(msg);
 					try {
-						discCacheService.put(uiCatalog, gameName, isPtr, getVersion(game.getGameDef(), isPtr));
+						int[] version = getVersion(game.getGameDef(), isPtr);
+						if (version != null) {
+							discCacheService.put(uiCatalog, gameName, isPtr, getVersion(game.getGameDef(), isPtr));
+						}
 					} catch (final IOException e) {
 						log.error("ERROR when creating cache file of UI", e);
 					}
@@ -589,6 +615,9 @@ public class BaseUiService {
 		@Override
 		protected void compute() {
 			final int[] version = baseUiService.getVersion(gameDef, usePtr);
+			if (version == null) {
+				return;
+			}
 			try {
 				writeToMetaFile(destination, gameDef.name(), version, usePtr);
 			} catch (final IOException e) {
