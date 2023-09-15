@@ -13,6 +13,7 @@ module ObserverUiSettingsEditor {
 	requires ch.qos.logback.classic; // entry required for logging after jlink (NOT redundant!)
 	requires ch.qos.logback.core; // required for logback classic (NOT redundant!)
 	requires java.naming; // required for logback classic (NOT redundant!)
+	requires lombok;
 	
 	requires GalaxyLib;
 	exports com.ahli.hotkey_ui.application to javafx.graphics;

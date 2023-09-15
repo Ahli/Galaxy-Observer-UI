@@ -37,6 +37,7 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,10 +66,28 @@ public class SettingsEditorApplication extends Application {
 	private static final Logger logger = LoggerFactory.getLogger(SettingsEditorApplication.class);
 	
 	private final long appStartTime = System.nanoTime();
+	/**
+	 * -- GETTER -- Returns the App's main window stage.
+	 *
+	 * @return
+	 */
+	@Getter
 	private Stage primaryStage;
 	private BorderPane rootLayout;
+	/**
+	 * -- GETTER --
+	 *
+	 * @return the mbarCtrl
+	 */
+	@Getter
 	private MenuBarController mbarCtrl;
 	private TabsController tabsCtrl;
+	/**
+	 * -- GETTER -- Returns the File path of the opened Document.
+	 *
+	 * @return
+	 */
+	@Getter
 	private Path openedDocPath;
 	private MpqEditorInterface mpqi;
 	private DescIndex descIndex;
@@ -89,7 +108,9 @@ public class SettingsEditorApplication extends Application {
 		logger.warn("warn log visible");
 		logger.error("error log visible");
 		
-		logger.trace("Configuration File of System: {}", System.getProperty("log4j.configurationFile"));
+		if (logger.isTraceEnabled()) {
+			logger.trace("Configuration File of System: {}", System.getProperty("log4j.configurationFile"));
+		}
 		
 		// TEST Locale
 		//		Messages.setBundle(Locale.CHINA);
@@ -337,20 +358,13 @@ public class SettingsEditorApplication extends Application {
 	}
 	
 	/**
-	 * @return the mbarCtrl
-	 */
-	public MenuBarController getMbarCtrl() {
-		return mbarCtrl;
-	}
-	
-	/**
 	 * Returns true, if the path of the current opened document is valid. Invalid usually means that no document has
 	 * been opened.
 	 *
 	 * @return
 	 */
 	public boolean isInvalidOpenedDocPath() {
-		return openedDocPath == null || "".equals(openedDocPath.toString());
+		return openedDocPath == null || openedDocPath.toString().isEmpty();
 	}
 	
 	/**
@@ -396,24 +410,6 @@ public class SettingsEditorApplication extends Application {
 			final Alert alert = Alerts.buildErrorAlert(getPrimaryStage(), title, title, content);
 			alert.showAndWait();
 		});
-	}
-	
-	/**
-	 * Returns the File path of the opened Document.
-	 *
-	 * @return
-	 */
-	public Path getOpenedDocPath() {
-		return openedDocPath;
-	}
-	
-	/**
-	 * Returns the App's main window stage.
-	 *
-	 * @return
-	 */
-	public Stage getPrimaryStage() {
-		return primaryStage;
 	}
 	
 	/**

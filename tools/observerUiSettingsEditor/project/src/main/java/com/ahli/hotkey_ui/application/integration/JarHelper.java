@@ -53,12 +53,14 @@ public final class JarHelper {
 			}
 		}
 		// this failed
-		logger.error("java.class.path={}", System.getProperty("java.class.path"));
-		logger.error("jdk.module.path={}", System.getProperty("jdk.module.path"));
-		logger.error("jdk.module.upgrade.path={}", System.getProperty("jdk.module.upgrade.path"));
-		logger.error("java.home={}", System.getProperty("java.home"));
-		logger.error("user.dir={}", System.getProperty("user.dir"));
-		logger.error("class-domtain-codesource-location-path={}", path);
+		if (logger.isErrorEnabled()) {
+			logger.error("java.class.path={}", System.getProperty("java.class.path"));
+			logger.error("jdk.module.path={}", System.getProperty("jdk.module.path"));
+			logger.error("jdk.module.upgrade.path={}", System.getProperty("jdk.module.upgrade.path"));
+			logger.error("java.home={}", System.getProperty("java.home"));
+			logger.error("user.dir={}", System.getProperty("user.dir"));
+			logger.error("class-domain-codesource-location-path={}", path);
+		}
 		return null;
 	}
 }
