@@ -7,7 +7,7 @@ Check out the UIs here: https://ahli.github.io/Galaxy-Observer-UI/#/
 
 ### User Installation:
 Required Software (for Windows):
-* [Java 17 or higher](https://adoptium.net)
+* [Java 21 or higher](https://www.azul.com/downloads/?package=jdk#zulu)
 * A text editor preferably with XML syntax support, e.g. [Notepad++](https://notepad-plus-plus.org/) with the [NppExec plugin](https://sourceforge.net/projects/npp-plugins/files/NppExec/)
 
 ### Using the Builder:
@@ -23,7 +23,7 @@ To compile a selected archive and start a replay, consult the 'ReadMe.txt' in th
 
 ### Tools-Developer Installation:
 Required Software (for Windows):
-* [Java 18 or higher](https://adoptium.net)
+* [Java 21 or higher](https://www.azul.com/downloads/?package=jdk#zulu)
 * Java IDE, for example [IntelliJ](https://www.jetbrains.com/idea/download/#section=windows) or [Eclipse for Java Developers](https://www.eclipse.org/downloads/eclipse-packages/)
 * A text editor preferably with XML syntax support, e.g. [Notepad++](https://notepad-plus-plus.org/) with optionally the [NppExec plugin](https://sourceforge.net/projects/npp-plugins/files/NppExec/) or alternatively [VSCode](https://code.visualstudio.com) with [Talv's SC2Layout plugin](https://github.com/Talv/sc2-layouts)
 * Git or some of its GUI software like [Sourcetree](https://www.sourcetreeapp.com/).
