@@ -51,11 +51,19 @@ int main(const int argc, const char* const argv[])
 
 		std::wcout << "Opening CASC Storage: " << path << std::endl;
 
-		HANDLE hStorage;
+		HANDLE hStorage = nullptr;
 
-		if (!CascOpenStorage(path, 0, &hStorage)) {
-			std::cerr << "ERROR: opening storage: " << GetCascError() << std::endl;
-			return EXIT_FAILURE;
+		for (char i = 10; i > 0; --i) {
+			if (CascOpenStorage(path, 0, &hStorage)) {
+				break;
+			}
+
+			if (i <= 1) {
+				std::cerr << "ERROR: opening storage: " << GetCascError() << std::endl;
+				return EXIT_FAILURE;
+			} else {
+				Sleep(100);
+			}
 		}
 
 		std::cout << "Finding files with mask: " << mask << std::endl;
