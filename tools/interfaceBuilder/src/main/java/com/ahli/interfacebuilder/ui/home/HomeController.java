@@ -155,7 +155,7 @@ public class HomeController implements Updateable, FxmlController {
 		final ObservableList<Project> selectedItems = selectionList.getSelectionModel().getSelectedItems();
 		if (selectedItems.size() == 1) {
 			selectedPanel.setVisible(true);
-			final Project p = selectedItems.get(0);
+			final Project p = selectedItems.getFirst();
 			selectedName.setText(p.getName());
 			final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
 			selectedBuildDate.setText(
@@ -238,7 +238,7 @@ public class HomeController implements Updateable, FxmlController {
 	public void editProjectAction() throws IOException {
 		final List<Project> projects = selectionList.getSelectionModel().getSelectedItems();
 		if (projects.size() == 1) {
-			final Project project = projects.get(0);
+			final Project project = projects.getFirst();
 			final FXMLSpringLoader loader = new FXMLSpringLoader(appContext);
 			final Dialog<Project> dialog = loader.load("classpath:view/Home_AddProjectDialog.fxml");
 			dialog.initOwner(addProject.getScene().getWindow());
@@ -315,7 +315,7 @@ public class HomeController implements Updateable, FxmlController {
 	public void viewBestCompressionForSelected() throws IOException {
 		final List<Project> selectedItems = selectionList.getSelectionModel().getSelectedItems();
 		if (selectedItems.size() == 1) {
-			final Project project = selectedItems.get(0);
+			final Project project = selectedItems.getFirst();
 			final FXMLSpringLoader loader = new FXMLSpringLoader(appContext);
 			final Dialog<Project> dialog = loader.load("classpath:view/Home_ViewRuleSet.fxml");
 			((ViewRuleSetController) loader.getController()).setProject(project);
@@ -330,7 +330,7 @@ public class HomeController implements Updateable, FxmlController {
 	public void mineBetterCompressionForSelected() throws IOException {
 		final List<Project> selectedItems = selectionList.getSelectionModel().getSelectedItems();
 		if (selectedItems.size() == 1) {
-			final Project project = selectedItems.get(0);
+			final Project project = selectedItems.getFirst();
 			// init UI as Tab in Progress
 			final FXMLSpringLoader loader = new FXMLSpringLoader(appContext);
 			final Parent content = loader.load("classpath:view/Progress_CompressionMining.fxml");
@@ -376,14 +376,8 @@ public class HomeController implements Updateable, FxmlController {
 		}
 	}
 	
-	private static final class CloseMiningTabAction implements EventHandler<ActionEvent> {
-		private final Tab tab;
-		private final CompressionMiningController controller;
-		
-		private CloseMiningTabAction(final Tab tab, final CompressionMiningController controller) {
-			this.tab = tab;
-			this.controller = controller;
-		}
+	private record CloseMiningTabAction(Tab tab, CompressionMiningController controller)
+			implements EventHandler<ActionEvent> {
 		
 		@Override
 		public void handle(final ActionEvent event) {

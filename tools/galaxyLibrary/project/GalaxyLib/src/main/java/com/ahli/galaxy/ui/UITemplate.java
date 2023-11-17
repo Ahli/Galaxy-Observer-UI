@@ -5,6 +5,8 @@ package com.ahli.galaxy.ui;
 
 import com.ahli.cloning.DeepCopyable;
 import com.ahli.galaxy.ui.interfaces.UIElement;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Objects;
 
@@ -12,7 +14,10 @@ import java.util.Objects;
  * @author Ahli
  */
 public class UITemplate implements DeepCopyable {
+	@Getter
 	private String fileName;
+	@Setter
+	@Getter
 	private UIElement element;
 	private boolean isLocked;
 	
@@ -39,47 +44,14 @@ public class UITemplate implements DeepCopyable {
 		return clone;
 	}
 	
-	/**
-	 * @return the fileName
-	 */
-	public String getFileName() {
-		return fileName;
-	}
-	
-	/**
-	 * @return the element
-	 */
-	public UIElement getElement() {
-		return element;
-	}
-	
-	/**
-	 * @param element
-	 * 		the element to set
-	 */
-	public void setElement(final UIElement element) {
-		this.element = element;
-	}
-	
-	/**
-	 * @return the isLocked
-	 */
 	public boolean isLocked() {
 		return isLocked;
 	}
 	
-	/**
-	 * @param isLocked
-	 * 		the isLocked to set
-	 */
 	public void setLocked(final boolean isLocked) {
 		this.isLocked = isLocked;
 	}
 	
-	/**
-	 * @param path
-	 * @return
-	 */
 	public UIElement receiveFrameFromPath(final String path) {
 		final String curName = UIElement.getLeftPathLevel(path);
 		// curName cannot be null here

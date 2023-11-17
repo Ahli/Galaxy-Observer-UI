@@ -3,17 +3,28 @@
 
 package com.ahli.mpq.mpqeditor;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serial;
 import java.util.Arrays;
 import java.util.Objects;
 
+@Getter
 public class MpqEditorCompressionRuleSize extends MpqEditorCompressionRule {
 	
 	@Serial
 	private static final long serialVersionUID = -3164363488174206663L;
 	
+	/**
+	 * -- SETTER --
+	 *  Sets the minimum file size for this rule. Must be greater or equal zero.
+	 *
+	 * @param minSize
+	 */
+	@Setter
 	private int minSize;
-	private int maxSize;
+	private final int maxSize;
 	
 	public MpqEditorCompressionRuleSize(final int minSize, final int maxSize) {
 		this.minSize = minSize;
@@ -31,10 +42,10 @@ public class MpqEditorCompressionRuleSize extends MpqEditorCompressionRule {
 		maxSize = original.maxSize;
 	}
 	
-	@Override
-	public boolean isValidRule() {
-		return super.isValidRule() && minSize >= 0 && maxSize >= minSize;
-	}
+//	@Override
+//	public boolean isValidRule() {
+//		return super.isValidRule() && minSize >= 0 && maxSize >= minSize;
+//	}
 	
 	@Override
 	public String toString() {
@@ -42,31 +53,14 @@ public class MpqEditorCompressionRuleSize extends MpqEditorCompressionRule {
 				", 0xFFFFFFFF";
 	}
 	
-	public int getMinSize() {
-		return minSize;
-	}
-	
-	/**
-	 * Sets the minimum file size for this rule. Must be greater or equal zero.
-	 *
-	 * @param minSize
-	 */
-	public void setMinSize(final int minSize) {
-		this.minSize = minSize;
-	}
-	
-	public int getMaxSize() {
-		return maxSize;
-	}
-	
-	/**
-	 * Sets the maximum file size for this rule. Must be greater or equal to minSize (and zero).
-	 *
-	 * @param maxSize
-	 */
-	public void setMaxSize(final int maxSize) {
-		this.maxSize = maxSize;
-	}
+	//	/**
+//	 * Sets the maximum file size for this rule. Must be greater or equal to minSize (and zero).
+//	 *
+//	 * @param maxSize
+//	 */
+//	public void setMaxSize(final int maxSize) {
+//		this.maxSize = maxSize;
+//	}
 	
 	@Override
 	public Object deepCopy() {

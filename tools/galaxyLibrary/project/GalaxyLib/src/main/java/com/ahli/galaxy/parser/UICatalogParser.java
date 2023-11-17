@@ -262,77 +262,86 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		
 		final List<UIElement> templateChildren;
 		
-		if (templateElem instanceof final UIFrame frame) {
-			templateChildren = frame.getChildrenRaw();
-			if (targetElem instanceof final UIFrame target) {
-				// TODO do not set the undefined anchors (-> track if a side was defined or is on the initial value)
-				target.setAnchor(UIAnchorSide.TOP,
-						frame.getAnchorRelative(UIAnchorSide.TOP),
-						frame.getAnchorPos(UIAnchorSide.TOP),
-						frame.getAnchorOffset(UIAnchorSide.TOP));
-				target.setAnchor(UIAnchorSide.LEFT,
-						frame.getAnchorRelative(UIAnchorSide.LEFT),
-						frame.getAnchorPos(UIAnchorSide.LEFT),
-						frame.getAnchorOffset(UIAnchorSide.LEFT));
-				target.setAnchor(UIAnchorSide.BOTTOM,
-						frame.getAnchorRelative(UIAnchorSide.BOTTOM),
-						frame.getAnchorPos(UIAnchorSide.BOTTOM),
-						frame.getAnchorOffset(UIAnchorSide.BOTTOM));
-				target.setAnchor(UIAnchorSide.RIGHT,
-						frame.getAnchorRelative(UIAnchorSide.RIGHT),
-						frame.getAnchorPos(UIAnchorSide.RIGHT),
-						frame.getAnchorOffset(UIAnchorSide.RIGHT));
-				if (frame.getAttributesRaw() != null) {
-					copyAttributes(frame.getAttributes(), target.getAttributes());
+		switch (templateElem) {
+			case final UIFrame frame -> {
+				templateChildren = frame.getChildrenRaw();
+				if (targetElem instanceof final UIFrame target) {
+					// TODO do not set the undefined anchors (-> track if a side was defined or is on the initial value)
+					target.setAnchor(
+							UIAnchorSide.TOP,
+							frame.getAnchorRelative(UIAnchorSide.TOP),
+							frame.getAnchorPos(UIAnchorSide.TOP),
+							frame.getAnchorOffset(UIAnchorSide.TOP));
+					target.setAnchor(
+							UIAnchorSide.LEFT,
+							frame.getAnchorRelative(UIAnchorSide.LEFT),
+							frame.getAnchorPos(UIAnchorSide.LEFT),
+							frame.getAnchorOffset(UIAnchorSide.LEFT));
+					target.setAnchor(
+							UIAnchorSide.BOTTOM,
+							frame.getAnchorRelative(UIAnchorSide.BOTTOM),
+							frame.getAnchorPos(UIAnchorSide.BOTTOM),
+							frame.getAnchorOffset(UIAnchorSide.BOTTOM));
+					target.setAnchor(
+							UIAnchorSide.RIGHT,
+							frame.getAnchorRelative(UIAnchorSide.RIGHT),
+							frame.getAnchorPos(UIAnchorSide.RIGHT),
+							frame.getAnchorOffset(UIAnchorSide.RIGHT));
+					if (frame.getAttributesRaw() != null) {
+						copyAttributes(frame.getAttributes(), target.getAttributes());
+					}
+				} else {
+					logger.error("Attempting to apply a template of type Frame to a different type.");
 				}
-			} else {
-				logger.error("Attempting to apply a template of type Frame to a different type.");
+				
+				
+				//		} else if (templateElem instanceof UIAttribute) {
+				//			final UIAttribute attr = (UIAttribute) templateElem;
+				//			templateChildren = attr.getChildrenRaw();
 			}
-			
-			
-			//		} else if (templateElem instanceof UIAttribute) {
-			//			final UIAttribute attr = (UIAttribute) templateElem;
-			//			templateChildren = attr.getChildrenRaw();
-		} else if (templateElem instanceof final UIStateGroup stateGroup) {
-			templateChildren = stateGroup.getChildrenRaw();
-			if (targetElem instanceof final UIStateGroup target) {
-				target.setDefaultState(stateGroup.getDefaultState());
-				// states are the children
-			} else {
-				logger.error("Attempting to apply a template of type StateGroup to a different type.");
+			case final UIStateGroup stateGroup -> {
+				templateChildren = stateGroup.getChildrenRaw();
+				if (targetElem instanceof final UIStateGroup target) {
+					target.setDefaultState(stateGroup.getDefaultState());
+					// states are the children
+				} else {
+					logger.error("Attempting to apply a template of type StateGroup to a different type.");
+				}
 			}
-		} else if (templateElem instanceof final UIController uiController) {
-			templateChildren = uiController.getChildrenRaw();
-			if (targetElem instanceof final UIController target) {
-				copyAttributes(uiController.getKeys(), target.getKeys());
-				// TODO attributesKeyValueList
-				// TODO isNameImplicit?
-				// TODO next edit overrides?
-			} else {
-				logger.error("Attempting to apply a template of type UIController to a different type.");
+			case final UIController uiController -> {
+				templateChildren = uiController.getChildrenRaw();
+				if (targetElem instanceof final UIController target) {
+					copyAttributes(uiController.getKeys(), target.getKeys());
+					// TODO attributesKeyValueList
+					// TODO isNameImplicit?
+					// TODO next edit overrides?
+				} else {
+					logger.error("Attempting to apply a template of type UIController to a different type.");
+				}
 			}
-		} else if (templateElem instanceof final UIAnimation uiAnimation) {
-			templateChildren = uiAnimation.getChildrenRaw();
-			if (targetElem instanceof UIAnimation) {
-				// final UIAnimation target = (UIAnimation) targetElem;
-				// TODO events
-				// TODO controller
-				// TODO driver
-			} else {
-				logger.error("Attempting to apply a template of type UIAnimation to a different type.");
+			case final UIAnimation uiAnimation -> {
+				templateChildren = uiAnimation.getChildrenRaw();
+				if (targetElem instanceof UIAnimation) {
+					// final UIAnimation target = (UIAnimation) targetElem;
+					// TODO events
+					// TODO controller
+					// TODO driver
+				} else {
+					logger.error("Attempting to apply a template of type UIAnimation to a different type.");
+				}
 			}
-		} else if (templateElem instanceof final UIState uiState) {
-			templateChildren = uiState.getChildrenRaw();
-			if (targetElem instanceof final UIState target) {
-				// TODO nextAdditionShouldOverrideActions
-				copyAttributes(uiState.getActions(), target.getActions());
-				// TODO nextAdditionShouldOverrideWhens
-				copyAttributes(uiState.getWhens(), target.getWhens());
-			} else {
-				logger.error("Attempting to apply a template of type UIState to a different type.");
+			case final UIState uiState -> {
+				templateChildren = uiState.getChildrenRaw();
+				if (targetElem instanceof final UIState target) {
+					// TODO nextAdditionShouldOverrideActions
+					copyAttributes(uiState.getActions(), target.getActions());
+					// TODO nextAdditionShouldOverrideWhens
+					copyAttributes(uiState.getWhens(), target.getWhens());
+				} else {
+					logger.error("Attempting to apply a template of type UIState to a different type.");
+				}
 			}
-		} else {
-			templateChildren = null;
+			default -> templateChildren = null;
 		}
 		
 		// copy template's children
@@ -414,7 +423,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 						curElement,
 						curLevel,
 						curPath);
-				curPath.remove(curPath.size() - 1);
+				curPath.removeLast();
 				logger.trace("path afterDropLast: {}", curPath);
 			}
 		}
@@ -747,51 +756,58 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					}
 					
 					// add to parent
-					if (curElement instanceof final UIFrame frame) {
-						// Frame's attributes
-						frame.addAttribute(newElemUiAttr);
-						// register handle
-						if (HANDLE.equals(tagName)) {
-							catalog.getHandles().put(newElemUiAttr.getValue(VAL), frame);
-						}
-					} else if (curElement instanceof final UIAnimation anim) {
-						// Animation's events
-						if (tagName.equals(EVENT)) {
-							anim.addEvent(newElemUiAttr);
-						} else if (tagName.equals(DRIVER)) {
-							anim.setDriver(newElemUiAttr);
-						} else {
-							logger.error("found an attribute that cannot be added to UIAnimation: {}", newElem);
-						}
-					} else if (curElement instanceof final UIController controller) {
-						// Controller's keys
-						if (tagName.equals(KEY)) {
-							controller.getKeys().add(newElemUiAttr);
-						} else {
-							logger.error("found an attribute that cannot be added to UIController: {}", newElem);
-						}
-					} else if (curElement instanceof final UIStateGroup stateGroup) {
-						if (tagName.equals(DEFAULTSTATE)) {
-							final String stateVal = newElemUiAttr.getValue(VAL);
-							if (stateVal != null) {
-								stateGroup.setDefaultState(stateVal);
-							} else {
-								logger.error("found <DefaultState> in <StateGroup '{}'> without val",
-										curElement.getName());
+					switch (curElement) {
+						case final UIFrame frame -> {
+							// Frame's attributes
+							frame.addAttribute(newElemUiAttr);
+							// register handle
+							if (HANDLE.equals(tagName)) {
+								catalog.getHandles().put(newElemUiAttr.getValue(VAL), frame);
 							}
-						} else {
-							logger.error("found an attribute that cannot be added to UIController: {}", newElem);
 						}
-					} else if (curElement instanceof final UIState state) {
-						if (tagName.equals(WHEN)) {
-							state.getWhens().add(newElemUiAttr);
-						} else if (tagName.equals(ACTION)) {
-							state.getActions().add(newElemUiAttr);
-						} else {
-							logger.error("found an attribute that cannot be added to UIState: {}", newElem);
+						case final UIAnimation anim -> {
+							// Animation's events
+							if (tagName.equals(EVENT)) {
+								anim.addEvent(newElemUiAttr);
+							} else if (tagName.equals(DRIVER)) {
+								anim.setDriver(newElemUiAttr);
+							} else {
+								logger.error("found an attribute that cannot be added to UIAnimation: {}", newElem);
+							}
 						}
-					} else {
-						logger.error("found an attribute that cannot be added to anything: {}", newElem);
+						case final UIController controller -> {
+							// Controller's keys
+							if (tagName.equals(KEY)) {
+								controller.getKeys().add(newElemUiAttr);
+							} else {
+								logger.error("found an attribute that cannot be added to UIController: {}", newElem);
+							}
+						}
+						case final UIStateGroup stateGroup -> {
+							if (tagName.equals(DEFAULTSTATE)) {
+								final String stateVal = newElemUiAttr.getValue(VAL);
+								if (stateVal != null) {
+									stateGroup.setDefaultState(stateVal);
+								} else {
+									logger.error(
+											"found <DefaultState> in <StateGroup '{}'> without val",
+											curElement.getName());
+								}
+							} else {
+								logger.error("found an attribute that cannot be added to UIController: {}", newElem);
+							}
+						}
+						case final UIState state -> {
+							if (tagName.equals(WHEN)) {
+								state.getWhens().add(newElemUiAttr);
+							} else if (tagName.equals(ACTION)) {
+								state.getActions().add(newElemUiAttr);
+							} else {
+								logger.error("found an attribute that cannot be added to UIState: {}", newElem);
+							}
+						}
+						case null, default ->
+								logger.error("found an attribute that cannot be added to anything: {}", newElem);
 					}
 					newElem = null;
 				}
@@ -1058,7 +1074,10 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	@SuppressWarnings("java:S3824")
 	private void deduplicate(final UIAnimation anim) {
 		//		logger.trace("deduplicating: {}", anim);
-		final List<UIElement> controllers = anim.getControllers();
+		deduplicate(anim.getControllers());
+	}
+	
+	private void deduplicate(final List<UIElement> controllers) {
 		for (int i = 0, len = controllers.size(); i < len; ++i) {
 			final UIElement controller = controllers.get(i);
 			final UIElement duplicate = addedFinalElements.get(controller);
@@ -1078,21 +1097,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	@SuppressWarnings("java:S3824")
 	private void deduplicate(final UIStateGroup stateGroup) {
 		//		logger.trace("deduplicating: {}, deduplicatedElements; {}", stateGroup, addedFinalElements.size());
-		final List<UIElement> states = stateGroup.getChildrenRaw();
-		for (int i = 0, len = states.size(); i < len; ++i) {
-			final UIElement child = states.get(i);
-			final UIElement duplicate = addedFinalElements.get(child);
-			if (duplicate != null && child != duplicate) {
-				// replace in parent
-				states.set(i, duplicate);
-				++postProcessDeduplications;
-			} else {
-				// states cannot be deduplicated any further at this point (Attributes were already)
-				if (duplicate == null) {
-					addedFinalElements.put(child, child);
-				}
-			}
-		}
+		deduplicate(stateGroup.getChildrenRaw());
 	}
 	
 	@SuppressWarnings("java:S3824")

@@ -14,6 +14,7 @@ import com.ahli.galaxy.ui.interfaces.UICatalog;
 import com.ahli.galaxy.ui.interfaces.UIConstant;
 import com.ahli.galaxy.ui.interfaces.UIElement;
 import com.ahli.galaxy.ui.interfaces.UIFrame;
+import lombok.Getter;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +46,9 @@ public class UICatalogImpl implements UICatalog {
 	private final Map<String, UIFrame> handles;
 	private List<String> blizzOnlyLayouts;
 	private ParsedXmlConsumer parser;
+	//	@Override
 	// internal, used during processing
+	@Getter
 	private String curBasePath;
 	
 	public UICatalogImpl() {
@@ -218,8 +221,8 @@ public class UICatalogImpl implements UICatalog {
 		}
 	}
 	
-	@Override
-	public void processLayoutFile(
+//	@Override
+	private void processLayoutFile(
 			final Path p,
 			final String raceId,
 			final boolean isDevLayout,
@@ -261,11 +264,6 @@ public class UICatalogImpl implements UICatalog {
 			logger.error("ERROR: while parsing include appearing within usual layouts.", e);
 		}
 		xmlParser.clear();
-	}
-	
-	@Override
-	public String getCurBasePath() {
-		return curBasePath;
 	}
 	
 	@Override

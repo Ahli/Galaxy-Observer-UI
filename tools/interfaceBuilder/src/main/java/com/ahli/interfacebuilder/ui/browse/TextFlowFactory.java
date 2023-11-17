@@ -17,6 +17,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.lang.NonNull;
 
 public class TextFlowFactory {
 	
@@ -32,33 +33,38 @@ public class TextFlowFactory {
 		this.query = query;
 	}
 	
-	public TextFlow getFlow(final UIElement item) {
+	public TextFlow getFlow(@NonNull final UIElement item) {
 		final TextFlow flow = new TextFlow();
 		
-		if (item instanceof final UIFrame frame) {
-			append(flow, textUnimportant("<Frame type=\""));
-			append(flow, textQueried(frame.getType()));
-			append(flow, textUnimportant("\" name=\""));
-			append(flow, textQueried(frame.getName()));
-			append(flow, textUnimportant("\">"));
-		} else if (item instanceof final UIAnimation anim) {
-			append(flow, textUnimportant("<Animation name=\""));
-			append(flow, textQueried(anim.getName()));
-			append(flow, textUnimportant("\">"));
-		} else if (item instanceof final UIState state) {
-			append(flow, textUnimportant("<State name=\""));
-			append(flow, textQueried(state.getName()));
-			append(flow, textUnimportant("\">"));
-		} else if (item instanceof final UIController ctrl) {
-			append(flow, textUnimportant("<Controller name=\""));
-			append(flow, textQueried(ctrl.getName()));
-			append(flow, textUnimportant("\">"));
-		} else if (item instanceof final UIStateGroup stateGroup) {
-			append(flow, textUnimportant("<StateGroup name=\""));
-			append(flow, textQueried(stateGroup.getName()));
-			append(flow, textUnimportant("\">"));
-		} else {
-			append(flow, textQueried(item.toString()));
+		switch (item) {
+			case final UIFrame frame -> {
+				append(flow, textUnimportant("<Frame type=\""));
+				append(flow, textQueried(frame.getType()));
+				append(flow, textUnimportant("\" name=\""));
+				append(flow, textQueried(frame.getName()));
+				append(flow, textUnimportant("\">"));
+			}
+			case final UIAnimation anim -> {
+				append(flow, textUnimportant("<Animation name=\""));
+				append(flow, textQueried(anim.getName()));
+				append(flow, textUnimportant("\">"));
+			}
+			case final UIState state -> {
+				append(flow, textUnimportant("<State name=\""));
+				append(flow, textQueried(state.getName()));
+				append(flow, textUnimportant("\">"));
+			}
+			case final UIController ctrl -> {
+				append(flow, textUnimportant("<Controller name=\""));
+				append(flow, textQueried(ctrl.getName()));
+				append(flow, textUnimportant("\">"));
+			}
+			case final UIStateGroup stateGroup -> {
+				append(flow, textUnimportant("<StateGroup name=\""));
+				append(flow, textQueried(stateGroup.getName()));
+				append(flow, textUnimportant("\">"));
+			}
+			default -> append(flow, textQueried(item.toString()));
 		}
 		return flow;
 	}

@@ -1,6 +1,6 @@
 module ObserverUiSettingsEditor {
 	requires static lombok; // static ones can be absent at run time
-
+	
 	// automatic modules :(
 	requires org.apache.commons.lang3;
 	requires com.esotericsoftware.kryo;

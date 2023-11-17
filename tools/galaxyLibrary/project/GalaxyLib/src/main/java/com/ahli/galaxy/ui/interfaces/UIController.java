@@ -17,22 +17,22 @@ public interface UIController extends UIElement {
 	 */
 	List<UIAttribute> getKeys();
 	
-	/**
-	 * @param keys
-	 * 		the keys to set
-	 */
-	void setKeys(List<UIAttribute> keys);
+//	/**
+//	 * @param keys
+//	 * 		the keys to set
+//	 */
+//	void setKeys(List<UIAttribute> keys);
 	
-	/**
-	 * @return the nextAdditionShouldOverride
-	 */
-	boolean isNextAdditionShouldOverride();
+//	/**
+//	 * @return the nextAdditionShouldOverride
+//	 */
+//	boolean isNextAdditionShouldOverride();
 	
-	/**
-	 * @param nextAdditionShouldOverride
-	 * 		the nextAdditionShouldOverride to set
-	 */
-	void setNextAdditionShouldOverride(boolean nextAdditionShouldOverride);
+//	/**
+//	 * @param nextAdditionShouldOverride
+//	 * 		the nextAdditionShouldOverride to set
+//	 */
+//	void setNextAdditionShouldOverride(boolean nextAdditionShouldOverride);
 	
 	/**
 	 * Adds a value for the key and returns any overridden value.
@@ -48,10 +48,10 @@ public interface UIController extends UIElement {
 	 */
 	String getValue(String key);
 	
-	/**
-	 * @return the nameIsImplicit
-	 */
-	boolean isNameIsImplicit();
+//	/**
+//	 * @return the nameIsImplicit
+//	 */
+//	boolean isNameIsImplicit();
 	
 	/**
 	 * @param nameIsImplicit
@@ -79,8 +79,8 @@ public interface UIController extends UIElement {
 	@Override
 	boolean equals(Object o);
 	
-	@Override
-	boolean canEqual(Object other);
+//	@Override
+//	boolean canEqual(Object other);
 	
 	@Override
 	int hashCode();

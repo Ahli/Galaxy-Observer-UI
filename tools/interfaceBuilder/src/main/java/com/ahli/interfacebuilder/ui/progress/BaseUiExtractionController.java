@@ -153,16 +153,9 @@ public class BaseUiExtractionController implements Updateable, FxmlController {
 		executor.execute(task);
 	}
 	
-	private static final class EndedListener implements ChangeListener<Boolean> {
+	private record EndedListener(FontAwesomeIconView stateImage, TextFlow txtArea) implements ChangeListener<Boolean> {
 		private static final String ERROR = "ERROR:";
 		private static final String WARNING = "WARNING:";
-		private final FontAwesomeIconView stateImage;
-		private final TextFlow txtArea;
-		
-		private EndedListener(final FontAwesomeIconView stateImage, final TextFlow txtArea) {
-			this.stateImage = stateImage;
-			this.txtArea = txtArea;
-		}
 		
 		@Override
 		public void changed(

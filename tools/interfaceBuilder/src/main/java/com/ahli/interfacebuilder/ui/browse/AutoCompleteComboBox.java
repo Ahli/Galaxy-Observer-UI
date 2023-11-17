@@ -109,19 +109,8 @@ public class AutoCompleteComboBox extends ComboBox<String> {
 			}
 		}
 		
-		private static class MenuItemEventHandler implements EventHandler<ActionEvent> {
-			private final AutoCompleteComboBox autoCompleteComboBox;
-			private final String item;
-			private final ContextMenu entriesPopup;
-			
-			public MenuItemEventHandler(
-					final AutoCompleteComboBox autoCompleteComboBox,
-					final String item,
-					final ContextMenu entriesPopup) {
-				this.autoCompleteComboBox = autoCompleteComboBox;
-				this.item = item;
-				this.entriesPopup = entriesPopup;
-			}
+		private record MenuItemEventHandler(AutoCompleteComboBox autoCompleteComboBox, String item,
+		                                    ContextMenu entriesPopup) implements EventHandler<ActionEvent> {
 			
 			@Override
 			public void handle(final ActionEvent event) {

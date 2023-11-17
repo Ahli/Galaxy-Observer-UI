@@ -336,10 +336,10 @@ public class AppController {
 				gameDef = gameService.getGameDefHeroes();
 				final boolean isPtr = baseUiService.isPtrActive(gameDef);
 				final String supportDir = gameDef.supportDirectoryX64();
-				final String swicherExe = gameDef.switcherExeNameX64();
+				final String switcherExe = gameDef.switcherExeNameX64();
 				gamePath =
 						(isPtr ? settings.getHeroesPtrPath() : settings.getHeroesPath()) + File.separator + supportDir +
-								File.separator + swicherExe;
+								File.separator + switcherExe;
 			} else {
 				// SC2
 				isHeroes = false;

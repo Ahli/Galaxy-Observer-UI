@@ -40,8 +40,8 @@ public interface UIConstant extends UIElement {
 	@Override
 	boolean equals(Object obj);
 	
-	@Override
-	boolean canEqual(Object other);
+//	@Override
+//	boolean canEqual(Object other);
 	
 	@Override
 	int hashCode();

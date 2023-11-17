@@ -75,14 +75,11 @@ public class ReferenceValidator {
 	
 	// TODO validate bindings
 	private void validate(final UIElement element, final ValidatorData data) {
-		if (element instanceof UIFrame uiFrame) {
-			validate(uiFrame, data);
-		} else if (element instanceof UIAnimation uiAnimation) {
-			validate(uiAnimation, data);
-		} else if (element instanceof UIStateGroup uiStateGroup) {
-			validate(uiStateGroup, data);
-		} else {
-			logger.error("ERROR: UIElement not handled in ReferenceValidator");
+		switch (element) {
+			case UIFrame uiFrame -> validate(uiFrame, data);
+			case UIAnimation uiAnimation -> validate(uiAnimation, data);
+			case UIStateGroup uiStateGroup -> validate(uiStateGroup, data);
+			case null, default -> logger.error("ERROR: UIElement not handled in ReferenceValidator");
 		}
 	}
 	

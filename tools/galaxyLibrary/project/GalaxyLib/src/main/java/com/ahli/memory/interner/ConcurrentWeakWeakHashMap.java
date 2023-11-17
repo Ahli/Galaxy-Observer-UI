@@ -64,13 +64,17 @@ public class ConcurrentWeakWeakHashMap<K> implements ConcurrentMap<K, K> {
 	
 	/**
 	 * Removes GC-collected keys.
+	 * @return whether keys were removed or not
 	 */
-	public void purgeKeys() {
+	public boolean purgeKeys() {
+		boolean purged = false;
 		Reference<? extends K> reference;
 		while ((reference = queue.poll()) != null) {
 			//noinspection SuspiciousMethodCalls
 			map.remove(reference);
+			purged = true;
 		}
+		return purged;
 	}
 	
 	private WeakReferenceWithHash<K> newKey(final K key) {
@@ -162,7 +166,7 @@ public class ConcurrentWeakWeakHashMap<K> implements ConcurrentMap<K, K> {
 	}
 	
 	@Override
-	public Set<K> keySet() {
+	public @NotNull Set<K> keySet() {
 		return new WeakHashMapKeySet<>(this);
 	}
 	
@@ -173,7 +177,7 @@ public class ConcurrentWeakWeakHashMap<K> implements ConcurrentMap<K, K> {
 	}
 	
 	@Override
-	public Collection<K> values() {
+	public @NotNull Collection<K> values() {
 		purgeKeys();
 		final var values = map.values();
 		final Collection<K> coll = new ArrayList<>(values.size());
@@ -184,7 +188,7 @@ public class ConcurrentWeakWeakHashMap<K> implements ConcurrentMap<K, K> {
 	}
 	
 	@Override
-	public Set<Entry<K, K>> entrySet() {
+	public @NotNull Set<Entry<K, K>> entrySet() {
 		return new WeakHashMapEntrySet<>(this);
 	}
 	

@@ -38,7 +38,7 @@ final class KryoServiceTest {
 		final List<Class<?>> payloadClasses = new ArrayList<>(1);
 		payloadClasses.add(KryoGameInfo.class);
 		
-		final KryoGameInfo kryoGameInfoB = (KryoGameInfo) kryoService.get(path, payloadClasses, kryo).get(0);
+		final KryoGameInfo kryoGameInfoB = (KryoGameInfo) kryoService.get(path, payloadClasses, kryo).getFirst();
 		Files.delete(path);
 		
 		assertEquals(kryoGameInfoA, kryoGameInfoB, "Meta file written and read mismatch");
@@ -67,7 +67,7 @@ final class KryoServiceTest {
 		payloadClasses.add(KryoGameInfo.class);
 		
 		final List<Object> objects = kryoService.get(path, payloadClasses, kryo2);
-		final UICatalogImpl uiCatalogB = (UICatalogImpl) objects.get(0);
+		final UICatalogImpl uiCatalogB = (UICatalogImpl) objects.getFirst();
 		final KryoGameInfo kryoGameInfoB = (KryoGameInfo) objects.get(1);
 		Files.delete(path);
 		

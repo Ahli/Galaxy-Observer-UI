@@ -213,8 +213,8 @@ public class NavigationController {
 	 */
 	private void showFirstNotification() {
 		notificationBar.setVisible(true);
-		final Notification notification = notifications.get(0);
-		notificationLabel.setText(notification.getText());
+		final Notification notification = notifications.getFirst();
+		notificationLabel.setText(notification.text());
 	}
 	
 	/**
@@ -225,7 +225,7 @@ public class NavigationController {
 	public void closeNotification(final String id) {
 		int i = 0;
 		for (final var notification : notifications) {
-			if (id.equals(notification.getId())) {
+			if (id.equals(notification.id())) {
 				notifications.remove(i);
 				if (notifications.isEmpty()) {
 					notificationBar.setVisible(false);
@@ -241,7 +241,7 @@ public class NavigationController {
 	@FXML
 	public void closeActiveNotification() {
 		if (!notifications.isEmpty()) {
-			notifications.remove(0);
+			notifications.removeFirst();
 			if (notifications.isEmpty()) {
 				notificationBar.setVisible(false);
 			} else {
@@ -252,8 +252,8 @@ public class NavigationController {
 	
 	@FXML
 	public void openNotificationLink() {
-		final Notification notification = notifications.get(0);
-		showNavPage(notification.getNavPageIndex());
+		final Notification notification = notifications.getFirst();
+		showNavPage(notification.navPageIndex());
 	}
 	
 	/**

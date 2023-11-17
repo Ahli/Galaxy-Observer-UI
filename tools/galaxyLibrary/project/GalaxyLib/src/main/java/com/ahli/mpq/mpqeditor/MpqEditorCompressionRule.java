@@ -4,12 +4,14 @@
 package com.ahli.mpq.mpqeditor;
 
 import com.ahli.cloning.DeepCopyable;
+import lombok.Getter;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
 
+@Getter
 public abstract class MpqEditorCompressionRule implements DeepCopyable, Serializable {
 	
 	@Serial
@@ -43,18 +45,14 @@ public abstract class MpqEditorCompressionRule implements DeepCopyable, Serializ
 		compressionMethod = original.compressionMethod;
 	}
 	
-	/**
-	 * Checks if the rule is valid.
-	 *
-	 * @return
-	 */
-	public boolean isValidRule() {
-		return (!singleUnit || !encrypt) && (encrypt || !encryptAdjusted) && (!includeSectorChecksum || compress);
-	}
-	
-	public boolean isSingleUnit() {
-		return singleUnit;
-	}
+//	/**
+//	 * Checks if the rule is valid.
+//	 *
+//	 * @return
+//	 */
+//	public boolean isValidRule() {
+//		return (!singleUnit || !encrypt) && (encrypt || !encryptAdjusted) && (!includeSectorChecksum || compress);
+//	}
 	
 	/**
 	 * Instead of being divided to 0x1000-bytes blocks, the file is stored as single unit. Requires encrypt to be
@@ -67,10 +65,6 @@ public abstract class MpqEditorCompressionRule implements DeepCopyable, Serializ
 		return this;
 	}
 	
-	public boolean isCompress() {
-		return compress;
-	}
-	
 	/**
 	 * File is compressed using combination of compression methods.
 	 *
@@ -79,10 +73,6 @@ public abstract class MpqEditorCompressionRule implements DeepCopyable, Serializ
 	public MpqEditorCompressionRule setCompress(final boolean compress) {
 		this.compress = compress;
 		return this;
-	}
-	
-	public boolean isEncrypt() {
-		return encrypt;
 	}
 	
 	/**
@@ -95,10 +85,6 @@ public abstract class MpqEditorCompressionRule implements DeepCopyable, Serializ
 		return this;
 	}
 	
-	public boolean isEncryptAdjusted() {
-		return encryptAdjusted;
-	}
-	
 	/**
 	 * Requires encrypt to be enabled.
 	 *
@@ -109,23 +95,15 @@ public abstract class MpqEditorCompressionRule implements DeepCopyable, Serializ
 		return this;
 	}
 	
-	public boolean isIncludeSectorChecksum() {
-		return includeSectorChecksum;
-	}
-	
-	/**
-	 * Requires compression to be enabled.
-	 *
-	 * @param includeSectorChecksum
-	 */
-	public MpqEditorCompressionRule setIncludeSectorChecksum(final boolean includeSectorChecksum) {
-		this.includeSectorChecksum = includeSectorChecksum;
-		return this;
-	}
-	
-	public boolean isMarkedForDeletion() {
-		return markedForDeletion;
-	}
+	//	/**
+//	 * Requires compression to be enabled.
+//	 *
+//	 * @param includeSectorChecksum
+//	 */
+//	public MpqEditorCompressionRule setIncludeSectorChecksum(final boolean includeSectorChecksum) {
+//		this.includeSectorChecksum = includeSectorChecksum;
+//		return this;
+//	}
 	
 	/**
 	 * File is a deletion marker, indicating that the file no longer exists. This is used to allow patch archives to
@@ -171,10 +149,6 @@ public abstract class MpqEditorCompressionRule implements DeepCopyable, Serializ
 			case SPARSE_BZIP2 -> "0x00000030";
 			default -> "0x00000000";
 		};
-	}
-	
-	public MpqEditorCompressionRuleMethod getCompressionMethod() {
-		return compressionMethod;
 	}
 	
 	/**

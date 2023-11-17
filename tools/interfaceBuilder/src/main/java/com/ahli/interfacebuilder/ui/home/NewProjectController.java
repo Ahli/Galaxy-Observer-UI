@@ -20,18 +20,14 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.TextField;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.Window;
 import lombok.extern.log4j.Log4j2;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 
 @Log4j2
-public class NewProjectController {
+public class NewProjectController extends AbstractProjectController {
 	private final ProjectService projectService;
-	private final FileService fileService;
 	@FXML
 	private ChoiceBox<GameType> gameDropdown;
 	@FXML
@@ -42,25 +38,12 @@ public class NewProjectController {
 	private Project project;
 	
 	public NewProjectController(final ProjectService projectService, final FileService fileService) {
+		super(fileService);
 		this.projectService = projectService;
-		this.fileService = fileService;
 	}
 	
 	public void browsePathAction() {
-		final DirectoryChooser directoryChooser = new DirectoryChooser();
-		directoryChooser.setTitle(Messages.getString("newProject.selectDirectory"));
-		final Path path = fileService.cutTillValidDirectory(Path.of(projectPathLabel.getText()));
-		if (path != null) {
-			directoryChooser.setInitialDirectory(path.toFile());
-		}
-		final File f = directoryChooser.showDialog(getWindow());
-		if (f != null) {
-			projectPathLabel.setText(f.getAbsolutePath());
-		}
-	}
-	
-	private Window getWindow() {
-		return projectPathLabel.getScene().getWindow();
+		showDirectoryChooser(Messages.getString("Customize Toolbar..."), projectPathLabel);
 	}
 	
 	/**

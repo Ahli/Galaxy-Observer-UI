@@ -458,22 +458,8 @@ public class BrowseController implements Updateable, FxmlController {
 		}
 	}
 	
-	private static final class CloseTabAction implements EventHandler<ActionEvent> {
-		private final Tab tab;
-		private final BrowseTabController controller;
-		private final List<Updateable> controllers;
-		private final CleaningForkJoinPool executor;
-		
-		private CloseTabAction(
-				final Tab tab,
-				final BrowseTabController controller,
-				final List<Updateable> controllers,
-				final CleaningForkJoinPool executor) {
-			this.tab = tab;
-			this.controller = controller;
-			this.controllers = controllers;
-			this.executor = executor;
-		}
+	private record CloseTabAction(Tab tab, BrowseTabController controller, List<Updateable> controllers,
+	                              CleaningForkJoinPool executor) implements EventHandler<ActionEvent> {
 		
 		@Override
 		public void handle(final ActionEvent event) {
@@ -494,17 +480,8 @@ public class BrowseController implements Updateable, FxmlController {
 		}
 	}
 	
-	private static final class ExtractBaseUiCloseAction implements EventHandler<ActionEvent> {
-		private final Tab tab;
-		private final BaseUiExtractionController controller;
-		private final List<Updateable> controllers;
-		
-		private ExtractBaseUiCloseAction(
-				final Tab tab, final BaseUiExtractionController controller, final List<Updateable> controllers) {
-			this.tab = tab;
-			this.controller = controller;
-			this.controllers = controllers;
-		}
+	private record ExtractBaseUiCloseAction(Tab tab, BaseUiExtractionController controller,
+	                                        List<Updateable> controllers) implements EventHandler<ActionEvent> {
 		
 		@Override
 		public void handle(final ActionEvent event) {
@@ -513,7 +490,7 @@ public class BrowseController implements Updateable, FxmlController {
 			controller.setErrorTabController(null);
 			StylizedTextAreaAppender.unregister(controller.getErrorTabController());
 			// for some reason this class was not garbage collected
-			tab.getContextMenu().getItems().get(0).setOnAction(null);
+			tab.getContextMenu().getItems().getFirst().setOnAction(null);
 			tab.getContextMenu().getItems().clear();
 			tab.setContextMenu(null);
 		}

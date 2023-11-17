@@ -124,10 +124,11 @@ public class BrowseTabController implements Updateable, FxmlController {
 	}
 	
 	private static String prettyPrintAttributeStringList(final List<String> attributes) {
-		if (attributes.size() == 2 && VAL.equals(attributes.get(0))) {
+		if (attributes.size() == 2 && VAL.equals(attributes.getFirst())) {
 			return attributes.get(1);
 		}
-		final StringBuilder str = new StringBuilder(16).append(attributes.get(0)).append('=').append(attributes.get(1));
+		final StringBuilder str =
+				new StringBuilder(16).append(attributes.getFirst()).append('=').append(attributes.get(1));
 		for (int i = 2, len = attributes.size(); i < len; i += 2) {
 			str.append(ATTRIBUTE_SEPARATOR).append(attributes.get(i)).append('=').append(attributes.get(i + 1));
 		}
@@ -351,7 +352,7 @@ public class BrowseTabController implements Updateable, FxmlController {
 			}
 			final ObservableList<String> fileNames = FXCollections.observableList(new ArrayList<>(fileNamesSet));
 			fileNames.sort(null);
-			final String firstSelection = fileNamesSet.contains(GAME_UI) ? GAME_UI : fileNames.get(0);
+			final String firstSelection = fileNamesSet.contains(GAME_UI) ? GAME_UI : fileNames.getFirst();
 			log.trace("updating dropdown - fileNames: {}, firstSelection: {}", fileNamesSet.size(), firstSelection);
 			Platform.runLater(() -> {
 				try {
@@ -375,12 +376,8 @@ public class BrowseTabController implements Updateable, FxmlController {
 	/**
 	 * Cell Factory for TreeCells that contain a TextFlow
 	 */
-	private static final class FlowTreeCellFactory implements Callback<TreeView<UIElement>, TreeCell<UIElement>> {
-		private final TextFlowFactory flowFactory;
-		
-		private FlowTreeCellFactory(final TextFlowFactory flowFactory) {
-			this.flowFactory = flowFactory;
-		}
+	private record FlowTreeCellFactory(TextFlowFactory flowFactory)
+			implements Callback<TreeView<UIElement>, TreeCell<UIElement>> {
 		
 		@Override
 		public TreeCell<UIElement> call(final TreeView<UIElement> treeView) {
@@ -388,12 +385,7 @@ public class BrowseTabController implements Updateable, FxmlController {
 		}
 	}
 	
-	private static final class TreeFilteringChangeListener implements ChangeListener<String> {
-		private final BrowseTabController controller;
-		
-		private TreeFilteringChangeListener(final BrowseTabController controller) {
-			this.controller = controller;
-		}
+	private record TreeFilteringChangeListener(BrowseTabController controller) implements ChangeListener<String> {
 		
 		@Override
 		public void changed(
@@ -402,12 +394,8 @@ public class BrowseTabController implements Updateable, FxmlController {
 		}
 	}
 	
-	private static final class FrameTreeSelectionChangedHandler implements ChangeListener<TreeItem<UIElement>> {
-		private final BrowseTabController controller;
-		
-		private FrameTreeSelectionChangedHandler(final BrowseTabController controller) {
-			this.controller = controller;
-		}
+	private record FrameTreeSelectionChangedHandler(BrowseTabController controller)
+			implements ChangeListener<TreeItem<UIElement>> {
 		
 		@Override
 		public void changed(
@@ -419,32 +407,22 @@ public class BrowseTabController implements Updateable, FxmlController {
 		}
 	}
 	
-	private static final class SearchCallable implements Callable<TreeItemPredicate<UIElement>> {
-		private final StringProperty queryString;
-		
-		private SearchCallable(final StringProperty queryString) {
-			this.queryString = queryString;
-		}
+	private record SearchCallable(StringProperty queryString) implements Callable<TreeItemPredicate<UIElement>> {
 		
 		@Override
 		public TreeItemPredicate<UIElement> call() {
 			return TreeItemPredicate.create(new QueryPredicate(queryString));
 		}
 		
-		private static final class QueryPredicate implements Predicate<UIElement> {
-			private final StringProperty queryString;
-			
-			private QueryPredicate(final StringProperty queryString) {
-				this.queryString = queryString;
-			}
+		private record QueryPredicate(StringProperty queryString) implements Predicate<UIElement> {
 			
 			/* do not turn the Predicate into a lambda -> for some reason it becomes 2-3x slower except
-						for first usage */
+							for first usage */
 			@SuppressWarnings("squid:S1067") // reduce number of conditional operators
 			@Override
 			public boolean test(final UIElement element) {
-						/* I could not get this code any faster than this form (caching toUpperCase() was not
-						faster) */
+									/* I could not get this code any faster than this form (caching toUpperCase() was not
+									faster) */
 				return queryString.getValue().isEmpty() || (element.getName() != null &&
 						AutoCompleteComboBox.containsIgnoreCase(element.getName(), queryString.getValue())) ||
 						(element instanceof UIFrame frame &&
@@ -469,12 +447,8 @@ public class BrowseTabController implements Updateable, FxmlController {
 		}
 	}
 	
-	private static final class FileSelectionEventHandler implements EventHandler<ActionEvent> {
-		private final BrowseTabController browseTabController;
-		
-		private FileSelectionEventHandler(final BrowseTabController browseTabController) {
-			this.browseTabController = browseTabController;
-		}
+	private record FileSelectionEventHandler(BrowseTabController browseTabController)
+			implements EventHandler<ActionEvent> {
 		
 		@Override
 		public void handle(final ActionEvent event) {
@@ -612,25 +586,9 @@ public class BrowseTabController implements Updateable, FxmlController {
 		}
 	}
 	
-	private static final class TreeFilteringRunnable implements Runnable {
-		private final String filter;
-		private final TreeItem<UIElement> root;
-		private final TreeItem<UIElement> selectedItem;
-		private final Node tableViewPlaceholderText;
-		private final BrowseTabController browseTabController;
-		
-		private TreeFilteringRunnable(
-				final String filter,
-				final TreeItem<UIElement> root,
-				final TreeItem<UIElement> selectedItem,
-				final Node tableViewPlaceholderText,
-				final BrowseTabController browseTabController) {
-			this.filter = filter;
-			this.root = root;
-			this.selectedItem = selectedItem;
-			this.tableViewPlaceholderText = tableViewPlaceholderText;
-			this.browseTabController = browseTabController;
-		}
+	private record TreeFilteringRunnable(String filter, TreeItem<UIElement> root, TreeItem<UIElement> selectedItem,
+	                                     Node tableViewPlaceholderText, BrowseTabController browseTabController)
+			implements Runnable {
 		
 		@Override
 		public void run() {
@@ -650,28 +608,9 @@ public class BrowseTabController implements Updateable, FxmlController {
 					tableViewPlaceholderText));
 		}
 		
-		private static final class TreeFilteringUiRunnable implements Runnable {
-			private final String curFilter;
-			private final String filter;
-			private final BrowseTabController browseTabController;
-			private final TreeItem<UIElement> selectedItem;
-			private final Node tableViewPlaceholderText;
-			private final TreeItem<UIElement> root;
-			
-			private TreeFilteringUiRunnable(
-					final String curFilter,
-					final String filter,
-					final BrowseTabController browseTabController,
-					final TreeItem<UIElement> root,
-					final TreeItem<UIElement> selectedItem,
-					final Node tableViewPlaceholderText) {
-				this.curFilter = curFilter;
-				this.filter = filter;
-				this.browseTabController = browseTabController;
-				this.root = root;
-				this.selectedItem = selectedItem;
-				this.tableViewPlaceholderText = tableViewPlaceholderText;
-			}
+		private record TreeFilteringUiRunnable(String curFilter, String filter, BrowseTabController browseTabController,
+		                                       TreeItem<UIElement> root, TreeItem<UIElement> selectedItem,
+		                                       Node tableViewPlaceholderText) implements Runnable {
 			
 			@Override
 			public void run() {

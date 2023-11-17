@@ -18,8 +18,8 @@ import java.util.Objects;
  */
 public class UIStateMutable extends UIElementAbstract implements UIState {
 	
-	private List<UIAttribute> whens;
-	private List<UIAttribute> actions;
+	private final List<UIAttribute> whens;
+	private final List<UIAttribute> actions;
 	private boolean nextAdditionShouldOverrideWhens;
 	private boolean nextAdditionShouldOverrideActions;
 	
@@ -79,14 +79,14 @@ public class UIStateMutable extends UIElementAbstract implements UIState {
 		return whens;
 	}
 	
-	/**
-	 * @param whens
-	 * 		the whens to set
-	 */
-	@Override
-	public void setWhens(final List<UIAttribute> whens) {
-		this.whens = whens;
-	}
+//	/**
+//	 * @param whens
+//	 * 		the whens to set
+//	 */
+//	@Override
+//	public void setWhens(final List<UIAttribute> whens) {
+//		this.whens = whens;
+//	}
 	
 	/**
 	 * @return the actions
@@ -96,22 +96,22 @@ public class UIStateMutable extends UIElementAbstract implements UIState {
 		return actions;
 	}
 	
-	/**
-	 * @param actions
-	 * 		the actions to set
-	 */
-	@Override
-	public void setActions(final List<UIAttribute> actions) {
-		this.actions = actions;
-	}
+//	/**
+//	 * @param actions
+//	 * 		the actions to set
+//	 */
+//	@Override
+//	public void setActions(final List<UIAttribute> actions) {
+//		this.actions = actions;
+//	}
 	
-	/**
-	 * @return the nextAdditionShouldOverrideWhens
-	 */
-	@Override
-	public boolean isNextAdditionShouldOverrideWhens() {
-		return nextAdditionShouldOverrideWhens;
-	}
+//	/**
+//	 * @return the nextAdditionShouldOverrideWhens
+//	 */
+//	@Override
+//	public boolean isNextAdditionShouldOverrideWhens() {
+//		return nextAdditionShouldOverrideWhens;
+//	}
 	
 	/**
 	 * @param nextAdditionShouldOverrideWhens
@@ -122,13 +122,13 @@ public class UIStateMutable extends UIElementAbstract implements UIState {
 		this.nextAdditionShouldOverrideWhens = nextAdditionShouldOverrideWhens;
 	}
 	
-	/**
-	 * @return the nextAdditionShouldOverrideActions
-	 */
-	@Override
-	public boolean isNextAdditionShouldOverrideActions() {
-		return nextAdditionShouldOverrideActions;
-	}
+//	/**
+//	 * @return the nextAdditionShouldOverrideActions
+//	 */
+//	@Override
+//	public boolean isNextAdditionShouldOverrideActions() {
+//		return nextAdditionShouldOverrideActions;
+//	}
 	
 	/**
 	 * @param nextAdditionShouldOverrideActions

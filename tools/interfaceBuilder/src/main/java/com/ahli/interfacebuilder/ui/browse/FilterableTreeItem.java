@@ -87,7 +87,7 @@ public class FilterableTreeItem<T> extends TreeItem<T> {
 				return true;
 			}
 			// Otherwise ask the TreeItemPredicate
-			return predicate.get().test(FilterableTreeItem.this, child.getValue());
+			return predicate.get().test(child.getValue());
 		}
 	}
 }

@@ -44,22 +44,22 @@ public interface UICatalog extends DeepCopyable {
 	void processDescIndex(Path file, String raceId, String consoleSkinId)
 			throws SAXException, IOException, ParserConfigurationException, InterruptedException;
 	
-	/**
-	 * @param p
-	 * 		layout file to process
-	 * @param raceId
-	 * 		to use to check constants starting with ##
-	 * @param isDevLayout
-	 * @param consoleSkinId
-	 * @param parser
-	 * @throws SAXException
-	 * @throws IOException
-	 * @throws ParserConfigurationException
-	 * @throws UIException
-	 * @throws InterruptedException
-	 */
-	void processLayoutFile(Path p, String raceId, boolean isDevLayout, String consoleSkinId, ParsedXmlConsumer parser)
-			throws IOException;
+//	/**
+//	 * @param p
+//	 * 		layout file to process
+//	 * @param raceId
+//	 * 		to use to check constants starting with ##
+//	 * @param isDevLayout
+//	 * @param consoleSkinId
+//	 * @param parser
+//	 * @throws SAXException
+//	 * @throws IOException
+//	 * @throws ParserConfigurationException
+//	 * @throws UIException
+//	 * @throws InterruptedException
+//	 */
+//	void processLayoutFile(Path p, String raceId, boolean isDevLayout, String consoleSkinId, ParsedXmlConsumer parser)
+//			throws IOException;
 	
 	/**
 	 * @param constantRef
@@ -99,10 +99,10 @@ public interface UICatalog extends DeepCopyable {
 	 */
 	List<String> getDevLayouts();
 	
-	/**
-	 * @return the curBasePath
-	 */
-	String getCurBasePath();
+//	/**
+//	 * @return the curBasePath
+//	 */
+//	String getCurBasePath();
 	
 	/**
 	 * Adds a Constant to the correct list. It removes other values and loggs warnings, if problems arise.

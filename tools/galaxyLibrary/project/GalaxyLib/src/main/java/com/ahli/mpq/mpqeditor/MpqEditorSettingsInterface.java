@@ -4,6 +4,7 @@
 package com.ahli.mpq.mpqeditor;
 
 import com.ahli.cloning.DeepCopyable;
+import lombok.Setter;
 import org.apache.commons.configuration2.INIConfiguration;
 import org.apache.commons.configuration2.SubnodeConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
@@ -49,6 +50,13 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 	private boolean backupActive;
 	private MpqEditorCompressionRule[] customRules;
 	
+	/**
+	 * -- SETTER --
+	 *  Sets the compression method.
+	 *
+	 * @param compression
+	 */
+	@Setter
 	private MpqEditorCompression compression = MpqEditorCompression.BLIZZARD_SC2_HEROES;
 	
 	public MpqEditorSettingsInterface() {
@@ -92,32 +100,23 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 		}
 	}
 	
-	/**
-	 * Returns the state of file backups.
-	 *
-	 * @return
-	 */
-	public boolean isBackupActive() {
-		return backupActive;
-	}
+//	/**
+//	 * Returns the state of file backups.
+//	 *
+//	 * @return
+//	 */
+//	public boolean isBackupActive() {
+//		return backupActive;
+//	}
 	
-	/**
-	 * Returns the currently active compression method.
-	 *
-	 * @return
-	 */
-	public MpqEditorCompression getCompression() {
-		return compression;
-	}
-	
-	/**
-	 * Sets the compression method.
-	 *
-	 * @param compression
-	 */
-	public void setCompression(final MpqEditorCompression compression) {
-		this.compression = compression;
-	}
+//	/**
+//	 * Returns the currently active compression method.
+//	 *
+//	 * @return
+//	 */
+//	public MpqEditorCompression getCompression() {
+//		return compression;
+//	}
 	
 	/**
 	 * Applies the compression. Make sure to call <code>restoreOriginalSettingFiles()</code> afterwards to restore these
@@ -131,6 +130,7 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 				applyChangesToFiles();
 			}
 			case SYSTEM_DEFAULT -> {
+				// nothing to do
 			}
 			default -> throw new IOException("unknown compression setting");
 		}
@@ -293,14 +293,14 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 		}
 	}
 	
-	/**
-	 * Returns the ruleset array used by this class.
-	 *
-	 * @return
-	 */
-	public MpqEditorCompressionRule[] getCustomRuleSet() {
-		return customRules;
-	}
+//	/**
+//	 * Returns the ruleset array used by this class.
+//	 *
+//	 * @return
+//	 */
+//	public MpqEditorCompressionRule[] getCustomRuleSet() {
+//		return customRules;
+//	}
 	
 	/**
 	 * @param customRules

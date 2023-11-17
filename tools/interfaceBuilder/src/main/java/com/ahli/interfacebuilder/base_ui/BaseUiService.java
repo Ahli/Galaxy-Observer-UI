@@ -152,7 +152,7 @@ public class BaseUiService {
 			final Kryo kryo = kryoService.getKryoForBaseUiMetaFile();
 			final List<Class<?>> payloadClasses = new ArrayList<>(1);
 			payloadClasses.add(KryoGameInfo.class);
-			return (KryoGameInfo) kryoService.get(path, payloadClasses, kryo).get(0);
+			return (KryoGameInfo) kryoService.get(path, payloadClasses, kryo).getFirst();
 		}
 		return null;
 	}

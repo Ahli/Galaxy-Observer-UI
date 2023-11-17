@@ -13,6 +13,7 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
 
+@Getter
 public class CommandLineParams implements Serializable {
 	public static final String PARAM_PREFIX = "--";
 	public static final String EQUAL = "=";
@@ -24,17 +25,11 @@ public class CommandLineParams implements Serializable {
 	@Serial
 	private static final long serialVersionUID = -1392167025965886051L;
 	
-	@Getter
 	private final String paramRunPath;
-	@Getter
 	private final boolean compileAndRun;
-	@Getter
 	private final boolean hasParamCompilePath;
-	@Getter
 	private final String paramCompilePath;
-	@Getter
 	private final boolean wasStartedWithParameters;
-	@Getter
 	private final boolean paramsOriginateFromExternalSource;
 	
 	public CommandLineParams() {

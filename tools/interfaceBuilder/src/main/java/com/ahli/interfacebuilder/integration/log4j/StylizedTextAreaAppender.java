@@ -182,21 +182,12 @@ public final class StylizedTextAreaAppender extends AbstractAppender {
 				
 				Platform.runLater(() -> {
 					try {
-						final Text text = new Text(message);
-						text.getStyleClass().add(level.toString());
-						text.setFontSmoothingType(FontSmoothingType.LCD);
-						final ObservableList<Node> children = txtArea.getChildren();
-						children.add(text);
-						
 						if (level == Level.ERROR || level == Level.FATAL) {
 							controller.reportError();
 						} else if (level == Level.WARN) {
 							controller.reportWarning();
 						}
-						
-						if (children.size() > 2000) {
-							children.remove(0);
-						}
+						appendMessage(message, level, txtArea);
 					} catch (final Exception e) {
 						System.err.println("Error while append to TextArea: " + e.getMessage());
 					}
@@ -206,6 +197,17 @@ public final class StylizedTextAreaAppender extends AbstractAppender {
 			ex.printStackTrace();
 		} finally {
 			readLock.unlock();
+		}
+	}
+	
+	private static void appendMessage(final String message, final Level level, final TextFlow txtArea) {
+		final Text text = new Text(message);
+		text.getStyleClass().add(level.toString());
+		text.setFontSmoothingType(FontSmoothingType.LCD);
+		final ObservableList<Node> children = txtArea.getChildren();
+		children.add(text);
+		if (children.size() > 2000) {
+			children.removeFirst();
 		}
 	}
 }

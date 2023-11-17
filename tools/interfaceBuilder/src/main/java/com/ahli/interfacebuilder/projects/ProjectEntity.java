@@ -72,7 +72,7 @@ public final class ProjectEntity implements Serializable {
 	@ToString.Exclude
 	private RuleSet bestCompressionRuleSet;
 	
-	private ProjectEntity() {
+	public ProjectEntity() {
 		// required for hibernate
 	}
 	

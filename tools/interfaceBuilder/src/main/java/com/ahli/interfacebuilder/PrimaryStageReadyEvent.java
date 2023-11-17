@@ -5,11 +5,13 @@ package com.ahli.interfacebuilder;
 
 import com.ahli.interfacebuilder.integration.CommandLineParams;
 import javafx.stage.Stage;
+import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.lang.Nullable;
 
 import java.io.Serial;
 
+@Getter
 public class PrimaryStageReadyEvent extends ApplicationEvent {
 	
 	@Serial
@@ -26,7 +28,4 @@ public class PrimaryStageReadyEvent extends ApplicationEvent {
 		return getSource() instanceof final Stage stage ? stage : null;
 	}
 	
-	public CommandLineParams getStartingParams() {
-		return startingParams;
-	}
 }

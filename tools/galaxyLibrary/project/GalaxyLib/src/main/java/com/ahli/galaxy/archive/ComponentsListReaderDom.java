@@ -40,7 +40,7 @@ public final class ComponentsListReaderDom {
 	/**
 	 * Returns the internal path of DescIndex of the mpq file.
 	 *
-	 * @param compListFile
+	 * @param componentsListFile
 	 * 		components list file
 	 * @return
 	 * @throws IOException
@@ -48,9 +48,9 @@ public final class ComponentsListReaderDom {
 	 * @throws ParserConfigurationException
 	 */
 	@NotNull
-	public static String getDescIndexPath(@NotNull final Path compListFile, @NotNull final GameDef game)
+	public static String getDescIndexPath(@NotNull final Path componentsListFile, @NotNull final GameDef game)
 			throws ParserConfigurationException, SAXException, IOException {
-		final String str = game.baseDataFolderName() + File.separator + getComponentsListValue(compListFile, UIUI);
+		final String str = game.baseDataFolderName() + File.separator + getComponentsListValue(componentsListFile, UIUI);
 		logger.trace("DescIndexPath: {}", str);
 		return str;
 	}

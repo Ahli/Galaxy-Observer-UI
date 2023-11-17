@@ -162,17 +162,17 @@ public class UIFrameMutable extends UIElementAbstract implements UIFrame {
 		attributes.add(value);
 	}
 	
-	@Override
-	public UIAttribute getValue(final String key) {
-		if (attributes != null) {
-			for (final UIAttribute a : attributes) {
-				if (a.getName().equalsIgnoreCase(key)) {
-					return a;
-				}
-			}
-		}
-		return null;
-	}
+//	@Override
+//	public UIAttribute getValue(final String key) {
+//		if (attributes != null) {
+//			for (final UIAttribute a : attributes) {
+//				if (a.getName().equalsIgnoreCase(key)) {
+//					return a;
+//				}
+//			}
+//		}
+//		return null;
+//	}
 	
 	@Override
 	public List<UIAttribute> getAttributes() {

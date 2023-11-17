@@ -19,7 +19,7 @@ import java.util.Objects;
  */
 public class UIControllerMutable extends UIElementAbstract implements UIController {
 	private final List<String> attributesKeyValueList;
-	private List<UIAttribute> keys;
+	private final List<UIAttribute> keys;
 	private boolean nextAdditionShouldOverride;
 	private boolean nameIsImplicit = true;
 	
@@ -78,31 +78,31 @@ public class UIControllerMutable extends UIElementAbstract implements UIControll
 		return keys;
 	}
 	
-	/**
-	 * @param keys
-	 * 		the keys to set
-	 */
-	@Override
-	public void setKeys(final List<UIAttribute> keys) {
-		this.keys = keys;
-	}
+//	/**
+//	 * @param keys
+//	 * 		the keys to set
+//	 */
+//	@Override
+//	public void setKeys(final List<UIAttribute> keys) {
+//		this.keys = keys;
+//	}
 	
-	/**
-	 * @return the nextAdditionShouldOverride
-	 */
-	@Override
-	public boolean isNextAdditionShouldOverride() {
-		return nextAdditionShouldOverride;
-	}
+//	/**
+//	 * @return the nextAdditionShouldOverride
+//	 */
+//	@Override
+//	public boolean isNextAdditionShouldOverride() {
+//		return nextAdditionShouldOverride;
+//	}
 	
-	/**
-	 * @param nextAdditionShouldOverride
-	 * 		the nextAdditionShouldOverride to set
-	 */
-	@Override
-	public void setNextAdditionShouldOverride(final boolean nextAdditionShouldOverride) {
-		this.nextAdditionShouldOverride = nextAdditionShouldOverride;
-	}
+//	/**
+//	 * @param nextAdditionShouldOverride
+//	 * 		the nextAdditionShouldOverride to set
+//	 */
+//	@Override
+//	public void setNextAdditionShouldOverride(final boolean nextAdditionShouldOverride) {
+//		this.nextAdditionShouldOverride = nextAdditionShouldOverride;
+//	}
 	
 	/**
 	 * Adds a value for the key and returns any overridden value.
@@ -143,13 +143,13 @@ public class UIControllerMutable extends UIElementAbstract implements UIControll
 		return null;
 	}
 	
-	/**
-	 * @return the nameIsImplicit
-	 */
-	@Override
-	public boolean isNameIsImplicit() {
-		return nameIsImplicit;
-	}
+//	/**
+//	 * @return the nameIsImplicit
+//	 */
+//	@Override
+//	public boolean isNameIsImplicit() {
+//		return nameIsImplicit;
+//	}
 	
 	/**
 	 * @param nameIsImplicit

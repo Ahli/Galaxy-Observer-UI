@@ -94,7 +94,7 @@ public class DiscCacheService {
 		final List<Class<?>> payloadClasses = new ArrayList<>(2);
 		payloadClasses.add(KryoGameInfo.class);
 		payloadClasses.add(UICatalogImpl.class);
-		return (KryoGameInfo) kryoService.get(path, payloadClasses, kryo, 0).get(0);
+		return (KryoGameInfo) kryoService.get(path, payloadClasses, kryo, 0).getFirst();
 	}
 	
 	/**

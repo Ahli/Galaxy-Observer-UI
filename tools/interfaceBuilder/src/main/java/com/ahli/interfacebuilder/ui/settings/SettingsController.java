@@ -74,12 +74,8 @@ public class SettingsController implements Updateable, FxmlController {
 		GAMEPATHS, GUITOOL, CMDLINETOOL
 	}
 	
-	private static final class PageSelectionListener implements ChangeListener<TreeItem<String>> {
-		private final SettingsController settingsController;
-		
-		private PageSelectionListener(final SettingsController settingsController) {
-			this.settingsController = settingsController;
-		}
+	private record PageSelectionListener(SettingsController settingsController)
+			implements ChangeListener<TreeItem<String>> {
 		
 		@Override
 		public void changed(

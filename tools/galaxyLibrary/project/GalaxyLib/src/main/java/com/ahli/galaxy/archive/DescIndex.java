@@ -5,10 +5,10 @@ package com.ahli.galaxy.archive;
 
 import com.ahli.mpq.MpqException;
 import com.ahli.mpq.MpqInterface;
+import lombok.Getter;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -48,6 +48,12 @@ public class DescIndex {
 	
 	private final MpqInterface mpqi;
 	private final List<Pair<Path, String>> fileIntPathList;
+	/**
+	 * -- GETTER --
+	 *
+	 * @return
+	 */
+	@Getter
 	private String descIndexIntPath;
 	
 	/**
@@ -62,41 +68,10 @@ public class DescIndex {
 	}
 	
 	/**
-	 * @return
-	 */
-	public String getDescIndexIntPath() {
-		return descIndexIntPath;
-	}
-	
-	/**
 	 * @param descIndexIntPath
 	 */
 	public void setDescIndexIntPath(@NotNull final String descIndexIntPath) {
 		this.descIndexIntPath = descIndexIntPath;
-	}
-	
-	/**
-	 * @param i
-	 * @return
-	 */
-	@NotNull
-	public String getLayoutIntPath(final int i) {
-		return fileIntPathList.get(i).getTwo();
-	}
-	
-	/**
-	 * @param intPath
-	 * @return
-	 */
-	public boolean removeLayoutIntPath(@NotNull final String intPath) {
-		for (int i = 0, len = fileIntPathList.size(); i < len; ++i) {
-			final Pair<Path, String> p = fileIntPathList.get(i);
-			if (p.getTwo().equals(intPath)) {
-				fileIntPathList.remove(i);
-				return true;
-			}
-		}
-		return false;
 	}
 	
 	/**
@@ -142,27 +117,6 @@ public class DescIndex {
 		fileIntPathList.add(Tuples.pair(p, intPath2));
 		
 		logger.trace("added Layout path: {}\nadded File path: {}", intPath2, p);
-	}
-	
-	/**
-	 * @return
-	 */
-	public int getLayoutCount() {
-		return fileIntPathList.size();
-	}
-	
-	/**
-	 * @param intPath
-	 * @return
-	 */
-	@Nullable
-	public Path getLayoutFilePath(@NotNull final String intPath) {
-		for (final Pair<Path, String> p : fileIntPathList) {
-			if (p.getTwo().equals(intPath)) {
-				return p.getOne();
-			}
-		}
-		return null;
 	}
 	
 	/**

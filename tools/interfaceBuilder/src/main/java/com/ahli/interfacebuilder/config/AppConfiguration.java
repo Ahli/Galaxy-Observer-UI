@@ -70,27 +70,17 @@ public class AppConfiguration {
 	}
 	
 	@Bean
-	protected MpqEditorInterface mpqEditorInterface() {
+	protected MpqEditorInterface mpqEditorInterface(final Path mpqEditorPath, final Path mpqCachePath) {
 		log.debug("init bean: mpqEditorInterface");
-		return new MpqEditorInterface(mpqCachePath(tempDirectory()), mpqEditorPath(basePath()));
+		return new MpqEditorInterface(mpqCachePath, mpqEditorPath);
 	}
 	
-	protected Path mpqCachePath(final Path tempDirectory) {
-		return Path.of(tempDirectory.toString(), "ObserverInterfaceBuilder", "_ExtractedMpq");
-	}
-	
-	protected Path tempDirectory() {
-		return Path.of(System.getProperty("java.io.tmpdir"));
-	}
-	
+	@Bean
 	protected Path mpqEditorPath(final Path basePath) {
+		log.debug("init bean: mpqEditorPath");
 		return Path.of(
 				basePath.getParent() + File.separator + "tools" + File.separator + "plugins" + File.separator + "mpq" +
 						File.separator + "MPQEditor.exe");
-	}
-	
-	protected Path basePath() {
-		return JarHelper.getJarDir(SpringBootApplication.class);
 	}
 	
 	@Bean
@@ -216,15 +206,12 @@ public class AppConfiguration {
 	
 	@Bean
 	protected GameService gameService(final ConfigService configService) {
-		
 		log.debug("init bean: gameService");
 		return new GameService(configService);
 	}
 	
 	@Bean
 	protected FileService fileService() {
-		
-		
 		log.debug("init bean: fileService");
 		return new FileService();
 	}
@@ -237,69 +224,87 @@ public class AppConfiguration {
 	
 	@Bean
 	protected KryoService kryoService() {
-		
 		log.debug("init bean: kryoService");
 		return new KryoService();
 	}
 	
 	@Bean
 	protected ConfigService configService(
-			final SettingsIniInterface settingsIniInterface) {
+			final SettingsIniInterface settingsIniInterface,
+			final Path basePath,
+			final Path mpqEditorPath,
+			final Path mpqCachePath,
+			final Path tempDirectory) {
 		log.debug("init bean: configService");
-		final Path tmpPath = tempDirectory();
-		final Path basePath = basePath();
 		return new ConfigService(
-				mpqCachePath(tmpPath),
+				mpqCachePath,
 				basePath,
 				documentsPath(),
-				mpqEditorPath(basePath),
+				mpqEditorPath,
 				settingsIniInterface,
 				raceId(),
 				consoleSkinId(),
 				baseUiPath(basePath),
 				cascExtractorExeFile(),
 				cachePath(),
-				miningTempPath(tmpPath));
+				miningTempPath(tempDirectory));
 	}
 	
-	protected Path documentsPath() {
+	private Path documentsPath() {
 		return FileSystemView.getFileSystemView().getDefaultDirectory().toPath();
 	}
 	
-	protected String raceId() {
+	private String raceId() {
 		return "Terr";
 	}
 	
-	protected String consoleSkinId() {
+	private String consoleSkinId() {
 		return "ClassicTerran";
 	}
 	
-	protected Path baseUiPath(final Path basePath) {
+	private Path baseUiPath(final Path basePath) {
 		return basePath.getParent().resolve("baseUI");
 	}
 	
-	protected File cascExtractorExeFile() {
+	private File cascExtractorExeFile() {
 		return new File(
 				basePath().getParent() + File.separator + "tools" + File.separator + "plugins" + File.separator +
 						"casc" + File.separator + "CascExtractor.exe");
 	}
 	
-	protected Path cachePath() {
+	private Path cachePath() {
 		return Path.of(System.getProperty("user.home") + File.separator + ".GalaxyObsUI" + File.separator + "cache");
 	}
 	
-	protected Path miningTempPath(final Path tempDirectory) {
+	private Path miningTempPath(final Path tempDirectory) {
 		return tempDirectory.resolve("ObserverInterfaceBuilder" + File.separator + "_Mining");
 	}
 	
 	@Bean
-	protected SettingsIniInterface settingsIniInterface() {
-		
-		log.debug("init bean: settingsIniInterface");
-		return new SettingsIniInterface(iniSettingsPath(basePath()));
+	protected Path basePath() {
+		log.debug("init bean: basePath");
+		return JarHelper.getJarDir(SpringBootApplication.class);
 	}
 	
-	protected Path iniSettingsPath(final Path basePath) {
+	@Bean
+	protected Path tempDirectory() {
+		log.debug("init bean: tempDirectory");
+		return Path.of(System.getProperty("java.io.tmpdir"));
+	}
+	
+	@Bean
+	protected Path mpqCachePath(final Path tempDirectory) {
+		log.debug("init bean: mpqCachePath");
+		return Path.of(tempDirectory.toString(), "ObserverInterfaceBuilder", "_ExtractedMpq");
+	}
+	
+	@Bean
+	protected SettingsIniInterface settingsIniInterface(Path basePath) {
+		log.debug("init bean: settingsIniInterface");
+		return new SettingsIniInterface(iniSettingsPath(basePath));
+	}
+	
+	private Path iniSettingsPath(final Path basePath) {
 		return basePath.getParent().resolve("settings.ini");
 	}
 }

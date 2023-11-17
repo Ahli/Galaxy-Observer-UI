@@ -13,9 +13,11 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.text.TextFlow;
 import lombok.Getter;
+import lombok.Setter;
 
 public class TabPaneController implements Updateable, FxmlController {
 	
+	@Setter
 	private ProgressController progressController;
 	
 	@Getter
@@ -24,10 +26,6 @@ public class TabPaneController implements Updateable, FxmlController {
 	
 	public TabPaneController() {
 		// explicit constructor
-	}
-	
-	public void setProgressController(final ProgressController progressController) {
-		this.progressController = progressController;
 	}
 	
 	/**
@@ -46,7 +44,7 @@ public class TabPaneController implements Updateable, FxmlController {
 		
 		// special ScrollPane within first Tab of tabPane
 		final ObservableList<Tab> tabs = tabPane.getTabs();
-		final Tab tab = tabs.get(0);
+		final Tab tab = tabs.getFirst();
 		tab.setContent(scrollPane);
 		
 		final ErrorTabController errorTabCtrl = new ErrorTabController(tab, txtArea, false, true, true);

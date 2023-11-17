@@ -61,7 +61,7 @@ public interface UIElement extends DeepCopyable {
 	@Override
 	boolean equals(Object obj);
 	
-	boolean canEqual(Object other);
+//	boolean canEqual(Object other);
 	
 	/**
 	 * @return the name

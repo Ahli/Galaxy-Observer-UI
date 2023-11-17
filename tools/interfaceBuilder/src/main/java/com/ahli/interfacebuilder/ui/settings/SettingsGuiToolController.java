@@ -8,20 +8,11 @@ import com.ahli.interfacebuilder.integration.SettingsIniInterface;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.RadioButton;
 
-public class SettingsGuiToolController extends SettingsAutoSaveController {
+public class SettingsGuiToolController extends AbstractBuildSettingController {
 	
 	@FXML
 	private CheckBox buildUnprotectedToo;
-	@FXML
-	private RadioButton compressMpqBlizz;
-	@FXML
-	private RadioButton compressMpqNone;
-	@FXML
-	private RadioButton compressMpqExperimentalBest;
-	@FXML
-	private RadioButton compressMpqSystemDefault;
 	@FXML
 	private CheckBox compressXml;
 	@FXML
@@ -52,41 +43,6 @@ public class SettingsGuiToolController extends SettingsAutoSaveController {
 		compressXml.setSelected(settings.isGuiCompressXml());
 		initCompressMpq(settings.getGuiCompressMpq());
 		buildUnprotectedToo.setSelected(settings.isGuiBuildUnprotectedToo());
-	}
-	
-	/**
-	 * Applies the selected mode to the radio buttons.
-	 *
-	 * @param val
-	 * 		selected mpq compression mode
-	 */
-	private void initCompressMpq(final int val) {
-		switch (val) {
-			case 1 -> {
-				compressMpqNone.setSelected(false);
-				compressMpqBlizz.setSelected(true);
-				compressMpqExperimentalBest.setSelected(false);
-				compressMpqSystemDefault.setSelected(false);
-			}
-			case 2 -> {
-				compressMpqNone.setSelected(false);
-				compressMpqBlizz.setSelected(false);
-				compressMpqExperimentalBest.setSelected(true);
-				compressMpqSystemDefault.setSelected(false);
-			}
-			case 3 -> {
-				compressMpqNone.setSelected(false);
-				compressMpqBlizz.setSelected(false);
-				compressMpqExperimentalBest.setSelected(false);
-				compressMpqSystemDefault.setSelected(true);
-			}
-			default -> {
-				compressMpqNone.setSelected(true);
-				compressMpqBlizz.setSelected(false);
-				compressMpqExperimentalBest.setSelected(false);
-				compressMpqSystemDefault.setSelected(false);
-			}
-		}
 	}
 	
 	@Override

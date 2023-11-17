@@ -3,16 +3,19 @@
 
 package com.ahli.mpq.mpqeditor;
 
+import lombok.Getter;
+
 import java.io.Serial;
 import java.util.Arrays;
 import java.util.Objects;
 
+@Getter
 public class MpqEditorCompressionRuleMask extends MpqEditorCompressionRule {
 	
 	@Serial
 	private static final long serialVersionUID = 1058198721980855682L;
 	
-	private String mask;
+	private final String mask;
 	
 	public MpqEditorCompressionRuleMask(final String mask) {
 		this.mask = mask;
@@ -33,18 +36,14 @@ public class MpqEditorCompressionRuleMask extends MpqEditorCompressionRule {
 		return "Mask:" + getMask() + "=" + getAttributeString() + ", " + getCompressionMethodString() + ", 0xFFFFFFFF";
 	}
 	
-	public String getMask() {
-		return mask;
-	}
-	
-	/**
-	 * Sets the mask to match file names. Use '*' as a wildcard.
-	 *
-	 * @param mask
-	 */
-	public void setMask(final String mask) {
-		this.mask = mask;
-	}
+	//	/**
+//	 * Sets the mask to match file names. Use '*' as a wildcard.
+//	 *
+//	 * @param mask
+//	 */
+//	public void setMask(final String mask) {
+//		this.mask = mask;
+//	}
 	
 	@Override
 	public Object deepCopy() {

@@ -38,8 +38,8 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	private static final String SLASH_C = "/C";
 	private static final Object classWideLock = new Object();
 	private MpqEditorSettingsInterface settings;
-	private Path mpqEditorPath;
-	private Path mpqCachePath;
+	private final Path mpqEditorPath;
+	private final Path mpqCachePath;
 	
 	/**
 	 * Constructor.
@@ -415,75 +415,75 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 		}
 	}
 	
-	/**
-	 * @param mpqPath
-	 * @param scriptPath
-	 * @throws InterruptedException
-	 * @throws IOException
-	 * @throws MpqException
-	 */
-	public void scriptMpq(final String mpqPath, final String scriptPath)
-			throws InterruptedException, IOException, MpqException {
-		if (isMissingMpqEditor()) {
-			throw new MpqException(String.format(Messages.getString(MPQ_INTERFACE_MPQ_EDITOR_NOT_FOUND),
-					mpqEditorPath));
-		}
-		final String[] cmd = new String[] { CMD, SLASH_C,
-				QUOTESTR + QUOTE + mpqEditorPath + QUOTE + " s " + QUOTE + mpqPath + QUOTE + " " + QUOTE + scriptPath +
-						QUOTE + QUOTE };
-		if (logger.isTraceEnabled()) {
-			logger.trace(EXECUTING, Arrays.toString(cmd));
-		}
-		Runtime.getRuntime().exec(cmd).waitFor();
-		logger.trace(EXECUTION_FINISHED);
-	}
+//	/**
+//	 * @param mpqPath
+//	 * @param scriptPath
+//	 * @throws InterruptedException
+//	 * @throws IOException
+//	 * @throws MpqException
+//	 */
+//	public void scriptMpq(final String mpqPath, final String scriptPath)
+//			throws InterruptedException, IOException, MpqException {
+//		if (isMissingMpqEditor()) {
+//			throw new MpqException(String.format(Messages.getString(MPQ_INTERFACE_MPQ_EDITOR_NOT_FOUND),
+//					mpqEditorPath));
+//		}
+//		final String[] cmd = new String[] { CMD, SLASH_C,
+//				QUOTESTR + QUOTE + mpqEditorPath + QUOTE + " s " + QUOTE + mpqPath + QUOTE + " " + QUOTE + scriptPath +
+//						QUOTE + QUOTE };
+//		if (logger.isTraceEnabled()) {
+//			logger.trace(EXECUTING, Arrays.toString(cmd));
+//		}
+//		Runtime.getRuntime().exec(cmd).waitFor();
+//		logger.trace(EXECUTION_FINISHED);
+//	}
 	
-	/**
-	 * @param mpqPath
-	 * @param filePath
-	 * @throws InterruptedException
-	 * @throws IOException
-	 * @throws MpqException
-	 */
-	public void deleteFileInMpq(final String mpqPath, final String filePath)
-			throws InterruptedException, IOException, MpqException {
-		if (isMissingMpqEditor()) {
-			throw new MpqException(String.format(Messages.getString(MPQ_INTERFACE_MPQ_EDITOR_NOT_FOUND),
-					mpqEditorPath));
-		}
-		final String[] cmd = new String[] { CMD, SLASH_C,
-				QUOTESTR + QUOTE + mpqEditorPath + QUOTE + " d " + QUOTE + mpqPath + QUOTE + " " + QUOTE + filePath +
-						QUOTE + QUOTE };
-		if (logger.isTraceEnabled()) {
-			logger.trace(EXECUTING, Arrays.toString(cmd));
-		}
-		Runtime.getRuntime().exec(cmd).waitFor();
-		logger.trace(EXECUTION_FINISHED);
-	}
+//	/**
+//	 * @param mpqPath
+//	 * @param filePath
+//	 * @throws InterruptedException
+//	 * @throws IOException
+//	 * @throws MpqException
+//	 */
+//	public void deleteFileInMpq(final String mpqPath, final String filePath)
+//			throws InterruptedException, IOException, MpqException {
+//		if (isMissingMpqEditor()) {
+//			throw new MpqException(String.format(Messages.getString(MPQ_INTERFACE_MPQ_EDITOR_NOT_FOUND),
+//					mpqEditorPath));
+//		}
+//		final String[] cmd = new String[] { CMD, SLASH_C,
+//				QUOTESTR + QUOTE + mpqEditorPath + QUOTE + " d " + QUOTE + mpqPath + QUOTE + " " + QUOTE + filePath +
+//						QUOTE + QUOTE };
+//		if (logger.isTraceEnabled()) {
+//			logger.trace(EXECUTING, Arrays.toString(cmd));
+//		}
+//		Runtime.getRuntime().exec(cmd).waitFor();
+//		logger.trace(EXECUTION_FINISHED);
+//	}
 	
-	/**
-	 * @param mpqPath
-	 * @param oldfilePath
-	 * @param newFilePath
-	 * @throws InterruptedException
-	 * @throws IOException
-	 * @throws MpqException
-	 */
-	public void renameFileInMpq(final String mpqPath, final String oldfilePath, final String newFilePath)
-			throws InterruptedException, IOException, MpqException {
-		if (isMissingMpqEditor()) {
-			throw new MpqException(String.format(Messages.getString(MPQ_INTERFACE_MPQ_EDITOR_NOT_FOUND),
-					mpqEditorPath));
-		}
-		final String[] cmd = new String[] { CMD, SLASH_C,
-				QUOTESTR + QUOTE + mpqEditorPath + QUOTE + " r " + QUOTE + mpqPath + QUOTE + " " + QUOTE + oldfilePath +
-						QUOTE + " " + QUOTE + newFilePath + QUOTE + QUOTE };
-		if (logger.isTraceEnabled()) {
-			logger.trace(EXECUTING, Arrays.toString(cmd));
-		}
-		Runtime.getRuntime().exec(cmd).waitFor();
-		logger.trace(EXECUTION_FINISHED);
-	}
+//	/**
+//	 * @param mpqPath
+//	 * @param oldfilePath
+//	 * @param newFilePath
+//	 * @throws InterruptedException
+//	 * @throws IOException
+//	 * @throws MpqException
+//	 */
+//	public void renameFileInMpq(final String mpqPath, final String oldfilePath, final String newFilePath)
+//			throws InterruptedException, IOException, MpqException {
+//		if (isMissingMpqEditor()) {
+//			throw new MpqException(String.format(Messages.getString(MPQ_INTERFACE_MPQ_EDITOR_NOT_FOUND),
+//					mpqEditorPath));
+//		}
+//		final String[] cmd = new String[] { CMD, SLASH_C,
+//				QUOTESTR + QUOTE + mpqEditorPath + QUOTE + " r " + QUOTE + mpqPath + QUOTE + " " + QUOTE + oldfilePath +
+//						QUOTE + " " + QUOTE + newFilePath + QUOTE + QUOTE };
+//		if (logger.isTraceEnabled()) {
+//			logger.trace(EXECUTING, Arrays.toString(cmd));
+//		}
+//		Runtime.getRuntime().exec(cmd).waitFor();
+//		logger.trace(EXECUTION_FINISHED);
+//	}
 	
 	/**
 	 * Returns the path to a file from the cache with the specified internal path.
@@ -535,19 +535,19 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 		return mpqCachePath;
 	}
 	
-	@Override
-	public void setCache(final Path cache) {
-		mpqCachePath = cache;
-	}
+//	@Override
+//	public void setCache(final Path cache) {
+//		mpqCachePath = cache;
+//	}
 	
-	/**
-	 * Returns the custom ruleset for the file attributes and compression.
-	 *
-	 * @return
-	 */
-	public MpqEditorCompressionRule[] getCustomRuleSet() {
-		return settings.getCustomRuleSet();
-	}
+//	/**
+//	 * Returns the custom ruleset for the file attributes and compression.
+//	 *
+//	 * @return
+//	 */
+//	public MpqEditorCompressionRule[] getCustomRuleSet() {
+//		return settings.getCustomRuleSet();
+//	}
 	
 	/**
 	 * Sets custom rules for the file attributes and compression. To use it, the archive needs to use
@@ -559,20 +559,20 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 		settings.setCustomRules(rules);
 	}
 	
-	/**
-	 * @return
-	 */
-	public Path getMpqEditorPath() {
-		return mpqEditorPath;
-	}
+//	/**
+//	 * @return
+//	 */
+//	public Path getMpqEditorPath() {
+//		return mpqEditorPath;
+//	}
 	
-	/**
-	 * Sets the MpqEditor path.
-	 *
-	 * @param editorPath
-	 * 		new editor path as String
-	 */
-	public void setMpqEditorPath(final Path editorPath) {
-		mpqEditorPath = editorPath;
-	}
+//	/**
+//	 * Sets the MpqEditor path.
+//	 *
+//	 * @param editorPath
+//	 * 		new editor path as String
+//	 */
+//	public void setMpqEditorPath(final Path editorPath) {
+//		mpqEditorPath = editorPath;
+//	}
 }

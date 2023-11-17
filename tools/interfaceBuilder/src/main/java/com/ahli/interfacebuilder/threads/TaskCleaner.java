@@ -42,14 +42,7 @@ public class TaskCleaner implements CleaningForkJoinTaskCleaner {
 				} catch (final BeanCreationNotAllowedException e) {
 					log.trace("Failed to instantiate lazy beans.", e);
 				}
-				// GC1 is the default GC and can now release RAM -> actually good to do after a task because we use a
-				// lot of RAM for the UIs
-				// Weak References survive 3 garbage collections by default
-				System.gc();
-				System.gc();
-				System.gc();
-				System.runFinalization();
-				// clean up StringInterner's weak references that the GC removed
+				// clean up StringInterner's weak references
 				log.trace("string interner size before cleaning: {}", StringInterner.size()); // instant calc!
 				StringInterner.cleanUpGarbage();
 				log.trace("string interner size after cleaning: {}", StringInterner::size);

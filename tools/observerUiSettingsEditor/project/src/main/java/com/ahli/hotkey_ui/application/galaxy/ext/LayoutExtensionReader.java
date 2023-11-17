@@ -45,7 +45,7 @@ public class LayoutExtensionReader {
 	private static final Logger logger = LoggerFactory.getLogger(LayoutExtensionReader.class);
 	private static final Pattern HOTKEY_SETTING_REGEX_PATTERN = Pattern.compile("(?<=@hotkey|@setting)/i");
 	private static final Pattern ATTRIBUTES_REGEX_PATTERN = Pattern.compile(
-			"(?i)(?=(?:constant|default|description|values|valuesdisplaynames|type|gamestrings_add)[\\s]*=)");
+			"(?i)(?=(?:constant|default|description|values|valuesdisplaynames|type|gamestrings_add)\\s*=)");
 	private final List<TextValueDef> hotkeys = new ArrayList<>();
 	private final List<ValueDef> settings = new ArrayList<>();
 	

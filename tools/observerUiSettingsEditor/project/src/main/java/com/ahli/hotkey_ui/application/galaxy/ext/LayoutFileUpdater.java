@@ -3,11 +3,11 @@ package com.ahli.hotkey_ui.application.galaxy.ext;
 import com.ahli.hotkey_ui.application.model.OptionValueDef;
 import com.ahli.hotkey_ui.application.model.TextValueDef;
 import com.ahli.hotkey_ui.application.model.abstracts.ValueDef;
+import com.ahli.xml.XmlDomHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -103,10 +103,10 @@ final class LayoutFileUpdater extends SimpleFileVisitor<Path> {
 	 */
 	private static void processConstant(
 			final Node node, final List<TextValueDef> hotkeys, final List<ValueDef> settings) {
-		final Node nameAttrNode = getNamedItemIgnoreCase(node.getAttributes(), NAME);
+		final Node nameAttrNode = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), NAME);
 		if (nameAttrNode != null) {
 			final String name = nameAttrNode.getNodeValue();
-			final Node valAttrNode = getNamedItemIgnoreCase(node.getAttributes(), VAL);
+			final Node valAttrNode = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), VAL);
 			if (valAttrNode != null) {
 				final String val = valAttrNode.getNodeValue();
 				logger.debug("Constant: name = {}, val = {}", name, val);
@@ -159,10 +159,10 @@ final class LayoutFileUpdater extends SimpleFileVisitor<Path> {
 	 */
 	private static void modifyConstant(
 			final Node node, final List<TextValueDef> hotkeys, final List<ValueDef> settings) {
-		final Node nameAttrNode = getNamedItemIgnoreCase(node.getAttributes(), NAME);
+		final Node nameAttrNode = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), NAME);
 		if (nameAttrNode != null) {
 			final String name = nameAttrNode.getNodeValue();
-			final Node valAttrNode = getNamedItemIgnoreCase(node.getAttributes(), VAL);
+			final Node valAttrNode = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), VAL);
 			if (valAttrNode != null) {
 				final String val = valAttrNode.getNodeValue();
 				
@@ -195,24 +195,6 @@ final class LayoutFileUpdater extends SimpleFileVisitor<Path> {
 		} else {
 			logger.warn("Constant has no 'name' attribute defined.");
 		}
-	}
-	
-	/**
-	 * @param nodes
-	 * @param name
-	 * @return
-	 */
-	private static Node getNamedItemIgnoreCase(final NamedNodeMap nodes, final String name) {
-		final Node node = nodes.getNamedItem(name);
-		if (node == null) {
-			for (int i = 0, len = nodes.getLength(); i < len; ++i) {
-				final Node curNode = nodes.item(i);
-				if (name.equalsIgnoreCase(curNode.getNodeName())) {
-					return curNode;
-				}
-			}
-		}
-		return node;
 	}
 	
 	@Override

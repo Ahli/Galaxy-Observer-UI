@@ -91,7 +91,8 @@ final class ReadAaltoTest {
 		// long executionTime = (System.currentTimeMillis() - startTime);
 		// System.out.println("file loading took " + executionTime + "ms.");
 		// startTime = System.currentTimeMillis();
-		int eventType = parser.next();
+		parser.next();
+		int eventType;
 		//		if (eventType == XMLStreamConstants.START_DOCUMENT) {
 		while ((eventType = parser.next()) != XMLStreamConstants.END_DOCUMENT) {
 			if (eventType == XMLStreamConstants.START_ELEMENT) {

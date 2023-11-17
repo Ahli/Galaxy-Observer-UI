@@ -162,17 +162,8 @@ public class ProgressController {
 		return null;
 	}
 	
-	private static final class CloseThreadlogTabAction implements EventHandler<ActionEvent> {
-		private final Tab tab;
-		private final ErrorTabController controller;
-		private final ProgressController progressController;
-		
-		private CloseThreadlogTabAction(
-				final Tab tab, final ErrorTabController controller, final ProgressController progressController) {
-			this.tab = tab;
-			this.controller = controller;
-			this.progressController = progressController;
-		}
+	private record CloseThreadlogTabAction(Tab tab, ErrorTabController controller,
+	                                       ProgressController progressController) implements EventHandler<ActionEvent> {
 		
 		@Override
 		public void handle(final ActionEvent event) {

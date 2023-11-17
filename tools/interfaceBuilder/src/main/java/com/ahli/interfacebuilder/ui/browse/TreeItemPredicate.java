@@ -3,8 +3,6 @@
 
 package com.ahli.interfacebuilder.ui.browse;
 
-import javafx.scene.control.TreeItem;
-
 import java.util.function.Predicate;
 
 @FunctionalInterface
@@ -19,13 +17,11 @@ public interface TreeItemPredicate<T> {
 	/**
 	 * Evaluates this predicate on the given argument.
 	 *
-	 * @param parent
-	 * 		the parent tree item of the element or null if there is no parent
 	 * @param value
 	 * 		the value to be tested
 	 * @return {@code true} if the input argument matches the predicate,otherwise {@code false}
 	 */
-	boolean test(TreeItem<T> parent, T value);
+	boolean test(T value);
 	
 	/**
 	 * TreeItemPredicate implementation for Utility method
@@ -40,7 +36,7 @@ public interface TreeItemPredicate<T> {
 		}
 		
 		@Override
-		public boolean test(final TreeItem<T> parent, final T value) {
+		public boolean test(final T value) {
 			return predicate.test(value);
 		}
 	}
