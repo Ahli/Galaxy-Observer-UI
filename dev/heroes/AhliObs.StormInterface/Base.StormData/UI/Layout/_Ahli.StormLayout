@@ -1675,6 +1675,148 @@
 		</StateGroup>
 	</Frame>
 	
+	<!-- FIX: Battlefield of Eternity - during red vision, immortal colors are wrong -->
+	<Frame type="Frame" name="BossDuelPanel" file="BossDuel">
+		
+		<Frame type="Frame" name="BossLaningFrame">
+			
+			<Frame type="Image" name="EnemyDemonHud2" template="BossDuel/BossDuelPanel/BossLaningFrame/EnemyDemonHud">
+				<Visible val="false"/>
+			</Frame>
+			<Frame type="Image" name="AllyAngelHud2" template="BossDuel/BossDuelPanel/BossLaningFrame/AllyAngelHud">
+				<Visible val="false"/>
+			</Frame>
+			
+			<Frame type="Image" name="AllyDemonHud">
+				<RenderType val="Offscreen"/>
+			</Frame>
+			<Frame type="Image" name="EnemyDemonHud">
+				<RenderType val="Offscreen"/>
+			</Frame>
+			<Frame type="Image" name="AllyAngelHud">
+				<RenderType val="Offscreen"/>
+			</Frame>
+			<Frame type="Image" name="EnemyAngelHud">
+				<RenderType val="Offscreen"/>
+			</Frame>
+			
+			<StateGroup name="FixDemon">
+				<State name="Fix">
+					<When type="Property" frame="$parent" visible="true"/>
+					<When type="Property" frame="AllyDemonHud" alpha="255"/>
+					<When type="Property" frame="EnemyDemonHud2" visible="false"/>
+					<Action type="SetProperty" frame="EnemyDemonHud2" visible="true"/>
+				</State>
+			</StateGroup>
+			<StateGroup name="FixAngel">
+				<State name="Fix">
+					<When type="Property" frame="$parent" visible="true"/>
+					<When type="Property" frame="EnemyAngelHud" alpha="255"/>
+					<When type="Property" frame="AllyAngelHud2" visible="false"/>
+					<Action type="SetProperty" frame="AllyAngelHud2" visible="true"/>
+				</State>
+			</StateGroup>
+			<StateGroup name="CorrectDemon">
+				<State name="Correct">
+					<When type="Property" frame="$parent" visible="true"/>
+					<When type="Property" frame="EnemyDemonHud" alpha="255"/>
+					<When type="Property" frame="EnemyDemonHud2" visible="false"/>
+					<Action type="SetProperty" frame="EnemyDemonHud2" visible="true"/>
+				</State>
+			</StateGroup>
+			<StateGroup name="CorrectAngel">
+				<State name="Correct">
+					<When type="Property" frame="$parent" visible="true"/>
+					<When type="Property" frame="AllyAngelHud" alpha="255"/>
+					<When type="Property" frame="AllyAngelHud2" visible="false"/>
+					<Action type="SetProperty" frame="AllyAngelHud2" visible="true"/>
+				</State>
+			</StateGroup>
+			
+			<!-- fix health bar being behind immortal image -->
+			<Frame type="UnitStatusFrame" name="BossLaningHealthBar">
+				<Anchor side="Right" relative="$parent/AllyDemonHud" pos="Min" offset="14"/>
+			</Frame>
+		</Frame>
+
+		<!-- Fix: keep BossDuellRightFrame hidden in favor of BossDuelLeftFrame -->
+		<Frame type="Frame" name="BossDuelRightFrame">
+			<Animation name="KeepHidden">
+				<Event event="OnShown" action="Reset,Play"/>
+				<Controller type="Visibility" end="Pause">
+					<Key type="Bool" time="0" value="false"/>
+				</Controller>
+				<Controller type="Visibility" frame="$parent/BossDuelLeftFrame" end="Pause">
+					<Key type="Bool" time="0" value="true"/>
+				</Controller>
+			</Animation>
+		</Frame>
+		<Frame type="Frame" name="BossDuelLeftFrame">
+			<!-- FIX: avoid playing delayed slash animations/persistent ones -->
+			<Frame type="Frame" name="RightSlashAnimation">
+				<Animation name="BossDefeated">
+					<Event event="OnShown" action="Reset,Stop"/>
+				</Animation>
+				<Frame type="Image" name="EnemyBossHudLeftSlash1">
+					<Animation name="BossDefeated">
+						<Event event="OnShown" action="Reset,Stop"/>
+					</Animation>
+				</Frame>
+				<Frame type="Image" name="EnemyBossHudLeftSlash2">
+					<Animation name="BossDefeated">
+						<Event event="OnShown" action="Reset,Stop"/>
+					</Animation>
+				</Frame>
+			</Frame>
+			<Frame type="Frame" name="LeftSlashAnimation">
+				<Animation name="BossDefeated">
+					<Event event="OnShown" action="Reset,Stop"/>
+				</Animation>
+				<Frame type="Image" name="EnemyBossHudLeftSlash1">
+					<Animation name="BossDefeated">
+						<Event event="OnShown" action="Reset,Stop"/>
+					</Animation>
+				</Frame>
+				<Frame type="Image" name="EnemyBossHudLeftSlash2">
+					<Animation name="BossDefeated">
+						<Event event="OnShown" action="Reset,Stop"/>
+					</Animation>
+				</Frame>
+			</Frame>
+			<Frame type="Image" name="BossHudLeft">
+				<Animation name="LeftBossDefeated">
+					<Event event="OnShown" action="Reset,Stop"/>
+				</Animation>
+			</Frame>
+			<Frame type="Image" name="BossHudRight">
+				<Animation name="LeftBossDefeated">
+					<Event event="OnShown" action="Reset,Stop"/>
+				</Animation>
+			</Frame>
+
+			<!-- FIX: colorblind color on health labels before death -->
+			<Frame type="UnitStatusFrame" name="AllyBossHealthBar">
+				<Frame type="UnitStatusHealthLabel" name="HealthLabel">
+					<Frame type="Label" name="StatusLabel">
+						<GlowColor val="{$GameUI/TeamOrderColors/@Color}"/>
+						<ColorAdjustMode val="Colorize"/>
+						<LightAdjustColor val="#ColorWhite"/>
+						<DarkAdjustColor val="{$GameUI/TeamOrderColors/@Color}"/>
+					</Frame>
+				</Frame>
+			</Frame>
+			<Frame type="UnitStatusFrame" name="EnemyBossHealthBar">
+				<Frame type="UnitStatusHealthLabel" name="HealthLabel">
+					<Frame type="Label" name="StatusLabel">
+						<GlowColor val="{$GameUI/TeamChaosColors/@Color}"/>
+						<ColorAdjustMode val="Colorize"/>
+						<LightAdjustColor val="#ColorWhite"/>
+						<DarkAdjustColor val="{$GameUI/TeamChaosColors/@Color}"/>
+					</Frame>
+				</Frame>
+			</Frame>
+		</Frame>
+	</Frame>
 	
 	<!-- FIX: KillLog colors on player vision changes -->
 	<!-- TODO selected-unit-player-vision-support, non 5vs5 -->
