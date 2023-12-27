@@ -28,7 +28,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "rule_set")
-public final class RuleSet implements Serializable {
+public class RuleSet implements Serializable {
 	
 	@Serial
 	private static final long serialVersionUID = -8442665535029507145L;
@@ -36,6 +36,7 @@ public final class RuleSet implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "id", nullable = false)
+	@Getter
 	private Long id;
 	
 	@Transient
@@ -89,7 +90,7 @@ public final class RuleSet implements Serializable {
 		}
 		final RuleSet ruleSet = (RuleSet) o;
 		// only compare primary keys
-		return Objects.equals(id, ruleSet.id);
+		return Objects.equals(getId(), ruleSet.getId());
 	}
 	
 	@Override

@@ -14,6 +14,7 @@ class ProjectEntityTest {
 		EqualsVerifier.forClass(ProjectEntity.class)
 				.suppress(Warning.STRICT_HASHCODE)
 				.suppress(Warning.SURROGATE_KEY)
+				.usingGetClass()
 				.verify();
 	}
 }

@@ -41,7 +41,7 @@ import java.util.Objects;
 @ToString
 @Builder
 @AllArgsConstructor
-public final class ProjectEntity implements Serializable {
+public class ProjectEntity implements Serializable {
 	
 	@Serial
 	private static final long serialVersionUID = -7732465886025160494L;
@@ -117,7 +117,7 @@ public final class ProjectEntity implements Serializable {
 		}
 		final ProjectEntity that = (ProjectEntity) o;
 		// only compare primary keys
-		return Objects.equals(id, that.id);
+		return Objects.equals(getId(), that.getId());
 	}
 	
 	@Override

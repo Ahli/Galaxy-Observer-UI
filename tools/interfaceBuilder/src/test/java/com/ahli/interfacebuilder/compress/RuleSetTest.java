@@ -14,6 +14,7 @@ class RuleSetTest {
 		EqualsVerifier.forClass(RuleSet.class)
 				.suppress(Warning.STRICT_HASHCODE)
 				.suppress(Warning.SURROGATE_KEY)
+				.usingGetClass()
 				.verify();
 	}
 }
