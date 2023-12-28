@@ -1375,28 +1375,22 @@
 			<Frame type="Frame" name="ImageMaskFrame">
 				<AlphaMaskSiblings val="false"/>
 			</Frame>
-			<!-- TODO use tracked frames in case that is benefitial -->
-			<!-- TODO heath bar per viking? -->
-			<!-- TODO additional one for misha? -->
-			<!-- TODO selection fix for vikings? dva first spawn? -->
+			<!-- TODO selection fix for vikings? dva? -->
+			
 			<StateGroup name="HeightOverride">
 				<State name="Default">
-					<Action type="SetProperty" frame="$this/VikingTrackingElement/TrackedUnitStatusFrame0" Visible="False"/>
-					<Action type="SetProperty" frame="$this/VikingTrackingElement/TrackedUnitStatusFrame1" Visible="False"/>
-					<Action type="SetProperty" frame="$this/VikingTrackingElement/TrackedUnitStatusFrame2" Visible="False"/>
-					<Action type="SetProperty" frame="$this/RexxarTrackingElement/TrackedUnitStatusFrame0" Visible="False"/>
+					<When type="Property" frame="$this/RexxarTrackingElement" Visible="False"/>
+					<When type="Property" frame="$this/VikingTrackingElement" Visible="False"/>
+					<Action type="SetProperty" frame="$this/HealthBar" Visible="True"/>
 				</State>
 				<State name="Present">
-					<Action type="SetProperty" frame="$this/VikingTrackingElement/TrackedUnitStatusFrame0" Visible="False"/>
-					<Action type="SetProperty" frame="$this/VikingTrackingElement/TrackedUnitStatusFrame1" Visible="False"/>
-					<Action type="SetProperty" frame="$this/VikingTrackingElement/TrackedUnitStatusFrame2" Visible="False"/>
-					<Action type="SetProperty" frame="$this/RexxarTrackingElement/TrackedUnitStatusFrame0" Visible="False"/>
+					<When type="Property" frame="$this/RexxarTrackingElement" Visible="True"/>
+					<Action type="SetAnchor" frame="$this/HealthBar" side="Right" relative="$parent" pos="0.66" offset="0"/>
 				</State>
 				<State name="Vikings">
-					<Action type="SetProperty" frame="$this/VikingTrackingElement/TrackedUnitStatusFrame0" Visible="False"/>
-					<Action type="SetProperty" frame="$this/VikingTrackingElement/TrackedUnitStatusFrame1" Visible="False"/>
-					<Action type="SetProperty" frame="$this/VikingTrackingElement/TrackedUnitStatusFrame2" Visible="False"/>
-					<Action type="SetProperty" frame="$this/RexxarTrackingElement/TrackedUnitStatusFrame0" Visible="False"/>
+					<When type="Property" frame="$this/VikingTrackingElement" Visible="True"/>
+					<Action type="SetProperty" frame="$this/HealthBar" RenderType="Offscreen"/>
+					<Action type="SetProperty" frame="$this/HealthBarBg" Visible="false"/>
 				</State>
 			</StateGroup>
 			
@@ -1581,6 +1575,239 @@
 				
 			</Frame>
 
+			<!-- Viking health bars -->
+			<Frame type="UnitStatusUnitTrackingBehavior" name="VikingTrackingElement">
+				<Anchor relative="$parent/HealthBar"/>
+				<Height val="7"/>
+				<Width val="0"/>
+				
+				<Frame type="UnitStatusFrame" name="TrackedUnitStatusFrame0">
+					<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+					<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+					<Anchor side="Right" relative="$parent" pos="0.33" offset="0"/>
+					
+					<Frame type="UnitStatusShieldedHealthBar" name="HealthBar">
+						<ReductionShown val="true"/>
+						<BarCount val="5"/>
+						<DisplayFlags val="Health | HealthDoT | Shields | ShieldsDoT | HoT"/>
+						<ColorStyle val="ObserverPanelCoreHealth" index="0"/>
+						<ReductionColor val="#ReductionColor" index="0"/>
+						<IncreaseDuration val="#LifeIncreaseDuration" index="0"/>
+						<DecreaseDuration val="#LifeLossDuration" index="0"/>
+						<ApplyToTotal val="True" index="0"/>
+						<ColorStyle val="DoT" index="1"/>
+						<ReductionShown val="false" index="1"/>
+						<DecreaseDuration val="0" index="1"/>
+						<IncreaseDuration val="0" index="1"/>
+						<ApplyToTotal val="False" index="1"/>
+						<ColorStyle val="Shields" index="2"/>
+						<ReductionShown val="true" index="2"/>
+						<IncreaseDuration val="#LifeIncreaseDuration" index="2"/>
+						<DecreaseDuration val="#LifeLossDuration" index="2"/>
+						<ReductionColor val="109, 255, 255" index="2"/>
+						<ApplyToTotal val="False" index="2"/>
+						<ColorStyle val="ShieldsDoT" index="3"/>
+						<ReductionShown val="false" index="3"/>
+						<DecreaseDuration val="0" index="3"/>
+						<IncreaseDuration val="0" index="3"/>
+						<ApplyToTotal val="False" index="3"/>
+						<ColorStyle val="HoT" index="4"/>
+						<ReductionShown val="true" index="4"/>
+						<IncreaseDuration val="0" index="4"/>
+						<ApplyToTotal val="False" index="4"/>
+						<AlphaMaskTexture val="@UI/obs_bar_player_blue"/>
+					</Frame>
+					<Frame type="Image" name="HealthBarBg">
+						<Anchor relative="$parent/HealthBar"/>
+						<Texture val="@UI/HUD_Bar_Nameplate_Generic"/>
+						<AlphaMaskTexture val="@UI/obs_bar_player_blue"/>
+						<Color val="40,40,40"/>
+						<RenderPriority val="500"/>
+					</Frame>
+
+					<StateGroup name="Position">
+						<State name="Erik">
+							<When type="Property" frame="$this" unit="HeroErik"/>
+							<Action type="SetAnchor" frame="$this" side="Left" relative="$parent" pos="0.34" offset="0"/>
+							<Action type="SetAnchor" frame="$this" side="Right" relative="$parent" pos="0.66" offset="0"/>
+						</State>
+						<State name="Olaf">
+							<When type="Property" frame="$this" unit="HeroOlaf"/>
+							<Action type="SetAnchor" frame="$this" side="Left" relative="$parent" pos="0.67" offset="0"/>
+							<Action type="SetAnchor" frame="$this" side="Right" relative="$parent" pos="Max" offset="0"/>
+						</State>
+					</StateGroup>
+				</Frame>
+				<Frame type="UnitStatusFrame" name="TrackedUnitStatusFrame1">
+					<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+					<Anchor side="Left" relative="$parent" pos="0.34" offset="0"/>
+					<Anchor side="Right" relative="$parent" pos="0.66" offset="0"/>
+					
+					<Frame type="UnitStatusShieldedHealthBar" name="HealthBar">
+						<ReductionShown val="true"/>
+						<BarCount val="5"/>
+						<DisplayFlags val="Health | HealthDoT | Shields | ShieldsDoT | HoT"/>
+						<ColorStyle val="ObserverPanelCoreHealth" index="0"/>
+						<ReductionColor val="#ReductionColor" index="0"/>
+						<IncreaseDuration val="#LifeIncreaseDuration" index="0"/>
+						<DecreaseDuration val="#LifeLossDuration" index="0"/>
+						<ApplyToTotal val="True" index="0"/>
+						<ColorStyle val="DoT" index="1"/>
+						<ReductionShown val="false" index="1"/>
+						<DecreaseDuration val="0" index="1"/>
+						<IncreaseDuration val="0" index="1"/>
+						<ApplyToTotal val="False" index="1"/>
+						<ColorStyle val="Shields" index="2"/>
+						<ReductionShown val="true" index="2"/>
+						<IncreaseDuration val="#LifeIncreaseDuration" index="2"/>
+						<DecreaseDuration val="#LifeLossDuration" index="2"/>
+						<ReductionColor val="109, 255, 255" index="2"/>
+						<ApplyToTotal val="False" index="2"/>
+						<ColorStyle val="ShieldsDoT" index="3"/>
+						<ReductionShown val="false" index="3"/>
+						<DecreaseDuration val="0" index="3"/>
+						<IncreaseDuration val="0" index="3"/>
+						<ApplyToTotal val="False" index="3"/>
+						<ColorStyle val="HoT" index="4"/>
+						<ReductionShown val="true" index="4"/>
+						<IncreaseDuration val="0" index="4"/>
+						<ApplyToTotal val="False" index="4"/>
+						<AlphaMaskTexture val="@UI/obs_bar_player_blue"/>
+					</Frame>
+					<Frame type="Image" name="HealthBarBg">
+						<Anchor relative="$parent/HealthBar"/>
+						<Texture val="@UI/HUD_Bar_Nameplate_Generic"/>
+						<AlphaMaskTexture val="@UI/obs_bar_player_blue"/>
+						<Color val="40,40,40"/>
+						<RenderPriority val="500"/>
+					</Frame>
+
+					<StateGroup name="Position">
+						<State name="Baleog">
+							<When type="Property" frame="$this" unit="HeroBaleog"/>
+							<Action type="SetAnchor" frame="$this" side="Left" relative="$parent" pos="Min" offset="0"/>
+							<Action type="SetAnchor" frame="$this" side="Right" relative="$parent" pos="0.33" offset="0"/>
+						</State>
+						<State name="Olaf">
+							<When type="Property" frame="$this" unit="HeroOlaf"/>
+							<Action type="SetAnchor" frame="$this" side="Left" relative="$parent" pos="0.67" offset="0"/>
+							<Action type="SetAnchor" frame="$this" side="Right" relative="$parent" pos="Max" offset="0"/>
+						</State>
+					</StateGroup>
+				</Frame>
+				<Frame type="UnitStatusFrame" name="TrackedUnitStatusFrame2">
+					<Anchor side="Top" relative="$parent" pos="Min" offset="0"/>
+					<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+					<Anchor side="Left" relative="$parent" pos="0.67" offset="0"/>
+					<Anchor side="Right" relative="$parent" pos="Max" offset="0"/>
+					
+					<Frame type="UnitStatusShieldedHealthBar" name="HealthBar">
+						<ReductionShown val="true"/>
+						<BarCount val="5"/>
+						<DisplayFlags val="Health | HealthDoT | Shields | ShieldsDoT | HoT"/>
+						<ColorStyle val="ObserverPanelCoreHealth" index="0"/>
+						<ReductionColor val="#ReductionColor" index="0"/>
+						<IncreaseDuration val="#LifeIncreaseDuration" index="0"/>
+						<DecreaseDuration val="#LifeLossDuration" index="0"/>
+						<ApplyToTotal val="True" index="0"/>
+						<ColorStyle val="DoT" index="1"/>
+						<ReductionShown val="false" index="1"/>
+						<DecreaseDuration val="0" index="1"/>
+						<IncreaseDuration val="0" index="1"/>
+						<ApplyToTotal val="False" index="1"/>
+						<ColorStyle val="Shields" index="2"/>
+						<ReductionShown val="true" index="2"/>
+						<IncreaseDuration val="#LifeIncreaseDuration" index="2"/>
+						<DecreaseDuration val="#LifeLossDuration" index="2"/>
+						<ReductionColor val="109, 255, 255" index="2"/>
+						<ApplyToTotal val="False" index="2"/>
+						<ColorStyle val="ShieldsDoT" index="3"/>
+						<ReductionShown val="false" index="3"/>
+						<DecreaseDuration val="0" index="3"/>
+						<IncreaseDuration val="0" index="3"/>
+						<ApplyToTotal val="False" index="3"/>
+						<ColorStyle val="HoT" index="4"/>
+						<ReductionShown val="true" index="4"/>
+						<IncreaseDuration val="0" index="4"/>
+						<ApplyToTotal val="False" index="4"/>
+						<AlphaMaskTexture val="@UI/obs_bar_player_blue"/>
+					</Frame>
+					<Frame type="Image" name="HealthBarBg">
+						<Anchor relative="$parent/HealthBar"/>
+						<Texture val="@UI/HUD_Bar_Nameplate_Generic"/>
+						<AlphaMaskTexture val="@UI/obs_bar_player_blue"/>
+						<Color val="40,40,40"/>
+						<RenderPriority val="500"/>
+					</Frame>
+
+					<StateGroup name="Position">
+						<State name="Baleog">
+							<When type="Property" frame="$this" unit="HeroBaleog"/>
+							<Action type="SetAnchor" frame="$this" side="Left" relative="$parent" pos="Min" offset="0"/>
+							<Action type="SetAnchor" frame="$this" side="Right" relative="$parent" pos="0.33" offset="0"/>
+						</State>
+						<State name="Erik">
+							<When type="Property" frame="$this" unit="HeroErik"/>
+							<Action type="SetAnchor" frame="$this" side="Left" relative="$parent" pos="0.34" offset="0"/>
+							<Action type="SetAnchor" frame="$this" side="Right" relative="$parent" pos="0.66" offset="0"/>
+						</State>
+					</StateGroup>
+				</Frame>
+			</Frame>
+			
+			<!-- Misha health bar -->
+			<Frame type="UnitStatusUnitTrackingBehavior" name="RexxarTrackingElement">
+				<Anchor side="Top" relative="$parent" pos="Min" offset="-1"/>
+				<Anchor side="Right" relative="$parent" pos="Max" offset="-4"/>
+				<Anchor side="Left" relative="$parent" pos="0.67" offset="0"/>
+				<Anchor side="Bottom" relative="$this" pos="Max" offset="0"/>
+				<Height val="7"/>
+				<Width val="0"/>
+				
+				<Frame type="UnitStatusFrame" name="TrackedUnitStatusFrame0">
+					<Frame type="UnitStatusShieldedHealthBar" name="HealthBar">
+						<ReductionShown val="true"/>
+						<BarCount val="5"/>
+						<DisplayFlags val="Health | HealthDoT | Shields | ShieldsDoT | HoT"/>
+						<ColorStyle val="ObserverPanelCoreHealth" index="0"/>
+						<ReductionColor val="#ReductionColor" index="0"/>
+						<IncreaseDuration val="#LifeIncreaseDuration" index="0"/>
+						<DecreaseDuration val="#LifeLossDuration" index="0"/>
+						<ApplyToTotal val="True" index="0"/>
+						<ColorStyle val="DoT" index="1"/>
+						<ReductionShown val="false" index="1"/>
+						<DecreaseDuration val="0" index="1"/>
+						<IncreaseDuration val="0" index="1"/>
+						<ApplyToTotal val="False" index="1"/>
+						<ColorStyle val="Shields" index="2"/>
+						<ReductionShown val="true" index="2"/>
+						<IncreaseDuration val="#LifeIncreaseDuration" index="2"/>
+						<DecreaseDuration val="#LifeLossDuration" index="2"/>
+						<ReductionColor val="109, 255, 255" index="2"/>
+						<ApplyToTotal val="False" index="2"/>
+						<ColorStyle val="ShieldsDoT" index="3"/>
+						<ReductionShown val="false" index="3"/>
+						<DecreaseDuration val="0" index="3"/>
+						<IncreaseDuration val="0" index="3"/>
+						<ApplyToTotal val="False" index="3"/>
+						<ColorStyle val="HoT" index="4"/>
+						<ReductionShown val="true" index="4"/>
+						<IncreaseDuration val="0" index="4"/>
+						<ApplyToTotal val="False" index="4"/>
+						<AlphaMaskTexture val="@UI/obs_bar_player_blue"/>
+					</Frame>
+					<Frame type="Image" name="HealthBarBg">
+						<Anchor relative="$parent/HealthBar"/>
+						<Texture val="@UI/HUD_Bar_Nameplate_Generic"/>
+						<AlphaMaskTexture val="@UI/obs_bar_player_blue"/>
+						<Color val="40,40,40"/>
+						<RenderPriority val="500"/>
+					</Frame>
+				</Frame>
+			</Frame>
+			
 		</Frame>
 		
 		<Frame type="UnitTargetFrame" name="TargetHeroUnitFrame">
@@ -2134,6 +2361,43 @@
 			</Frame>
 			<Frame type="Image" name="EnergyBarBg">
 				<AlphaMaskTexture val="@UI/obs_bar_player_red"/>
+			</Frame>
+			
+			<Frame type="UnitStatusUnitTrackingBehavior" name="VikingTrackingElement">
+				<Frame type="UnitStatusFrame" name="TrackedUnitStatusFrame0">
+					<Frame type="UnitStatusShieldedHealthBar" name="HealthBar">
+						<AlphaMaskTexture val="@UI/obs_bar_player_red"/>
+					</Frame>
+					<Frame type="Image" name="HealthBarBg">
+						<AlphaMaskTexture val="@UI/obs_bar_player_red"/>
+					</Frame>
+				</Frame>
+				<Frame type="UnitStatusFrame" name="TrackedUnitStatusFrame1">
+					<Frame type="UnitStatusShieldedHealthBar" name="HealthBar">
+						<AlphaMaskTexture val="@UI/obs_bar_player_red"/>
+					</Frame>
+					<Frame type="Image" name="HealthBarBg">
+						<AlphaMaskTexture val="@UI/obs_bar_player_red"/>
+					</Frame>
+				</Frame>
+				<Frame type="UnitStatusFrame" name="TrackedUnitStatusFrame2">
+					<Frame type="UnitStatusShieldedHealthBar" name="HealthBar">
+						<AlphaMaskTexture val="@UI/obs_bar_player_red"/>
+					</Frame>
+					<Frame type="Image" name="HealthBarBg">
+						<AlphaMaskTexture val="@UI/obs_bar_player_red"/>
+					</Frame>
+				</Frame>
+			</Frame>
+			<Frame type="UnitStatusUnitTrackingBehavior" name="RexxarTrackingElement">
+				<Frame type="UnitStatusFrame" name="TrackedUnitStatusFrame0">
+					<Frame type="UnitStatusShieldedHealthBar" name="HealthBar">
+						<AlphaMaskTexture val="@UI/obs_bar_player_red"/>
+					</Frame>
+					<Frame type="Image" name="HealthBarBg">
+						<AlphaMaskTexture val="@UI/obs_bar_player_red"/>
+					</Frame>
+				</Frame>
 			</Frame>
 		</Frame>
 
