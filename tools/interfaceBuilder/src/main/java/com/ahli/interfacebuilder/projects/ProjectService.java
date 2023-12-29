@@ -11,6 +11,10 @@ import org.hibernate.Hibernate;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.dao.DataAccessException;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -27,9 +31,15 @@ import java.util.List;
 public class ProjectService {
 	private static final String DIRECTORY_SYMBOL = "/";
 	private final ProjectJpaRepository projectRepo;
+	private final PlatformTransactionManager transactionManager;
+	private final DefaultTransactionDefinition readOnlyTransactionDefinition;
 	
-	public ProjectService(final ProjectJpaRepository projectRepo) {
+	public ProjectService(
+			final ProjectJpaRepository projectRepo, final PlatformTransactionManager transactionManager) {
 		this.projectRepo = projectRepo;
+		this.transactionManager = transactionManager;
+		readOnlyTransactionDefinition = new DefaultTransactionDefinition(TransactionDefinition.PROPAGATION_REQUIRED);
+		readOnlyTransactionDefinition.setReadOnly(true);
 	}
 	
 	/**
@@ -118,16 +128,18 @@ public class ProjectService {
 	 * @param project
 	 * @return
 	 */
-	//	@Transactional(readOnly = true)
+	//	@Transactional(readOnly = true) // does not work with java modules => create session manually
 	public RuleSet fetchBestCompressionRuleSet(final Project project) {
+		final TransactionStatus transaction = transactionManager.getTransaction(readOnlyTransactionDefinition);
 		if (project.getBestCompressionRuleSet() == null) {
-			//if (!Hibernate.isInitialized(project.getBestCompressionRuleSet())) {
-			final ProjectEntity projectEntity = projectRepo.getReferenceById(project.getId());
 			try {
+				final ProjectEntity projectEntity = projectRepo.getReferenceById(project.getId());
 				final RuleSet ruleSet = Hibernate.unproxy(projectEntity.getBestCompressionRuleSet(), RuleSet.class);
 				project.setBestCompressionRuleSet(ruleSet);
+				transactionManager.commit(transaction);
 			} catch (final PersistenceException e) {
 				log.error("Error while fetching compression rule set from DB.", e);
+				transactionManager.rollback(transaction);
 			}
 		}
 		return project.getBestCompressionRuleSet();

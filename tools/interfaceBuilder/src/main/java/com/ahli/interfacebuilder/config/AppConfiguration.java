@@ -36,6 +36,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.swing.filechooser.FileSystemView;
 import java.io.File;
@@ -96,9 +97,11 @@ public class AppConfiguration {
 	}
 	
 	@Bean
-	protected ProjectService projectService(final ProjectJpaRepository projectJpaRepository) {
+	protected ProjectService projectService(
+			final ProjectJpaRepository projectJpaRepository,
+			final PlatformTransactionManager platformTransactionManager) {
 		log.debug("init bean: projectService");
-		return new ProjectService(projectJpaRepository);
+		return new ProjectService(projectJpaRepository, platformTransactionManager);
 	}
 	
 	@Bean

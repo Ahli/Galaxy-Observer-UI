@@ -203,7 +203,7 @@ public class CompressionMiningController implements Updateable, FxmlController {
 					updateUiAttemptSize(lastSize, attempts);
 					updateUiRules(comprMiner.getCurrentRules());
 					if (lastSize < bestSize) {
-						if (validateTargetFile(mod, expCompMiner.getMpqInterface())) {
+						if (validateTargetFile(mod, comprMiner.getMpqInterface())) {
 							bestSize = lastSize;
 							log.info("Mined better compression of size {} kb.", lastSize / 1024);
 							//noinspection ObjectAllocationInLoop
