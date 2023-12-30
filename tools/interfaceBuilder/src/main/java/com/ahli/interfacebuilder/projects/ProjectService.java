@@ -141,6 +141,8 @@ public class ProjectService {
 				log.error("Error while fetching compression rule set from DB.", e);
 				transactionManager.rollback(transaction);
 			}
+		} else {
+			transactionManager.commit(transaction);
 		}
 		return project.getBestCompressionRuleSet();
 	}
