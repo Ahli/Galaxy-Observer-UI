@@ -50,15 +50,48 @@ import ahliObs73a from '../../../assets/ahliObs/73a.jpg';
 import ahliObs73b from '../../../assets/ahliObs/73b.jpg';
 import ahliObs74a from '../../../assets/ahliObs/74a.jpg';
 import ahliObs74b from '../../../assets/ahliObs/74b.jpg';
+import ahliObs75 from '../../../assets/ahliObs/75.jpg';
 
 export const ahliObsChangelog: Post[] = [
+  {
+    id: '75',
+    title: '0.75 - Patch Compatibility and Fixes',
+    image: [ahliObs75],
+    createdAt: '2nd January 2024',
+    download: 'https://www.dropbox.com/s/tv931liwl3a3mjs/AhliObs%200.74.StormInterface?dl=1',
+    version: '0.75',
+    date: '2nd January 2024',
+    changes: [
+      new Change('added compatibility with Heroes 2.55.4.91418', [
+        'fixed health bars in top panel being too large',
+        "fixed DVa Mech's energy color in top panel and simplified the detection for all heroes",
+        'added three health bars for Lost Vikings into top panel',
+        "added a second health bar for Rexxar's Misha",
+        "removed now unnecessary workaround for DVa's Mech HP in top panel",
+        "fixed DVa's portrait not displaying her in Mech",
+        new Change("improved Dragon Shire's Dragon Knight UI", [
+          "controller's portrait now looks similar to Volkovskaya's Robot's one",
+          "fixed appearance of Lost Vikings"
+        ])
+      ]),
+      "fixed visual appearance of Maiev's Naisha's Memento button icon in the selected unit's panel",
+      new Change("fixed some issues with Battlefield of Eternity's map objective UI:",[
+          "fixed lane Immortal's health bar starting behind the icon so the last few percentages of life are not visible",
+          "fixed Duel UI swapping positions in red player's vision",
+          "fixed lane Immortal's icon disappearing when switching player vision",
+          'fixed issues with crossout image animations of an earlier duel appearing',
+          'fixed health labels not using colorblind colors when option is enabled'
+      ]),
+      "fixed Sky Temple's shrine icons having wrong color in red player's vision"
+    ],
+  },
   {
     id: '74',
     title: '0.74 - fixes and polish',
     image: [ahliObs74a, ahliObs74b],
     createdAt: '2nd March 2022',
     download: 'https://www.dropbox.com/s/tv931liwl3a3mjs/AhliObs%200.74.StormInterface?dl=1',
-    version: '0.73',
+    version: '0.74',
     date: '2nd March 2022',
     changes: [
       'fixed self healing and heal other stats in bottom panel referencing the damage taken values instead of its actual value',
