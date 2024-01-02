@@ -58,7 +58,7 @@ export const ahliObsChangelog: Post[] = [
     title: '0.75 - Patch Compatibility and Fixes',
     image: [ahliObs75],
     createdAt: '2nd January 2024',
-    download: 'https://www.dropbox.com/s/tv931liwl3a3mjs/AhliObs%200.74.StormInterface?dl=1',
+    download: 'https://www.dropbox.com/scl/fi/5fuwxl26ttl9e2dy5tmtj/AhliObs-0.75.StormInterface?rlkey=bco85hmdb87011frvkp4yursr&dl=1',
     version: '0.75',
     date: '2nd January 2024',
     changes: [
