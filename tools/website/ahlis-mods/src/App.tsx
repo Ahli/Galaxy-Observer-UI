@@ -13,6 +13,7 @@ import { HtmlPage } from './pages/HtmlPage';
 import { ahliObsShortcuts } from './content/ahliObs/shortcuts/ahliObsShortcuts';
 import { heroesSettings } from './content/heroes/settings';
 import { sc2logosMod } from './content/sc2/LogosMod';
+import ScrollToTop from './components/navigation/ScrollToTop';
 
 const darkTheme = createTheme({
   palette: {
@@ -25,6 +26,7 @@ function App() {
     <div className='App'>
       <ThemeProvider theme={darkTheme}>
         <Router>
+          <ScrollToTop />
           <Navbar />
           <div style={{ marginLeft: navBarWidth + 'px' }}>
             <Routes>
