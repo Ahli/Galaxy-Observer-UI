@@ -134,10 +134,20 @@ public class MpqBuilderService {
 	 * Schedules a task to build the mpq archive file for a project.
 	 *
 	 * @param project
+	 * @param useCmdLineSettings - use command line settings or ini settings for compression, verification, etc
 	 */
 	public void build(@NonNull final Project project, final boolean useCmdLineSettings) {
 		final BuildTask task = new BuildTask(executor, project, useCmdLineSettings, this, baseUiService);
 		executor.execute(task);
+	}
+	
+	/**
+	 * Schedules a task to build the mpq archive file for a project.
+	 *
+	 * @param project
+	 */
+	public void build(@NonNull final Project project) {
+		build(project, false);
 	}
 	
 	/**
@@ -187,9 +197,7 @@ public class MpqBuilderService {
 		// create tasks for the worker pool
 		try {
 			if (primaryStage.hasPrimaryStage()) {
-				progressController.addThreadlogTab(Thread.currentThread().getName(),
-						interfaceDirectory.getFileName().toString(),
-						true);
+				progressController.addBuildTab(Thread.currentThread().getName(), project,true);
 			}
 			// create unique cache path
 			final MpqEditorInterface threadsMpqInterface = new MpqEditorInterface(configService.getMpqCachePath()

@@ -27,6 +27,7 @@ public final class ErrorTabController {
 	@Getter
 	private final TextFlow textArea;
 	private boolean encounteredError;
+	@Getter
 	private boolean running;
 	private boolean encounteredWarning;
 	private State state = State.NOT_STARTED;

@@ -32,6 +32,7 @@ import com.ahli.interfacebuilder.ui.progress.TabPaneController;
 import com.ahli.mpq.MpqEditorInterface;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -111,9 +112,10 @@ public class AppConfiguration {
 	}
 	
 	@Bean
-	protected ProgressController progressController(final TabPaneController tabPaneController) {
+	protected ProgressController progressController(
+			final TabPaneController tabPaneController, final ApplicationContext appContext) {
 		log.debug("init bean: progressController");
-		return new ProgressController(tabPaneController);
+		return new ProgressController(tabPaneController, appContext);
 	}
 	
 	@Bean

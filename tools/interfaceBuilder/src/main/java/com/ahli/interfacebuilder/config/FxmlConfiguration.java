@@ -21,6 +21,7 @@ import com.ahli.interfacebuilder.ui.home.NewProjectDialogController;
 import com.ahli.interfacebuilder.ui.home.ViewRuleSetController;
 import com.ahli.interfacebuilder.ui.navigation.NavigationController;
 import com.ahli.interfacebuilder.ui.progress.BaseUiExtractionController;
+import com.ahli.interfacebuilder.ui.progress.BuildUiController;
 import com.ahli.interfacebuilder.ui.progress.CompressionMiningController;
 import com.ahli.interfacebuilder.ui.progress.ProgressController;
 import com.ahli.interfacebuilder.ui.progress.TabPaneController;
@@ -190,5 +191,11 @@ public class FxmlConfiguration {
 			final NavigationController navigationController,
 			final CleaningForkJoinPool executor) {
 		return new BaseUiExtractionController(baseUiService, gameServic, navigationController, executor);
+	}
+	
+	@Bean
+	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+	protected BuildUiController buildUiController(final MpqBuilderService mpqBuilderService) {
+		return new BuildUiController(mpqBuilderService);
 	}
 }
