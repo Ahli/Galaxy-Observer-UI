@@ -152,7 +152,7 @@ public final class StylizedTextAreaAppender extends AbstractAppender {
 	 * Unregisters a specified ErrorTabController.
 	 */
 	public static void unregister(final ErrorTabController controller) {
-		final var keys = workerTaskControllers.keySet().toArray(new String[0]);
+		final var keys = workerTaskControllers.keySet();
 		for (final String key : keys) {
 			final ErrorTabController curController = workerTaskControllers.get(key);
 			if (curController == controller) {
