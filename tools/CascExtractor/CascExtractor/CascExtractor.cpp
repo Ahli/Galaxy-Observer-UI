@@ -320,7 +320,7 @@ static bool ExtractFile(HANDLE hStorage, const CASC_FIND_DATA& findData, const c
 
 			//std::cout << "totalWritten: " << totalWritten << std::endl;
 		}
-		else if (dwErrCode == ERROR_SUCCESS) {
+		else {
 			std::cerr << "   WARNING: file had no content: " << szOpenName << std::endl;
 			dwErrCode = ERROR_NO_DATA;
 		}
