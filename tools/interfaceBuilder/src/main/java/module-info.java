@@ -22,6 +22,7 @@ module interfacex.builder {
 	requires org.apache.commons.configuration2; // automatic module
 	requires org.apache.logging.log4j;
 	requires org.apache.logging.log4j.core; // automatic module
+	requires com.lmax.disruptor;
 	requires transitive com.esotericsoftware.kryo; // automatic module
 	requires com.kichik.pecoff4j;
 	requires org.eclipse.collections.impl; // automatic module
