@@ -29,6 +29,7 @@ import com.kichik.pecoff4j.constant.ResourceType;
 import com.kichik.pecoff4j.io.DataReader;
 import com.kichik.pecoff4j.io.PEParser;
 import com.kichik.pecoff4j.resources.StringFileInfo;
+import com.kichik.pecoff4j.resources.StringPair;
 import com.kichik.pecoff4j.resources.StringTable;
 import com.kichik.pecoff4j.resources.VersionInfo;
 import com.kichik.pecoff4j.util.ResourceHelper;
@@ -184,12 +185,12 @@ public class BaseUiService {
 				@SuppressWarnings("ObjectAllocationInLoop")
 				final VersionInfo version = VersionInfo.read(new DataReader(data));
 				
-				final StringFileInfo strings = version.getStringFileInfo();
-				final StringTable table = strings.getTable(0);
-				for (int j = 0; j < table.getCount(); ++j) {
-					final String key = table.getString(j).getKey();
+				final StringFileInfo fileInfo = version.getStringFileInfo();
+				final StringTable table = fileInfo.getTable(0);
+				for (final StringPair string : table.getStrings()) {
+					final String key = string.getKey();
 					if ("FileVersion".equals(key)) {
-						final String value = table.getString(j).getValue();
+						final String value = string.getValue();
 						log.trace("found FileVersion={}", value);
 						
 						final String[] parts = value.split("\\.");
@@ -361,7 +362,7 @@ public class BaseUiService {
 					log.info(msg);
 					primaryStage.printInfoLogMessageToGeneral(msg);
 					try {
-						int[] version = getVersion(game.getGameDef(), isPtr);
+						final int[] version = getVersion(game.getGameDef(), isPtr);
 						if (version != null) {
 							discCacheService.put(uiCatalog, gameName, isPtr, getVersion(game.getGameDef(), isPtr));
 						}
@@ -446,7 +447,7 @@ public class BaseUiService {
 	/**
 	 * @return
 	 */
-	public boolean isPtrActive(GameDef gameDef) {
+	public boolean isPtrActive(final GameDef gameDef) {
 		final Path baseUiMetaFileDir = configService.getBaseUiPath(gameDef);
 		try {
 			final KryoGameInfo baseUiInfo = readMetaFile(baseUiMetaFileDir);

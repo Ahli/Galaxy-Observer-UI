@@ -147,7 +147,7 @@ public final class XmlCompressorDom {
 				
 				doc = dBuilder.parse(is);
 				
-			} catch (final SAXParseException ignored) {
+			} catch (final SAXParseException _) {
 				return FileVisitResult.CONTINUE;
 			} catch (final IOException | SAXException e) {
 				logger.trace("Error while compressing xml.", e);

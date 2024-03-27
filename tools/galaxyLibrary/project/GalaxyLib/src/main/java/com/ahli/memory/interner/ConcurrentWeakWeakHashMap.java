@@ -64,6 +64,7 @@ public class ConcurrentWeakWeakHashMap<K> implements ConcurrentMap<K, K> {
 	
 	/**
 	 * Removes GC-collected keys.
+	 *
 	 * @return whether keys were removed or not
 	 */
 	public boolean purgeKeys() {
@@ -122,7 +123,7 @@ public class ConcurrentWeakWeakHashMap<K> implements ConcurrentMap<K, K> {
 		try {
 			//noinspection unchecked
 			return map.containsValue(new WeakReferenceWithHash<>((K) value, queue));
-		} catch (final ClassCastException ignored) {
+		} catch (final ClassCastException _) {
 			return false;
 		}
 	}

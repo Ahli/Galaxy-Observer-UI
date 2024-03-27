@@ -70,7 +70,7 @@ public class JavafxApplication extends Application {
 					}
 				}
 			}
-		} catch (final NumberFormatException ignored) {
+		} catch (final NumberFormatException _) {
 			// ignored
 		}
 		log.error("Failed to find IpcServerThread of id: {}", id);
