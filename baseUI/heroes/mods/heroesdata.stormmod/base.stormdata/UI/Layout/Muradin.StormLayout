@@ -56,4 +56,59 @@
             </Frame>
         </Frame>
     </Frame>
+	
+	<Frame type="SelectionUnitStatusPanel" name="MuradinFrame">
+		<Anchor side="Bottom" relative="$parent" pos="Max" offset="0"/>
+		<Anchor side="Left" relative="$parent" pos="Min" offset="0"/>
+		<Height val="137"/>
+		<Width val="300"/>
+		<SpecificUnit val="HeroMuradin"/>
+		
+		<Frame type="UnitStatusFrame" name="UnitStatusFrame0">
+			<Anchor relative="$parent"/>
+			
+			<Frame type="UnitStatusValidatorAnimElement" name="HealthIndicatorVisibility">
+				<Anchor relative="$parent"/>
+				<Validator val="HasMuradinCombatStyleThirdWind"/>
+			</Frame>
+			
+			<Frame type="UnitStatusValidatorAnimElement" name="HealthIndicatorTexture">
+				<Anchor relative="$parent"/>
+				<Validator val="IsDead"/>
+				<Validator val="MuradinSecondWindImprovedLifeValidator"/>
+				<Animation name="IsDead">
+					<Event event="Reset" action="Stop"/>
+					<Event event="NoState" action="Stop"/>
+					<Event event="IsDead" action="Restart, Play"/>
+				</Animation>
+				<Animation name="MuradinSecondWindImprovedLifeValidator">
+					<Event event="Reset" action="Stop"/>
+					<Event event="NoState" action="Stop"/>
+					<Event event="MuradinSecondWindImprovedLifeValidator" action="Restart, Play"/>
+				</Animation>
+			</Frame>
+		</Frame>
+		
+		<StateGroup name="FrameState">
+			<DefaultState val="GT60"/>
+			
+			<State name="GT60">
+				<When type="AnimationState" frame="UnitStatusFrame0/HealthIndicatorTexture" operator="NotEqual" UnitStatusValidatorState="MuradinSecondWindImprovedLifeValidator"/>
+				<Action type="SetProperty" frame="HealthIndicator" Texture="@UI/HeroConsole/Hero/HealthIndicatorDead"/>
+			</State>
+			
+			<State name="LE60">
+				<When type="AnimationState" frame="UnitStatusFrame0/HealthIndicatorTexture" UnitStatusValidatorState="MuradinSecondWindImprovedLifeValidator"/>
+				<Action type="SetProperty" frame="HealthIndicator" Texture="@UI/HeroConsole/Hero/HealthIndicator"/>
+			</State>
+		</StateGroup>
+		
+		<Frame type="Image" name="HealthIndicator">
+			<Anchor side="Bottom" relative="$parent/$parent/$parent/HeroConsolePanel/HeroStatsFrame/HeroUnitStatusFrame/HealthBar" pos="Mid" offset="9"/>
+			<Anchor side="Left" relative="$parent/$parent/$parent/HeroConsolePanel/HeroStatsFrame/HeroUnitStatusFrame/HealthBar" pos="60%" offset="-17"/>
+			<Texture val="@UI/HeroConsole/Hero/HealthIndicator"/>
+			<Unclipped val="True"/>
+			<Visible val="{$parent/UnitStatusFrame0/HealthIndicatorVisibility/@Visible}"/>
+		</Frame>
+	</Frame>	
 </Desc>
