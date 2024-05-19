@@ -7,7 +7,8 @@ module interfacex.builder {
 	requires static lombok; // static ones can be absent at run time
 	
 	requires transitive jakarta.persistence;
-	requires org.flywaydb.core; // automatic module
+	requires flyway.core;
+	requires transitive com.fasterxml.jackson.databind; // for flyway even if it is not used
 	
 	// javafx
 	requires java.desktop;
@@ -22,6 +23,7 @@ module interfacex.builder {
 	requires org.apache.commons.configuration2; // automatic module
 	requires org.apache.logging.log4j;
 	requires org.apache.logging.log4j.core; // automatic module
+	requires com.lmax.disruptor;
 	requires transitive com.esotericsoftware.kryo; // automatic module
 	requires com.kichik.pecoff4j;
 	requires org.eclipse.collections.impl; // automatic module

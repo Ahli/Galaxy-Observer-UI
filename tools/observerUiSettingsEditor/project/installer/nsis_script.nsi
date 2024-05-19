@@ -6,7 +6,7 @@ Unicode True
 !define DESCRIPTION "App to edit Observer Interface files for StarCraft II and Heroes of the Storm."
 
 ; This is the size (in kB) of all the files copied into "Program Files"
-!define INSTALLSIZE 62718
+!define INSTALLSIZE 99910
 
 ; The name of the installer
 Name "${COMPANYNAME} - ${APPNAME}"
@@ -95,7 +95,7 @@ Function un.onInit
 	SetShellVarContext all
  
 	; Verify the uninstaller - last chance to back out
-	MessageBox MB_OKCANCEL "Permanantly remove ${APPNAME}?" IDOK next
+	MessageBox MB_OKCANCEL "Permanently remove ${APPNAME}?" IDOK next
 		Abort
 	next:
 	!insertmacro VerifyUserIsAdmin

@@ -3,6 +3,7 @@ package db.migration;
 import lombok.extern.log4j.Log4j2;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
+import org.flywaydb.core.internal.database.h2.H2DatabaseType;
 import org.flywaydb.core.internal.jdbc.JdbcTemplate;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
@@ -20,8 +21,9 @@ public class V3__ImportV1data extends BaseJavaMigration {
 		final Path migrationScriptPath =
 				Path.of(System.getProperty("user.home"), ".GalaxyObsUI", "database", "exportMigrate.zip");
 		if (Files.exists(migrationScriptPath)) {
-			final JdbcTemplate jdbcTemplate =
-					new JdbcTemplate(new SingleConnectionDataSource(context.getConnection(), true).getConnection());
+			final JdbcTemplate jdbcTemplate = new JdbcTemplate(
+					new SingleConnectionDataSource(context.getConnection(), true).getConnection(),
+					new H2DatabaseType());
 			jdbcTemplate.executeStatement("DROP ALL OBJECTS");
 			jdbcTemplate.execute("RUNSCRIPT FROM '~/.GalaxyObsUI/database/exportMigrate.zip' COMPRESSION ZIP FROM_1X");
 			try {

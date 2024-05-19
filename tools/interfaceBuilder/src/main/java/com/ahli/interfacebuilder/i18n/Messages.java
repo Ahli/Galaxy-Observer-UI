@@ -20,7 +20,7 @@ public final class Messages {
 	private static final ResourceBundle resourceBundle = ResourceBundle.getBundle(BUNDLE_NAME);
 	
 	private Messages() {
-		// no instances alllowed
+		// no instances allowed
 	}
 	
 	/**

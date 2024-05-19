@@ -156,7 +156,7 @@ public class UnixDomainSocketCommunication implements IpcCommunication {
 	public boolean isAvailable() {
 		if (Files.exists(address.getPath())) {
 			
-			try (final SocketChannel ignored = SocketChannel.open(UnixDomainSocketAddress.of(address.getPath()))) {
+			try (final SocketChannel _ = SocketChannel.open(UnixDomainSocketAddress.of(address.getPath()))) {
 				log.trace("socket can be connected to => not orphaned socket file");
 				return false;
 			} catch (final IOException e) {
@@ -192,7 +192,7 @@ public class UnixDomainSocketCommunication implements IpcCommunication {
 			while (server.isOpen()) {
 				try (final SocketChannel channel = server.accept()) {
 					handleConnectionAsServer(channel);
-				} catch (final AsynchronousCloseException ignored) {
+				} catch (final AsynchronousCloseException _) {
 					log.info("Server Socket shut down.");
 				} catch (final IOException e) {
 					log.error("I/O Exception while waiting for client connections.", e);
