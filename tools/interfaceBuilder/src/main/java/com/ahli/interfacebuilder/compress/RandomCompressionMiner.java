@@ -438,7 +438,7 @@ public class RandomCompressionMiner {
 			} else {
 				try {
 					Thread.sleep(50);
-				} catch (final InterruptedException ignored) {
+				} catch (final InterruptedException _) {
 					Thread.currentThread().interrupt();
 					log.trace("Interrupted while waiting to clean up");
 				}
@@ -457,7 +457,7 @@ public class RandomCompressionMiner {
 				log.trace("Error while cleaning up compression mining target file {}", targetFile, e);
 				try {
 					Thread.sleep(50);
-				} catch (final InterruptedException ignored) {
+				} catch (final InterruptedException _) {
 					Thread.currentThread().interrupt();
 					log.trace("Interrupted while waiting to clean up");
 				}

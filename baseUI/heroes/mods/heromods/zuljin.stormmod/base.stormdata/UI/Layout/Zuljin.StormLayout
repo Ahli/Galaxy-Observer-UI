@@ -1,6 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Desc>
   <Constant name="BerserkerColor" val="255, 105, 180" />
+  <Frame type="Image" name="HealthIndicatorTemplate">
+    <Texture val="@UI/HeroConsole/Hero/HealthIndicator" />
+    <Unclipped val="True" />
+    <Visible val="False" />
+    <Animation name="HealthIndicatorFadeAnimation">
+      <Event event="DisplayOn" action="Reset,Play" />
+      <Event event="DisplayOff" action="DirectionReverse,Play" />
+      <Controller type="Fade" end="Pause" frame="$this">
+        <Key type="Curve" time="0.0" value="0" />
+        <Key type="Curve" time="0.25" value="255" />
+      </Controller>
+    </Animation>
+  </Frame>
   <Frame type="SelectionUnitStatusPanel" name="ZuljinTraitFrame">
     <Anchor side="Left" relative="$parent" pos="Min" offset="20" />
     <Anchor side="Bottom" relative="$parent" pos="Max" offset="5" />
@@ -334,6 +347,62 @@
           </Frame>
         </Frame>
       </Frame>
+      <Frame type="UnitStatusValidatorAnimElement" name="HealthIndicatorVisibility">
+        <Anchor relative="$parent" />
+        <Validator val="ZuljinHasRecklessnessTalent" />
+      </Frame>
+      <Frame type="UnitStatusValidatorAnimElement" name="HealthIndicatorTexture1">
+        <Anchor relative="$parent" />
+        <Validator val="CasterLifeLT50Percent" />
+        <Animation name="CasterLifeLT50Percent">
+          <Event event="Reset" action="Stop" />
+          <Event event="NoState" action="Stop" />
+          <Event event="CasterLifeLT50Percent" action="Restart, Play" />
+        </Animation>
+      </Frame>
+      <Frame type="UnitStatusValidatorAnimElement" name="HealthIndicatorTexture2">
+        <Anchor relative="$parent" />
+        <Validator val="CasterLifeLT75Percent" />
+        <Animation name="CasterLifeLT75Percent">
+          <Event event="Reset" action="Stop" />
+          <Event event="NoState" action="Stop" />
+          <Event event="CasterLifeLT75Percent" action="Restart, Play" />
+        </Animation>
+      </Frame>
+    </Frame>
+    <StateGroup name="FrameState1">
+      <DefaultState val="NotLT50" />
+      <State name="LT50">
+        <When type="AnimationState" frame="UnitStatusFrame0/HealthIndicatorTexture1" UnitStatusValidatorState="CasterLifeLT50Percent" />
+        <Action type="SetProperty" frame="HealthIndicator1" Texture="@UI/HeroConsole/Hero/HealthIndicator" />
+        <Action type="SendEvent" frame="HealthIndicator2" event="DisplayOff" on="Enter" />
+      </State>
+      <State name="NotLT50">
+        <Action type="SetProperty" frame="HealthIndicator1" Texture="@UI/HeroConsole/Hero/HealthIndicatorDead" />
+        <Action type="SendEvent" frame="HealthIndicator2" event="DisplayOn" on="Enter" />
+      </State>
+    </StateGroup>
+    <StateGroup name="FrameState2">
+      <DefaultState val="NotLT75" />
+      <State name="LT75">
+        <When type="AnimationState" frame="UnitStatusFrame0/HealthIndicatorTexture2" UnitStatusValidatorState="CasterLifeLT75Percent" />
+        <Action type="SetProperty" frame="HealthIndicator2" Texture="@UI/HeroConsole/Hero/HealthIndicator" />
+        <Action type="SendEvent" frame="HealthIndicator1" event="DisplayOn" on="Enter" />
+      </State>
+      <State name="NotLT75">
+        <Action type="SetProperty" frame="HealthIndicator2" Texture="@UI/HeroConsole/Hero/HealthIndicatorDead" />
+        <Action type="SendEvent" frame="HealthIndicator1" event="DisplayOff" on="Enter" />
+      </State>
+    </StateGroup>
+    <Frame type="Image" name="HealthIndicator1" template="Zuljin/HealthIndicatorTemplate">
+      <Anchor side="Bottom" relative="$parent/$parent/$parent/HeroConsolePanel/HeroStatsFrame/HeroUnitStatusFrame/HealthBar" pos="Mid" offset="9" />
+      <Anchor side="Left" relative="$parent/$parent/$parent/HeroConsolePanel/HeroStatsFrame/HeroUnitStatusFrame/HealthBar" pos="50%" offset="-17" />
+      <Visible val="{$parent/UnitStatusFrame0/HealthIndicatorVisibility/@Visible}" />
+    </Frame>
+    <Frame type="Image" name="HealthIndicator2" template="Zuljin/HealthIndicatorTemplate">
+      <Anchor side="Bottom" relative="$parent/$parent/$parent/HeroConsolePanel/HeroStatsFrame/HeroUnitStatusFrame/HealthBar" pos="Mid" offset="9" />
+      <Anchor side="Left" relative="$parent/$parent/$parent/HeroConsolePanel/HeroStatsFrame/HeroUnitStatusFrame/HealthBar" pos="75%" offset="-17" />
+      <Visible val="{$parent/UnitStatusFrame0/HealthIndicatorVisibility/@Visible}" />
     </Frame>
   </Frame>
 </Desc>
