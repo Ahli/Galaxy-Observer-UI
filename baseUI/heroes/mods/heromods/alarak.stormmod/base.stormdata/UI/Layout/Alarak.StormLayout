@@ -179,6 +179,185 @@
         <TooltipFrame val="BehaviorIconTooltip" />
         <Behavior val="AlarakSadismTakedownIncreaseTokenCounter" />
       </Frame>
+      <Frame type="UnitStatusValidatorAnimElement" name="HealthIndicatorVisibility">
+        <Anchor relative="$parent" />
+        <Validator val="AlarakHasRuthlessMomentumTalent" />
+      </Frame>
+      <Frame type="UnitStatusValidatorAnimElement" name="HealthIndicatorTexture">
+        <Anchor relative="$parent" />
+        <Validator val="IsDead" />
+        <Validator val="TargetLifeGT80Percent" />
+        <Animation name="IsDead">
+          <Event event="Reset" action="Stop" />
+          <Event event="NoState" action="Stop" />
+          <Event event="IsDead" action="Restart, Play" />
+        </Animation>
+        <Animation name="TargetLifeGT80Percent">
+          <Event event="Reset" action="Stop" />
+          <Event event="NoState" action="Stop" />
+          <Event event="TargetLifeGT80Percent" action="Restart, Play" />
+        </Animation>
+      </Frame>
+    </Frame>
+    <StateGroup name="FrameState">
+      <DefaultState val="GT80" />
+      <State name="GT80">
+        <Action type="SetProperty" frame="HealthIndicator" Texture="@UI/HeroConsole/Hero/HealthIndicator" />
+      </State>
+      <State name="DeadORLT80">
+        <When type="AnimationState" frame="UnitStatusFrame0/HealthIndicatorTexture" operator="NotEqual" UnitStatusValidatorState="TargetLifeGT80Percent" />
+        <Action type="SetProperty" frame="HealthIndicator" Texture="@UI/HeroConsole/Hero/HealthIndicatorDead" />
+      </State>
+    </StateGroup>
+    <Frame type="Image" name="HealthIndicator">
+      <Anchor side="Bottom" relative="$parent/$parent/$parent/HeroConsolePanel/HeroStatsFrame/HeroUnitStatusFrame/HealthBar" pos="Mid" offset="9" />
+      <Anchor side="Left" relative="$parent/$parent/$parent/HeroConsolePanel/HeroStatsFrame/HeroUnitStatusFrame/HealthBar" pos="80%" offset="-17" />
+      <Texture val="@UI/HeroConsole/Hero/HealthIndicator" />
+      <Unclipped val="True" />
+      <Visible val="{$parent/UnitStatusFrame0/HealthIndicatorVisibility/@Visible}" />
+    </Frame>
+  </Frame>
+  <Frame type="SelectionUnitStatusPanel" name="AlarakHeroicChargeFrame">
+    <Anchor side="Bottom" relative="$GameUI_HeroCustomChannelBarPlaceholder" pos="Max" offset="0" />
+    <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
+    <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
+    <Height val="56" />
+    <Width val="602" />
+    <SpecificUnit val="HeroAlarak" />
+    <Frame type="UnitStatusFrame" name="UnitStatusFrame0">
+      <Anchor relative="$parent" />
+      <VisibleToOwner val="true" />
+      <VisibleToAlly val="false" />
+      <VisibleToEnemy val="false" />
+      <Frame type="Image" name="ChannelBarFrame">
+        <Anchor side="Bottom" relative="$parent/AlarakCounterStrikeDurationBar" pos="Max" offset="0" />
+        <Anchor side="Left" relative="$parent/AlarakCounterStrikeDurationBar" pos="Min" offset="0" />
+        <Anchor side="Right" relative="$parent/AlarakCounterStrikeDurationBar" pos="Max" offset="0" />
+        <Height val="#ChannelBarHeight" />
+        <Texture val="@UI/HUD_Bar_CastChannel_BG" />
+        <TextureType val="NineSlice" />
+        <IgnoreParentColor val="True" />
+        <RenderPriority val="600" />
+        <Frame type="Label" name="ChannelNameLabel">
+          <Anchor side="Top" relative="$parent" pos="Mid" offset="0" />
+          <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0" />
+          <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+          <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+          <Style val="Storm_BehaviorBarLabel" />
+          <Text val="@Button/Name/AlarakDeadlyCharge" />
+          <IgnoreParentColor val="True" />
+          <RenderPriority val="602" />
+        </Frame>
+        <StateGroup name="ChannelState">
+          <State name="Neither">
+            <When type="Property" frame="$parent/AlarakCounterStrikeDurationBar" Visible="False" />
+            <When type="Property" frame="$parent/AlarakDeadlyChargeDurationBar" Visible="False" />
+            <When type="Property" frame="$parent/DeadlyChargeFullyChargedAnimElement" Visible="False" />
+            <Action type="SetProperty" frame="$this" Visible="false" />
+            <Action type="SetProperty" frame="$this/ChannelNameLabel" Visible="True" />
+            <Action type="SetProperty" frame="$GameUI_HeroCustomChannelBarPlaceholder" Visible="True" />
+          </State>
+          <State name="Counterstrike">
+            <When type="Property" frame="$parent/AlarakCounterStrikeDurationBar" Visible="True" />
+            <Action type="SetProperty" frame="$this" Visible="True" />
+            <Action type="SetProperty" frame="$this/ChannelNameLabel" Visible="True" />
+            <Action type="SetProperty" frame="$this/ChannelNameLabel" Text="@Button/Name/AlarakCounterStrikeTargeted" />
+            <Action type="SetProperty" frame="$GameUI_HeroCustomChannelBarPlaceholder" Visible="True" />
+          </State>
+          <State name="DeadlyCharge">
+            <When type="Property" frame="$parent/AlarakDeadlyChargeDurationBar" Visible="True" />
+            <Action type="SetProperty" frame="$this" Visible="True" />
+            <Action type="SetProperty" frame="$this/ChannelNameLabel" Visible="True" />
+            <Action type="SetProperty" frame="$this/ChannelNameLabel" Text="@Button/Name/AlarakDeadlyCharge" />
+            <Action type="SetProperty" frame="$GameUI_HeroCustomChannelBarPlaceholder" Visible="True" />
+          </State>
+          <State name="DeadlyChargeComplete">
+            <When type="Property" frame="$parent/DeadlyChargeFullyChargedAnimElement" Visible="True" />
+            <Action type="SetProperty" frame="$this" Visible="True" />
+            <Action type="SetProperty" frame="$this/ChannelNameLabel" Visible="True" />
+            <Action type="SetProperty" frame="$this/ChannelNameLabel" Text="@Button/Name/AlarakDeadlyCharge" />
+            <Action type="SetProperty" frame="$GameUI_HeroCustomChannelBarPlaceholder" Visible="True" />
+          </State>
+        </StateGroup>
+      </Frame>
+      <Frame type="UnitStatusDurationBar" name="AlarakCounterStrikeDurationBar">
+        <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
+        <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+        <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+        <Height val="#ChannelBarHeight" />
+        <Texture val="@UI/HUD_Bar_Cast" />
+        <BackgroundShown val="true" />
+        <BackgroundColor val="125, 0, 0, 0" />
+        <BarInsetRect top="0" left="0" bottom="0" right="0" />
+        <ColorStyle val="AllWhite" index="0" />
+        <AdditionalColorStyle val="DurationBar" index="0" />
+        <Sliced val="false" index="0" />
+        <Tiled val="true" index="0" />
+        <Behavior val="AlarakCounterStrikePrimed" />
+      </Frame>
+      <Frame type="UnitStatusDurationBar" name="AlarakDeadlyChargeDurationBar">
+        <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
+        <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+        <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+        <Height val="#ChannelBarHeight" />
+        <Texture val="@UI/Storm_UI_Ingame_hud_bar_cast_grey" />
+        <BackgroundShown val="true" />
+        <BackgroundColor val="125, 0, 0, 0" />
+        <BarInsetRect top="0" left="0" bottom="0" right="0" />
+        <ColorStyle val="DurationBar" index="0" />
+        <Sliced val="false" index="0" />
+        <Tiled val="true" index="0" />
+        <Behavior val="AlarakDeadlyChargeDummyTimer" />
+      </Frame>
+      <Frame type="UnitStatusValidatorAnimElement" name="DeadlyChargeFullyChargedAnimElement">
+        <Anchor relative="$parent" />
+        <Validator val="AlarakHasDeadlyChargeFullyChargedDummy" />
+      </Frame>
+      <Frame type="Image" name="AlarakDeadlyChargeChargedBar">
+        <Anchor side="Top" relative="$parent" pos="Min" offset="0" />
+        <Anchor side="Left" relative="$parent" pos="Min" offset="0" />
+        <Anchor side="Right" relative="$parent" pos="Max" offset="0" />
+        <Height val="#ChannelBarHeight" />
+        <Texture val="@UI/Storm_UI_Ingame_hud_bar_cast_grey" />
+        <ColorStyle val="DurationBar" index="0" />
+        <Tiled val="true" index="0" />
+        <Frame type="Image" name="GlowOverlay">
+          <Anchor relative="$parent" />
+          <Height val="#ChannelBarHeight" />
+          <Texture val="@UI/Storm_UI_Ingame_hud_bar_cast_grey" />
+          <Tiled val="true" index="0" />
+          <BlendMode val="Add" />
+          <Color val="240,72,72" />
+          <Animation name="Pulse">
+            <Event event="OnShown" action="Reset,Play" frame="$parent" />
+            <Controller type="Fade" end="PingPong">
+              <Key type="Curve" time="0" value="0" inout="Linear,Slow" />
+              <Key type="Curve" time=".7" value="80" inout="Linear" />
+            </Controller>
+          </Animation>
+        </Frame>
+        <StateGroup name="ColorblindOverride">
+          <DefaultState val="NotColorblind" />
+          <State name="Colorblind">
+            <When type="Option" colorblind="false" />
+            <Action type="SetProperty" Color="255,180,0" />
+          </State>
+          <State name="NotColorblind">
+            <When type="Option" colorblind="True" />
+            <Action type="SetProperty" Color="126,0,164" />
+          </State>
+        </StateGroup>
+        <StateGroup name="ChannelState">
+          <State name="Neither">
+            <When type="Property" frame="$parent/DeadlyChargeFullyChargedAnimElement" Visible="False" />
+            <Action type="SetProperty" frame="$this" Visible="false" />
+          </State>
+          <State name="DeadlyChargeComplete">
+            <When type="Property" frame="$parent/DeadlyChargeFullyChargedAnimElement" Visible="True" />
+            <Action type="SetProperty" frame="$this" Visible="True" />
+          </State>
+        </StateGroup>
+      </Frame>
     </Frame>
   </Frame>
 </Desc>

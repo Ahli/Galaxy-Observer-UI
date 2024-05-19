@@ -31,9 +31,9 @@ public class TcpIpSocketCommunication implements IpcCommunication {
 	
 	@Override
 	public boolean isAvailable() {
-		try (final var ignored1 = new ServerSocket(port, 4, InetAddress.getByAddress(new byte[] { 127, 0, 0, 1 }))) {
+		try (final var _ = new ServerSocket(port, 4, InetAddress.getByAddress(new byte[] { 127, 0, 0, 1 }))) {
 			return true;
-		} catch (final IOException ignored) {
+		} catch (final IOException _) {
 			return false;
 		}
 	}

@@ -78,7 +78,7 @@ public class OptionValueDef extends ValueDef {
 	private OptionValueDefType determineType(final String typeStr) {
 		try {
 			return OptionValueDefType.valueOf(typeStr.toUpperCase(Locale.ROOT));
-		} catch (final IllegalArgumentException ignored) {
+		} catch (final IllegalArgumentException _) {
 			return OptionValueDefType.TEXT;
 		}
 	}
