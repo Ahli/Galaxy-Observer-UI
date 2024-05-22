@@ -27,16 +27,6 @@ public interface UIAnimation extends UIElement {
 	 */
 	void addEvent(UIAttribute newEvent);
 	
-//	/**
-//	 * @return
-//	 */
-//	boolean isNextEventsAdditionShouldOverride();
-	
-//	/**
-//	 * @param nextEventsAdditionShouldOverride
-//	 */
-//	void setNextEventsAdditionShouldOverride(boolean nextEventsAdditionShouldOverride);
-	
 	/**
 	 * @return the driver
 	 */
@@ -68,9 +58,6 @@ public interface UIAnimation extends UIElement {
 	
 	@Override
 	boolean equals(Object o);
-	
-//	@Override
-//	boolean canEqual(Object other);
 	
 	@Override
 	int hashCode();

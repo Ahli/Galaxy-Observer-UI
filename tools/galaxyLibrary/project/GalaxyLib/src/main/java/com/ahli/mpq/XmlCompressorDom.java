@@ -4,8 +4,7 @@
 package com.ahli.mpq;
 
 import com.ahli.xml.XmlDomHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -36,11 +35,11 @@ import java.util.Locale;
 /**
  * @author Ahli
  */
+@Slf4j
 public final class XmlCompressorDom {
 	private static final String AHLI_SETTING = "@setting";
 	private static final String AHLI_HOTKEY = "@hotkey";
 	private static final String ANY_TAGNAME = "*";
-	private static final Logger logger = LoggerFactory.getLogger(XmlCompressorDom.class);
 	
 	private XmlCompressorDom() {
 		// no instances allowed
@@ -58,8 +57,8 @@ public final class XmlCompressorDom {
 		
 		long startTime = System.currentTimeMillis();
 		
-		logger.info("Compressing XML files...");
-		logger.trace("cachePath: {}", cachePath);
+		log.info("Compressing XML files...");
+		log.trace("cachePath: {}", cachePath);
 		
 		final DocumentBuilder dBuilder = XmlDomHelper.buildSecureDocumentBuilder(true, false);
 		final Transformer transformer = XmlDomHelper.buildSecureTransformer();
@@ -68,7 +67,7 @@ public final class XmlCompressorDom {
 		Files.walkFileTree(cachePath, visitor);
 		
 		long executionTime = (System.currentTimeMillis() - startTime);
-		logger.info("Compressing XML files took {}ms.", executionTime);
+		log.info("Compressing XML files took {}ms.", executionTime);
 	}
 	
 	/**
@@ -140,7 +139,7 @@ public final class XmlCompressorDom {
 				return FileVisitResult.CONTINUE;
 			}
 			
-			logger.trace("compression - processing file: {}", file);
+			log.trace("compression - processing file: {}", file);
 			
 			final Document doc;
 			try (final InputStream is = new BufferedInputStream(Files.newInputStream(file))) {
@@ -150,7 +149,7 @@ public final class XmlCompressorDom {
 			} catch (final SAXParseException _) {
 				return FileVisitResult.CONTINUE;
 			} catch (final IOException | SAXException e) {
-				logger.trace("Error while compressing xml.", e);
+				log.trace("Error while compressing xml.", e);
 				return FileVisitResult.CONTINUE;
 			}
 			
@@ -172,7 +171,7 @@ public final class XmlCompressorDom {
 			try {
 				transformer.transform(new DOMSource(doc), new StreamResult(file.toString()));
 			} catch (final TransformerException e) {
-				logger.error("Transforming to generate XML file failed.", e);
+				log.error("Transforming to generate XML file failed.", e);
 			}
 			
 			return FileVisitResult.CONTINUE;
@@ -180,7 +179,7 @@ public final class XmlCompressorDom {
 		
 		@Override
 		public FileVisitResult visitFileFailed(final Path file, final IOException exc) throws IOException {
-			logger.error("Failed to access file: {}", file);
+			log.error("Failed to access file: {}", file);
 			throw exc;
 		}
 	}

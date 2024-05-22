@@ -15,16 +15,14 @@ public class MpqEditorCompressionRuleSize extends MpqEditorCompressionRule {
 	
 	@Serial
 	private static final long serialVersionUID = -3164363488174206663L;
-	
+	private final int maxSize;
 	/**
-	 * -- SETTER --
-	 *  Sets the minimum file size for this rule. Must be greater or equal zero.
+	 * -- SETTER -- Sets the minimum file size for this rule. Must be greater or equal zero.
 	 *
 	 * @param minSize
 	 */
 	@Setter
 	private int minSize;
-	private final int maxSize;
 	
 	public MpqEditorCompressionRuleSize(final int minSize, final int maxSize) {
 		this.minSize = minSize;
@@ -42,25 +40,11 @@ public class MpqEditorCompressionRuleSize extends MpqEditorCompressionRule {
 		maxSize = original.maxSize;
 	}
 	
-//	@Override
-//	public boolean isValidRule() {
-//		return super.isValidRule() && minSize >= 0 && maxSize >= minSize;
-//	}
-	
 	@Override
 	public String toString() {
 		return "Size:" + minSize + "-" + maxSize + "=" + getAttributeString() + ", " + getCompressionMethodString() +
 				", 0xFFFFFFFF";
 	}
-	
-	//	/**
-//	 * Sets the maximum file size for this rule. Must be greater or equal to minSize (and zero).
-//	 *
-//	 * @param maxSize
-//	 */
-//	public void setMaxSize(final int maxSize) {
-//		this.maxSize = maxSize;
-//	}
 	
 	@Override
 	public Object deepCopy() {

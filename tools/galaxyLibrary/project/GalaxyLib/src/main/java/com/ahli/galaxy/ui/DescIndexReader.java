@@ -4,8 +4,7 @@
 package com.ahli.galaxy.ui;
 
 import com.ahli.xml.XmlDomHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -24,8 +23,8 @@ import java.util.List;
  *
  * @author Ahli
  */
+@Slf4j
 public final class DescIndexReader {
-	private static final Logger logger = LoggerFactory.getLogger(DescIndexReader.class);
 	
 	private DescIndexReader() {
 		// no instances allowed
@@ -44,7 +43,7 @@ public final class DescIndexReader {
 	public static LayoutPathData getLayoutPathList(final Path descIndexFile)
 			throws SAXException, IOException, ParserConfigurationException {
 		final DocumentBuilder dBuilder = XmlDomHelper.buildSecureDocumentBuilder();
-		logger.trace("reading layouts from descIndexFile: {}", descIndexFile);
+		log.trace("reading layouts from descIndexFile: {}", descIndexFile);
 		final Document doc = dBuilder.parse(descIndexFile.toFile());
 		
 		// must be in a DataComponent node
@@ -63,7 +62,7 @@ public final class DescIndexReader {
 				final String path = attributes.item(0).getNodeValue();
 				list.add(path);
 				result.combined().add(path);
-				logger.trace("Adding layout path to layoutPathList: {}", path);
+				log.trace("Adding layout path to layoutPathList: {}", path);
 			}
 		}
 		return result;

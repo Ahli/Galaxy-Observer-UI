@@ -8,16 +8,15 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableCell;
 import javafx.scene.layout.HBox;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * A table cell for ValueDef model data to reset its value to the default or the old value.
  *
  * @author Ahli
  */
+@Slf4j
 public class ResetDefaultButtonTableCell extends TableCell<ValueDef, Boolean> {
-	private static final Logger logger = LoggerFactory.getLogger(ResetDefaultButtonTableCell.class);
 	
 	private final Button resetToDefaultButton = new Button();
 	private final Button resetToOldValueButton = new Button();
@@ -35,13 +34,13 @@ public class ResetDefaultButtonTableCell extends TableCell<ValueDef, Boolean> {
 	}
 	
 	private void resetToDefault(final ActionEvent event) {
-		logger.trace("reset value to default value button clicked");
+		log.trace("reset value to default value button clicked");
 		final ValueDef data = getTableRow().getItem();
 		data.resetToDefault();
 	}
 	
 	private void resetToOldValue(final ActionEvent event) {
-		logger.trace("reset value to old value button clicked");
+		log.trace("reset value to old value button clicked");
 		final ValueDef data = getTableRow().getItem();
 		data.resetToOldValue();
 	}

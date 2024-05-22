@@ -49,7 +49,6 @@ public abstract class UIElementAbstract implements UIElement {
 		return Objects.equals(name, other.name);
 	}
 	
-//	@Override
 	public boolean canEqual(final Object other) {
 		return other instanceof UIElementAbstract;
 	}

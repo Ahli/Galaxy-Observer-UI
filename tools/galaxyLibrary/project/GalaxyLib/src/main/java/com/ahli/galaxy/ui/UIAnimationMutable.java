@@ -98,22 +98,6 @@ public class UIAnimationMutable extends UIElementAbstract implements UIAnimation
 		events.add(newEvent);
 	}
 	
-//	/**
-//	 * @return
-//	 */
-//	@Override
-//	public boolean isNextEventsAdditionShouldOverride() {
-//		return nextEventsAdditionShouldOverride;
-//	}
-	
-//	/**
-//	 * @param nextEventsAdditionShouldOverride
-//	 */
-//	@Override
-//	public void setNextEventsAdditionShouldOverride(final boolean nextEventsAdditionShouldOverride) {
-//		this.nextEventsAdditionShouldOverride = nextEventsAdditionShouldOverride;
-//	}
-	
 	/**
 	 * @return the driver
 	 */

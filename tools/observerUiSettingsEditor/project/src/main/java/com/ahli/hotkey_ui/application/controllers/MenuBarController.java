@@ -14,8 +14,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.net.URL;
@@ -25,8 +24,8 @@ import java.nio.file.Path;
 /**
  * @author Ahli
  */
+@Slf4j
 public class MenuBarController {
-	private static final Logger logger = LoggerFactory.getLogger(MenuBarController.class);
 	private final RecentlyUsed recentlyUsed = new RecentlyUsed();
 	private SettingsEditorApplication main;
 	@FXML
@@ -139,7 +138,7 @@ public class MenuBarController {
 		if (resource != null) {
 			imgUrl = resource.toString();
 		} else {
-			logger.error("Error loading resource. Resource not found");
+			log.error("Error loading resource. Resource not found");
 			imgUrl = "/ahliLogo.png";
 		}
 		

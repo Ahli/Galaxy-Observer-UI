@@ -3,8 +3,7 @@
 
 package com.ahli.hotkey_ui.application.integration;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.net.URL;
 import java.nio.file.Files;
@@ -17,8 +16,8 @@ import java.security.ProtectionDomain;
  *
  * @author Ahli
  */
+@Slf4j
 public final class JarHelper {
-	private static final Logger logger = LoggerFactory.getLogger(JarHelper.class);
 	
 	private JarHelper() {
 		// no instances allowed
@@ -44,7 +43,7 @@ public final class JarHelper {
 		final int i = path.indexOf("/target/classes/");
 		if (i > 0) {
 			final String check = path.substring(0, i);
-			logger.trace("target/classes location: {}", check);
+			log.trace("target/classes location: {}", check);
 			if (check.charAt(0) == '/') {
 				final Path p = Path.of(check.substring(1)).getParent().getParent();
 				if (Files.exists(p)) {
@@ -53,13 +52,21 @@ public final class JarHelper {
 			}
 		}
 		// this failed
-		if (logger.isErrorEnabled()) {
-			logger.error("java.class.path={}", System.getProperty("java.class.path"));
-			logger.error("jdk.module.path={}", System.getProperty("jdk.module.path"));
-			logger.error("jdk.module.upgrade.path={}", System.getProperty("jdk.module.upgrade.path"));
-			logger.error("java.home={}", System.getProperty("java.home"));
-			logger.error("user.dir={}", System.getProperty("user.dir"));
-			logger.error("class-domain-codesource-location-path={}", path);
+		if (log.isErrorEnabled()) {
+			log.error(
+					"""
+					java.class.path={}
+					jdk.module.path={}
+					jdk.module.upgrade.path={}
+					java.home={}
+					user.dir={}
+					class-domain-codesource-location-path={}""",
+					System.getProperty("java.class.path"),
+					System.getProperty("jdk.module.path"),
+					System.getProperty("jdk.module.upgrade.path"),
+					System.getProperty("java.home"),
+					System.getProperty("user.dir"),
+					path);
 		}
 		return null;
 	}

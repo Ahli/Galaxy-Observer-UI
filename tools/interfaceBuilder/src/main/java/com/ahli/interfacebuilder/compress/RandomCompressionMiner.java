@@ -5,13 +5,13 @@ package com.ahli.interfacebuilder.compress;
 
 import com.ahli.galaxy.ModD;
 import com.ahli.interfacebuilder.integration.FileService;
-import com.ahli.mpq.MpqEditorInterface;
 import com.ahli.mpq.MpqException;
 import com.ahli.mpq.mpqeditor.MpqEditorCompression;
 import com.ahli.mpq.mpqeditor.MpqEditorCompressionRule;
 import com.ahli.mpq.mpqeditor.MpqEditorCompressionRuleMask;
 import com.ahli.mpq.mpqeditor.MpqEditorCompressionRuleMethod;
 import com.ahli.mpq.mpqeditor.MpqEditorCompressionRuleSize;
+import com.ahli.mpq.mpqeditor.MpqEditorInterface;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectLongHashMap;

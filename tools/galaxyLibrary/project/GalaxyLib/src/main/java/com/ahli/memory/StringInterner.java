@@ -16,9 +16,9 @@ public final class StringInterner {
 		return (exists == null) ? s : exists;
 	}
 	
-//	public static void clear() {
-//		map.clear();
-//	}
+	//	public static void clear() {
+	//		map.clear();
+	//	}
 	
 	/**
 	 * Removes obsolete WeakReference-Instances that remain after the VM garbage was collected.
@@ -42,11 +42,11 @@ public final class StringInterner {
 		return map.size();
 	}
 	
-//	public static StringBuilder print() {
-//		final StringBuilder sb = new StringBuilder(32);
-//		for (final String key : map.keySet()) {
-//			sb.append(key).append('\n');
-//		}
-//		return sb;
-//	}
+	//	public static StringBuilder print() {
+	//		final StringBuilder sb = new StringBuilder(32);
+	//		for (final String key : map.keySet()) {
+	//			sb.append(key).append('\n');
+	//		}
+	//		return sb;
+	//	}
 }

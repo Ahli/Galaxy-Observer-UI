@@ -17,9 +17,9 @@ import com.ahli.hotkey_ui.application.model.TextValueDef;
 import com.ahli.hotkey_ui.application.model.abstracts.ValueDef;
 import com.ahli.hotkey_ui.application.ui.Alerts;
 import com.ahli.hotkey_ui.application.ui.ShowToUserException;
-import com.ahli.mpq.MpqEditorInterface;
 import com.ahli.mpq.MpqException;
 import com.ahli.mpq.mpqeditor.MpqEditorCompression;
+import com.ahli.mpq.mpqeditor.MpqEditorInterface;
 import javafx.animation.FadeTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -38,8 +38,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import lombok.Getter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
@@ -58,12 +57,11 @@ import java.util.Optional;
  *
  * @author Ahli
  */
+@Slf4j
 public class SettingsEditorApplication extends Application {
 	public static final String VERSION = "alpha";
 	public static final String STORM_INTERFACE_FILE_FILTER = "*.StormInterface";
 	public static final String SC2_INTERFACE_FILE_FILTER = "*.SC2Interface";
-	
-	private static final Logger logger = LoggerFactory.getLogger(SettingsEditorApplication.class);
 	
 	private final long appStartTime = System.nanoTime();
 	/**
@@ -102,14 +100,14 @@ public class SettingsEditorApplication extends Application {
 	 * 		command line arguments
 	 */
 	public static void main(final String[] args) {
-		logger.trace("trace log visible");
-		logger.debug("debug log visible");
-		logger.info("info log visible");
-		logger.warn("warn log visible");
-		logger.error("error log visible");
+		log.trace("trace log visible");
+		log.debug("debug log visible");
+		log.info("info log visible");
+		log.warn("warn log visible");
+		log.error("error log visible");
 		
-		if (logger.isTraceEnabled()) {
-			logger.trace("Configuration File of System: {}", System.getProperty("log4j.configurationFile"));
+		if (log.isTraceEnabled()) {
+			log.trace("Configuration File of System: {}", System.getProperty("log4j.configurationFile"));
 		}
 		
 		// TEST Locale
@@ -126,7 +124,7 @@ public class SettingsEditorApplication extends Application {
 	public void start(final Stage primaryStage) {
 		try {
 			Thread.currentThread().setName("UI");
-			logger.trace("start function called after {}ms.", (System.nanoTime() - appStartTime) / 1_000_000);
+			log.trace("start function called after {}ms.", (System.nanoTime() - appStartTime) / 1_000_000);
 			Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 			this.primaryStage = primaryStage;
 			primaryStage.setMaximized(true);
@@ -138,7 +136,7 @@ public class SettingsEditorApplication extends Application {
 			
 			final long time = System.nanoTime();
 			initRootLayout();
-			logger.trace("initialized root layout within {}ms.", (System.nanoTime() - time) / 1_000_000);
+			log.trace("initialized root layout within {}ms.", (System.nanoTime() - time) / 1_000_000);
 			
 			// Load Tab layout from fxml file
 			final long time2 = System.nanoTime();
@@ -150,7 +148,7 @@ public class SettingsEditorApplication extends Application {
 				tabPane = loader.load(is);
 			}
 			
-			logger.trace("initialized tab layout within {}ms.", (System.nanoTime() - time2) / 1_000_000);
+			log.trace("initialized tab layout within {}ms.", (System.nanoTime() - time2) / 1_000_000);
 			rootLayout.setCenter(tabPane);
 			tabsCtrl = loader.getController();
 			
@@ -174,17 +172,17 @@ public class SettingsEditorApplication extends Application {
 			final long time3 = System.nanoTime();
 			primaryStage.show();
 			primaryStage.setOpacity(1);
-			logger.trace("executed root layout stage.show() within {}ms", (System.nanoTime() - time3) / 1_000_000);
+			log.trace("executed root layout stage.show() within {}ms", (System.nanoTime() - time3) / 1_000_000);
 			
 			// hide apps splash screen image
 			Platform.runLater(new SplashScreenHider());
 			
-			logger.trace("finished app initialization after {}ms", (System.nanoTime() - appStartTime) / 1_000_000);
+			log.trace("finished app initialization after {}ms", (System.nanoTime() - appStartTime) / 1_000_000);
 			
 			initMpqInterface();
 			
 		} catch (final Exception e) {
-			logger.error("App Error", e);
+			log.error("App Error", e);
 			this.primaryStage.setOpacity(1);
 			Alerts.buildExceptionAlert(this.primaryStage, e).showAndWait();
 			closeApp();
@@ -197,7 +195,7 @@ public class SettingsEditorApplication extends Application {
 			primaryStage.getIcons()
 					.add(new Image(SettingsEditorApplication.class.getResourceAsStream("/res/ahliLogo.png")));
 		} catch (final NullPointerException e) {
-			logger.error("Error loading resource", e);
+			log.error("Error loading resource", e);
 			primaryStage.getIcons().add(new Image("ahliLogo.png"));
 		}
 	}
@@ -216,13 +214,13 @@ public class SettingsEditorApplication extends Application {
 		try (final InputStream is = SettingsEditorApplication.class.getResourceAsStream("/view/RootLayout.fxml")) {
 			rootLayout = loader.load(is);
 		}
-		logger.trace("initialized root layout fxml within {}ms.", (System.nanoTime() - time) / 1_000_000);
+		log.trace("initialized root layout fxml within {}ms.", (System.nanoTime() - time) / 1_000_000);
 		
 		// get Controller
 		final long time2 = System.nanoTime();
 		mbarCtrl = loader.getController();
 		mbarCtrl.setMainApp(this);
-		logger.trace("received root layout controller within {}ms.", (System.nanoTime() - time2) / 1_000_000);
+		log.trace("received root layout controller within {}ms.", (System.nanoTime() - time2) / 1_000_000);
 		
 		// Show the scene containing the root layout.
 		final Scene scene = new Scene(rootLayout);
@@ -230,8 +228,8 @@ public class SettingsEditorApplication extends Application {
 		scene.getStylesheets()
 				.add(SettingsEditorApplication.class.getResource("/view/application.css").toExternalForm());
 		
-		if (logger.isTraceEnabled()) {
-			logger.trace(
+		if (log.isTraceEnabled()) {
+			log.trace(
 					"installed font families: {}\nLocale dflt is '{}'\nLocale of Messages.class is '{}'\nLocale china: {}",
 					Font.getFamilies(),
 					Locale.getDefault(),
@@ -239,19 +237,19 @@ public class SettingsEditorApplication extends Application {
 					Locale.SIMPLIFIED_CHINESE);
 		}
 		if (Messages.checkIfTargetResourceIsUsed(Locale.CHINA)) {
-			logger.trace("apply Chinese css");
+			log.trace("apply Chinese css");
 			scene.getStylesheets().add(SettingsEditorApplication.class.getResource("/i18n/china.css").toExternalForm());
 		}
-		logger.trace("initialized root layout css within {}ms.", (System.nanoTime() - time3) / 1_000_000);
+		log.trace("initialized root layout css within {}ms.", (System.nanoTime() - time3) / 1_000_000);
 		
 		final long time4 = System.nanoTime();
 		primaryStage.setTitle(Messages.getString("Main.observerUiSettingsEditorTitle"));
 		primaryStage.setScene(scene);
-		logger.trace("executed root layout setScene+title within {}ms.", (System.nanoTime() - time4) / 1_000_000);
+		log.trace("executed root layout setScene+title within {}ms.", (System.nanoTime() - time4) / 1_000_000);
 		
 		final long time5 = System.nanoTime();
 		updateMenuBar();
-		logger.trace("updateMenuBar within {}ms.", (System.nanoTime() - time5) / 1_000_000);
+		log.trace("updateMenuBar within {}ms.", (System.nanoTime() - time5) / 1_000_000);
 	}
 	
 	/**
@@ -297,7 +295,7 @@ public class SettingsEditorApplication extends Application {
 				basePath.resolve("plugins" + File.separator + "mpq" + File.separator + "MPQEditor.exe");
 		mpqi = new MpqEditorInterface(cachePath, mpqEditorPath);
 		if (!Files.isExecutable(mpqEditorPath)) {
-			logger.error("Could not find MPQEditor.exe within its expected path: {}", mpqEditorPath);
+			log.error("Could not find MPQEditor.exe within its expected path: {}", mpqEditorPath);
 			final String title = Messages.getString("Main.warningAlertTitle");
 			final String content = String.format(Messages.getString("Main.couldNotFindMpqEditor"), mpqEditorPath);
 			final Alert alert = Alerts.buildWarningAlert(primaryStage, title, title, content);
@@ -351,10 +349,10 @@ public class SettingsEditorApplication extends Application {
 			Thread.currentThread().interrupt();
 		} catch (final IOException | ParserConfigurationException | TransformerConfigurationException |
 		               MpqException e) {
-			logger.error("Failed to save MPQ.", e);
+			log.error("Failed to save MPQ.", e);
 			showErrorAlert(e);
 		}
-		logger.trace("opened mpq within {}ms.", (System.nanoTime() - time) / 1_000_000);
+		log.trace("opened mpq within {}ms.", (System.nanoTime() - time) / 1_000_000);
 	}
 	
 	/**
@@ -404,7 +402,7 @@ public class SettingsEditorApplication extends Application {
 	 */
 	private void showErrorAlert(final Exception e) {
 		Platform.runLater(() -> {
-			logger.trace("showing error popup");
+			log.trace("showing error popup");
 			final String title = Messages.getString("Main.anErrorOccurred");
 			final String content = e.getMessage();
 			final Alert alert = Alerts.buildErrorAlert(getPrimaryStage(), title, title, content);
@@ -503,27 +501,27 @@ public class SettingsEditorApplication extends Application {
 				}
 				
 			} catch (final MpqException | ShowToUserException e) {
-				logger.error("File could not be opened.", e);
+				log.error("File could not be opened.", e);
 				openedDocPath = null;
 				updateAppTitle();
 				showErrorAlert(e);
 			} catch (final InterruptedException e) {
-				logger.error("Opening File was interrupted.", e);
+				log.error("Opening File was interrupted.", e);
 				Thread.currentThread().interrupt();
 				openedDocPath = null;
 				updateAppTitle();
 				showExceptionAlert(e);
 			} catch (final Exception e) {
-				logger.error("File could not be opened.", e);
+				log.error("File could not be opened.", e);
 				openedDocPath = null;
 				updateAppTitle();
 				showExceptionAlert(e);
 			}
 			updateMenuBar();
 		} else {
-			logger.trace("File to open was null, most likely due to 'cancel'.");
+			log.trace("File to open was null, most likely due to 'cancel'.");
 		}
-		logger.trace("opened mpq within {}ms.", (System.nanoTime() - time) / 1_000_000);
+		log.trace("opened mpq within {}ms.", (System.nanoTime() - time) / 1_000_000);
 	}
 	
 	/**
@@ -535,7 +533,7 @@ public class SettingsEditorApplication extends Application {
 		try {
 			return mpqi.isHeroesMpq();
 		} catch (final MpqException e) {
-			logger.error("Error while checking if namespace is heroes", e);
+			log.error("Error while checking if namespace is heroes", e);
 			// special case to show readable error to user
 			throw new ShowToUserException(Messages.getString("Main.OpenedFileNoComponentList"));
 		}
@@ -566,7 +564,7 @@ public class SettingsEditorApplication extends Application {
 	 */
 	private void showExceptionAlert(final Exception e) {
 		Platform.runLater(() -> {
-			logger.trace("showing exception popup");
+			log.trace("showing exception popup");
 			final Alert alert = Alerts.buildExceptionAlert(getPrimaryStage(), e);
 			alert.showAndWait();
 		});
@@ -648,7 +646,7 @@ public class SettingsEditorApplication extends Application {
 				Thread.currentThread().interrupt();
 			} catch (final IOException | ParserConfigurationException | TransformerConfigurationException |
 			               MpqException e) {
-				logger.error("Error while saving", e);
+				log.error("Error while saving", e);
 				showErrorAlert(e);
 			}
 		}
