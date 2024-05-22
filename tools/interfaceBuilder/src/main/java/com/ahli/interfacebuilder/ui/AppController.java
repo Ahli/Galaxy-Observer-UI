@@ -284,7 +284,7 @@ public class AppController {
 							try {
 								// close after 5 seconds, if compiled all and no errors
 								final PauseTransition delay = new PauseTransition(Duration.seconds(5));
-								delay.setOnFinished(event -> primaryStage.getPrimaryStage().close());
+								delay.setOnFinished(_ -> primaryStage.getPrimaryStage().close());
 								delay.play();
 							} catch (final Exception e) {
 								log.fatal(FATAL_ERROR, e);
@@ -315,7 +315,7 @@ public class AppController {
 	 *
 	 * @return true if a process was started with a replay parameter; else false
 	 */
-	public boolean runGameWithReplay(final CommandLineParams params) {
+	public void runGameWithReplay(final CommandLineParams params) {
 		final boolean isHeroes;
 		final String gamePath;
 		
@@ -323,17 +323,30 @@ public class AppController {
 			// use the run param
 			gamePath = params.getParamRunPath();
 			if (gamePath == null) {
-				return false;
+				log.error("Command's game path parameter must not be empty!");
+				return;
 			}
-			isHeroes = gamePath.contains("HeroesSwitcher");
+			final Path path = Path.of(gamePath);
+			final var heroes = gameService.getGameDefHeroes();
+			final var sc2 = gameService.getGameDefSc2();
+			isHeroes = gamePath.endsWith(heroes.supportDirectoryX64() + File.separator + heroes.switcherExeNameX64());
+			final boolean isSc2x64 =
+					gamePath.endsWith(sc2.supportDirectoryX64() + File.separator + sc2.switcherExeNameX64());
+			final boolean isSc2x32 =
+					gamePath.endsWith(sc2.supportDirectoryX32() + File.separator + sc2.switcherExeNameX32());
+			if ((!isHeroes && !isSc2x64 && !isSc2x32) || !Files.exists(path) || !Files.isExecutable(path)) {
+				log.error(
+						"Failed to validate game path '{}'! Please provide the path to the Switcher executable.",
+						gamePath);
+				return;
+			}
 		} else {
 			final SettingsIniInterface settings = configService.getIniSettings();
 			// compileAndRun is active -> figure out the right game
-			final GameDef gameDef;
 			if (params.getParamCompilePath().contains(File.separator + "heroes" + File.separator)) {
 				// Heroes
 				isHeroes = true;
-				gameDef = gameService.getGameDefHeroes();
+				final GameDef gameDef = gameService.getGameDefHeroes();
 				final boolean isPtr = baseUiService.isPtrActive(gameDef);
 				final String supportDir = gameDef.supportDirectoryX64();
 				final String switcherExe = gameDef.switcherExeNameX64();
@@ -343,13 +356,13 @@ public class AppController {
 			} else {
 				// SC2
 				isHeroes = false;
-				gameDef = gameService.getGameDefSc2();
+				final GameDef gameDef = gameService.getGameDefSc2();
 				final boolean isPtr = baseUiService.isPtrActive(gameDef);
 				final boolean is64bit = isPtr ? settings.isSc2PtrX64() : settings.isSc2X64();
 				final String supportDir = is64bit ? gameDef.supportDirectoryX64() : gameDef.supportDirectoryX32();
-				final String swicherExe = is64bit ? gameDef.switcherExeNameX64() : gameDef.switcherExeNameX32();
+				final String switcherExe = is64bit ? gameDef.switcherExeNameX64() : gameDef.switcherExeNameX32();
 				gamePath = (isPtr ? settings.getSc2PtrPath() : settings.getSc2Path()) + File.separator + supportDir +
-						File.separator + swicherExe;
+						File.separator + switcherExe;
 			}
 		}
 		log.info("Game location: {}", gamePath);
@@ -362,7 +375,6 @@ public class AppController {
 					final String[] cmd = new String[] { "cmd", "/C", "start",
 							"\"\" \"" + gamePath + "\" \"" + replay.toAbsolutePath() + "\"" };
 					Runtime.getRuntime().exec(cmd);
-					return true;
 				} catch (final IOException e) {
 					log.error("Failed to execute the game launch command.", e);
 				}
@@ -372,7 +384,6 @@ public class AppController {
 		} catch (final IOException e) {
 			log.error("Error while finding replay.", e);
 		}
-		return false;
 	}
 	
 	@EventListener
