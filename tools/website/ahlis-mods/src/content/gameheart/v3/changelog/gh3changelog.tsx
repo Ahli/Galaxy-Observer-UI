@@ -8,7 +8,7 @@ export const gh3changelog: Post[] = [
   {
     id: '37',
     title: '3.7',
-    image: [gh_37, gh3_36],
+    image: [gh3_37, gh3_36],
     createdAt: '22nd May 2024',
     download: 'https://www.dropbox.com/s/1edtu9ci9z767cg/GameHeart_3.6.SC2Interface?dl=1',
     version: '3.6',

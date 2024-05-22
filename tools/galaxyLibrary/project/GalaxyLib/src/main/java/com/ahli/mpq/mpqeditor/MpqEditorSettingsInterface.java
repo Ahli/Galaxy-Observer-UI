@@ -27,6 +27,8 @@ import java.util.stream.Stream;
  */
 @Slf4j
 public class MpqEditorSettingsInterface implements DeepCopyable {
+	public static final int GAME_ID_CUSTOM = 13;
+	public static final int GAME_ID_SC2_HEROES = 11;
 	private static final String MPQEDITOR_RULESET_INI = "MPQEditor_Ruleset.ini";
 	private static final String CUSTOM_RULE_PROPERTY_KEY = "CustomRules. ";
 	private static final String MPQEDITOR_INI = "MPQEditor.ini";
@@ -187,7 +189,7 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 			log.error("Error while applying custom ruleset usage entry.", e);
 		}
 		
-		if (gameId == 13) {
+		if (gameId == GAME_ID_CUSTOM) {
 			writeMpqRuleset();
 		}
 	}
@@ -198,9 +200,9 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 	 */
 	private static int getGameIdPropertyValue(final MpqEditorCompression compression) {
 		if (compression == MpqEditorCompression.BLIZZARD_SC2_HEROES) {
-			return 11;
+			return GAME_ID_SC2_HEROES;
 		}
-		return 13;
+		return GAME_ID_CUSTOM;
 	}
 	
 	/**
