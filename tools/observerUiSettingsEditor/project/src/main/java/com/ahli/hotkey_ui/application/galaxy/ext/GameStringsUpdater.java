@@ -4,8 +4,7 @@ import com.ahli.hotkey_ui.application.model.Constants;
 import com.ahli.hotkey_ui.application.model.OptionValueDef;
 import com.ahli.hotkey_ui.application.model.OptionValueDefType;
 import com.ahli.hotkey_ui.application.model.abstracts.ValueDef;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -17,9 +16,8 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 public class GameStringsUpdater extends SimpleFileVisitor<Path> {
-	
-	private static final Logger logger = LoggerFactory.getLogger(GameStringsUpdater.class);
 	
 	private final List<OptionValueDef> gamestringsAddSettings;
 	
@@ -32,7 +30,7 @@ public class GameStringsUpdater extends SimpleFileVisitor<Path> {
 		
 		if (file.getFileName().toString().equalsIgnoreCase("GameStrings.txt")) {
 			
-			logger.debug("processing file: {}", file);
+			log.debug("processing file: {}", file);
 			
 			StringBuilder gamestrings = new StringBuilder(Files.readString(file, StandardCharsets.UTF_8));
 			

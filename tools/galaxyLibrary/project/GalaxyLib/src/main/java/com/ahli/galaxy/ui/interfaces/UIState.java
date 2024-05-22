@@ -17,38 +17,16 @@ public interface UIState extends UIElement {
 	 */
 	List<UIAttribute> getWhens();
 	
-//	/**
-//	 * @param whens
-//	 * 		the whens to set
-//	 */
-//	void setWhens(List<UIAttribute> whens);
-	
 	/**
 	 * @return the actions
 	 */
 	List<UIAttribute> getActions();
-	
-//	/**
-//	 * @param actions
-//	 * 		the actions to set
-//	 */
-//	void setActions(List<UIAttribute> actions);
-	
-//	/**
-//	 * @return the nextAdditionShouldOverrideWhens
-//	 */
-//	boolean isNextAdditionShouldOverrideWhens();
 	
 	/**
 	 * @param nextAdditionShouldOverrideWhens
 	 * 		the nextAdditionShouldOverrideWhens to set
 	 */
 	void setNextAdditionShouldOverrideWhens(boolean nextAdditionShouldOverrideWhens);
-	
-//	/**
-//	 * @return the nextAdditionShouldOverrideActions
-//	 */
-//	boolean isNextAdditionShouldOverrideActions();
 	
 	/**
 	 * @param nextAdditionShouldOverrideActions
@@ -75,9 +53,6 @@ public interface UIState extends UIElement {
 	
 	@Override
 	boolean equals(Object o);
-	
-//	@Override
-//	boolean canEqual(Object other);
 	
 	@Override
 	int hashCode();

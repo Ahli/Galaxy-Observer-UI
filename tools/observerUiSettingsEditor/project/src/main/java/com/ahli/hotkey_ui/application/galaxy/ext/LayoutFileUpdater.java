@@ -4,8 +4,7 @@ import com.ahli.hotkey_ui.application.model.OptionValueDef;
 import com.ahli.hotkey_ui.application.model.TextValueDef;
 import com.ahli.hotkey_ui.application.model.abstracts.ValueDef;
 import com.ahli.xml.XmlDomHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -29,11 +28,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
+@Slf4j
 final class LayoutFileUpdater extends SimpleFileVisitor<Path> {
 	private static final String NAME = "name";
 	private static final String VAL = "val";
 	private static final String CONSTANT = "constant";
-	private static final Logger logger = LoggerFactory.getLogger(LayoutFileUpdater.class);
 	private final DocumentBuilder dBuilder;
 	private final Transformer transformer;
 	private final String[] fileExtensions;
@@ -109,13 +108,13 @@ final class LayoutFileUpdater extends SimpleFileVisitor<Path> {
 			final Node valAttrNode = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), VAL);
 			if (valAttrNode != null) {
 				final String val = valAttrNode.getNodeValue();
-				logger.debug("Constant: name = {}, val = {}", name, val);
+				log.debug("Constant: name = {}, val = {}", name, val);
 				setValueDefCurValue(name, val, hotkeys, settings);
 			} else {
-				logger.warn("Constant '{}' has no 'val' attribute defined.", name);
+				log.warn("Constant '{}' has no 'val' attribute defined.", name);
 			}
 		} else {
-			logger.warn("Constant has no 'name' attribute defined.");
+			log.warn("Constant has no 'name' attribute defined.");
 		}
 	}
 	
@@ -147,7 +146,7 @@ final class LayoutFileUpdater extends SimpleFileVisitor<Path> {
 				}
 			}
 		}
-		logger.debug("no ValueDef found with name: {}", name);
+		log.debug("no ValueDef found with name: {}", name);
 	}
 	
 	/**
@@ -170,7 +169,7 @@ final class LayoutFileUpdater extends SimpleFileVisitor<Path> {
 					if (item.getId().equalsIgnoreCase(name)) {
 						final String itemVal = item.getValue();
 						if (!Objects.equals(itemVal, val)) {
-							logger.debug("updating hotkey constant: '{}' with val: '{}' from '{}'", name, itemVal, val);
+							log.debug("updating hotkey constant: '{}' with val: '{}' from '{}'", name, itemVal, val);
 							valAttrNode.setNodeValue(itemVal);
 						}
 						return;
@@ -180,20 +179,17 @@ final class LayoutFileUpdater extends SimpleFileVisitor<Path> {
 					if (item.getId().equalsIgnoreCase(name)) {
 						final String itemVal = item.getValue();
 						if (!Objects.equals(itemVal, val)) {
-							logger.debug("updating setting constant: '{}' with val: '{}' from '{}'",
-									name,
-									itemVal,
-									val);
+							log.debug("updating setting constant: '{}' with val: '{}' from '{}'", name, itemVal, val);
 							valAttrNode.setNodeValue(itemVal);
 						}
 						return;
 					}
 				}
 			} else {
-				logger.warn("Constant has no 'val' attribute defined.");
+				log.warn("Constant has no 'val' attribute defined.");
 			}
 		} else {
-			logger.warn("Constant has no 'name' attribute defined.");
+			log.warn("Constant has no 'name' attribute defined.");
 		}
 	}
 	
@@ -216,11 +212,11 @@ final class LayoutFileUpdater extends SimpleFileVisitor<Path> {
 					doc = dBuilder.parse(is);
 				} catch (final SAXException e) {
 					final String msg = "Error parsing file.";
-					logger.trace(msg, e);
+					log.trace(msg, e);
 					throw new IOException(msg, e);
 				}
 				
-				logger.debug("processing file: {}", file);
+				log.debug("processing file: {}", file);
 				
 				// process files
 				final Element elem = doc.getDocumentElement();
@@ -231,7 +227,7 @@ final class LayoutFileUpdater extends SimpleFileVisitor<Path> {
 				try {
 					transformer.transform(new DOMSource(doc), new StreamResult(file.toFile()));
 				} catch (final TransformerException e) {
-					logger.error("Transforming to generate XML file failed.", e);
+					log.error("Transforming to generate XML file failed.", e);
 				}
 			}
 		}
@@ -240,7 +236,7 @@ final class LayoutFileUpdater extends SimpleFileVisitor<Path> {
 	
 	@Override
 	public FileVisitResult visitFileFailed(final Path file, final IOException exc) throws IOException {
-		logger.error("Failed to access file: {}", file);
+		log.error("Failed to access file: {}", file);
 		throw exc;
 	}
 }

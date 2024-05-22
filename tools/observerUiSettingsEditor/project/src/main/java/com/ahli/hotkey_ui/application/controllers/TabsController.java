@@ -18,22 +18,22 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Ahli
  */
+@Slf4j
 public class TabsController {
-	private static final Logger logger = LoggerFactory.getLogger(TabsController.class);
 	
 	private static final Callback<TableColumn<ValueDef, Boolean>, TableCell<ValueDef, Boolean>>
 			ActionColumnCellFactoryReset =
-			tableColumn -> new ResetDefaultButtonTableCell(Messages.getString("TabsController.ResetDefault"),
+			_ -> new ResetDefaultButtonTableCell(Messages.getString("TabsController.ResetDefault"),
 					Messages.getString("TabsController.ResetOldValue"));
 	
 	private static final Callback<TableColumn<ValueDef, String>, TableCell<ValueDef, String>> WRAPPING_CELL_FACTORY =
-			tableColumn -> {
+			_ -> {
 				TableCell<ValueDef, String> cell = new TableCell<>();
 				Text text = new Text();
 				cell.setGraphic(text);
@@ -44,9 +44,11 @@ public class TabsController {
 			};
 	
 	private static final Callback<TableColumn<ValueDef, String>, TableCell<ValueDef, String>>
-			VALUEDEF_EDIT_CELL_FACTORY = tableColumn -> new DynamicValueDefEditingTableCell();
+			VALUEDEF_EDIT_CELL_FACTORY = _ -> new DynamicValueDefEditingTableCell();
 	
+	@Getter
 	private final ObservableList<ValueDef> hotkeysData = FXCollections.observableArrayList();
+	@Getter
 	private final ObservableList<ValueDef> settingsData = FXCollections.observableArrayList();
 	@FXML
 	private TableView<ValueDef> hotkeysTable;
@@ -78,7 +80,7 @@ public class TabsController {
 	 */
 	@FXML
 	public void initialize() {
-		logger.trace("initializing");
+		log.trace("initializing");
 		
 		final Callback<CellDataFeatures<ValueDef, String>, ObservableValue<String>> idFac =
 				new PropertyValueFactory<>("id");
@@ -115,20 +117,6 @@ public class TabsController {
 		
 		hotkeysTable.setItems(hotkeysData);
 		settingsTable.setItems(settingsData);
-	}
-	
-	/**
-	 * @return the hotkeysData
-	 */
-	public ObservableList<ValueDef> getHotkeysData() {
-		return hotkeysData;
-	}
-	
-	/**
-	 * @return the settingsData
-	 */
-	public ObservableList<ValueDef> getSettingsData() {
-		return settingsData;
 	}
 	
 	/**

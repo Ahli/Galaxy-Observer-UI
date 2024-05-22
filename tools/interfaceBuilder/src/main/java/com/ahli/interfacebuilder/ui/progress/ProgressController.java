@@ -271,7 +271,8 @@ public class ProgressController {
 		}
 	}
 	
-	private record CloseBuildUiTabAction(Tab tab, BuildUiController controller, List<Updateable> controllers, ProgressController progressController) implements EventHandler<ActionEvent> {
+	private record CloseBuildUiTabAction(Tab tab, BuildUiController controller, List<Updateable> controllers,
+	                                     ProgressController progressController) implements EventHandler<ActionEvent> {
 		@Override
 		public void handle(final ActionEvent event) {
 			tab.getTabPane().getTabs().remove(tab);

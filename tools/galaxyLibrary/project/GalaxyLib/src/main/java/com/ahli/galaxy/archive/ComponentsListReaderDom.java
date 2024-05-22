@@ -5,10 +5,9 @@ package com.ahli.galaxy.archive;
 
 import com.ahli.galaxy.game.GameDef;
 import com.ahli.xml.XmlDomHelper;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -25,11 +24,11 @@ import java.nio.file.Path;
  *
  * @author Ahli
  */
+@Slf4j
 public final class ComponentsListReaderDom {
 	private static final String TYPE = "Type";
 	private static final String DATA_COMPONENT = "DataComponent";
 	private static final String UIUI = "uiui";
-	private static final Logger logger = LoggerFactory.getLogger(ComponentsListReaderDom.class);
 	
 	/**
 	 *
@@ -50,8 +49,9 @@ public final class ComponentsListReaderDom {
 	@NotNull
 	public static String getDescIndexPath(@NotNull final Path componentsListFile, @NotNull final GameDef game)
 			throws ParserConfigurationException, SAXException, IOException {
-		final String str = game.baseDataFolderName() + File.separator + getComponentsListValue(componentsListFile, UIUI);
-		logger.trace("DescIndexPath: {}", str);
+		final String str =
+				game.baseDataFolderName() + File.separator + getComponentsListValue(componentsListFile, UIUI);
+		log.trace("DescIndexPath: {}", str);
 		return str;
 	}
 	

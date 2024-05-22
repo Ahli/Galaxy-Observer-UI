@@ -15,9 +15,8 @@ import com.ahli.galaxy.ui.interfaces.UIConstant;
 import com.ahli.galaxy.ui.interfaces.UIElement;
 import com.ahli.galaxy.ui.interfaces.UIFrame;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -35,10 +34,10 @@ import java.util.Objects;
  *
  * @author Ahli
  */
+@Slf4j
 public class UICatalogImpl implements UICatalog {
 	
 	private static final String UNDERSCORE = "_";
-	private static final Logger logger = LoggerFactory.getLogger(UICatalogImpl.class);
 	private final List<UITemplate> templates;
 	private final List<UITemplate> blizzOnlyTemplates;
 	private final List<UIConstant> constants;
@@ -158,11 +157,11 @@ public class UICatalogImpl implements UICatalog {
 		final String descIndexPath = descIndexFile.toAbsolutePath().toString();
 		final String basePath =
 				descIndexPath.substring(0, descIndexPath.length() - descIndexFile.getFileName().toString().length());
-		logger.trace("descIndexPath={}\nbasePath={}", descIndexPath, basePath);
+		log.trace("descIndexPath={}\nbasePath={}", descIndexPath, basePath);
 		
 		processLayouts(layoutPathData.combined(), basePath, raceId, consoleSkinId);
 		
-		logger.trace(
+		log.trace(
 				"UICatalogSizes: templates={}, blizzTemplates={}, constants={}, blizzConstants={}, blizzLayouts={}, handles={}",
 				templates.size(),
 				blizzOnlyTemplates.size(),
@@ -186,19 +185,19 @@ public class UICatalogImpl implements UICatalog {
 		String basePathTemp;
 		for (final String intPath : toProcessList) {
 			final boolean isDevLayout = blizzOnlyLayouts.contains(intPath);
-			logger.trace("intPath={}\nisDevLayout={}", intPath, isDevLayout);
+			log.trace("intPath={}\nisDevLayout={}", intPath, isDevLayout);
 			basePathTemp = basePath;
 			int lastIndex = 0;
 			while (!new File(basePathTemp + File.separator + intPath).exists() && lastIndex != -1) {
 				lastIndex = basePathTemp.lastIndexOf(File.separatorChar);
 				if (lastIndex != -1) {
 					basePathTemp = basePathTemp.substring(0, lastIndex);
-					logger.trace("basePathTemp={}", basePathTemp);
+					log.trace("basePathTemp={}", basePathTemp);
 				} else {
 					if (!isDevLayout) {
-						logger.error("ERROR: Cannot find layout file: {}", intPath);
+						log.error("ERROR: Cannot find layout file: {}", intPath);
 					} else {
-						logger.warn("WARNING: Cannot find Blizz-only layout file: {}, so this is fine.", intPath);
+						log.warn("WARNING: Cannot find Blizz-only layout file: {}, so this is fine.", intPath);
 					}
 				}
 			}
@@ -211,7 +210,7 @@ public class UICatalogImpl implements UICatalog {
 					final String msg = String.format(
 							"ERROR: encountered an Exception while processing the layout file '%s'.",
 							layoutFilePath);
-					logger.error(msg, e);
+					log.error(msg, e);
 				}
 				if (Thread.interrupted()) {
 					//noinspection NewExceptionWithoutArguments
@@ -221,7 +220,7 @@ public class UICatalogImpl implements UICatalog {
 		}
 	}
 	
-//	@Override
+	//	@Override
 	private void processLayoutFile(
 			final Path p,
 			final String raceId,
@@ -238,19 +237,19 @@ public class UICatalogImpl implements UICatalog {
 			final String raceId,
 			final String consoleSkinId,
 			final DeduplicationIntensity deduplicationAllowed) {
-		logger.trace("processing Include appearing within a real layout");
+		log.trace("processing Include appearing within a real layout");
 		
 		String basePathTemp = getCurBasePath();
 		while (!Files.exists(Path.of(basePathTemp, path))) {
 			final int lastIndex = basePathTemp.lastIndexOf(File.separatorChar);
 			if (lastIndex != -1) {
 				basePathTemp = basePathTemp.substring(0, lastIndex);
-				logger.trace("basePathTemp={}", basePathTemp);
+				log.trace("basePathTemp={}", basePathTemp);
 			} else {
 				if (!isDevLayout) {
-					logger.error("ERROR: Cannot find layout file: {}", path);
+					log.error("ERROR: Cannot find layout file: {}", path);
 				} else {
-					logger.warn("WARNING: Cannot find Blizz-only layout file: {}, so this is fine.", path);
+					log.warn("WARNING: Cannot find Blizz-only layout file: {}, so this is fine.", path);
 				}
 				return;
 			}
@@ -261,7 +260,7 @@ public class UICatalogImpl implements UICatalog {
 		try {
 			parserTemp.parseFile(filePath, raceId, isDevLayout, consoleSkinId);
 		} catch (final IOException e) {
-			logger.error("ERROR: while parsing include appearing within usual layouts.", e);
+			log.error("ERROR: while parsing include appearing within usual layouts.", e);
 		}
 		xmlParser.clear();
 	}
@@ -276,12 +275,12 @@ public class UICatalogImpl implements UICatalog {
 		}
 		for (final var template : blizzOnlyTemplates) {
 			if (template.getFileName().equalsIgnoreCase(file)) {
-				logger.error("ERROR: cannot modify Blizzard-only Template: {}", template.getFileName());
+				log.error("ERROR: cannot modify Blizzard-only Template: {}", template.getFileName());
 				break;
 			}
 		}
 		if (foundTemplates.isEmpty()) {
-			logger.warn("WARN: cannot find Layout file: {}", file);
+			log.warn("WARN: cannot find Layout file: {}", file);
 		}
 		return foundTemplates.toArray(new UITemplate[0]);
 	}
@@ -329,7 +328,7 @@ public class UICatalogImpl implements UICatalog {
 			removeConstantFromList(name, constants);
 			constants.add(constant);
 			if (removedBlizzOnly) {
-				logger.warn("WARNING: constant '{}' overrides value from Blizz-only constant, so this might be fine.",
+				log.warn("WARNING: constant '{}' overrides value from Blizz-only constant, so this might be fine.",
 						name);
 			}
 		} else {
@@ -338,7 +337,7 @@ public class UICatalogImpl implements UICatalog {
 			final boolean removedGeneral = removeConstantFromList(name, constants);
 			blizzOnlyConstants.add(constant);
 			if (removedGeneral) {
-				logger.warn(
+				log.warn(
 						"WARNING: constant '{}' from Blizz-only layout overrides a general constant, so this might be fine.",
 						name);
 			}
@@ -377,7 +376,7 @@ public class UICatalogImpl implements UICatalog {
 		}
 		final String prefix = constantRef.substring(0, i);
 		final String constantName = constantRef.substring(i);
-		logger.trace("Encountered Constant: prefix='{}', constantName='{}'", prefix, constantName);
+		log.trace("Encountered Constant: prefix='{}', constantName='{}'", prefix, constantName);
 		for (final UIConstant c : constants) {
 			if (c.getName().equalsIgnoreCase(constantName)) {
 				return c.getValue();
@@ -399,13 +398,13 @@ public class UICatalogImpl implements UICatalog {
 				}
 			}
 		} else if (i >= 4) {
-			logger.error(
+			log.error(
 					"ERROR: Encountered a constant definition with three #'{}' when its maximum is two '#'.",
 					constantRef);
 		}
 		
 		if (!isDevLayout) {
-			logger.warn("WARNING: Did not find a constant definition for '{}', so '{}' is used instead.",
+			log.warn("WARNING: Did not find a constant definition for '{}', so '{}' is used instead.",
 					constantRef,
 					constantName);
 		} else {
@@ -415,7 +414,7 @@ public class UICatalogImpl implements UICatalog {
 					return c.getValue();
 				}
 			}
-			logger.warn(
+			log.warn(
 					"WARNING: Did not find a constant definition for '{}', but it is a Blizz-only layout, so this is fine.",
 					constantRef);
 		}

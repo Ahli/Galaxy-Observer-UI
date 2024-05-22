@@ -2,8 +2,25 @@ import { Change, Changelog, Post } from '../../../../types/Post';
 import gh3_34 from '../../../../assets/gameheart/v3/gh3_34.jpg';
 import gh3_35 from '../../../../assets/gameheart/v3/gh3_35.jpg';
 import gh3_36 from '../../../../assets/gameheart/v3/gh3_36.jpg';
+import gh3_37 from '../../../../assets/gameheart/v3/gh3_37.jpg';
 
 export const gh3changelog: Post[] = [
+  {
+    id: '37',
+    title: '3.7',
+    image: [gh_37, gh3_36],
+    createdAt: '22nd May 2024',
+    download: 'https://www.dropbox.com/s/1edtu9ci9z767cg/GameHeart_3.6.SC2Interface?dl=1',
+    version: '3.6',
+    date: '22nd May 2024',
+    changes: [
+      'fixed workers killed notification background not sliding in',
+      'added worker count to 3vs3, 4vs4 and FFA player cards',
+      'fixed 3vs3 shwoing 8 slots',
+      'fixed 3vs3 and 4vs4 not using team slots (upper vs lower row in UI)',
+      'added selected player information from FFA to 3vs3 and 4vs4',
+    ],
+  } as Changelog,
   {
     id: '36',
     title: '3.6',

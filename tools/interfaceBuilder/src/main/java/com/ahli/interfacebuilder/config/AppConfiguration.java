@@ -29,7 +29,7 @@ import com.ahli.interfacebuilder.ui.PrimaryStageHolder;
 import com.ahli.interfacebuilder.ui.navigation.NavigationController;
 import com.ahli.interfacebuilder.ui.progress.ProgressController;
 import com.ahli.interfacebuilder.ui.progress.TabPaneController;
-import com.ahli.mpq.MpqEditorInterface;
+import com.ahli.mpq.mpqeditor.MpqEditorInterface;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.ApplicationContext;

@@ -23,13 +23,13 @@ import com.ahli.interfacebuilder.ui.AppController;
 import com.ahli.interfacebuilder.ui.PrimaryStageHolder;
 import com.ahli.interfacebuilder.ui.navigation.NavigationController;
 import com.ahli.interfacebuilder.ui.progress.ProgressController;
-import com.ahli.mpq.MpqEditorInterface;
 import com.ahli.mpq.MpqException;
 import com.ahli.mpq.mpqeditor.MpqEditorCompression;
 import com.ahli.mpq.mpqeditor.MpqEditorCompressionRule;
 import com.ahli.mpq.mpqeditor.MpqEditorCompressionRuleMask;
 import com.ahli.mpq.mpqeditor.MpqEditorCompressionRuleMethod;
 import com.ahli.mpq.mpqeditor.MpqEditorCompressionRuleSize;
+import com.ahli.mpq.mpqeditor.MpqEditorInterface;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.lang.NonNull;
 import org.xml.sax.SAXException;
@@ -134,7 +134,8 @@ public class MpqBuilderService {
 	 * Schedules a task to build the mpq archive file for a project.
 	 *
 	 * @param project
-	 * @param useCmdLineSettings - use command line settings or ini settings for compression, verification, etc
+	 * @param useCmdLineSettings
+	 * 		- use command line settings or ini settings for compression, verification, etc
 	 */
 	public void build(@NonNull final Project project, final boolean useCmdLineSettings) {
 		final BuildTask task = new BuildTask(executor, project, useCmdLineSettings, this, baseUiService);
@@ -197,7 +198,7 @@ public class MpqBuilderService {
 		// create tasks for the worker pool
 		try {
 			if (primaryStage.hasPrimaryStage()) {
-				progressController.addBuildTab(Thread.currentThread().getName(), project,true);
+				progressController.addBuildTab(Thread.currentThread().getName(), project, true);
 			}
 			// create unique cache path
 			final MpqEditorInterface threadsMpqInterface = new MpqEditorInterface(configService.getMpqCachePath()

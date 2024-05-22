@@ -44,5 +44,6 @@ public class BuildUiController implements Updateable, FxmlController {
 	
 	@Override
 	public void update() {
+		// do nothing
 	}
 }

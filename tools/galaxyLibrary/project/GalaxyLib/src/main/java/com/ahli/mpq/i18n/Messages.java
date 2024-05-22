@@ -3,8 +3,7 @@
 
 package com.ahli.mpq.i18n;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -15,9 +14,9 @@ import java.util.ResourceBundle;
  *
  * @author Ahli
  */
+@Slf4j
 public final class Messages {
 	private static final String BUNDLE_NAME = "galaxylib_i18n.galaxyLibMessages";
-	private static final Logger logger = LoggerFactory.getLogger(Messages.class);
 	private static final ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE_NAME);
 	
 	private Messages() {
@@ -35,9 +34,9 @@ public final class Messages {
 		try {
 			return bundle.getString(key);
 		} catch (final MissingResourceException e) {
-			logger.error(String.format("ERROR: failed to receive String for %s", key), e);
+			log.error(String.format("ERROR: failed to receive String for %s", key), e);
 			return '!' + key + '!';
 		}
 	}
-
+	
 }

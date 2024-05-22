@@ -3,8 +3,7 @@
 
 package com.ahli.hotkey_ui.application.i18n;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Locale;
 import java.util.MissingResourceException;
@@ -16,9 +15,9 @@ import java.util.ResourceBundle;
  *
  * @author Ahli
  */
+@Slf4j
 public final class Messages {
 	private static final String BUNDLE_NAME = "i18n.messages";
-	private static final Logger logger = LoggerFactory.getLogger(Messages.class);
 	private static ResourceBundle resourceBundle = ResourceBundle.getBundle(BUNDLE_NAME);
 	
 	private static Locale usedLocale = Locale.getDefault();
@@ -37,7 +36,7 @@ public final class Messages {
 		try {
 			return resourceBundle.getString(key);
 		} catch (final MissingResourceException e) {
-			logger.error(String.format("ERROR: failed to receive String for %s", key), e);
+			log.error(String.format("ERROR: failed to receive String for %s", key), e);
 			return '!' + key + '!';
 		}
 	}
@@ -62,15 +61,6 @@ public final class Messages {
 	}
 	
 	/**
-	 * Returns the Locale that was used to get the bundle in effect.
-	 *
-	 * @return
-	 */
-	public static Locale getUsedLocale() {
-		return usedLocale;
-	}
-	
-	/**
 	 * Checks if the Locale's resource bundle is the one used.
 	 *
 	 * @param locale
@@ -78,7 +68,7 @@ public final class Messages {
 	 */
 	public static boolean checkIfTargetResourceIsUsed(final Locale locale) {
 		final boolean result = resourceBundle.equals(ResourceBundle.getBundle(BUNDLE_NAME, locale));
-		logger.trace("compare used locale's resource '{}' with one for locale '{}', result: {}",
+		log.trace("compare used locale's resource '{}' with one for locale '{}', result: {}",
 				usedLocale,
 				locale,
 				result);

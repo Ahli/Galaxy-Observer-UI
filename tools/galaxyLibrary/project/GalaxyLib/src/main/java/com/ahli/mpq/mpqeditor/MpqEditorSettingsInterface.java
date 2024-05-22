@@ -5,14 +5,13 @@ package com.ahli.mpq.mpqeditor;
 
 import com.ahli.cloning.DeepCopyable;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.configuration2.INIConfiguration;
 import org.apache.commons.configuration2.SubnodeConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.INIBuilderParameters;
 import org.apache.commons.configuration2.builder.fluent.Parameters;
 import org.apache.commons.configuration2.ex.ConfigurationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -26,11 +25,11 @@ import java.util.stream.Stream;
 /**
  * Class to manage the settings of Ladik's MpqEditor.
  */
+@Slf4j
 public class MpqEditorSettingsInterface implements DeepCopyable {
 	private static final String MPQEDITOR_RULESET_INI = "MPQEditor_Ruleset.ini";
 	private static final String CUSTOM_RULE_PROPERTY_KEY = "CustomRules. ";
 	private static final String MPQEDITOR_INI = "MPQEditor.ini";
-	private static final Logger logger = LoggerFactory.getLogger(MpqEditorSettingsInterface.class);
 	private static final String APPDATA = "APPDATA";
 	private static final String NO_COMPRESSION_CUSTOM_RULE = "0x01000000, 0x00000002, 0xFFFFFFFF";
 	private static final String DEFAULT = "Default";
@@ -51,8 +50,7 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 	private MpqEditorCompressionRule[] customRules;
 	
 	/**
-	 * -- SETTER --
-	 *  Sets the compression method.
+	 * -- SETTER -- Sets the compression method.
 	 *
 	 * @param compression
 	 */
@@ -99,24 +97,6 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 			Files.move(backUpFileName, originalFileName);
 		}
 	}
-	
-//	/**
-//	 * Returns the state of file backups.
-//	 *
-//	 * @return
-//	 */
-//	public boolean isBackupActive() {
-//		return backupActive;
-//	}
-	
-//	/**
-//	 * Returns the currently active compression method.
-//	 *
-//	 * @return
-//	 */
-//	public MpqEditorCompression getCompression() {
-//		return compression;
-//	}
 	
 	/**
 	 * Applies the compression. Make sure to call <code>restoreOriginalSettingFiles()</code> afterwards to restore these
@@ -187,7 +167,7 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 	 */
 	private void applyChangesToFiles() throws IOException {
 		if (!Files.exists(iniFile)) {
-			logger.error(
+			log.error(
 					"MpqEditor's ini file does not exist. It would be located at '{}'. The editor will run with its factory settings.",
 					iniFile.toAbsolutePath());
 			return;
@@ -204,7 +184,7 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 			options.setProperty(GAME_ID, gameId);
 			b.save();
 		} catch (final ConfigurationException e) {
-			logger.error("Error while applying custom ruleset usage entry.", e);
+			log.error("Error while applying custom ruleset usage entry.", e);
 		}
 		
 		if (gameId == 13) {
@@ -237,7 +217,7 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 				ini = b.getConfiguration();
 				ini.clear();
 			} catch (final ConfigurationException e) {
-				logger.error("Error while editing custom ruleset file.", e);
+				log.error("Error while editing custom ruleset file.", e);
 			}
 		}
 		if (ini == null) {
@@ -268,6 +248,7 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 			}
 			case NONE -> section.addProperty(DEFAULT, NO_COMPRESSION_CUSTOM_RULE);
 			default -> {
+				// nothing
 			}
 		}
 		
@@ -292,15 +273,6 @@ public class MpqEditorSettingsInterface implements DeepCopyable {
 			}
 		}
 	}
-	
-//	/**
-//	 * Returns the ruleset array used by this class.
-//	 *
-//	 * @return
-//	 */
-//	public MpqEditorCompressionRule[] getCustomRuleSet() {
-//		return customRules;
-//	}
 	
 	/**
 	 * @param customRules

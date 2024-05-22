@@ -29,7 +29,7 @@ import com.ahli.interfacebuilder.ui.navigation.NavigationController;
 import com.ahli.interfacebuilder.ui.progress.BaseUiExtractionController;
 import com.ahli.interfacebuilder.ui.progress.ErrorTabController;
 import com.ahli.interfacebuilder.ui.progress.ProgressController;
-import com.ahli.mpq.MpqEditorInterface;
+import com.ahli.mpq.mpqeditor.MpqEditorInterface;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
@@ -145,7 +145,7 @@ public class BrowseController implements Updateable, FxmlController {
 				FXCollections.observableList(projectService.getAllProjects());
 		projectListView.setItems(projectsObservable);
 		projectListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-		projectListView.setCellFactory(listViewProject -> new ListCell<>() {
+		projectListView.setCellFactory(_ -> new ListCell<>() {
 			@Override
 			protected void updateItem(final Project project, final boolean empty) {
 				super.updateItem(project, empty);

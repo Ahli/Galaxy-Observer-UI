@@ -43,9 +43,6 @@ public interface UIStateGroup extends UIElement {
 	@Override
 	boolean equals(Object o);
 	
-//	@Override
-//	boolean canEqual(Object other);
-	
 	@Override
 	int hashCode();
 }

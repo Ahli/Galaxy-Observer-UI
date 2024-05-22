@@ -5,8 +5,7 @@ import com.esotericsoftware.kryo.KryoException;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryo.util.ListReferenceResolver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -16,9 +15,8 @@ import java.util.Deque;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
+@Slf4j
 public class RecentlyUsed {
-	
-	private static final Logger logger = LoggerFactory.getLogger(RecentlyUsed.class);
 	private final ArrayDeque<Path> recent = new ArrayDeque<>(5);
 	private final Kryo kryo;
 	
@@ -37,13 +35,13 @@ public class RecentlyUsed {
 						recent.add(Path.of(kryo.readObject(input, String.class)));
 					}
 				} catch (final KryoException e) {
-					logger.error("Failed to load save file.", e);
+					log.error("Failed to load save file.", e);
 					if (i == 0) {
 						Files.deleteIfExists(path);
 					}
 				}
 			} catch (final IOException e) {
-				logger.error("Failed to delete save file.", e);
+				log.error("Failed to delete save file.", e);
 			}
 		}
 	}
@@ -73,7 +71,7 @@ public class RecentlyUsed {
 				throw new IOException(e);
 			}
 		} catch (final IOException e) {
-			logger.error("Failed to write save file.", e);
+			log.error("Failed to write save file.", e);
 		}
 	}
 	
