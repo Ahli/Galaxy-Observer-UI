@@ -9,8 +9,7 @@ import com.ahli.hotkey_ui.application.model.TextValueDef;
 import com.ahli.hotkey_ui.application.model.TextValueDefType;
 import com.ahli.hotkey_ui.application.model.abstracts.ValueDef;
 import com.ahli.xml.XmlDomHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -32,6 +31,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
+@Slf4j
 public class LayoutExtensionReader {
 	private static final String ATTRIBUTE_CONSTANT = "constant";
 	private static final String ATTRIBUTE_DEFAULT = "default";
@@ -42,7 +42,6 @@ public class LayoutExtensionReader {
 	private static final String ATTRIBUTE_GAMESTRINGS_ADD = "gamestrings_add";
 	private static final String HOTKEY = "@hotkey";
 	private static final String SETTING = "@setting";
-	private static final Logger logger = LoggerFactory.getLogger(LayoutExtensionReader.class);
 	private static final Pattern HOTKEY_SETTING_REGEX_PATTERN = Pattern.compile("(?<=@hotkey|@setting)/i");
 	private static final Pattern ATTRIBUTES_REGEX_PATTERN = Pattern.compile(
 			"(?i)(?=(?:constant|default|description|values|valuesdisplaynames|type|gamestrings_add)\\s*=)");
@@ -96,7 +95,7 @@ public class LayoutExtensionReader {
 	 * 		if there was a parse error
 	 */
 	public void processLayoutFiles(final List<Path> layoutFiles) throws ParserConfigurationException, SAXException {
-		logger.info("Scanning for XML file...");
+		log.info("Scanning for XML file...");
 		
 		final DocumentBuilder dBuilder = XmlDomHelper.buildSecureDocumentBuilder(true, false);
 		
@@ -116,7 +115,7 @@ public class LayoutExtensionReader {
 				continue;
 			}
 			
-			logger.debug("comments - processing file: {}", path);
+			log.debug("comments - processing file: {}", path);
 			
 			// read comments
 			final Element elem = doc.getDocumentElement();
@@ -135,7 +134,7 @@ public class LayoutExtensionReader {
 				continue;
 			}
 			
-			logger.debug("constants - processing file: {}", path);
+			log.debug("constants - processing file: {}", path);
 			
 			// read constants
 			final Element elem = doc.getDocumentElement();
@@ -146,9 +145,9 @@ public class LayoutExtensionReader {
 	
 	private void logParseException(final Exception e, final Path path) {
 		if (!"Content is not allowed in prolog.".equals(e.getMessage())) {
-			logger.trace("Error parsing file {}.", path, e);
+			log.trace("Error parsing file {}.", path, e);
 		} else {
-			logger.trace("Error parsing file {}.", path);
+			log.trace("Error parsing file {}.", path);
 		}
 	}
 	
@@ -179,17 +178,17 @@ public class LayoutExtensionReader {
 	 * @param textInput
 	 */
 	public void processCommentText(final String textInput) {
-		logger.debug("textInput:{}", textInput);
+		log.debug("textInput:{}", textInput);
 		try {
 			// split at keywords @hotkey or @setting without removing, case-insensitive
 			for (String text : HOTKEY_SETTING_REGEX_PATTERN.split(textInput)) {
-				logger.debug("token start:{}", text);
+				log.debug("token start:{}", text);
 				text = text.trim();
 				
 				final String lowerCaseText = text.toLowerCase(Locale.ROOT);
 				final boolean isHotkey = lowerCaseText.startsWith(HOTKEY);
 				if (isHotkey || lowerCaseText.startsWith(SETTING)) {
-					logger.debug("detected hotkey or setting");
+					log.debug("detected hotkey or setting");
 					
 					String constant = "";
 					String description = "";
@@ -209,30 +208,30 @@ public class LayoutExtensionReader {
 					// split at keyword
 					for (String part : ATTRIBUTES_REGEX_PATTERN.split(toProcess)) {
 						part = part.trim();
-						logger.trace("part: {}", part);
+						log.trace("part: {}", part);
 						final String partLower = part.toLowerCase(Locale.ROOT);
 						part = getValueAfterEqualsChar(part);
 						if (partLower.startsWith(ATTRIBUTE_CONSTANT)) {
 							constant = getValueWithinQuotes(part);
-							logger.trace("constant = {}", constant);
+							log.trace("constant = {}", constant);
 						} else if (partLower.startsWith(ATTRIBUTE_DEFAULT)) {
 							defaultValue = getValueWithinQuotes(part);
-							logger.trace("default = {}", defaultValue);
+							log.trace("default = {}", defaultValue);
 						} else if (partLower.startsWith(ATTRIBUTE_DESCRIPTION)) {
 							description = getValueWithinQuotes(part);
-							logger.trace("description = {}", description);
+							log.trace("description = {}", description);
 						} else if (partLower.startsWith(ATTRIBUTE_VALUES_DISPLAY_NAMES)) {
 							allowedValuesDisplayNames = parseListOfValues(part);
-							logger.trace("valuesDisplayNames = {}", part);
+							log.trace("valuesDisplayNames = {}", part);
 						} else if (partLower.startsWith(ATTRIBUTE_VALUES)) {
 							allowedValues = parseListOfValues(part);
-							logger.trace("values = {}", part);
+							log.trace("values = {}", part);
 						} else if (partLower.startsWith(ATTRIBUTE_TYPE)) {
 							type = getValueWithinQuotes(part).trim();
-							logger.trace("type = {}", part);
+							log.trace("type = {}", part);
 						} else if (partLower.startsWith(ATTRIBUTE_GAMESTRINGS_ADD)) {
 							gamestringsAdd = getValueWithinQuotes(part).trim();
-							logger.trace("gamestrings_add = {}", part);
+							log.trace("gamestrings_add = {}", part);
 						}
 					}
 					
@@ -253,7 +252,7 @@ public class LayoutExtensionReader {
 		} catch (final RuntimeException e) {
 			throw e;
 		} catch (final Exception e) {
-			logger.trace("Parsing Comment failed.", e);
+			log.trace("Parsing Comment failed.", e);
 		}
 	}
 	
@@ -300,7 +299,7 @@ public class LayoutExtensionReader {
 		
 		if (!changedHotkeys.isEmpty() || !changedSettings.isEmpty()) {
 			
-			logger.info("Scanning for XML files...");
+			log.info("Scanning for XML files...");
 			final DocumentBuilder dBuilder = XmlDomHelper.buildSecureDocumentBuilder(true, false);
 			final Transformer transformer = XmlDomHelper.buildSecureTransformer();
 			
@@ -314,7 +313,7 @@ public class LayoutExtensionReader {
 				Files.walkFileTree(projectInCache, visitor);
 			} catch (final IOException e) {
 				// TODO do not eat this exception -> stop and show error
-				logger.error("Transforming to generate XML file failed.", e);
+				log.error("Transforming to generate XML file failed.", e);
 			}
 			return true;
 		}
@@ -341,13 +340,13 @@ public class LayoutExtensionReader {
 			}
 		}
 		if (!gamestringsAddSettings.isEmpty()) {
-			logger.info("Scanning for GameStrings.txt files...");
+			log.info("Scanning for GameStrings.txt files...");
 			try {
 				final FileVisitor<Path> visitor = new GameStringsUpdater(gamestringsAddSettings);
 				
 				Files.walkFileTree(projectInCache, visitor);
 			} catch (final IOException e) {
-				logger.error("Editing GameStrings.txt files failed..", e);
+				log.error("Editing GameStrings.txt files failed..", e);
 			}
 			return true;
 		}

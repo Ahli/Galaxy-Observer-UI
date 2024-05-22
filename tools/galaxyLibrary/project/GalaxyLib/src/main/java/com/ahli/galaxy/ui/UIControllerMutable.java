@@ -78,32 +78,6 @@ public class UIControllerMutable extends UIElementAbstract implements UIControll
 		return keys;
 	}
 	
-//	/**
-//	 * @param keys
-//	 * 		the keys to set
-//	 */
-//	@Override
-//	public void setKeys(final List<UIAttribute> keys) {
-//		this.keys = keys;
-//	}
-	
-//	/**
-//	 * @return the nextAdditionShouldOverride
-//	 */
-//	@Override
-//	public boolean isNextAdditionShouldOverride() {
-//		return nextAdditionShouldOverride;
-//	}
-	
-//	/**
-//	 * @param nextAdditionShouldOverride
-//	 * 		the nextAdditionShouldOverride to set
-//	 */
-//	@Override
-//	public void setNextAdditionShouldOverride(final boolean nextAdditionShouldOverride) {
-//		this.nextAdditionShouldOverride = nextAdditionShouldOverride;
-//	}
-	
 	/**
 	 * Adds a value for the key and returns any overridden value.
 	 *
@@ -142,14 +116,6 @@ public class UIControllerMutable extends UIElementAbstract implements UIControll
 		}
 		return null;
 	}
-	
-//	/**
-//	 * @return the nameIsImplicit
-//	 */
-//	@Override
-//	public boolean isNameIsImplicit() {
-//		return nameIsImplicit;
-//	}
 	
 	/**
 	 * @param nameIsImplicit

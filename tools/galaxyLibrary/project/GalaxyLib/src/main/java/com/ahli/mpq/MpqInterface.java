@@ -33,12 +33,4 @@ public interface MpqInterface {
 	 */
 	Path getCache();
 	
-//	/**
-//	 * Sets the cache folder.
-//	 *
-//	 * @param cache
-//	 * 		Cache folder to temporarily store mpq content within
-//	 */
-//	void setCache(Path cache);
-	
 }

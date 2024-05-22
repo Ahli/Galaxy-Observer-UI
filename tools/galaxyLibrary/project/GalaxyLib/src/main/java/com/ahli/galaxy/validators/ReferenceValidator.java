@@ -13,14 +13,13 @@ import com.ahli.galaxy.ui.interfaces.UIController;
 import com.ahli.galaxy.ui.interfaces.UIElement;
 import com.ahli.galaxy.ui.interfaces.UIFrame;
 import com.ahli.galaxy.ui.interfaces.UIStateGroup;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayDeque;
 import java.util.List;
 
+@Slf4j
 public class ReferenceValidator {
-	private static final Logger logger = LoggerFactory.getLogger(ReferenceValidator.class);
 	
 	private final UICatalog uiCatalog;
 	
@@ -79,7 +78,7 @@ public class ReferenceValidator {
 			case UIFrame uiFrame -> validate(uiFrame, data);
 			case UIAnimation uiAnimation -> validate(uiAnimation, data);
 			case UIStateGroup uiStateGroup -> validate(uiStateGroup, data);
-			case null, default -> logger.error("ERROR: UIElement not handled in ReferenceValidator");
+			case null, default -> log.error("ERROR: UIElement not handled in ReferenceValidator");
 		}
 	}
 	

@@ -45,15 +45,6 @@ public abstract class MpqEditorCompressionRule implements DeepCopyable, Serializ
 		compressionMethod = original.compressionMethod;
 	}
 	
-//	/**
-//	 * Checks if the rule is valid.
-//	 *
-//	 * @return
-//	 */
-//	public boolean isValidRule() {
-//		return (!singleUnit || !encrypt) && (encrypt || !encryptAdjusted) && (!includeSectorChecksum || compress);
-//	}
-	
 	/**
 	 * Instead of being divided to 0x1000-bytes blocks, the file is stored as single unit. Requires encrypt to be
 	 * disabled.
@@ -94,16 +85,6 @@ public abstract class MpqEditorCompressionRule implements DeepCopyable, Serializ
 		this.encryptAdjusted = encryptAdjusted;
 		return this;
 	}
-	
-	//	/**
-//	 * Requires compression to be enabled.
-//	 *
-//	 * @param includeSectorChecksum
-//	 */
-//	public MpqEditorCompressionRule setIncludeSectorChecksum(final boolean includeSectorChecksum) {
-//		this.includeSectorChecksum = includeSectorChecksum;
-//		return this;
-//	}
 	
 	/**
 	 * File is a deletion marker, indicating that the file no longer exists. This is used to allow patch archives to

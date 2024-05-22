@@ -73,13 +73,12 @@ public class ViewRuleSetController {
 				.isSingleUnit()).asString());
 		columnMaskSize.setCellValueFactory(cellData -> {
 			final MpqEditorCompressionRule rule = cellData.getValue();
-			if (rule instanceof final MpqEditorCompressionRuleMask ruleMask) {
-				return new SimpleStringProperty(ruleMask.getMask());
-			} else if (rule instanceof final MpqEditorCompressionRuleSize ruleSize) {
-				return new SimpleStringProperty(ruleSize.getMinSize() + " - " + ruleSize.getMaxSize());
-			} else {
-				return new SimpleStringProperty("");
-			}
+			return switch (rule) {
+				case final MpqEditorCompressionRuleMask ruleMask -> new SimpleStringProperty(ruleMask.getMask());
+				case final MpqEditorCompressionRuleSize ruleSize ->
+						new SimpleStringProperty(ruleSize.getMinSize() + " - " + ruleSize.getMaxSize());
+				case null, default -> new SimpleStringProperty("");
+			};
 		});
 		columnCompressionAlgo.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue()
 				.getCompressionMethod()

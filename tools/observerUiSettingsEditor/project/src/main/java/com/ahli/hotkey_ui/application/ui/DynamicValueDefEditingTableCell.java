@@ -13,13 +13,12 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TextField;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.regex.Pattern;
 
+@Slf4j
 public class DynamicValueDefEditingTableCell extends TableCell<ValueDef, String> {
-	private static final Logger logger = LoggerFactory.getLogger(DynamicValueDefEditingTableCell.class);
 	private static final Pattern NUMBER_INPUT_REGEX_PATTERN = Pattern.compile("-?\\d{0,7}(?:[.]\\d{0,4})?");
 	
 	@Override
@@ -34,7 +33,7 @@ public class DynamicValueDefEditingTableCell extends TableCell<ValueDef, String>
 	}
 	
 	private void updateItemNull() {
-		logger.trace("update valuedef-edit table cell - null");
+		log.trace("update valuedef-edit table cell - null");
 		setGraphic(null);
 		setText(null);
 	}
@@ -42,17 +41,17 @@ public class DynamicValueDefEditingTableCell extends TableCell<ValueDef, String>
 	private void updateItem(final String item) {
 		final ValueDef data = getTableRow().getItem();
 		if (data instanceof TextValueDef tvd) {
-			logger.trace("update valuedef-edit table cell - label {} - type: {}", item, tvd.getType());
+			log.trace("update valuedef-edit table cell - label {} - type: {}", item, tvd.getType());
 			if (tvd.getType() == TextValueDefType.NUMBER) {
 				createNumberEditor(tvd, item);
 			} else {
 				createTextEditor(tvd, item);
 			}
 		} else if (data instanceof OptionValueDef ovd) {
-			logger.trace("update valuedef-edit table cell - label {} - type: {}", item, ovd.getType());
+			log.trace("update valuedef-edit table cell - label {} - type: {}", item, ovd.getType());
 			createChoiceEditor(ovd);
 		} else {
-			logger.trace("update valuedef-edit table cell - label {} - null ValueDef", item);
+			log.trace("update valuedef-edit table cell - label {} - null ValueDef", item);
 			setGraphic(null);
 		}
 	}
@@ -61,7 +60,7 @@ public class DynamicValueDefEditingTableCell extends TableCell<ValueDef, String>
 		final TextField textField = new TextField(item);
 		
 		textField.focusedProperty().addListener((obs, wasFocussed, isFocussed) -> {
-			logger.debug("createNumberEditor: {}", isFocussed);
+			log.debug("createNumberEditor: {}", isFocussed);
 			if (isFocussed != null && !isFocussed) {
 				final TextField control = (TextField) ((ReadOnlyBooleanProperty) obs).getBean();
 				final String input = control.getText().trim();
@@ -83,7 +82,7 @@ public class DynamicValueDefEditingTableCell extends TableCell<ValueDef, String>
 		final TextField textField = new TextField(item);
 		
 		textField.focusedProperty().addListener((obs, wasFocussed, isFocussed) -> {
-			logger.debug("createTextEditor: {}", isFocussed);
+			log.debug("createTextEditor: {}", isFocussed);
 			if (isFocussed != null && !isFocussed) {
 				final TextField control = (TextField) ((ReadOnlyBooleanProperty) obs).getBean();
 				data.setValue(control.getText());

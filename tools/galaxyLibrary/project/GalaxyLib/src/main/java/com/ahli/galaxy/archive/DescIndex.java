@@ -6,11 +6,10 @@ package com.ahli.galaxy.archive;
 import com.ahli.mpq.MpqException;
 import com.ahli.mpq.MpqInterface;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -29,6 +28,7 @@ import java.util.List;
  */
 // TODO rebuild to use the UI object model instead of parsing all layout files
 // another time
+@Slf4j
 public class DescIndex {
 	private static final String STRING2 = "#";
 	
@@ -41,7 +41,6 @@ public class DescIndex {
 	private static final String XML_VERSION_1_0_ENCODING_UTF_8_STANDALONE_YES_DESC =
 			"<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\r\n<Desc>\r\n";
 	
-	private static final Logger logger = LoggerFactory.getLogger(DescIndex.class);
 	private static final String CHECKED_WITH_DEPENDENCY_AND_I_J_I2 =
 			"checked {} with dependency {} and {} i={} j={} i2={}";
 	private static final String FILE_INT_PATH_LIST = "fileIntPathList: {}";
@@ -68,13 +67,6 @@ public class DescIndex {
 	}
 	
 	/**
-	 * @param descIndexIntPath
-	 */
-	public void setDescIndexIntPath(@NotNull final String descIndexIntPath) {
-		this.descIndexIntPath = descIndexIntPath;
-	}
-	
-	/**
 	 * @param descIndexPath
 	 */
 	public void setDescIndexPathAndClear(@NotNull final String descIndexPath) {
@@ -87,6 +79,13 @@ public class DescIndex {
 	 */
 	public void clear() {
 		fileIntPathList.clear();
+	}
+	
+	/**
+	 * @param descIndexIntPath
+	 */
+	public void setDescIndexIntPath(@NotNull final String descIndexIntPath) {
+		this.descIndexIntPath = descIndexIntPath;
 	}
 	
 	/**
@@ -116,7 +115,7 @@ public class DescIndex {
 		}
 		fileIntPathList.add(Tuples.pair(p, intPath2));
 		
-		logger.trace("added Layout path: {}\nadded File path: {}", intPath2, p);
+		log.trace("added Layout path: {}\nadded File path: {}", intPath2, p);
 	}
 	
 	/**
@@ -157,7 +156,7 @@ public class DescIndex {
 			
 			// add calculated list of dependencies from layout file
 			final List<String> layoutDeps = LayoutReaderDom.getDependencyLayouts(f, curConstants);
-			logger.trace("Dependencies found: {}", layoutDeps);
+			log.trace("Dependencies found: {}", layoutDeps);
 			
 			ownConstants.add(curConstants);
 			dependencies.add(layoutDeps);
@@ -166,7 +165,7 @@ public class DescIndex {
 		boolean insertOccurred = true;
 		final int end = (int) Math.pow(fileIntPathList.size(), 4);
 		for (int counter = 0; insertOccurred && counter < end; ++counter) {
-			logger.trace("counter={}", counter);
+			log.trace("counter={}", counter);
 			insertOccurred = false;
 			for (int i = 0, len = dependencies.size(); i < len; ++i) {
 				
@@ -178,7 +177,7 @@ public class DescIndex {
 					String curDependencyTo = curLayoutDepList.get(j);
 					
 					if (curDependencyTo.startsWith(STRING2)) {
-						logger.trace("DEPENDENCY: {}", curDependencyTo);
+						log.trace("DEPENDENCY: {}", curDependencyTo);
 						while (curDependencyTo.startsWith(STRING2)) {
 							curDependencyTo = curDependencyTo.substring(1);
 						}
@@ -212,8 +211,8 @@ public class DescIndex {
 								}
 								for (final String constant : ownConstants.get(i2)) {
 									if (constant.equals(curDependencyTo)) {
-										if (logger.isTraceEnabled()) {
-											logger.trace(
+										if (log.isTraceEnabled()) {
+											log.trace(
 													CHECKED_WITH_DEPENDENCY_AND_I_J_I2,
 													fileIntPathList.get(i).getOne().getFileName(),
 													curDependencyTo,
@@ -221,7 +220,7 @@ public class DescIndex {
 													i,
 													j,
 													i2);
-											logger.trace(FILE_INT_PATH_LIST, fileIntPathList);
+											log.trace(FILE_INT_PATH_LIST, fileIntPathList);
 										}
 										// i's needs to be inserted after i2
 										dependencies.remove(i);
@@ -230,17 +229,17 @@ public class DescIndex {
 										dependencies.add(i, curLayoutDepList);
 										fileIntPathList.add(i, pair);
 										//constantDefinedBefore = true;
-										if (logger.isTraceEnabled()) {
-											logger.trace(
+										if (log.isTraceEnabled()) {
+											log.trace(
 													"inserted {} after {}",
 													fileIntPathList.get(i).getOne().getFileName(),
 													fileName);
-											logger.trace(FILE_INT_PATH_LIST, fileIntPathList);
+											log.trace(FILE_INT_PATH_LIST, fileIntPathList);
 										}
 										break y;
 									} else {
-										if (logger.isTraceEnabled()) {
-											logger.trace(
+										if (log.isTraceEnabled()) {
+											log.trace(
 													CHECKED_WITH_DEPENDENCY_AND_I_J_I2,
 													fileIntPathList.get(i).getOne().getFileName(),
 													curDependencyTo,
@@ -265,7 +264,7 @@ public class DescIndex {
 		// change order according to templates
 		insertOccurred = true;
 		for (int counter = 0; insertOccurred && counter < end; ++counter) {
-			logger.trace("counter={}", counter);
+			log.trace("counter={}", counter);
 			insertOccurred = false;
 			x:
 			for (int i = 0; i < dependencies.size(); ++i) {
@@ -288,8 +287,8 @@ public class DescIndex {
 							}
 							
 							if (fileName.equals(curDependencyTo)) {
-								if (logger.isTraceEnabled()) {
-									logger.trace(
+								if (log.isTraceEnabled()) {
+									log.trace(
 											CHECKED_WITH_DEPENDENCY_AND_I_J_I2,
 											fileIntPathList.get(i).getOne().getFileName(),
 											curDependencyTo,
@@ -297,7 +296,7 @@ public class DescIndex {
 											i,
 											j,
 											i2);
-									logger.trace(FILE_INT_PATH_LIST, fileIntPathList);
+									log.trace(FILE_INT_PATH_LIST, fileIntPathList);
 								}
 								// i's needs to be inserted after i2
 								dependencies.remove(i);
@@ -306,17 +305,17 @@ public class DescIndex {
 								dependencies.add(i, curLayoutDepList);
 								fileIntPathList.add(i, pair);
 								insertOccurred = true;
-								if (logger.isTraceEnabled()) {
-									logger.trace(
+								if (log.isTraceEnabled()) {
+									log.trace(
 											"inserted {} after {}",
 											fileIntPathList.get(i).getOne().getFileName(),
 											fileName);
-									logger.trace(FILE_INT_PATH_LIST, fileIntPathList);
+									log.trace(FILE_INT_PATH_LIST, fileIntPathList);
 								}
 								break x;
 							} else {
-								if (logger.isTraceEnabled()) {
-									logger.trace(
+								if (log.isTraceEnabled()) {
+									log.trace(
 											CHECKED_WITH_DEPENDENCY_AND_I_J_I2,
 											fileIntPathList.get(i).getOne().getFileName(),
 											curDependencyTo,

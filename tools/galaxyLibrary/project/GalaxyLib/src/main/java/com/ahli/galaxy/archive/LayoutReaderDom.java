@@ -4,9 +4,8 @@
 package com.ahli.galaxy.archive;
 
 import com.ahli.xml.XmlDomHelper;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -25,6 +24,7 @@ import java.util.List;
  *
  * @author Ahli
  */
+@Slf4j
 public final class LayoutReaderDom {
 	private static final String TEMPLATE = "template";
 	private static final String FRAME = "Frame";
@@ -33,7 +33,6 @@ public final class LayoutReaderDom {
 	private static final String CONSTANT = "Constant";
 	private static final String NAME = "name";
 	private static final String CONSTANT_MARKER = "#";
-	private static final Logger logger = LoggerFactory.getLogger(LayoutReaderDom.class);
 	
 	private LayoutReaderDom() {
 		// no instances allowed
@@ -84,7 +83,7 @@ public final class LayoutReaderDom {
 							final String layoutName = dependency.substring(0, firstIndex);
 							if (!layoutName.equalsIgnoreCase(nameWOfileEnding) &&
 									isNotAppearingInList(layoutName, list)) {
-								logger.trace("{} has dependency to {}", nameWOfileEnding, layoutName);
+								log.trace("{} has dependency to {}", nameWOfileEnding, layoutName);
 								list.add(layoutName);
 							}
 						}
@@ -100,9 +99,9 @@ public final class LayoutReaderDom {
 		if (ownConstants == null) {
 			ownConstants = getLayoutsConstantDefinitions(doc);
 			
-			if (logger.isTraceEnabled()) {
+			if (log.isTraceEnabled()) {
 				for (final String str : ownConstants) {
-					logger.trace("{} defines constant {}", nameWOfileEnding, str);
+					log.trace("{} defines constant {}", nameWOfileEnding, str);
 				}
 			}
 		}
@@ -132,7 +131,7 @@ public final class LayoutReaderDom {
 				final String attrName = attribute.getNodeName();
 				if (attrName.startsWith(CONSTANT_MARKER) && isNotAppearingInList(attrName, usedConstants) &&
 						isConstantNotAppearingInList(attrName, ownConstants)) {
-					logger.trace("{} uses undefined constant {}", nameWOfileEnding, attrName);
+					log.trace("{} uses undefined constant {}", nameWOfileEnding, attrName);
 					usedConstants.add(attrName);
 					list.add(attrName);
 				}
@@ -140,7 +139,7 @@ public final class LayoutReaderDom {
 				final String attrValue = attribute.getNodeValue();
 				if (attrValue.startsWith(CONSTANT_MARKER) && isNotAppearingInList(attrValue, usedConstants) &&
 						isConstantNotAppearingInList(attrValue, ownConstants)) {
-					logger.trace("{} uses undefined constant {}", nameWOfileEnding, attrValue);
+					log.trace("{} uses undefined constant {}", nameWOfileEnding, attrValue);
 					usedConstants.add(attrValue);
 					list.add(attrValue);
 				}
@@ -206,7 +205,7 @@ public final class LayoutReaderDom {
 				if (attr.getNodeName().equalsIgnoreCase(NAME)) {
 					final String nodeValue = attr.getNodeValue();
 					ownConstants.add(nodeValue);
-					logger.trace("FOUND CONSTANT DEFINITION: {}", nodeValue);
+					log.trace("FOUND CONSTANT DEFINITION: {}", nodeValue);
 				}
 				// else
 				// System.out.println("REJECTED CONSTANT ATTR: " +

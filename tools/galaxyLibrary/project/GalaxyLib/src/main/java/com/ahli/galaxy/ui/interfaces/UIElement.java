@@ -61,8 +61,6 @@ public interface UIElement extends DeepCopyable {
 	@Override
 	boolean equals(Object obj);
 	
-//	boolean canEqual(Object other);
-	
 	/**
 	 * @return the name
 	 */
@@ -76,6 +74,4 @@ public interface UIElement extends DeepCopyable {
 	
 	@Override
 	int hashCode();
-	
-	//	void invalidateHashcode();
 }

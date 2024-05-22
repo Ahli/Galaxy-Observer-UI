@@ -23,8 +23,6 @@ public interface UIFrame extends UIElement {
 	
 	void addAttribute(UIAttribute value);
 	
-//	UIAttribute getValue(String key);
-	
 	List<UIAttribute> getAttributes();
 	
 	List<UIAttribute> getAttributesRaw();
@@ -53,9 +51,6 @@ public interface UIFrame extends UIElement {
 	
 	@Override
 	boolean equals(Object obj);
-	
-//	@Override
-//	boolean canEqual(Object other);
 	
 	@Override
 	int hashCode();

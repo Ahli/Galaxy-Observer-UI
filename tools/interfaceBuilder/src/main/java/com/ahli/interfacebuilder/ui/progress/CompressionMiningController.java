@@ -14,11 +14,11 @@ import com.ahli.interfacebuilder.projects.Project;
 import com.ahli.interfacebuilder.projects.ProjectService;
 import com.ahli.interfacebuilder.ui.FxmlController;
 import com.ahli.interfacebuilder.ui.Updateable;
-import com.ahli.mpq.MpqEditorInterface;
 import com.ahli.mpq.MpqException;
 import com.ahli.mpq.mpqeditor.MpqEditorCompressionRule;
 import com.ahli.mpq.mpqeditor.MpqEditorCompressionRuleMask;
 import com.ahli.mpq.mpqeditor.MpqEditorCompressionRuleSize;
+import com.ahli.mpq.mpqeditor.MpqEditorInterface;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -112,13 +112,12 @@ public class CompressionMiningController implements Updateable, FxmlController {
 				.isSingleUnit()).asString());
 		columnMaskSize.setCellValueFactory(cellData -> {
 			final MpqEditorCompressionRule rule = cellData.getValue();
-			if (rule instanceof MpqEditorCompressionRuleMask ruleMask) {
-				return new SimpleStringProperty(ruleMask.getMask());
-			} else if (rule instanceof MpqEditorCompressionRuleSize ruleSize) {
-				return new SimpleStringProperty(ruleSize.getMinSize() + " - " + ruleSize.getMaxSize());
-			} else {
-				return new SimpleStringProperty("");
-			}
+			return switch (rule) {
+				case MpqEditorCompressionRuleMask ruleMask -> new SimpleStringProperty(ruleMask.getMask());
+				case MpqEditorCompressionRuleSize ruleSize ->
+						new SimpleStringProperty(ruleSize.getMinSize() + " - " + ruleSize.getMaxSize());
+				default -> new SimpleStringProperty("");
+			};
 		});
 		columnCompressionAlgo.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue()
 				.getCompressionMethod()

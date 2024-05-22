@@ -58,13 +58,11 @@ public class UIStateMutable extends UIElementAbstract implements UIState {
 	@Override
 	public Object deepCopy() {
 		final UIStateMutable clone = new UIStateMutable(getName(), whens.size(), actions.size());
-		final List<UIAttribute> whensClone = clone.whens;
 		for (final UIAttribute when : whens) {
-			whensClone.add((UIAttribute) when.deepCopy());
+			clone.whens.add((UIAttribute) when.deepCopy());
 		}
-		final List<UIAttribute> actionsClone = clone.actions;
 		for (final UIAttribute action : actions) {
-			actionsClone.add((UIAttribute) action.deepCopy());
+			clone.actions.add((UIAttribute) action.deepCopy());
 		}
 		clone.nextAdditionShouldOverrideActions = nextAdditionShouldOverrideActions;
 		clone.nextAdditionShouldOverrideWhens = nextAdditionShouldOverrideWhens;
@@ -79,15 +77,6 @@ public class UIStateMutable extends UIElementAbstract implements UIState {
 		return whens;
 	}
 	
-//	/**
-//	 * @param whens
-//	 * 		the whens to set
-//	 */
-//	@Override
-//	public void setWhens(final List<UIAttribute> whens) {
-//		this.whens = whens;
-//	}
-	
 	/**
 	 * @return the actions
 	 */
@@ -95,23 +84,6 @@ public class UIStateMutable extends UIElementAbstract implements UIState {
 	public List<UIAttribute> getActions() {
 		return actions;
 	}
-	
-//	/**
-//	 * @param actions
-//	 * 		the actions to set
-//	 */
-//	@Override
-//	public void setActions(final List<UIAttribute> actions) {
-//		this.actions = actions;
-//	}
-	
-//	/**
-//	 * @return the nextAdditionShouldOverrideWhens
-//	 */
-//	@Override
-//	public boolean isNextAdditionShouldOverrideWhens() {
-//		return nextAdditionShouldOverrideWhens;
-//	}
 	
 	/**
 	 * @param nextAdditionShouldOverrideWhens
@@ -121,14 +93,6 @@ public class UIStateMutable extends UIElementAbstract implements UIState {
 	public void setNextAdditionShouldOverrideWhens(final boolean nextAdditionShouldOverrideWhens) {
 		this.nextAdditionShouldOverrideWhens = nextAdditionShouldOverrideWhens;
 	}
-	
-//	/**
-//	 * @return the nextAdditionShouldOverrideActions
-//	 */
-//	@Override
-//	public boolean isNextAdditionShouldOverrideActions() {
-//		return nextAdditionShouldOverrideActions;
-//	}
 	
 	/**
 	 * @param nextAdditionShouldOverrideActions

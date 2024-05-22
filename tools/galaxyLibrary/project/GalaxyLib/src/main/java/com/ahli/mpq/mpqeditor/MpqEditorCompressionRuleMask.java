@@ -36,15 +36,6 @@ public class MpqEditorCompressionRuleMask extends MpqEditorCompressionRule {
 		return "Mask:" + getMask() + "=" + getAttributeString() + ", " + getCompressionMethodString() + ", 0xFFFFFFFF";
 	}
 	
-	//	/**
-//	 * Sets the mask to match file names. Use '*' as a wildcard.
-//	 *
-//	 * @param mask
-//	 */
-//	public void setMask(final String mask) {
-//		this.mask = mask;
-//	}
-	
 	@Override
 	public Object deepCopy() {
 		return new MpqEditorCompressionRuleMask(this);
