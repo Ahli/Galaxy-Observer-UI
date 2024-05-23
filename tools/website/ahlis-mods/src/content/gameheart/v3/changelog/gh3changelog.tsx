@@ -9,10 +9,11 @@ export const gh3changelog: Post[] = [
     id: '37',
     title: '3.7',
     image: [gh3_37, gh3_36],
-    createdAt: '22nd May 2024',
-    download: 'https://www.dropbox.com/s/1edtu9ci9z767cg/GameHeart_3.6.SC2Interface?dl=1',
-    version: '3.6',
-    date: '22nd May 2024',
+    createdAt: '23rd May 2024',
+    download:
+      'https://www.dropbox.com/scl/fi/v0k6pbt5xkd9rcotsjoba/GameHeart_3.7.SC2Interface?rlkey=hb7k60nwlyu5m66zrg95ih42m&dl=1',
+    version: '3.7',
+    date: '23rd May 2024',
     changes: [
       'fixed workers killed notification background not sliding in',
       'added worker count to 3vs3, 4vs4 and FFA player cards',

@@ -20,7 +20,7 @@ export const PostView = (props: PostProps) => {
   const [data] = useState({ post: props.post, isChangelog: (props.post as Changelog) != undefined } as Data);
   return (
     // TODO show multiple images
-    <Card variant='elevation'>
+    <Card variant='outlined'>
       {data.post.image && (
         <CardMedia component='img' loading='lazy' image={getFirstImage(data.post)} alt='screenshot' />
       )}
