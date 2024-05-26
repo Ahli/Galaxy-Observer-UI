@@ -1,7 +1,7 @@
 import { Change, Changelog, Post } from '../../../types/Post';
-import pro2020_10 from '../../../assets/pro2020ahliMod/pro2020ahliMod_10.jpg';
-import pro2020_11 from '../../../assets/pro2020ahliMod/pro2020ahliMod_11.jpg';
-import pro2020_12 from '../../../assets/pro2020ahliMod/pro2020ahliMod_12.jpg';
+import pro2020_10 from '../../../assets/pro2020ahliMod/pro2020ahliMod_10.avif';
+import pro2020_11 from '../../../assets/pro2020ahliMod/pro2020ahliMod_11.avif';
+import pro2020_12 from '../../../assets/pro2020ahliMod/pro2020ahliMod_12.avif';
 
 export const pro2020AhliModChangelog: Post[] = [
   {

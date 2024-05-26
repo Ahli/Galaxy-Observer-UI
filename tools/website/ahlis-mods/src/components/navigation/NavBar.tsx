@@ -5,13 +5,13 @@ import KeyboardOutlinedIcon from '@mui/icons-material/KeyboardOutlined';
 import { NavBarCollapsibleData, NavBarItemData, NavBarLinkData } from '../../types/NavBarItemData';
 import { NavBarLink } from './NavBarLink';
 import { NavBarCollapsible } from './NavBarCollapsible';
-import sc2Img from '../../assets/common/sc2.png';
-import heroesImg from '../../assets/common/heroes.png';
+import sc2Img from '../../assets/common/sc2.avif';
+import heroesImg from '../../assets/common/heroes.avif';
 
 export const navBarWidth = 220;
 
-const sc2icon = <img width='40' height='40' src={sc2Img} />;
-const heroesIcon = <img width='40' height='40' src={heroesImg} />;
+const sc2icon = <img width='40' height='40' src={sc2Img} alt='sc2' />;
+const heroesIcon = <img width='40' height='40' src={heroesImg} alt='heroes' />;
 
 const navbarItems = [
   new NavBarLinkData('News', <HomeIcon />, '/'),

@@ -1,56 +1,55 @@
 import { Change, Changelog, Post } from '../../../types/Post';
-import ahliObs1 from '../../../assets/ahliObs/1.jpg';
-import ahliObs3 from '../../../assets/ahliObs/3.jpg';
-import ahliObs5 from '../../../assets/ahliObs/5.jpg';
-import ahliObs11 from '../../../assets/ahliObs/11.jpg';
-import ahliObs14 from '../../../assets/ahliObs/14.jpg';
-import ahliObs15 from '../../../assets/ahliObs/15.jpg';
-import ahliObs17 from '../../../assets/ahliObs/17.jpg';
-import ahliObs18 from '../../../assets/ahliObs/18.jpg';
-import ahliObs20 from '../../../assets/ahliObs/20.jpg';
-import ahliObs21 from '../../../assets/ahliObs/21.jpg';
-import ahliObs22 from '../../../assets/ahliObs/22.jpg';
-import ahliObs23 from '../../../assets/ahliObs/23.jpg';
-import ahliObs24 from '../../../assets/ahliObs/24.jpg';
-import ahliObs26 from '../../../assets/ahliObs/26.jpg';
-import ahliObs27 from '../../../assets/ahliObs/27.jpg';
-import ahliObs30 from '../../../assets/ahliObs/30.jpg';
-import ahliObs31 from '../../../assets/ahliObs/31.jpg';
-import ahliObs32 from '../../../assets/ahliObs/32.jpg';
-import ahliObs33 from '../../../assets/ahliObs/33.jpg';
-import ahliObs34 from '../../../assets/ahliObs/34.jpg';
-import ahliObs35 from '../../../assets/ahliObs/35.jpg';
-import ahliObs36 from '../../../assets/ahliObs/36.jpg';
-import ahliObs37 from '../../../assets/ahliObs/37.jpg';
-import ahliObs38 from '../../../assets/ahliObs/38.jpg';
-import ahliObs39 from '../../../assets/ahliObs/39.jpg';
-import ahliObs40 from '../../../assets/ahliObs/40.jpg';
-import ahliObs41 from '../../../assets/ahliObs/41.jpg';
-import ahliObs42 from '../../../assets/ahliObs/42.jpg';
-import ahliObs43 from '../../../assets/ahliObs/43.jpg';
-import ahliObs44 from '../../../assets/ahliObs/44.jpg';
-import ahliObs45 from '../../../assets/ahliObs/45.jpg';
-import ahliObs46 from '../../../assets/ahliObs/46.jpg';
-import ahliObs49 from '../../../assets/ahliObs/49.jpg';
-import ahliObs50 from '../../../assets/ahliObs/50.jpg';
-import ahliObs51 from '../../../assets/ahliObs/51.jpg';
-import ahliObs52 from '../../../assets/ahliObs/52.jpg';
-import ahliObs53 from '../../../assets/ahliObs/53.jpg';
-import ahliObs54 from '../../../assets/ahliObs/54.jpg';
-import ahliObs55 from '../../../assets/ahliObs/55.jpg';
-import ahliObs56 from '../../../assets/ahliObs/56.jpg';
-import ahliObs59 from '../../../assets/ahliObs/59.jpg';
-import ahliObs67 from '../../../assets/ahliObs/67.jpg';
-import ahliObs68 from '../../../assets/ahliObs/68.jpg';
-import ahliObs69 from '../../../assets/ahliObs/69.jpg';
-import ahliObs70 from '../../../assets/ahliObs/70.jpg';
-import ahliObs71 from '../../../assets/ahliObs/71.jpg';
-import ahliObs72 from '../../../assets/ahliObs/72.jpg';
-import ahliObs73a from '../../../assets/ahliObs/73a.jpg';
-import ahliObs73b from '../../../assets/ahliObs/73b.jpg';
-import ahliObs74a from '../../../assets/ahliObs/74a.jpg';
-import ahliObs74b from '../../../assets/ahliObs/74b.jpg';
-import ahliObs75 from '../../../assets/ahliObs/75.jpg';
+import ahliObs1 from '../../../assets/ahliObs/1.avif';
+import ahliObs3 from '../../../assets/ahliObs/3.avif';
+import ahliObs5 from '../../../assets/ahliObs/5.avif';
+import ahliObs11 from '../../../assets/ahliObs/11.avif';
+import ahliObs14 from '../../../assets/ahliObs/14.avif';
+import ahliObs15 from '../../../assets/ahliObs/15.avif';
+import ahliObs17 from '../../../assets/ahliObs/17.avif';
+import ahliObs18 from '../../../assets/ahliObs/18.avif';
+import ahliObs20 from '../../../assets/ahliObs/20.avif';
+import ahliObs21 from '../../../assets/ahliObs/21.avif';
+import ahliObs22 from '../../../assets/ahliObs/22.avif';
+import ahliObs23 from '../../../assets/ahliObs/23.avif';
+import ahliObs24 from '../../../assets/ahliObs/24.avif';
+import ahliObs26 from '../../../assets/ahliObs/26.avif';
+import ahliObs27 from '../../../assets/ahliObs/27.avif';
+import ahliObs30 from '../../../assets/ahliObs/30.avif';
+import ahliObs31 from '../../../assets/ahliObs/31.avif';
+import ahliObs32 from '../../../assets/ahliObs/32.avif';
+import ahliObs33 from '../../../assets/ahliObs/33.avif';
+import ahliObs34 from '../../../assets/ahliObs/34.avif';
+import ahliObs35 from '../../../assets/ahliObs/35.avif';
+import ahliObs36 from '../../../assets/ahliObs/36.avif';
+import ahliObs37 from '../../../assets/ahliObs/37.avif';
+import ahliObs38 from '../../../assets/ahliObs/38.avif';
+import ahliObs39 from '../../../assets/ahliObs/39.avif';
+import ahliObs40 from '../../../assets/ahliObs/40.avif';
+import ahliObs41 from '../../../assets/ahliObs/41.avif';
+import ahliObs43 from '../../../assets/ahliObs/43.avif';
+import ahliObs44 from '../../../assets/ahliObs/44.avif';
+import ahliObs45 from '../../../assets/ahliObs/45.avif';
+import ahliObs46 from '../../../assets/ahliObs/46.avif';
+import ahliObs49 from '../../../assets/ahliObs/49.avif';
+import ahliObs50 from '../../../assets/ahliObs/50.avif';
+import ahliObs51 from '../../../assets/ahliObs/51.avif';
+import ahliObs52 from '../../../assets/ahliObs/52.avif';
+import ahliObs53 from '../../../assets/ahliObs/53.avif';
+import ahliObs54 from '../../../assets/ahliObs/54.avif';
+import ahliObs55 from '../../../assets/ahliObs/55.avif';
+import ahliObs56 from '../../../assets/ahliObs/56.avif';
+import ahliObs59 from '../../../assets/ahliObs/59.avif';
+import ahliObs67 from '../../../assets/ahliObs/67.avif';
+import ahliObs68 from '../../../assets/ahliObs/68.avif';
+import ahliObs69 from '../../../assets/ahliObs/69.avif';
+import ahliObs70 from '../../../assets/ahliObs/70.avif';
+import ahliObs71 from '../../../assets/ahliObs/71.avif';
+import ahliObs72 from '../../../assets/ahliObs/72.avif';
+import ahliObs73a from '../../../assets/ahliObs/73a.avif';
+import ahliObs73b from '../../../assets/ahliObs/73b.avif';
+import ahliObs74a from '../../../assets/ahliObs/74a.avif';
+import ahliObs74b from '../../../assets/ahliObs/74b.avif';
+import ahliObs75 from '../../../assets/ahliObs/75.avif';
 
 export const ahliObsChangelog: Post[] = [
   {
@@ -724,7 +723,7 @@ export const ahliObsChangelog: Post[] = [
   {
     id: '42',
     title: 'v.0.42 - Bug Fix',
-    image: ahliObs42,
+    image: ahliObs41,
     createdAt: '2nd April 2017',
     download: 'https://www.dropbox.com/s/c6dh5met9p1j91c/AhliObs%20v.0.42.StormInterface?dl=1',
     version: '0.42',

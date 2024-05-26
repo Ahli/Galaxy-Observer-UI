@@ -1,8 +1,8 @@
 import { Change, Changelog, Post } from '../../../../types/Post';
-import gh3_34 from '../../../../assets/gameheart/v3/gh3_34.jpg';
-import gh3_35 from '../../../../assets/gameheart/v3/gh3_35.jpg';
-import gh3_36 from '../../../../assets/gameheart/v3/gh3_36.jpg';
-import gh3_37 from '../../../../assets/gameheart/v3/gh3_37.jpg';
+import gh3_34 from '../../../../assets/gameheart/v3/gh3_34.avif';
+import gh3_35 from '../../../../assets/gameheart/v3/gh3_35.avif';
+import gh3_36 from '../../../../assets/gameheart/v3/gh3_36.avif';
+import gh3_37 from '../../../../assets/gameheart/v3/gh3_37.avif';
 
 export const gh3changelog: Post[] = [
   {

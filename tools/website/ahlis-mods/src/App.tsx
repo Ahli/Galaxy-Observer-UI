@@ -21,6 +21,7 @@ const darkTheme = createTheme({
   },
 });
 
+// avif image converter: https://squoosh.app
 function App() {
   return (
     <div className='App'>
