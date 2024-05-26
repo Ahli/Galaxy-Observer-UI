@@ -10,7 +10,7 @@ export type ChangelogPageProps = {
 export const ChangelogPage = (props: ChangelogPageProps) => {
   return (
     <Card sx={{ borderRadius: '0px' }}>
-      <PostList posts={props.posts} title={props.title} />
+      <PostList posts={props.posts} title={props.title} key={props.title} />
     </Card>
   );
 };

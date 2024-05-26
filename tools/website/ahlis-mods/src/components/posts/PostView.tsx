@@ -10,18 +10,24 @@ import EmblaCarousel from '../images/EmblaCarousel';
 
 export type PostProps = {
   post: Post;
+  index: number;
 };
 
 type Data = {
   post: Post;
   isChangelog: boolean;
+  lazy: boolean;
 };
 
 export const PostView = (props: PostProps) => {
-  const [data] = useState({ post: props.post, isChangelog: (props.post as Changelog) != undefined } as Data);
+  const [data] = useState({
+    post: props.post,
+    isChangelog: (props.post as Changelog) != undefined,
+    lazy: props.index >= 1,
+  } as Data);
   return (
     <Card variant='outlined'>
-      {renderImages(data.post.image)}
+      {renderImages(data.lazy, data.post.image)}
       <CardContent>
         <Typography gutterBottom variant='h5' component='div'>
           {data.post.title}
@@ -79,13 +85,26 @@ function renderChange(change: string | Change) {
   );
 }
 
-function renderImages(image?: string | Array<string>) {
+function renderImages(lazy: boolean, image?: string | Array<string>) {
   if (!image) {
     return null;
   }
   const isString = typeof image === 'string';
   if (isString || image.length == 1) {
-    return <CardMedia component='img' loading='lazy' image={isString ? image : image[0]} alt='screenshot' />;
+    return (
+      <CardMedia
+        component='img'
+        loading={lazy ? 'lazy' : 'eager'}
+        image={isString ? image : image[0]}
+        alt='screenshot'
+        height='16'
+        width='9'
+        sx={{
+          height: 'auto',
+          width: '100%',
+        }}
+      />
+    );
   }
   return <EmblaCarousel slides={Array.from(Array(image.length).keys())} images={image} options={{ loop: true }} />;
 }

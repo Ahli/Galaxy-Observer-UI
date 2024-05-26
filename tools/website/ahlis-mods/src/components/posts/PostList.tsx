@@ -13,8 +13,8 @@ export const PostList = (props: PostListProps) => {
   return (
     <>
       <h2>{postList.title}</h2>
-      {postList.posts.map((post) => (
-        <PostView post={post} key={post.id} />
+      {postList.posts.map((post, idx) => (
+        <PostView post={post} key={post.id} index={idx} />
       ))}
     </>
   );
