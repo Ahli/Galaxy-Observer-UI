@@ -56,9 +56,10 @@ export const ahliObsChangelog: Post[] = [
   {
     id: '75',
     title: '0.75 - Patch Compatibility and Fixes',
-    image: [ahliObs75],
+    image: ahliObs75,
     createdAt: '2nd January 2024',
-    download: 'https://www.dropbox.com/scl/fi/5fuwxl26ttl9e2dy5tmtj/AhliObs-0.75.StormInterface?rlkey=bco85hmdb87011frvkp4yursr&dl=1',
+    download:
+      'https://www.dropbox.com/scl/fi/5fuwxl26ttl9e2dy5tmtj/AhliObs-0.75.StormInterface?rlkey=bco85hmdb87011frvkp4yursr&dl=1',
     version: '0.75',
     date: '2nd January 2024',
     changes: [
@@ -71,18 +72,18 @@ export const ahliObsChangelog: Post[] = [
         "fixed DVa's portrait not displaying her in Mech",
         new Change("improved Dragon Shire's Dragon Knight UI", [
           "controller's portrait now looks similar to Volkovskaya's Robot's one",
-          "fixed appearance of Lost Vikings"
-        ])
+          'fixed appearance of Lost Vikings',
+        ]),
       ]),
       "fixed visual appearance of Maiev's Naisha's Memento button icon in the selected unit's panel",
-      new Change("fixed some issues with Battlefield of Eternity's map objective UI:",[
-          "fixed lane Immortal's health bar starting behind the icon so the last few percentages of life are not visible",
-          "fixed Duel UI swapping positions in red player's vision",
-          "fixed lane Immortal's icon disappearing when switching player vision",
-          'fixed issues with crossout image animations of an earlier duel appearing',
-          'fixed health labels not using colorblind colors when option is enabled'
+      new Change("fixed some issues with Battlefield of Eternity's map objective UI:", [
+        "fixed lane Immortal's health bar starting behind the icon so the last few percentages of life are not visible",
+        "fixed Duel UI swapping positions in red player's vision",
+        "fixed lane Immortal's icon disappearing when switching player vision",
+        'fixed issues with crossout image animations of an earlier duel appearing',
+        'fixed health labels not using colorblind colors when option is enabled',
       ]),
-      "fixed Sky Temple's shrine icons having wrong color in red player's vision"
+      "fixed Sky Temple's shrine icons having wrong color in red player's vision",
     ],
   },
   {

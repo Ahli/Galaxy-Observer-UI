@@ -6,6 +6,7 @@ import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
 import { Post, Changelog, Change } from '../../types/Post';
+import EmblaCarousel from '../images/EmblaCarousel';
 
 export type PostProps = {
   post: Post;
@@ -19,11 +20,8 @@ type Data = {
 export const PostView = (props: PostProps) => {
   const [data] = useState({ post: props.post, isChangelog: (props.post as Changelog) != undefined } as Data);
   return (
-    // TODO show multiple images
     <Card variant='outlined'>
-      {data.post.image && (
-        <CardMedia component='img' loading='lazy' image={getFirstImage(data.post)} alt='screenshot' />
-      )}
+      {renderImages(data.post.image)}
       <CardContent>
         <Typography gutterBottom variant='h5' component='div'>
           {data.post.title}
@@ -81,12 +79,13 @@ function renderChange(change: string | Change) {
   );
 }
 
-function getFirstImage(post: Post): string | undefined {
-  if (!post.image) {
-    return undefined;
+function renderImages(image?: string | Array<string>) {
+  if (!image) {
+    return null;
   }
-  if (typeof post.image === 'string') {
-    return post.image;
+  const isString = typeof image === 'string';
+  if (isString || image.length == 1) {
+    return <CardMedia component='img' loading='lazy' image={isString ? image : image[0]} alt='screenshot' />;
   }
-  return post.image[0];
+  return <EmblaCarousel slides={Array.from(Array(image.length).keys())} images={image} options={{ loop: true }} />;
 }

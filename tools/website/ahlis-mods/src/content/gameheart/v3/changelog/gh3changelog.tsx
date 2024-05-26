@@ -25,7 +25,7 @@ export const gh3changelog: Post[] = [
   {
     id: '36',
     title: '3.6',
-    image: [gh3_36],
+    image: gh3_36,
     createdAt: '5th January 2023',
     download: 'https://www.dropbox.com/s/1edtu9ci9z767cg/GameHeart_3.6.SC2Interface?dl=1',
     version: '3.6',
@@ -42,7 +42,7 @@ export const gh3changelog: Post[] = [
   {
     id: '35',
     title: '3.5',
-    image: [gh3_35],
+    image: gh3_35,
     createdAt: '26th June 2022',
     download: 'https://www.dropbox.com/s/egixonbgilk3no8/GameHeart_3.5.SC2Interface?dl=1',
     version: '3.5',
@@ -70,7 +70,7 @@ export const gh3changelog: Post[] = [
   {
     id: '34',
     title: '3.4',
-    image: [gh3_34],
+    image: gh3_34,
     createdAt: '19th March 2021',
     download: 'https://www.dropbox.com/s/wbug98qxapkwoo1/GameHeart_3.4.SC2Interface?dl=1',
     version: '3.4',

@@ -7,7 +7,7 @@ export const pro2020AhliModChangelog: Post[] = [
   {
     id: '12',
     title: '1.2',
-    image: [pro2020_12],
+    image: pro2020_12,
     createdAt: '5th Januaray 2023',
     download: 'https://www.dropbox.com/s/1efcfpgb7m9fk9n/Pro2020ahliMod_1.2.SC2Interface?dl=1',
     version: '1.2',
@@ -22,7 +22,7 @@ export const pro2020AhliModChangelog: Post[] = [
   {
     id: '11',
     title: '1.1',
-    image: [pro2020_11],
+    image: pro2020_11,
     createdAt: '26th June 2022',
     download: 'https://www.dropbox.com/s/g47yvccechvmiqn/Pro2020ahliMod_1.1.SC2Interface?dl=1',
     version: '1.1',
@@ -39,7 +39,7 @@ export const pro2020AhliModChangelog: Post[] = [
   {
     id: '10',
     title: '1.0',
-    image: [pro2020_10],
+    image: pro2020_10,
     createdAt: '18th May 2022',
     download: 'https://www.dropbox.com/s/3hwuxn9cbilr09j/Pro2020ahliMod_1.0.SC2Interface?dl=1',
     version: '1.0',
