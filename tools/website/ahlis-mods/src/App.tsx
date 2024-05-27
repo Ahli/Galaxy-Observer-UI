@@ -1,6 +1,5 @@
 import './App.css';
 import { HomePage } from './pages/HomePage';
-import '@fontsource/roboto';
 import { HashRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { Navbar, navBarWidth } from './components/navigation/NavBar';
 import { NotFoundPage } from './pages/NotFoundPage';
