@@ -16,7 +16,7 @@ Here are the two worst that one can create:
 <br>
 <iframe title="YouTube video player" class="youtube-player" type="text/html"
     src="https://www.youtube.com/embed/CCHvcshn4HU?rel=0&amp;wmode=opaque"
-    frameborder="0" allowfullscreen="true" width="480" height="270">
+    frameborder="0" allowfullscreen="true" width="480" height="270" loading="lazy">
 </iframe>
 <br>
 <br>
