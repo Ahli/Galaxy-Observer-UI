@@ -4,7 +4,6 @@ import useEmblaCarousel from 'embla-carousel-react';
 import { LazyLoadImage } from './EmblaCarouselLazyLoadImage';
 import { NextButton, PrevButton, usePrevNextButtons } from './EmblaCarouselArrowButtons';
 import { DotButton, useDotButton } from './EmblaCarouselDotButton';
-import './Embla.css';
 
 type PropType = {
   slides: number[];
