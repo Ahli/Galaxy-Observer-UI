@@ -39,9 +39,11 @@ export const PostView = (props: PostProps) => {
         )}
         <div className='post-body'>
           {renderChangelog(data)}
-          <Typography variant='body1' color='text.secondary'>
-            {data.post.text}
-          </Typography>
+          {data.post.text && (
+            <Typography variant='body1' color='text.secondary'>
+              {data.post.text}
+            </Typography>
+          )}
         </div>
       </CardContent>
       <CardActions>
