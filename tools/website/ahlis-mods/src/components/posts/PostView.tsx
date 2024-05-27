@@ -80,7 +80,7 @@ function renderChange(change: string | Change) {
       ) : (
         <>
           {change.text}
-          <ul>{renderChanges(change.children)}</ul>
+          {renderChanges(change.children)}
         </>
       )}
     </>
