@@ -288,7 +288,11 @@ public class AppConfiguration {
 	@Bean
 	protected Path basePath() {
 		log.debug("init bean: basePath");
-		return JarHelper.getJarDir(SpringBootApplication.class);
+		Path path = JarHelper.getJarDir(SpringBootApplication.class);
+		if (path.endsWith("compiler")) {
+			return path.getParent();
+		}
+		return path;
 	}
 	
 	@Bean

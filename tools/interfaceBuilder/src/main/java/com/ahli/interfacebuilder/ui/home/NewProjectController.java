@@ -43,7 +43,7 @@ public class NewProjectController extends AbstractProjectController {
 	}
 	
 	public void browsePathAction() {
-		showDirectoryChooser(Messages.getString("Customize Toolbar..."), projectPathLabel);
+		showDirectoryChooser(Messages.getString("newProject.selectDirectory"), projectPathLabel);
 	}
 	
 	/**
@@ -67,7 +67,7 @@ public class NewProjectController extends AbstractProjectController {
 			final Button okBttn = (Button) dialogPane.lookupButton(ButtonType.APPLY);
 			okBttn.addEventFilter(ActionEvent.ACTION, this::newProjectAction);
 			okBttn.setText(Messages.getString("general.createButton"));
-			dialog.setResultConverter(param -> project);
+			dialog.setResultConverter(_ -> project);
 			
 			gameDropdown.setItems(FXCollections.observableArrayList(GameType.SC2, GameType.HEROES));
 			gameDropdown.getSelectionModel().select(0);
@@ -84,14 +84,16 @@ public class NewProjectController extends AbstractProjectController {
 	public void newProjectAction(final Event event) {
 		log.trace("new project action event fired");
 		final GameType gameType = gameDropdown.getValue();
-		if (gameType == null) {
+		final String pathLabel = projectPathLabel.getText();
+		final String name = projectNameLabel.getText();
+		if (gameType == null || name.isBlank() || pathLabel.isBlank()) {
 			// eat event before it reaches the resultConverter
 			event.consume();
 			return;
 		}
 		
 		// ensure that the project's path is not used in another project
-		final Path path = Path.of(projectPathLabel.getText());
+		final Path path = Path.of(pathLabel);
 		if (!projectService.getProjectsOfPath(path).isEmpty()) {
 			final Alert alert = Alerts.buildErrorAlert(
 					dialog.getOwner(),
@@ -103,7 +105,6 @@ public class NewProjectController extends AbstractProjectController {
 		}
 		
 		// try creating the project
-		final String name = projectNameLabel.getText();
 		project = new Project(name, path, gameType);
 		try {
 			project = projectService.saveProject(project);

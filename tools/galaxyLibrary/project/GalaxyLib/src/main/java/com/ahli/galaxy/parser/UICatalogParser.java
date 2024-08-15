@@ -27,6 +27,7 @@ import com.ahli.galaxy.ui.interfaces.UIStateGroup;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
+import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,6 +39,7 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 @Slf4j
 public class UICatalogParser implements ParsedXmlConsumer {
@@ -97,6 +99,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	private int postProcessDeduplications;
 	private boolean layoutFileDescLocked;
 	private int unnamedFrameCounter;
+	private Set<StringMapping> editedTemplatesMappings;
 	
 	public UICatalogParser(
 			@NotNull final UICatalog catalog,
@@ -108,6 +111,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		statesToCloseLevel = new IntArrayList();
 		curPath = new ArrayList<>();
 		newTemplatesOfCurFile = new ArrayList<>(250);
+		editedTemplatesMappings = new UnifiedSet<>(250);
 		this.deduplicationIntensity = deduplicationIntensity;
 		log.trace("deduplication intensity: {}", deduplicationIntensity);
 		switch (deduplicationIntensity) {
@@ -139,15 +143,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		parser.setConsumer(this);
 	}
 	
-	//	/**
-	//	 * @param typeTemplate
-	//	 * @param typeFrame
-	//	 * @return
-	//	 */
-	//	private static boolean checkFrameTypeCompatibility(final String typeTemplate, final String typeFrame) {
-	//		// TODO frame type compatibility check
-	//		return true;
-	//	}
+	;
 	
 	/**
 	 * Set the implicit names of controllers in animations.
@@ -167,6 +163,16 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			}
 		}
 	}
+	
+	//	/**
+	//	 * @param typeTemplate
+	//	 * @param typeFrame
+	//	 * @return
+	//	 */
+	//	private static boolean checkFrameTypeCompatibility(final String typeTemplate, final String typeFrame) {
+	//		// TODO frame type compatibility check
+	//		return true;
+	//	}
 	
 	/**
 	 * Returns the UIElement that resides in the specified UITemplates under the specified path and the specified file
@@ -373,6 +379,24 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		return null;
 	}
 	
+	//	/**
+	//	 * Returns the UIElement that resides in the current Root under the specified path and the specified file name.
+	//	 *
+	//	 * @param fileName
+	//	 * @param path
+	//	 * @return
+	//	 */
+	//	@Nullable
+	//	private UIElement findTemplateFromCurrentRoot(@NotNull final String fileName, @NotNull final String path) {
+	//		if (!fileName.equalsIgnoreCase(curFileName) || curPath.isEmpty()) {
+	//			return null;
+	//		}
+	//
+	//		final String newPath = UIElement.removeLeftPathLevel(path);
+	//
+	//		return curPath.get(0).receiveFrameFromPath(newPath);
+	//	}
+	
 	@Override
 	public void parseFile(
 			@NotNull final Path p,
@@ -466,6 +490,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					newElem = editedElem;
 					curExtTemplate = template; // entering that template
 					editingExistingElem = true;
+					editedTemplatesMappings.add(new StringMapping(curFileName, template.getFileName()));
 					break;
 				}
 			}
@@ -837,19 +862,37 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				pathParam,
 				targetElem.getName());
 		final String path = pathParam.replace('\\', '/');
-		final int seperatorIndex = path.indexOf('/');
-		if (seperatorIndex < 0) {
+		final int separatorIndex = path.indexOf('/');
+		if (separatorIndex < 0) {
 			log.error("ERROR: Template paths must follow the pattern 'FileName/FrameName'. Found '{}' instead.", path);
 			return;
 		}
-		final String fileName = path.substring(0, seperatorIndex);
+		final String fileName = path.substring(0, separatorIndex);
 		
 		// 1. check templates
-		UIElement templateInstance = findTemplateFromList(catalog.getTemplates(), fileName, path);
-		if (templateInstance == null) {
+		UIElement templateInstance =
+				!catalog.getTemplates().isEmpty() ? findTemplateFromList(catalog.getTemplates(), fileName, path) : null;
+		if (templateInstance == null && !catalog.getBlizzOnlyTemplates().isEmpty()) {
 			// 2. if fail -> check dev templates
 			templateInstance = findTemplateFromList(catalog.getBlizzOnlyTemplates(), fileName, path);
 		}
+		//		if (templateInstance == null && !newTemplatesOfCurFile.isEmpty()) {
+		//			// 3. if fail -> check templates of current file // TODO is this a thing?
+		//			templateInstance = findTemplateFromList(newTemplatesOfCurFile, fileName, path);
+		//			log.info("check templates of current file! {}", templateInstance);
+		//		}
+		//		if (templateInstance == null) {
+		//			// 4. if fail -> check templates of current root // TODO is this a thing?
+		//			templateInstance = findTemplateFromCurrentRoot(fileName, path);
+		//			log.info("check templates of current file! {}", templateInstance);
+		//		}
+		// TODO find templates that are editing via file="..."
+		if (templateInstance == null) {
+			// 5. if fail -> check edited templates
+			templateInstance = findTemplateFromEditedTemplates(path);
+		}
+		
+		
 		if (templateInstance == null) {
 			// template does not exist or its layout was not loaded, yet
 			if (!curIsDevLayout) {
@@ -862,6 +905,33 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		} else {
 			applyTemplateElementToElement(templateInstance, targetElem);
 		}
+	}
+	
+	private UIElement findTemplateFromEditedTemplates(final String filenamePlusPath) {
+		final String newPath = UIElement.removeLeftPathLevel(filenamePlusPath);
+		if (newPath != null) {
+			final String fileName = UIElement.getLeftPathLevel(filenamePlusPath);
+			for (var mapping : editedTemplatesMappings) {
+				if (!mapping.left().equalsIgnoreCase(fileName)) {
+					continue;
+				}
+				String replacedFileName = mapping.right() + "/" + newPath;
+				
+				var templateInstance = findTemplateFromList(catalog.getTemplates(), replacedFileName, newPath);
+				if (templateInstance != null) {
+					log.info("Found template of edited! {}", templateInstance);
+					return templateInstance;
+				}
+				
+				templateInstance = findTemplateFromList(catalog.getBlizzOnlyTemplates(), replacedFileName, newPath);
+				if (templateInstance != null) {
+					log.info("Found template of edited! {}", templateInstance);
+					return templateInstance;
+				}
+				
+			}
+		}
+		return null;
 	}
 	
 	/**
@@ -1070,17 +1140,13 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	private void deduplicate(final List<UIElement> controllers) {
 		for (int i = 0, len = controllers.size(); i < len; ++i) {
 			final UIElement controller = controllers.get(i);
-			final UIElement duplicate = addedFinalElements.get(controller);
+			final UIElement duplicate = addedFinalElements.putIfAbsent(controller, controller);
 			if (duplicate != null && controller != duplicate) {
 				// replace in parent
 				controllers.set(i, duplicate);
 				++postProcessDeduplications;
-			} else {
-				// controllers cannot be deduplicated any further at this point (Attributes were already)
-				if (duplicate == null) {
-					addedFinalElements.put(controller, controller);
-				}
 			}
+			// else: controllers cannot be deduplicated any further at this point (Attributes were already)
 		}
 	}
 	
@@ -1105,5 +1171,8 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				addedFinalElements.put(elem, elem);
 			}
 		}
+	}
+	
+	record StringMapping(String left, String right) {
 	}
 }

@@ -77,7 +77,7 @@ public class AddProjectController extends AbstractProjectController {
 			final Button okBttn = (Button) dialogPane.lookupButton(ButtonType.APPLY);
 			okBttn.addEventFilter(ActionEvent.ACTION, this::addProjectAction);
 			okBttn.setText(Messages.getString("general.addButton"));
-			dialog.setResultConverter(param -> project);
+			dialog.setResultConverter(_ -> project);
 			
 			gameDropdown.setItems(FXCollections.observableArrayList(GameType.SC2, GameType.HEROES));
 			gameDropdown.getSelectionModel().select(0);
@@ -87,13 +87,14 @@ public class AddProjectController extends AbstractProjectController {
 	public void addProjectAction(final Event event) {
 		log.trace("add project action event fired");
 		final GameType gameType = gameDropdown.getValue();
-		if (gameType == null) {
+		final String pathLabel = projectPathLabel.getText();
+		final String name = projectNameLabel.getText();
+		if (gameType == null || name.isBlank() || pathLabel.isBlank()) {
 			// eat event before it reaches the resultConverter
 			event.consume();
 			return;
 		}
-		final String name = projectNameLabel.getText();
-		final Path path = Path.of(projectPathLabel.getText());
+		final Path path = Path.of(pathLabel);
 		if (project == null) {
 			project = new Project(name, path, gameType);
 		} else {

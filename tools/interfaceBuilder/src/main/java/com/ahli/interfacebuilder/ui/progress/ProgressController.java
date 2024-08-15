@@ -21,6 +21,7 @@ import org.springframework.context.ApplicationContext;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Log4j2
@@ -36,8 +37,8 @@ public class ProgressController {
 		this.tabPaneController = tabPaneController;
 		this.appContext = appContext;
 		tabPaneController.setProgressController(this);
-		errorTabControllers = new ArrayList<>(0);
-		tabContentControllers = new ArrayList<>(0);
+		errorTabControllers = Collections.synchronizedList(new ArrayList<>(0));
+		tabContentControllers = Collections.synchronizedList(new ArrayList<>(0));
 	}
 	
 	public void removeErrorTabController(final ErrorTabController errorTabController) {

@@ -12,6 +12,7 @@ import com.ahli.interfacebuilder.integration.ipc.TcpIpSocketCommunication;
 import com.ahli.interfacebuilder.integration.ipc.UnixDomainSocketCommunication;
 import javafx.application.Application;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.context.ConfigurationPropertiesAutoConfiguration;
 import org.springframework.boot.autoconfigure.context.MessageSourceAutoConfiguration;
@@ -270,6 +271,8 @@ public final class SpringBootApplication {
 		} catch (final InterruptedException e) {
 			log.error("Interrupted server/client entry point", e);
 			Thread.currentThread().interrupt();
+		} catch (final SpringApplication.AbandonedRunException e) {
+			throw e;
 		} catch (final Exception e) {
 			log.error(FATAL_ERROR, e);
 		}
