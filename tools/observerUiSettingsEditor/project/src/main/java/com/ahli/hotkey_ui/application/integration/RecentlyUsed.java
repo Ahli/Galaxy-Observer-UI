@@ -17,31 +17,35 @@ import java.util.zip.InflaterInputStream;
 
 @Slf4j
 public class RecentlyUsed {
-	private final ArrayDeque<Path> recent = new ArrayDeque<>(5);
+	private static final int MAX_RECENT_ELEMENTS = 5;
+	
+	private final ArrayDeque<Path> recent = new ArrayDeque<>(MAX_RECENT_ELEMENTS);
 	private final Kryo kryo;
 	
 	public RecentlyUsed() {
 		kryo = new Kryo(new ListReferenceResolver());
 		kryo.setRegistrationRequired(true);
-		load(Path.of(System.getProperty("user.home"), ".GalaxyObsUiSettingsEditor/recent.bin"));
+		loadItems(Path.of(System.getProperty("user.home"), ".GalaxyObsUiSettingsEditor/recent.bin"));
 	}
 	
-	private void load(final Path path) {
-		if (Files.exists(path)) {
-			try (final InflaterInputStream in = new InflaterInputStream(Files.newInputStream(path))) {
-				int i = 0;
+	private void loadItems(final Path recentSaveFile) {
+		if (Files.exists(recentSaveFile)) {
+			try (final InflaterInputStream in = new InflaterInputStream(Files.newInputStream(recentSaveFile))) {
 				try (final Input input = new Input(in)) {
-					for (i = 0; i < 5; ++i) {
-						recent.add(Path.of(kryo.readObject(input, String.class)));
+					while (input.position() < input.limit()) {
+						Path path = Path.of(kryo.readObject(input, String.class));
+						if (Files.exists(path)) {
+							recent.add(path);
+						}
 					}
 				} catch (final KryoException e) {
-					log.error("Failed to load save file.", e);
-					if (i == 0) {
-						Files.deleteIfExists(path);
-					}
+					log.error("Failed to load {} file.", recentSaveFile.getFileName(), e);
+				}
+				if (recent.isEmpty()) {
+					Files.deleteIfExists(recentSaveFile);
 				}
 			} catch (final IOException e) {
-				log.error("Failed to delete save file.", e);
+				log.error("Failed to delete {} file.", recentSaveFile.getFileName(), e);
 			}
 		}
 	}
@@ -51,7 +55,7 @@ public class RecentlyUsed {
 	}
 	
 	public void addRecent(final Path path) {
-		if (!recent.remove(path) && recent.size() >= 5) {
+		if (!recent.remove(path) && recent.size() >= MAX_RECENT_ELEMENTS) {
 			recent.pollFirst();
 		}
 		recent.add(path);
@@ -71,7 +75,7 @@ public class RecentlyUsed {
 				throw new IOException(e);
 			}
 		} catch (final IOException e) {
-			log.error("Failed to write save file.", e);
+			log.error("Failed to write save file {}.", path.getFileName(), e);
 		}
 	}
 	
