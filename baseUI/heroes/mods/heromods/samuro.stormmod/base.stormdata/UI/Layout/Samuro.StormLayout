@@ -175,7 +175,7 @@
       <Frame type="BehaviorIcon" name="CriticalStrikeTooltipFrame">
         <Anchor relative="$parent/SamuroFlameBaseImage" />
         <TooltipFrame val="BehaviorIconTooltip" />
-        <Behavior val="SamuroCriticalStrike" />
+        <Behavior val="SamuroCriticalStrikeTokenCounter" />
       </Frame>
       <Frame type="Image" name="SamuroFlamePhase1Image" template="Samuro/SamuroFlameImageTemplate">
         <StartAngle val="-70" />
@@ -512,15 +512,15 @@
       </Frame>
       <Frame type="UnitStatusValidatorAnimElement" name="CriticalStrikeCounterAnims">
         <Anchor relative="$parent" />
-        <Validator val="SamuroDoesNotHaveWayoftheBladewithOneStack" />
-        <Validator val="SamuroHasWayoftheBladewithOneStack" />
-        <Validator val="SamuroDoesNotHaveWayoftheBladewithTwoStacks" />
-        <Validator val="HasWayoftheBladeAnd2StacksOrHas3Stacks" />
-        <Validator val="DoesNotHaveSamuroCriticalStrike" />
+        <Validator val="SamuroCriticalStrike1StackNoWOTB" />
+        <Validator val="SamuroCriticalStrike1StackWithWOTB" />
+        <Validator val="SamuroCriticalStrike2StackNoWOTB" />
+        <Validator val="SamuroHas3CriticalStrikeTokens" />
+        <Validator val="SamuroHas0CriticalStrikeTokens" />
         <Animation name="SamuroNoStack">
           <Event event="Reset" action="Stop" />
           <Event event="NoState" action="stop" />
-          <Event event="DoesNotHaveSamuroCriticalStrike" action="Restart, Play" />
+          <Event event="SamuroHas0CriticalStrikeTokens" action="Restart, Play" />
           <Controller type="Visibility" end="Pause" frame="$parent/SamuroBlackBladePulseImage">
             <Key type="Bool" time="0" value="True" />
           </Controller>
@@ -543,7 +543,7 @@
         <Animation name="SamuroOneStackNoTalent">
           <Event event="Reset" action="Stop" />
           <Event event="NoState" action="stop" />
-          <Event event="SamuroDoesNotHaveWayoftheBladewithOneStack" action="Restart, Play" />
+          <Event event="SamuroCriticalStrike1StackNoWOTB" action="Restart, Play" />
           <Controller type="Visibility" end="Pause" frame="$parent/SamuroFlamePhase1Image">
             <Key type="Bool" time="0" value="True" />
           </Controller>
@@ -558,7 +558,7 @@
         <Animation name="SamuroOneStackWithTalent">
           <Event event="Reset" action="Stop" />
           <Event event="NoState" action="stop" />
-          <Event event="SamuroHasWayoftheBladewithOneStack" action="Restart, Play" />
+          <Event event="SamuroCriticalStrike1StackWithWOTB" action="Restart, Play" />
           <Controller type="Visibility" end="Pause" frame="$parent/SamuroFlamePhase2Image">
             <Key type="Bool" time="0" value="True" />
           </Controller>
@@ -573,7 +573,7 @@
         <Animation name="SamuroTwoStack">
           <Event event="Reset" action="Stop" />
           <Event event="NoState" action="stop" />
-          <Event event="SamuroDoesNotHaveWayoftheBladewithTwoStacks" action="Restart, Play" />
+          <Event event="SamuroCriticalStrike2StackNoWOTB" action="Restart, Play" />
           <Controller type="Visibility" end="Pause" frame="$parent/SamuroFlamePhase2Image">
             <Key type="Bool" time="0" value="True" />
           </Controller>
@@ -588,7 +588,7 @@
         <Animation name="SamuroThreeStack">
           <Event event="Reset" action="Stop" />
           <Event event="NoState" action="stop" />
-          <Event event="HasWayoftheBladeAnd2StacksOrHas3Stacks" action="Restart, Play" />
+          <Event event="SamuroHas3CriticalStrikeTokens" action="Restart, Play" />
           <Controller type="Visibility" end="Pause" frame="$parent/SamuroFlamePhase3Image">
             <Key type="Bool" time="0" value="True" />
           </Controller>
@@ -605,6 +605,193 @@
             <Key type="Bool" time=".2" value="False" />
           </Controller>
         </Animation>
+      </Frame>
+    </Frame>
+  </Frame>
+  <Frame type="SelectionUnitStatusPanel" name="SamuroCriticalStrikeButtonOverride">
+    <Anchor relative="$parent" />
+    <SpecificUnit val="HeroSamuro" />
+    <Frame type="UnitStatusFrame" name="UnitStatusFrame0">
+      <Anchor relative="$parent" />
+      <AcceptsMouse val="False" />
+      <Frame type="UnitStatusBehaviorIcon" name="RaynorInspireIcon">
+        <Anchor relative="$parent" />
+        <Behavior val="SamuroCriticalStrikeTimed" />
+        <AcceptsMouse val="False" />
+        <Frame type="BehaviorIcon" name="BehaviorIcon">
+          <Anchor relative="$parent" />
+          <Behavior val="SamuroCriticalStrikeTimed" />
+          <AcceptsMouse val="False" />
+          <Frame type="ProgressBar" name="CooldownBar">
+            <Anchor side="Top" relative="$parent" pos="Mid" offset="0" />
+            <Anchor side="Left" relative="$parent" pos="Mid" offset="0" />
+            <Anchor side="Bottom" relative="$parent" pos="Mid" offset="0" />
+            <Anchor side="Right" relative="$parent" pos="Mid" offset="0" />
+            <Height val="120" />
+            <Width val="120" />
+            <AcceptsMouse val="False" />
+            <MinValue val="0" />
+            <MaxValue val="8" />
+            <Value val="0" />
+            <Circular val="True" />
+            <CircularStart val="0" />
+            <CircularEndOffset val="360" />
+            <FillInset val="0.0" />
+            <Frame type="Frame" name="FillImageContainer">
+              <Anchor relative="$parent" />
+              <Frame type="Image" name="FillImage">
+                <Anchor relative="$parent" />
+                <SubpixelRendering val="True" />
+                <ColorAdjustMode val="Colorize" />
+                <AdjustmentColor val="AC2414" />
+                <RenderPriority val="510" />
+                <Texture val="@UI/Storm_UI_InGame_AbilityButton_Active_Add" />
+                <BlendMode val="Normal" />
+                <TextureType val="Circular" />
+              </Frame>
+            </Frame>
+          </Frame>
+        </Frame>
+      </Frame>
+    </Frame>
+  </Frame>
+  <Frame type="SelectionUnitStatusPanel" name="SamuroStacksFrameContainer">
+    <Anchor relative="$parent" />
+    <SpecificUnit val="HeroSamuro" />
+    <SpecificUnit val="SamuroMirrorImage" />
+    <CheckPassengers val="True" />
+    <Frame type="UnitStatusUnitStackingDebuffElement" name="OverflowingChaosStacksFrame">
+      <Anchor relative="$parent" />
+      <BuffBehavior val="SamuroCriticalStrikeTokenCounter" />
+      <ShowForBehaviorOwner val="True" />
+      <Frame type="UnitStatusValidatorAnimElement" name="OverflowingChaosStackVisibility">
+        <Anchor relative="$parent" />
+        <Validator val="SamuroHas3CriticalStrikeTokens" />
+        <Validator val="SamuroHas2CriticalStrikeTokens" />
+        <Validator val="SamuroHas1CriticalStrikeTokens" />
+        <StateGroup name="OverflowingChaosStackState">
+          <DefaultState val="NoState" />
+          <State name="NoState">
+            <When type="AnimationState" UnitStatusValidatorState="NoState" />
+            <Action type="SetProperty" frame="CriticalStrikeStackBase" Visible="false" />
+            <Action type="SetProperty" frame="CriticalStrikeStackFull" Visible="false" />
+            <Action type="SetProperty" frame="CriticalStrikeStack1" Visible="false" />
+            <Action type="SetProperty" frame="CriticalStrikeStack2" Visible="false" />
+            <Action type="SetProperty" frame="CriticalStrikeStack3" Visible="false" />
+          </State>
+          <State name="3Stack">
+            <When type="AnimationState" UnitStatusValidatorState="SamuroHas3CriticalStrikeTokens" />
+            <Action type="SetProperty" frame="CriticalStrikeStackBase" Visible="true" />
+            <Action type="SetProperty" frame="CriticalStrikeStackFull" Visible="true" />
+            <Action type="SetProperty" frame="CriticalStrikeStack1" Visible="true" />
+            <Action type="SetProperty" frame="CriticalStrikeStack2" Visible="true" />
+            <Action type="SetProperty" frame="CriticalStrikeStack3" Visible="true" />
+          </State>
+          <State name="2Stack">
+            <When type="AnimationState" UnitStatusValidatorState="SamuroHas2CriticalStrikeTokens" />
+            <Action type="SetProperty" frame="CriticalStrikeStackBase" Visible="true" />
+            <Action type="SetProperty" frame="CriticalStrikeStack1" Visible="true" />
+            <Action type="SetProperty" frame="CriticalStrikeStack2" Visible="true" />
+          </State>
+          <State name="1Stack">
+            <When type="AnimationState" UnitStatusValidatorState="SamuroHas1CriticalStrikeTokens" />
+            <Action type="SetProperty" frame="CriticalStrikeStackBase" Visible="true" />
+            <Action type="SetProperty" frame="CriticalStrikeStack1" Visible="true" />
+          </State>
+        </StateGroup>
+        <Frame type="Frame" name="CriticalStrikeStackBase">
+          <Anchor side="Top" relative="$parent" pos="Min" offset="-2" />
+          <Anchor side="Left" relative="$parent" pos="Min" offset="-4" />
+          <Height val="32" />
+          <Width val="64" />
+          <Visible val="true" />
+          <BatchImages val="true" />
+          <Frame type="Image" name="CriticalStrikeStack1">
+            <Anchor side="Top" relative="$parent" pos="Min" offset="8" />
+            <Anchor side="Left" relative="$parent" pos="Min" offset="7" />
+            <Texture val="@UI/Storm_UI_HUD_HeroMechanic_Samuro_blackcircle" />
+            <Height val="16" />
+            <Width val="16" />
+            <Visible val="true" />
+          </Frame>
+          <Frame type="Image" name="CriticalStrikeStack2">
+            <Anchor side="Top" relative="$parent/CriticalStrikeStack1" pos="Min" offset="0" />
+            <Anchor side="Left" relative="$parent/CriticalStrikeStack1" pos="Max" offset="1" />
+            <Texture val="@UI/Storm_UI_HUD_HeroMechanic_Samuro_blackcircle" />
+            <Height val="16" />
+            <Width val="16" />
+            <Visible val="true" />
+          </Frame>
+          <Frame type="Image" name="CriticalStrikeStack3">
+            <Anchor side="Top" relative="$parent/CriticalStrikeStack2" pos="Min" offset="0" />
+            <Anchor side="Left" relative="$parent/CriticalStrikeStack2" pos="Max" offset="1" />
+            <Texture val="@UI/Storm_UI_HUD_HeroMechanic_Samuro_blackcircle" />
+            <Height val="16" />
+            <Width val="16" />
+            <Visible val="true" />
+          </Frame>
+        </Frame>
+        <Frame type="Image" name="CriticalStrikeStack1">
+          <Anchor side="Top" relative="$parent/CriticalStrikeStackBase" pos="Min" offset="8" />
+          <Anchor side="Left" relative="$parent/CriticalStrikeStackBase" pos="Min" offset="7" />
+          <Texture val="@UI/Storm_UI_HUD_HeroMechanic_Samuro_firecircle_A" />
+          <Height val="16" />
+          <Width val="16" />
+          <Visible val="false" />
+        </Frame>
+        <Frame type="Image" name="CriticalStrikeStack2">
+          <Anchor side="Top" relative="$parent/CriticalStrikeStack1" pos="Min" offset="0" />
+          <Anchor side="Left" relative="$parent/CriticalStrikeStack1" pos="Max" offset="1" />
+          <Texture val="@UI/Storm_UI_HUD_HeroMechanic_Samuro_firecircle_A" />
+          <Height val="16" />
+          <Width val="16" />
+          <Visible val="false" />
+        </Frame>
+        <Frame type="Image" name="CriticalStrikeStack3">
+          <Anchor side="Top" relative="$parent/CriticalStrikeStack2" pos="Min" offset="0" />
+          <Anchor side="Left" relative="$parent/CriticalStrikeStack2" pos="Max" offset="1" />
+          <Texture val="@UI/Storm_UI_HUD_HeroMechanic_Samuro_firecircle_A" />
+          <Height val="16" />
+          <Width val="16" />
+          <Visible val="false" />
+        </Frame>
+        <Frame type="Frame" name="CriticalStrikeStackFull">
+          <Anchor relative="$parent/CriticalStrikeStackBase" offset="0" />
+          <Height val="32" />
+          <Width val="64" />
+          <Visible val="false" />
+          <BatchImages val="true" />
+          <Frame type="Image" name="CriticalStrikeStack1">
+            <Anchor side="Top" relative="$parent/$parent/CriticalStrikeStack1" pos="Mid" offset="0" />
+            <Anchor side="Left" relative="$parent/$parent/CriticalStrikeStack1" pos="Mid" offset="0" />
+            <Anchor side="Right" relative="$parent/$parent/CriticalStrikeStack1" pos="Mid" offset="0" />
+            <Anchor side="Bottom" relative="$parent/$parent/CriticalStrikeStack1" pos="Mid" offset="0" />
+            <Texture val="@UI/Storm_UI_HUD_HeroMechanic_Samuro_sword_black" />
+            <Height val="24" />
+            <Width val="24" />
+            <Visible val="true" />
+          </Frame>
+          <Frame type="Image" name="CriticalStrikeStack2">
+            <Anchor side="Top" relative="$parent/$parent/CriticalStrikeStack2" pos="Mid" offset="0" />
+            <Anchor side="Left" relative="$parent/$parent/CriticalStrikeStack2" pos="Mid" offset="0" />
+            <Anchor side="Right" relative="$parent/$parent/CriticalStrikeStack2" pos="Mid" offset="0" />
+            <Anchor side="Bottom" relative="$parent/$parent/CriticalStrikeStack2" pos="Mid" offset="0" />
+            <Texture val="@UI/Storm_UI_HUD_HeroMechanic_Samuro_sword_black" />
+            <Height val="24" />
+            <Width val="24" />
+            <Visible val="true" />
+          </Frame>
+          <Frame type="Image" name="CriticalStrikeStack3">
+            <Anchor side="Top" relative="$parent/$parent/CriticalStrikeStack3" pos="Mid" offset="0" />
+            <Anchor side="Left" relative="$parent/$parent/CriticalStrikeStack3" pos="Mid" offset="0" />
+            <Anchor side="Right" relative="$parent/$parent/CriticalStrikeStack3" pos="Mid" offset="0" />
+            <Anchor side="Bottom" relative="$parent/$parent/CriticalStrikeStack3" pos="Mid" offset="0" />
+            <Texture val="@UI/Storm_UI_HUD_HeroMechanic_Samuro_sword_black" />
+            <Height val="24" />
+            <Width val="24" />
+            <Visible val="true" />
+          </Frame>
+        </Frame>
       </Frame>
     </Frame>
   </Frame>
