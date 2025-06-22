@@ -345,14 +345,13 @@ public class SettingsEditorApplication extends Application {
 			}
 			hasUnsavedFileChanges = false;
 			updateAppTitle();
+			log.trace("opened mpq within {}ms.", (System.nanoTime() - time) / 1_000_000);
 		} catch (final InterruptedException e) {
 			Thread.currentThread().interrupt();
-		} catch (final IOException | ParserConfigurationException | TransformerConfigurationException |
-		               MpqException e) {
+		} catch (final Exception e) {
 			log.error("Failed to save MPQ.", e);
 			showErrorAlert(e);
 		}
-		log.trace("opened mpq within {}ms.", (System.nanoTime() - time) / 1_000_000);
 	}
 	
 	/**
@@ -518,10 +517,10 @@ public class SettingsEditorApplication extends Application {
 				showExceptionAlert(e);
 			}
 			updateMenuBar();
+			log.trace("opened mpq within {}ms.", (System.nanoTime() - time) / 1_000_000);
 		} else {
 			log.trace("File to open was null, most likely due to 'cancel'.");
 		}
-		log.trace("opened mpq within {}ms.", (System.nanoTime() - time) / 1_000_000);
 	}
 	
 	/**

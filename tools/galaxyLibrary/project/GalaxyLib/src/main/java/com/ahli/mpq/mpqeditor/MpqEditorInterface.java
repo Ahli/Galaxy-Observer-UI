@@ -123,12 +123,8 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 				// special unprotected file path
 				final Path unprotectedPath = getPathWithUnprotectedSuffix(targetFile);
 				
-				// make way for unprotected file
-				deleteFile(unprotectedPath);
-				
-				
 				// build unprotected file
-				buildMpqWithCompression(MpqEditorCompression.NONE, unprotectedPath.toString(), fileCount);
+				buildMpqWithCompression(MpqEditorCompression.NONE, unprotectedPath, fileCount);
 			}
 			
 			// make way for protected file
@@ -142,14 +138,8 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 				log.error("Error while compressing files in the cache", e);
 			}
 			
-		} else {
-			// NO CONTENT COMPRESSION/PROTECTION OPTIONS
-			
-			// make way for file
-			deleteFile(targetFile);
-			
 		}
-		buildMpqWithCompression(compressMpq, targetFile.toString(), fileCount);
+		buildMpqWithCompression(compressMpq, targetFile, fileCount);
 	}
 	
 	/**
@@ -195,16 +185,20 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 					try {
 						Files.delete(path);
 					} catch (final IOException e) {
-						log.error(String.format("ERROR: Could not delete file '%s'.", path), e);
-						throw new MpqException(String.format(Messages.getString("MpqInterface.CouldNotOverwriteFile"),
-								path), e);
+						log.error("ERROR: Could not delete file '{}'.", path, e);
+						throw new MpqException(
+								String.format(
+										Messages.getString("MpqInterface.CouldNotOverwriteFile"),
+										path), e);
 					}
 				} else {
-					throw new MpqException(String.format("ERROR: Could not delete file '%s'. It might be used by another process.",
+					throw new MpqException(String.format(
+							"ERROR: Could not delete file '%s'. It might be used by another process.",
 							path));
 				}
 			} else {
-				throw new MpqException(String.format("ERROR: Could not delete file '%s'. A directory with the same name exists.",
+				throw new MpqException(String.format(
+						"ERROR: Could not delete file '%s'. A directory with the same name exists.",
 						path));
 			}
 		}
@@ -219,21 +213,24 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	 * @throws InterruptedException
 	 */
 	private void buildMpqWithCompression(
-			final MpqEditorCompression compressMpq, final String absolutePath, final long fileCount)
-			throws IOException, MpqException, InterruptedException {
+			final MpqEditorCompression compressMpq,
+			final Path absolutePath,
+			final long fileCount) throws IOException, MpqException, InterruptedException {
 		/* MpqEditor reads its settings from ini files in a specific location.
 		   Multiple different compression settings would cause race conditions and problems. */
 		final MpqEditorSettingsInterface settingsFinal = settings;
 		// mpq compression
 		settingsFinal.setCompression(compressMpq);
 		final String cachePath = mpqCachePath.toString();
+		final String absolutePathStr = absolutePath.toString();
 		synchronized (classWideLock) {
 			settingsFinal.applyCompression();
 			try {
+				deleteFile(absolutePath);
 				// build protected file
-				newMpq(absolutePath, fileCount);
-				addToMpq(absolutePath, cachePath, "");
-				compactMpq(absolutePath);
+				newMpq(absolutePathStr, fileCount);
+				addToMpq(absolutePathStr, cachePath, "");
+				compactMpq(absolutePathStr);
 			} finally {
 				settingsFinal.restoreOriginalSettingFiles();
 			}
@@ -250,7 +247,8 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	public void newMpq(final String mpqPath, final long maxFileCount)
 			throws InterruptedException, IOException, MpqException {
 		if (isMissingMpqEditor()) {
-			throw new MpqException(String.format(Messages.getString(MPQ_INTERFACE_MPQ_EDITOR_NOT_FOUND),
+			throw new MpqException(String.format(
+					Messages.getString(MPQ_INTERFACE_MPQ_EDITOR_NOT_FOUND),
 					mpqEditorPath));
 		}
 		final String[] cmd = new String[] { CMD, SLASH_C,
@@ -274,7 +272,8 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	public void addToMpq(final String mpqPath, final String sourceFilePath, final String targetName)
 			throws InterruptedException, IOException, MpqException {
 		if (isMissingMpqEditor()) {
-			throw new MpqException(String.format(Messages.getString(MPQ_INTERFACE_MPQ_EDITOR_NOT_FOUND),
+			throw new MpqException(String.format(
+					Messages.getString(MPQ_INTERFACE_MPQ_EDITOR_NOT_FOUND),
 					mpqEditorPath));
 		}
 		final String[] cmd = new String[] { CMD, SLASH_C,
@@ -295,7 +294,8 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	 */
 	public void compactMpq(final String mpqPath) throws InterruptedException, IOException, MpqException {
 		if (isMissingMpqEditor()) {
-			throw new MpqException(String.format(Messages.getString(MPQ_INTERFACE_MPQ_EDITOR_NOT_FOUND),
+			throw new MpqException(String.format(
+					Messages.getString(MPQ_INTERFACE_MPQ_EDITOR_NOT_FOUND),
 					mpqEditorPath));
 		}
 		final String[] cmd = new String[] { CMD, SLASH_C,
@@ -363,10 +363,13 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 	 * @throws MpqException
 	 */
 	public void extractFromMpq(
-			final String mpqPath, final String fileName, final String targetPath, final boolean inclSubFolders)
-			throws InterruptedException, IOException, MpqException {
+			final String mpqPath,
+			final String fileName,
+			final String targetPath,
+			final boolean inclSubFolders) throws InterruptedException, IOException, MpqException {
 		if (isMissingMpqEditor()) {
-			throw new MpqException(String.format(Messages.getString(MPQ_INTERFACE_MPQ_EDITOR_NOT_FOUND),
+			throw new MpqException(String.format(
+					Messages.getString(MPQ_INTERFACE_MPQ_EDITOR_NOT_FOUND),
 					mpqEditorPath));
 		}
 		final String[] cmd = new String[] { CMD, SLASH_C,
@@ -534,20 +537,6 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 		return mpqCachePath;
 	}
 	
-	//	@Override
-	//	public void setCache(final Path cache) {
-	//		mpqCachePath = cache;
-	//	}
-	
-	//	/**
-	//	 * Returns the custom ruleset for the file attributes and compression.
-	//	 *
-	//	 * @return
-	//	 */
-	//	public MpqEditorCompressionRule[] getCustomRuleSet() {
-	//		return settings.getCustomRuleSet();
-	//	}
-	
 	/**
 	 * Sets custom rules for the file attributes and compression. To use it, the archive needs to use
 	 * MpqEditorCompression.CUSTOM.
@@ -558,20 +547,4 @@ public class MpqEditorInterface implements MpqInterface, DeepCopyable {
 		settings.setCustomRules(rules);
 	}
 	
-	//	/**
-	//	 * @return
-	//	 */
-	//	public Path getMpqEditorPath() {
-	//		return mpqEditorPath;
-	//	}
-	
-	//	/**
-	//	 * Sets the MpqEditor path.
-	//	 *
-	//	 * @param editorPath
-	//	 * 		new editor path as String
-	//	 */
-	//	public void setMpqEditorPath(final Path editorPath) {
-	//		mpqEditorPath = editorPath;
-	//	}
 }

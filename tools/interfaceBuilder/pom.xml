@@ -20,7 +20,7 @@
 		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-parent -->
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.0</version>
+		<version>3.5.3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
@@ -33,10 +33,10 @@
 
 		<!-- override spring versions -->
 		<lombok.version>1.18.38</lombok.version>
-		<byte-buddy.version>1.17.5</byte-buddy.version>
+		<byte-buddy.version>1.17.6</byte-buddy.version>
 		<glassfish-jaxb.version>4.0.5</glassfish-jaxb.version>
 		<!-- https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-core -->
-		<hibernate.version>6.6.17.Final</hibernate.version>
+		<hibernate.version>6.6.18.Final</hibernate.version>
 		<h2.version>2.3.232</h2.version>
 		<junit-jupiter.version>5.13.1</junit-jupiter.version>
 		<slf4j.version>2.0.17</slf4j.version>
@@ -44,19 +44,19 @@
 		<hikaricp.version>6.3.0</hikaricp.version>
 		<jboss-logging.version>3.6.1.Final</jboss-logging.version>
 		<mockito.version>5.18.0</mockito.version>
-		<flyway.version>11.9.1</flyway.version>
-		<log4j2.version>2.24.3</log4j2.version>
+		<flyway.version>11.9.2</flyway.version>
+		<log4j2.version>2.25.0</log4j2.version>
 		<classmate.version>1.7.0</classmate.version>
 
 		<!-- local versions -->
-		<javafx-base.version>25-ea+18</javafx-base.version>
+		<javafx-base.version>25-ea+21</javafx-base.version>
 		<scaledfx.version>0.6</scaledfx.version>
 		<kryo.version>5.6.2</kryo.version>
 		<pecoff4j.version>0.4.1</pecoff4j.version>
 		<asm.version>9.8</asm.version>
 		<lmax-disruptor.version>4.0.0</lmax-disruptor.version>
 		<fontawesomefx-fontawesome.version>4.7.0-9.1.2</fontawesomefx-fontawesome.version>
-		<equalsverifier.version>4.0</equalsverifier.version>
+		<equalsverifier.version>4.0.2</equalsverifier.version>
 
 		<!-- transitive dependencies -->
 		<commons-text.version>1.13.1</commons-text.version>
@@ -444,12 +444,6 @@
 					<showDeprecation>true</showDeprecation>
 					<annotationProcessorPaths>
 						<path>
-							<!-- Creates .dat file for log4j custom appenders -->
-							<groupId>org.apache.logging.log4j</groupId>
-							<artifactId>log4j-core</artifactId>
-							<version>${log4j2.version}</version>
-						</path>
-						<path>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
 							<version>${lombok.version}</version>
@@ -470,18 +464,36 @@
 				</dependencies>
 				<executions>
 					<execution>
-						<id>log4j-plugin-processor</id>
+						<!-- Creates .dat file for log4j custom appenders -->
+						<!-- see: https://logging.apache.org/log4j/2.x/manual/plugins.html#plugin-registry -->
+						<id>generate-log4j-plugin-descriptor</id>
 						<goals>
 							<goal>compile</goal>
 						</goals>
 						<phase>process-classes</phase>
 						<configuration>
 							<proc>only</proc>
+							<annotationProcessorPaths>
+								<!-- Include `log4j-core` providing
+									 1. `org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor` that generates `Log4j2Plugins.dat`
+									 2. `org.apache.logging.log4j.core.config.plugins.processor.GraalVmProcessor` that generates the GraalVM reachability metadata file -->
+								<path>
+									<groupId>org.apache.logging.log4j</groupId>
+									<artifactId>log4j-core</artifactId>
+									<version>${log4j2.version}</version>
+								</path>
+							</annotationProcessorPaths>
 							<annotationProcessors>
-								<annotationProcessor>
-									org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor
-								</annotationProcessor>
+								<!-- Process sources using `PluginProcessor` to generate `Log4j2Plugins.dat` -->
+								<processor>org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor</processor>
+								<!-- Process sources using `GraalVmProcessor` to generate a GraalVM reachability metadata file -->
+								<processor>org.apache.logging.log4j.core.config.plugins.processor.GraalVmProcessor</processor>
 							</annotationProcessors>
+							<compilerArgs>
+								<!-- Provide the project coordinates to `GraalVmProcessor`: -->
+								<arg>-Alog4j.graalvm.groupId=${project.groupId}</arg>
+								<arg>-Alog4j.graalvm.artifactId=${project.artifactId}</arg>
+							</compilerArgs>
 						</configuration>
 					</execution>
 				</executions>
@@ -579,7 +591,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
-				<version>3.5.0</version>
+				<version>3.5.1</version>
 				<executions>
 					<execution>
 						<goals>
