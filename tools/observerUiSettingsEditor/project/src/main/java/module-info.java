@@ -11,6 +11,7 @@ module ObserverUiSettingsEditor {
 	requires javafx.controls;
 	requires javafx.fxml;
 	requires javafx.graphics;
+	requires javafx.media;
 	requires org.slf4j;
 	requires ch.qos.logback.classic; // entry required for logging after jlink (NOT redundant!)
 	requires ch.qos.logback.core; // required for logback classic (NOT redundant!)
