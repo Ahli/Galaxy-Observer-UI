@@ -20,7 +20,7 @@
 		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-parent -->
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.3</version>
+		<version>3.5.4</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
@@ -36,30 +36,30 @@
 		<byte-buddy.version>1.17.6</byte-buddy.version>
 		<glassfish-jaxb.version>4.0.5</glassfish-jaxb.version>
 		<!-- https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-core -->
-		<hibernate.version>6.6.18.Final</hibernate.version>
+		<hibernate.version>6.6.24.Final</hibernate.version>
 		<h2.version>2.3.232</h2.version>
-		<junit-jupiter.version>5.13.1</junit-jupiter.version>
+		<junit-jupiter.version>5.13.4</junit-jupiter.version>
 		<slf4j.version>2.0.17</slf4j.version>
-		<commons-lang3.version>3.17.0</commons-lang3.version>
+		<commons-lang3.version>3.18.0</commons-lang3.version>
 		<hikaricp.version>6.3.0</hikaricp.version>
 		<jboss-logging.version>3.6.1.Final</jboss-logging.version>
 		<mockito.version>5.18.0</mockito.version>
-		<flyway.version>11.9.2</flyway.version>
-		<log4j2.version>2.25.0</log4j2.version>
+		<flyway.version>11.11.0</flyway.version>
+		<log4j2.version>2.25.1</log4j2.version>
 		<classmate.version>1.7.0</classmate.version>
 
 		<!-- local versions -->
-		<javafx-base.version>25-ea+21</javafx-base.version>
+		<javafx-base.version>26-ea+3</javafx-base.version>
 		<scaledfx.version>0.6</scaledfx.version>
 		<kryo.version>5.6.2</kryo.version>
 		<pecoff4j.version>0.4.1</pecoff4j.version>
 		<asm.version>9.8</asm.version>
 		<lmax-disruptor.version>4.0.0</lmax-disruptor.version>
 		<fontawesomefx-fontawesome.version>4.7.0-9.1.2</fontawesomefx-fontawesome.version>
-		<equalsverifier.version>4.0.2</equalsverifier.version>
+		<equalsverifier.version>4.0.7</equalsverifier.version>
 
 		<!-- transitive dependencies -->
-		<commons-text.version>1.13.1</commons-text.version>
+		<commons-text.version>1.14.0</commons-text.version>
 		<antlr4-runtime.version>4.13.2</antlr4-runtime.version>
 	</properties>
 
@@ -436,16 +436,20 @@
 					<encoding>UTF-8</encoding>
 					<showWarnings>true</showWarnings>
 					<showDeprecation>true</showDeprecation>
-					<annotationProcessorPaths>
-						<path>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-							<version>${lombok.version}</version>
-						</path>
-					</annotationProcessorPaths>
+					<!-- it's now configured in the compile step to work with log4j -->
+<!--					<annotationProcessorPaths>-->
+<!--						<path>-->
+<!--							<groupId>org.projectlombok</groupId>-->
+<!--							<artifactId>lombok</artifactId>-->
+<!--							<version>${lombok.version}</version>-->
+<!--						</path>-->
+<!--					</annotationProcessorPaths>-->
 					<compilerArgs>
 						<!--<compilerArg>&#45;&#45;enable-preview</compilerArg>-->
 						<compilerArg>-Xlint:all</compilerArg>
+						<!-- Provide the project coordinates to `GraalVmProcessor`: -->
+						<arg>-Alog4j.graalvm.groupId=${project.groupId}</arg>
+						<arg>-Alog4j.graalvm.artifactId=${project.artifactId}</arg>
 					</compilerArgs>
 				</configuration>
 				<dependencies>
@@ -460,14 +464,22 @@
 					<execution>
 						<!-- Creates .dat file for log4j custom appenders -->
 						<!-- see: https://logging.apache.org/log4j/2.x/manual/plugins.html#plugin-registry -->
-						<id>generate-log4j-plugin-descriptor</id>
-						<goals>
-							<goal>compile</goal>
-						</goals>
-						<phase>process-classes</phase>
+						<!--
+						  ~ Explicitly list the annotation processors for the default compile execution.
+						  ~ This is required starting with JDK 23, where annotation processors are not enabled automatically.
+						  ~ Explicit configuration also improves build reliability and clarity.
+						  ~ For more details, see: https://inside.java/2024/06/18/quality-heads-up/
+						  -->
+						<id>default-compile</id>
 						<configuration>
-							<proc>only</proc>
 							<annotationProcessorPaths>
+								<!-- dependency to lombok's processor to generate lombok's code before log4j's
+								processor -->
+								<path>
+									<groupId>org.projectlombok</groupId>
+									<artifactId>lombok</artifactId>
+									<version>${lombok.version}</version>
+								</path>
 								<!-- Include `log4j-core` providing
 									 1. `org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor` that generates `Log4j2Plugins.dat`
 									 2. `org.apache.logging.log4j.core.config.plugins.processor.GraalVmProcessor` that generates the GraalVM reachability metadata file -->
@@ -478,16 +490,13 @@
 								</path>
 							</annotationProcessorPaths>
 							<annotationProcessors>
+								<!-- run lombok's processor to generate lombok's code before log4j's processor -->
+								<processor>lombok.launch.AnnotationProcessorHider$AnnotationProcessor</processor>
 								<!-- Process sources using `PluginProcessor` to generate `Log4j2Plugins.dat` -->
 								<processor>org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor</processor>
 								<!-- Process sources using `GraalVmProcessor` to generate a GraalVM reachability metadata file -->
 								<processor>org.apache.logging.log4j.core.config.plugins.processor.GraalVmProcessor</processor>
 							</annotationProcessors>
-							<compilerArgs>
-								<!-- Provide the project coordinates to `GraalVmProcessor`: -->
-								<arg>-Alog4j.graalvm.groupId=${project.groupId}</arg>
-								<arg>-Alog4j.graalvm.artifactId=${project.artifactId}</arg>
-							</compilerArgs>
 						</configuration>
 					</execution>
 				</executions>
@@ -563,7 +572,7 @@
 				<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-enforcer-plugin -->
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-enforcer-plugin</artifactId>
-				<version>3.5.0</version>
+				<version>3.6.1</version>
 				<executions>
 					<execution>
 						<id>enforce-maven</id>
