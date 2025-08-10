@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 public class TabsController {
 	
 	private static final Callback<TableColumn<ValueDef, Boolean>, TableCell<ValueDef, Boolean>>
-			ActionColumnCellFactoryReset =
+			ACTION_COLUMN_CELL_FACTORY_RESET =
 			_ -> new ResetDefaultButtonTableCell(Messages.getString("TabsController.ResetDefault"),
 					Messages.getString("TabsController.ResetOldValue"));
 	
@@ -102,7 +102,7 @@ public class TabsController {
 		hotkeysKeyCol.setSortable(false);
 		hotkeysActionsCol.setSortable(false);
 		hotkeysActionsCol.setCellValueFactory(hasChangedFac);
-		hotkeysActionsCol.setCellFactory(ActionColumnCellFactoryReset);
+		hotkeysActionsCol.setCellFactory(ACTION_COLUMN_CELL_FACTORY_RESET);
 		
 		settingsNameCol.setCellValueFactory(idFac);
 		settingsDescriptionCol.setCellValueFactory(descFac);
@@ -113,7 +113,7 @@ public class TabsController {
 		settingsValueCol.setSortable(false);
 		settingsActionsCol.setSortable(false);
 		settingsActionsCol.setCellValueFactory(hasChangedFac);
-		settingsActionsCol.setCellFactory(ActionColumnCellFactoryReset);
+		settingsActionsCol.setCellFactory(ACTION_COLUMN_CELL_FACTORY_RESET);
 		
 		hotkeysTable.setItems(hotkeysData);
 		settingsTable.setItems(settingsData);

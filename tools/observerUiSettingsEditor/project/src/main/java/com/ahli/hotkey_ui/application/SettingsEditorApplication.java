@@ -345,6 +345,7 @@ public class SettingsEditorApplication extends Application {
 			}
 			hasUnsavedFileChanges = false;
 			updateAppTitle();
+			updateValueDefsUnchangedState();
 			log.trace("opened mpq within {}ms.", (System.nanoTime() - time) / 1_000_000);
 		} catch (final InterruptedException e) {
 			Thread.currentThread().interrupt();
@@ -352,6 +353,10 @@ public class SettingsEditorApplication extends Application {
 			log.error("Failed to save MPQ.", e);
 			showErrorAlert(e);
 		}
+	}
+	
+	private void updateValueDefsUnchangedState() {
+		this.layoutExtReader.updateValueDefsUnchangedState();
 	}
 	
 	/**

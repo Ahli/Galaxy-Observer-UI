@@ -369,4 +369,13 @@ public class LayoutExtensionReader {
 		}
 		return false;
 	}
+	
+	public void updateValueDefsUnchangedState() {
+		for (final ValueDef setting : settings) {
+			setting.setOldValueToCurrent();
+		}
+		for (final TextValueDef hotkey : hotkeys) {
+			hotkey.setOldValueToCurrent();
+		}
+	}
 }

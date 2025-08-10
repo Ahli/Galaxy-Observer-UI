@@ -3,15 +3,19 @@ package com.ahli.hotkey_ui.application.model;
 import com.ahli.hotkey_ui.application.model.abstracts.ValueDef;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ChangeListener;
+import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.Locale;
 
 public class OptionValueDef extends ValueDef {
 	
+	@Getter
 	protected final OptionValueDefType type;
 	private final String[] allowedValues;
+	@Getter
 	private final String[] allowedDisplayValues;
+	@Getter
 	private final String gamestringsAdd;
 	private final SimpleIntegerProperty selectedIndex;
 	private final SimpleIntegerProperty defaultSelectedIndex;
@@ -115,14 +119,6 @@ public class OptionValueDef extends ValueDef {
 		this.selectedIndex.set(selectedIndex);
 	}
 	
-	public String getGamestringsAdd() {
-		return gamestringsAdd;
-	}
-	
-	public String[] getAllowedDisplayValues() {
-		return allowedDisplayValues;
-	}
-	
 	/**
 	 * Returns whether the value is the default value.
 	 *
@@ -131,10 +127,6 @@ public class OptionValueDef extends ValueDef {
 	@Override
 	public boolean isDefaultValue() {
 		return selectedIndex.get() == defaultSelectedIndex.get();
-	}
-	
-	public OptionValueDefType getType() {
-		return type;
 	}
 	
 	@Override
@@ -205,6 +197,11 @@ public class OptionValueDef extends ValueDef {
 	@Override
 	public String getDisplayValue() {
 		return allowedDisplayValues[selectedIndex.get()];
+	}
+	
+	@Override
+	public void setOldValueToCurrent() {
+		oldSelectedIndex.set(selectedIndex.get());
 	}
 	
 	public SimpleIntegerProperty getSelectedIndexProperty() {

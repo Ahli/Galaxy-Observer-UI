@@ -83,4 +83,6 @@ public abstract class ValueDef {
 		return hasChanged;
 	}
 	
+	// update old value, e.g. after saving
+	public abstract void setOldValueToCurrent();
 }

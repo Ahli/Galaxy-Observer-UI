@@ -3,12 +3,14 @@ package com.ahli.hotkey_ui.application.model;
 import com.ahli.hotkey_ui.application.model.abstracts.ValueDef;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
+import lombok.Getter;
 
 import java.util.Locale;
 
 public class TextValueDef extends ValueDef {
 	
 	private final SimpleStringProperty oldValue;
+	@Getter
 	private final TextValueDefType type;
 	
 	public TextValueDef(final String id, final String description, final String defaultValue, final String typeStr) {
@@ -49,10 +51,6 @@ public class TextValueDef extends ValueDef {
 		displayValue.addListener(changeListener);
 	}
 	
-	public TextValueDefType getType() {
-		return type;
-	}
-	
 	@Override
 	public void resetToDefault() {
 		displayValue.set(defaultDisplayValue.get());
@@ -75,6 +73,11 @@ public class TextValueDef extends ValueDef {
 	@Override
 	public String getDisplayValue() {
 		return displayValue.get();
+	}
+	
+	@Override
+	public void setOldValueToCurrent() {
+		setOldValue(getValue());
 	}
 	
 	public void setOldValue(final String oldValue) {

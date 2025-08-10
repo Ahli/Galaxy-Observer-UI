@@ -18,6 +18,8 @@ import java.util.zip.InflaterInputStream;
 @Slf4j
 public class RecentlyUsed {
 	private static final int MAX_RECENT_ELEMENTS = 5;
+	private static final String GALAXY_OBS_UI_SETTINGS_EDITOR_RECENT_BIN = ".GalaxyObsUiSettingsEditor/recent.bin";
+	private static final String USER_HOME = "user.home";
 	
 	private final ArrayDeque<Path> recent = new ArrayDeque<>(MAX_RECENT_ELEMENTS);
 	private final Kryo kryo;
@@ -25,14 +27,14 @@ public class RecentlyUsed {
 	public RecentlyUsed() {
 		kryo = new Kryo(new ListReferenceResolver());
 		kryo.setRegistrationRequired(true);
-		loadItems(Path.of(System.getProperty("user.home"), ".GalaxyObsUiSettingsEditor/recent.bin"));
+		loadItems(Path.of(System.getProperty(USER_HOME), GALAXY_OBS_UI_SETTINGS_EDITOR_RECENT_BIN));
 	}
 	
 	private void loadItems(final Path recentSaveFile) {
 		if (Files.exists(recentSaveFile)) {
 			try (final InflaterInputStream in = new InflaterInputStream(Files.newInputStream(recentSaveFile))) {
 				try (final Input input = new Input(in)) {
-					while (input.position() < input.limit()) {
+					while (input.available() > 0) {
 						Path path = Path.of(kryo.readObject(input, String.class));
 						if (Files.exists(path)) {
 							recent.add(path);
@@ -59,7 +61,7 @@ public class RecentlyUsed {
 			recent.pollFirst();
 		}
 		recent.add(path);
-		save(Path.of(System.getProperty("user.home"), ".GalaxyObsUiSettingsEditor/recent.bin"));
+		save(Path.of(System.getProperty("user.home"), GALAXY_OBS_UI_SETTINGS_EDITOR_RECENT_BIN));
 	}
 	
 	private void save(final Path path) {
