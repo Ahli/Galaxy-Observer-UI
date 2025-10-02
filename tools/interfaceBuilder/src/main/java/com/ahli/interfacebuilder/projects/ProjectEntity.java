@@ -97,7 +97,7 @@ public class ProjectEntity implements Serializable {
 	
 	public static ProjectEntity fromProject(@NonNull final Project project) {
 		return ProjectEntity.builder()
-				.id(project.getId())
+				.id(project.getId() == 0 ? null : project.getId())
 				.name(project.getName())
 				.projectPath(project.getProjectPath().toString())
 				.gameType(project.getGameType())
