@@ -5,6 +5,7 @@ import com.ahli.hotkey_ui.application.model.TextValueDef;
 import com.ahli.hotkey_ui.application.model.abstracts.ValueDef;
 import com.ahli.xml.XmlDomHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -53,7 +54,9 @@ final class LayoutFileUpdater extends SimpleFileVisitor<Path> {
 	}
 	
 	private static void modifyConstants(
-			final NodeList childNodes, final List<TextValueDef> hotkeys, final List<ValueDef> settings) {
+			final NodeList childNodes,
+			final List<TextValueDef> hotkeys,
+			final List<ValueDef> settings) {
 		for (int i = 0, len = childNodes.getLength(); i < len; ++i) {
 			final Node curNode = childNodes.item(i);
 			
@@ -78,7 +81,9 @@ final class LayoutFileUpdater extends SimpleFileVisitor<Path> {
 	 * @param settings
 	 */
 	public static void readConstants(
-			final NodeList childNodes, final List<TextValueDef> hotkeys, final List<ValueDef> settings) {
+			final NodeList childNodes,
+			final List<TextValueDef> hotkeys,
+			final List<ValueDef> settings) {
 		for (int i = 0, len = childNodes.getLength(); i < len; ++i) {
 			final Node curNode = childNodes.item(i);
 			
@@ -101,7 +106,9 @@ final class LayoutFileUpdater extends SimpleFileVisitor<Path> {
 	 * @param settings
 	 */
 	private static void processConstant(
-			final Node node, final List<TextValueDef> hotkeys, final List<ValueDef> settings) {
+			final Node node,
+			final List<TextValueDef> hotkeys,
+			final List<ValueDef> settings) {
 		final Node nameAttrNode = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), NAME);
 		if (nameAttrNode != null) {
 			final String name = nameAttrNode.getNodeValue();
@@ -114,7 +121,7 @@ final class LayoutFileUpdater extends SimpleFileVisitor<Path> {
 				log.warn("Constant '{}' has no 'val' attribute defined.", name);
 			}
 		} else {
-			log.warn("Constant has no 'name' attribute defined.");
+			log.warn("Constant has no 'name' attribute defined - process constant.");
 		}
 	}
 	
@@ -125,7 +132,10 @@ final class LayoutFileUpdater extends SimpleFileVisitor<Path> {
 	 * @param settings
 	 */
 	private static void setValueDefCurValue(
-			final String name, final String val, final List<TextValueDef> hotkeys, final List<ValueDef> settings) {
+			final String name,
+			final String val,
+			final List<TextValueDef> hotkeys,
+			final List<ValueDef> settings) {
 		for (final TextValueDef item : hotkeys) {
 			if (item.getId().equalsIgnoreCase(name)) {
 				item.setValue(val);
@@ -157,7 +167,9 @@ final class LayoutFileUpdater extends SimpleFileVisitor<Path> {
 	 * @param settings
 	 */
 	private static void modifyConstant(
-			final Node node, final List<TextValueDef> hotkeys, final List<ValueDef> settings) {
+			final Node node,
+			final List<TextValueDef> hotkeys,
+			final List<ValueDef> settings) {
 		final Node nameAttrNode = XmlDomHelper.getNamedItemIgnoringCase(node.getAttributes(), NAME);
 		if (nameAttrNode != null) {
 			final String name = nameAttrNode.getNodeValue();
@@ -189,12 +201,13 @@ final class LayoutFileUpdater extends SimpleFileVisitor<Path> {
 				log.warn("Constant has no 'val' attribute defined.");
 			}
 		} else {
-			log.warn("Constant has no 'name' attribute defined.");
+			log.warn("Constant has no 'name' attribute defined - modify constant.");
 		}
 	}
 	
 	@Override
-	public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
+	public @NonNull FileVisitResult visitFile(final @NonNull Path file, final @NonNull BasicFileAttributes attrs)
+			throws IOException {
 		final String fileName = file.getFileName().toString();
 		final int i = fileName.lastIndexOf('.');
 		if (i >= 0) {
@@ -235,7 +248,8 @@ final class LayoutFileUpdater extends SimpleFileVisitor<Path> {
 	}
 	
 	@Override
-	public FileVisitResult visitFileFailed(final Path file, final IOException exc) throws IOException {
+	public @NonNull FileVisitResult visitFileFailed(final @NonNull Path file, final IOException exc)
+			throws IOException {
 		log.error("Failed to access file: {}", file);
 		throw exc;
 	}

@@ -23,7 +23,7 @@ final class ReadAaltoTest {
 	private ReadAaltoTest() {
 	}
 	
-	public static void main(final String[] args) {
+	static void main(final String[] args) {
 		final long endMem;
 		int iterations = 0;
 		try {

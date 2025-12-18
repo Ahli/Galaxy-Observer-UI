@@ -109,9 +109,7 @@ public class SettingsIniInterface {
 		try {
 			readSettingsFromFilePrivate();
 		} catch (final IOException e) {
-			log.error(
-					String.format("Failed to load settings from ini at construction. Filepath=%s", settingsFilePath),
-					e);
+			log.error("Failed to load settings from ini at construction. Filepath={}", settingsFilePath, e);
 		}
 	}
 	

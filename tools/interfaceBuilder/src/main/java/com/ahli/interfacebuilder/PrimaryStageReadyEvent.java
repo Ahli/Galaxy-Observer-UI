@@ -6,8 +6,8 @@ package com.ahli.interfacebuilder;
 import com.ahli.interfacebuilder.integration.CommandLineParams;
 import javafx.stage.Stage;
 import lombok.Getter;
+import org.jspecify.annotations.Nullable;
 import org.springframework.context.ApplicationEvent;
-import org.springframework.lang.Nullable;
 
 import java.io.Serial;
 

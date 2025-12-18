@@ -14,7 +14,7 @@ import com.ahli.interfacebuilder.compress.GameService;
 import com.ahli.interfacebuilder.projects.enums.GameType;
 import com.ahli.xml.XmlDomHelper;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.NonNull;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -91,7 +91,8 @@ public class CompileService {
 					return null;
 				}
 				
-				catalogClone.setParser(new UICatalogParser(catalogClone, new XmlParserAalto(),
+				catalogClone.setParser(new UICatalogParser(
+						catalogClone, new XmlParserAalto(),
 						//						new XmlParserVtd(),
 						DeduplicationIntensity.SIMPLE));
 				
@@ -164,7 +165,8 @@ public class CompileService {
 		}
 		
 		@Override
-		public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
+		public @NonNull FileVisitResult visitFile(final Path file, final @NonNull BasicFileAttributes attrs)
+				throws IOException {
 			final String fileName = file.getFileName().toString();
 			final int i = fileName.lastIndexOf('.');
 			if (i >= 0) {
@@ -191,7 +193,8 @@ public class CompileService {
 		}
 		
 		@Override
-		public FileVisitResult visitFileFailed(final Path file, final IOException exc) throws IOException {
+		public @NonNull FileVisitResult visitFileFailed(final @NonNull Path file, final IOException exc)
+				throws IOException {
 			log.error("Failed to access file: {}", file);
 			throw exc;
 		}

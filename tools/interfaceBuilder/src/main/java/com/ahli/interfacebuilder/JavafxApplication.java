@@ -12,12 +12,11 @@ import javafx.application.Platform;
 import javafx.application.Preloader;
 import javafx.stage.Stage;
 import lombok.extern.log4j.Log4j2;
+import org.jspecify.annotations.Nullable;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
-import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 
 @Log4j2
 public class JavafxApplication extends Application {
@@ -45,7 +44,7 @@ public class JavafxApplication extends Application {
 				.build()
 				.run(toArray(getParameters()));
 		
-		if (serverThread != null && serverThread.isAlive() && context != null) {
+		if (serverThread != null && serverThread.isAlive()) {
 			serverThread.setAppController(context.getBean(AppController.class));
 		}
 		
@@ -54,7 +53,7 @@ public class JavafxApplication extends Application {
 	
 	@SuppressWarnings("java:S3014") // ThreadGroup is ok to be used here
 	@Nullable
-	private static IpcServerThread findServerThread(@NonNull final String id) {
+	private static IpcServerThread findServerThread(final String id) {
 		try {
 			if (!id.isEmpty()) {
 				final long idLong = Long.parseLong(id);

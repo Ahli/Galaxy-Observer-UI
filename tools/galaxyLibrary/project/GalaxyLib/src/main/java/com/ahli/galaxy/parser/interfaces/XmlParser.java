@@ -3,8 +3,8 @@
 
 package com.ahli.galaxy.parser.interfaces;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -22,7 +22,7 @@ public interface XmlParser {
 	 * @param p
 	 * @throws IOException
 	 */
-	void parseFile(@NotNull final Path p) throws IOException;
+	void parseFile(@NonNull final Path p) throws IOException;
 	
 	/**
 	 * Release the allocated resources.

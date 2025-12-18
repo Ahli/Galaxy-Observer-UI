@@ -3,13 +3,15 @@
 
 package com.ahli.interfacebuilder.integration.kryo;
 
+import org.jspecify.annotations.NonNull;
+
 import java.util.Arrays;
 import java.util.Objects;
 
 public record KryoGameInfo(int[] version, String gameName, boolean isPtr) {
 	
 	@Override
-	public String toString() {
+	public @NonNull String toString() {
 		return "KryoGameInfo{gameName=" + gameName + ", isPtr=" + isPtr + ", version=" + Arrays.toString(version) + "}";
 	}
 	
@@ -18,10 +20,10 @@ public record KryoGameInfo(int[] version, String gameName, boolean isPtr) {
 		if (this == obj) {
 			return true;
 		}
-		if (!(obj instanceof final KryoGameInfo that)) {
+		if (!(obj instanceof KryoGameInfo(int[] ver, String name, boolean ptr))) {
 			return false;
 		}
-		return isPtr == that.isPtr && Arrays.equals(version, that.version) && Objects.equals(gameName, that.gameName);
+		return isPtr == ptr && Arrays.equals(version, ver) && Objects.equals(gameName, name);
 	}
 	
 	@Override

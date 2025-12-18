@@ -6,10 +6,10 @@ package com.ahli.interfacebuilder;
 import com.ahli.interfacebuilder.integration.CommandLineParams;
 import com.ahli.interfacebuilder.integration.ipc.IpcServerThread;
 import com.ahli.interfacebuilder.ui.AppController;
+import org.jspecify.annotations.Nullable;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
-import org.springframework.lang.Nullable;
 
 public class NoGuiApplication {
 	

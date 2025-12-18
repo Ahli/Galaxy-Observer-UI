@@ -5,6 +5,7 @@ import com.ahli.hotkey_ui.application.model.OptionValueDef;
 import com.ahli.hotkey_ui.application.model.OptionValueDefType;
 import com.ahli.hotkey_ui.application.model.abstracts.ValueDef;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -26,7 +27,8 @@ public class GameStringsUpdater extends SimpleFileVisitor<Path> {
 	}
 	
 	@Override
-	public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
+	public @NonNull FileVisitResult visitFile(final @NonNull Path file, final @NonNull BasicFileAttributes attrs)
+			throws IOException {
 		
 		if (file.getFileName().toString().equalsIgnoreCase("GameStrings.txt")) {
 			

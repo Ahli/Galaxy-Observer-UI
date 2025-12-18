@@ -10,7 +10,7 @@ import com.ahli.interfacebuilder.integration.kryo.KryoGameInfo;
 import com.ahli.interfacebuilder.integration.kryo.KryoService;
 import com.esotericsoftware.kryo.Kryo;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -37,7 +37,7 @@ public class DiscCacheService {
 			@NonNull final UICatalog catalog,
 			@NonNull final String gameDefName,
 			final boolean isPtr,
-			@NonNull final int[] version) throws IOException {
+			final int @NonNull [] version) throws IOException {
 		final Path p = getCacheFilePath(gameDefName, isPtr);
 		Files.deleteIfExists(p);
 		

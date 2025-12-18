@@ -8,8 +8,8 @@ import com.ahli.galaxy.parser.interfaces.ParsedXmlConsumer;
 import com.ahli.galaxy.ui.exceptions.UIException;
 import com.ahli.xml.XmlDomHelper;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -77,7 +77,7 @@ public class XmlParserDom extends XmlParserAbstract {
 	}
 	
 	@Override
-	public void parseFile(@NotNull final Path p) throws IOException {
+	public void parseFile(final @NonNull Path p) throws IOException {
 		if (consumer == null || attrTypes == null || attrValues == null || dBuilder == null) {
 			throw new IllegalStateException("No consumer set");
 		}

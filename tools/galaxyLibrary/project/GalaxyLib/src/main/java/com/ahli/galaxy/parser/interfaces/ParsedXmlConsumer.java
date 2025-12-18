@@ -4,7 +4,7 @@
 package com.ahli.galaxy.parser.interfaces;
 
 import com.ahli.galaxy.ui.exceptions.UIException;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -12,10 +12,10 @@ import java.util.List;
 
 public interface ParsedXmlConsumer {
 	
-	void parseFile(@NotNull Path p, @NotNull String raceId, boolean isDevLayout, @NotNull String consoleSkinId)
+	void parseFile(@NonNull Path p, @NonNull String raceId, boolean isDevLayout, @NonNull String consoleSkinId)
 			throws IOException;
 	
-	void parse(int level, @NotNull String tagName, @NotNull List<String> attrTypes, @NotNull List<String> attrValues)
+	void parse(int level, @NonNull String tagName, @NonNull List<String> attrTypes, @NonNull List<String> attrValues)
 			throws UIException;
 	
 	void endLayoutFile();

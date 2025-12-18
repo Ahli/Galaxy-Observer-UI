@@ -11,8 +11,8 @@ import com.fasterxml.aalto.AsyncXMLInputFactory;
 import com.fasterxml.aalto.AsyncXMLStreamReader;
 import com.fasterxml.aalto.stax.InputFactoryImpl;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -65,7 +65,7 @@ public class XmlParserAalto extends XmlParserAbstract {
 	}
 	
 	@Override
-	public void parseFile(@NotNull final Path p) throws IOException {
+	public void parseFile(final @NonNull Path p) throws IOException {
 		if (consumer == null || attrTypes == null || attrValues == null || asyncInputFactory == null) {
 			throw new IllegalStateException("No consumer set");
 		}

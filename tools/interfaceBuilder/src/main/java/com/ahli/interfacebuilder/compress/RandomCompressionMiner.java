@@ -143,7 +143,9 @@ public class RandomCompressionMiner {
 	 * @return
 	 */
 	private static MpqEditorCompressionRule[] addRulesForFiles(
-			final MpqEditorCompressionRule[] oldBestRuleset, final List<File> untrackedFiles, final Path cacheDir) {
+			final MpqEditorCompressionRule[] oldBestRuleset,
+			final List<File> untrackedFiles,
+			final Path cacheDir) {
 		final int oldRuleCount = oldBestRuleset.length;
 		final MpqEditorCompressionRule[] merged = new MpqEditorCompressionRule[oldRuleCount + untrackedFiles.size()];
 		// copy old
@@ -151,7 +153,8 @@ public class RandomCompressionMiner {
 		// insert new untracked
 		for (int i = 0, len = untrackedFiles.size(); i < len; ++i) {
 			//noinspection ObjectAllocationInLoop
-			merged[oldRuleCount + i] = new MpqEditorCompressionRuleMask(getFileMask(untrackedFiles.get(i).toPath(),
+			merged[oldRuleCount + i] = new MpqEditorCompressionRuleMask(getFileMask(
+					untrackedFiles.get(i).toPath(),
 					cacheDir)).setSingleUnit(true)
 					.setCompress(true)
 					.setCompressionMethod(MpqEditorCompressionRuleMethod.NONE);
@@ -166,7 +169,8 @@ public class RandomCompressionMiner {
 	 * @return
 	 */
 	private static MpqEditorCompressionRule[] removeUnusedMaskEntries(
-			final MpqEditorCompressionRule[] dirty, final Path cacheDir) {
+			final MpqEditorCompressionRule[] dirty,
+			final Path cacheDir) {
 		final List<MpqEditorCompressionRule> clean = new ArrayList<>();
 		String mask;
 		for (final MpqEditorCompressionRule rule : dirty) {
@@ -440,7 +444,7 @@ public class RandomCompressionMiner {
 					Thread.sleep(50);
 				} catch (final InterruptedException _) {
 					Thread.currentThread().interrupt();
-					log.trace("Interrupted while waiting to clean up");
+					log.trace("Interrupted while waiting to clean up cache");
 				}
 			}
 		}
@@ -459,7 +463,7 @@ public class RandomCompressionMiner {
 					Thread.sleep(50);
 				} catch (final InterruptedException _) {
 					Thread.currentThread().interrupt();
-					log.trace("Interrupted while waiting to clean up");
+					log.trace("Interrupted while waiting to clean up target file");
 				}
 			}
 		}

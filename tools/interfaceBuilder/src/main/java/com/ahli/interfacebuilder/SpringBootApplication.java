@@ -12,6 +12,7 @@ import com.ahli.interfacebuilder.integration.ipc.TcpIpSocketCommunication;
 import com.ahli.interfacebuilder.integration.ipc.UnixDomainSocketCommunication;
 import javafx.application.Application;
 import lombok.extern.log4j.Log4j2;
+import org.jspecify.annotations.Nullable;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.context.ConfigurationPropertiesAutoConfiguration;
@@ -22,7 +23,6 @@ import org.springframework.boot.hibernate.autoconfigure.HibernateJpaAutoConfigur
 import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
 import org.springframework.boot.transaction.autoconfigure.TransactionAutoConfiguration;
 import org.springframework.context.annotation.Import;
-import org.springframework.lang.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -258,7 +258,7 @@ public final class SpringBootApplication {
 	}
 	
 	@SuppressWarnings("java:S2095") //
-	public static void main(final String[] args) {
+	static void main(final String[] args) {
 		try {
 			if (getIpc().isAvailable()) {
 				if (!actAsServer(args)) {

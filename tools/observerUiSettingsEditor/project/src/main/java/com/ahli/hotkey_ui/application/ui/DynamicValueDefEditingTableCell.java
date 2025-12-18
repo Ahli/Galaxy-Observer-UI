@@ -41,14 +41,14 @@ public class DynamicValueDefEditingTableCell extends TableCell<ValueDef, String>
 	private void updateItem(final String item) {
 		final ValueDef data = getTableRow().getItem();
 		if (data instanceof TextValueDef tvd) {
-			log.trace("update valuedef-edit table cell - label {} - type: {}", item, tvd.getType());
+			log.trace("update valuedef-edit table cell - text - label {} - type: {}", item, tvd.getType());
 			if (tvd.getType() == TextValueDefType.NUMBER) {
 				createNumberEditor(tvd, item);
 			} else {
 				createTextEditor(tvd, item);
 			}
 		} else if (data instanceof OptionValueDef ovd) {
-			log.trace("update valuedef-edit table cell - label {} - type: {}", item, ovd.getType());
+			log.trace("update valuedef-edit table cell - option - label {} - type: {}", item, ovd.getType());
 			createChoiceEditor(ovd);
 		} else {
 			log.trace("update valuedef-edit table cell - label {} - null ValueDef", item);

@@ -3,8 +3,8 @@
 
 package com.ahli.galaxy.game;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -12,15 +12,15 @@ import java.util.Objects;
 /**
  * @author Ahli
  */
-public record GameDef(@NotNull String name, @NotNull String nameHandle, @NotNull String modFileEnding,
-                      @NotNull String[] coreModsOrDirectories, @NotNull String defaultRaceId,
-                      @NotNull String defaultConsoleSkinId, @NotNull String documentsGameDirectoryName,
-                      @NotNull String layoutFileEnding, @NotNull String baseDataFolderName, @NotNull String rootExeName,
-                      @Nullable String switcherExeNameX32, @NotNull String switcherExeNameX64,
-                      @Nullable String supportDirectoryX32, @NotNull String supportDirectoryX64,
-                      @NotNull String documentsInterfaceSubdirectoryName, @NotNull String modsSubDirectory,
-                      @Nullable String ptrRootExeName, @NotNull String componentsFileEnding,
-                      @NotNull String styleFileEnding, @NotNull String cutsceneFileEnding) {
+public record GameDef(@NonNull String name, @NonNull String nameHandle, @NonNull String modFileEnding,
+                      @NonNull String[] coreModsOrDirectories, @NonNull String defaultRaceId,
+                      @NonNull String defaultConsoleSkinId, @NonNull String documentsGameDirectoryName,
+                      @NonNull String layoutFileEnding, @NonNull String baseDataFolderName, @NonNull String rootExeName,
+                      @Nullable String switcherExeNameX32, @NonNull String switcherExeNameX64,
+                      @Nullable String supportDirectoryX32, @NonNull String supportDirectoryX64,
+                      @NonNull String documentsInterfaceSubdirectoryName, @NonNull String modsSubDirectory,
+                      @Nullable String ptrRootExeName, @NonNull String componentsFileEnding,
+                      @NonNull String styleFileEnding, @NonNull String cutsceneFileEnding) {
 	
 	public static GameDef buildSc2GameDef() {
 		return new GameDef(
@@ -76,7 +76,7 @@ public record GameDef(@NotNull String name, @NotNull String nameHandle, @NotNull
 	 * @param gameDef
 	 * @return
 	 */
-	public static boolean isSc2(@NotNull final GameDef gameDef) {
+	public static boolean isSc2(@NonNull final GameDef gameDef) {
 		return "sc2".equals(gameDef.nameHandle());
 	}
 	
@@ -86,7 +86,7 @@ public record GameDef(@NotNull String name, @NotNull String nameHandle, @NotNull
 	 * @param gameDef
 	 * @return
 	 */
-	public static boolean isHeroes(@NotNull final GameDef gameDef) {
+	public static boolean isHeroes(@NonNull final GameDef gameDef) {
 		return "heroes".equals(gameDef.nameHandle());
 	}
 	
@@ -146,7 +146,7 @@ public record GameDef(@NotNull String name, @NotNull String nameHandle, @NotNull
 	}
 	
 	@Override
-	@NotNull
+	@NonNull
 	public String toString() {
 		return "GameDef{" + "name='" + name + '\'' + ", nameHandle='" + nameHandle + '\'' + ", modFileEnding='" +
 				modFileEnding + '\'' + ", coreModsOrDirectories=" + Arrays.toString(coreModsOrDirectories) +

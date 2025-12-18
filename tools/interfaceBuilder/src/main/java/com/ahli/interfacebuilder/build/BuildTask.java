@@ -9,7 +9,7 @@ import com.ahli.interfacebuilder.projects.Project;
 import com.ahli.interfacebuilder.threads.CleaningForkJoinPool;
 import com.ahli.interfacebuilder.threads.CleaningForkJoinTask;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.NonNull;
 
 import java.io.Serial;
 

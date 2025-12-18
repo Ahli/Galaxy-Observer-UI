@@ -34,7 +34,7 @@ public final class Messages {
 		try {
 			return bundle.getString(key);
 		} catch (final MissingResourceException e) {
-			log.error(String.format("ERROR: failed to receive String for %s", key), e);
+			log.error("ERROR: failed to receive String for {}", key, e);
 			return '!' + key + '!';
 		}
 	}

@@ -231,19 +231,23 @@ public class BrowseTabController implements Updateable, FxmlController {
 			final Map<String, String> map = new UnifiedMap<>();
 			if (el instanceof final UIFrameMutable elem) {
 				UIAnchorSide side = UIAnchorSide.TOP;
-				map.put(ANCHOR_TOP,
+				map.put(
+						ANCHOR_TOP,
 						elem.getAnchorRelative(side) + SPACE_HIVEN_SPACE + elem.getAnchorPos(side) + SPACE_HIVEN_SPACE +
 								elem.getAnchorOffset(side));
 				side = UIAnchorSide.LEFT;
-				map.put(ANCHOR_LEFT,
+				map.put(
+						ANCHOR_LEFT,
 						elem.getAnchorRelative(side) + SPACE_HIVEN_SPACE + elem.getAnchorPos(side) + SPACE_HIVEN_SPACE +
 								elem.getAnchorOffset(side));
 				side = UIAnchorSide.BOTTOM;
-				map.put(ANCHOR_BOTTOM,
+				map.put(
+						ANCHOR_BOTTOM,
 						elem.getAnchorRelative(side) + SPACE_HIVEN_SPACE + elem.getAnchorPos(side) + SPACE_HIVEN_SPACE +
 								elem.getAnchorOffset(side));
 				side = UIAnchorSide.RIGHT;
-				map.put(ANCHOR_RIGHT,
+				map.put(
+						ANCHOR_RIGHT,
 						elem.getAnchorRelative(side) + SPACE_HIVEN_SPACE + elem.getAnchorPos(side) + SPACE_HIVEN_SPACE +
 								elem.getAnchorOffset(side));
 				if (elem.getAttributesRaw() != null) {
@@ -389,7 +393,9 @@ public class BrowseTabController implements Updateable, FxmlController {
 		
 		@Override
 		public void changed(
-				final ObservableValue<? extends String> observable, final String oldValue, final String newValue) {
+				final ObservableValue<? extends String> observable,
+				final String oldValue,
+				final String newValue) {
 			controller.filterTree(newValue);
 		}
 	}
@@ -452,7 +458,8 @@ public class BrowseTabController implements Updateable, FxmlController {
 		
 		@Override
 		public void handle(final ActionEvent event) {
-			log.trace("selection of file changed: {}",
+			log.trace(
+					"selection of file changed: {}",
 					() -> browseTabController.fileSelector.getSelectionModel().getSelectedItem());
 			try {
 				final String selectedFileName = browseTabController.fileSelector.getSelectionModel().getSelectedItem();
@@ -543,7 +550,8 @@ public class BrowseTabController implements Updateable, FxmlController {
 					rootItem.expandedProperty().setValue(true);
 					// set filter predicate
 					rootItem.predicateProperty()
-							.bind(Bindings.createObjectBinding(browseTabController.searchCallable,
+							.bind(Bindings.createObjectBinding(
+									browseTabController.searchCallable,
 									browseTabController.queryString));
 					Platform.runLater(() -> {
 						log.trace("setting root");
@@ -551,7 +559,8 @@ public class BrowseTabController implements Updateable, FxmlController {
 						log.trace("selecting first entry");
 						browseTabController.frameTree.getSelectionModel().select(0);
 						if (log.isTraceEnabled()) {
-							log.trace("Tree creation: {}ms , {} frames",
+							log.trace(
+									"Tree creation (with template): {}ms , {} frames",
 									(System.currentTimeMillis() - start),
 									browseTabController.framesTotal);
 						}
@@ -560,7 +569,8 @@ public class BrowseTabController implements Updateable, FxmlController {
 			} else {
 				browseTabController.frameTree.setRoot(null);
 				if (log.isTraceEnabled()) {
-					log.trace("Tree creation: {}ms , {} frames",
+					log.trace(
+							"Tree creation (no-template): {}ms , {} frames",
 							(System.currentTimeMillis() - start),
 							browseTabController.framesTotal);
 				}
@@ -600,7 +610,8 @@ public class BrowseTabController implements Updateable, FxmlController {
 				browseTabController.queryString.set(str.toUpperCase(Locale.getDefault()));
 				log.trace("filter apply: {}ms - {}", (System.currentTimeMillis() - startTime), str);
 			}
-			Platform.runLater(new TreeFilteringUiRunnable(str,
+			Platform.runLater(new TreeFilteringUiRunnable(
+					str,
 					filter,
 					browseTabController,
 					root,

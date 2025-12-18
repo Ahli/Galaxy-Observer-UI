@@ -4,11 +4,11 @@
 package com.ahli.interfacebuilder.ui;
 
 import javafx.fxml.FXMLLoader;
+import org.jspecify.annotations.NonNull;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.MessageSource;
 import org.springframework.context.support.MessageSourceResourceBundle;
-import org.springframework.lang.NonNull;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,7 +29,8 @@ public class FXMLSpringLoader extends FXMLLoader implements ApplicationContextAw
 	private void setApplicationContextPrivate(final ApplicationContext applicationContext) {
 		context = applicationContext;
 		setControllerFactory(applicationContext::getBean);
-		setResources(new MessageSourceResourceBundle(applicationContext.getBean(MessageSource.class),
+		setResources(new MessageSourceResourceBundle(
+				applicationContext.getBean(MessageSource.class),
 				Locale.getDefault()));
 	}
 	

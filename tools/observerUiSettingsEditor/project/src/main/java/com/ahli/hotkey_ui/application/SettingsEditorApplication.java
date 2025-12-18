@@ -66,24 +66,18 @@ public class SettingsEditorApplication extends Application {
 	private final long appStartTime = System.nanoTime();
 	/**
 	 * -- GETTER -- Returns the App's main window stage.
-	 *
-	 * @return
 	 */
 	@Getter
 	private Stage primaryStage;
 	private BorderPane rootLayout;
 	/**
 	 * -- GETTER --
-	 *
-	 * @return the mbarCtrl
 	 */
 	@Getter
 	private MenuBarController mbarCtrl;
 	private TabsController tabsCtrl;
 	/**
 	 * -- GETTER -- Returns the File path of the opened Document.
-	 *
-	 * @return
 	 */
 	@Getter
 	private Path openedDocPath;
@@ -346,17 +340,13 @@ public class SettingsEditorApplication extends Application {
 			hasUnsavedFileChanges = false;
 			updateAppTitle();
 			updateValueDefsUnchangedState();
-			log.trace("opened mpq within {}ms.", (System.nanoTime() - time) / 1_000_000);
+			log.trace("saved mpq within {}ms.", (System.nanoTime() - time) / 1_000_000);
 		} catch (final InterruptedException e) {
 			Thread.currentThread().interrupt();
 		} catch (final Exception e) {
 			log.error("Failed to save MPQ.", e);
 			showErrorAlert(e);
 		}
-	}
-	
-	private void updateValueDefsUnchangedState() {
-		this.layoutExtReader.updateValueDefsUnchangedState();
 	}
 	
 	/**
@@ -397,6 +387,10 @@ public class SettingsEditorApplication extends Application {
 			}
 			getPrimaryStage().setTitle(sb.toString());
 		});
+	}
+	
+	private void updateValueDefsUnchangedState() {
+		this.layoutExtReader.updateValueDefsUnchangedState();
 	}
 	
 	/**

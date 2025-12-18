@@ -18,6 +18,7 @@ module ObserverUiSettingsEditor {
 	requires org.apache.commons.beanutils; // to interact with INI files with apache commons configuration2
 	
 	requires GalaxyLib;
+	requires org.jspecify;
 	exports com.ahli.hotkey_ui.application to javafx.graphics;
 	exports com.ahli.hotkey_ui.application.controllers to javafx.fxml;
 	exports com.ahli.hotkey_ui.application.model to javafx.fxml; // for the TabsController

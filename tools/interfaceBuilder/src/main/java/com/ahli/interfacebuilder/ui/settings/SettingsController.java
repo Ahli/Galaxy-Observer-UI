@@ -132,7 +132,7 @@ public class SettingsController implements Updateable, FxmlController {
 			try {
 				return loader.load(path);
 			} catch (final IOException e) {
-				log.error(String.format("failed to load FXML: %s.", path), e);
+				log.error("failed to load FXML: {}.", path, e);
 			}
 			return null;
 		}

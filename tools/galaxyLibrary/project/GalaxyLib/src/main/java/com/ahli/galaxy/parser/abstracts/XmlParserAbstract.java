@@ -5,7 +5,7 @@ package com.ahli.galaxy.parser.abstracts;
 
 import com.ahli.galaxy.parser.interfaces.ParsedXmlConsumer;
 import com.ahli.galaxy.parser.interfaces.XmlParser;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public abstract class XmlParserAbstract implements XmlParser {
 	

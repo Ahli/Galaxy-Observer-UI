@@ -86,12 +86,16 @@ public class NavigationController {
 		
 		notificationBar.setVisible(false);
 		notificationBar.managedProperty().bind(notificationBar.visibleProperty());
-		notificationBar.setBackground(new Background(new BackgroundFill(Color.color(211.0D / 256.0D,
-				168.0D / 255.0D,
-				3.0D / 255.0D), CornerRadii.EMPTY, Insets.EMPTY)));
-		selectedMarker.setBackground(new Background(new BackgroundFill(Color.color(211.0D / 256.0D,
-				168.0D / 255.0D,
-				3.0D / 255.0D), CornerRadii.EMPTY, Insets.EMPTY)));
+		notificationBar.setBackground(new Background(new BackgroundFill(
+				Color.color(
+						211.0D / 256.0D,
+						168.0D / 255.0D,
+						3.0D / 255.0D), CornerRadii.EMPTY, Insets.EMPTY)));
+		selectedMarker.setBackground(new Background(new BackgroundFill(
+				Color.color(
+						211.0D / 256.0D,
+						168.0D / 255.0D,
+						3.0D / 255.0D), CornerRadii.EMPTY, Insets.EMPTY)));
 		
 		// content pages
 		initFXML("classpath:view/Home.fxml", 0);
@@ -113,7 +117,7 @@ public class NavigationController {
 			final Object controller = loader.getController();
 			controllers[index] = (controller instanceof final Updateable updateable) ? updateable : null;
 		} catch (final IOException e) {
-			log.error(String.format("failed to load FXML: %s.", path), e);
+			log.error("failed to load FXML: {}.", path, e);
 			contentPages[index] = null;
 			controllers[index] = null;
 		}

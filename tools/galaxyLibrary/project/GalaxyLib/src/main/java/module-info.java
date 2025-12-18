@@ -8,9 +8,10 @@ module GalaxyLib {
 	//	requires vtd.xml;
 	
 	requires transitive java.xml;
-	requires transitive org.jetbrains.annotations;
+	//	requires transitive org.jetbrains.annotations;
 	requires org.slf4j;
 	requires com.fasterxml.aalto;
+	requires org.jspecify;
 	
 	exports com.ahli.cloning;
 	exports com.ahli.files;

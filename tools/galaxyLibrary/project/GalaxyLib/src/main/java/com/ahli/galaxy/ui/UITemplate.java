@@ -13,12 +13,12 @@ import java.util.Objects;
 /**
  * @author Ahli
  */
+@Getter
 public class UITemplate implements DeepCopyable {
-	@Getter
 	private String fileName;
 	@Setter
-	@Getter
 	private UIElement element;
+	@Setter
 	private boolean isLocked;
 	
 	private UITemplate() {
@@ -42,14 +42,6 @@ public class UITemplate implements DeepCopyable {
 		final UITemplate clone = new UITemplate(fileName, (UIElement) element.deepCopy());
 		clone.isLocked = isLocked;
 		return clone;
-	}
-	
-	public boolean isLocked() {
-		return isLocked;
-	}
-	
-	public void setLocked(final boolean isLocked) {
-		this.isLocked = isLocked;
 	}
 	
 	public UIElement receiveFrameFromPath(final String path) {

@@ -5,6 +5,7 @@ package com.ahli.mpq;
 
 import com.ahli.xml.XmlDomHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -122,14 +123,16 @@ public final class XmlCompressorDom {
 		private final int ignoreCommentCountPerFile;
 		
 		private FileProcessor(
-				final DocumentBuilder dBuilder, final Transformer transformer, final int ignoreCommentCountPerFile) {
+				final DocumentBuilder dBuilder,
+				final Transformer transformer,
+				final int ignoreCommentCountPerFile) {
 			this.dBuilder = dBuilder;
 			this.transformer = transformer;
 			this.ignoreCommentCountPerFile = ignoreCommentCountPerFile;
 		}
 		
 		@Override
-		public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) {
+		public @NonNull FileVisitResult visitFile(final Path file, final @NonNull BasicFileAttributes attrs) {
 			
 			String fileStr =
 					file.toString().substring(file.toString().lastIndexOf(File.separatorChar) + 1).toLowerCase();
@@ -178,7 +181,8 @@ public final class XmlCompressorDom {
 		}
 		
 		@Override
-		public FileVisitResult visitFileFailed(final Path file, final IOException exc) throws IOException {
+		public @NonNull FileVisitResult visitFileFailed(final @NonNull Path file, final IOException exc)
+				throws IOException {
 			log.error("Failed to access file: {}", file);
 			throw exc;
 		}

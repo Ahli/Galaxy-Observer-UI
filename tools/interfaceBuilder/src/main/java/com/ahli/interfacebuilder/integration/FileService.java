@@ -4,6 +4,7 @@
 package com.ahli.interfacebuilder.integration;
 
 import com.ahli.files.FileCountingVisitor;
+import org.jspecify.annotations.NonNull;
 import org.springframework.util.FileSystemUtils;
 
 import java.io.IOException;
@@ -168,7 +169,7 @@ public class FileService {
 		private final List<Path> paths = new ArrayList<>();
 		
 		@Override
-		public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) {
+		public @NonNull FileVisitResult visitFile(final @NonNull Path file, final @NonNull BasicFileAttributes attrs) {
 			paths.add(file);
 			return FileVisitResult.CONTINUE;
 		}

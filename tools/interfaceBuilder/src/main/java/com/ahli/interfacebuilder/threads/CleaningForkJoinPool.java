@@ -3,7 +3,7 @@
 
 package com.ahli.interfacebuilder.threads;
 
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.NonNull;
 
 import java.io.Serial;
 import java.util.concurrent.ForkJoinPool;

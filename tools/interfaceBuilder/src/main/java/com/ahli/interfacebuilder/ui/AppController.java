@@ -212,8 +212,11 @@ public class AppController {
 		try {
 			if (baseUiService.isOutdated(GameType.SC2, false)) {
 				if (primaryStage.hasPrimaryStage()) {
-					navigationController.appendNotification(new Notification(Messages.getString(
-							"browse.notification.sc2OutOfDate"), NavigationController.BROWSE_TAB, "sc2OutOfDate"));
+					navigationController.appendNotification(new Notification(
+							Messages.getString(
+									"browse.notification.sc2OutOfDate"),
+							NavigationController.BROWSE_TAB,
+							"sc2OutOfDate"));
 				} else {
 					log.warn(Messages.getString("browse.notification.sc2OutOfDate"));
 				}
@@ -312,8 +315,6 @@ public class AppController {
 	
 	/**
 	 * Attempts to run a game with a replay, if desired.
-	 *
-	 * @return true if a process was started with a replay parameter; else false
 	 */
 	public void runGameWithReplay(final CommandLineParams params) {
 		final boolean isHeroes;

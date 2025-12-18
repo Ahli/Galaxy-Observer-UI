@@ -9,6 +9,7 @@ import com.ahli.hotkey_ui.application.model.TextValueDef;
 import com.ahli.hotkey_ui.application.model.TextValueDefType;
 import com.ahli.hotkey_ui.application.model.abstracts.ValueDef;
 import com.ahli.xml.XmlDomHelper;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
+@Getter
 @Slf4j
 public class LayoutExtensionReader {
 	private static final String ATTRIBUTE_CONSTANT = "constant";
@@ -45,7 +47,13 @@ public class LayoutExtensionReader {
 	private static final Pattern HOTKEY_SETTING_REGEX_PATTERN = Pattern.compile("(?<=@hotkey|@setting)/i");
 	private static final Pattern ATTRIBUTES_REGEX_PATTERN = Pattern.compile(
 			"(?i)(?=(?:constant|default|description|values|valuesdisplaynames|type|gamestrings_add)\\s*=)");
+	/**
+	 * -- GETTER --
+	 */
 	private final List<TextValueDef> hotkeys = new ArrayList<>();
+	/**
+	 * -- GETTER --
+	 */
 	private final List<ValueDef> settings = new ArrayList<>();
 	
 	
@@ -68,20 +76,6 @@ public class LayoutExtensionReader {
 			values[i] = getValueWithinQuotes(values[i]);
 		}
 		return values;
-	}
-	
-	/**
-	 * @return the hotkeys
-	 */
-	public List<TextValueDef> getHotkeys() {
-		return hotkeys;
-	}
-	
-	/**
-	 * @return the settings
-	 */
-	public List<ValueDef> getSettings() {
-		return settings;
 	}
 	
 	/**

@@ -28,8 +28,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -85,6 +85,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	private final DeduplicationIntensity deduplicationIntensity;
 	private final boolean deduplicateDuringParsing;
 	private final boolean deduplicatePostProcessing;
+	private final Set<StringMapping> editedTemplatesMappings;
 	private int attributeDeduplications;
 	private int constantDeduplications;
 	private UIElement curElement;
@@ -99,12 +100,11 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	private int postProcessDeduplications;
 	private boolean layoutFileDescLocked;
 	private int unnamedFrameCounter;
-	private Set<StringMapping> editedTemplatesMappings;
 	
 	public UICatalogParser(
-			@NotNull final UICatalog catalog,
-			@NotNull final XmlParser parser,
-			@NotNull final DeduplicationIntensity deduplicationIntensity) {
+			@NonNull final UICatalog catalog,
+			@NonNull final XmlParser parser,
+			@NonNull final DeduplicationIntensity deduplicationIntensity) {
 		this.catalog = catalog;
 		this.parser = parser;
 		statesToClose = new ArrayList<>();
@@ -143,14 +143,12 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		parser.setConsumer(this);
 	}
 	
-	;
-	
 	/**
 	 * Set the implicit names of controllers in animations.
 	 *
 	 * @param thisElem
 	 */
-	private static void setImplicitControllerNames(@NotNull final UIAnimation thisElem) {
+	private static void setImplicitControllerNames(@NonNull final UIAnimation thisElem) {
 		log.trace("Setting implicit controller names for UIAnimation {}", thisElem.getName());
 		final List<UIElement> controllers = thisElem.getControllers();
 		for (final UIElement uiElem : controllers) {
@@ -185,7 +183,9 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	 */
 	@Nullable
 	private static UIElement findTemplateFromList(
-			@NotNull final Iterable<UITemplate> templates, @NotNull final String fileName, @NotNull final String path) {
+			@NonNull final Iterable<UITemplate> templates,
+			@NonNull final String fileName,
+			@NonNull final String path) {
 		final String newPath = UIElement.removeLeftPathLevel(path);
 		
 		for (final UITemplate currTemplate : templates) {
@@ -207,9 +207,9 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	 * @param controllers
 	 * @return
 	 */
-	@NotNull
+	@NonNull
 	@SuppressWarnings("ObjectAllocationInLoop")
-	private static String getImplicitName(@Nullable final String type, @NotNull final List<UIElement> controllers) {
+	private static String getImplicitName(@Nullable final String type, @NonNull final List<UIElement> controllers) {
 		log.trace("Constructing implicit controller name");
 		if (type == null) {
 			log.error("'type=\"...\"' of Controller is not set or invalid.");
@@ -232,7 +232,8 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	
 	@SuppressWarnings("squid:S4973")
 	private static void copyAttributes(
-			@NotNull final List<UIAttribute> attributesSource, @NotNull final List<UIAttribute> attributesTarget) {
+			@NonNull final List<UIAttribute> attributesSource,
+			@NonNull final List<UIAttribute> attributesTarget) {
 		for (final UIAttribute attrSource : attributesSource) {
 			boolean noChanges = true;
 			final String sourceName = attrSource.getName();
@@ -262,7 +263,8 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	 * @param targetElem
 	 */
 	private static void applyTemplateElementToElement(
-			@NotNull final UIElement templateElem, @NotNull final UIElement targetElem) {
+			@NonNull final UIElement templateElem,
+			@NonNull final UIElement targetElem) {
 		log.trace("Applying template {} to element {}", templateElem.getName(), targetElem.getName());
 		
 		final List<UIElement> templateChildren;
@@ -272,19 +274,23 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				templateChildren = frame.getChildrenRaw();
 				if (targetElem instanceof final UIFrame target) {
 					// TODO do not set the undefined anchors (-> track if a side was defined or is on the initial value)
-					target.setAnchor(UIAnchorSide.TOP,
+					target.setAnchor(
+							UIAnchorSide.TOP,
 							frame.getAnchorRelative(UIAnchorSide.TOP),
 							frame.getAnchorPos(UIAnchorSide.TOP),
 							frame.getAnchorOffset(UIAnchorSide.TOP));
-					target.setAnchor(UIAnchorSide.LEFT,
+					target.setAnchor(
+							UIAnchorSide.LEFT,
 							frame.getAnchorRelative(UIAnchorSide.LEFT),
 							frame.getAnchorPos(UIAnchorSide.LEFT),
 							frame.getAnchorOffset(UIAnchorSide.LEFT));
-					target.setAnchor(UIAnchorSide.BOTTOM,
+					target.setAnchor(
+							UIAnchorSide.BOTTOM,
 							frame.getAnchorRelative(UIAnchorSide.BOTTOM),
 							frame.getAnchorPos(UIAnchorSide.BOTTOM),
 							frame.getAnchorOffset(UIAnchorSide.BOTTOM));
-					target.setAnchor(UIAnchorSide.RIGHT,
+					target.setAnchor(
+							UIAnchorSide.RIGHT,
 							frame.getAnchorRelative(UIAnchorSide.RIGHT),
 							frame.getAnchorPos(UIAnchorSide.RIGHT),
 							frame.getAnchorOffset(UIAnchorSide.RIGHT));
@@ -366,10 +372,10 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	 * @return
 	 */
 	private UIElement instanciateTemplateFromList(
-			@NotNull final List<UITemplate> templates,
-			@NotNull final String fileName,
-			@NotNull final String path,
-			@NotNull final String newName) {
+			@NonNull final List<UITemplate> templates,
+			@NonNull final String fileName,
+			@NonNull final String path,
+			@NonNull final String newName) {
 		final UIElement frameFromPath = findTemplateFromList(templates, fileName, path);
 		if (frameFromPath != null) {
 			final UIElement clone = (UIElement) frameFromPath.deepCopy();
@@ -387,7 +393,7 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	//	 * @return
 	//	 */
 	//	@Nullable
-	//	private UIElement findTemplateFromCurrentRoot(@NotNull final String fileName, @NotNull final String path) {
+	//	private UIElement findTemplateFromCurrentRoot(@NonNull final String fileName, @NonNull final String path) {
 	//		if (!fileName.equalsIgnoreCase(curFileName) || curPath.isEmpty()) {
 	//			return null;
 	//		}
@@ -399,10 +405,10 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	
 	@Override
 	public void parseFile(
-			@NotNull final Path p,
-			@NotNull final String raceId,
+			final @NonNull Path p,
+			final @NonNull String raceId,
 			final boolean isDevLayout,
-			@NotNull final String consoleSkinId) throws IOException {
+			final @NonNull String consoleSkinId) throws IOException {
 		this.raceId = raceId;
 		this.consoleSkinId = consoleSkinId;
 		curIsDevLayout = isDevLayout;
@@ -417,9 +423,9 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	@Override
 	public void parse(
 			final int level,
-			@NotNull final String tagName,
-			@NotNull final List<String> attrTypes,
-			@NotNull final List<String> attrValues) throws UIException {
+			final @NonNull String tagName,
+			final @NonNull List<String> attrTypes,
+			final @NonNull List<String> attrValues) throws UIException {
 		log.trace("level={}, tag={}", level, tagName);
 		
 		// move curElement to parent position of new frame
@@ -438,7 +444,8 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				--curLevel;
 				// curLevel - 2 because root is level 2 on list index 0
 				curElement = curPath.get(curLevel - 2);
-				log.trace("shrinking path: curElement={}, level={}\npath  pre-dropLast: {}",
+				log.trace(
+						"shrinking path: curElement={}, level={}\npath  pre-dropLast: {}",
 						curElement,
 						curLevel,
 						curPath);
@@ -548,7 +555,8 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					applyTemplateElementToElement(attrValues.get(i), newElem);
 				} else {
 					if (curExtTemplate != null) {
-						log.error("ERROR: attempting to edit '{}' within the locked layout file '{}'",
+						log.error(
+								"ERROR: attempting to edit '{}' within the locked layout file '{}'",
 								newElem.getName(),
 								curExtTemplate.getFileName());
 					}
@@ -559,7 +567,8 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					// TODO what can have a template?
 					if (FRAME.equals(tagName) || ANIMATION.equals(tagName)) {
 						if (name == null) {
-							log.error("A frame has no name, but should be instanciated with template='{}'",
+							log.error(
+									"A frame has no name, but should be instanciated with template='{}'",
 									attrValues.get(i));
 							name = "UnnamedFrame" + (++unnamedFrameCounter);
 						}
@@ -574,7 +583,8 @@ public class UICatalogParser implements ParsedXmlConsumer {
 		// prevent editing of layouts of locked templates
 		if (curExtTemplate != null && curExtTemplate.isLocked()) {
 			if (newElem != null) {
-				log.error("ERROR: attempting to edit '{}' within the locked layout file '{}'",
+				log.error(
+						"ERROR: attempting to edit '{}' within the locked layout file '{}'",
 						newElem.getName(),
 						curExtTemplate.getFileName());
 				newElem = null;
@@ -757,7 +767,8 @@ public class UICatalogParser implements ParsedXmlConsumer {
 					i = 0;
 					for (final int len = attrTypes.size(); i < len; ++i) {
 						attributeKeyValueList.add(attrTypes.get(i));
-						attributeKeyValueList.add(catalog.getConstantValue(attrValues.get(i),
+						attributeKeyValueList.add(catalog.getConstantValue(
+								attrValues.get(i),
 								raceId,
 								curIsDevLayout,
 								consoleSkinId));
@@ -809,7 +820,8 @@ public class UICatalogParser implements ParsedXmlConsumer {
 								if (stateVal != null) {
 									stateGroup.setDefaultState(stateVal);
 								} else {
-									log.error("found <DefaultState> in <StateGroup '{}'> without val",
+									log.error(
+											"found <DefaultState> in <StateGroup '{}'> without val",
 											curElement.getName());
 								}
 							} else {
@@ -858,7 +870,8 @@ public class UICatalogParser implements ParsedXmlConsumer {
 	}
 	
 	private void applyTemplateElementToElement(final String pathParam, final UIElement targetElem) {
-		log.trace("Applying Template of path {} to element {} - searching the template",
+		log.trace(
+				"Applying Template of path {} to element {} - searching the template",
 				pathParam,
 				targetElem.getName());
 		final String path = pathParam.replace('\\', '/');
@@ -958,7 +971,8 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			templateInstance = instanciateTemplateFromList(catalog.getBlizzOnlyTemplates(), fileName, path, newName);
 			if (templateInstance != null) {
 				if (!curIsDevLayout) {
-					log.error("ERROR: the non-Blizz-only frame '{}' uses a Blizz-only template '{}'.",
+					log.error(
+							"ERROR: the non-Blizz-only frame '{}' uses a Blizz-only template '{}'.",
 							curElement,
 							path);
 				}
@@ -995,7 +1009,8 @@ public class UICatalogParser implements ParsedXmlConsumer {
 			if (side == null) {
 				log.trace("relative={}, offset={}", relative, offset);
 				if (relative == null) {
-					log.error("'Anchor' attribute has no 'relative' attribute defined in parent element: {}",
+					log.error(
+							"'Anchor' attribute has no 'relative' attribute defined in parent element: {}",
 							curElement.getName());
 				} else {
 					try {
@@ -1024,7 +1039,8 @@ public class UICatalogParser implements ParsedXmlConsumer {
 				}
 				if (sideVal != null) {
 					if (offset == null) {
-						log.error("'Anchor' attribute has no 'offset' attribute defined in parent element: {}",
+						log.error(
+								"'Anchor' attribute has no 'offset' attribute defined in parent element: {}",
 								curElement.getName());
 					} else {
 						if (pos == null) {

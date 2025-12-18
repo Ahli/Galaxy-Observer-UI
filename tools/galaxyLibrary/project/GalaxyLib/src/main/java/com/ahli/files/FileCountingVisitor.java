@@ -1,6 +1,7 @@
 package com.ahli.files;
 
 import lombok.Getter;
+import org.jspecify.annotations.NonNull;
 
 import java.nio.file.FileVisitResult;
 import java.nio.file.Path;
@@ -16,7 +17,7 @@ public class FileCountingVisitor extends SimpleFileVisitor<Path> {
 	}
 	
 	@Override
-	public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) {
+	public @NonNull FileVisitResult visitFile(final @NonNull Path file, final @NonNull BasicFileAttributes attrs) {
 		++count;
 		return FileVisitResult.CONTINUE;
 	}

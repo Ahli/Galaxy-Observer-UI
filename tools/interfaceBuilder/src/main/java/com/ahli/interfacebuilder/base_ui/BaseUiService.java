@@ -34,8 +34,8 @@ import com.kichik.pecoff4j.resources.StringTable;
 import com.kichik.pecoff4j.resources.VersionInfo;
 import com.kichik.pecoff4j.util.ResourceHelper;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -101,7 +101,8 @@ public class BaseUiService {
 		final GameDef gameDef = gameService.getGameDef(gameType);
 		final Path gameBaseUI = configService.getBaseUiPath(gameDef);
 		
-		final Path switcherExePath = Path.of(gameService.getGameDirPath(gameDef, usePtr),
+		final Path switcherExePath = Path.of(
+				gameService.getGameDirPath(gameDef, usePtr),
 				gameDef.supportDirectoryX64(),
 				gameDef.switcherExeNameX64());
 		if (!Files.exists(switcherExePath)) {
@@ -137,7 +138,8 @@ public class BaseUiService {
 			isUpToDate = versionExe[i] <= versionBaseUi[i];
 		}
 		if (log.isTraceEnabled()) {
-			log.trace("Exe version check - exe={} - {} - upToDate={}",
+			log.trace(
+					"Exe version check - exe={} - {} - upToDate={}",
 					Arrays.toString(versionExe),
 					Arrays.toString(versionBaseUi),
 					isUpToDate);
@@ -166,7 +168,8 @@ public class BaseUiService {
 	 * @return version, or null if not existing
 	 */
 	public int[] getVersion(@NonNull final GameDef gameDef, final boolean isPtr) {
-		final Path path = Path.of(gameService.getGameDirPath(gameDef, isPtr),
+		final Path path = Path.of(
+				gameService.getGameDirPath(gameDef, isPtr),
 				gameDef.supportDirectoryX64(),
 				gameDef.switcherExeNameX64());
 		
@@ -218,7 +221,9 @@ public class BaseUiService {
 	 */
 	@NonNull
 	public List<ForkJoinTask<Void>> createExtractionTasks(
-			@NonNull final GameType gameType, final boolean usePtr, @NonNull final Appender[] outputs) {
+			@NonNull final GameType gameType,
+			final boolean usePtr,
+			@NonNull final Appender[] outputs) {
 		log.info("Extracting baseUI for {}", gameType);
 		
 		final GameDef gameDef = gameService.getGameDef(gameType);
@@ -232,7 +237,7 @@ public class BaseUiService {
 			}
 			discCacheService.remove(gameDef.name(), usePtr);
 		} catch (final IOException e) {
-			log.error(String.format("Directory %s could not be cleaned.", destination), e);
+			log.error("Directory {} could not be cleaned.", destination, e);
 			return Collections.emptyList();
 		}
 		
@@ -326,12 +331,14 @@ public class BaseUiService {
 				if (needToParseAgain) {
 					// parse baseUI
 					uiCatalog = new UICatalogImpl(game.getGameDef());
-					uiCatalog.setParser(new UICatalogParser(uiCatalog,
+					uiCatalog.setParser(new UICatalogParser(
+							uiCatalog,
 							new XmlParserAalto(),
 							DeduplicationIntensity.FULL));
 					primaryStage.printInfoLogMessageToGeneral("Starting to parse base " + gameName + " UI.");
 					if (primaryStage.hasPrimaryStage()) {
-						progressController.addThreadlogTab(Thread.currentThread().getName(),
+						progressController.addThreadlogTab(
+								Thread.currentThread().getName(),
 								game.getGameDef().nameHandle() + "UI",
 								false);
 					}
@@ -403,9 +410,9 @@ public class BaseUiService {
 		try {
 			return cacheIsUpToDate(gameDef, usePtr);
 		} catch (final NoSuchFileException e) {
-			log.trace(String.format("No cache exists for %s", gameDef.name()), e);
+			log.trace("No cache exists for {}", gameDef.name(), e);
 		} catch (final IOException e) {
-			log.info(String.format("Failed to check cache status of %s:", gameDef.name()), e);
+			log.info("Failed to check cache status of {}}:", gameDef.name(), e);
 		}
 		return false;
 	}
@@ -473,7 +480,7 @@ public class BaseUiService {
 		}
 		
 		@Override
-		public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) {
+		public @NonNull FileVisitResult visitFile(final Path file, final @NonNull BasicFileAttributes attrs) {
 			if (descIndexFileName.equalsIgnoreCase(file.getFileName().toString())) {
 				log.info("parsing descIndexFile '{}'", file);
 				try {
@@ -558,7 +565,8 @@ public class BaseUiService {
 				@NonNull final String mask,
 				@NonNull final Path destination,
 				@Nullable final Appender out) throws IOException, InterruptedException {
-			final ProcessBuilder pb = new ProcessBuilder(extractorExe.getAbsolutePath(),
+			final ProcessBuilder pb = new ProcessBuilder(
+					extractorExe.getAbsolutePath(),
 					gamePath + File.separator,
 					mask,
 					destination + File.separator);
@@ -629,7 +637,7 @@ public class BaseUiService {
 		private void writeToMetaFile(
 				@NonNull final Path directory,
 				@NonNull final String gameName,
-				@NonNull final int[] version,
+				final int @NonNull [] version,
 				final boolean isPtr) throws IOException {
 			final Path path = directory.resolve(META_FILE_NAME);
 			final KryoGameInfo metaInfo = new KryoGameInfo(version, gameName, isPtr);

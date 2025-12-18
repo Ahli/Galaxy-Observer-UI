@@ -16,8 +16,8 @@ import javafx.scene.effect.DropShadow;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.lang.NonNull;
+import org.apache.commons.lang3.Strings;
+import org.jspecify.annotations.NonNull;
 
 public class TextFlowFactory {
 	
@@ -87,7 +87,7 @@ public class TextFlowFactory {
 		int count = 1;
 		int index = -1;
 		if (query != null && !query.isEmpty()) {
-			index = StringUtils.indexOfIgnoreCase(label, query);
+			index = Strings.CI.indexOf(label, query);
 			if (index > -1) {
 				// match in the front = 2 segments; match in the middle = 3 segments
 				count += (index > 0 ? 2 : 1);

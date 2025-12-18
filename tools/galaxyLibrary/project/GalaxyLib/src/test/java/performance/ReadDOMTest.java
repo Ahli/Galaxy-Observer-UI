@@ -25,7 +25,7 @@ final class ReadDOMTest {
 	private ReadDOMTest() {
 	}
 	
-	public static void main(final String[] args) {
+	static void main(final String[] args) {
 		final long endMem;
 		int iterations = 0;
 		try {

@@ -6,8 +6,8 @@ package com.ahli.galaxy.archive;
 import com.ahli.galaxy.game.GameDef;
 import com.ahli.xml.XmlDomHelper;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -46,8 +46,8 @@ public final class ComponentsListReaderDom {
 	 * @throws SAXException
 	 * @throws ParserConfigurationException
 	 */
-	@NotNull
-	public static String getDescIndexPath(@NotNull final Path componentsListFile, @NotNull final GameDef game)
+	@NonNull
+	public static String getDescIndexPath(@NonNull final Path componentsListFile, @NonNull final GameDef game)
 			throws ParserConfigurationException, SAXException, IOException {
 		final String str =
 				game.baseDataFolderName() + File.separator + getComponentsListValue(componentsListFile, UIUI);
@@ -68,7 +68,7 @@ public final class ComponentsListReaderDom {
 	 * @throws SAXException
 	 */
 	@Nullable
-	public static String getComponentsListValue(@NotNull final Path compListFile, @NotNull final String typeVal)
+	public static String getComponentsListValue(@NonNull final Path compListFile, @NonNull final String typeVal)
 			throws ParserConfigurationException, SAXException, IOException {
 		
 		final DocumentBuilder dBuilder = XmlDomHelper.buildSecureDocumentBuilder(false, true);

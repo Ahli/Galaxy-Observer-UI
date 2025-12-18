@@ -1,5 +1,7 @@
 package com.ahli.hotkey_ui.application.integration;
 
+import org.jspecify.annotations.NonNull;
+
 import java.nio.file.FileVisitResult;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
@@ -11,7 +13,7 @@ public class FileListingVisitor extends SimpleFileVisitor<Path> {
 	private final List<Path> paths = new ArrayList<>();
 	
 	@Override
-	public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) {
+	public @NonNull FileVisitResult visitFile(final @NonNull Path file, final @NonNull BasicFileAttributes attrs) {
 		paths.add(file);
 		return FileVisitResult.CONTINUE;
 	}

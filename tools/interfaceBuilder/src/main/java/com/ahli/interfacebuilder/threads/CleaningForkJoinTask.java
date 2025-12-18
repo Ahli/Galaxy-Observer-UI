@@ -5,7 +5,7 @@ package com.ahli.interfacebuilder.threads;
 
 import com.ahli.interfacebuilder.integration.log4j.StylizedTextAreaAppender;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.NonNull;
 
 import java.io.Serial;
 import java.util.concurrent.ForkJoinTask;

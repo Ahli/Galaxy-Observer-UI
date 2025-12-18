@@ -18,7 +18,7 @@ package com.ahli.memory.interner;
  * limitations under the License.
  */
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
@@ -55,7 +55,7 @@ public class ConcurrentWeakWeakHashMap<K> implements ConcurrentMap<K, K> {
 	}
 	
 	@Override
-	public K putIfAbsent(final @NotNull K key, final K value) {
+	public K putIfAbsent(final @NonNull K key, final K value) {
 		purgeKeys();
 		final var weakRef = newKey(key);
 		final var result = map.putIfAbsent(weakRef, weakRef);
@@ -83,13 +83,13 @@ public class ConcurrentWeakWeakHashMap<K> implements ConcurrentMap<K, K> {
 	}
 	
 	@Override
-	public boolean remove(final @NotNull Object key, final Object value) {
+	public boolean remove(final @NonNull Object key, final Object value) {
 		purgeKeys();
 		return map.remove(new WeakReferenceWithHash<>(key), key);
 	}
 	
 	@Override
-	public boolean replace(final @NotNull K key, final @NotNull K oldValue, final @NotNull K newValue) {
+	public boolean replace(final @NonNull K key, final @NonNull K oldValue, final @NonNull K newValue) {
 		purgeKeys();
 		final var weakKeyRefKey = newKey(key);
 		// TODO I guess this is wrong, but I don't use it...
@@ -97,7 +97,7 @@ public class ConcurrentWeakWeakHashMap<K> implements ConcurrentMap<K, K> {
 	}
 	
 	@Override
-	public K replace(final @NotNull K key, final @NotNull K value) {
+	public K replace(final @NonNull K key, final @NonNull K value) {
 		purgeKeys();
 		final var weakKeyRef = newKey(key);
 		final var result = map.replace(weakKeyRef, weakKeyRef);
@@ -167,7 +167,7 @@ public class ConcurrentWeakWeakHashMap<K> implements ConcurrentMap<K, K> {
 	}
 	
 	@Override
-	public @NotNull Set<K> keySet() {
+	public @NonNull Set<K> keySet() {
 		return new WeakHashMapKeySet<>(this);
 	}
 	
@@ -178,7 +178,7 @@ public class ConcurrentWeakWeakHashMap<K> implements ConcurrentMap<K, K> {
 	}
 	
 	@Override
-	public @NotNull Collection<K> values() {
+	public @NonNull Collection<K> values() {
 		purgeKeys();
 		final var values = map.values();
 		final Collection<K> coll = new ArrayList<>(values.size());
@@ -189,7 +189,7 @@ public class ConcurrentWeakWeakHashMap<K> implements ConcurrentMap<K, K> {
 	}
 	
 	@Override
-	public @NotNull Set<Entry<K, K>> entrySet() {
+	public @NonNull Set<Entry<K, K>> entrySet() {
 		return new WeakHashMapEntrySet<>(this);
 	}
 	
@@ -270,7 +270,7 @@ public class ConcurrentWeakWeakHashMap<K> implements ConcurrentMap<K, K> {
 		}
 		
 		@Override
-		public @NotNull Iterator<K> iterator() {
+		public @NonNull Iterator<K> iterator() {
 			weakHashMap.purgeKeys();
 			return new WeakHashMapKeySetIterator<>(weakHashMap.map.keySet().iterator());
 		}
@@ -327,7 +327,7 @@ public class ConcurrentWeakWeakHashMap<K> implements ConcurrentMap<K, K> {
 		}
 		
 		@Override
-		public @NotNull Iterator<Entry<K, K>> iterator() {
+		public @NonNull Iterator<Entry<K, K>> iterator() {
 			weakHashMap.purgeKeys();
 			return new WeakHashMapEntrySetIterator<>(weakHashMap.map.entrySet().iterator());
 		}

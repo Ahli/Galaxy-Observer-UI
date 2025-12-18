@@ -30,7 +30,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.NonNull;
 
 public class BaseUiExtractionController implements Updateable, FxmlController {
 	
@@ -143,7 +143,8 @@ public class BaseUiExtractionController implements Updateable, FxmlController {
 		stateImage2.setVisible(true);
 		stateImage3.setVisible(true);
 		
-		final ExtractBaseUiTask task = new ExtractBaseUiTask(executor,
+		final ExtractBaseUiTask task = new ExtractBaseUiTask(
+				executor,
 				baseUiService,
 				gameType,
 				usePtr,
@@ -159,7 +160,9 @@ public class BaseUiExtractionController implements Updateable, FxmlController {
 		
 		@Override
 		public void changed(
-				final ObservableValue<? extends Boolean> observable, final Boolean oldValue, final Boolean newValue) {
+				final ObservableValue<? extends Boolean> observable,
+				final Boolean oldValue,
+				final Boolean newValue) {
 			// the text children are added after the UI updates
 			Platform.runLater(() -> {
 				boolean isError = false;

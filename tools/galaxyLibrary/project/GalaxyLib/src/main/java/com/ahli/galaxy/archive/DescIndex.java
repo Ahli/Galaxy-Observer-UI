@@ -9,7 +9,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.tuple.Tuples;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -61,7 +61,7 @@ public class DescIndex {
 	 * @param mpqi
 	 * 		MpqInterface
 	 */
-	public DescIndex(@NotNull final MpqInterface mpqi) {
+	public DescIndex(@NonNull final MpqInterface mpqi) {
 		this.mpqi = mpqi;
 		fileIntPathList = new ArrayList<>();
 	}
@@ -69,7 +69,7 @@ public class DescIndex {
 	/**
 	 * @param descIndexPath
 	 */
-	public void setDescIndexPathAndClear(@NotNull final String descIndexPath) {
+	public void setDescIndexPathAndClear(@NonNull final String descIndexPath) {
 		clear();
 		setDescIndexIntPath(descIndexPath);
 	}
@@ -84,7 +84,7 @@ public class DescIndex {
 	/**
 	 * @param descIndexIntPath
 	 */
-	public void setDescIndexIntPath(@NotNull final String descIndexIntPath) {
+	public void setDescIndexIntPath(@NonNull final String descIndexIntPath) {
 		this.descIndexIntPath = descIndexIntPath;
 	}
 	
@@ -92,7 +92,7 @@ public class DescIndex {
 	 * @param layoutPathList
 	 * @throws MpqException
 	 */
-	public void addLayoutIntPath(@NotNull final Iterable<String> layoutPathList) throws MpqException {
+	public void addLayoutIntPath(@NonNull final Iterable<String> layoutPathList) throws MpqException {
 		for (final String aLayoutPathList : layoutPathList) {
 			addLayoutIntPath(aLayoutPathList);
 		}
@@ -102,7 +102,7 @@ public class DescIndex {
 	 * @param intPath
 	 * @throws MpqException
 	 */
-	public void addLayoutIntPath(@NotNull final String intPath) throws MpqException {
+	public void addLayoutIntPath(@NonNull final String intPath) throws MpqException {
 		String intPath2 = intPath;
 		Path p = mpqi.getFilePathFromMpq(intPath);
 		if (!Files.exists(p)) {

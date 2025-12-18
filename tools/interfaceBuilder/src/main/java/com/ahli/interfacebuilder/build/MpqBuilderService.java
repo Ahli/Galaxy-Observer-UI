@@ -31,7 +31,7 @@ import com.ahli.mpq.mpqeditor.MpqEditorCompressionRuleMethod;
 import com.ahli.mpq.mpqeditor.MpqEditorCompressionRuleSize;
 import com.ahli.mpq.mpqeditor.MpqEditorInterface;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.NonNull;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -173,7 +173,9 @@ public class MpqBuilderService {
 	 * @param project
 	 */
 	public void buildSpecificUI(
-			@NonNull final Game game, final boolean useCmdLineSettings, @NonNull final Project project) {
+			@NonNull final Game game,
+			final boolean useCmdLineSettings,
+			@NonNull final Project project) {
 		if (executor.isShutdown()) {
 			log.error("ERROR: Executor shut down. Skipping building a UI...");
 			return;
@@ -191,7 +193,8 @@ public class MpqBuilderService {
 		
 		if (game.getUiCatalog() == null && verifyLayout) {
 			// parse default UI
-			throw new IllegalStateException(String.format("Base UI of game '%s' has not been parsed.",
+			throw new IllegalStateException(String.format(
+					"Base UI of game '%s' has not been parsed.",
 					game.getGameDef().name()));
 		}
 		
@@ -201,8 +204,10 @@ public class MpqBuilderService {
 				progressController.addBuildTab(Thread.currentThread().getName(), project, true);
 			}
 			// create unique cache path
-			final MpqEditorInterface threadsMpqInterface = new MpqEditorInterface(configService.getMpqCachePath()
-					.resolve(Long.toString(Thread.currentThread().threadId())), configService.getMpqEditorPath());
+			final MpqEditorInterface threadsMpqInterface =
+					new MpqEditorInterface(
+							configService.getMpqCachePath().resolve(Long.toString(Thread.currentThread().threadId())),
+							configService.getMpqEditorPath());
 			
 			// work
 			final boolean compressXml;
@@ -236,7 +241,8 @@ public class MpqBuilderService {
 				threadsMpqInterface.setCustomCompressionRules(ruleSet.getCompressionRules());
 			}
 			threadsMpqInterface.clearCacheExtractedMpq();
-			buildFile(interfaceDirectory,
+			buildFile(
+					interfaceDirectory,
 					game,
 					threadsMpqInterface,
 					compressXml,
@@ -398,7 +404,8 @@ public class MpqBuilderService {
 		log.info("Compiling... {}", sourceFile.getFileName());
 		
 		// perform checks/improvements on code
-		compileService.compile(mod,
+		compileService.compile(
+				mod,
 				configService.getRaceId(),
 				repairLayoutOrder,
 				verifyLayout,
@@ -409,7 +416,8 @@ public class MpqBuilderService {
 		
 		final String sourceFileName = sourceFile.getFileName().toString();
 		try {
-			mpqi.buildMpq(targetFile,
+			mpqi.buildMpq(
+					targetFile,
 					sourceFileName,
 					compressXml,
 					getCompressionModeOfSetting(compressMpq),
