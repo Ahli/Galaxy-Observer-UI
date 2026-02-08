@@ -1,6 +1,6 @@
-import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-import { NavBarLinkData } from '../../types/NavBarItemData';
+import { ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
+import { useNavigate } from "react-router";
+import { NavBarLinkData } from "../../types/NavBarItemData";
 
 export type NavBarLinkProps = {
   linkData: NavBarLinkData;
